@@ -14,4 +14,6 @@ public interface DepotRepository {
     Depot viewById(DepotId depotId);
 
     List<Depot> findAll();
+
+    void saveAll(List<Depot> depots);
 }

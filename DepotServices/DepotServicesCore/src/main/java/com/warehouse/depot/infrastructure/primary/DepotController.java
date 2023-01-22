@@ -21,6 +21,11 @@ public class DepotController {
         depotService.add(depot);
     }
 
+    @PostMapping("/save/multiple")
+    public void add(@RequestBody List<DepotDto> depots) {
+        depotService.addMultipleDepots(depots);
+    }
+
     @GetMapping("/depotId/{value}")
     public DepotDto viewDepotById(DepotIdDto depotId) {
         return depotService.viewDepotById(depotId);

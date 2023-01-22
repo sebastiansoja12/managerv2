@@ -12,7 +12,7 @@ public class RouteRequest {
 
     UUID id;
     Long parcelId;
-    String username;
-    String supplierCode;
-    String depotCode;
+    Long userId;
+    Long supplierId;
+    Long depotId;
 }

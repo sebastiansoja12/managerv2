@@ -6,7 +6,7 @@ import com.warehouse.supplier.dto.SupplyResponseDto;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/v2/api/delivery")
+@RequestMapping("/v2/api/deliveries")
 @RestController
 @AllArgsConstructor
 public class DeliveryController {

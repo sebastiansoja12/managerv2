@@ -10,7 +10,7 @@ import lombok.Value;
 public class RouteRequestDto {
 
     Long parcelId;
-    String username;
-    String supplierCode;
-    String depotCode;
+    Long userId;
+    Long supplierId;
+    Long depotId;
 }

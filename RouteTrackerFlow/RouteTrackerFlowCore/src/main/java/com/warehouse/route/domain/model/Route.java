@@ -19,12 +19,12 @@ public class Route {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     LocalDateTime created;
 
-    String username;
+    Long userId;
 
     Long parcelId;
 
-    String depotCode;
+    Long depotId;
 
-    String supplierCode;
+    Long supplierId;
 
 }

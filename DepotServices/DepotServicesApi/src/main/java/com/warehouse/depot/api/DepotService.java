@@ -10,6 +10,8 @@ public interface DepotService {
 
     void add(DepotDto depot);
 
+    void addMultipleDepots(List<DepotDto> depot);
+
     DepotDto viewDepotById(DepotIdDto depotIdDto);
 
     DepotDto viewDepotByCode(DepotCodeDto depotCodeDto);

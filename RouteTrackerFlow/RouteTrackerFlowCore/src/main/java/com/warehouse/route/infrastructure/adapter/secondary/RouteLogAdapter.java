@@ -4,6 +4,7 @@ import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
 import com.warehouse.route.domain.port.secondary.RouteTrackerServicePort;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteMapper;
@@ -31,14 +32,14 @@ public class RouteLogAdapter implements RouteTrackerServicePort {
     }
 
     @Override
-    public List<Route> findByParcelId(Long parcelId) {
+    public List<Routes> findByParcelId(Long parcelId) {
         return routeRepository.findByParcelId(parcelId);
     }
 
     @Override
-    public List<Route> findByUsername(String username) {
+    public List<Routes> findByUsername(String username) {
         return routeRepository.findByUsername(username).stream()
-                .sorted(Comparator.comparing(Route::getCreated).reversed())
+                .sorted(Comparator.comparing(Routes::getCreated).reversed())
                 .limit(10)
                 .collect(Collectors.toList());
     }

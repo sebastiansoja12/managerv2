@@ -6,7 +6,7 @@
 
     <groupId>com.warehouse</groupId>
     <artifactId>TokenStage</artifactId>
-    <version>2022.15-SNAPSHOT</version>
+    <version>2023.1-SNAPSHOT</version>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -19,7 +19,6 @@
             <version>2.7.2</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>

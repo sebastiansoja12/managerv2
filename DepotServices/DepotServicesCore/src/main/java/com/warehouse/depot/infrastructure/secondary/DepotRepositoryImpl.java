@@ -27,20 +27,29 @@ public class DepotRepositoryImpl implements DepotRepository {
 
     @Override
     public Depot viewByCode(DepotCode depotCode) {
-        return repository.findByDepotCode(depotCode.getValue()).map(depotMapper::map).orElseThrow(
+        final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode.getValue());
+        return depot.map(depotMapper::map).orElseThrow(
                 () -> new DepotNotFoundException("Depot was not found")
         );
     }
 
     @Override
     public Depot viewById(DepotId depotId) {
-        return repository.findById(depotId.getValue()).map(depotMapper::map).orElseThrow(
+        final Optional<DepotEntity> depot = repository.findById(depotId.getValue());
+        return depot.map(depotMapper::map).orElseThrow(
                 () -> new DepotNotFoundException("Depot was not found")
         );
     }
 
     @Override
     public List<Depot> findAll() {
-        return depotMapper.map(repository.findAll());
+        final List<DepotEntity> depots = repository.findAll();
+        return depotMapper.map(depots);
+    }
+
+    @Override
+    public void saveAll(List<Depot> depots) {
+        final List<DepotEntity> depotEntities = depotMapper.mapToDepotEntityList(depots);
+        repository.saveAll(depotEntities);
     }
 }

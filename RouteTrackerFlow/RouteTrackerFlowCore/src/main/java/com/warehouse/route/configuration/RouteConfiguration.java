@@ -23,14 +23,9 @@ import org.springframework.context.annotation.Configuration;
 public class  RouteConfiguration {
 
     @Bean
-    public RouteRepository routeRepository(RouteReadRepository routeReadRepository,
-                                           RouteDepotReadRepository routeDepotReadRepository,
-                                           ParcelReadRepository parcelReadRepository,
-                                           RouteSupplierReadRepository routeSupplierReadRepository,
-                                           UserReadRepository userReadRepository) {
+    public RouteRepository routeRepository(RouteReadRepository routeReadRepository) {
         final RouteModelMapper routeModelMapper = Mappers.getMapper(RouteModelMapper.class);
-        return new RouteRepositoryImpl(routeReadRepository, routeModelMapper, routeDepotReadRepository,
-                parcelReadRepository, routeSupplierReadRepository, userReadRepository);
+        return new RouteRepositoryImpl(routeReadRepository, routeModelMapper);
     }
 
     @Bean

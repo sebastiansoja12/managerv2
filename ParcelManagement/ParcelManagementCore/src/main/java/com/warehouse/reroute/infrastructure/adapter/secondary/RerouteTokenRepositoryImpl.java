@@ -7,21 +7,21 @@ import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.infrastructure.adapter.entity.RerouteTokenEntity;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
+@Slf4j
+@AllArgsConstructor
 public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
 
     private final RerouteTokenMapper rerouteTokenMapper;
 
     private final RerouteTokenReadRepository repository;
 
-    public RerouteTokenRepositoryImpl(RerouteTokenMapper rerouteTokenMapper, RerouteTokenReadRepository repository) {
-        this.rerouteTokenMapper = rerouteTokenMapper;
-        this.repository = repository;
-    }
+    private final Long EXPIRY_TIME = 600L;
 
 
     @Override
@@ -52,14 +52,16 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
 
     @Scheduled(cron = "${purge.cron.expression}")
     public void purgeExpired() {
+        log.warn("Cleanup database from expired reroute tokens");
         repository.deleteAllExpiredSince(Instant.now());
+        log.info("Expired reroute tokens have been successfully deleted");
     }
 
     private RerouteTokenEntity generateRerouteToken(Long parcelId) {
         final RerouteToken rerouteToken = new RerouteToken();
         rerouteToken.setToken(rerouteToken.generateToken());
         rerouteToken.setCreatedDate(Instant.now());
-        rerouteToken.setExpiryDate(Instant.now().plusSeconds(600L));
+        rerouteToken.setExpiryDate(Instant.now().plusSeconds(EXPIRY_TIME));
         rerouteToken.setParcelId(parcelId);
         return rerouteTokenMapper.map(rerouteToken);
     }

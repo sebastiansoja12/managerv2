@@ -19,4 +19,8 @@ public interface DepotMapper {
     Depot map(DepotEntity depot);
 
     List<Depot> map(List<DepotEntity> depots);
+
+    List<DepotEntity> mapToDepotEntityList(List<Depot> depots);
+
+
 }

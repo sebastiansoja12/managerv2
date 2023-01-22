@@ -1,12 +1,12 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
+import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import lombok.AllArgsConstructor;
 
-import java.util.Optional;
 
 @AllArgsConstructor
 public class ShipmentRepositoryImpl implements ShipmentRepository {
@@ -32,8 +32,10 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     @Override
     public Parcel loadParcelById(Long parcelId) {
-        final Optional<ParcelEntity> entity = repository.findParcelEntityById(parcelId);
+        final ParcelEntity entity = repository.findParcelEntityById(parcelId).orElseThrow(
+                () -> new ParcelNotFoundException("Parcel was not found")
+        );
 
-        return parcelMapper.map(entity.get());
+        return parcelMapper.map(entity);
     }
 }

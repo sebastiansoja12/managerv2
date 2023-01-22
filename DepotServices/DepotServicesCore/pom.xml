@@ -5,7 +5,7 @@
     <parent>
         <artifactId>DepotServices</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2022.15-SNAPSHOT</version>
+        <version>2023.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>

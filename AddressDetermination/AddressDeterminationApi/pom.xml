@@ -6,14 +6,14 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>AddressDetermination</artifactId>
-        <version>2022.15-SNAPSHOT</version>
+        <version>2023.1-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>DepotServicesApi</artifactId>
-            <version>2022.15-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -30,6 +30,12 @@ public class DepotServiceAdapter implements DepotService {
     }
 
     @Override
+    public void addMultipleDepots(List<DepotDto> depot) {
+        final List<Depot> depots = requestMapper.map(depot);
+        depotPort.addMultipleDepots(depots);
+    }
+
+    @Override
     public DepotDto viewDepotById(DepotIdDto depotIdDto) {
         final DepotId depotId = requestMapper.map(depotIdDto);
         final Depot depot = depotPort.viewDepotById(depotId);

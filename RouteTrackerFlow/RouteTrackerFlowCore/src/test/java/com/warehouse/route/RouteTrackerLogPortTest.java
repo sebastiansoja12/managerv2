@@ -37,7 +37,7 @@ public class RouteTrackerLogPortTest {
         // given
         final SupplyInformation supplyInformation = SupplyInformation.builder()
                 .username("")
-                .supplierCode("TST")
+                .supplierId(1L)
                 .created(LocalDateTime.now())
                 .parcelId(1L)
                 .depotCode("")
@@ -62,6 +62,4 @@ public class RouteTrackerLogPortTest {
         // then
         assertEquals(expectedResponse.getId(), actualResponse.getId());
     }
-
-
 }

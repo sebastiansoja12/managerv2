@@ -15,4 +15,6 @@ public interface DepotSecondaryPort {
     Depot viewById(DepotId depotId);
 
     List<Depot> findAll();
+
+    void addMultiple(List<Depot> depots);
 }

@@ -7,7 +7,7 @@
     <groupId>com.warehouse</groupId>
     <artifactId>SupplyOperation</artifactId>
     <packaging>pom</packaging>
-    <version>2022.15-SNAPSHOT</version>
+    <version>2023.1-SNAPSHOT</version>
     <modules>
         <module>SupplyOperationApi</module>
         <module>SupplyOperationCore</module>

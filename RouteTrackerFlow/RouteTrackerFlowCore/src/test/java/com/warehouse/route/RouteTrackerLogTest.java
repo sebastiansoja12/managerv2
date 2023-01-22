@@ -36,7 +36,7 @@ public class RouteTrackerLogTest {
                 .created(LocalDateTime.now())
                 .depotCode("KT1")
                 .parcelId(100001L)
-                .supplierCode("SEB_KT1")
+                .supplierId(1L)
                 .username("s-soja")
                 .build();
         final RouteResponse response = new RouteResponse(ROUTE_ID);

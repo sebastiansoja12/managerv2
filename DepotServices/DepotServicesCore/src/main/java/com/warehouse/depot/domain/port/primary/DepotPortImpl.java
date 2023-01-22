@@ -33,4 +33,9 @@ public class DepotPortImpl implements DepotPort {
     public List<Depot> findAll() {
         return depotSecondaryPort.findAll();
     }
+
+    @Override
+    public void addMultipleDepots(List<Depot> depots) {
+        depotSecondaryPort.addMultiple(depots);
+    }
 }

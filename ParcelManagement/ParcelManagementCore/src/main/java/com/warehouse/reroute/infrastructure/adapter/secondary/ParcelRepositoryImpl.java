@@ -20,11 +20,11 @@ public class ParcelRepositoryImpl implements ParcelRepository {
     @Override
     public Optional<ParcelResponse> update(UpdateParcelRequest parcelRequest) {
 
-        final Optional<ParcelEntity> parcelEntity = Optional.ofNullable(mapper.mapToParcelEntity(parcelRequest));
+        final ParcelEntity parcelEntity = mapper.mapToParcelEntity(parcelRequest);
 
-        parcelShipmentReadRepository.save(parcelEntity.get());
+        parcelShipmentReadRepository.save(parcelEntity);
 
-        return parcelEntity.map(mapper::mapFromParcelEntityToParcelResponse);
+        return Optional.ofNullable(mapper.mapFromParcelEntityToParcelResponse(parcelEntity));
     }
 
     @Override

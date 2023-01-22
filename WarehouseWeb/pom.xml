@@ -6,7 +6,7 @@
 
     <groupId>com.warehouse.web</groupId>
     <artifactId>WarehouseWeb</artifactId>
-    <version>2022.15-SNAPSHOT</version>
+    <version>2023.1-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>

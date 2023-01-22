@@ -1,8 +1,8 @@
 package com.warehouse.route.infrastructure.adapter.primary;
 
-import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,19 +20,18 @@ public class RouteController {
 
     private final RouteTrackerLogPort trackerLogPort;
 
-
     @PostMapping
     public RouteResponse saveRoute(@RequestBody RouteRequest routeRequest) {
         return trackerLogPort.saveRoute(routeRequest);
     }
 
     @GetMapping("/by-parcel/{parcelId}")
-    public List<Route> getRouteListByParcelId(@PathVariable Long parcelId) {
+    public List<Routes> getRouteListByParcelId(@PathVariable Long parcelId) {
         return trackerLogPort.findByParcelId(parcelId);
     }
 
     @GetMapping("/by-username/{username}")
-    public List<Route> findAllByUsername(@PathVariable String username) {
+    public List<Routes> findAllByUsername(@PathVariable String username) {
         return trackerLogPort.findByUsername(username);
     }
 
@@ -41,7 +40,4 @@ public class RouteController {
         trackerLogPort.deleteRoute(id);
         return ResponseEntity.status(OK).body("Recorded route for given parcel has been deleted");
     }
-
-
-
 }

@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/v2/api/barcodes")
+@RequestMapping("/v2/api/qrcodes")
 @AllArgsConstructor
-public class BarcodeGeneratorController {
+public class QRCodeGeneratorController {
 
     private final ParcelService service;
 

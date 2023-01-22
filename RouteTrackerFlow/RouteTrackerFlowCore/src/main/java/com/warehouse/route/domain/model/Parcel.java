@@ -15,10 +15,4 @@ public class Parcel {
     Sender sender;
     Recipient recipient;
     ParcelType parcelType;
-
-    double price;
-
-    public double price() {
-        return parcelType.getPrice();
-    }
 }

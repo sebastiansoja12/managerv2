@@ -1,10 +1,7 @@
 package com.warehouse.route;
 
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.route.domain.model.Parcel;
-import com.warehouse.route.domain.model.Route;
-import com.warehouse.route.domain.model.RouteRequest;
-import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.model.*;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
 import com.warehouse.route.infrastructure.adapter.secondary.RouteLogAdapter;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteMapper;
@@ -47,17 +44,14 @@ public class RouteLogAdapterTest {
     void shouldSaveRoute() {
         // given
         final RouteRequest routeRequest = RouteRequest.builder()
-                .depotCode("TST")
+                .depotId(1L)
                 .parcelId(1L)
                 .id(ROUTE_ID)
-                .supplierCode("TS_TST")
-                .username("test")
+                .supplierId(1L)
+                .userId(1L)
                 .build();
         final Route route = Route.builder()
-                .username("test")
-                .supplierCode("TS_TST")
                 .created(LocalDateTime.now())
-                .depotCode("TST")
                 .parcelId(1L)
                 .id(ROUTE_ID)
                 .build();
@@ -75,15 +69,17 @@ public class RouteLogAdapterTest {
     void shouldFindParcelById() {
         // given
         final Long parcelId = 1L;
-        final Route route = Route.builder()
+        final Routes route = Routes.builder()
                 .id(ROUTE_ID)
-                .parcelId(parcelId)
+                .parcel(Parcel.builder()
+                        .id(1L)
+                        .build())
                 .build();
-        final List<Route> routeList = Lists.list(route);
+        final List<Routes> routeList = Lists.list(route);
         when(routeRepository.findByParcelId(parcelId)).thenReturn(routeList);
         when(adapter.findByParcelId(parcelId)).thenReturn(routeList);
         // when
-        final List<Route> actualRouteList = adapter.findByParcelId(parcelId);
+        final List<Routes> actualRouteList = adapter.findByParcelId(parcelId);
         // then
         assertThat(actualRouteList.size()).isEqualTo(1L);
     }
@@ -92,15 +88,17 @@ public class RouteLogAdapterTest {
     void shouldFindParcelByUsername() {
         // given
         final String username = "test";
-        final Route route = Route.builder()
+        final Routes route = Routes.builder()
                 .id(ROUTE_ID)
-                .username(username)
+                .user(User.builder()
+                        .username("test")
+                        .build())
                 .build();
-        final List<Route> routeList = Lists.list(route);
+        final List<Routes> routeList = Lists.list(route);
         when(routeRepository.findByUsername(username)).thenReturn(routeList);
         when(adapter.findByUsername(username)).thenReturn(routeList);
         // when
-        final List<Route> actualRouteList = adapter.findByUsername(username);
+        final List<Routes> actualRouteList = adapter.findByUsername(username);
         // then
         assertThat(actualRouteList.size()).isEqualTo(1L);
     }

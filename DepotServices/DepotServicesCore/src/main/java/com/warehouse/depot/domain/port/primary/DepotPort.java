@@ -1,6 +1,5 @@
 package com.warehouse.depot.domain.port.primary;
 
-import com.warehouse.depot.api.dto.DepotDto;
 import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.domain.model.DepotCode;
 import com.warehouse.depot.domain.model.DepotId;
@@ -15,4 +14,6 @@ public interface DepotPort {
     Depot viewDepotByCode(DepotCode depotCode);
 
     List<Depot> findAll();
+
+    void addMultipleDepots(List<Depot> depots);
 }

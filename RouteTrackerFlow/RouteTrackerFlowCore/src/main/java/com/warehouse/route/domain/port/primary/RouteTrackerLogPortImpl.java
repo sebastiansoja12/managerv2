@@ -3,6 +3,7 @@ package com.warehouse.route.domain.port.primary;
 import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteLogService;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
 import com.warehouse.route.domain.port.secondary.RouteTrackerServicePort;
@@ -34,7 +35,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         final Route route = Route.builder()
                 .parcelId(supplyInformation.getParcelId())
                 .created(supplyInformation.created())
-                .supplierCode(supplyInformation.getSupplierCode())
+                .supplierId(supplyInformation.getSupplierId())
                 .build();
 
         return routeLogService.saveSupplyRoute(route);
@@ -45,20 +46,20 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         final Route route = Route.builder()
                 .parcelId(routeRequest.getParcelId())
                 .created(LocalDateTime.now())
-                .supplierCode(routeRequest.getSupplierCode())
-                .depotCode(routeRequest.getDepotCode())
-                .username(routeRequest.getUsername())
+                .supplierId(routeRequest.getSupplierId())
+                .depotId(routeRequest.getDepotId())
+                .userId(routeRequest.getUserId())
                 .build();
         return routeLogService.saveRoute(route);
     }
 
     @Override
-    public List<Route> findByParcelId(Long parcelId) {
+    public List<Routes> findByParcelId(Long parcelId) {
         return trackerServicePort.findByParcelId(parcelId);
     }
 
     @Override
-    public List<Route> findByUsername(String username) {
+    public List<Routes> findByUsername(String username) {
         return trackerServicePort.findByUsername(username);
     }
 
