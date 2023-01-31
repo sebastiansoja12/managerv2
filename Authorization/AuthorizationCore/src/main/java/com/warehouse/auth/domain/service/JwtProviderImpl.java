@@ -46,7 +46,7 @@ public class JwtProviderImpl implements JwtProvider {
                 .setSubject(principal.getUsername())
                 .setIssuedAt(from(Instant.now()))
                 .signWith(getPrivateKey())
-                //.setExpiration(Date.from(Instant.now().plusSeconds(jwtExpirationInSeconds)))
+                .setExpiration(Date.from(Instant.now().plusSeconds(jwtExpirationInSeconds)))
                 .compact();
     }
 
@@ -72,7 +72,7 @@ public class JwtProviderImpl implements JwtProvider {
                 .setSubject(username)
                 .setIssuedAt(from(Instant.now()))
                 .signWith(getPrivateKey())
-                //.setExpiration(java.sql.Date.from(Instant.now().plusSeconds(jwtExpirationInSeconds)))
+                .setExpiration(java.sql.Date.from(Instant.now().plusSeconds(jwtExpirationInSeconds)))
                 .compact();
     }
 

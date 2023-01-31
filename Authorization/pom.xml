@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.warehouse</groupId>
-    <artifactId>AuthSecurity</artifactId>
+    <artifactId>Authorization</artifactId>
     <version>2023.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>AuthSecurityCore</module>
+        <module>AuthorizationCore</module>
     </modules>
 
     <properties>

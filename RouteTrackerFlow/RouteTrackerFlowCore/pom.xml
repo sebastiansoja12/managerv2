@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>AuthSecurityCore</artifactId>
+            <artifactId>AuthorizationCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

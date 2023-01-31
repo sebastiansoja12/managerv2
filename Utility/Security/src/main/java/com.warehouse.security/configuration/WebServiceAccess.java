@@ -1,9 +1,8 @@
-package com.warehouse.auth.configuration;
+package com.warehouse.security.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.Filter;
@@ -15,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @Slf4j
-public class WebConfiguration implements Filter, WebMvcConfigurer {
+public class WebServiceAccess implements Filter, WebMvcConfigurer {
 
 
     @Override

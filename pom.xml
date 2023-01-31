@@ -28,7 +28,7 @@
 		<module>ParcelManagement</module>
 		<module>WarehouseWeb</module>
 		<module>MailService</module>
-		<module>AuthSecurity</module>
+		<module>Authorization</module>
 		<module>DepotServices</module>
 		<module>RouteTrackerFlow</module>
 		<module>SupplyOperation</module>

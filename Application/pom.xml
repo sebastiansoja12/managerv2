@@ -57,7 +57,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>AuthSecurityCore</artifactId>
+            <artifactId>AuthorizationCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -68,6 +68,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>CsvFileGenerator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>Security</artifactId>
             <version>${project.version}</version>
         </dependency>
 
