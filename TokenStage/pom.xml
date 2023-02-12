@@ -6,7 +6,7 @@
 
     <groupId>com.warehouse</groupId>
     <artifactId>TokenStage</artifactId>
-    <version>2023.2-SNAPSHOT</version>
+    <version>2023.3-SNAPSHOT</version>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
