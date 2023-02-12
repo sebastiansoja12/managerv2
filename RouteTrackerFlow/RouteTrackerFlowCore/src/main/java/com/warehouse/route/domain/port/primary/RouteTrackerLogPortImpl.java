@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -54,6 +55,13 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
+    public List<RouteResponse> saveMultipleRoutes(List<RouteRequest> routeRequests) {
+        validateParcels(routeRequests);
+        return routeRequests.stream()
+                .map(trackerServicePort::saveRoute).toList();
+    }
+
+    @Override
     public List<Routes> findByParcelId(Long parcelId) {
         return trackerServicePort.findByParcelId(parcelId);
     }
@@ -66,5 +74,10 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public void deleteRoute(Long id) {
         trackerServicePort.deleteRoute(id);
+    }
+
+    public void validateParcels(List<RouteRequest> routeRequests) {
+        routeRequests
+                .forEach(r -> trackerServicePort.exists(r.getParcelId()));
     }
 }

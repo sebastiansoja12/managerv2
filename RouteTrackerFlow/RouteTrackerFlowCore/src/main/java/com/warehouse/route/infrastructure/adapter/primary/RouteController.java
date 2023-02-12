@@ -25,6 +25,11 @@ public class RouteController {
         return trackerLogPort.saveRoute(routeRequest);
     }
 
+    @PostMapping("/multiple")
+    public List<RouteResponse> saveMultipleRoutes(@RequestBody List<RouteRequest> routeRequests) {
+        return trackerLogPort.saveMultipleRoutes(routeRequests);
+    }
+
     @GetMapping("/by-parcel/{parcelId}")
     public List<Routes> getRouteListByParcelId(@PathVariable Long parcelId) {
         return trackerLogPort.findByParcelId(parcelId);

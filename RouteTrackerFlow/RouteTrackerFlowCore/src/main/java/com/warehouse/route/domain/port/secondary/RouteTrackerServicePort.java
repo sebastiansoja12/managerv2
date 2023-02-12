@@ -1,6 +1,5 @@
 package com.warehouse.route.domain.port.secondary;
 
-import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.Routes;
@@ -16,4 +15,6 @@ public interface RouteTrackerServicePort {
     List<Routes> findByUsername(String username);
 
     void deleteRoute(Long id);
+
+    boolean exists(Long id);
 }

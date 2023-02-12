@@ -30,19 +30,15 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>RouteTrackerFlowCore</artifactId>
+            <artifactId>AddressDeterminationApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>AddressDeterminationApi</artifactId>
+            <artifactId>RouteTrackerFlowApi</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
-
-
-
-
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

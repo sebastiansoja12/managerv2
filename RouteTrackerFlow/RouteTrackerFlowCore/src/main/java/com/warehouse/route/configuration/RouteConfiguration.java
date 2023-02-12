@@ -13,6 +13,7 @@ import com.warehouse.route.infrastructure.adapter.secondary.*;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteMapper;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteModelMapper;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -49,8 +50,9 @@ public class  RouteConfiguration {
     }
 
     @Bean
-    public RouteTrackerServicePort routeTrackerServicePort(RouteRepository routeRepository, AuthenticationPort authPort) {
+    public RouteTrackerServicePort routeTrackerServicePort(RouteRepository routeRepository, AuthenticationPort authPort,
+        ShipmentPort shipmentPort) {
         final RouteMapper routeMapper = Mappers.getMapper(RouteMapper.class);
-        return new RouteLogAdapter(routeMapper, routeRepository, authPort);
+        return new RouteLogAdapter(routeMapper, routeRepository, authPort, shipmentPort);
     }
 }

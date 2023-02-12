@@ -16,6 +16,8 @@ public interface RouteTrackerLogPort {
 
     RouteResponse saveRoute(RouteRequest routeRequest);
 
+    List<RouteResponse> saveMultipleRoutes(List<RouteRequest> routeRequests);
+
     List<Routes> findByParcelId(Long parcelId);
 
     List<Routes> findByUsername(String username);

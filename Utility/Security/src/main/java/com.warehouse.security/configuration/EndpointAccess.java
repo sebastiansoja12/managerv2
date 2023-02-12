@@ -27,7 +27,7 @@ public class EndpointAccess extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/v2/api/shipments/**")
                 .permitAll()
-                .antMatchers("/v2/api/barcodes/**")
+                .antMatchers("/v2/api/qrcodes/**")
                 .permitAll()
                 .antMatchers("/v2/api/csv/**")
                 .permitAll()
