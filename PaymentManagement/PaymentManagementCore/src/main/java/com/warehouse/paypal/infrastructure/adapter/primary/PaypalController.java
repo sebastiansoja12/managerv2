@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v2/api/payments")
+@RequestMapping("/payments")
 @AllArgsConstructor
 public class PaypalController {
 

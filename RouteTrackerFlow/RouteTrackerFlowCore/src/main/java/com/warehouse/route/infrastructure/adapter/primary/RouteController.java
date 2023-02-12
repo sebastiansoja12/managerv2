@@ -14,7 +14,7 @@ import java.util.List;
 import static com.sun.mail.iap.Response.OK;
 
 @RestController
-@RequestMapping("/v2/api/routes")
+@RequestMapping("/routes")
 @AllArgsConstructor
 public class RouteController {
 

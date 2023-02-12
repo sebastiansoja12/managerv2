@@ -1,4 +1,4 @@
-package com.warehouse.reroute.infrastructure.adapter.entity;
+package com.warehouse.reroute.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.reroute.domain.enumeration.ParcelType;
 import lombok.AllArgsConstructor;

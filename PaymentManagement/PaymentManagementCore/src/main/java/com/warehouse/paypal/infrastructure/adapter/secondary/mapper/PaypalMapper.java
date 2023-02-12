@@ -5,7 +5,7 @@ import com.paypal.api.payments.Payee;
 import com.warehouse.paypal.domain.model.AmountInformation;
 import com.warehouse.paypal.domain.model.PayeeInformation;
 import com.warehouse.paypal.domain.model.PaymentInformation;
-import com.warehouse.paypal.infrastructure.adapter.entity.PaypalEntity;
+import com.warehouse.paypal.infrastructure.adapter.secondary.entity.PaypalEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

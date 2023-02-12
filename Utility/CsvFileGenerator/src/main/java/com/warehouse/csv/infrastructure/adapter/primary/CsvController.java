@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/v2/api/csv")
+@RequestMapping("/csv")
 @AllArgsConstructor
 public class CsvController {
 

@@ -1,4 +1,4 @@
-package com.warehouse.paypal.infrastructure.adapter.entity;
+package com.warehouse.paypal.infrastructure.adapter.secondary.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
