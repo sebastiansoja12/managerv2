@@ -1,21 +1,17 @@
 package com.warehouse.route;
 
-import com.warehouse.route.configuration.RouteTrackerTestConfiguration;
-import com.warehouse.route.domain.model.Route;
+import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.route.domain.vo.SupplyInformation;
-import lombok.AllArgsConstructor;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +24,9 @@ public class RouteTrackerLogTest {
     private RouteTrackerLogPort routeTrackerLogPort;
 
     private final UUID ROUTE_ID = UUID.fromString("1d614a30-910f-486e-8c7b-e3043744088f");
+
+    private final UUID ROUTE_ID_2 = UUID.fromString("f0a45a51-6d0f-45ab-a839-41f161208c65");
+
 
     @Test
     void shouldSaveRoute() {
@@ -45,5 +44,35 @@ public class RouteTrackerLogTest {
         final RouteResponse route = routeTrackerLogPort.saveSupplyRoute(supplyInformation);
         // then
         assertThat(route.getId()).isNotNull();
+    }
+
+    @Test
+    void shouldSaveMultipleRoutes() {
+        // given
+        final RouteRequest routeRequest = RouteRequest.builder()
+                .depotId(1L)
+                .id(ROUTE_ID)
+                .parcelId(100001L)
+                .supplierId(1L)
+                .build();
+
+        final RouteRequest routeRequest2 = RouteRequest.builder()
+                .depotId(1L)
+                .id(ROUTE_ID_2)
+                .parcelId(100002L)
+                .supplierId(1L)
+                .build();
+
+        final RouteResponse response = new RouteResponse(ROUTE_ID);
+        final RouteResponse response2 = new RouteResponse(ROUTE_ID_2);
+
+        when(routeTrackerLogPort.saveMultipleRoutes(Lists.list(routeRequest, routeRequest2)))
+                .thenReturn(Lists.list(response, response2));
+        // when
+        final List<RouteResponse> route =
+                routeTrackerLogPort.saveMultipleRoutes(Lists.list(routeRequest, routeRequest2));
+        // then
+        assertThat(route).isNotNull();
+        assertThat(route.get(1).getId()).isEqualTo(ROUTE_ID_2);
     }
 }

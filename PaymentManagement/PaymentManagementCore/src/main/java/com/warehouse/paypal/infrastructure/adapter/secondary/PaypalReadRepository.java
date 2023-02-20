@@ -1,6 +1,6 @@
 package com.warehouse.paypal.infrastructure.adapter.secondary;
 
-import com.warehouse.paypal.infrastructure.adapter.entity.PaypalEntity;
+import com.warehouse.paypal.infrastructure.adapter.secondary.entity.PaypalEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

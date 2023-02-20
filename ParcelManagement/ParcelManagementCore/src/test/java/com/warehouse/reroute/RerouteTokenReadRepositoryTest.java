@@ -4,7 +4,7 @@ import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.reroute.configuration.RerouteTokenTestConfiguration;
 import com.warehouse.reroute.domain.model.Token;
-import com.warehouse.reroute.infrastructure.adapter.entity.RerouteTokenEntity;
+import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
 import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenReadRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

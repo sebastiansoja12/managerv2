@@ -3,7 +3,7 @@ package com.warehouse.paypal;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.paypal.configuration.PaypalTestConfiguration;
-import com.warehouse.paypal.infrastructure.adapter.entity.PaypalEntity;
+import com.warehouse.paypal.infrastructure.adapter.secondary.entity.PaypalEntity;
 import com.warehouse.paypal.infrastructure.adapter.secondary.PaypalReadRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

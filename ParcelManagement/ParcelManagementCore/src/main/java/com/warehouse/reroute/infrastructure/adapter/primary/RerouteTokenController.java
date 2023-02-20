@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v2/api/reroutes")
+@RequestMapping("/reroutes")
 @AllArgsConstructor
 public class RerouteTokenController {
 

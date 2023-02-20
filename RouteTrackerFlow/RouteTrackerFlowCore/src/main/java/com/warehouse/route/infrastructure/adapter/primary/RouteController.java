@@ -14,7 +14,7 @@ import java.util.List;
 import static com.sun.mail.iap.Response.OK;
 
 @RestController
-@RequestMapping("/v2/api/routes")
+@RequestMapping("/routes")
 @AllArgsConstructor
 public class RouteController {
 
@@ -23,6 +23,11 @@ public class RouteController {
     @PostMapping
     public RouteResponse saveRoute(@RequestBody RouteRequest routeRequest) {
         return trackerLogPort.saveRoute(routeRequest);
+    }
+
+    @PostMapping("/multiple")
+    public List<RouteResponse> saveMultipleRoutes(@RequestBody List<RouteRequest> routeRequests) {
+        return trackerLogPort.saveMultipleRoutes(routeRequests);
     }
 
     @GetMapping("/by-parcel/{parcelId}")

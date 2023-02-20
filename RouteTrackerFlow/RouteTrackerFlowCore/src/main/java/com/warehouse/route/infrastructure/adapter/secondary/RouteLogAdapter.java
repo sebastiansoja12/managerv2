@@ -8,8 +8,7 @@ import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
 import com.warehouse.route.domain.port.secondary.RouteTrackerServicePort;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteMapper;
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.route.infrastructure.api.event.RouteRequestEvent;
+import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import lombok.AllArgsConstructor;
 
 import java.util.Comparator;
@@ -24,6 +23,8 @@ public class RouteLogAdapter implements RouteTrackerServicePort {
     private final RouteRepository routeRepository;
 
     private final AuthenticationPort authenticationPort;
+
+    private final ShipmentPort shipmentPort;
 
     @Override
     public RouteResponse saveRoute(RouteRequest routeRequest) {
@@ -55,6 +56,11 @@ public class RouteLogAdapter implements RouteTrackerServicePort {
         final String username = getUsername();
         final String depotCode = getDepotCode();
         routeRepository.deleteByParcelIdAndDepotCodeAndUsername(id, depotCode, username);
+    }
+
+    @Override
+    public boolean exists(Long id) {
+        return shipmentPort.loadParcel(id) != null;
     }
 
     public String getUsername() {

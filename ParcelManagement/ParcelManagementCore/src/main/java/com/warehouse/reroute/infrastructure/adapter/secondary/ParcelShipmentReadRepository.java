@@ -1,6 +1,6 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
-import com.warehouse.reroute.infrastructure.adapter.entity.ParcelEntity;
+import com.warehouse.reroute.infrastructure.adapter.secondary.entity.ParcelEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

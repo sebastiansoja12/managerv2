@@ -7,7 +7,7 @@
     <groupId>com.warehouse</groupId>
     <artifactId>PaymentManagement</artifactId>
     <packaging>pom</packaging>
-    <version>2023.1-SNAPSHOT</version>
+    <version>2023.2-SNAPSHOT</version>
     <modules>
         <module>PaymentManagementApi</module>
         <module>PaymentManagementCore</module>

@@ -4,7 +4,7 @@ import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.infrastructure.adapter.entity.RerouteTokenEntity;
+import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
 import lombok.AllArgsConstructor;

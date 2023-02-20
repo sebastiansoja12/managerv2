@@ -7,7 +7,7 @@ import com.warehouse.paypal.domain.enumeration.ParcelStatus;
 import com.warehouse.paypal.domain.model.AmountInformation;
 import com.warehouse.paypal.domain.model.PayeeInformation;
 import com.warehouse.paypal.domain.model.PaymentInformation;
-import com.warehouse.paypal.infrastructure.adapter.entity.PaypalEntity;
+import com.warehouse.paypal.infrastructure.adapter.secondary.entity.PaypalEntity;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalMapper;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalMapperImpl;
 import org.junit.jupiter.api.BeforeEach;

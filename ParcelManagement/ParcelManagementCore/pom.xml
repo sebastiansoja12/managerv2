@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ParcelManagement</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2023.1-SNAPSHOT</version>
+        <version>2023.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -30,19 +30,15 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>RouteTrackerFlowCore</artifactId>
+            <artifactId>AddressDeterminationApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>AddressDeterminationApi</artifactId>
+            <artifactId>RouteTrackerFlowApi</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
-
-
-
-
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

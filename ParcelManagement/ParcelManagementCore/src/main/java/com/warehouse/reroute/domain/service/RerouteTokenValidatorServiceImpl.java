@@ -1,6 +1,6 @@
 package com.warehouse.reroute.domain.service;
 
-import com.warehouse.reroute.infrastructure.adapter.entity.RerouteTokenEntity;
+import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
 import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenReadRepository;
 import lombok.AllArgsConstructor;
 

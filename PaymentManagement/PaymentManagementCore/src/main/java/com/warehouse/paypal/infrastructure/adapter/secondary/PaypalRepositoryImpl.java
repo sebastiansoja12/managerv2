@@ -3,7 +3,7 @@ package com.warehouse.paypal.infrastructure.adapter.secondary;
 import com.warehouse.paypal.domain.enumeration.ParcelStatus;
 import com.warehouse.paypal.domain.model.PaymentInformation;
 import com.warehouse.paypal.domain.port.secondary.PaymentRepository;
-import com.warehouse.paypal.infrastructure.adapter.entity.PaypalEntity;
+import com.warehouse.paypal.infrastructure.adapter.secondary.entity.PaypalEntity;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalMapper;
 import lombok.AllArgsConstructor;
 

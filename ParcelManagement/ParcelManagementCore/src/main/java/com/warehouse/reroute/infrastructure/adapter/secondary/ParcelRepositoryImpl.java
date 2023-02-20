@@ -4,7 +4,7 @@ import com.warehouse.reroute.domain.exception.ParcelNotFoundException;
 import com.warehouse.reroute.domain.model.UpdateParcelRequest;
 import com.warehouse.reroute.domain.port.secondary.ParcelRepository;
 import com.warehouse.reroute.domain.vo.ParcelResponse;
-import com.warehouse.reroute.infrastructure.adapter.entity.ParcelEntity;
+import com.warehouse.reroute.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import lombok.AllArgsConstructor;
 

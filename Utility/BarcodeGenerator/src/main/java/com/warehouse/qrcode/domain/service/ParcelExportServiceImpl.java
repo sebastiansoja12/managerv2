@@ -5,8 +5,8 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import com.warehouse.qrcode.domain.model.Parcel;
 import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapper;
+import com.warehouse.shipment.domain.model.Parcel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -100,9 +100,7 @@ public class ParcelExportServiceImpl implements ParcelExportService {
 
         writeTableHeader(senderTable, recipientTable);
 
-        final Parcel barcodeParcel = entityMapper.map(parcel);
-
-        writeTableData(senderTable, recipientTable, barcodeParcel);
+        writeTableData(senderTable, recipientTable, parcel);
 
         document.add(senderTable);
         document.add(recipientTable);

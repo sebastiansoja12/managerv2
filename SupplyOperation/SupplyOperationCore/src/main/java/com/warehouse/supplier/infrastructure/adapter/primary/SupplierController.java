@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/v2/api/suppliers")
+@RequestMapping("/suppliers")
 @RestController
 @AllArgsConstructor
 public class SupplierController {
