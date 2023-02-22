@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dataset>
-    <payment
+    <PAYMENT
             ID="1"
             PAYMENT_URL="test.pl"
             PARCEL_ID="10001"
