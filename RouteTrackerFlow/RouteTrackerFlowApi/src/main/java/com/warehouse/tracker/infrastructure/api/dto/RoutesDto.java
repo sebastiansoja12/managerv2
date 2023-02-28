@@ -1,30 +1,27 @@
-package com.warehouse.route.domain.model;
+package com.warehouse.tracker.infrastructure.api.dto;
 
-import lombok.Builder;
-import lombok.Data;
 import lombok.Value;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
 @Value
-@Builder
-public class Routes {
+public class RoutesDto {
 
     UUID id;
 
     LocalDateTime created;
 
-    Parcel parcel;
+    ParcelDto parcel;
 
-    User user;
+    UserDto user;
 
-    Supplier supplier;
+    SupplierDto supplier;
 
-    Depot depot;
+    DepotDto depot;
 
     public LocalDateTime getCreated() {
         return created;
     }
+
 }

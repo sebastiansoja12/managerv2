@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface RouteTrackerServicePort {
 
-    RouteResponse saveRoute(RouteRequest routeRequest);
+    void saveRoute(RouteRequest routeRequest);
 
     List<Routes> findByParcelId(Long parcelId);
 

@@ -5,9 +5,14 @@ import com.warehouse.route.domain.model.*;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
 import com.warehouse.route.infrastructure.adapter.secondary.RouteLogAdapter;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteMapper;
+import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.route.infrastructure.api.dto.RouteResponseDto;
+import com.warehouse.route.infrastructure.api.event.RouteResponseEvent;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,7 +25,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RouteLogAdapterTest {
@@ -34,11 +40,16 @@ public class RouteLogAdapterTest {
     @Mock
     private AuthenticationPort authenticationPort;
 
+    @Mock
+    private RouteLogEventPublisher routeLogEventPublisher;
+
     @InjectMocks
     private RouteLogAdapter adapter;
 
-    private final UUID ROUTE_ID = UUID.fromString("558a76b8-0b36-4677-aede-915674b9f6a9");
+    @Captor
+    private ArgumentCaptor<Route> routeCaptor;
 
+    private final UUID ROUTE_ID = UUID.fromString("558a76b8-0b36-4677-aede-915674b9f6a9");
 
     @Test
     void shouldSaveRoute() {
@@ -50,21 +61,31 @@ public class RouteLogAdapterTest {
                 .supplierId(1L)
                 .userId(1L)
                 .build();
-        final Route route = Route.builder()
-                .created(LocalDateTime.now())
+
+        final Route mappedRoute = Route.builder()
+                .depotId(1L)
                 .parcelId(1L)
                 .id(ROUTE_ID)
+                .supplierId(1L)
+                .userId(1L)
                 .build();
-        final RouteResponse response = new RouteResponse(ROUTE_ID);
-        when(routeMapper.mapToRoute(routeRequest)).thenReturn(route);
-        when(routeRepository.save(route)).thenReturn(response);
-        when(adapter.saveRoute(routeRequest)).thenReturn(response);
-        // when
-        final RouteResponse actualResponse = adapter.saveRoute(routeRequest);
-        // then
-        assertThat(actualResponse.getId()).isEqualTo(ROUTE_ID);
-    }
 
+        final RouteResponse savedRouteResponse = new RouteResponse(ROUTE_ID);
+        final RouteResponseDto mappedRouteResponseDto = new RouteResponseDto(ROUTE_ID);
+        when(routeMapper.mapToRoute(routeRequest)).thenReturn(mappedRoute);
+        when(routeRepository.save(mappedRoute)).thenReturn(savedRouteResponse);
+        when(routeMapper.map(savedRouteResponse)).thenReturn(mappedRouteResponseDto);
+        // when: saving route is called
+        adapter.saveRoute(routeRequest);
+
+        // then
+        verify(routeMapper).mapToRoute(routeRequest);
+        verify(routeRepository).save(routeCaptor.capture());
+        verify(routeMapper).map(savedRouteResponse);
+        verify(routeLogEventPublisher).send(any(RouteResponseEvent.class));
+        // and: values are equal
+        assertEquals(mappedRoute, routeCaptor.getValue());
+    }
     @Test
     void shouldFindParcelById() {
         // given

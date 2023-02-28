@@ -55,10 +55,11 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public List<RouteResponse> saveMultipleRoutes(List<RouteRequest> routeRequests) {
+    public void saveMultipleRoutes(List<RouteRequest> routeRequests) {
         validateParcels(routeRequests);
-        return routeRequests.stream()
-                .map(trackerServicePort::saveRoute).toList();
+        routeRequests.forEach(
+                trackerServicePort::saveRoute
+        );
     }
 
     @Override

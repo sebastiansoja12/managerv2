@@ -1,20 +1,19 @@
 package com.warehouse.route.infrastructure.adapter.primary;
 
 import com.warehouse.route.domain.model.RouteRequest;
+import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.ShipmentRequest;
 import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.route.domain.vo.SupplyInformation;
 import com.warehouse.route.infrastructure.adapter.primary.mapper.EventMapper;
-import com.warehouse.route.infrastructure.api.event.RouteRequestEvent;
-import com.warehouse.route.infrastructure.api.event.RouteLogBaseEvent;
-import com.warehouse.route.infrastructure.api.event.ShipmentLogEvent;
-import com.warehouse.route.infrastructure.api.event.SupplyLogEvent;
+import com.warehouse.route.infrastructure.api.event.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -47,6 +46,20 @@ public class RouteLogEventListener {
         logEvent(event);
         final RouteRequest routeRequest = eventMapper.map(event.getRouteRequestDto());
         trackerLogPort.saveRoute(routeRequest);
+    }
+
+    @EventListener
+    public String handle(RouteResponseEvent event) {
+        logEvent(event);
+        final RouteResponse routeResponse = eventMapper.map(event.getRouteResponse());
+        return routeResponse.getId().toString();
+    }
+
+    @EventListener
+    public void handle(RouteRequestsEvent event) {
+        logEvent(event);
+        final List<RouteRequest> routeRequest = eventMapper.mapToMultipleRouteRequests(event.getRequest());
+        trackerLogPort.saveMultipleRoutes(routeRequest);
     }
 
     private void logEvent(RouteLogBaseEvent event) {

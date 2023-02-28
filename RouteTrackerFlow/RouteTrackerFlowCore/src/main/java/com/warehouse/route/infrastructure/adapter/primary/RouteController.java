@@ -26,8 +26,8 @@ public class RouteController {
     }
 
     @PostMapping("/multiple")
-    public List<RouteResponse> saveMultipleRoutes(@RequestBody List<RouteRequest> routeRequests) {
-        return trackerLogPort.saveMultipleRoutes(routeRequests);
+    public void saveMultipleRoutes(@RequestBody List<RouteRequest> routeRequests) {
+         trackerLogPort.saveMultipleRoutes(routeRequests);
     }
 
     @GetMapping("/by-parcel/{parcelId}")

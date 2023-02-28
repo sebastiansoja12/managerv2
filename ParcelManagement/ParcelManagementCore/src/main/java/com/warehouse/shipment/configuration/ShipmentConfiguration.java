@@ -28,9 +28,8 @@ public class ShipmentConfiguration {
 
     @Bean
     public ShipmentAdapter shipmentAdapter(ShipmentRepository shipmentRepository, MailPort mailPort,
-                                           PaypalPort paypalPort, NotificationCreatorService creatorService,
-                                           RouteLogEventPublisher routeLogEventPublisher,
-                                           AddressDeterminationService addressDeterminationService) {
+        PaypalPort paypalPort, NotificationCreatorService creatorService,
+        RouteLogEventPublisher routeLogEventPublisher, AddressDeterminationService addressDeterminationService) {
         final ShipmentMapper shipmentMapper = Mappers.getMapper(ShipmentMapper.class);
         final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
         final PaymentMapper paymentMapper = Mappers.getMapper(PaymentMapper.class);
@@ -61,7 +60,6 @@ public class ShipmentConfiguration {
 
     @Bean
     public ShipmentService shipmentService(com.warehouse.shipment.domain.port.secondary.ShipmentPort shipmentPort) {
-
         return new ShipmentServiceImpl(shipmentPort);
     }
 }

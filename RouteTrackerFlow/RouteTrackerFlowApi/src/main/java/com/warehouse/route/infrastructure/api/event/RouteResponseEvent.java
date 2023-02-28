@@ -12,7 +12,7 @@ public class RouteResponseEvent extends RouteLogBaseEvent implements RouteLogEve
     private final RouteResponseDto routeResponse;
 
     @Builder
-    RouteResponseEvent(@NonNull RouteResponseDto routeResponse) {
+    public RouteResponseEvent(@NonNull RouteResponseDto routeResponse) {
         super();
         this.routeResponse = routeResponse;
     }
