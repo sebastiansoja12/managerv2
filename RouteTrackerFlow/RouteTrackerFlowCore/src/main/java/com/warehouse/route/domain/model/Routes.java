@@ -23,4 +23,8 @@ public class Routes {
     Supplier supplier;
 
     Depot depot;
+
+    public LocalDateTime getCreated() {
+        return created;
+    }
 }

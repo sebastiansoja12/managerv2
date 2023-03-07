@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.warehouse</groupId>
     <artifactId>Application</artifactId>
-    <version>2023.2-SNAPSHOT</version>
+    <version>2023.3-SNAPSHOT</version>
     <name>WarehouseApplication</name>
     <description>Inparcel Java Application</description>
     <packaging>jar</packaging>
@@ -57,6 +57,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>Security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>AuthorizationCore</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -68,11 +73,6 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>CsvFileGenerator</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>Security</artifactId>
             <version>${project.version}</version>
         </dependency>
 

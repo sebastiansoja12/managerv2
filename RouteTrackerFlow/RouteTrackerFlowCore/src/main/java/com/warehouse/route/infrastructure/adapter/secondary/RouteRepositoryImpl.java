@@ -4,11 +4,7 @@ import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
-import com.warehouse.route.infrastructure.adapter.secondary.entity.*;
-import com.warehouse.route.infrastructure.adapter.secondary.exception.DepotNotFoundException;
-import com.warehouse.route.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
-import com.warehouse.route.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
-import com.warehouse.route.infrastructure.adapter.secondary.exception.UserNotFoundException;
+import com.warehouse.route.infrastructure.adapter.secondary.entity.RouteEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteModelMapper;
 import lombok.AllArgsConstructor;
 

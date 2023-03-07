@@ -66,13 +66,7 @@ public class RouteTrackerLogTest {
         final RouteResponse response = new RouteResponse(ROUTE_ID);
         final RouteResponse response2 = new RouteResponse(ROUTE_ID_2);
 
-        when(routeTrackerLogPort.saveMultipleRoutes(Lists.list(routeRequest, routeRequest2)))
-                .thenReturn(Lists.list(response, response2));
+
         // when
-        final List<RouteResponse> route =
-                routeTrackerLogPort.saveMultipleRoutes(Lists.list(routeRequest, routeRequest2));
-        // then
-        assertThat(route).isNotNull();
-        assertThat(route.get(1).getId()).isEqualTo(ROUTE_ID_2);
     }
 }

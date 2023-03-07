@@ -8,11 +8,15 @@ import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
 import com.warehouse.route.domain.port.secondary.RouteTrackerServicePort;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteMapper;
+import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.route.infrastructure.api.dto.RouteResponseDto;
+import com.warehouse.route.infrastructure.api.event.RouteResponseEvent;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import lombok.AllArgsConstructor;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -26,10 +30,14 @@ public class RouteLogAdapter implements RouteTrackerServicePort {
 
     private final ShipmentPort shipmentPort;
 
+    private final RouteLogEventPublisher eventPublisher;
+
     @Override
-    public RouteResponse saveRoute(RouteRequest routeRequest) {
+    public void saveRoute(RouteRequest routeRequest) {
         final Route route = routeMapper.mapToRoute(routeRequest);
-        return routeRepository.save(route);
+        final RouteResponse response =  routeRepository.save(route);
+        final RouteResponseDto routeResponseDto = routeMapper.map(response);
+        eventPublisher.send(new RouteResponseEvent(routeResponseDto));
     }
 
     @Override
@@ -60,7 +68,7 @@ public class RouteLogAdapter implements RouteTrackerServicePort {
 
     @Override
     public boolean exists(Long id) {
-        return shipmentPort.loadParcel(id) != null;
+        return Objects.nonNull(shipmentPort.loadParcel(id));
     }
 
     public String getUsername() {

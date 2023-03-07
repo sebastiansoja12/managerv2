@@ -16,7 +16,7 @@ public interface RouteTrackerLogPort {
 
     RouteResponse saveRoute(RouteRequest routeRequest);
 
-    List<RouteResponse> saveMultipleRoutes(List<RouteRequest> routeRequests);
+    void saveMultipleRoutes(List<RouteRequest> routeRequests);
 
     List<Routes> findByParcelId(Long parcelId);
 
