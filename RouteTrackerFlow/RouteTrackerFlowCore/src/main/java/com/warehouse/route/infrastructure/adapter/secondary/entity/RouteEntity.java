@@ -15,6 +15,12 @@ import java.util.UUID;
 @Entity
 @Builder
 @Table(name = "route")
+@NamedEntityGraph(name = "RouteEntity.full", attributeNodes = {
+        @NamedAttributeNode("user"),
+        @NamedAttributeNode("parcel"),
+        @NamedAttributeNode("depot"),
+        @NamedAttributeNode("supplier")
+})
 public class RouteEntity {
 
     @Id
