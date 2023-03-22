@@ -3,6 +3,7 @@ package com.warehouse.route.infrastructure.adapter.secondary;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.RouteEntity;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;

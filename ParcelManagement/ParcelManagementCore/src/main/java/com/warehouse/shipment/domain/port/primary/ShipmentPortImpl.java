@@ -1,8 +1,8 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.model.ShipmentRequest;
-import com.warehouse.shipment.domain.model.ShipmentResponse;
+import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
+import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import lombok.AllArgsConstructor;
 
@@ -17,7 +17,46 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public void delete(Long parcelId) {
+        service.delete(parcelId);
+    }
+
+    @Override
     public Parcel loadParcel(Long parcelId) {
         return service.loadParcel(parcelId);
+    }
+
+    @Override
+    public UpdateParcelResponse update(UpdateParcelRequest updateParcelRequest) {
+        validateParcelRequest(updateParcelRequest);
+        final ParcelUpdate parcelUpdate = ParcelUpdate.builder()
+                .id(updateParcelRequest.getParcel().getId())
+                .parcelType(updateParcelRequest.getParcel().getParcelType())
+                .senderFirstName(updateParcelRequest.getParcel().getSender().getFirstName())
+                .senderLastName(updateParcelRequest.getParcel().getSender().getLastName())
+                .senderEmail(updateParcelRequest.getParcel().getSender().getEmail())
+                .senderTelephone(updateParcelRequest.getParcel().getSender().getTelephoneNumber())
+                .senderCity(updateParcelRequest.getParcel().getSender().getCity())
+                .senderStreet(updateParcelRequest.getParcel().getSender().getStreet())
+                .senderPostalCode(updateParcelRequest.getParcel().getSender().getPostalCode())
+                .recipientFirstName(updateParcelRequest.getParcel().getRecipient().getFirstName())
+                .recipientLastName(updateParcelRequest.getParcel().getRecipient().getLastName())
+                .recipientEmail(updateParcelRequest.getParcel().getRecipient().getEmail())
+                .recipientTelephone(updateParcelRequest.getParcel().getRecipient().getTelephoneNumber())
+                .recipientCity(updateParcelRequest.getParcel().getRecipient().getCity())
+                .recipientStreet(updateParcelRequest.getParcel().getRecipient().getStreet())
+                .recipientPostalCode(updateParcelRequest.getParcel().getRecipient().getPostalCode())
+                .build();
+        return service.update(parcelUpdate);
+    }
+
+    private void validateParcelRequest(UpdateParcelRequest updateParcelRequest) {
+        if (updateParcelRequest.getParcel() == null) {
+            throw new ParcelNotFoundException("Parcel ID is null");
+        } else if (updateParcelRequest.getToken() == null) {
+            throw new RerouteTokenNotFoundException("Reroute token is null");
+        } else if (updateParcelRequest.getParcel().getId() == null) {
+            throw new ParcelNotFoundException("Parcel is null");
+        }
     }
 }

@@ -1,16 +1,15 @@
 package com.warehouse.reroute.domain.port.primary;
 
-import com.warehouse.reroute.domain.exception.ParcelNotFoundException;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.RerouteResponse;
 import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.model.UpdateParcelRequest;
-import com.warehouse.reroute.domain.service.ParcelValidatorService;
 import com.warehouse.reroute.domain.service.RerouteService;
 import com.warehouse.reroute.domain.service.RerouteTokenValidatorService;
 import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.ParcelResponse;
+import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
 import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
+import com.warehouse.reroute.infrastructure.adapter.secondary.exception.EmailNotFoundException;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 import lombok.AllArgsConstructor;
 
@@ -19,17 +18,11 @@ public class RerouteServicePortImpl implements RerouteServicePort {
 
     private final RerouteService rerouteService;
 
-    private final ParcelValidatorService parcelValidatorService;
-
     private final RerouteTokenValidatorService rerouteTokenValidatorService;
 
     @Override
-    public ParcelResponse update(UpdateParcelRequest request) {
-
-        validateParcel(request.getId());
-
+    public ParcelUpdateResponse update(UpdateParcelRequest request) {
         validateRerouteToken(request.getToken());
-
         return rerouteService.update(request);
     }
 
@@ -45,20 +38,20 @@ public class RerouteServicePortImpl implements RerouteServicePort {
 
     @Override
     public RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest) {
+        validateEmail(rerouteRequest.getEmail());
         return rerouteService.sendReroutingInformation(rerouteRequest);
-    }
-
-    public void validateParcel(Long id) {
-        final boolean parcelValidate = parcelValidatorService.validate(id);
-        if (!parcelValidate) {
-            throw new ParcelNotFoundException("Parcel was not found");
-        }
     }
 
     public void validateRerouteToken(Integer token) {
         final boolean rerouteTokenValidate = rerouteTokenValidatorService.validate(token);
         if (!rerouteTokenValidate) {
             throw new RerouteTokenNotFoundException("Reroute token was not found");
+        }
+    }
+
+    public void validateEmail(String email) {
+        if (email == null) {
+            throw new EmailNotFoundException("E-Mail cannot be null");
         }
     }
 

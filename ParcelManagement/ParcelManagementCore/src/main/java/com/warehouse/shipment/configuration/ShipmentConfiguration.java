@@ -58,8 +58,9 @@ public class ShipmentConfiguration {
         return new ShipmentPortImpl(service);
     }
 
-    @Bean
-    public ShipmentService shipmentService(com.warehouse.shipment.domain.port.secondary.ShipmentPort shipmentPort) {
-        return new ShipmentServiceImpl(shipmentPort);
+    @Bean(name = "shipment.shipmentService")
+    public ShipmentService shipmentService(com.warehouse.shipment.domain.port.secondary.ShipmentPort shipmentPort,
+                                           ShipmentRepository shipmentRepository) {
+        return new ShipmentServiceImpl(shipmentPort, shipmentRepository);
     }
 }

@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.domain.model.UpdateParcelResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import com.warehouse.shipment.domain.model.Parcel;
@@ -32,10 +33,17 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     @Override
     public Parcel loadParcelById(Long parcelId) {
-        final ParcelEntity entity = repository.findParcelEntityById(parcelId).orElseThrow(
-                () -> new ParcelNotFoundException("Parcel was not found")
-        );
+        return repository.findParcelEntityById(parcelId).map(parcelMapper::map).orElseThrow(
+                () -> new ParcelNotFoundException("Parcel was not found"));
+    }
 
-        return parcelMapper.map(entity);
+    @Override
+    public UpdateParcelResponse update(Parcel parcelUpdate) {
+
+        final ParcelEntity entity = parcelMapper.mapForUpdate(parcelUpdate);
+
+        repository.save(entity);
+
+        return parcelMapper.mapToUpdateParcelResponse(entity);
     }
 }

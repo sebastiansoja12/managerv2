@@ -1,5 +1,7 @@
 package com.warehouse.reroute.configuration;
 
+import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.infrastructure.api.ShipmentService;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,4 +15,10 @@ public class RerouteTokenTestConfiguration {
 
     @MockBean
     public JavaMailSender javaMailSender;
+
+    @MockBean
+    public ShipmentPort shipmentPort;
+
+    @MockBean
+    public ShipmentService shipmentService;
 }

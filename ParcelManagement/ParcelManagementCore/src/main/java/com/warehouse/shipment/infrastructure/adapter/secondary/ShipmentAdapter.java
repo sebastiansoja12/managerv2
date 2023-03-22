@@ -8,13 +8,12 @@ import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.route.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.route.infrastructure.api.event.ShipmentLogEvent;
-import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.model.ShipmentRequest;
-import com.warehouse.shipment.domain.model.ShipmentResponse;
+import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.ShipmentPort;
 import com.warehouse.shipment.domain.service.NotificationCreatorService;
 import com.warehouse.shipment.domain.vo.Notification;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.PaymentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
@@ -41,6 +40,8 @@ public class ShipmentAdapter implements ShipmentPort {
 
     private final AddressDeterminationService addressDeterminationService;
 
+    private final String REROUTE_MESSAGE = "Zmiana trasy przesyłki";
+
     @Override
     public ShipmentResponse ship(ShipmentRequest request) {
         final ShipmentResponse shipmentResponse =  createParcel(request);
@@ -49,16 +50,25 @@ public class ShipmentAdapter implements ShipmentPort {
     }
 
     @Override
-    public void delete(Long parcelId) {
-        parcelRepository.delete(parcelId);
-    }
+    public UpdateParcelResponse update(ParcelUpdate parcelUpdate) {
 
-    @Override
-    public Parcel loadParcelById(Long parcelId) {
-        return parcelRepository.loadParcelById(parcelId);
+        final Parcel parcel = shipmentMapper.map(parcelUpdate);
+
+        final String fastestRoute = addressDeterminationService.findFastestRoute(parcel.getRecipient().getCity());
+
+        parcel.setDestination(fastestRoute);
+
+        final Notification notification = notificationCreatorService.createNotification(parcel, REROUTE_MESSAGE);
+
+        final com.warehouse.mail.domain.vo.Notification mailNotification = notificationMapper.map(notification);
+
+        mailPort.sendNotification(mailNotification);
+
+        return parcelRepository.update(parcel);
     }
 
     private ShipmentResponse createParcel(ShipmentRequest request) {
+
         final Parcel parcel = shipmentMapper.map(request);
 
         final String fastestRoute = addressDeterminationService.findFastestRoute(parcel.getRecipient().getCity());

@@ -99,7 +99,7 @@ public class RerouteServicePortImplTest {
                 .token(TOKEN_VALUE)
                 .id(PARCEL_ID)
                 .build();
-        final ParcelResponse expectedResponse = ParcelResponse.builder()
+        final ParcelUpdateResponse expectedResponse = ParcelUpdateResponse.builder()
                 .parcelId(new ParcelId(PARCEL_ID))
                 .parcelType(ParcelType.TEST)
                 .recipient(Recipient.builder().build())
@@ -107,7 +107,7 @@ public class RerouteServicePortImplTest {
                 .build();
         when(port.update(updateParcelRequest)).thenReturn(expectedResponse);
         // when
-        final ParcelResponse actualResponse = port.update(updateParcelRequest);
+        final ParcelUpdateResponse actualResponse = port.update(updateParcelRequest);
 
         // then
         assertAll(

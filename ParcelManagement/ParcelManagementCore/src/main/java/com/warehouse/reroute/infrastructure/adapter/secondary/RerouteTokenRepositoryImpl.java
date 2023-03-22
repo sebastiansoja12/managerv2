@@ -9,7 +9,6 @@ import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteT
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.Instant;
 
@@ -48,13 +47,6 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
     @Override
     public void deleteByToken(Token token) {
         repository.deleteByToken(token.getValue());
-    }
-
-    @Scheduled(cron = "${purge.cron.expression}")
-    public void purgeExpired() {
-        log.warn("Cleanup database from expired reroute tokens");
-        repository.deleteAllExpiredSince(Instant.now());
-        log.info("Expired reroute tokens have been successfully deleted");
     }
 
     private RerouteTokenEntity generateRerouteToken(Long parcelId) {

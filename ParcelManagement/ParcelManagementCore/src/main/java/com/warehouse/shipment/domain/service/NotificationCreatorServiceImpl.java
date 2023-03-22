@@ -11,8 +11,8 @@ public class NotificationCreatorServiceImpl implements NotificationCreatorServic
     private final static String SUBJECT = "Została nadana do państwa przesyłka: ";
 
     @Override
-    public Notification createNotification(Parcel parcel, String paymentUrl) {
-        final ConstantBodyMailMessage constantBodyMailMessage = new ConstantBodyMailMessage(parcel, paymentUrl);
+    public Notification createNotification(Parcel parcel, String message) {
+        final ConstantBodyMailMessage constantBodyMailMessage = new ConstantBodyMailMessage(parcel, message);
 
         return Notification.builder()
                 .body(constantBodyMailMessage.getMessage())

@@ -21,7 +21,6 @@ public class Parcel {
     double price;
 
     public double price() {
-        this.price = parcelType.getPrice();
-        return this.price;
+        return parcelType.getPrice();
     }
 }
