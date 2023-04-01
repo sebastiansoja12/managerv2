@@ -22,5 +22,4 @@ public interface DepotMapper {
 
     List<DepotEntity> mapToDepotEntityList(List<Depot> depots);
 
-
 }
