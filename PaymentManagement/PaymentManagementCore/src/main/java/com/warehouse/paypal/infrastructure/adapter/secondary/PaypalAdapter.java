@@ -19,9 +19,9 @@ public class PaypalAdapter implements PaymentSecondaryPort {
 
     private final APIContext apiContext;
 
-    private final static String SUCCESS_URL = "http://localhost:8080/payment/pay/success";
+    private final static String SUCCESS_URL = "/v2/api/payments/pay/success";
     
-    private final static String CANCEL_URL = "http://localhost:8080/payment/pay/cancel";
+    private final static String CANCEL_URL = "/v2/api/payments/pay/cancel";
     
     private final PaypalMapper paypalMapper;
 
@@ -103,17 +103,6 @@ public class PaypalAdapter implements PaymentSecondaryPort {
         final Payer payer = new Payer();
         payer.setPaymentMethod("paypal");
         return payer;
-    }
-
-    private Payee getPayee() {
-        return paypalMapper.map(PayeeInformation.builder()
-                .accountNumber("1234567890")
-                .email("inparcel@inp.com")
-                .firstName("Sebastian")
-                .lastName("Soja")
-                .merchantId("3489")
-                .telephoneNumber("799024163")
-                .build());
     }
 
     public List<Transaction> transactions(Long parcelId, Amount amount) {

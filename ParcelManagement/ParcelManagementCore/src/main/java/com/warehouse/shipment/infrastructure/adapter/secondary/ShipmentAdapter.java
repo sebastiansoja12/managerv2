@@ -8,12 +8,11 @@ import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.route.infrastructure.api.event.ShipmentLogEvent;
 import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.ShipmentPort;
+import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.service.NotificationCreatorService;
 import com.warehouse.shipment.domain.vo.Notification;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.PaymentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import lombok.AllArgsConstructor;
 
@@ -29,8 +28,6 @@ public class ShipmentAdapter implements ShipmentPort {
     private final NotificationMapper notificationMapper;
 
     private final PaypalPort paypalPort;
-
-    private final PaymentMapper paymentMapper;
 
     private final NotificationCreatorService notificationCreatorService;
 
@@ -75,12 +72,9 @@ public class ShipmentAdapter implements ShipmentPort {
 
         final Long parcelId = parcelRepository.save(parcel);
 
-        final com.warehouse.shipment.domain.vo.PaymentRequest paymentRequest =
-                buildPaymentRequest(parcelId, parcel.getParcelType().getPrice());
+        final PaymentRequest paymentRequest = buildPaymentRequest(parcelId, parcel.getParcelType().getPrice());
 
-        final PaymentRequest request1 = paymentMapper.map(paymentRequest);
-
-        final PaymentResponse payment = paypalPort.payment(request1);
+        final PaymentResponse payment = paypalPort.payment(paymentRequest);
 
         final Notification notification = notificationCreatorService.createNotification(parcel,
                 payment.getLink().getPaymentUrl());
@@ -93,9 +87,8 @@ public class ShipmentAdapter implements ShipmentPort {
 
     }
 
-    private com.warehouse.shipment.domain.vo.PaymentRequest buildPaymentRequest(Long parcelId, double price) {
-        final com.warehouse.shipment.domain.vo.PaymentRequest request =
-                new com.warehouse.shipment.domain.vo.PaymentRequest();
+    private PaymentRequest buildPaymentRequest(Long parcelId, double price) {
+        final PaymentRequest request = new PaymentRequest();
         request.setParcelId(parcelId);
         request.setPrice(price);
 

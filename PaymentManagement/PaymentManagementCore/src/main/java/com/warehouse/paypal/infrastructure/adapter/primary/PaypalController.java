@@ -1,9 +1,10 @@
 package com.warehouse.paypal.infrastructure.adapter.primary;
 
 
+import com.warehouse.paypal.domain.model.PaymentInformation;
 import com.warehouse.paypal.domain.model.PaymentRequest;
 import com.warehouse.paypal.domain.model.PaymentResponse;
-import com.warehouse.paypal.domain.port.secondary.PaymentSecondaryPort;
+import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,16 +13,20 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class PaypalController {
 
-    private final PaymentSecondaryPort paymentSecondaryPort;
+    private final PaypalPort paypalPort;
 
     @PostMapping("/pay")
     public PaymentResponse payment(@RequestBody PaymentRequest request) {
-        return paymentSecondaryPort.payment(request);
+        return paypalPort.payment(request);
     }
 
     @GetMapping(value = "/pay/success")
     public String successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
-        return paymentSecondaryPort.update(paymentId, payerId);
+        final PaymentInformation paymentInformation = new PaymentInformation();
+        paymentInformation.setPaymentId(paymentId);
+        paymentInformation.setPayerId(payerId);
+
+        return paypalPort.update(paymentInformation);
     }
 
     @GetMapping(value = "/pay/cancel")
