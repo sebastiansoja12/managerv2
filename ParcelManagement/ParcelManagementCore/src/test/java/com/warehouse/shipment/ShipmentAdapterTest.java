@@ -11,21 +11,17 @@ import com.warehouse.shipment.domain.service.NotificationCreatorService;
 import com.warehouse.shipment.domain.vo.Notification;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentAdapter;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.PaymentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
-import com.warehouse.shipment.infrastructure.api.ShipmentService;
-import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelRequestDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipmentAdapterTest {
@@ -41,8 +37,7 @@ public class ShipmentAdapterTest {
     private NotificationMapper notificationMapper;
     @Mock
     private PaypalPort paypalPort;
-    @Mock
-    private PaymentMapper paymentMapper;
+
     @Mock
     private NotificationCreatorService notificationCreatorService;
     @Mock
@@ -56,7 +51,7 @@ public class ShipmentAdapterTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         shipmentAdapter = new ShipmentAdapter(shipmentMapper, parcelRepository, mailPort, notificationMapper,
-                paypalPort, paymentMapper, notificationCreatorService, routeLogEventPublisher,
+                paypalPort, notificationCreatorService, routeLogEventPublisher,
                 addressDeterminationService);
     }
     @Test
