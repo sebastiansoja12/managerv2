@@ -7,7 +7,7 @@ import com.warehouse.reroute.domain.port.secondary.ParcelPort;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.ParcelResponse;
+import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
 import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 import com.warehouse.reroute.domain.model.Token;
 import lombok.AllArgsConstructor;
@@ -22,14 +22,15 @@ public class RerouteServiceImpl implements RerouteService {
     private final RerouteTokenRepository rerouteTokenRepository;
 
     @Override
-    public ParcelResponse update(UpdateParcelRequest parcelRequest) {
-        final ParcelResponse parcelResponse = parcelPort.update(parcelRequest);
+    public ParcelUpdateResponse update(UpdateParcelRequest parcelRequest) {
+
+        final ParcelUpdateResponse parcelUpdateResponse = parcelPort.update(parcelRequest);
 
         final Token token = token(parcelRequest.getToken());
 
         rerouteTokenRepository.deleteByToken(token);
 
-        return parcelResponse;
+        return parcelUpdateResponse;
     }
 
     @Override

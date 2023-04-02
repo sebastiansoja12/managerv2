@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class ParcelResponse {
+public class ParcelUpdateResponse {
     ParcelId parcelId;
     Sender sender;
     Recipient recipient;

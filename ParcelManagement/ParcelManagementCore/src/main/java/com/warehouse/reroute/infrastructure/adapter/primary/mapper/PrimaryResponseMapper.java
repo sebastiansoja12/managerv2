@@ -1,7 +1,7 @@
 package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.reroute.domain.model.RerouteResponse;
-import com.warehouse.reroute.domain.vo.ParcelResponse;
+import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
 import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 import com.warehouse.reroute.infrastructure.api.dto.ParcelResponseDto;
 import com.warehouse.reroute.infrastructure.api.dto.RerouteResponseDto;
@@ -17,7 +17,7 @@ public interface PrimaryResponseMapper {
     RerouteResponse map(RerouteResponseDto rerouteResponse);
 
     @Mapping(source = "parcelType", target = "parcelType")
-    ParcelResponseDto map(ParcelResponse parcelResponse);
+    ParcelResponseDto map(ParcelUpdateResponse parcelUpdateResponse);
 
     @Mapping(source = "parcelId.value", target = "parcelId")
     RerouteTokenResponseDto map(RerouteTokenResponse rerouteTokenResponse);

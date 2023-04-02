@@ -17,7 +17,6 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepos
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentAdapter;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.PaymentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +31,8 @@ public class ShipmentConfiguration {
         RouteLogEventPublisher routeLogEventPublisher, AddressDeterminationService addressDeterminationService) {
         final ShipmentMapper shipmentMapper = Mappers.getMapper(ShipmentMapper.class);
         final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
-        final PaymentMapper paymentMapper = Mappers.getMapper(PaymentMapper.class);
         return new ShipmentAdapter(shipmentMapper, shipmentRepository, mailPort, notificationMapper, paypalPort,
-                paymentMapper, creatorService, routeLogEventPublisher, addressDeterminationService);
+                creatorService, routeLogEventPublisher, addressDeterminationService);
     }
 
     @Bean
@@ -58,8 +56,9 @@ public class ShipmentConfiguration {
         return new ShipmentPortImpl(service);
     }
 
-    @Bean
-    public ShipmentService shipmentService(com.warehouse.shipment.domain.port.secondary.ShipmentPort shipmentPort) {
-        return new ShipmentServiceImpl(shipmentPort);
+    @Bean(name = "shipment.shipmentService")
+    public ShipmentService shipmentService(com.warehouse.shipment.domain.port.secondary.ShipmentPort shipmentPort,
+                                           ShipmentRepository shipmentRepository) {
+        return new ShipmentServiceImpl(shipmentPort, shipmentRepository);
     }
 }

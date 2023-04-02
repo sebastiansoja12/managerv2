@@ -13,6 +13,5 @@ public interface SupplierRequestMapper {
 
     Supplier map(SupplierAddRequest supplierDto);
 
-
     List<Supplier> map(List<SupplierAddRequest> supplierAddRequestList);
 }

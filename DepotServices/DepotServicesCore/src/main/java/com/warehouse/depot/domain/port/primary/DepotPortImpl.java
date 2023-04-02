@@ -3,7 +3,7 @@ package com.warehouse.depot.domain.port.primary;
 import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.domain.model.DepotCode;
 import com.warehouse.depot.domain.model.DepotId;
-import com.warehouse.depot.domain.port.secondary.DepotSecondaryPort;
+import com.warehouse.depot.domain.port.secondary.DepotRepository;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -12,30 +12,30 @@ import java.util.List;
 public class DepotPortImpl implements DepotPort {
 
 
-    private final DepotSecondaryPort depotSecondaryPort;
+    private final DepotRepository depotRepository;
 
     @Override
     public void add(Depot depot) {
-        depotSecondaryPort.add(depot);
+        depotRepository.save(depot);
     }
 
     @Override
     public Depot viewDepotById(DepotId depotId) {
-        return depotSecondaryPort.viewById(depotId);
+        return depotRepository.viewById(depotId);
     }
 
     @Override
     public Depot viewDepotByCode(DepotCode depotCode) {
-        return depotSecondaryPort.viewByCode(depotCode);
+        return depotRepository.viewByCode(depotCode);
     }
 
     @Override
     public List<Depot> findAll() {
-        return depotSecondaryPort.findAll();
+        return depotRepository.findAll();
     }
 
     @Override
     public void addMultipleDepots(List<Depot> depots) {
-        depotSecondaryPort.addMultiple(depots);
+        depotRepository.saveAll(depots);
     }
 }

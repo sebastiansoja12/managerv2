@@ -1,7 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.warehouse.auth.domain.model.Depot;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +29,6 @@ public class UserEntity {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotEmpty
     @Column(nullable = false)
     private String password;
@@ -47,7 +45,6 @@ public class UserEntity {
     @Column(nullable = false)
     private String email;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String role;
 
     @Column(nullable = false)

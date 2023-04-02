@@ -14,6 +14,9 @@ import javax.persistence.*;
 @Entity(name = "supplier.SupplierEntity")
 @Builder
 @Table(name = "supplier")
+@NamedEntityGraph(name = "SupplierEntity.full", attributeNodes = {
+        @NamedAttributeNode("depot")
+})
 public class SupplierEntity {
 
     @Id

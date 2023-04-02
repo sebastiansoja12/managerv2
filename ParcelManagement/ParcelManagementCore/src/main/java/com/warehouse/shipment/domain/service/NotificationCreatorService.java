@@ -5,5 +5,5 @@ import com.warehouse.shipment.domain.vo.Notification;
 
 public interface NotificationCreatorService {
 
-    Notification createNotification(Parcel parcel, String paymentUrl);
+    Notification createNotification(Parcel parcel, String message);
 }

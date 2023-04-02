@@ -1,62 +1,70 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
-import com.warehouse.reroute.domain.enumeration.ParcelType;
-import com.warehouse.reroute.domain.model.Parcel;
-import com.warehouse.reroute.domain.model.RerouteToken;
-import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.model.UpdateParcelRequest;
-import com.warehouse.reroute.domain.port.secondary.ParcelRepository;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
-import com.warehouse.reroute.domain.vo.ParcelResponse;
-import com.warehouse.reroute.domain.vo.Recipient;
-import com.warehouse.reroute.domain.vo.Sender;
+import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
+import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.ParcelMapper;
+import com.warehouse.shipment.infrastructure.api.ShipmentService;
+import com.warehouse.shipment.infrastructure.api.dto.RecipientDto;
+import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelRequestDto;
+import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelResponseDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
 public class ParcelAdapterTest {
 
     @Mock
-    private ParcelRepository parcelRepository;
+    private ShipmentService shipmentService;
 
     @Mock
-    private RerouteTokenRepository rerouteTokenRepository;
+    private ParcelMapper parcelMapper;
 
     @InjectMocks
-    private ParcelAdapter adapter;
+    private ParcelAdapter parcelAdapter;
 
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
-    void shouldUpdate() {
-        // given
-        final Long parcelId = 123456L;
-        final UpdateParcelRequest request = UpdateParcelRequest.builder()
-                .parcel(Parcel.builder()
-                        .recipient(Recipient.builder().build())
-                        .sender(Sender.builder().build())
-                        .parcelType(ParcelType.AVERAGE).build())
-                .id(parcelId)
-                .token(12345)
-                .build();
-        final Token token = Token.builder()
-                .value(12345).build();
-        final RerouteToken rerouteToken = new RerouteToken();
-        when(rerouteTokenRepository.findByToken(token)).thenReturn(rerouteToken);
-        when(parcelRepository.update(request)).thenReturn(Optional.ofNullable(ParcelResponse.builder().build()));
-        // when
-        final ParcelResponse parcelResponse = adapter.update(request);
+    public void shouldSendUpdateRequestToShipmentDomain() {
+        // given: create test data
+        final UpdateParcelRequest request = new UpdateParcelRequest();
+        final UpdateParcelRequestDto requestDto = new UpdateParcelRequestDto();
+        final UpdateParcelResponseDto responseDto = new UpdateParcelResponseDto();
+        final ParcelUpdateResponse expectedResponse = ParcelUpdateResponse.builder().build();
+
+        // mock mappers
+        when(parcelMapper.map(request)).thenReturn(requestDto);
+        when(parcelMapper.map(responseDto)).thenReturn(expectedResponse);
+
+        /// mock service update
+        when(shipmentService.update(requestDto)).thenReturn(responseDto);
+
+        // when: call the method update in secondary adapter
+        final ParcelUpdateResponse actualResponse = parcelAdapter.update(request);
 
         // then
-        verify(parcelRepository).update(request);
-        assertThat(parcelResponse.getRecipient()).isEqualTo(null);
+        assertEquals(expectedResponse, actualResponse);
+
+        // Verify that the parcelMapper.map() method was called exactly once with the correct argument
+        verify(parcelMapper, times(1)).map(request);
+
+        // Verify that the shipmentService.update() method was called exactly once with the correct argument
+        verify(shipmentService, times(1)).update(requestDto);
+
+        // Verify that the parcelMapper.map() method was called exactly once with the correct argument
+        verify(parcelMapper, times(1)).map(responseDto);
+    }
+
+    private RecipientDto recipient() {
+        return RecipientDto.builder()
+                .city("Poznań").build();
     }
 }

@@ -9,11 +9,12 @@ import java.util.List;
 public interface DepotRepository {
     void save(Depot depot);
 
+    void saveAll(List<Depot> depots);
+
     Depot viewByCode(DepotCode depotCode);
 
     Depot viewById(DepotId depotId);
 
     List<Depot> findAll();
 
-    void saveAll(List<Depot> depots);
 }

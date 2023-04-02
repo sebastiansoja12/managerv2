@@ -17,10 +17,14 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 
 
 @ExtendWith(SpringExtension.class)
@@ -46,5 +50,25 @@ public class DepotReadRepositoryTest {
         // then
         assertTrue(depot.isPresent());
         assertEquals(depotCode, depot.get().getDepotCode());
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/depots.xml")
+    void shouldFindAll() {
+        // when
+        final List<DepotEntity> depot = repository.findAll();
+        // then
+        assertTrue(depot.size() > 0);
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/depots.xml")
+    void shouldNotFindDepotByCode() {
+        // given
+        final String depotCode = "abc";
+        // when
+        final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode);
+        // then
+        assertFalse(depot.isPresent());
     }
 }

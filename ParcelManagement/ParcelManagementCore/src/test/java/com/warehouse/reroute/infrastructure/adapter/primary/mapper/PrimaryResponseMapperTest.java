@@ -44,14 +44,14 @@ public class PrimaryResponseMapperTest {
     @Test
     void shouldMapFromParcelResponseToParcelResponseDto() {
         // given
-        final ParcelResponse parcelResponse = ParcelResponse.builder()
+        final ParcelUpdateResponse parcelUpdateResponse = ParcelUpdateResponse.builder()
                 .parcelId(new ParcelId(PARCEL_ID))
                 .parcelType(ParcelType.AVERAGE)
                 .recipient(Recipient.builder().build())
                 .sender(Sender.builder().build())
                 .build();
         // when
-        final ParcelResponseDto parcelResponseDto = mapper.map(parcelResponse);
+        final ParcelResponseDto parcelResponseDto = mapper.map(parcelUpdateResponse);
 
         // then
         assertThat(parcelResponseDto.getParcelId().getValue()).isEqualTo(PARCEL_ID);

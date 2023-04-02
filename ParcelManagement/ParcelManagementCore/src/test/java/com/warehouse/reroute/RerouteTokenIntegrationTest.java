@@ -4,21 +4,23 @@ import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.reroute.configuration.RerouteTokenTestConfiguration;
 import com.warehouse.reroute.domain.enumeration.ParcelType;
-import com.warehouse.reroute.domain.exception.ParcelNotFoundException;
-import com.warehouse.reroute.domain.model.*;
+import com.warehouse.reroute.domain.model.Parcel;
+import com.warehouse.reroute.domain.model.RerouteRequest;
+import com.warehouse.reroute.domain.model.UpdateParcelRequest;
+import com.warehouse.reroute.domain.port.primary.RerouteServicePort;
 import com.warehouse.reroute.domain.port.secondary.ParcelPort;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
-import com.warehouse.reroute.domain.vo.ParcelResponse;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
+import com.warehouse.reroute.infrastructure.adapter.secondary.exception.EmailNotFoundException;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
-import com.warehouse.reroute.infrastructure.adapter.secondary.exception.WarehouseMailException;
 import com.warehouse.reroute.infrastructure.api.RerouteService;
 import com.warehouse.reroute.infrastructure.api.dto.EmailDto;
 import com.warehouse.reroute.infrastructure.api.dto.ParcelId;
 import com.warehouse.reroute.infrastructure.api.dto.RerouteRequestDto;
 import com.warehouse.reroute.infrastructure.api.dto.RerouteResponseDto;
+import com.warehouse.shipment.infrastructure.api.dto.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -50,13 +52,7 @@ public class RerouteTokenIntegrationTest {
     private RerouteService rerouteService;
 
     @Autowired
-    private RerouteTokenRepository rerouteTokenRepository;
-
-    @Autowired
-    private RerouteTokenPort rerouteTokenPort;
-
-    @Autowired
-    private ParcelPort parcelPort;
+    private RerouteServicePort rerouteServicePort;
 
     private final static Long PARCEL_ID = 100001L;
 
@@ -79,13 +75,7 @@ public class RerouteTokenIntegrationTest {
 
     @Test
     void shouldNotSendRequest() {
-        shouldThrowExceptionWhenParcelIdIsEmpty();
-    }
-
-    @Test
-    @DatabaseSetup("/dataset/rerouteToken.xml")
-    void shouldSendUpdateParcelRequest() {
-        shouldUpdateParcelRequestWhenTokenAndParcelExistInDb();
+        shouldThrowExceptionWhenEmailIsEmpty();
     }
 
     @Test
@@ -93,36 +83,6 @@ public class RerouteTokenIntegrationTest {
     void shouldThrowRerouteTokenNotFoundException() {
         shouldNotUpdateParcelRequestWhenTokenDoesntExistInDb();
     }
-
-    @Test
-    @DatabaseSetup("/dataset/rerouteToken.xml")
-    void shouldThrowParcelNotFoundException() {
-        shouldNotUpdateParcelRequestWhenParcelDoesntExistInDb();
-    }
-
-    void shouldNotUpdateParcelRequestWhenParcelDoesntExistInDb() {
-        // given
-        final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder()
-                .parcel(createParcel())
-                .id(INVALID_PARCEL_ID)
-                .token(VALID_TOKEN)
-                .build();
-
-        final Token token = Token.builder()
-                .value(VALID_TOKEN)
-                .build();
-        // when
-        final Executable executable = () -> parcelPort.update(updateParcelRequest);
-
-        final ParcelNotFoundException parcelNotFoundException =
-                assertThrows(ParcelNotFoundException.class, executable);
-        // then
-        assertAll(
-                () -> assertThat(parcelNotFoundException.getMessage())
-                        .isEqualTo("Parcel was not found")
-        );
-    }
-
 
     void shouldNotUpdateParcelRequestWhenTokenDoesntExistInDb() {
         // given
@@ -132,11 +92,8 @@ public class RerouteTokenIntegrationTest {
                 .token(INVALID_TOKEN)
                 .build();
 
-        final Token token = Token.builder()
-                .value(INVALID_TOKEN)
-                .build();
         // when
-        final Executable executable = () -> parcelPort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteServicePort.update(updateParcelRequest);
 
         final RerouteTokenNotFoundException rerouteTokenNotFoundException =
                 assertThrows(RerouteTokenNotFoundException.class, executable);
@@ -144,28 +101,6 @@ public class RerouteTokenIntegrationTest {
         assertAll(
                 () -> assertThat(rerouteTokenNotFoundException.getMessage())
                         .isEqualTo("Reroute token was not found")
-        );
-    }
-
-    void shouldUpdateParcelRequestWhenTokenAndParcelExistInDb() {
-        // given
-        final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder()
-                .parcel(createParcel())
-                .id(PARCEL_ID)
-                .token(VALID_TOKEN)
-                .build();
-
-        final Token token = Token.builder()
-                .value(VALID_TOKEN)
-                .build();
-        // when
-        final ParcelResponse response = parcelPort.update(updateParcelRequest);
-        // and: we will check if given token exists in db
-        final RerouteToken rerouteToken = rerouteTokenRepository.findByToken(token);
-        // then
-        assertAll(
-                () -> assertThat(response.getSender().getFirstName()).isEqualTo("updatedTest"),
-                () -> assertThat(rerouteToken.getToken().intValue()).isEqualTo(VALID_TOKEN)
         );
     }
 
@@ -188,26 +123,19 @@ public class RerouteTokenIntegrationTest {
 
     }
 
-    void shouldThrowExceptionWhenParcelIdIsEmpty() {
+    void shouldThrowExceptionWhenEmailIsEmpty() {
         // given
-        final EmailDto emailDto = new EmailDto();
-        emailDto.setValue("");
+        final RerouteRequest request = new RerouteRequest();
+        request.setParcelId(PARCEL_ID);
 
-        final ParcelId parcelId = new ParcelId();
-
-        final RerouteRequestDto requestDto = new RerouteRequestDto();
-        requestDto.setEmail(emailDto);
-        requestDto.setParcelId(parcelId);
-
-        final String exceptionMessage = "parcelId is marked non-null but is null";
+        final String exceptionMessage = "E-Mail cannot be null";
 
         // when
-        final Executable executable = () -> rerouteService.sendReroutingInformation(requestDto);
+        final Executable executable = () -> rerouteServicePort.sendReroutingInformation(request);
 
-        final NullPointerException exception = assertThrows(NullPointerException.class, executable);
+        final EmailNotFoundException exception = assertThrows(EmailNotFoundException.class, executable);
         //then
         assertThat(exception.getMessage()).isEqualTo(exceptionMessage);
-
     }
 
 
@@ -217,6 +145,18 @@ public class RerouteTokenIntegrationTest {
                 .parcelType(ParcelType.TEST)
                 .sender(createSender())
                 .build();
+    }
+
+    private ParcelDto createParcelDto() {
+        final ParcelIdDto parcelId = new ParcelIdDto();
+        parcelId.setValue(PARCEL_ID);
+
+        final ParcelDto parcel = new ParcelDto();
+        parcel.setRecipient(createShipmentApiRecipient());
+        parcel.setSender(createShipmentApiSender());
+        parcel.setParcelType(ParcelTypeDto.TEST);
+        parcel.setParcelId(parcelId);
+        return parcel;
     }
 
     private Recipient createRecipient() {
@@ -234,6 +174,30 @@ public class RerouteTokenIntegrationTest {
     private Sender createSender() {
         return Sender.builder()
                 .firstName("updatedTest")
+                .lastName("test")
+                .city("test")
+                .street("test")
+                .postalCode("00-000")
+                .telephoneNumber("123")
+                .email("test@test.pl")
+                .build();
+    }
+
+    private SenderDto createShipmentApiSender() {
+        return SenderDto.builder()
+                .firstName("updatedTest")
+                .lastName("test")
+                .city("test")
+                .street("test")
+                .postalCode("00-000")
+                .telephoneNumber("123")
+                .email("test@test.pl")
+                .build();
+    }
+
+    private RecipientDto createShipmentApiRecipient() {
+        return RecipientDto.builder()
+                .firstName("test")
                 .lastName("test")
                 .city("test")
                 .street("test")

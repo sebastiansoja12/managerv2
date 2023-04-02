@@ -1,49 +1,106 @@
 package com.warehouse.shipment;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.shipment.configuration.ShipmentConfigurationTest;
-import com.warehouse.shipment.domain.enumeration.ParcelType;
-import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.domain.model.*;
+import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
+import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentRepositoryImpl;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Optional;
 
-@ExtendWith(SpringExtension.class)
-@DataJpaTest
-@ContextConfiguration(classes = ShipmentConfigurationTest.class)
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class })
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-// TODO REBUILD
 public class ShipmentRepositoryTest {
 
-    @Autowired
+    @Mock
+    private ShipmentReadRepository readRepository;
+
+    @Mock
+    private ParcelMapper parcelMapper;
+
     private ShipmentRepository shipmentRepository;
 
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        shipmentRepository = new ShipmentRepositoryImpl(readRepository, parcelMapper);
+    }
+
     @Test
-    @DatabaseSetup("/dataset/shipment.xml")
-    void shouldLoadById() {
+    void shouldSaveParcel() {
         // given
-        final Long parcelId = 100001L;
+        final Parcel parcel = new Parcel();
+        parcel.setId(1L);
+
+        final ParcelEntity entity = new ParcelEntity();
+        // map to entity
+        Mockito.when(parcelMapper.map(parcel)).thenReturn(entity);
         // when
-        final Parcel parcel = shipmentRepository.loadParcelById(parcelId);
+        shipmentRepository.save(parcel);
+
         // then
-        assertThat(parcel.getId()).isEqualTo(parcelId);
+        Mockito.verify(readRepository).save(entity);
+    }
+
+    @Test
+    void shouldDeleteParcel() {
+        // given
+        final Long parcelId = 1L;
+
+        // when
+        shipmentRepository.delete(parcelId);
+
+        // then
+        Mockito.verify(readRepository).deleteById(parcelId);
+    }
+
+    @Test
+    void shouldReturnParcelById() {
+        // given
+        final Long parcelId = 1L;
+        final ParcelEntity entity = new ParcelEntity();
+        final Parcel parcel = new Parcel();
+        Mockito.when(readRepository.findParcelEntityById(parcelId)).thenReturn(Optional.of(entity));
+        Mockito.when(parcelMapper.map(entity)).thenReturn(parcel);
+        // when
+        final Parcel result = shipmentRepository.loadParcelById(parcelId);
+
+        // then
+        Assertions.assertEquals(parcel, result);
+    }
+
+    @Test
+    void shouldNotFindParcelAndThrowException() {
+        // given
+        final Long parcelId = 1L;
+        Mockito.when(readRepository.findParcelEntityById(parcelId)).thenReturn(Optional.empty());
+
+        // when && then
+        Assertions.assertThrows(ParcelNotFoundException.class, () -> {
+            shipmentRepository.loadParcelById(parcelId);
+        });
+    }
+
+    @Test
+    void shouldUpdate() {
+        // given
+        final Parcel parcelUpdate = new Parcel();
+        final ParcelEntity entity = new ParcelEntity();
+        final UpdateParcelResponse updateParcelResponse = new UpdateParcelResponse();
+
+        Mockito.when(parcelMapper.mapForUpdate(parcelUpdate)).thenReturn(entity);
+        Mockito.when(readRepository.save(entity)).thenReturn(entity);
+        Mockito.when(parcelMapper.mapToUpdateParcelResponse(entity)).thenReturn(updateParcelResponse);
+        // when
+        final UpdateParcelResponse result = shipmentRepository.update(parcelUpdate);
+
+        // then
+        Assertions.assertEquals(updateParcelResponse, result);
     }
 }

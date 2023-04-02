@@ -6,7 +6,7 @@ import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.model.UpdateParcelRequest;
 import com.warehouse.reroute.domain.port.primary.RerouteServicePort;
 import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.ParcelResponse;
+import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
 import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class RerouteTokenController {
     }
 
     @PostMapping()
-    ParcelResponse update(@RequestBody UpdateParcelRequest request) {
+    ParcelUpdateResponse update(@RequestBody UpdateParcelRequest request) {
         return port.update(request);
     }
 
