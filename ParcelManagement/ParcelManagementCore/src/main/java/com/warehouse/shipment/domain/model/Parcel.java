@@ -20,6 +20,8 @@ public class Parcel {
 
     double price;
 
+    String status;
+
     public double price() {
         return parcelType.getPrice();
     }

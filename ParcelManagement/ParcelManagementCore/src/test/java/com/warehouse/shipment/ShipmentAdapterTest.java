@@ -5,6 +5,7 @@ import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.service.NotificationCreatorService;
@@ -51,8 +52,7 @@ public class ShipmentAdapterTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         shipmentAdapter = new ShipmentAdapter(shipmentMapper, parcelRepository, mailPort, notificationMapper,
-                paypalPort, notificationCreatorService, routeLogEventPublisher,
-                addressDeterminationService);
+                paypalPort, notificationCreatorService, routeLogEventPublisher, addressDeterminationService);
     }
     @Test
     public void shouldUpdateParcel() {
@@ -86,6 +86,7 @@ public class ShipmentAdapterTest {
                 .recipient(createRecipient())
                 .parcelType(ParcelType.TEST)
                 .sender(createSender())
+                .status(Status.REROUTE.name())
                 .build();
     }
 

@@ -7,6 +7,7 @@ import com.warehouse.paypal.domain.model.PaymentResponse;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.route.infrastructure.api.event.ShipmentLogEvent;
+import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.ShipmentPort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
@@ -53,6 +54,8 @@ public class ShipmentAdapter implements ShipmentPort {
 
         parcel.setDestination(fastestRoute);
 
+        parcel.setStatus(Status.REROUTE.name());
+
         final Notification notification = notificationCreatorService.createNotification(parcel, REROUTE_MESSAGE);
 
         final com.warehouse.mail.domain.vo.Notification mailNotification = notificationMapper.map(notification);
@@ -64,11 +67,13 @@ public class ShipmentAdapter implements ShipmentPort {
 
     private ShipmentResponse createParcel(ShipmentRequest request) {
 
-        final Parcel parcel = shipmentMapper.map(request);
+        final Parcel parcel = request.getParcel();
 
         final String fastestRoute = addressDeterminationService.findFastestRoute(parcel.getRecipient().getCity());
 
         parcel.setDestination(fastestRoute);
+
+        parcel.setStatus(Status.CREATED.name());
 
         final Long parcelId = parcelRepository.save(parcel);
 

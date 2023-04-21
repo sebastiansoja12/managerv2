@@ -26,6 +26,7 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.street", target = "recipientStreet")
     @Mapping(source = "parcelType", target = "parcelType")
     @Mapping(source = "price", target = "price")
+    @Mapping(source = "status", target = "status")
     ParcelEntity map(Parcel parcel);
 
     @Mapping(target = "id", source = "id")
@@ -45,6 +46,7 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.street", target = "recipientStreet")
     @Mapping(source = "parcelType", target = "parcelType")
     @Mapping(source = "price", target = "price")
+    @Mapping(source = "status", target = "status")
     ParcelEntity mapForUpdate(Parcel parcel);
 
     ParcelEntity map(ParcelUpdate parcel);

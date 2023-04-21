@@ -1,6 +1,7 @@
 package com.warehouse.shipment.mapper;
 
 import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
@@ -30,6 +31,9 @@ public class ParcelMapperTest {
 
         // then
         assertThat(parcelEntity.getParcelType().getSize()).isEqualTo("test");
+        // and status is enum type CREATED
+        assertThat(parcelEntity.getStatus().name()).isEqualTo("CREATED");
+
     }
 
     @Test
@@ -38,6 +42,7 @@ public class ParcelMapperTest {
         final ParcelEntity parcelEntity = ParcelEntity.builder()
                 .price(20)
                 .lastName("test")
+                .status(Status.CREATED)
                 .build();
         // when
         final Parcel parcel = mapper.map(parcelEntity);
@@ -45,12 +50,17 @@ public class ParcelMapperTest {
         // then
         assertThat(parcel.getPrice()).isEqualTo(20);
         assertThat(parcel.getSender().getLastName()).isEqualTo("test");
+
+        // and status is enum type CREATED
+        assertThat(parcel.getStatus()).isEqualTo("CREATED");
     }
     private Parcel createParcel() {
         return Parcel.builder()
                 .parcelType(ParcelType.TEST)
                 .id(1L)
                 .price(20)
+                .destination("KT1")
+                .status("CREATED")
                 .sender(null)
                 .recipient(null)
                 .build();

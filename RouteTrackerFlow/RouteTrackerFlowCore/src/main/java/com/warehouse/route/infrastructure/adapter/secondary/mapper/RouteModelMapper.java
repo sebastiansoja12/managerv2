@@ -47,6 +47,9 @@ public interface RouteModelMapper {
     @Mapping(target = "user.id", source = "userId")
     RouteEntity map(Route route);
 
+    @Mapping(target = "parcel.id", source = "parcelId")
+    RouteEntity mapInitialize(Route route);
+
 
     @Mapping(source = "id", target = "id")
     RouteResponse mapToRouteResponse(RouteEntity routeEntity);

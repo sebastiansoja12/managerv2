@@ -1,6 +1,7 @@
 package com.warehouse.route.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Status;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -92,4 +93,10 @@ public class ParcelEntity {
 
     @Column(name = "price", nullable = false)
     private double price;
+
+    @Column(name = "destination", nullable = false)
+    private String destination;
+
+    @Column(name = "status", nullable = false)
+    private Status status;
 }

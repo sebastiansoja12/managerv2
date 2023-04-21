@@ -1,6 +1,7 @@
 package com.warehouse.shipment;
 
 import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
 import com.warehouse.shipment.domain.model.*;
@@ -126,6 +127,8 @@ class ShipmentPrimaryPortTest {
                 .recipient(createRecipient())
                 .parcelType(ParcelType.TEST)
                 .sender(createSender())
+                .status(Status.CREATED.name())
+                .destination("KT1")
                 .id(1L)
                 .build();
     }
