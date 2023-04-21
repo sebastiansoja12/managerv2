@@ -66,6 +66,8 @@ public interface ParcelMapper {
 
     @Mapping(source = "id", target = "parcel.parcelId.value")
     @Mapping(source = "token", target = "token.value")
+    @Mapping(source = "parcel.sender", target = "parcel.sender")
+    @Mapping(source = "parcel.recipient", target = "parcel.recipient")
     UpdateParcelRequestDto map(UpdateParcelRequest updateParcelRequest);
 
     @Mapping(source = "parcel.sender.firstName", target = "sender.firstName")
