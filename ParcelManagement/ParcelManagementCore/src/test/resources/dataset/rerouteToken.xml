@@ -37,8 +37,9 @@
             RECIPIENT_CITY="test"
             RECIPIENT_STREET="test"
             RECIPIENT_POSTAL_CODE="00-000"
-            PARCEL_TYPE="3"
-            PRICE="10"
+            PARCEL_SIZE="3"
+            DESTINATION="KT1"
+            STATUS="0"
     />
 
 </dataset>

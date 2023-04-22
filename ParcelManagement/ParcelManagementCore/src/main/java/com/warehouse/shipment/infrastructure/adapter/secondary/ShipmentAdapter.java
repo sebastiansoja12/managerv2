@@ -77,7 +77,7 @@ public class ShipmentAdapter implements ShipmentPort {
 
         final Long parcelId = parcelRepository.save(parcel);
 
-        final PaymentRequest paymentRequest = buildPaymentRequest(parcelId, parcel.getParcelType().getPrice());
+        final PaymentRequest paymentRequest = buildPaymentRequest(parcelId, parcel.getParcelSize().getPrice());
 
         final PaymentResponse payment = paypalPort.payment(paymentRequest);
 

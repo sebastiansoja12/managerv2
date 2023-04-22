@@ -2,7 +2,7 @@ package com.warehouse.shipment.mapper;
 
 import com.warehouse.paypal.domain.model.LinkInformation;
 import com.warehouse.paypal.domain.model.PaymentResponse;
-import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Size;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.Sender;
 import com.warehouse.shipment.domain.model.ShipmentRequest;
@@ -60,7 +60,7 @@ public class ShipmentMapperTest {
 
     private Parcel createParcel() {
         return Parcel.builder()
-                .parcelType(ParcelType.TEST)
+                .parcelSize(Size.TEST)
                 .id(1L)
                 .price(20)
                 .sender(createSender())

@@ -3,14 +3,11 @@ package com.warehouse.reroute;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.reroute.configuration.RerouteTokenTestConfiguration;
-import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.UpdateParcelRequest;
 import com.warehouse.reroute.domain.port.primary.RerouteServicePort;
-import com.warehouse.reroute.domain.port.secondary.ParcelPort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenPort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.EmailNotFoundException;
@@ -142,7 +139,7 @@ public class RerouteTokenIntegrationTest {
     private Parcel createParcel() {
         return Parcel.builder()
                 .recipient(createRecipient())
-                .parcelType(ParcelType.TEST)
+                .parcelSize(Size.TEST)
                 .sender(createSender())
                 .build();
     }
@@ -154,7 +151,7 @@ public class RerouteTokenIntegrationTest {
         final ParcelDto parcel = new ParcelDto();
         parcel.setRecipient(createShipmentApiRecipient());
         parcel.setSender(createShipmentApiSender());
-        parcel.setParcelType(ParcelTypeDto.TEST);
+        parcel.setParcelSize(ParcelSizeDto.TEST);
         parcel.setParcelId(parcelId);
         return parcel;
     }

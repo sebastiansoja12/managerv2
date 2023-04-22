@@ -1,7 +1,7 @@
 package com.warehouse.reroute.infrastructure.api.dto;
 
 
-public enum ParcelTypeDto {
+public enum ParcelSizeDto {
 
     TINY("5cmx5cmx5cm", 10),
     SMALL("10cmx10cmx10cm", 15),
@@ -14,7 +14,7 @@ public enum ParcelTypeDto {
     private final String parcelSize;
     public final double price;
 
-    ParcelTypeDto(String size, double price) {
+    ParcelSizeDto(String size, double price) {
         this.parcelSize = size;
         this.price = price;
     }

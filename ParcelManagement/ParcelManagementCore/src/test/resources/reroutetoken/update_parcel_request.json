@@ -19,7 +19,7 @@
       "postalCode": "60-394",
       "street": "Test 15C/2"
     },
-    "parcelType": "AVERAGE"
+    "parcelSize": "AVERAGE"
   },
   "token": "12345"
 }

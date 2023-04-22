@@ -1,6 +1,6 @@
 package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.Token;
@@ -72,7 +72,7 @@ public class PrimaryRequestMapperTest {
         // given
         final ParcelDto parcelDto = parcelDto();
         when(mapper.map(parcelDto)).thenReturn(Parcel.builder()
-                .parcelType(ParcelType.AVERAGE)
+                .parcelSize(Size.AVERAGE)
                 .recipient(Recipient.builder().build())
                 .sender(Sender.builder().build())
                 .build());
@@ -80,7 +80,7 @@ public class PrimaryRequestMapperTest {
         // when
         final Parcel parcel = mapper.map(parcelDto);
         // then
-        assertThat(parcel.getParcelType().getSize()).isEqualTo(parcelDto.getParcelType().getSize());
+        assertThat(parcel.getParcelSize().getSize()).isEqualTo(parcelDto.getParcelSize().getSize());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class PrimaryRequestMapperTest {
 
     private ParcelDto parcelDto() {
         final ParcelDto parcel = new ParcelDto();
-        parcel.setParcelType(ParcelTypeDto.AVERAGE);
+        parcel.setParcelSize(ParcelSizeDto.AVERAGE);
         parcel.setRecipient(new RecipientDto());
         parcel.setSender(new SenderDto());
         return parcel;

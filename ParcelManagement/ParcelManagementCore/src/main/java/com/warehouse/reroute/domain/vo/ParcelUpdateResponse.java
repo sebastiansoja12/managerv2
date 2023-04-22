@@ -1,6 +1,6 @@
 package com.warehouse.reroute.domain.vo;
 
-import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Size;
 import lombok.Builder;
 import lombok.Value;
 
@@ -10,5 +10,5 @@ public class ParcelUpdateResponse {
     ParcelId parcelId;
     Sender sender;
     Recipient recipient;
-    ParcelType parcelType;
+    Size parcelSize;
 }

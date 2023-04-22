@@ -14,7 +14,7 @@ import com.warehouse.route.infrastructure.adapter.secondary.entity.DepotEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.SupplierEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.UserEntity;
-import com.warehouse.route.infrastructure.adapter.secondary.enumeration.ParcelType;
+import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.domain.enumeration.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -123,7 +123,7 @@ public class RouteLogServiceTest {
 
     private ParcelEntity createParcelEntity() {
         return ParcelEntity.builder()
-                .parcelType(ParcelType.TEST)
+                .parcelSize(Size.TEST)
                 .firstName("test")
                 .lastName("test")
                 .senderTelephone("123")

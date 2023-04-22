@@ -1,7 +1,7 @@
 package com.warehouse.reroute.domain.model;
 
 
-import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ public class ParcelTest {
         final Parcel parcel = Parcel.builder()
                 .sender(sender())
                 .recipient(recipient())
-                .parcelType(parcelType())
+                .parcelSize(parcelSize())
                 .build();
         // then
         assertThat(parcel.getSender().getFirstName()).isNull();
@@ -28,7 +28,7 @@ public class ParcelTest {
     public Sender sender() {
         return Sender.builder().build();
     }
-    public ParcelType parcelType() {
-        return ParcelType.AVERAGE;
+    public Size parcelSize() {
+        return Size.AVERAGE;
     }
 }

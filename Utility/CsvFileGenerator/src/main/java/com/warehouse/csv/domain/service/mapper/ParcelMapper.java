@@ -22,7 +22,7 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.city", target = "recipientCity")
     @Mapping(source = "recipient.postalCode", target = "recipientPostalCode")
     @Mapping(source = "recipient.street", target = "recipientStreet")
-    @Mapping(source = "parcelType", target = "parcelType")
+    @Mapping(source = "parcelSize", target = "parcelSize")
     @Mapping(source = "price", target = "price")
     ParcelCsv map(Parcel parcel);
 }

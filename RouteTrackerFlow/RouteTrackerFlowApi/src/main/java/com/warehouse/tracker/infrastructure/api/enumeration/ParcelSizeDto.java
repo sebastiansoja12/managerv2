@@ -1,6 +1,6 @@
-package com.warehouse.shipment.domain.enumeration;
+package com.warehouse.tracker.infrastructure.api.enumeration;
 
-public enum ParcelType {
+public enum ParcelSizeDto {
 
     TINY("5cmx5cmx5cm", 10),
     SMALL("10cmx10cmx10cm", 15),
@@ -13,7 +13,7 @@ public enum ParcelType {
     private final String parcelSize;
     public final double price;
 
-    ParcelType(String size, double price) {
+    ParcelSizeDto(String size, double price) {
         this.parcelSize = size;
         this.price = price;
     }

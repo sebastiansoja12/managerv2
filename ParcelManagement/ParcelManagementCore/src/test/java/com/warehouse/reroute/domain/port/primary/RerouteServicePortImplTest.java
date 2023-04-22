@@ -1,6 +1,6 @@
 package com.warehouse.reroute.domain.port.primary;
 
-import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.vo.*;
@@ -91,7 +91,7 @@ public class RerouteServicePortImplTest {
         // given
         final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder()
                 .parcel(Parcel.builder()
-                        .parcelType(ParcelType.TEST)
+                        .parcelSize(Size.TEST)
                         .recipient(Recipient.builder().build())
                         .sender(Sender.builder().build())
                         .build()
@@ -101,7 +101,7 @@ public class RerouteServicePortImplTest {
                 .build();
         final ParcelUpdateResponse expectedResponse = ParcelUpdateResponse.builder()
                 .parcelId(new ParcelId(PARCEL_ID))
-                .parcelType(ParcelType.TEST)
+                .parcelSize(Size.TEST)
                 .recipient(Recipient.builder().build())
                 .sender(Sender.builder().build())
                 .build();

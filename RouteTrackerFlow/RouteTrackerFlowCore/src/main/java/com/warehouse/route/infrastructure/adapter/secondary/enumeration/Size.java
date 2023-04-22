@@ -1,6 +1,6 @@
 package com.warehouse.route.infrastructure.adapter.secondary.enumeration;
 
-public enum ParcelType {
+public enum Size {
     TINY("5cmx5cmx5cm", 10),
     SMALL("10cmx10cmx10cm", 15),
     MEDIUM("30cmx30cmx30cm", 20),
@@ -12,7 +12,7 @@ public enum ParcelType {
     private final String parcelSize;
     public final double price;
 
-    ParcelType(String size, double price) {
+    Size(String size, double price) {
         this.parcelSize = size;
         this.price = price;
     }

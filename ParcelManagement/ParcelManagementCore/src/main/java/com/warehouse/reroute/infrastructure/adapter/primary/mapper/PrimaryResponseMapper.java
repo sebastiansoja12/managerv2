@@ -16,7 +16,7 @@ public interface PrimaryResponseMapper {
 
     RerouteResponse map(RerouteResponseDto rerouteResponse);
 
-    @Mapping(source = "parcelType", target = "parcelType")
+    @Mapping(source = "parcelSize", target = "parcelSize")
     ParcelResponseDto map(ParcelUpdateResponse parcelUpdateResponse);
 
     @Mapping(source = "parcelId.value", target = "parcelId")

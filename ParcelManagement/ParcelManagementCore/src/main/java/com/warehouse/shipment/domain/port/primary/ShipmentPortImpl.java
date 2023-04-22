@@ -31,7 +31,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         validateParcelRequest(updateParcelRequest);
         final ParcelUpdate parcelUpdate = ParcelUpdate.builder()
                 .id(updateParcelRequest.getParcel().getId())
-                .parcelType(updateParcelRequest.getParcel().getParcelType())
+                .parcelSize(updateParcelRequest.getParcel().getParcelSize())
                 .senderFirstName(updateParcelRequest.getParcel().getSender().getFirstName())
                 .senderLastName(updateParcelRequest.getParcel().getSender().getLastName())
                 .senderEmail(updateParcelRequest.getParcel().getSender().getEmail())

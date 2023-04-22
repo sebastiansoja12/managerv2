@@ -4,7 +4,7 @@ import com.warehouse.addressdetermination.AddressDeterminationService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Size;
 import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
@@ -84,7 +84,7 @@ public class ShipmentAdapterTest {
     private Parcel createParcel() {
         return Parcel.builder()
                 .recipient(createRecipient())
-                .parcelType(ParcelType.TEST)
+                .parcelSize(Size.TEST)
                 .sender(createSender())
                 .status(Status.REROUTE.name())
                 .build();

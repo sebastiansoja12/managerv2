@@ -9,5 +9,5 @@ public class ParcelResponseDto {
     ParcelIdDto parcelId;
     SenderDto sender;
     RecipientDto recipient;
-    ParcelTypeDto parcelType;
+    ParcelSizeDto parcelSize;
 }

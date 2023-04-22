@@ -24,8 +24,7 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.city", target = "recipientCity")
     @Mapping(source = "recipient.postalCode", target = "recipientPostalCode")
     @Mapping(source = "recipient.street", target = "recipientStreet")
-    @Mapping(source = "parcelType", target = "parcelType")
-    @Mapping(source = "price", target = "price")
+    @Mapping(source = "parcelSize", target = "parcelSize")
     @Mapping(source = "status", target = "status")
     ParcelEntity map(Parcel parcel);
 
@@ -44,8 +43,7 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.city", target = "recipientCity")
     @Mapping(source = "recipient.postalCode", target = "recipientPostalCode")
     @Mapping(source = "recipient.street", target = "recipientStreet")
-    @Mapping(source = "parcelType", target = "parcelType")
-    @Mapping(source = "price", target = "price")
+    @Mapping(source = "parcelSize", target = "parcelSize")
     @Mapping(source = "status", target = "status")
     ParcelEntity mapForUpdate(Parcel parcel);
 
@@ -65,7 +63,7 @@ public interface ParcelMapper {
     @Mapping(target = "recipient.city", source = "recipientCity")
     @Mapping(target = "recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "recipient.street", source = "recipientStreet")
-    @Mapping(target = "parcelType", source = "parcelType")
+    @Mapping(target = "parcelSize", source = "parcelSize")
     @Mapping(target = "id", source = "id")
     Parcel map(ParcelEntity entity);
 
@@ -84,7 +82,7 @@ public interface ParcelMapper {
     @Mapping(target = "parcel.recipient.city", source = "recipientCity")
     @Mapping(target = "parcel.recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "parcel.recipient.street", source = "recipientStreet")
-    @Mapping(target = "parcel.parcelType", source = "parcelType")
+    @Mapping(target = "parcel.parcelSize", source = "parcelSize")
     @Mapping(target = "parcel.id", source = "id")
     UpdateParcelResponse mapToUpdateParcelResponse(ParcelEntity entity);
 }

@@ -1,6 +1,6 @@
 package com.warehouse.route.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.route.infrastructure.adapter.secondary.enumeration.ParcelType;
+import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.domain.enumeration.Status;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -88,11 +88,8 @@ public class ParcelEntity {
     @Column(name = "recipientPostalCode", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "parcelType", nullable = false)
-    private ParcelType parcelType;
-
-    @Column(name = "price", nullable = false)
-    private double price;
+    @Column(name = "parcelSize", nullable = false)
+    private Size parcelSize;
 
     @Column(name = "destination", nullable = false)
     private String destination;

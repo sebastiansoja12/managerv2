@@ -26,7 +26,7 @@ public interface ShipmentMapper {
     @Mapping(source = "parcel.recipient.city", target = "recipient.city")
     @Mapping(source = "parcel.recipient.postalCode", target = "recipient.postalCode")
     @Mapping(source = "parcel.recipient.street", target = "recipient.street")
-    @Mapping(source = "parcel.parcelType", target = "parcelType")
+    @Mapping(source = "parcel.parcelSize", target = "parcelSize")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "price", ignore = true)
     Parcel map(ShipmentRequest request);
@@ -44,7 +44,7 @@ public interface ShipmentMapper {
     @Mapping(target = "recipient.city", source = "recipientCity")
     @Mapping(target = "recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "recipient.street", source = "recipientStreet")
-    @Mapping(target = "parcelType", source = "parcelType")
+    @Mapping(target = "parcelSize", source = "parcelSize")
     @Mapping(target = "id", source = "id")
     Parcel map(ParcelUpdate parcelUpdate);
 

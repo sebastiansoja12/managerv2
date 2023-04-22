@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.model;
 
-import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ public class Parcel {
     Long id;
     Sender sender;
     Recipient recipient;
-    ParcelType parcelType;
+    Size parcelSize;
 
     String destination;
 
@@ -22,7 +22,7 @@ public class Parcel {
 
     String status;
 
-    public double price() {
-        return parcelType.getPrice();
+    public double getPrice() {
+        return this.price = parcelSize.getPrice();
     }
 }
