@@ -52,7 +52,7 @@ public class ParcelMapperTest {
         assertThat(parcel.getSender().getLastName()).isEqualTo("test");
 
         // and status is enum type CREATED
-        assertThat(parcel.getStatus()).isEqualTo("CREATED");
+        assertThat(parcel.getStatus()).isEqualTo(Status.CREATED);
     }
     private Parcel createParcel() {
         return Parcel.builder()
@@ -60,7 +60,7 @@ public class ParcelMapperTest {
                 .id(1L)
                 .price(20)
                 .destination("KT1")
-                .status("CREATED")
+                .status(Status.CREATED)
                 .sender(null)
                 .recipient(null)
                 .build();

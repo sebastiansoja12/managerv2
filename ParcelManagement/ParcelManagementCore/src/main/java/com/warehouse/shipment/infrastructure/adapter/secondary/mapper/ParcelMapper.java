@@ -84,5 +84,7 @@ public interface ParcelMapper {
     @Mapping(target = "parcel.recipient.street", source = "recipientStreet")
     @Mapping(target = "parcel.parcelSize", source = "parcelSize")
     @Mapping(target = "parcel.id", source = "id")
+    @Mapping(target = "parcel.parcelType", source = "parcelType")
+    @Mapping(target = "parcel.status", source = "status")
     UpdateParcelResponse mapToUpdateParcelResponse(ParcelEntity entity);
 }

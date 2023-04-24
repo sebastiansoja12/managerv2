@@ -1,7 +1,8 @@
 package com.warehouse.route.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Size;
-import com.warehouse.shipment.domain.enumeration.Status;
+import com.warehouse.route.infrastructure.adapter.secondary.enumeration.ParcelType;
+import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Status;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -11,7 +12,7 @@ import javax.validation.constraints.Pattern;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -96,4 +97,10 @@ public class ParcelEntity {
 
     @Column(name = "status", nullable = false)
     private Status status;
+
+    @Column(name = "type", nullable = false)
+    private ParcelType parcelType;
+
+    @Column(name = "parentRelatedId")
+    private Long parcelRelatedId;
 }

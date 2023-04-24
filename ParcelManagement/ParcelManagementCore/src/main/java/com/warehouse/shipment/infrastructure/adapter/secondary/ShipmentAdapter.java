@@ -2,17 +2,18 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.addressdetermination.AddressDeterminationService;
 import com.warehouse.mail.domain.port.primary.MailPort;
+import com.warehouse.mail.domain.vo.Notification;
 import com.warehouse.paypal.domain.model.PaymentRequest;
 import com.warehouse.paypal.domain.model.PaymentResponse;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.route.infrastructure.api.event.ShipmentLogEvent;
+import com.warehouse.shipment.domain.enumeration.ParcelType;
 import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.ShipmentPort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.service.NotificationCreatorService;
-import com.warehouse.shipment.domain.vo.Notification;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import lombok.AllArgsConstructor;
@@ -54,13 +55,11 @@ public class ShipmentAdapter implements ShipmentPort {
 
         parcel.setDestination(fastestRoute);
 
-        parcel.setStatus(Status.REROUTE.name());
+        parcel.setStatus(Status.REROUTE);
 
         final Notification notification = notificationCreatorService.createNotification(parcel, REROUTE_MESSAGE);
 
-        final com.warehouse.mail.domain.vo.Notification mailNotification = notificationMapper.map(notification);
-
-        mailPort.sendNotification(mailNotification);
+        mailPort.sendNotification(notification);
 
         return parcelRepository.update(parcel);
     }
@@ -73,7 +72,9 @@ public class ShipmentAdapter implements ShipmentPort {
 
         parcel.setDestination(fastestRoute);
 
-        parcel.setStatus(Status.CREATED.name());
+        parcel.setStatus(Status.CREATED);
+
+        parcel.setParcelType(ParcelType.PARENT);
 
         final Long parcelId = parcelRepository.save(parcel);
 
@@ -84,9 +85,7 @@ public class ShipmentAdapter implements ShipmentPort {
         final Notification notification = notificationCreatorService.createNotification(parcel,
                 payment.getLink().getPaymentUrl());
 
-        final com.warehouse.mail.domain.vo.Notification mailNotification = notificationMapper.map(notification);
-
-        mailPort.sendNotification(mailNotification);
+        mailPort.sendNotification(notification);
 
         return shipmentMapper.map(parcelId, payment);
 

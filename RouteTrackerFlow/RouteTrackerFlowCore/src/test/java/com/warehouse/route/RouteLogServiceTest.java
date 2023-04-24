@@ -14,6 +14,7 @@ import com.warehouse.route.infrastructure.adapter.secondary.entity.DepotEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.SupplierEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.route.infrastructure.adapter.secondary.enumeration.ParcelType;
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.domain.enumeration.Status;
 import org.junit.jupiter.api.BeforeEach;
@@ -139,7 +140,8 @@ public class RouteLogServiceTest {
                 .recipientPostalCode("00-000")
                 .recipientTelephone("1233")
                 .destination("KT1")
-                .status(Status.CREATED)
+                .status(com.warehouse.route.infrastructure.adapter.secondary.enumeration.Status.CREATED)
+                .parcelType(ParcelType.PARENT)
                 .build();
     }
 

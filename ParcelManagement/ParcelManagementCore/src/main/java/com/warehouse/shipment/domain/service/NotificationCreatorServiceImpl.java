@@ -1,8 +1,8 @@
 package com.warehouse.shipment.domain.service;
 
+import com.warehouse.mail.domain.vo.Notification;
 import com.warehouse.shipment.domain.model.ConstantBodyMailMessage;
 import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.vo.Notification;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -18,6 +18,17 @@ public class NotificationCreatorServiceImpl implements NotificationCreatorServic
                 .body(constantBodyMailMessage.getMessage())
                 .recipient(parcel.getRecipient().getEmail())
                 .subject(SUBJECT)
+                .build();
+    }
+
+    @Override
+    public Notification createRerouteNotification(Parcel parcel, String message) {
+        final ConstantBodyMailMessage constantBodyMailMessage = new ConstantBodyMailMessage(parcel, message);
+
+        return Notification.builder()
+                .body(constantBodyMailMessage.getMessage())
+                .recipient(parcel.getRecipient().getEmail())
+                .subject(message)
                 .build();
     }
 }

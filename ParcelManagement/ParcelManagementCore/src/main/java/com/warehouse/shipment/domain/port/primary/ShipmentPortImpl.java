@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.port.primary;
 
+import com.warehouse.shipment.domain.enumeration.ParcelType;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
 import com.warehouse.shipment.domain.model.*;
@@ -46,6 +47,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                 .recipientCity(updateParcelRequest.getParcel().getRecipient().getCity())
                 .recipientStreet(updateParcelRequest.getParcel().getRecipient().getStreet())
                 .recipientPostalCode(updateParcelRequest.getParcel().getRecipient().getPostalCode())
+                .parcelType(updateParcelRequest.getParcel().getParcelType())
+                .status(updateParcelRequest.getParcel().getStatus())
                 .build();
         return service.update(parcelUpdate);
     }

@@ -30,6 +30,7 @@
             parcel_size="3"
             destination="KT1"
             status="0"
+            type="0"
     />
 
     <depot

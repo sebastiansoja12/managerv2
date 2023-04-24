@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.shipment.domain.enumeration.Size;
 import com.warehouse.shipment.domain.enumeration.Status;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ParcelType;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -96,4 +97,10 @@ public class ParcelEntity {
 
     @Column(name = "status", nullable = false)
     private Status status;
+
+    @Column(name = "type", nullable = false)
+    private ParcelType parcelType;
+
+    @Column(name = "parentRelatedId")
+    private Long parcelRelatedId;
 }

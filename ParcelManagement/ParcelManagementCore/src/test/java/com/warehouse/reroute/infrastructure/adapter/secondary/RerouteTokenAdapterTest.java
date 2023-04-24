@@ -46,27 +46,6 @@ public class RerouteTokenAdapterTest {
 
     private final static Integer TOKEN = 12345;
 
-    @Test
-    void shouldFindByToken() {
-        // given
-        final Token token = Token.builder()
-                .value(12345)
-                .build();
-        final RerouteToken rerouteToken = new RerouteToken();
-        final RerouteTokenResponse response = RerouteTokenResponse.builder()
-                .parcelId(new ParcelId(123456L))
-                .token(token.getValue())
-                .valid(true)
-                .build();
-        when(responseMapper.map(rerouteToken)).thenReturn(response);
-        when(rerouteTokenRepository.findByToken(token)).thenReturn(rerouteToken);
-        // when
-        final RerouteTokenResponse rerouteTokenResponse = rerouteTokenAdapter.findByToken(token);
-        // then
-        verify(rerouteTokenRepository, times(1)).findByToken(token);
-        assertThat(rerouteTokenResponse.getToken()).isEqualTo(token.getValue());
-    }
-
 
     @Test
     void shouldSendReroutingInformation() {

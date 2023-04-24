@@ -1,15 +1,11 @@
 package com.warehouse.reroute.domain.service;
 
-import com.warehouse.reroute.domain.model.RerouteRequest;
-import com.warehouse.reroute.domain.model.RerouteResponse;
-import com.warehouse.reroute.domain.model.UpdateParcelRequest;
+import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.ParcelPort;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
-import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
-import com.warehouse.reroute.domain.model.Token;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -34,8 +30,8 @@ public class RerouteServiceImpl implements RerouteService {
     }
 
     @Override
-    public RerouteTokenResponse findByToken(Token token) {
-        return rerouteTokenPort.findByToken(token);
+    public RerouteToken findByToken(Token token) {
+        return rerouteTokenRepository.findByToken(token);
     }
 
     @Override
@@ -44,8 +40,8 @@ public class RerouteServiceImpl implements RerouteService {
     }
 
     @Override
-    public RerouteTokenResponse loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
-        return rerouteTokenPort.loadByTokenAndParcelId(token, aParcelId);
+    public RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
+        return rerouteTokenRepository.loadByTokenAndParcelId(token, aParcelId);
     }
 
     public Token token(Integer value) {

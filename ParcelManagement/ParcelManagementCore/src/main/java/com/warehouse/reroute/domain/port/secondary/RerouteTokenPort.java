@@ -8,9 +8,5 @@ import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 
 public interface RerouteTokenPort {
 
-    RerouteTokenResponse findByToken(Token token);
-
-    RerouteTokenResponse loadByTokenAndParcelId(Token token, ParcelId aParcelId);
-
     RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest);
 }

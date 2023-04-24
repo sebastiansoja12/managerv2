@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -84,15 +85,22 @@ class ShipmentPrimaryPortTest {
         updateParcelRequest.setParcel(createParcel());
         updateParcelRequest.setToken(VALID_TOKEN);
 
-        final UpdateParcelResponse expectedResponse = new UpdateParcelResponse();
-        when(shipmentService.update(any(ParcelUpdate.class))).thenReturn(expectedResponse);
+        final Parcel parcel =  createParcel();
+        parcel.setStatus(Status.REROUTE);
 
+        final UpdateParcelResponse expectedResponse = new UpdateParcelResponse();
+        expectedResponse.setParcel(parcel);
+
+        when(shipmentService.update(any(ParcelUpdate.class))).thenReturn(expectedResponse);
         // when
         final UpdateParcelResponse response = shipmentPort.update(updateParcelRequest);
 
         // then
         verify(shipmentService, times(1)).update(any(ParcelUpdate.class));
         assertEquals(expectedResponse, response);
+
+        // and status changed to reroute
+        assertThat(response.getParcel().getStatus().name()).isEqualTo("REROUTE");
     }
 
     @Test
@@ -127,7 +135,7 @@ class ShipmentPrimaryPortTest {
                 .recipient(createRecipient())
                 .parcelSize(Size.TEST)
                 .sender(createSender())
-                .status(Status.CREATED.name())
+                .status(Status.CREATED)
                 .destination("KT1")
                 .id(1L)
                 .build();
