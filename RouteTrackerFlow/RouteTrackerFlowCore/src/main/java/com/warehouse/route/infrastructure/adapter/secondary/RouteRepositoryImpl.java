@@ -6,9 +6,7 @@ import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.RouteEntity;
-import com.warehouse.route.infrastructure.adapter.secondary.enumeration.ParcelType;
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Status;
-import com.warehouse.route.infrastructure.adapter.secondary.exception.ParcelRedirectedException;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteModelMapper;
 import lombok.AllArgsConstructor;
 
@@ -54,10 +52,6 @@ public class RouteRepositoryImpl implements RouteRepository {
     @Override
     public RouteResponse save(Route route) {
         final RouteEntity routeEntity = mapper.map(route);
-
-        if (routeEntity.getParcel().getStatus().equals(Status.REDIRECT)) {
-            throw new ParcelRedirectedException("Parcel cannot be registered because it was already redirected");
-        }
 
         routeReadRepository.save(routeEntity);
 
