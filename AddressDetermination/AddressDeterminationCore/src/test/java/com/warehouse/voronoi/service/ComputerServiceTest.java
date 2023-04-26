@@ -4,8 +4,6 @@ import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.domain.service.ComputeService;
 import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
-import com.warehouse.depot.api.dto.CoordinatesDto;
-import com.warehouse.depot.api.dto.DepotDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -49,7 +47,7 @@ public class ComputerServiceTest {
 
         // when
         final String compute = computerService.computeLength(coordinates, depotsList);
-        // then nearest depot is KT1
+        // then nearest depot is WRO
         assertThat(compute).isEqualTo("WRO");
     }
 
