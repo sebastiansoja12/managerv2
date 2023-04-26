@@ -1,6 +1,7 @@
 package com.warehouse.shipment.configuration;
 
-import com.warehouse.addressdetermination.AddressDeterminationService;
+import com.warehouse.depot.api.DepotService;
+import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
@@ -28,11 +29,11 @@ public class ShipmentConfiguration {
     @Bean
     public ShipmentAdapter shipmentAdapter(ShipmentRepository shipmentRepository, MailPort mailPort,
         PaypalPort paypalPort, NotificationCreatorService creatorService,
-        RouteLogEventPublisher routeLogEventPublisher, AddressDeterminationService addressDeterminationService) {
+        RouteLogEventPublisher routeLogEventPublisher, VoronoiService voronoiService, DepotService depotService) {
         final ShipmentMapper shipmentMapper = Mappers.getMapper(ShipmentMapper.class);
         final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
         return new ShipmentAdapter(shipmentMapper, shipmentRepository, mailPort, notificationMapper, paypalPort,
-                creatorService, routeLogEventPublisher, addressDeterminationService);
+                creatorService, routeLogEventPublisher, voronoiService, depotService);
     }
 
     @Bean

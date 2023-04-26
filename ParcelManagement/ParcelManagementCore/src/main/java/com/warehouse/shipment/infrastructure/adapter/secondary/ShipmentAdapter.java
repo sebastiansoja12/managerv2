@@ -1,6 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.addressdetermination.AddressDeterminationService;
+import com.warehouse.depot.api.DepotService;
+import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.vo.Notification;
 import com.warehouse.paypal.domain.model.PaymentRequest;
@@ -17,6 +19,8 @@ import com.warehouse.shipment.domain.service.NotificationCreatorService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 @AllArgsConstructor
 public class ShipmentAdapter implements ShipmentPort {
@@ -35,7 +39,9 @@ public class ShipmentAdapter implements ShipmentPort {
 
     private final RouteLogEventPublisher routeLogEventPublisher;
 
-    private final AddressDeterminationService addressDeterminationService;
+    private final VoronoiService voronoiService;
+
+    private final DepotService depotService;
 
     private final String REROUTE_MESSAGE = "Zmiana trasy przesyłki";
 
@@ -51,7 +57,9 @@ public class ShipmentAdapter implements ShipmentPort {
 
         final Parcel parcel = shipmentMapper.map(parcelUpdate);
 
-        final String fastestRoute = addressDeterminationService.findFastestRoute(parcel.getRecipient().getCity());
+        final List<DepotDto> depots = depotService.findAll();
+
+        final String fastestRoute = voronoiService.findFastestRoute(depots, parcel.getRecipient().getCity());
 
         parcel.setDestination(fastestRoute);
 
@@ -68,7 +76,9 @@ public class ShipmentAdapter implements ShipmentPort {
 
         final Parcel parcel = request.getParcel();
 
-        final String fastestRoute = addressDeterminationService.findFastestRoute(parcel.getRecipient().getCity());
+        final List<DepotDto> depots = depotService.findAll();
+
+        final String fastestRoute = voronoiService.findFastestRoute(depots, parcel.getRecipient().getCity());
 
         parcel.setDestination(fastestRoute);
 
