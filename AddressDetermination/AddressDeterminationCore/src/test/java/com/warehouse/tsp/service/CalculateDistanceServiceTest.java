@@ -1,6 +1,5 @@
 package com.warehouse.tsp.service;
 
-import com.warehouse.tsp.domain.model.Coordinates;
 import com.warehouse.tsp.domain.model.Depot;
 import com.warehouse.tsp.domain.service.CalculateDistanceBetweenDepots;
 import com.warehouse.tsp.domain.service.CalculateDistanceBetweenDepotsServiceImpl;
@@ -8,11 +7,10 @@ import com.warehouse.tsp.domain.service.CalculateDistanceService;
 import com.warehouse.tsp.domain.service.CalculateDistanceServiceImpl;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.warehouse.tsp.service.DepotInMemoryData.depots;
+import static com.warehouse.tsp.DepotInMemoryData.depots;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class CalculateDistanceServiceTest {

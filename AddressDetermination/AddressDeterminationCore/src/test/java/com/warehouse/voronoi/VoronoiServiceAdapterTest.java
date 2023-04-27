@@ -48,7 +48,7 @@ public class VoronoiServiceAdapterTest {
 
 
         when(addressRequestMapper.map(depotRequestList)).thenReturn(depotList);
-        when(adapter.findFastestRoute(depotRequestList, requestCity)).thenReturn(expectedDepotCode);
+        when(voronoiPort.findFastestRoute(depotList, requestCity)).thenReturn(expectedDepotCode);
 
         // when
         final String actualDepotCode = adapter.findFastestRoute(depotRequestList, requestCity);

@@ -1,6 +1,6 @@
 package com.warehouse.voronoi.domain.port.primary;
 
-import com.warehouse.tsp.domain.exception.MissingDepotsException;
+import com.warehouse.voronoi.domain.exception.MissingDepotsException;
 import com.warehouse.voronoi.domain.exception.MissingRequestCityException;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;

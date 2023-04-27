@@ -5,24 +5,48 @@ import com.warehouse.tsp.domain.model.Depot;
 import com.warehouse.tsp.domain.port.primary.TravellingSalesManPort;
 import com.warehouse.tsp.domain.port.primary.TravellingSalesManPortImpl;
 import com.warehouse.tsp.domain.port.secondary.SalesManServicePort;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.warehouse.tsp.DepotInMemoryData.depots;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TravellingSalesManPortImplTest {
 
     @Mock
     private SalesManServicePort salesManServicePort;
-    private final TravellingSalesManPort travellingSalesManPort = new TravellingSalesManPortImpl(salesManServicePort);
+    private TravellingSalesManPortImpl travellingSalesManPort;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+        travellingSalesManPort = new TravellingSalesManPortImpl(salesManServicePort);
+    }
+
+    @Test
+    void shouldCalculatePath() {
+        // given
+        final List<Depot> depots = depots();
+
+        final String mockPath = "KT1, KR1, LUB";
+
+        when(salesManServicePort.findFastestRoute(depots)).thenReturn(mockPath);
+        // when
+        final String path = travellingSalesManPort.findFastestRoute(depots);
+        // then
+        assertEquals(mockPath, path);
+    }
 
 
     @Test

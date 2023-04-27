@@ -1,4 +1,4 @@
-package com.warehouse.tsp.service;
+package com.warehouse.tsp;
 
 import com.warehouse.tsp.domain.model.Coordinates;
 import com.warehouse.tsp.domain.model.Depot;
