@@ -3,7 +3,6 @@ package com.warehouse.star.configuration;
 import com.warehouse.star.StarService;
 import com.warehouse.star.domain.port.primary.StarPort;
 import com.warehouse.star.domain.port.primary.StarPortImpl;
-import com.warehouse.star.domain.port.secondary.StarServicePort;
 import com.warehouse.star.domain.service.CalculateDistanceBetweenDepots;
 import com.warehouse.star.domain.service.CalculateDistanceBetweenDepotsServiceImpl;
 import com.warehouse.star.infrastructure.adapter.primary.StarServiceAdapter;
@@ -22,9 +21,9 @@ public class StarConfiguration {
     }
 
     @Bean
-    public StarPort starPort(StarServicePort starServicePort) {
+    public StarPort starPort() {
         final CalculateDistanceBetweenDepots
                 calculateDistanceBetweenDepots = new CalculateDistanceBetweenDepotsServiceImpl();
-        return new StarPortImpl(starServicePort, calculateDistanceBetweenDepots);
+        return new StarPortImpl(calculateDistanceBetweenDepots);
     }
 }

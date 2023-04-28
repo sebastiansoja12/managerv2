@@ -6,11 +6,9 @@ import com.warehouse.star.domain.model.Coordinates;
 import com.warehouse.star.domain.model.Depot;
 import com.warehouse.star.domain.port.primary.StarPort;
 import com.warehouse.star.domain.port.primary.StarPortImpl;
-import com.warehouse.star.domain.port.secondary.StarServicePort;
 import com.warehouse.star.domain.service.CalculateDistanceBetweenDepots;
 import com.warehouse.star.domain.service.CalculateDistanceBetweenDepotsServiceImpl;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StarPortImplTest {
 
-    @Mock
-    private StarServicePort starServicePort;
 
     private final CalculateDistanceBetweenDepots calculateDistanceBetweenDepots =
             new CalculateDistanceBetweenDepotsServiceImpl();
-    private final StarPort starPort = new StarPortImpl(starServicePort, calculateDistanceBetweenDepots);
+    private final StarPort starPort = new StarPortImpl(calculateDistanceBetweenDepots);
 
 
     @Test

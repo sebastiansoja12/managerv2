@@ -4,7 +4,6 @@ import com.warehouse.star.domain.exception.MissingCoordinatesException;
 import com.warehouse.star.domain.exception.MissingDepotsException;
 import com.warehouse.star.domain.model.Coordinates;
 import com.warehouse.star.domain.model.Depot;
-import com.warehouse.star.domain.port.secondary.StarServicePort;
 import com.warehouse.star.domain.service.CalculateDistanceBetweenDepots;
 import lombok.AllArgsConstructor;
 
@@ -22,8 +21,6 @@ public class StarPortImpl implements StarPort {
     public static final int ROTATION_OF_EARTH = 360;
 
     public static final double PI = 3.14;
-
-    private final StarServicePort starServicePort;
 
     private final CalculateDistanceBetweenDepots calculateDistance;
 
