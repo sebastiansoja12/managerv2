@@ -7,7 +7,7 @@
     <groupId>com.warehouse</groupId>
     <artifactId>Utility</artifactId>
     <packaging>pom</packaging>
-    <version>2023.5-SNAPSHOT</version>
+    <version>2023.6-SNAPSHOT</version>
     <modules>
         <module>BarcodeGenerator</module>
         <module>CsvFileGenerator</module>
