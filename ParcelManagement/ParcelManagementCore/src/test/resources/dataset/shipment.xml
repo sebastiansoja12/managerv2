@@ -17,7 +17,9 @@
             recipient_city="test"
             recipient_street="test"
             recipient_postal_code="00-000"
-            parcel_type="3"
-            price="10"
+            parcel_size="3"
+            destination="KT1"
+            status="0"
+            type="0"
     />
 </dataset>

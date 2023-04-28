@@ -1,6 +1,6 @@
 package com.warehouse.shipment.configuration;
 
-import com.warehouse.addressdetermination.AddressDeterminationService;
+import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.depot.api.DepotService;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
@@ -35,7 +35,7 @@ public class ShipmentConfigurationTest {
     public DepotService depotService;
 
     @MockBean
-    public AddressDeterminationService addressDeterminationService;
+    public VoronoiService voronoiService;
 
     @MockBean
     public RouteLogEventPublisher routeLogEventPublisher;

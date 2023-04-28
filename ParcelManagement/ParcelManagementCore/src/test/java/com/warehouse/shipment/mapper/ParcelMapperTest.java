@@ -1,6 +1,7 @@
 package com.warehouse.shipment.mapper;
 
-import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Size;
+import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
@@ -29,28 +30,37 @@ public class ParcelMapperTest {
         final ParcelEntity parcelEntity = mapper.map(parcel);
 
         // then
-        assertThat(parcelEntity.getParcelType().getSize()).isEqualTo("test");
+        assertThat(parcelEntity.getParcelSize().getSize()).isEqualTo("test");
+        // and status is enum type CREATED
+        assertThat(parcelEntity.getStatus().name()).isEqualTo("CREATED");
+
     }
 
     @Test
     void shouldMapFromEntityToParcel() {
         // given
         final ParcelEntity parcelEntity = ParcelEntity.builder()
-                .price(20)
+                .parcelSize(Size.TEST)
                 .lastName("test")
+                .status(Status.CREATED)
                 .build();
         // when
         final Parcel parcel = mapper.map(parcelEntity);
 
         // then
-        assertThat(parcel.getPrice()).isEqualTo(20);
+        assertThat(parcel.getPrice()).isEqualTo(99);
         assertThat(parcel.getSender().getLastName()).isEqualTo("test");
+
+        // and status is enum type CREATED
+        assertThat(parcel.getStatus()).isEqualTo(Status.CREATED);
     }
     private Parcel createParcel() {
         return Parcel.builder()
-                .parcelType(ParcelType.TEST)
+                .parcelSize(Size.TEST)
                 .id(1L)
                 .price(20)
+                .destination("KT1")
+                .status(Status.CREATED)
                 .sender(null)
                 .recipient(null)
                 .build();

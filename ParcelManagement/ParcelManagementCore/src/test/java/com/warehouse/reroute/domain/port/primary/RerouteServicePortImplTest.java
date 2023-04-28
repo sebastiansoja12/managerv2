@@ -1,6 +1,6 @@
 package com.warehouse.reroute.domain.port.primary;
 
-import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.vo.*;
@@ -30,13 +30,12 @@ public class RerouteServicePortImplTest {
                 .value(TOKEN_VALUE)
                 .build();
         when(port.findByToken(token)).thenReturn(
-                RerouteTokenResponse.builder()
-                        .valid(true)
+                RerouteToken.builder()
                         .token(TOKEN_VALUE)
-                        .parcelId(new ParcelId(PARCEL_ID))
+                        .parcelId(PARCEL_ID)
                         .build());
         // when
-        final RerouteTokenResponse response = port.findByToken(token);
+        final RerouteToken response = port.findByToken(token);
         // then
         assertThat(response).isNotNull();
         assertThat(response.getToken()).isEqualTo(TOKEN_VALUE);
@@ -49,18 +48,17 @@ public class RerouteServicePortImplTest {
                 .value(TOKEN_VALUE)
                 .build();
         final ParcelId parcelId = new ParcelId(PARCEL_ID);
-        final RerouteTokenResponse rerouteTokenResponse = RerouteTokenResponse.builder()
-                .valid(true)
+        final RerouteToken rerouteTokenResponse = RerouteToken.builder()
                 .token(TOKEN_VALUE)
-                .parcelId(new ParcelId(PARCEL_ID))
+                .parcelId(PARCEL_ID)
                 .build();
         when(port.loadByTokenAndParcelId(token, parcelId)).thenReturn(rerouteTokenResponse);
         // when
-        final RerouteTokenResponse actual = port.loadByTokenAndParcelId(token, parcelId);
+        final RerouteToken actual = port.loadByTokenAndParcelId(token, parcelId);
         // then
         assertAll(
                 () -> assertThat(actual.getToken().intValue()).isEqualTo(TOKEN_VALUE),
-                () -> assertThat(actual.getParcelId().getValue()).isEqualTo(PARCEL_ID)
+                () -> assertThat(actual.getParcelId()).isEqualTo(PARCEL_ID)
         );
     }
 
@@ -91,7 +89,7 @@ public class RerouteServicePortImplTest {
         // given
         final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder()
                 .parcel(Parcel.builder()
-                        .parcelType(ParcelType.TEST)
+                        .parcelSize(Size.TEST)
                         .recipient(Recipient.builder().build())
                         .sender(Sender.builder().build())
                         .build()
@@ -101,7 +99,7 @@ public class RerouteServicePortImplTest {
                 .build();
         final ParcelUpdateResponse expectedResponse = ParcelUpdateResponse.builder()
                 .parcelId(new ParcelId(PARCEL_ID))
-                .parcelType(ParcelType.TEST)
+                .parcelSize(Size.TEST)
                 .recipient(Recipient.builder().build())
                 .sender(Sender.builder().build())
                 .build();

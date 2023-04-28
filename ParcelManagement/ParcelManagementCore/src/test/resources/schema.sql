@@ -42,7 +42,6 @@ recipient_last_name varchar(255) DEFAULT NULL,
 recipient_postal_code varchar(255) DEFAULT NULL,
 recipient_street varchar(255) DEFAULT NULL,
 recipient_telephone varchar(255) DEFAULT NULL,
-price DOUBLE NOT NULL,
-parcel_type varchar(255) DEFAULT NULL,
+parcel_size varchar(255) DEFAULT NULL,
 primary key (id)
 );

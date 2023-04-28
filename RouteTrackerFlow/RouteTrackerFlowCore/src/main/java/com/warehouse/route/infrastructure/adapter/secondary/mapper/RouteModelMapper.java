@@ -34,7 +34,7 @@ public interface RouteModelMapper {
     @Mapping(target = "parcel.recipient.city", source = "parcel.recipientCity")
     @Mapping(target = "parcel.recipient.postalCode", source = "parcel.recipientPostalCode")
     @Mapping(target = "parcel.recipient.street", source = "parcel.recipientStreet")
-    @Mapping(target = "parcel.parcelType", source = "parcel.parcelType")
+    @Mapping(target = "parcel.parcelSize", source = "parcel.parcelSize")
     @Mapping(target = "parcel.id", source = "parcel.id")
     Routes mapToRoutes(RouteEntity routeEntity);
 
@@ -46,6 +46,9 @@ public interface RouteModelMapper {
     @Mapping(target = "depot.id", source = "depotId")
     @Mapping(target = "user.id", source = "userId")
     RouteEntity map(Route route);
+
+    @Mapping(target = "parcel.id", source = "parcelId")
+    RouteEntity mapInitialize(Route route);
 
 
     @Mapping(source = "id", target = "id")

@@ -1,9 +1,6 @@
 package com.warehouse.reroute.infrastructure.adapter.primary;
 
-import com.warehouse.reroute.domain.model.RerouteRequest;
-import com.warehouse.reroute.domain.model.RerouteResponse;
-import com.warehouse.reroute.domain.model.Token;
-import com.warehouse.reroute.domain.model.UpdateParcelRequest;
+import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.primary.RerouteServicePort;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
@@ -23,18 +20,18 @@ public class RerouteTokenController {
         return port.sendReroutingInformation(request);
     }
 
-    @PostMapping()
+    @PostMapping
     ParcelUpdateResponse update(@RequestBody UpdateParcelRequest request) {
         return port.update(request);
     }
 
     @GetMapping("/token/{value}")
-    RerouteTokenResponse getToken(Token token) {
+    RerouteToken getToken(Token token) {
         return port.findByToken(token);
     }
 
     @GetMapping("/token/{value}/parcel/{parcelId}")
-    RerouteTokenResponse loadByTokenAndParcelId(Token token, ParcelId parcel) {
+    RerouteToken loadByTokenAndParcelId(Token token, ParcelId parcel) {
         return port.loadByTokenAndParcelId(token, parcel);
     }
 

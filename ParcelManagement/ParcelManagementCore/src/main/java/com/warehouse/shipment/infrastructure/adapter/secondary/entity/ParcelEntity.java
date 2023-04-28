@@ -1,6 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Size;
+import com.warehouse.shipment.domain.enumeration.Status;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ParcelType;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -87,12 +89,18 @@ public class ParcelEntity {
     @Column(name = "recipientPostalCode", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "parcelType", nullable = false)
+    @Column(name = "parcelSize", nullable = false)
+    private Size parcelSize;
+
+    @Column(name = "destination", nullable = false)
+    private String destination;
+
+    @Column(name = "status", nullable = false)
+    private Status status;
+
+    @Column(name = "type", nullable = false)
     private ParcelType parcelType;
 
-    @Column(name = "price", nullable = false)
-    private double price;
-
-    @Column(name = "destination")
-    private String destination;
+    @Column(name = "parentRelatedId")
+    private Long parcelRelatedId;
 }

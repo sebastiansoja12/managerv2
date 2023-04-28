@@ -24,8 +24,8 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
 
 
     @Override
-    public RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
-        return repository.loadByTokenAndParcelId(token.getValue(), aParcelId.getValue())
+    public RerouteToken loadByTokenAndParcelId(Token token, ParcelId parcelId) {
+        return repository.loadByTokenAndParcelId(token.getValue(), parcelId.getValue())
                 .map(rerouteTokenMapper::map).orElseThrow( () -> new RerouteTokenNotFoundException(
                         "Reroute token was not found"
                 ));

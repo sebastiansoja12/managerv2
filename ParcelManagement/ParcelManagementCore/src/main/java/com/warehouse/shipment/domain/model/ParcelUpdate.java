@@ -1,6 +1,8 @@
 package com.warehouse.shipment.domain.model;
 
 import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Size;
+import com.warehouse.shipment.domain.enumeration.Status;
 import lombok.Builder;
 import lombok.Data;
 
@@ -37,7 +39,9 @@ public class ParcelUpdate {
 
     String recipientPostalCode;
 
+    Size parcelSize;
+
+    Status status;
+
     ParcelType parcelType;
-
-
 }

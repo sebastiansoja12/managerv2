@@ -1,6 +1,8 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Size;
+import com.warehouse.reroute.domain.enumeration.Status;
+import com.warehouse.reroute.infrastructure.adapter.secondary.enumeration.ParcelType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -78,9 +80,18 @@ public class ParcelEntity {
     @Column(name = "recipientPostalCode", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "parcelType", nullable = false)
+    @Column(name = "parcelSize", nullable = false)
+    private Size parcelSize;
+
+    @Column(name = "destination", nullable = false)
+    private String destination;
+
+    @Column(name = "status", nullable = false)
+    private Status status;
+
+    @Column(name = "type", nullable = false)
     private ParcelType parcelType;
 
-    @Column(name = "price", nullable = false)
-    private double price;
+    @Column(name = "parentRelatedId")
+    private Long parcelRelatedId;
 }

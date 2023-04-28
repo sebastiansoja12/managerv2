@@ -25,7 +25,7 @@ public interface ParcelMapper {
     @Mapping(target = "recipient.city", source = "recipientCity")
     @Mapping(target = "recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "recipient.street", source = "recipientStreet")
-    @Mapping(target = "parcelType", source = "parcelType")
+    @Mapping(target = "parcelSize", source = "parcelSize")
     @Mapping(target = "parcelId.value", source = "id")
     ParcelUpdateResponse mapFromParcelEntityToParcelResponse(ParcelEntity parcelEntity);
 
@@ -43,7 +43,7 @@ public interface ParcelMapper {
     @Mapping(source = "parcel.recipient.city", target = "recipientCity")
     @Mapping(source = "parcel.recipient.postalCode", target = "recipientPostalCode")
     @Mapping(source = "parcel.recipient.street", target = "recipientStreet")
-    @Mapping(source = "parcel.parcelType", target = "parcelType")
+    @Mapping(source = "parcel.parcelSize", target = "parcelSize")
     ParcelEntity mapToParcelEntity(UpdateParcelRequest parcelRequest);
 
     @Mapping(source = "sender.firstName", target = "firstName")
@@ -60,12 +60,14 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.city", target = "recipientCity")
     @Mapping(source = "recipient.postalCode", target = "recipientPostalCode")
     @Mapping(source = "recipient.street", target = "recipientStreet")
-    @Mapping(source = "parcelType", target = "parcelType")
+    @Mapping(source = "parcelSize", target = "parcelSize")
     ParcelEntity mapFromParcelResponseToParcelEntity(ParcelUpdateResponse parcelRequest);
 
 
     @Mapping(source = "id", target = "parcel.parcelId.value")
     @Mapping(source = "token", target = "token.value")
+    @Mapping(source = "parcel.sender", target = "parcel.sender")
+    @Mapping(source = "parcel.recipient", target = "parcel.recipient")
     UpdateParcelRequestDto map(UpdateParcelRequest updateParcelRequest);
 
     @Mapping(source = "parcel.sender.firstName", target = "sender.firstName")
@@ -82,8 +84,10 @@ public interface ParcelMapper {
     @Mapping(source = "parcel.recipient.city", target = "recipient.city")
     @Mapping(source = "parcel.recipient.postalCode", target = "recipient.postalCode")
     @Mapping(source = "parcel.recipient.street", target = "recipient.street")
-    @Mapping(source = "parcel.parcelType", target = "parcelType")
+    @Mapping(source = "parcel.parcelSize", target = "parcelSize")
     @Mapping(source = "parcel.parcelId.value", target = "parcelId.value")
+    @Mapping(source = "parcel.parcelType", target = "parcelType")
+    @Mapping(source = "parcel.status", target = "status")
     ParcelUpdateResponse map(UpdateParcelResponseDto updateParcelResponse);
 
 }

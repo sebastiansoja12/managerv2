@@ -1,6 +1,7 @@
 package com.warehouse.reroute.domain.model;
 
 
+import com.warehouse.reroute.domain.exception.EmailNotFoundException;
 import lombok.*;
 
 
@@ -13,6 +14,12 @@ public class RerouteRequest {
     @NonNull
     private Long parcelId;
 
-    @NonNull
     private String email;
+
+    public String getEmail() {
+        if (email == null) {
+            throw new EmailNotFoundException("E-Mail cannot be null");
+        }
+        return email;
+    }
 }

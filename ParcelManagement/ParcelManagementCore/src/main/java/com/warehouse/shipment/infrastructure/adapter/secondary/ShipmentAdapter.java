@@ -1,20 +1,26 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.addressdetermination.AddressDeterminationService;
+import com.warehouse.depot.api.DepotService;
+import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
+import com.warehouse.mail.domain.vo.Notification;
 import com.warehouse.paypal.domain.model.PaymentRequest;
 import com.warehouse.paypal.domain.model.PaymentResponse;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.route.infrastructure.api.event.ShipmentLogEvent;
+import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.ShipmentPort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.service.NotificationCreatorService;
-import com.warehouse.shipment.domain.vo.Notification;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 @AllArgsConstructor
 public class ShipmentAdapter implements ShipmentPort {
@@ -33,7 +39,9 @@ public class ShipmentAdapter implements ShipmentPort {
 
     private final RouteLogEventPublisher routeLogEventPublisher;
 
-    private final AddressDeterminationService addressDeterminationService;
+    private final VoronoiService voronoiService;
+
+    private final DepotService depotService;
 
     private final String REROUTE_MESSAGE = "Zmiana trasy przesyłki";
 
@@ -49,39 +57,45 @@ public class ShipmentAdapter implements ShipmentPort {
 
         final Parcel parcel = shipmentMapper.map(parcelUpdate);
 
-        final String fastestRoute = addressDeterminationService.findFastestRoute(parcel.getRecipient().getCity());
+        final List<DepotDto> depots = depotService.findAll();
+
+        final String fastestRoute = voronoiService.findFastestRoute(depots, parcel.getRecipient().getCity());
 
         parcel.setDestination(fastestRoute);
 
+        parcel.setStatus(Status.REROUTE);
+
         final Notification notification = notificationCreatorService.createNotification(parcel, REROUTE_MESSAGE);
 
-        final com.warehouse.mail.domain.vo.Notification mailNotification = notificationMapper.map(notification);
-
-        mailPort.sendNotification(mailNotification);
+        mailPort.sendNotification(notification);
 
         return parcelRepository.update(parcel);
     }
 
     private ShipmentResponse createParcel(ShipmentRequest request) {
 
-        final Parcel parcel = shipmentMapper.map(request);
+        final Parcel parcel = request.getParcel();
 
-        final String fastestRoute = addressDeterminationService.findFastestRoute(parcel.getRecipient().getCity());
+        final List<DepotDto> depots = depotService.findAll();
+
+        final String fastestRoute = voronoiService.findFastestRoute(depots, parcel.getRecipient().getCity());
 
         parcel.setDestination(fastestRoute);
 
+        parcel.setStatus(Status.CREATED);
+
+        parcel.setParcelType(ParcelType.PARENT);
+
         final Long parcelId = parcelRepository.save(parcel);
 
-        final PaymentRequest paymentRequest = buildPaymentRequest(parcelId, parcel.getParcelType().getPrice());
+        final PaymentRequest paymentRequest = buildPaymentRequest(parcelId, parcel.getParcelSize().getPrice());
 
         final PaymentResponse payment = paypalPort.payment(paymentRequest);
 
         final Notification notification = notificationCreatorService.createNotification(parcel,
                 payment.getLink().getPaymentUrl());
 
-        final com.warehouse.mail.domain.vo.Notification mailNotification = notificationMapper.map(notification);
-
-        mailPort.sendNotification(mailNotification);
+        mailPort.sendNotification(notification);
 
         return shipmentMapper.map(parcelId, payment);
 

@@ -4,7 +4,9 @@ import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
+import com.warehouse.route.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.RouteEntity;
+import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteModelMapper;
 import lombok.AllArgsConstructor;
 
@@ -29,13 +31,18 @@ public class RouteRepositoryImpl implements RouteRepository {
 
     @Override
     public void initializeRoute(Route route) {
-        final RouteEntity routeEntity = mapper.map(route);
+        final RouteEntity routeEntity = mapper.mapInitialize(route);
         routeReadRepository.save(routeEntity);
     }
 
     @Override
     public RouteResponse saveSupplyRoute(Route route) {
         final RouteEntity routeEntity = mapper.map(route);
+
+        final ParcelEntity parcelEntity = routeEntity.getParcel();
+        parcelEntity.setStatus(Status.SENT);
+
+        routeEntity.setParcel(parcelEntity);
 
         routeReadRepository.save(routeEntity);
 

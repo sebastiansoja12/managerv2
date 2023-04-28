@@ -7,5 +7,9 @@ public class ParcelDto {
 
     SenderDto sender;
     RecipientDto recipient;
+    ParcelSizeDto parcelSize;
+
+    StatusDto status;
+
     ParcelTypeDto parcelType;
 }

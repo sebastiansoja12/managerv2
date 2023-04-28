@@ -32,22 +32,6 @@ public class RerouteTokenAdapter implements RerouteTokenPort {
     }
 
     @Override
-    public RerouteTokenResponse findByToken(Token token) {
-
-        final RerouteToken rerouteToken = rerouteTokenRepository.findByToken(token);
-
-        return responseMapper.map(rerouteToken);
-    }
-
-    @Override
-    public RerouteTokenResponse loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
-
-        final RerouteToken rerouteToken = rerouteTokenRepository.loadByTokenAndParcelId(token, aParcelId);
-
-        return responseMapper.map(rerouteToken);
-    }
-
-    @Override
     public RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest) {
 
         final Integer token = rerouteTokenRepository.saveReroutingToken(rerouteRequest.getParcelId());

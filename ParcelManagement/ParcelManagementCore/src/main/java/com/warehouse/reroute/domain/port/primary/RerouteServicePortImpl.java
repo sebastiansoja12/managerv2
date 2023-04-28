@@ -1,15 +1,12 @@
 package com.warehouse.reroute.domain.port.primary;
 
-import com.warehouse.reroute.domain.model.RerouteRequest;
-import com.warehouse.reroute.domain.model.RerouteResponse;
-import com.warehouse.reroute.domain.model.Token;
-import com.warehouse.reroute.domain.model.UpdateParcelRequest;
+import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Status;
+import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.service.RerouteService;
 import com.warehouse.reroute.domain.service.RerouteTokenValidatorService;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
-import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
-import com.warehouse.reroute.infrastructure.adapter.secondary.exception.EmailNotFoundException;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 import lombok.AllArgsConstructor;
 
@@ -22,37 +19,34 @@ public class RerouteServicePortImpl implements RerouteServicePort {
 
     @Override
     public ParcelUpdateResponse update(UpdateParcelRequest request) {
-        validateRerouteToken(request.getToken());
+        validateRequest(request);
         return rerouteService.update(request);
     }
 
     @Override
-    public RerouteTokenResponse findByToken(Token token) {
+    public RerouteToken findByToken(Token token) {
         return rerouteService.findByToken(token);
     }
 
     @Override
-    public RerouteTokenResponse loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
+    public RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
         return rerouteService.loadByTokenAndParcelId(token, aParcelId);
     }
 
     @Override
     public RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest) {
-        validateEmail(rerouteRequest.getEmail());
         return rerouteService.sendReroutingInformation(rerouteRequest);
     }
 
-    public void validateRerouteToken(Integer token) {
-        final boolean rerouteTokenValidate = rerouteTokenValidatorService.validate(token);
+    public void validateRequest(UpdateParcelRequest request) {
+        final boolean rerouteTokenValidate = rerouteTokenValidatorService.validate(request.getToken());
         if (!rerouteTokenValidate) {
             throw new RerouteTokenNotFoundException("Reroute token was not found");
         }
-    }
-
-    public void validateEmail(String email) {
-        if (email == null) {
-            throw new EmailNotFoundException("E-Mail cannot be null");
+        if (request.getParcel().getParcelType().equals(ParcelType.CHILD)) {
+            throw new IllegalArgumentException("Parcel cannot be rerouted after redirection");
+        } else if (!request.getParcel().getStatus().equals(Status.CREATED)) {
+            throw new IllegalArgumentException("Parcel cannot be rerouted because it was already sent");
         }
     }
-
 }

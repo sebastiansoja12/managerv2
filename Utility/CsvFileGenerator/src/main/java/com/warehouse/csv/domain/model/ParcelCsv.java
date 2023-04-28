@@ -1,6 +1,6 @@
 package com.warehouse.csv.domain.model;
 
-import com.warehouse.shipment.domain.enumeration.ParcelType;
+import com.warehouse.shipment.domain.enumeration.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +29,7 @@ public class ParcelCsv {
     String recipientPostalCode;
     String recipientStreet;
 
-    ParcelType parcelType;
+    Size parcelSize;
 
     double price;
 }
