@@ -40,7 +40,6 @@ public class RouteEntity {
     @JoinColumn(name = "parcel_id", referencedColumnName = "id")
     private ParcelEntity parcel;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depot_id", referencedColumnName = "id")
     private DepotEntity depot;
