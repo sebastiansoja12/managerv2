@@ -4,8 +4,9 @@ import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.DepotEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DepotEntityMapper {
 
     @Mapping(source = "depot.city", target = "city")

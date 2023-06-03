@@ -33,7 +33,7 @@ public class PaypalAdapter implements PaymentSecondaryPort {
 
     @Override
     public PaymentResponse payment(PaymentRequest request) {
-        final PaymentInformation paymentInformation = new PaymentInformation();
+        final PaymentInformation paymentInformation = PaymentInformation.builder().build();
         final Payment payment = createPayment(request);
 
         paymentInformation.setParcelId(request.getParcelId());

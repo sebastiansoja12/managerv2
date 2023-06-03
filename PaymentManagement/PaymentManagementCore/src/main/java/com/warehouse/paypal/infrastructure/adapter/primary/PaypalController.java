@@ -22,7 +22,7 @@ public class PaypalController {
 
     @GetMapping(value = "/pay/success")
     public String successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
-        final PaymentInformation paymentInformation = new PaymentInformation();
+        final PaymentInformation paymentInformation = PaymentInformation.builder().build();
         paymentInformation.setPaymentId(paymentId);
         paymentInformation.setPayerId(payerId);
 

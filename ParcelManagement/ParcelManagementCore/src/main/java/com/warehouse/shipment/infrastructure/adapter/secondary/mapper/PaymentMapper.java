@@ -4,8 +4,9 @@ import com.warehouse.paypal.domain.model.PaymentRequest;
 import com.warehouse.paypal.domain.model.PaymentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface PaymentMapper {
 
     PaymentRequest map(com.warehouse.shipment.domain.vo.PaymentRequest request);

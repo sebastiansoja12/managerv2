@@ -1,14 +1,10 @@
 package com.warehouse.paypal.domain.model;
 
 import com.warehouse.paypal.domain.enumeration.ParcelStatus;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class PaymentInformation {
 

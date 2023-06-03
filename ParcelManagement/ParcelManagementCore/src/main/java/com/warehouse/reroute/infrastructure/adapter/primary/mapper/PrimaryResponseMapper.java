@@ -8,8 +8,9 @@ import com.warehouse.reroute.infrastructure.api.dto.RerouteResponseDto;
 import com.warehouse.reroute.infrastructure.api.dto.RerouteTokenResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface PrimaryResponseMapper {
 
     RerouteResponseDto map(RerouteResponse rerouteResponse);

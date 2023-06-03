@@ -3,18 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.warehouse</groupId>
-    <artifactId>Authorization</artifactId>
-    <version>2023.6-SNAPSHOT</version>
+    <parent>
+        <groupId>com.warehouse</groupId>
+        <artifactId>warehouse</artifactId>
+        <version>2023.6-SNAPSHOT</version>
+    </parent>
     <packaging>pom</packaging>
+
+    <artifactId>Authorization</artifactId>
+
     <modules>
         <module>AuthorizationCore</module>
     </modules>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
 
 </project>

@@ -6,8 +6,9 @@ import com.warehouse.shipment.domain.model.UpdateParcelResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ParcelMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "sender.firstName", target = "firstName")

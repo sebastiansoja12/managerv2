@@ -3,19 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.warehouse</groupId>
+        <artifactId>warehouse</artifactId>
+        <version>2023.6-SNAPSHOT</version>
+    </parent>
 
-    <groupId>com.warehouse</groupId>
     <artifactId>ParcelManagement</artifactId>
+
     <packaging>pom</packaging>
-    <version>2023.6-SNAPSHOT</version>
+
     <modules>
         <module>ParcelManagementApi</module>
         <module>ParcelManagementCore</module>
     </modules>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
 
 </project>

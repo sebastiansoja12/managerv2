@@ -59,11 +59,6 @@ public class PaymentConfiguration {
     }
 
     @Bean
-    public PaymentInformation paymentInformation() {
-        return new PaymentInformation();
-    }
-
-    @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }

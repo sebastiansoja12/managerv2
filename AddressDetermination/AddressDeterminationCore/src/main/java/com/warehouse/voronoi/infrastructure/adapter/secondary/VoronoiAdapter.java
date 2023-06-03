@@ -1,14 +1,12 @@
 package com.warehouse.voronoi.infrastructure.adapter.secondary;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fire.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
 import com.warehouse.voronoi.domain.service.ComputeService;
 import com.warehouse.voronoi.domain.service.UrlJsonReaderService;
-import com.warehouse.depot.api.DepotService;
-import com.warehouse.depot.api.dto.DepotDto;
-import com.warehouse.positionstack.configuration.TokenStageProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,9 +19,7 @@ import java.util.List;
 @Slf4j
 public class VoronoiAdapter implements VoronoiServicePort {
 
-    private final TokenStageProperties tokenStageProperties;
-
-    private final DepotService depotService;
+    private final PositionStackProperties positionStackProperties;
 
     private final ComputeService computeService;
 
@@ -66,7 +62,7 @@ public class VoronoiAdapter implements VoronoiServicePort {
     }
 
     private String createRequest(String city) {
-        return tokenStageProperties.createRequestLink(city);
+        return positionStackProperties.createRequest(city);
     }
 
 

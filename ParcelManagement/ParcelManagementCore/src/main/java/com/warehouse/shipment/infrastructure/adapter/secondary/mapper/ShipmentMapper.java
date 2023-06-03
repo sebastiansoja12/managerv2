@@ -8,8 +8,9 @@ import com.warehouse.shipment.domain.model.ShipmentRequest;
 import com.warehouse.shipment.domain.model.ShipmentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentMapper {
 
     @Mapping(source = "parcel.sender.firstName", target = "sender.firstName")

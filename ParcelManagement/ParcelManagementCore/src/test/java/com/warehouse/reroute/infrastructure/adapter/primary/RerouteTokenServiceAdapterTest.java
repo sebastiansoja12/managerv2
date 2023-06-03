@@ -65,14 +65,10 @@ public class RerouteTokenServiceAdapterTest {
     }
 
     private EmailDto emailDto() {
-        final EmailDto email = new EmailDto();
-        email.setValue("sebastian5152@wp.pl");
-        return email;
+        return new EmailDto("sebastian5152@wp.pl");
     }
 
     private ParcelId parcelId() {
-        final ParcelId parcelId = new ParcelId();
-        parcelId.setValue(123456L);
-        return parcelId;
+        return new ParcelId(123456L);
     }
 }

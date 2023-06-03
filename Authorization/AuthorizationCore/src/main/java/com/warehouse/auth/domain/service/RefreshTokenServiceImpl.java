@@ -7,13 +7,9 @@ import java.util.UUID;
 
 
 public class RefreshTokenServiceImpl implements RefreshTokenService {
+
     @Override
     public RefreshToken generateRefreshToken() {
-        return generate();
-    }
-
-
-    private RefreshToken generate() {
         return RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
                 .createdDate(Instant.now())

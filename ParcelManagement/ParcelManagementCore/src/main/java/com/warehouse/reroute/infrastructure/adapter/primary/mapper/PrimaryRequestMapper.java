@@ -8,8 +8,9 @@ import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.infrastructure.api.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface PrimaryRequestMapper {
 
 

@@ -4,8 +4,9 @@ import com.warehouse.delivery.domain.model.SupplyInformation;
 import com.warehouse.delivery.domain.model.SupplyResponse;
 import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface SupplyMapper {
 
     SupplyInformationDto map(SupplyInformation supplyInformation);

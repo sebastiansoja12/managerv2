@@ -1,6 +1,5 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +23,6 @@ public class SupplierEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String supplierCode;
 
     @Column(nullable = false)
