@@ -5,6 +5,8 @@ import com.warehouse.depot.api.dto.DepotCodeDto;
 import com.warehouse.depot.api.dto.DepotDto;
 import com.warehouse.depot.api.dto.DepotIdDto;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,29 +19,31 @@ public class DepotController {
     private final DepotService depotService;
 
     @PostMapping("/save")
-    public void add(@RequestBody DepotDto depot) {
+    public ResponseEntity<?> add(@RequestBody DepotDto depot) {
         depotService.add(depot);
+        return ResponseEntity.ok().body(HttpStatus.OK);
     }
 
     @PostMapping("/save/multiple")
-    public void add(@RequestBody List<DepotDto> depots) {
+    public ResponseEntity<?> add(@RequestBody List<DepotDto> depots) {
         depotService.addMultipleDepots(depots);
+        return ResponseEntity.ok().body(HttpStatus.OK);
     }
 
     @GetMapping("/depotId/{value}")
-    public DepotDto viewDepotById(DepotIdDto depotId) {
-        return depotService.viewDepotById(depotId);
+    public ResponseEntity<?> viewDepotById(DepotIdDto depotId) {
+        final DepotDto depot = depotService.viewDepotById(depotId);
+        return ResponseEntity.status(HttpStatus.FOUND).body(depot);
     }
 
     @GetMapping("/depotCode/{value}")
-    public DepotDto viewDepotByCode(DepotCodeDto depotCode) {
-        return depotService.viewDepotByCode(depotCode);
+    public ResponseEntity<?> viewDepotByCode(DepotCodeDto depotCode) {
+        final DepotDto depot = depotService.viewDepotByCode(depotCode);
+        return ResponseEntity.status(HttpStatus.FOUND).body(depot);
     }
 
     @GetMapping("/all")
-    public List<DepotDto> allDepots() {
-        return depotService.findAll();
+    public ResponseEntity<?> allDepots() {
+        return ResponseEntity.status(HttpStatus.FOUND).body(depotService.findAll());
     }
-
-
 }

@@ -2,12 +2,11 @@ package com.warehouse.reroute.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.model.UpdateParcelRequest;
-import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface RerouteTokenMapper {
 
     RerouteToken map(RerouteTokenEntity entity);
@@ -16,7 +15,4 @@ public interface RerouteTokenMapper {
 
     RerouteTokenEntity map(UpdateParcelRequest parcelRequest);
 
-    @Mapping(source = "token", target = "token")
-    @Mapping(source = "parcelId", target = "parcelId.value")
-    RerouteTokenResponse mapToResponse(RerouteTokenEntity entity);
 }

@@ -180,11 +180,8 @@ public class RerouteTokenIntegrationTest {
 
     void shouldSendRerouteRequest() {
         // given
-        final EmailDto emailDto = new EmailDto();
-        emailDto.setValue(EMAIL);
-
-        final ParcelId parcelId = new ParcelId();
-        parcelId.setValue(PARCEL_ID);
+        final EmailDto emailDto = new EmailDto(EMAIL);
+        final ParcelId parcelId = new ParcelId(PARCEL_ID);
 
         final RerouteRequestDto requestDto = new RerouteRequestDto();
         requestDto.setEmail(emailDto);

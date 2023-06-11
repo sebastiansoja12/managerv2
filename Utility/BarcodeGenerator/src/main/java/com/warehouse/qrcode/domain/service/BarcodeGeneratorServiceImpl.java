@@ -7,6 +7,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.itextpdf.text.BadElementException;
 import com.lowagie.text.Image;
+import net.glxn.qrgen.QRCode;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -15,8 +16,6 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.UUID;
-
-import net.glxn.qrgen.javase.QRCode;
 
 
 public class BarcodeGeneratorServiceImpl implements BarcodeGeneratorService {
@@ -40,7 +39,7 @@ public class BarcodeGeneratorServiceImpl implements BarcodeGeneratorService {
     }
 
     @Override
-    public Image generateQRCodeImage(Long barcodeText) throws BadElementException, IOException {
+    public Image generateQRCodeImage(Long barcodeText) throws IOException {
         final BufferedImage image = new BufferedImage(250,
                 250,
                 BufferedImage.TYPE_BYTE_GRAY);

@@ -5,8 +5,14 @@
     <parent>
         <artifactId>SupplyOperation</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2023.5-SNAPSHOT</version>
+        <version>2023.6-SNAPSHOT</version>
     </parent>
+
+    <artifactId>SupplyOperationApi</artifactId>
+
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
@@ -17,13 +23,9 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.13.4</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
-    <modelVersion>4.0.0</modelVersion>
-    <packaging>jar</packaging>
-    <artifactId>SupplyOperationApi</artifactId>
+
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

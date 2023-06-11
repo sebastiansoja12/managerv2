@@ -13,11 +13,13 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface PaypalMapper {
 
+    @Mapping(target = "id", ignore = true)
     PaypalEntity map(PaymentInformation paymentInformation);
 
     @Mapping(source = "price", target = "details.subtotal")
     Amount map(AmountInformation amountInformation);
-
+    @Mapping(target = "paypalId", source = "paymentId")
+    @Mapping(target = "payerId", ignore = true)
     PaymentInformation map(PaypalEntity paypalEntity);
 
     @Mapping(source = "telephoneNumber", target = "phone.nationalNumber")

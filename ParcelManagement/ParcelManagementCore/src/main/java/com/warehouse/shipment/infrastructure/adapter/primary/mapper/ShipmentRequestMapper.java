@@ -6,8 +6,9 @@ import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentRequestMapper {
 
     ShipmentRequest map(ShipmentRequestDto requestDto);

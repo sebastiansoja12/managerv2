@@ -3,12 +3,12 @@ package com.warehouse.reroute.infrastructure.adapter.secondary.entity;
 import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.infrastructure.adapter.secondary.enumeration.ParcelType;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 

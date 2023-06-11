@@ -7,10 +7,11 @@ import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.domain.model.DepotCode;
 import com.warehouse.depot.domain.model.DepotId;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DepotRequestMapper {
 
     Depot map(DepotDto depot);

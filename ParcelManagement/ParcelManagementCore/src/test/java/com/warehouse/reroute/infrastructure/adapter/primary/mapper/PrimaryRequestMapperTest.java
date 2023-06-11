@@ -101,21 +101,17 @@ public class PrimaryRequestMapperTest {
         final ParcelIdDto parcelIdDto = parcelIdDto();
         when(mapper.map(parcelIdDto)).thenReturn(new com.warehouse.reroute.domain.vo.ParcelId(PARCEL_ID));
         // when
-        final com.warehouse.reroute.domain.vo.ParcelId aParcelId = mapper.map(parcelIdDto);
+        final com.warehouse.reroute.domain.vo.ParcelId parcelId = mapper.map(parcelIdDto);
         // then
-        assertThat(aParcelId.getValue()).isEqualTo(PARCEL_ID);
+        assertThat(parcelId.getValue()).isEqualTo(PARCEL_ID);
     }
 
     private com.warehouse.reroute.infrastructure.api.dto.ParcelId parcelId() {
-        final com.warehouse.reroute.infrastructure.api.dto.ParcelId parcelId = new com.warehouse.reroute.infrastructure.api.dto.ParcelId();
-        parcelId.setValue(PARCEL_ID);
-        return parcelId;
+        return new ParcelId(PARCEL_ID);
     }
 
     private EmailDto email() {
-        final EmailDto email = new EmailDto();
-        email.setValue(EMAIL);
-        return email;
+        return new EmailDto(EMAIL);
     }
 
     private ParcelIdDto parcelIdDto() {

@@ -4,10 +4,11 @@ import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.infrastructure.secondary.entity.DepotEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DepotMapper {
 
     @Mapping(source = "coordinates.lon", target = "lon")

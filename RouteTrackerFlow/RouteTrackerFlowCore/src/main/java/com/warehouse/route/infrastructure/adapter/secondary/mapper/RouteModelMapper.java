@@ -6,10 +6,11 @@ import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.RouteEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface RouteModelMapper {
 
     @Mapping(source = "parcel.id", target = "parcelId")

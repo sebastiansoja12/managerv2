@@ -47,8 +47,7 @@ public class EndpointAccess extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests();
     }
 
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    @Override
+    @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }

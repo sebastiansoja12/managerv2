@@ -1,5 +1,6 @@
 package com.warehouse.voronoi.configuration;
 
+import com.fire.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPortImpl;
@@ -11,8 +12,6 @@ import com.warehouse.voronoi.domain.service.UrlReaderServiceImpl;
 import com.warehouse.voronoi.infrastructure.adapter.primary.VoronoiServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.primary.mapper.AddressRequestMapper;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.VoronoiAdapter;
-import com.warehouse.depot.api.DepotService;
-import com.warehouse.positionstack.configuration.TokenStageProperties;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,9 +31,10 @@ public class VoronoiConfiguration {
     }
 
     @Bean
-    public VoronoiServicePort addressDeterminationServicePort(TokenStageProperties tokenStageProperties,
-        DepotService depotService, ComputeService computeService, UrlJsonReaderService urlJsonReaderService) {
-        return new VoronoiAdapter(tokenStageProperties, depotService, computeService, urlJsonReaderService);
+    public VoronoiServicePort addressDeterminationServicePort(ComputeService computeService,
+          UrlJsonReaderService urlJsonReaderService) {
+        final PositionStackProperties positionStackProperties = new PositionStackProperties();
+        return new VoronoiAdapter(positionStackProperties, computeService, urlJsonReaderService);
     }
 
     @Bean

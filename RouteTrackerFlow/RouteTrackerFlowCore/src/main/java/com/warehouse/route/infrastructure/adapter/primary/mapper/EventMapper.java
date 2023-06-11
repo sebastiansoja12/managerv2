@@ -9,10 +9,11 @@ import com.warehouse.route.infrastructure.api.dto.RouteResponseDto;
 import com.warehouse.route.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface EventMapper {
 
     SupplyInformation map(SupplyInformationDto supplyInformationDto);

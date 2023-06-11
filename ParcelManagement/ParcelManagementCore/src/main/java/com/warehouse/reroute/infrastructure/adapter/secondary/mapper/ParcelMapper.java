@@ -29,40 +29,6 @@ public interface ParcelMapper {
     @Mapping(target = "parcelId.value", source = "id")
     ParcelUpdateResponse mapFromParcelEntityToParcelResponse(ParcelEntity parcelEntity);
 
-    @Mapping(source = "parcel.sender.firstName", target = "firstName")
-    @Mapping(source = "parcel.sender.lastName", target = "lastName")
-    @Mapping(source = "parcel.sender.email", target = "senderEmail")
-    @Mapping(source = "parcel.sender.telephoneNumber", target = "senderTelephone")
-    @Mapping(source = "parcel.sender.city", target = "senderCity")
-    @Mapping(source = "parcel.sender.postalCode", target = "senderPostalCode")
-    @Mapping(source = "parcel.sender.street", target = "senderStreet")
-    @Mapping(source = "parcel.recipient.firstName", target = "recipientFirstName")
-    @Mapping(source = "parcel.recipient.lastName", target = "recipientLastName")
-    @Mapping(source = "parcel.recipient.email", target = "recipientEmail")
-    @Mapping(source = "parcel.recipient.telephoneNumber", target = "recipientTelephone")
-    @Mapping(source = "parcel.recipient.city", target = "recipientCity")
-    @Mapping(source = "parcel.recipient.postalCode", target = "recipientPostalCode")
-    @Mapping(source = "parcel.recipient.street", target = "recipientStreet")
-    @Mapping(source = "parcel.parcelSize", target = "parcelSize")
-    ParcelEntity mapToParcelEntity(UpdateParcelRequest parcelRequest);
-
-    @Mapping(source = "sender.firstName", target = "firstName")
-    @Mapping(source = "sender.lastName", target = "lastName")
-    @Mapping(source = "sender.email", target = "senderEmail")
-    @Mapping(source = "sender.telephoneNumber", target = "senderTelephone")
-    @Mapping(source = "sender.city", target = "senderCity")
-    @Mapping(source = "sender.postalCode", target = "senderPostalCode")
-    @Mapping(source = "sender.street", target = "senderStreet")
-    @Mapping(source = "recipient.firstName", target = "recipientFirstName")
-    @Mapping(source = "recipient.lastName", target = "recipientLastName")
-    @Mapping(source = "recipient.email", target = "recipientEmail")
-    @Mapping(source = "recipient.telephoneNumber", target = "recipientTelephone")
-    @Mapping(source = "recipient.city", target = "recipientCity")
-    @Mapping(source = "recipient.postalCode", target = "recipientPostalCode")
-    @Mapping(source = "recipient.street", target = "recipientStreet")
-    @Mapping(source = "parcelSize", target = "parcelSize")
-    ParcelEntity mapFromParcelResponseToParcelEntity(ParcelUpdateResponse parcelRequest);
-
 
     @Mapping(source = "id", target = "parcel.parcelId.value")
     @Mapping(source = "token", target = "token.value")
