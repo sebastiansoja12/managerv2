@@ -15,12 +15,13 @@ public class SecurityConfiguration {
     @Autowired
     public UserDetailsService userDetailsService;
 
-    @Autowired
+    //TODO INPL-1564
+    /*@Autowired
     public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userDetailsService)
                 .passwordEncoder(new BCryptPasswordEncoder());
     }
-
+    */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

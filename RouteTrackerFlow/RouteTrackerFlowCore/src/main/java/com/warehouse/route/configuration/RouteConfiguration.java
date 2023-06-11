@@ -15,8 +15,6 @@ import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteModelMap
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

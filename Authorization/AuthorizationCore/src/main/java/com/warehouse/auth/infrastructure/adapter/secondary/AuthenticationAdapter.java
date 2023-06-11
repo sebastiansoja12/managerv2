@@ -4,7 +4,7 @@ import com.warehouse.auth.domain.model.AuthenticationResponse;
 import com.warehouse.auth.domain.model.Depot;
 import com.warehouse.auth.domain.model.RegisterRequest;
 import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.secondary.AuthenticationPort;
+import com.warehouse.auth.domain.port.secondary.AuthenticationServicePort;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.RefreshTokenService;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.util.List;
 
 @AllArgsConstructor
-public class AuthenticationAdapter implements AuthenticationPort {
+public class AuthenticationAdapter implements AuthenticationServicePort {
 
     private final UserRepository userRepository;
 

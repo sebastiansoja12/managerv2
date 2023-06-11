@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @AllArgsConstructor

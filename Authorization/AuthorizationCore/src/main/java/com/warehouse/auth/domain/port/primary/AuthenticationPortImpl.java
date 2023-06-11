@@ -18,7 +18,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final AuthenticationService authenticationService;
 
-    @Autowired
+
     private AuthenticationManager authenticationManager;
 
 

@@ -4,10 +4,11 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface UserMapper {
 
     @Mapping(source = "depot.depotCode", target = "depotCode")

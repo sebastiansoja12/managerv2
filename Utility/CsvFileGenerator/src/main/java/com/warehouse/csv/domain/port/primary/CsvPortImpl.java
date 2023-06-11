@@ -6,7 +6,7 @@ import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import lombok.AllArgsConstructor;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

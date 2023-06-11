@@ -7,11 +7,11 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapper;
 import com.warehouse.shipment.domain.model.Parcel;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 
 @Service

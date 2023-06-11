@@ -2,7 +2,7 @@ package com.warehouse.reroute.infrastructure.adapter.secondary.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Instant;
 
 @Getter

@@ -1,6 +1,6 @@
 package com.warehouse.qrcode.domain.service;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface ParcelService {
 

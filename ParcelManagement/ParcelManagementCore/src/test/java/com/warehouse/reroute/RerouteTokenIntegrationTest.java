@@ -14,7 +14,7 @@ import com.warehouse.reroute.domain.port.primary.RerouteServicePort;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
-import com.warehouse.reroute.infrastructure.api.RerouteService;
+import com.warehouse.reroute.infrastructure.api.RerouteApiService;
 import com.warehouse.reroute.infrastructure.api.dto.EmailDto;
 import com.warehouse.reroute.infrastructure.api.dto.ParcelId;
 import com.warehouse.reroute.infrastructure.api.dto.RerouteRequestDto;
@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RerouteTokenIntegrationTest {
 
     @Autowired
-    private RerouteService rerouteService;
+    private RerouteApiService rerouteApiService;
 
     @Autowired
     private RerouteServicePort rerouteServicePort;
@@ -188,7 +188,7 @@ public class RerouteTokenIntegrationTest {
         requestDto.setParcelId(parcelId);
 
         // when
-        final RerouteResponseDto response = rerouteService.sendReroutingInformation(requestDto);
+        final RerouteResponseDto response = rerouteApiService.sendReroutingInformation(requestDto);
         //then
         assertThat(response.getToken().intValue()).isNotNull();
 

@@ -5,7 +5,7 @@ import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 

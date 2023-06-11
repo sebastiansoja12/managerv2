@@ -2,7 +2,7 @@ package com.warehouse.csv.domain.port.primary;
 
 import com.itextpdf.text.DocumentException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public interface CsvPort {

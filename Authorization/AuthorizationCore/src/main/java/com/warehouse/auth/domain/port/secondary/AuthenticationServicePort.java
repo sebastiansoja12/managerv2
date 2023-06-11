@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
-public interface AuthenticationPort {
+public interface AuthenticationServicePort {
 
     AuthenticationResponse login(Authentication authentication, String token);
 

@@ -13,7 +13,6 @@ import java.util.UUID;
 @Builder
 public class Route {
 
-    @Type(type = "uuid-char")
     UUID id;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")

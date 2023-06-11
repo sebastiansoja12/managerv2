@@ -3,7 +3,7 @@ package com.warehouse.route.infrastructure.adapter.secondary.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -22,14 +22,12 @@ import java.util.UUID;
 public class RouteEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")

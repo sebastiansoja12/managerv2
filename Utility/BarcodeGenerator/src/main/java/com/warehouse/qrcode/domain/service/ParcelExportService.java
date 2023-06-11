@@ -2,7 +2,7 @@ package com.warehouse.qrcode.domain.service;
 
 import com.warehouse.shipment.domain.model.Parcel;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface ParcelExportService {
 

@@ -20,8 +20,7 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>AuthorizationCore</artifactId>
-            <!--TODO Update in INPL-1564-->
-            <version>2023.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>

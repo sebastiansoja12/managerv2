@@ -2,6 +2,7 @@ package com.warehouse.auth.configuration;
 
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
+import com.warehouse.auth.domain.port.secondary.AuthenticationServicePort;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.*;
@@ -21,10 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Slf4j
 public class AuthConfiguration  {
 
+    //TODO INPL-1564
     @Bean(name = "primaryAuthenticationPort")
-    public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
-                                                 AuthenticationManager authenticationManager) {
-        return new AuthenticationPortImpl(authenticationService, authenticationManager);
+    public AuthenticationPort authenticationPort(AuthenticationService authenticationService) {
+        return new AuthenticationPortImpl(authenticationService, null);
     }
 
     @Bean
@@ -34,12 +35,12 @@ public class AuthConfiguration  {
 
     @Bean
     public AuthenticationService authenticationService(
-            com.warehouse.auth.domain.port.secondary.AuthenticationPort authenticationPort, JwtProvider jwtProvider) {
-        return new AuthenticationServiceImpl(authenticationPort, jwtProvider);
+            AuthenticationServicePort authenticationServicePort, JwtProvider jwtProvider) {
+        return new AuthenticationServiceImpl(authenticationServicePort, jwtProvider);
     }
 
     @Bean
-    public com.warehouse.auth.domain.port.secondary.AuthenticationPort authenticationPort(
+    public AuthenticationServicePort authenticationServicePort(
             UserRepository userRepository, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder,
             DepotService depotService) {
         final UserMapper userMapper = Mappers.getMapper(UserMapper.class);

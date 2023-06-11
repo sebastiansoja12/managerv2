@@ -5,7 +5,7 @@ import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
