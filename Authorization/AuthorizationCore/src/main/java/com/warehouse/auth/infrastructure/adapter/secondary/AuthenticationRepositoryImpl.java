@@ -25,7 +25,7 @@ public class AuthenticationRepositoryImpl implements UserRepository {
     public AuthenticationResponse login(AuthenticationResponse authentication) {
         final RefreshTokenEntity refreshToken = new RefreshTokenEntity();
         refreshToken.setToken(authentication.getRefreshToken());
-        refreshToken.setCreatedDate(authentication.getCreatedAt());
+        //refreshToken.setCreatedDate(authentication.getCreatedAt());
         refreshTokenReadRepository.save(refreshToken);
         return authentication;
     }
@@ -42,7 +42,7 @@ public class AuthenticationRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findByUsername(String username) {
-        return userMapper.mapToUserList(repository.findByUsername(username));
+        return null;
     }
 
     @Override

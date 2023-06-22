@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface AuthenticationServicePort {
 
-    AuthenticationResponse login(Authentication authentication, String token);
+    AuthenticationResponse login(Authentication authentication);
 
     void signup(RegisterRequest registerRequest);
 

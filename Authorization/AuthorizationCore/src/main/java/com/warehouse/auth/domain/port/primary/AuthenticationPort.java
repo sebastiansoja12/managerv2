@@ -11,8 +11,4 @@ public interface AuthenticationPort {
     void signup(RegisterRequest registerRequest);
 
     void logout(RefreshTokenRequest refreshTokenRequest);
-
-    List<User> findCurrentUser();
-
-    User findUserByUsername(String username);
 }

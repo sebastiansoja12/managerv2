@@ -12,5 +12,5 @@ public interface AuthenticationReadRepository extends JpaRepository<UserEntity, 
 
     Optional<UserEntity> getByUsername(String username);
 
-    List<UserEntity> findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 }

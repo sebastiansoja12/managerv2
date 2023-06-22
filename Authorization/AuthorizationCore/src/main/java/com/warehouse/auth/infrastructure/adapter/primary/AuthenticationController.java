@@ -32,11 +32,11 @@ public class AuthenticationController {
 
     @GetMapping("/current-user")
     public List<User> currentUser() {
-        return authenticationPort.findCurrentUser();
+        return null;
     }
 
     @GetMapping("/{username}")
     public User findUserByUsername(@PathVariable String username) {
-        return authenticationPort.findUserByUsername(username);
+        return null;
     }
 }

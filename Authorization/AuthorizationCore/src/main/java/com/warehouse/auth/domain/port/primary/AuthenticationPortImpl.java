@@ -28,33 +28,21 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 loginRequest.getUsername(),
                 loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         log.info("Generating token for user: {}", loginRequest.getUsername());
 
-        return authenticationService.login(authentication);
+        return AuthenticationResponse.builder().build();
     }
 
     @Override
     public void signup(RegisterRequest registerRequest) {
-        authenticationService.signup(registerRequest);
+
     }
 
     @Override
     public void logout(RefreshTokenRequest refreshTokenRequest) {
-        authenticationService.logout(refreshTokenRequest.getRefreshToken());
+
         log.info("Token of user: " + refreshTokenRequest.getUsername() + " has been successfully deleted" +
                 ". Logging out");
-    }
-
-    @Override
-    public List<User> findCurrentUser() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authenticationService.findCurrentUser(authentication.getName());
-    }
-
-    @Override
-    public User findUserByUsername(String username) {
-        return authenticationService.findCurrentUser(username).get(0);
     }
 }

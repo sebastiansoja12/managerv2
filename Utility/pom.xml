@@ -16,7 +16,6 @@
     <modules>
         <module>BarcodeGenerator</module>
         <module>CsvFileGenerator</module>
-        <module>Security</module>
     </modules>
 
 </project>

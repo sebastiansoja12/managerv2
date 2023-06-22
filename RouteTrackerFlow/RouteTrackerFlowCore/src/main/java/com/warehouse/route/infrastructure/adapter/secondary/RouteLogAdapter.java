@@ -61,21 +61,12 @@ public class RouteLogAdapter implements RouteTrackerServicePort {
      */
     @Override
     public void deleteRoute(Long id) {
-        final String username = getUsername();
-        final String depotCode = getDepotCode();
-        routeRepository.deleteByParcelIdAndDepotCodeAndUsername(id, depotCode, username);
+        // TODO change to RouteDeleteRequest
+        routeRepository.deleteByParcelIdAndDepotCodeAndUsername(id, "", "");
     }
 
     @Override
     public boolean exists(Long id) {
         return Objects.nonNull(shipmentPort.loadParcel(id));
-    }
-
-    public String getUsername() {
-        return authenticationPort.findCurrentUser().get(0).getUsername();
-    }
-
-    public String getDepotCode() {
-        return authenticationPort.findCurrentUser().get(0).getDepot().getDepotCode();
     }
 }
