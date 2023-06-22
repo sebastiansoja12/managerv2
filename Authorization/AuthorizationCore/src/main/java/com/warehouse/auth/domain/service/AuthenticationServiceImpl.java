@@ -1,40 +1,23 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.model.AuthenticationResponse;
-import com.warehouse.auth.domain.model.RegisterRequest;
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.secondary.AuthenticationServicePort;
-import lombok.AllArgsConstructor;
-import org.springframework.security.core.Authentication;
+import com.warehouse.auth.domain.vo.UserResponse;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.warehouse.auth.domain.model.RegisterResponse;
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.secondary.UserRepository;
+
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
+@Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final AuthenticationServicePort authenticationServicePort;
-
-    private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
     @Override
-    public AuthenticationResponse login(Authentication authentication) {
-        final String token = jwtProvider.generateToken(authentication);
-        return authenticationServicePort.login(authentication, token);
+    public RegisterResponse register(User user) {
+        final UserResponse userResponse = userRepository.signup(user);
+        return new RegisterResponse(userResponse);
     }
-
-    @Override
-    public void signup(RegisterRequest registerRequest) {
-        authenticationServicePort.signup(registerRequest);
-    }
-
-    @Override
-    public void logout(String token) {
-        authenticationServicePort.logout(token);
-    }
-
-    @Override
-    public List<User> findCurrentUser(String username) {
-        return authenticationServicePort.findCurrentUser(username);
-    }
-
 }

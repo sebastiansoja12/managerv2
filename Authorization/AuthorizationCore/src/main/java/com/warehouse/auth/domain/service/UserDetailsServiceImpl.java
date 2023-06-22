@@ -1,6 +1,6 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,13 +21,13 @@ import static java.util.Collections.singletonList;
 @Service("userDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final AuthenticationReadRepository authenticationReadRepository;
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) {
-        final Optional<UserEntity> userOptional = userRepository.
-                findUserEntityByUsername(username);
+        final Optional<UserEntity> userOptional = authenticationReadRepository.
+                findByUsername(username);
 
         final UserEntity user = userOptional
                 .orElseThrow(() -> new UsernameNotFoundException("No user " +
@@ -37,7 +37,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .core.userdetails.User(user.getUsername(), user.getPassword(),
                 true, true,
                 true, true,
-                getAuthorities(user.getRole()));
+                getAuthorities(user.getRole().name()));
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(String role) {

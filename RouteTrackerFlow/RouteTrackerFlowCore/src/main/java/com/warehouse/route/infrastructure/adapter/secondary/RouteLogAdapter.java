@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+// TODO to be deleted
 @AllArgsConstructor
 public class RouteLogAdapter implements RouteTrackerServicePort {
 
@@ -61,21 +62,12 @@ public class RouteLogAdapter implements RouteTrackerServicePort {
      */
     @Override
     public void deleteRoute(Long id) {
-        final String username = getUsername();
-        final String depotCode = getDepotCode();
-        routeRepository.deleteByParcelIdAndDepotCodeAndUsername(id, depotCode, username);
+        // TODO change to RouteDeleteRequest
+        routeRepository.deleteByParcelIdAndDepotCodeAndUsername(id, "", "");
     }
 
     @Override
     public boolean exists(Long id) {
         return Objects.nonNull(shipmentPort.loadParcel(id));
-    }
-
-    public String getUsername() {
-        return authenticationPort.findCurrentUser().get(0).getUsername();
-    }
-
-    public String getDepotCode() {
-        return authenticationPort.findCurrentUser().get(0).getDepot().getDepotCode();
     }
 }

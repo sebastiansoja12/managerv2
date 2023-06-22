@@ -1,67 +1,88 @@
 package com.warehouse.auth.configuration;
 
-import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
-import com.warehouse.auth.domain.port.secondary.AuthenticationServicePort;
-import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
-import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.service.*;
-import com.warehouse.auth.infrastructure.adapter.secondary.*;
-import com.warehouse.auth.infrastructure.adapter.secondary.mapper.DepotEntityMapper;
-import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
-import com.warehouse.depot.api.DepotService;
-import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+
+import com.warehouse.auth.domain.port.primary.AuthenticationPort;
+import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
+import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
+import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.service.AuthenticationService;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationRepositoryImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenRepositoryImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
+
+import jakarta.servlet.ServletException;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Configuration
 @Slf4j
 public class AuthConfiguration  {
 
-    //TODO INPL-1564
-    @Bean(name = "primaryAuthenticationPort")
-    public AuthenticationPort authenticationPort(AuthenticationService authenticationService) {
-        return new AuthenticationPortImpl(authenticationService, null);
+	@Bean
+	public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
+			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+		return new AuthenticationPortImpl(authenticationService, passwordEncoder);
     }
 
-    @Bean
-    public JwtProvider jwtProvider() {
-        return new JwtProviderImpl();
-    }
-
-    @Bean
-    public AuthenticationService authenticationService(
-            AuthenticationServicePort authenticationServicePort, JwtProvider jwtProvider) {
-        return new AuthenticationServiceImpl(authenticationServicePort, jwtProvider);
-    }
-
-    @Bean
-    public AuthenticationServicePort authenticationServicePort(
-            UserRepository userRepository, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder,
-            DepotService depotService) {
-        final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
-        final DepotEntityMapper depotEntityMapper = Mappers.getMapper(DepotEntityMapper.class);
-        return new AuthenticationAdapter(userRepository, refreshTokenService, passwordEncoder, userMapper, depotService,
-                depotEntityMapper);
-    }
-
-    @Bean
-    public RefreshTokenService refreshTokenService() {
-        return new RefreshTokenServiceImpl();
-    }
-    @Bean(name = "authUserRepository")
-    public UserRepository userRepository(AuthenticationReadRepository repository,
-        RefreshTokenReadRepository refreshTokenReadRepository) {
-        final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
-        return new AuthenticationRepositoryImpl(repository, refreshTokenReadRepository, userMapper);
-    }
+	@Bean
+	public UserRepository userRepository(AuthenticationReadRepository repository,
+			RefreshTokenReadRepository refreshTokenReadRepository) {
+		final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+		return new AuthenticationRepositoryImpl(repository, refreshTokenReadRepository, userMapper);
+	}
 
     @Bean
     public RefreshTokenRepository refreshTokenRepository(RefreshTokenReadRepository repository) {
         return new RefreshTokenRepositoryImpl(repository);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		return new AuthenticationProvider() {
+			@Override
+			public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+				return authentication;
+			}
+
+			@Override
+			public boolean supports(Class<?> authentication) {
+				return authentication.isAnnotation();
+			}
+		};
+	}
+
+    @Bean
+    public LogoutHandler logoutHandler() {
+        return (request, response, authentication) -> {
+            try {
+                request.logout();
+                authentication.setAuthenticated(false);
+            } catch (ServletException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

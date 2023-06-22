@@ -65,11 +65,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>Security</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>AddressDeterminationCore</artifactId>
             <version>${project.version}</version>
         </dependency>
