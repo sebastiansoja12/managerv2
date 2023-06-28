@@ -8,13 +8,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class JwtProvider {
     private static final String SECRET_KEY = "application.jwt.security.secret-key";
 
-    private static final String EXPIRATION = "application.jwt.security.expiration";
+    private static final String EXPIRATION = "application.jwt.security.secret-key.expiration";
 
-    private static final String REFRESH_TOKEN = "application.jwt.security.refresh-token";
+    private static final String REFRESH_TOKEN_EXPIRATION = "application.jwt.security.refresh-token.expiration";
 
     private String secretKey;
 
-    private String refreshToken;
+    private String refreshTokenExpiration;
 
     private Long expiration;
 
@@ -22,8 +22,8 @@ public class JwtProvider {
         this.secretKey = secretKey;
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    public void setRefreshTokenExpiration(String refreshTokenExpiration) {
+        this.refreshTokenExpiration = refreshTokenExpiration;
     }
 
     public void setExpiration(Long expiration) {
