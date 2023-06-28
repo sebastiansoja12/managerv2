@@ -48,4 +48,11 @@ public class JwtServiceTest {
     void shouldTokenBeInvalid() {
 
     }
+
+    @Test
+    void shouldExtractUsernameFromJwt() {
+
+    }
+
+
 }
