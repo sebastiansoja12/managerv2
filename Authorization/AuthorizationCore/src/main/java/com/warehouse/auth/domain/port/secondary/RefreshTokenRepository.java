@@ -1,14 +1,11 @@
 package com.warehouse.auth.domain.port.secondary;
 
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
+import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
-/**
- * Class only for test purposes
- */
 public interface RefreshTokenRepository {
 
     void save(RefreshTokenEntity refreshToken);
 
-    boolean existsById(Long id);
-
+    String save(UserEntity userEntity, String token);
 }

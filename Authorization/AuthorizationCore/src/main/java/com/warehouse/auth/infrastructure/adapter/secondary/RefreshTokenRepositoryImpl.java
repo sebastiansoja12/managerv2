@@ -2,12 +2,15 @@ package com.warehouse.auth.infrastructure.adapter.secondary;
 
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
+
+import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType;
 import lombok.AllArgsConstructor;
 
+import java.time.Instant;
+import java.util.UUID;
 
-/**
- * Class only for test purposes
- */
+
 @AllArgsConstructor
 public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
 
@@ -19,7 +22,16 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     }
 
     @Override
-    public boolean existsById(Long id) {
-        return repository.existsById(id);
+    public String save(UserEntity userEntity, String token) {
+        final RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
+                .user(userEntity)
+                .tokenType(TokenType.BEARER)
+                .createdDate(Instant.now())
+                .expired(false)
+                .revoked(false)
+                .token(token)
+                .build();
+
+        return refreshToken.getId().toString();
     }
 }

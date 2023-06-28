@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+// TODO to be deleted
 @AllArgsConstructor
 public class RouteLogAdapter implements RouteTrackerServicePort {
 

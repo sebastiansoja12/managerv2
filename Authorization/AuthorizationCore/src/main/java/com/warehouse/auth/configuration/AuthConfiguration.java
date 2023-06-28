@@ -1,21 +1,5 @@
 package com.warehouse.auth.configuration;
 
-import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
-import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
-import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.service.AuthenticationService;
-import com.warehouse.auth.domain.service.AuthenticationServiceImpl;
-import com.warehouse.auth.domain.service.RefreshTokenService;
-import com.warehouse.auth.domain.service.RefreshTokenServiceImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
-import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationRepositoryImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
-import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenRepositoryImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
-import jakarta.servlet.ServletException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,27 +8,33 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+
+import com.warehouse.auth.domain.port.primary.AuthenticationPort;
+import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
+import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
+import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.service.AuthenticationService;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationRepositoryImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenRepositoryImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
+
+import jakarta.servlet.ServletException;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Configuration
 @Slf4j
-@RequiredArgsConstructor
 public class AuthConfiguration  {
 
-    @Bean
-    public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
-	    AuthenticationManager authenticationManager) {
-        return new AuthenticationPortImpl(authenticationService, authenticationManager);
-    }
-
-    @Bean
-    public AuthenticationService authenticationService() {
-        return new AuthenticationServiceImpl();
-    }
-    @Bean
-    public RefreshTokenService refreshTokenService() {
-        return new RefreshTokenServiceImpl();
+	@Bean
+	public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
+			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+		return new AuthenticationPortImpl(authenticationService, passwordEncoder);
     }
 
 	@Bean
@@ -89,5 +79,10 @@ public class AuthConfiguration  {
                 throw new RuntimeException(e);
             }
         };
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

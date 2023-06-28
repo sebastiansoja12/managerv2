@@ -1,11 +1,13 @@
 package com.warehouse.auth.domain.service;
 
+import com.warehouse.auth.domain.provider.JwtProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +22,8 @@ import java.util.function.Function;
 public class JwtServiceImpl implements JwtService {
 
 
-    private final String secretKey = "XD";
-    private final long jwtExpiration = 10L;
-    private final long refreshExpiration = 10l;
+    @NonNull
+    private final JwtProvider jwtProvider;
 
     @Override
     public String extractUsername(String token) {
@@ -75,7 +76,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSigningKey() {
-        final byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        final byte[] keyBytes = Decoders.BASE64.decode(jwtProvider.getSecretKey());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

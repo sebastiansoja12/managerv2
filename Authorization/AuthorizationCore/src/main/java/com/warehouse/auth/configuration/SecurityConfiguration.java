@@ -5,14 +5,21 @@ import com.warehouse.auth.domain.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.AbstractRequestMatcherRegistry;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 import static com.warehouse.auth.infrastructure.adapter.secondary.authority.Role.*;
 
@@ -30,10 +37,17 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(httpSecurityCsrfConfigurer ->
-                        httpSecurityCsrfConfigurer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> {
+                    cors.configurationSource(
+                            source -> {
+                                final CorsConfiguration configuration = new CorsConfiguration();
+                                configuration.setAllowedMethods(List.of("*"));
+                                return configuration;
+                            }
+                    );
+                })
                 .authorizeHttpRequests(authorization -> authorization.requestMatchers(
-                        "/v2/api/**",
                         "/swagger-resources",
                         "/swagger-resources/**",
                         "/configuration/ui",
@@ -45,8 +59,10 @@ public class SecurityConfiguration {
 
 
             http
-                    .authorizeHttpRequests(authorization -> authorization.requestMatchers("/v2/api/**")
-                            .hasAnyRole(ADMIN.name(), MANAGER.name(), USER.name()));
+                    .authorizeHttpRequests(request -> request.requestMatchers("/v2/api/depots/all").access(
+                           new WebExpressionAuthorizationManager("isAnonymous()")).anyRequest()
+                            .anonymous()
+                    );
 
             http
                     .authenticationProvider(authenticationProvider)

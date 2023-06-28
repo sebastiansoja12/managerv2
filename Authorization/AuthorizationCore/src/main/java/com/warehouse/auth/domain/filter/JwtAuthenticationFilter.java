@@ -1,7 +1,9 @@
 package com.warehouse.auth.domain.filter;
 
 
+import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
+	private final RefreshTokenReadRepository refreshTokenReadRepository;
+
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 			@NonNull FilterChain filterChain) throws ServletException, IOException {
@@ -34,16 +38,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		final String jwt;
 		final String username;
 
-		if (StringUtils.isBlank(authHeader) || authHeader.startsWith("Bearer ")) {
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
+			return;
 		}
 
 		jwt = authHeader.substring(7);
 		username = jwtService.extractUsername(authHeader);
 
-		if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
+		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			final UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-			if (jwtService.isTokenValid(jwt, userDetails)) {
+			final var isTokenValid = refreshTokenReadRepository.findByToken(jwt)
+					.map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
+			if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
 				final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
