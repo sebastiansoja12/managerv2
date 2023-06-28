@@ -1,15 +1,14 @@
 package com.warehouse.auth.domain.port.primary;
 
-import com.warehouse.auth.domain.exception.AuthenticationErrorException;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.service.AuthenticationService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Objects;
 
 @AllArgsConstructor
 @Slf4j
@@ -52,7 +51,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     private void handleRequest(RegisterRequest request) {
-        if (Objects.isNull(request)) {
+        if (ObjectUtils.isEmpty(request)) {
             throw new AuthenticationErrorException("Request is not correct");
         }
     }
