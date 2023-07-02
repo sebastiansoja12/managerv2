@@ -1,11 +1,14 @@
 package com.warehouse.auth;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
+import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.User;
@@ -32,11 +35,20 @@ public class JwtServiceTest {
     void shouldGenerateToken() {
         // given
         final Map<String, Object> extraClaims = new HashMap<>();
-        final UserDetails userDetails = new User("test", "test", Collections.emptyList());
+        final UserEntity user = UserEntity.builder()
+                .depotCode("TST")
+                .email("test@test.pl")
+                .firstName("Test")
+                .lastName("Test")
+                .role(Role.ADMIN)
+                .id(1L)
+                .username("test")
+                .build();
         // when
-        final String jwtToken = jwtService.generateToken(extraClaims, userDetails);
+        final String jwtToken = jwtService.generateToken(extraClaims, user);
         // then
         assertTrue(StringUtils.isNotEmpty(jwtToken));
+        assertTrue(jwtToken.startsWith("eyJhbGciOiJIUzI1NiJ9"));
     }
 
     @Test
