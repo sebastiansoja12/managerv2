@@ -28,6 +28,7 @@
 		<module>Authorization</module>
 		<module>Utility</module>
         <module>TokenStage</module>
+        <module>Generator</module>
     </modules>
 
 	<properties>

@@ -9,8 +9,13 @@
         <version>2023.7-SNAPSHOT</version>
     </parent>
 
-    <artifactId>Utility</artifactId>
-
     <packaging>pom</packaging>
+
+    <artifactId>Generator</artifactId>
+
+    <modules>
+        <module>BarcodeGenerator</module>
+        <module>CsvFileGenerator</module>
+    </modules>
 
 </project>
