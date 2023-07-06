@@ -1,11 +1,13 @@
 package com.warehouse.route.domain.port.primary;
 
+import com.warehouse.route.domain.model.RouteDeleteRequest;
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.vo.SupplyInformation;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface RouteTrackerLogPort {
 
@@ -18,9 +20,5 @@ public interface RouteTrackerLogPort {
 
     void saveMultipleRoutes(List<RouteRequest> routeRequests);
 
-    List<Routes> findByParcelId(Long parcelId);
-
-    List<Routes> findByUsername(String username);
-
-    void deleteRoute(Long id);
+    void deleteRoute(RouteDeleteRequest request);
 }

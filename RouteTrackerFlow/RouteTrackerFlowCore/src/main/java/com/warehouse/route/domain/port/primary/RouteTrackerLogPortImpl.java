@@ -1,26 +1,20 @@
 package com.warehouse.route.domain.port.primary;
 
-import com.warehouse.route.domain.model.Route;
-import com.warehouse.route.domain.model.RouteRequest;
-import com.warehouse.route.domain.model.RouteResponse;
-import com.warehouse.route.domain.model.Routes;
-import com.warehouse.route.domain.port.secondary.RouteLogService;
-import com.warehouse.route.domain.port.secondary.RouteRepository;
-import com.warehouse.route.domain.port.secondary.RouteTrackerServicePort;
-import com.warehouse.route.domain.vo.SupplyInformation;
-import lombok.AllArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
+
+import com.warehouse.route.domain.model.*;
+import com.warehouse.route.domain.port.secondary.RouteLogService;
+import com.warehouse.route.domain.vo.SupplyInformation;
+
+import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
 public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     private final RouteLogService routeLogService;
-
-    private final RouteTrackerServicePort trackerServicePort;
 
     @Override
     public void initializeRoute(Long parcelId) {
@@ -56,29 +50,22 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     @Override
     public void saveMultipleRoutes(List<RouteRequest> routeRequests) {
-        validateParcels(routeRequests);
-        routeRequests.forEach(
-                trackerServicePort::saveRoute
-        );
+        routeRequests.stream()
+                .map(this::mapToRoute)
+                .forEach(routeLogService::saveRoute);
     }
-
     @Override
-    public List<Routes> findByParcelId(Long parcelId) {
-        return trackerServicePort.findByParcelId(parcelId);
+    public void deleteRoute(RouteDeleteRequest request) {
+        routeLogService.deleteRoute(request);
     }
 
-    @Override
-    public List<Routes> findByUsername(String username) {
-        return trackerServicePort.findByUsername(username);
-    }
-
-    @Override
-    public void deleteRoute(Long id) {
-        trackerServicePort.deleteRoute(id);
-    }
-
-    public void validateParcels(List<RouteRequest> routeRequests) {
-        routeRequests
-                .forEach(r -> trackerServicePort.exists(r.getParcelId()));
+    private Route mapToRoute(RouteRequest routeRequest) {
+        return Route.builder()
+                .parcelId(routeRequest.getParcelId())
+                .created(LocalDateTime.now())
+                .supplierId(routeRequest.getSupplierId())
+                .depotId(routeRequest.getDepotId())
+                .userId(routeRequest.getUserId())
+                .build();
     }
 }

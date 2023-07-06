@@ -1,14 +1,14 @@
 package com.warehouse.route.infrastructure.adapter.primary;
 
-import com.warehouse.route.domain.model.RouteRequest;
-import com.warehouse.route.domain.model.RouteResponse;
-import com.warehouse.route.domain.model.Routes;
+import com.warehouse.route.domain.model.*;
 import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.sun.mail.iap.Response.OK;
@@ -32,17 +32,17 @@ public class RouteController {
 
     @GetMapping("/by-parcel/{parcelId}")
     public List<Routes> getRouteListByParcelId(@PathVariable Long parcelId) {
-        return trackerLogPort.findByParcelId(parcelId);
+        return new ArrayList<>();
     }
 
     @GetMapping("/by-username/{username}")
     public List<Routes> findAllByUsername(@PathVariable String username) {
-        return trackerLogPort.findByUsername(username);
+        return new ArrayList<>();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRouteByParcelId(@Valid @PathVariable Long id) {
-        trackerLogPort.deleteRoute(id);
+    public ResponseEntity<?> deleteRouteByParcelId(@RequestBody RouteDeleteRequest request) {
+        trackerLogPort.deleteRoute(request);
         return ResponseEntity.status(OK).body("Recorded route for given parcel has been deleted");
     }
 }

@@ -1,6 +1,7 @@
 package com.warehouse.route.infrastructure.adapter.secondary;
 
 import com.warehouse.route.domain.model.Route;
+import com.warehouse.route.domain.model.RouteDeleteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
@@ -64,7 +65,7 @@ public class RouteRepositoryImpl implements RouteRepository {
     }
 
     @Override
-    public void deleteByParcelIdAndDepotCodeAndUsername(Long id, String depotCode, String username) {
-        routeReadRepository.deleteByParcelIdAndDepot_DepotCodeAndUser_Username(id, depotCode, username);
+    public void deleteRoute(RouteDeleteRequest request) {
+        routeReadRepository.deleteById(request.getId());
     }
 }
