@@ -1,9 +1,8 @@
 package com.warehouse.reroute;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.reroute.configuration.RerouteTokenTestConfiguration;
-import com.warehouse.reroute.domain.service.RerouteTokenValidatorService;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.reroute.configuration.RerouteTokenTestConfiguration;
+import com.warehouse.reroute.domain.service.RerouteTokenValidatorService;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -31,8 +32,6 @@ public class RerouteTokenValidatorServiceTest {
 
     @Autowired
     private RerouteTokenValidatorService validatorService;
-
-
 
     @Test
     @DatabaseSetup("/dataset/rerouteToken.xml")

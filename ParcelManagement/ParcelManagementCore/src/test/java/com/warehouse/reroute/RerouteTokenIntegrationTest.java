@@ -1,25 +1,9 @@
 package com.warehouse.reroute;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.reroute.configuration.RerouteTokenTestConfiguration;
-import com.warehouse.reroute.domain.enumeration.ParcelType;
-import com.warehouse.reroute.domain.enumeration.Size;
-import com.warehouse.reroute.domain.enumeration.Status;
-import com.warehouse.reroute.domain.exception.EmailNotFoundException;
-import com.warehouse.reroute.domain.model.Parcel;
-import com.warehouse.reroute.domain.model.RerouteRequest;
-import com.warehouse.reroute.domain.model.UpdateParcelRequest;
-import com.warehouse.reroute.domain.port.primary.RerouteServicePort;
-import com.warehouse.reroute.domain.vo.Recipient;
-import com.warehouse.reroute.domain.vo.Sender;
-import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
-import com.warehouse.reroute.infrastructure.api.RerouteApiService;
-import com.warehouse.reroute.infrastructure.api.dto.EmailDto;
-import com.warehouse.reroute.infrastructure.api.dto.ParcelId;
-import com.warehouse.reroute.infrastructure.api.dto.RerouteRequestDto;
-import com.warehouse.reroute.infrastructure.api.dto.RerouteResponseDto;
-import com.warehouse.shipment.infrastructure.api.dto.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -33,9 +17,22 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.reroute.configuration.RerouteTokenTestConfiguration;
+import com.warehouse.reroute.domain.enumeration.ParcelType;
+import com.warehouse.reroute.domain.enumeration.Size;
+import com.warehouse.reroute.domain.enumeration.Status;
+import com.warehouse.reroute.domain.exception.EmailNotFoundException;
+import com.warehouse.reroute.domain.model.Parcel;
+import com.warehouse.reroute.domain.model.RerouteRequest;
+import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.model.UpdateParcelRequest;
+import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
+import com.warehouse.reroute.domain.vo.Recipient;
+import com.warehouse.reroute.domain.vo.Sender;
+import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
+import com.warehouse.shipment.infrastructure.api.dto.*;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -48,10 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RerouteTokenIntegrationTest {
 
     @Autowired
-    private RerouteApiService rerouteApiService;
-
-    @Autowired
-    private RerouteServicePort rerouteServicePort;
+    private RerouteTokenPort rerouteTokenPort;
 
     private final static Long PARCEL_ID = 100001L;
 
@@ -109,7 +103,7 @@ public class RerouteTokenIntegrationTest {
                 .build();
 
         // when
-        final Executable executable = () -> rerouteServicePort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
 
         final RerouteTokenNotFoundException rerouteTokenNotFoundException =
                 assertThrows(RerouteTokenNotFoundException.class, executable);
@@ -137,7 +131,7 @@ public class RerouteTokenIntegrationTest {
                 .build();
 
         // when
-        final Executable executable = () -> rerouteServicePort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
 
 
         // then
@@ -166,7 +160,7 @@ public class RerouteTokenIntegrationTest {
                 .build();
 
         // when
-        final Executable executable = () -> rerouteServicePort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
 
 
         // then
@@ -180,18 +174,14 @@ public class RerouteTokenIntegrationTest {
 
     void shouldSendRerouteRequest() {
         // given
-        final EmailDto emailDto = new EmailDto(EMAIL);
-        final ParcelId parcelId = new ParcelId(PARCEL_ID);
-
-        final RerouteRequestDto requestDto = new RerouteRequestDto();
-        requestDto.setEmail(emailDto);
-        requestDto.setParcelId(parcelId);
+        final RerouteRequest request = new RerouteRequest();
+        request.setEmail(EMAIL);
+        request.setParcelId(PARCEL_ID);
 
         // when
-        final RerouteResponseDto response = rerouteApiService.sendReroutingInformation(requestDto);
+        final RerouteResponse response = rerouteTokenPort.sendReroutingInformation(request);
         //then
-        assertThat(response.getToken().intValue()).isNotNull();
-
+        assertThat(response.getToken()).isNotNull();
     }
 
     void shouldThrowExceptionWhenEmailIsNull() {
@@ -203,7 +193,7 @@ public class RerouteTokenIntegrationTest {
         final String exceptionMessage = "E-Mail cannot be null";
 
         // when
-        final Executable executable = () -> rerouteServicePort.sendReroutingInformation(request);
+        final Executable executable = () -> rerouteTokenPort.sendReroutingInformation(request);
 
         //then
         final EmailNotFoundException exception = assertThrows(EmailNotFoundException.class, executable);

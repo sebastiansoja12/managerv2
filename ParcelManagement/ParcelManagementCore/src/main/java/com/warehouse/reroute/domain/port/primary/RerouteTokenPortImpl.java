@@ -11,7 +11,7 @@ import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteT
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class RerouteServicePortImpl implements RerouteServicePort {
+public class RerouteTokenPortImpl implements RerouteTokenPort {
 
     private final RerouteService rerouteService;
 

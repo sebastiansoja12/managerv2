@@ -1,25 +1,18 @@
 package com.warehouse.reroute.domain.service;
 
-import com.warehouse.reroute.domain.model.RerouteToken;
-import com.warehouse.reroute.domain.model.Token;
-import com.warehouse.reroute.domain.port.secondary.ParcelPort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenPort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
-import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.warehouse.reroute.domain.model.RerouteToken;
+import com.warehouse.reroute.domain.model.Token;
+import com.warehouse.reroute.domain.vo.ParcelId;
+import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class RerouteServiceImplTest {

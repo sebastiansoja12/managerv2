@@ -14,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class RerouteServicePortImplTest {
+public class RerouteTokenPortImplTest {
 
     @Mock
-    private RerouteServicePort port;
+    private RerouteTokenPort port;
 
     private final Integer TOKEN_VALUE = 27150;
 
