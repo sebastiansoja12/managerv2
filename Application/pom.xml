@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>AddressDeterminationCore</artifactId>
+            <artifactId>PathFinderCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
