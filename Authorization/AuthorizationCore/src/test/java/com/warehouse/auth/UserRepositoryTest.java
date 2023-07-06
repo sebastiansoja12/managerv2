@@ -1,53 +1,59 @@
 package com.warehouse.auth;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.auth.configuration.AuthTestConfiguration;
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.vo.UserResponse;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationRepositoryImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
+import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapperImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-@ExtendWith(SpringExtension.class)
-@DataJpaTest
-@ContextConfiguration(classes = AuthTestConfiguration.class)
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class })
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ExtendWith(MockitoExtension.class)
 public class UserRepositoryTest {
-
-    @Autowired
+    
+    @Mock
+    private AuthenticationReadRepository authenticationReadRepository;
+    
+    @Mock
+    private RefreshTokenReadRepository refreshTokenReadRepository;
+    
+    private final UserMapper userMapper = new UserMapperImpl();
+    
     private UserRepository userRepository;
+    
+    @BeforeEach
+    void setup() {
+		userRepository = new AuthenticationRepositoryImpl(authenticationReadRepository, refreshTokenReadRepository,
+				userMapper);
+    }
 
     @Test
-    @DatabaseSetup("/dataset/user_repository.xml")
-    void shouldFindByUsername() {
+    void shouldSaveUser() {
         // given
-        final String username = "s-soja";
+        final User user = User.builder()
+                .username("s-soja")
+                .depotCode("TST")
+                .email("test@test.pl")
+                .firstName("test")
+                .lastName("test")
+                .password("password")
+                .role(Role.ADMIN.name())
+                .build();
         // when
-        final Optional<UserEntity> userEntity = userRepository.findUserEntityByUsername(username);
+        userRepository.signup(user);
         // then
-        assertAll(
-                () -> assertTrue(userEntity.isPresent()),
-                () -> assertThat(userEntity.get().getUsername()).isEqualTo(username),
-                () -> assertThat(userEntity.get().getDepotCode()).isEqualTo("Test")
-        );
+        verify(authenticationReadRepository).save(any(UserEntity.class));
     }
 }

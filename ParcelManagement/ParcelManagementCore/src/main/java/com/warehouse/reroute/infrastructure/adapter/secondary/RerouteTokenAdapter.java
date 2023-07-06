@@ -2,21 +2,17 @@ package com.warehouse.reroute.infrastructure.adapter.secondary;
 
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.mail.domain.vo.Notification;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenPort;
+import com.warehouse.reroute.domain.port.secondary.RerouteTokenServicePort;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
-import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.RerouteNotification;
-import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RequestMapper;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.ResponseMapper;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.RerouteResponse;
-import com.warehouse.reroute.domain.model.RerouteToken;
-import com.warehouse.reroute.domain.model.Token;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class RerouteTokenAdapter implements RerouteTokenPort {
+public class RerouteTokenAdapter implements RerouteTokenServicePort {
 
     private final RequestMapper requestMapper;
 

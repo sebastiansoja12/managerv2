@@ -3,12 +3,12 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 import com.warehouse.shipment.domain.enumeration.Size;
 import com.warehouse.shipment.domain.enumeration.Status;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ParcelType;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

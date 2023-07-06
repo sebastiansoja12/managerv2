@@ -1,35 +1,33 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "users")
-public class UserEntity {
+public class UserEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
-    private int id;
+    private Long id;
 
-    @JsonProperty()
-    @NotEmpty
     @Column(unique = true, nullable = false)
     private String username;
 
-    @NotEmpty
     @Column(nullable = false)
     private String password;
 
@@ -40,15 +38,48 @@ public class UserEntity {
     @Column(nullable = false)
     private String lastName;
 
-    @Email
-    @NotBlank
     @Column(nullable = false)
     private String email;
 
-    private String role;
+    @Column(nullable = false)
+    private Role role;
 
     @Column(nullable = false)
     private String depotCode;
 
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return role.getAuthorities();
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

@@ -3,9 +3,11 @@ package com.warehouse.auth.infrastructure.adapter.primary;
 import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -21,8 +23,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public void signup(@RequestBody RegisterRequest registerRequest) {
-        authenticationPort.signup(registerRequest);
+    public ResponseEntity<?> signup(@RequestBody RegisterRequest registerRequest) {
+        final RegisterResponse registerResponse = authenticationPort.signup(registerRequest);
+        return new ResponseEntity<>(registerResponse, HttpStatus.OK);
     }
 
     @PostMapping("/logout")
@@ -32,11 +35,11 @@ public class AuthenticationController {
 
     @GetMapping("/current-user")
     public List<User> currentUser() {
-        return authenticationPort.findCurrentUser();
+        return null;
     }
 
     @GetMapping("/{username}")
     public User findUserByUsername(@PathVariable String username) {
-        return authenticationPort.findUserByUsername(username);
+        return null;
     }
 }

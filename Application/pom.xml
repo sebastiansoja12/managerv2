@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2023.6-SNAPSHOT</version>
+        <version>2023.7-SNAPSHOT</version>
     </parent>
     <artifactId>Application</artifactId>
 
@@ -32,13 +32,6 @@
         </profile>
     </profiles>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
@@ -46,7 +39,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.warehouse.web</groupId>
+            <groupId>com.warehouse</groupId>
             <artifactId>WarehouseWeb</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -72,17 +65,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>Security</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>AuthorizationCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>AddressDeterminationCore</artifactId>
+            <artifactId>PathFinderCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

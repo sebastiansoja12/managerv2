@@ -1,11 +1,13 @@
 package com.warehouse.route.infrastructure.adapter.secondary.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -22,14 +24,11 @@ import java.util.UUID;
 public class RouteEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")

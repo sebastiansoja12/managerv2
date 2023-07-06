@@ -1,6 +1,5 @@
 package com.warehouse.auth.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +9,6 @@ public class User {
 
     String username;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String password;
 
     String firstName;
@@ -19,8 +17,7 @@ public class User {
 
     String email;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String role;
 
-    Depot depot;
+    String depotCode;
 }

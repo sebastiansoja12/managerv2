@@ -6,9 +6,9 @@ import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Status;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
+import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

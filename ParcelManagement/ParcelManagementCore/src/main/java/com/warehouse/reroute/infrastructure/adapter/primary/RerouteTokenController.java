@@ -1,10 +1,9 @@
 package com.warehouse.reroute.infrastructure.adapter.primary;
 
 import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.port.primary.RerouteServicePort;
+import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
-import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class RerouteTokenController {
 
-    private final RerouteServicePort port;
+    private final RerouteTokenPort port;
 
     @PostMapping("/information")
     RerouteResponse sendInformation(@RequestBody RerouteRequest request) {

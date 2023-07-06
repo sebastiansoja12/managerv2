@@ -1,6 +1,7 @@
 package com.warehouse.route.domain.port.secondary;
 
 import com.warehouse.route.domain.model.Route;
+import com.warehouse.route.domain.model.RouteDeleteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.Routes;
 
@@ -18,5 +19,5 @@ public interface RouteRepository {
 
     List<Routes> findByUsername(String username);
 
-    void deleteByParcelIdAndDepotCodeAndUsername(Long id, String depotCode, String username);
+    void deleteRoute(RouteDeleteRequest request);
 }
