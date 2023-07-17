@@ -9,6 +9,7 @@ import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteT
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 
@@ -23,13 +24,11 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
     private final Long EXPIRY_TIME = 600L;
 
 
-    @Override
-    public RerouteToken loadByTokenAndParcelId(Token token, ParcelId parcelId) {
-        return repository.loadByTokenAndParcelId(token.getValue(), parcelId.getValue())
-                .map(rerouteTokenMapper::map).orElseThrow( () -> new RerouteTokenNotFoundException(
-                        "Reroute token was not found"
-                ));
-    }
+	@Override
+	public RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId) {
+		return repository.loadByTokenAndParcelId(token, parcelId).map(rerouteTokenMapper::map)
+				.orElseThrow(() -> new RerouteTokenNotFoundException("Reroute token was not found"));
+	}
 
     @Override
     public RerouteToken findByToken(Token token) {
@@ -40,13 +39,12 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
     @Override
     public Integer saveReroutingToken(Long id) {
         final RerouteTokenEntity entity = repository.save(generateRerouteToken(id));
-
         return entity.getToken();
     }
 
     @Override
-    public void deleteByToken(Token token) {
-        repository.deleteByToken(token.getValue());
+    public void deleteByToken(RerouteToken token) {
+        repository.deleteByToken(token.getToken());
     }
 
     private RerouteTokenEntity generateRerouteToken(Long parcelId) {

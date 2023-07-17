@@ -6,11 +6,11 @@ import com.warehouse.reroute.domain.vo.ParcelId;
 
 public interface RerouteTokenRepository {
 
-    RerouteToken loadByTokenAndParcelId(Token token, ParcelId parcelId);
+    RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId);
 
     RerouteToken findByToken(Token token);
 
     Integer saveReroutingToken(Long id);
 
-    void deleteByToken(Token token);
+    void deleteByToken(RerouteToken token);
 }
