@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class ShipmentRequestDto {
 
-    ParcelDto parcel;
+    ShipmentParcelDto parcel;
 }

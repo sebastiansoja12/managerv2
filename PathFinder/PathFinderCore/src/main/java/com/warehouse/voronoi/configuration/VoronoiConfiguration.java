@@ -1,6 +1,6 @@
 package com.warehouse.voronoi.configuration;
 
-import com.fire.positionstack.PositionStackProperties;
+import com.warehouse.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPortImpl;

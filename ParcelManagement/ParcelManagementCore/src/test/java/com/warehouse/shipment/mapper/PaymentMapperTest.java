@@ -21,9 +21,7 @@ public class PaymentMapperTest {
     @Test
     void shouldMapFromModelPaymentRequestToMailPaymentRequest() {
         // given
-        final PaymentRequest request = new PaymentRequest();
-        request.setParcelId(1L);
-        request.setPrice(20);
+        final PaymentRequest request = new PaymentRequest(1L, 20);
         // when
         final com.warehouse.paypal.domain.model.PaymentRequest paymentRequest = mapper.map(request);
         // then

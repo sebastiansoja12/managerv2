@@ -1,10 +1,7 @@
 package com.warehouse.reroute.domain.service;
 
 import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.port.secondary.ParcelPort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenServicePort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
-import com.warehouse.reroute.domain.vo.ParcelId;
+import com.warehouse.reroute.domain.port.secondary.*;
 import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
 import lombok.AllArgsConstructor;
 
@@ -13,18 +10,19 @@ public class RerouteServiceImpl implements RerouteService {
 
     private final RerouteTokenServicePort rerouteTokenServicePort;
 
-    private final ParcelPort parcelPort;
-
     private final RerouteTokenRepository rerouteTokenRepository;
 
+    private final ParcelRepository parcelRepository;
+
+    private final PathFinderServicePort pathFinderServicePort;
+
     @Override
-    public ParcelUpdateResponse update(UpdateParcelRequest parcelRequest) {
+    public ParcelUpdateResponse update(Parcel parcel, RerouteToken rerouteToken) {
+        final City city = pathFinderServicePort.determineNewDeliveryDepot(parcel);
 
-        final ParcelUpdateResponse parcelUpdateResponse = parcelPort.update(parcelRequest);
+        final ParcelUpdateResponse parcelUpdateResponse = parcelRepository.updateParcel(parcel, city);
 
-        final Token token = token(parcelRequest.getToken());
-
-        rerouteTokenRepository.deleteByToken(token);
+        rerouteTokenRepository.deleteByToken(rerouteToken);
 
         return parcelUpdateResponse;
     }
@@ -40,8 +38,8 @@ public class RerouteServiceImpl implements RerouteService {
     }
 
     @Override
-    public RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
-        return rerouteTokenRepository.loadByTokenAndParcelId(token, aParcelId);
+    public RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId) {
+        return rerouteTokenRepository.loadByTokenAndParcelId(token, parcelId);
     }
 
     public Token token(Integer value) {

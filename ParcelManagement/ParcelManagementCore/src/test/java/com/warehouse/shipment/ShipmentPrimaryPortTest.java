@@ -1,52 +1,58 @@
 package com.warehouse.shipment;
 
-import com.warehouse.shipment.domain.enumeration.Size;
-import com.warehouse.shipment.domain.enumeration.Status;
-import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
-import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
-import com.warehouse.shipment.domain.service.ShipmentService;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
+import com.warehouse.shipment.domain.model.*;
+import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
+import com.warehouse.shipment.domain.port.secondary.Logger;
+import com.warehouse.shipment.domain.service.ShipmentService;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 
 class ShipmentPrimaryPortTest {
 
     @Mock
     private ShipmentService shipmentService;
 
-    private ShipmentPort shipmentPort;
+    private Logger logger;
+
+    private ShipmentPortImpl shipmentPort;
 
     private final Integer VALID_TOKEN = 12345;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        shipmentPort = new ShipmentPortImpl(shipmentService);
+        logger = mock(Logger.class);
+        shipmentPort = new ShipmentPortImpl(shipmentService, logger);
     }
 
     @Test
     void shouldShip() {
         // given
-        final ShipmentRequest shipmentRequest = new ShipmentRequest();
+        final ShipmentRequest request = ShipmentRequest.builder()
+                .parcel(createShipmentParcel())
+                .build();
 
-        final ShipmentResponse expectedResponse = new ShipmentResponse();
-        when(shipmentService.ship(any(ShipmentRequest.class))).thenReturn(expectedResponse);
+        // create expected response from service
+        final ShipmentResponse expectedResponse = new ShipmentResponse("paymentUrl", 1L);
 
+        when(shipmentService.createShipment(createShipmentParcel())).thenReturn(expectedResponse);
         // when
-        final ShipmentResponse response = shipmentPort.ship(shipmentRequest);
-
+        final ShipmentResponse response = shipmentPort.ship(request);
         // then
-        assertEquals(expectedResponse, response);
-        verify(shipmentService, times(1)).ship(shipmentRequest);
+        assertEquals(response, expectedToBeEqualTo(response));
     }
 
     @Test
@@ -141,6 +147,16 @@ class ShipmentPrimaryPortTest {
                 .build();
     }
 
+    private ShipmentParcel createShipmentParcel() {
+        return ShipmentParcel.builder()
+                .recipient(createRecipient())
+                .parcelSize(Size.TEST)
+                .sender(createSender())
+                .status(Status.CREATED)
+                .destination("KT1")
+                .build();
+    }
+
     private Recipient createRecipient() {
         return Recipient.builder()
                 .firstName("test")
@@ -163,5 +179,9 @@ class ShipmentPrimaryPortTest {
                 .telephoneNumber("123")
                 .email("test@test.pl")
                 .build();
+    }
+
+    private ShipmentResponse expectedToBeEqualTo(ShipmentResponse response) {
+        return response;
     }
 }

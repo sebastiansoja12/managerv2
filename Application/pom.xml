@@ -75,7 +75,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>TokenStage</artifactId>
+            <artifactId>PositionDetermination</artifactId>
             <version>${project.version}</version>
         </dependency>
 

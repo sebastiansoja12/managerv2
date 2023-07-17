@@ -6,6 +6,7 @@ import com.warehouse.paypal.domain.model.PaymentResponse;
 import com.warehouse.paypal.domain.port.secondary.PaymentSecondaryPort;
 import lombok.AllArgsConstructor;
 
+// TODO refactor 2023.9
 @AllArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
