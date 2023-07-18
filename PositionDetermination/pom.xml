@@ -9,7 +9,7 @@
         <version>2023.8-SNAPSHOT</version>
     </parent>
 
-    <artifactId>TokenStage</artifactId>
+    <artifactId>PositionDetermination</artifactId>
 
     <packaging>jar</packaging>
 

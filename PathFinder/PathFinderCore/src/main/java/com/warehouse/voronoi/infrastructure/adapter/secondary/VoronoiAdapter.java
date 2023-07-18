@@ -1,7 +1,7 @@
 package com.warehouse.voronoi.infrastructure.adapter.secondary;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fire.positionstack.PositionStackProperties;
+import com.warehouse.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;

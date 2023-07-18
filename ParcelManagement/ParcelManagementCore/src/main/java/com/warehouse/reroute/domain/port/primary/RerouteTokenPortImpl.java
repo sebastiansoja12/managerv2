@@ -5,18 +5,15 @@ import com.warehouse.reroute.domain.exception.RerouteException;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.service.RerouteService;
-import com.warehouse.reroute.domain.service.RerouteTokenValidatorService;
 import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
+
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 public class RerouteTokenPortImpl implements RerouteTokenPort {
 
     private final RerouteService rerouteService;
-
-    private final RerouteTokenValidatorService rerouteTokenValidatorService;
 
     private final RerouteTokenRepository rerouteTokenRepository;
 
@@ -30,7 +27,7 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
 
         final RerouteToken rerouteToken = extractTokenFromRequest(request);
 
-        if (rerouteToken.isValid()) {
+        if (!rerouteToken.isValid()) {
             throw new RerouteTokenNotFoundException("Reroute token is not valid");
         }
 

@@ -1,4 +1,4 @@
-package com.fire.positionstack;
+package com.warehouse.positionstack;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

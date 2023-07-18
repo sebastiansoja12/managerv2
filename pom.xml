@@ -27,9 +27,10 @@
 		<module>PathFinder</module>
 		<module>Authorization</module>
 		<module>Utility</module>
-        <module>TokenStage</module>
+        <module>PositionDetermination</module>
         <module>Generator</module>
-    </modules>
+		<module>Properties</module>
+	</modules>
 
 	<properties>
 		<java.version>17</java.version>

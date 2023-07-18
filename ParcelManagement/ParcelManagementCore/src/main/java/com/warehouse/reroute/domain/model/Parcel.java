@@ -26,19 +26,15 @@ public class Parcel {
 
 	Long parcelRelatedId;
 
-	public boolean isChild() {
-		return parcelType.equals(ParcelType.CHILD);
+	public boolean isParent() {
+		return parcelType.equals(ParcelType.PARENT);
 	}
 
-	public boolean isRedirected() {
-		return status.equals(Status.REDIRECT);
-	}
-
-	public boolean isRegistered() {
-		return status.equals(Status.DELIVERY);
+	public boolean hasStatusCreated() {
+		return status.equals(Status.CREATED);
 	}
 
 	public boolean isRequiredToReroute() {
-		return !isRegistered() && !isRedirected() && !isChild();
+		return hasStatusCreated() && isParent();
 	}
 }

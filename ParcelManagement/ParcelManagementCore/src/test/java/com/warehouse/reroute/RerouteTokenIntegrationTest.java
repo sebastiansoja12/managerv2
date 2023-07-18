@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.warehouse.reroute.domain.exception.RerouteException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -135,8 +136,8 @@ public class RerouteTokenIntegrationTest {
 
 
         // then
-        final IllegalArgumentException illegalArgumentException =
-                      assertThrows(IllegalArgumentException.class, executable);
+        final RerouteTokenNotFoundException illegalArgumentException =
+                      assertThrows(RerouteTokenNotFoundException.class, executable);
         assertAll(
                 () -> assertThat(illegalArgumentException.getMessage())
                         .isEqualTo("Parcel cannot be rerouted because it was already sent")
@@ -164,8 +165,8 @@ public class RerouteTokenIntegrationTest {
 
 
         // then
-        final IllegalArgumentException illegalArgumentException =
-                assertThrows(IllegalArgumentException.class, executable);
+        final RerouteException illegalArgumentException =
+                assertThrows(RerouteException.class, executable);
         assertAll(
                 () -> assertThat(illegalArgumentException.getMessage())
                         .isEqualTo("Parcel cannot be rerouted after redirection")

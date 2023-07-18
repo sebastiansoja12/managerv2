@@ -1,7 +1,7 @@
 package com.warehouse.shipment.domain.model;
 
-import com.warehouse.shipment.domain.enumeration.Size;
-import com.warehouse.shipment.domain.enumeration.Status;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.shipment.domain.enumeration.ParcelType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

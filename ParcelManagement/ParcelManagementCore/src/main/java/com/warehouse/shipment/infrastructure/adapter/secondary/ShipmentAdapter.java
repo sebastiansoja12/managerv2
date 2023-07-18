@@ -11,7 +11,7 @@ import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.route.infrastructure.api.event.ShipmentLogEvent;
 import com.warehouse.shipment.domain.enumeration.ParcelType;
-import com.warehouse.shipment.domain.enumeration.Status;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.ShipmentPort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;

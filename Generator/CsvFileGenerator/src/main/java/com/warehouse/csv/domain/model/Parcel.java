@@ -1,6 +1,6 @@
 package com.warehouse.csv.domain.model;
 
-import com.warehouse.shipment.domain.enumeration.Size;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.domain.model.Recipient;
 import com.warehouse.shipment.domain.model.Sender;
 import lombok.AllArgsConstructor;

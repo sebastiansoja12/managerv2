@@ -1,4 +1,4 @@
-package com.warehouse.shipment.domain.enumeration;
+package com.warehouse.parcelstate.infrastructure.adapter.secondary.enumeration;
 
 public enum Status {
     CREATED,

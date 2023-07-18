@@ -2,7 +2,7 @@ package com.warehouse.shipment.mapper;
 
 import com.warehouse.paypal.domain.model.LinkInformation;
 import com.warehouse.paypal.domain.model.PaymentResponse;
-import com.warehouse.shipment.domain.enumeration.Size;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.Sender;
 import com.warehouse.shipment.domain.model.ShipmentRequest;

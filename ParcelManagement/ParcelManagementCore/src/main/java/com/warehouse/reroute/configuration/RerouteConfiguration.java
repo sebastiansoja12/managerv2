@@ -48,7 +48,7 @@ public class RerouteConfiguration {
 			ParcelRepository parcelRepository, PathFinderServicePort pathFinderServicePort) {
 		final com.warehouse.reroute.domain.service.RerouteService rerouteService = new RerouteServiceImpl(
 				rerouteTokenServicePort, rerouteTokenRepository, parcelRepository, pathFinderServicePort);
-		return new RerouteTokenPortImpl(rerouteService, rerouteTokenValidatorService, rerouteTokenRepository);
+		return new RerouteTokenPortImpl(rerouteService, rerouteTokenRepository);
 	}
 
 	@Bean
