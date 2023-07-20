@@ -3,13 +3,19 @@ package com.warehouse.parcelstate.infrastructure.adapter.secondary;
 import com.warehouse.parcelstate.domain.model.Parcel;
 import com.warehouse.parcelstate.domain.port.secondary.ParcelStateRepository;
 
+import com.warehouse.parcelstate.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.parcelstate.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import lombok.AllArgsConstructor;
+
+import java.util.Optional;
 
 
 @AllArgsConstructor
 public class PackageRepositoryImpl implements ParcelStateRepository {
 
     private final PackageReadRepository repository;
+
+    private final ParcelMapper parcelMapper;
 
     @Override
     public Long save(Parcel parcel) {
@@ -28,6 +34,8 @@ public class PackageRepositoryImpl implements ParcelStateRepository {
 
     @Override
     public Parcel update(Parcel parcelUpdate) {
-        return null;
+        final ParcelEntity parcel = parcelMapper.map(parcelUpdate);
+        final ParcelEntity updatedEntity = repository.save(parcel);
+        return parcelMapper.map(updatedEntity);
     }
 }

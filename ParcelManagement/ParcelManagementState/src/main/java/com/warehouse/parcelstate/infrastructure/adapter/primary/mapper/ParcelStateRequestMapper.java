@@ -1,11 +1,12 @@
 package com.warehouse.parcelstate.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.parcelstate.domain.model.Parcel;
-import com.warehouse.parcelstate.infrastructure.adapter.primary.dto.ParcelDto;
 import org.mapstruct.Mapper;
+
+import com.warehouse.parcelstate.domain.model.RerouteParcel;
+import com.warehouse.parcelstate.infrastructure.adapter.primary.dto.RerouteRequestDto;
 
 @Mapper
 public interface ParcelStateRequestMapper {
 
-    Parcel map(ParcelDto parcel);
+    RerouteParcel map(RerouteRequestDto parcel);
 }

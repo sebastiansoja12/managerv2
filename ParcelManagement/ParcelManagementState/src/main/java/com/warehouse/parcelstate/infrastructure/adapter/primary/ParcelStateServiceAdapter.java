@@ -1,11 +1,11 @@
 package com.warehouse.parcelstate.infrastructure.adapter.primary;
 
-import com.warehouse.parcelstate.domain.model.Parcel;
 import com.warehouse.parcelstate.domain.model.RerouteParcel;
+import com.warehouse.parcelstate.domain.model.RerouteResponse;
 import com.warehouse.parcelstate.domain.port.primary.ParcelStatePort;
-import com.warehouse.parcelstate.infrastructure.adapter.primary.dto.ParcelDto;
+import com.warehouse.parcelstate.infrastructure.adapter.primary.dto.RerouteRequestDto;
 
-import com.warehouse.parcelstate.infrastructure.adapter.primary.dto.RerouteParcelDto;
+import com.warehouse.parcelstate.infrastructure.adapter.primary.dto.RerouteResponseDto;
 import com.warehouse.parcelstate.infrastructure.adapter.primary.dto.ShipmentParcelDto;
 import com.warehouse.parcelstate.infrastructure.adapter.primary.mapper.ParcelStateRequestMapper;
 import com.warehouse.parcelstate.infrastructure.adapter.primary.mapper.ParcelStateResponseMapper;
@@ -21,14 +21,14 @@ public class ParcelStateServiceAdapter implements ParcelStateService {
     private final ParcelStateResponseMapper parcelStateResponseMapper;
 
     @Override
-    public ShipmentParcelDto shipParcel(ParcelDto parcel) {
+    public ShipmentParcelDto shipParcel(RerouteRequestDto parcel) {
         return null;
     }
 
     @Override
-    public RerouteParcelDto rerouteParcel(ParcelDto parcelRequest) {
-        final Parcel parcel = parcelStateRequestMapper.map(parcelRequest);
-        final RerouteParcel rerouteParcel = parcelStatePort.rerouteParcel(parcel);
-        return parcelStateResponseMapper.map(rerouteParcel);
+    public RerouteResponseDto rerouteParcel(RerouteRequestDto rerouteRequest) {
+        final RerouteParcel parcel = parcelStateRequestMapper.map(rerouteRequest);
+        final RerouteResponse rerouteResponse = parcelStatePort.rerouteParcel(parcel);
+        return parcelStateResponseMapper.map(rerouteResponse);
     }
 }

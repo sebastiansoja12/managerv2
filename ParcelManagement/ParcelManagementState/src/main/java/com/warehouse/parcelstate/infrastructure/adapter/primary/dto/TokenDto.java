@@ -1,4 +1,4 @@
 package com.warehouse.parcelstate.infrastructure.adapter.primary.dto;
 
-public class RerouteParcelDto {
+public class TokenDto {
 }
