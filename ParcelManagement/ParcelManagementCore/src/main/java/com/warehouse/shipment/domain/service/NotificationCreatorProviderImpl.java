@@ -1,12 +1,12 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.mail.domain.vo.Notification;
+import com.warehouse.shipment.domain.vo.Notification;
 import com.warehouse.shipment.domain.model.ConstantBodyMailMessage;
 import com.warehouse.shipment.domain.model.Parcel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class NotificationCreatorServiceImpl implements NotificationCreatorService {
+public class NotificationCreatorProviderImpl implements NotificationCreatorProvider {
 
     private final static String SUBJECT = "Została nadana do państwa przesyłka: ";
 

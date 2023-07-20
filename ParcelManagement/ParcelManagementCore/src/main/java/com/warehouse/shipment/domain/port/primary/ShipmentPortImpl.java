@@ -5,7 +5,10 @@ import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.service.ShipmentService;
+
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 
 @AllArgsConstructor
 public class ShipmentPortImpl implements ShipmentPort {
@@ -14,7 +17,17 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public ShipmentResponse ship(ShipmentRequest request) {
-        return service.ship(request);
+        final ShipmentParcel parcel = extractParcelFromRequest(request);
+        if (ObjectUtils.isEmpty(parcel)) {
+            throw new ParcelNotFoundException("Parcel not found in request");
+        }
+        parcel.setStatus(Status.CREATED);
+        parcel.setParcelType(ParcelType.PARENT);
+        return service.createShipment(parcel);
+    }
+
+    private ShipmentParcel extractParcelFromRequest(ShipmentRequest request) {
+        return request.getParcel();
     }
 
     @Override

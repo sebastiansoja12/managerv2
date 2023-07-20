@@ -1,11 +1,12 @@
 package com.warehouse.shipment.domain.port.secondary;
 
 import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.model.UpdateParcelResponse;
 
 public interface ShipmentRepository {
 
-    Long save(Parcel parcel);
+    Parcel save(ShipmentParcel parcel);
 
     void delete(Long parcelId);
 

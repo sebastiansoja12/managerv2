@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ShipmentRequest {
 
-    Parcel parcel;
+    ShipmentParcel parcel;
 }

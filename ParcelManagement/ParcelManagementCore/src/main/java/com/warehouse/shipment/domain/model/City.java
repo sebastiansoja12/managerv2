@@ -5,9 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ShipmentResponse {
-
-    String paymentUrl;
-    Long parcelId;
-
+public class City {
+    String value;
 }

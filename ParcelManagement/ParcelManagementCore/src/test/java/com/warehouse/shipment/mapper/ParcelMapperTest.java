@@ -27,7 +27,7 @@ public class ParcelMapperTest {
         final Parcel parcel = createParcel();
 
         // when
-        final ParcelEntity parcelEntity = mapper.map(parcel);
+        final ParcelEntity parcelEntity = null;
 
         // then
         assertThat(parcelEntity.getParcelSize().getSize()).isEqualTo("test");

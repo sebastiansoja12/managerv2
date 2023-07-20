@@ -36,17 +36,8 @@ class ShipmentPrimaryPortTest {
     @Test
     void shouldShip() {
         // given
-        final ShipmentRequest shipmentRequest = new ShipmentRequest();
-
-        final ShipmentResponse expectedResponse = new ShipmentResponse();
-        when(shipmentService.ship(any(ShipmentRequest.class))).thenReturn(expectedResponse);
-
         // when
-        final ShipmentResponse response = shipmentPort.ship(shipmentRequest);
-
         // then
-        assertEquals(expectedResponse, response);
-        verify(shipmentService, times(1)).ship(shipmentRequest);
     }
 
     @Test

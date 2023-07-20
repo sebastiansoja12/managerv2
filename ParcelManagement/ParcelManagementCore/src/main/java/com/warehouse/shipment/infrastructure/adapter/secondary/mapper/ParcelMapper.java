@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.ParcelUpdate;
+import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.model.UpdateParcelResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import org.mapstruct.Mapper;
@@ -27,7 +28,7 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.street", target = "recipientStreet")
     @Mapping(source = "parcelSize", target = "parcelSize")
     @Mapping(source = "status", target = "status")
-    ParcelEntity map(Parcel parcel);
+    ParcelEntity map(ShipmentParcel parcel);
 
     @Mapping(target = "id", source = "id")
     @Mapping(source = "sender.firstName", target = "firstName")

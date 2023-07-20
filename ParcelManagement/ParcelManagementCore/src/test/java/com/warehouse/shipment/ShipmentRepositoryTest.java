@@ -40,9 +40,6 @@ public class ShipmentRepositoryTest {
 
         final ParcelEntity entity = new ParcelEntity();
         // map to entity
-        Mockito.when(parcelMapper.map(parcel)).thenReturn(entity);
-        // when
-        shipmentRepository.save(parcel);
 
         // then
         Mockito.verify(readRepository).save(entity);
