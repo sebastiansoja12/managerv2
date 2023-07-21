@@ -18,12 +18,19 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public ShipmentResponse ship(ShipmentRequest request) {
         final ShipmentParcel parcel = extractParcelFromRequest(request);
+
         if (ObjectUtils.isEmpty(parcel)) {
             throw new ParcelNotFoundException("Parcel not found in request");
         }
+
+        prepareParcelToCreate(parcel);
+
+        return service.createShipment(parcel);
+    }
+
+    private void prepareParcelToCreate(ShipmentParcel parcel) {
         parcel.setStatus(Status.CREATED);
         parcel.setParcelType(ParcelType.PARENT);
-        return service.createShipment(parcel);
     }
 
     private ShipmentParcel extractParcelFromRequest(ShipmentRequest request) {

@@ -63,7 +63,7 @@ public class ShipmentConfiguration {
 				paypalServicePort, notificationCreatorProvider, mailServicePort);
 	}
 
-	@Bean
+	@Bean(name = "shipment.pathFinderServicePort")
 	public PathFinderServicePort pathFinderServicePort(VoronoiService voronoiService, DepotService depotService) {
 		return new PathFinderAdapter(voronoiService, depotService);
 	}

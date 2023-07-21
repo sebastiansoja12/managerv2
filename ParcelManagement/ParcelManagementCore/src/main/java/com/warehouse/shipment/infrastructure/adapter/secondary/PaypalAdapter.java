@@ -19,12 +19,8 @@ public class PaypalAdapter implements PaypalServicePort {
 
     @Override
     public PaymentStatus payment(Parcel parcel) {
-        final PaymentRequest paymentRequest = buildPaymentRequest(parcel);
+        final PaymentRequest paymentRequest = new PaymentRequest(parcel.getId(), parcel.getPrice());
         final PaymentResponse paymentResponse = paypalPort.payment(paymentRequest);
         return paymentMapper.map(paymentResponse);
-    }
-
-    private PaymentRequest buildPaymentRequest(Parcel parcel) {
-        return new PaymentRequest(parcel.getId(), parcel.getPrice());
     }
 }
