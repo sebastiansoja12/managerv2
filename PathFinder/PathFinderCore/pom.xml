@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>AddressDeterminationApi</artifactId>
+            <artifactId>PathFinderApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
