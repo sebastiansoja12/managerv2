@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>Q2_2023-SNAPSHOT</version>
+        <version>Q2_2023.1-SNAPSHOT</version>
     </parent>
     <artifactId>Application</artifactId>
 
