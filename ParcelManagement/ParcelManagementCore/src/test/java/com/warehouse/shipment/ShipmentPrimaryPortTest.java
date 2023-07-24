@@ -1,5 +1,6 @@
 package com.warehouse.shipment;
 
+import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
@@ -23,6 +24,8 @@ class ShipmentPrimaryPortTest {
     @Mock
     private ShipmentService shipmentService;
 
+    private Logger logger;
+
     private ShipmentPort shipmentPort;
 
     private final Integer VALID_TOKEN = 12345;
@@ -30,7 +33,7 @@ class ShipmentPrimaryPortTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        shipmentPort = new ShipmentPortImpl(shipmentService);
+        shipmentPort = new ShipmentPortImpl(shipmentService, logger);
     }
 
     @Test

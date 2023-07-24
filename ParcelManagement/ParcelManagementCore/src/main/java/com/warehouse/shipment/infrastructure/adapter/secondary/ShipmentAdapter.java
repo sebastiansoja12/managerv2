@@ -11,7 +11,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMa
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ShipmentServiceAdapter implements ShipmentServicePort {
+public class ShipmentAdapter implements ShipmentServicePort {
 
     private final ShipmentMapper shipmentMapper;
 

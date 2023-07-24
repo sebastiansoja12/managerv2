@@ -2,17 +2,13 @@ package com.warehouse.shipment.domain.service;
 
 import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.port.secondary.PaypalServicePort;
-import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
-import com.warehouse.shipment.domain.port.secondary.ShipmentServicePort;
+import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.vo.Notification;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
-@Slf4j
 public class ShipmentServiceImpl implements ShipmentService {
 
     private final ShipmentServicePort shipmentServicePort;
@@ -26,6 +22,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final NotificationCreatorProvider notificationCreatorProvider;
     
     private final MailServicePort mailServicePort;
+
+    private final Logger logger;
 
 	@Override
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
@@ -61,10 +59,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 		return shipmentServicePort.registerParcel(parcel.getId(), paymentStatus.getLink());
 	}
 
-    private void logPayment(PaymentStatus status, Parcel parcel) {
-        log.info("Detected payment for parcel {0} with payment method {1}", parcel.getId(), status.getPaymentMethod());
-    }
-
 
     @Override
     public Parcel loadParcel(Long parcelId) {
@@ -81,12 +75,15 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipmentRepository.delete(parcelId);
     }
 
-
     private void logNotification(Notification notification) {
-        log.info("Email notification to {0} has been sent", notification.getRecipient());
+        logger.info("Email notification to {0} has been sent", notification.getRecipient());
     }
 
     private void logParcel(Parcel parcel) {
-        log.info("Parcel {0} has been created", parcel.getId());
+        logger.info("Parcel {0} has been created", parcel.getId());
+    }
+
+    private void logPayment(PaymentStatus status, Parcel parcel) {
+        logger.info("Detected payment for parcel {0} with payment method {1}", parcel.getId(), status.getPaymentMethod());
     }
 }

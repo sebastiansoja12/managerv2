@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.warehouse.paypal.domain.model.LinkInformation;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.Sender;
+import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.model.ShipmentRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
@@ -27,7 +28,7 @@ public class ShipmentMapperTest {
     void shouldMapFromRequestToParcel() {
         // given
         final ShipmentRequest request = ShipmentRequest.builder()
-                //.parcel(createParcel())
+                .parcel(createParcel())
                 .build();
         // when
         final Parcel parcel = mapper.map(request);
@@ -45,10 +46,9 @@ public class ShipmentMapperTest {
         return link;
     }
 
-    private Parcel createParcel() {
-        return Parcel.builder()
+    private ShipmentParcel createParcel() {
+        return ShipmentParcel.builder()
                 .parcelSize(Size.TEST)
-                .id(1L)
                 .price(20)
                 .sender(createSender())
                 .recipient(null)

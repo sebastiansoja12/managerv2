@@ -1,5 +1,9 @@
 package com.warehouse.shipment.configuration;
 
+import com.warehouse.shipment.domain.port.secondary.*;
+import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
+import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
+import io.micrometer.common.util.internal.logging.Slf4JLoggerFactory;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,10 +16,6 @@ import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.port.secondary.PaypalServicePort;
-import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
-import com.warehouse.shipment.domain.port.secondary.ShipmentServicePort;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
@@ -27,10 +27,12 @@ import com.warehouse.voronoi.VoronoiService;
 @Configuration
 public class ShipmentConfiguration {
 
+	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
+
 	@Bean
-	public ShipmentServiceAdapter shipmentAdapter(RouteLogEventPublisher routeLogEventPublisher) {
+	public ShipmentAdapter shipmentAdapter(RouteLogEventPublisher routeLogEventPublisher) {
 		final ShipmentMapper shipmentMapper = Mappers.getMapper(ShipmentMapper.class);
-		return new ShipmentServiceAdapter(shipmentMapper, routeLogEventPublisher);
+		return new ShipmentAdapter(shipmentMapper, routeLogEventPublisher);
 	}
 
 	@Bean
@@ -51,7 +53,18 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentPort shipmentPort(ShipmentService service) {
-		return new ShipmentPortImpl(service);
+		return new ShipmentPortImpl(service,
+				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class));
+	}
+
+	@Bean
+	public ShipmentRequestMapper shipmentRequestMapper() {
+		return Mappers.getMapper(ShipmentRequestMapper.class);
+	}
+
+	@Bean
+	public ShipmentResponseMapper shipmentResponseMapper() {
+		return Mappers.getMapper(ShipmentResponseMapper.class);
 	}
 
 	@Bean(name = "shipment.shipmentService")
@@ -60,7 +73,8 @@ public class ShipmentConfiguration {
 			NotificationCreatorProvider notificationCreatorProvider, MailServicePort mailServicePort,
 			ShipmentRepository shipmentRepository) {
 		return new ShipmentServiceImpl(shipmentServicePort, shipmentRepository, pathFinderServicePort,
-				paypalServicePort, notificationCreatorProvider, mailServicePort);
+				paypalServicePort, notificationCreatorProvider, mailServicePort,
+				LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class));
 	}
 
 	@Bean(name = "shipment.pathFinderServicePort")

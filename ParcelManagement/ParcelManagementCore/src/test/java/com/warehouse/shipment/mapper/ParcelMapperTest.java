@@ -1,5 +1,7 @@
 package com.warehouse.shipment.mapper;
 
+import com.warehouse.shipment.ShipmentAdapter;
+import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.shipment.domain.model.Parcel;
@@ -24,10 +26,10 @@ public class ParcelMapperTest {
     @Test
     void shouldMapFromParcelToEntity() {
         // given
-        final Parcel parcel = createParcel();
+        final ShipmentParcel parcel = createParcel();
 
         // when
-        final ParcelEntity parcelEntity = null;
+        final ParcelEntity parcelEntity = mapper.map(parcel);
 
         // then
         assertThat(parcelEntity.getParcelSize().getSize()).isEqualTo("test");
@@ -54,10 +56,9 @@ public class ParcelMapperTest {
         // and status is enum type CREATED
         assertThat(parcel.getStatus()).isEqualTo(Status.CREATED);
     }
-    private Parcel createParcel() {
-        return Parcel.builder()
+    private ShipmentParcel createParcel() {
+        return ShipmentParcel.builder()
                 .parcelSize(Size.TEST)
-                .id(1L)
                 .price(20)
                 .destination("KT1")
                 .status(Status.CREATED)
