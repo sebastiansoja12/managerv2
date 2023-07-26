@@ -35,4 +35,63 @@ public class ShipmentIntegrationTest {
         // TODO
     }
 
+    @Test
+    void shouldNotShipWhenThereIsNoParcelInRequest() {
+
+    }
+
+    @Test
+    void shouldNotShipParcelWhenPathFinderServiceIsNotAvailable() {
+
+    }
+
+    @Test
+    void shouldNotDetermineNearestDepotForParcelDelivery() {
+
+    }
+
+    @Test
+    void shouldFailPaymentForGivenParcel() {
+
+    }
+
+    @Test
+    void shouldDeleteParcelFromDatabase() {
+
+    }
+
+    @Test
+    void shouldNotDeleteParcelFromDatabase() {
+
+    }
+
+    @Test
+    void shouldLoadParcel() {
+
+    }
+
+    @Test
+    void shouldNotLoadParcel() {
+
+    }
+
+    @Test
+    void shouldNotUpdateParcel() {
+
+    }
+
+    @Test
+    void shouldNotUpdateParcelWhenPathFinderServiceIsNotAvailable() {
+
+    }
+
+    @Test
+    void shouldNotUpdateWhenNewNearestDeliveryDepotCannotBeDetermined() {
+
+    }
+
+    @Test
+    void shouldNotUpdateWhenThereIsNothingToUpdate() {
+
+    }
 }

@@ -4,5 +4,5 @@ import com.warehouse.shipment.domain.model.City;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
 
 public interface PathFinderServicePort {
-    City determineNewDeliveryDepot(ShipmentParcel parcel);
+    City determineDeliveryDepot(ShipmentParcel parcel);
 }

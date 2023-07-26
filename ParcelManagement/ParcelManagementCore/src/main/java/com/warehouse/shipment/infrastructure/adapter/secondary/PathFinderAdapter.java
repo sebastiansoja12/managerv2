@@ -19,7 +19,7 @@ public class PathFinderAdapter implements PathFinderServicePort {
     private final DepotService depotService;
 
     @Override
-    public City determineNewDeliveryDepot(ShipmentParcel parcel) {
+    public City determineDeliveryDepot(ShipmentParcel parcel) {
         final List<DepotDto> depots = depotService.findAll();
         final String cityToDeliver = voronoiService.findFastestRoute(depots, parcel.getRecipient().getCity());
         return new City(cityToDeliver);

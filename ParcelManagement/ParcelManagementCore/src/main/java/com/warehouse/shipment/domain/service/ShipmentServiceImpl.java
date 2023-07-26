@@ -6,7 +6,6 @@ import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.vo.Notification;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 public class ShipmentServiceImpl implements ShipmentService {
@@ -28,7 +27,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 	@Override
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
 
-		final City city = pathFinderServicePort.determineNewDeliveryDepot(shipmentParcel);
+		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
 
 		if (city.getValue() != null) {
 			shipmentParcel.setDestination(city.getValue());
@@ -37,7 +36,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logParcel(parcel);
 
-        //TOBE fixed
 		final PaymentStatus paymentStatus = paypalServicePort.payment(parcel);
 
         logPayment(paymentStatus, parcel);
