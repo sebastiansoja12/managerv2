@@ -27,9 +27,9 @@ public class ShipmentServiceImpl implements ShipmentService {
 
 	@Override
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
-        // TOBE fixed
-		//final City city = pathFinderServicePort.determineNewDeliveryDepot(shipmentParcel);
-        final City city = new City("Poznań");
+
+		final City city = pathFinderServicePort.determineNewDeliveryDepot(shipmentParcel);
+
 		if (city.getValue() != null) {
 			shipmentParcel.setDestination(city.getValue());
 		}
@@ -38,10 +38,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         logParcel(parcel);
 
         //TOBE fixed
-		//final PaymentStatus paymentStatus = paypalServicePort.payment(parcel);
-		final PaymentStatus paymentStatus = new PaymentStatus();
-        paymentStatus.setPaymentMethod("paypal");
-        paymentStatus.setLink("fake link");
+		final PaymentStatus paymentStatus = paypalServicePort.payment(parcel);
 
         logPayment(paymentStatus, parcel);
 
@@ -76,14 +73,14 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     private void logNotification(Notification notification) {
-        logger.info("Email notification to {0} has been sent", notification.getRecipient());
+        logger.info("Email notification to {} has been sent", notification.getRecipient());
     }
 
     private void logParcel(Parcel parcel) {
-        logger.info("Parcel {0} has been created", parcel.getId());
+        logger.info("Parcel {} has been created", parcel.getId());
     }
 
     private void logPayment(PaymentStatus status, Parcel parcel) {
-        logger.info("Detected payment for parcel {0} with payment method {1}", parcel.getId(), status.getPaymentMethod());
+        logger.info("Detected payment for parcel {} with payment method {}", parcel.getId(), status.getPaymentMethod());
     }
 }

@@ -5,4 +5,6 @@ public interface AddressingConfiguration {
     String getUrl();
 
     String getStage();
+
+    String requestUrl(String value);
 }

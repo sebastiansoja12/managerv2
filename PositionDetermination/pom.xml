@@ -15,6 +15,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>Properties</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
@@ -33,9 +38,6 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>**/*.properties</include>
-                </includes>
             </resource>
         </resources>
     </build>

@@ -11,6 +11,8 @@
 
     <artifactId>Properties</artifactId>
 
+    <packaging>jar</packaging>
+
 
 
     <dependencies>

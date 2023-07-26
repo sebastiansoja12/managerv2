@@ -105,11 +105,11 @@ public class ShipmentPortImpl implements ShipmentPort {
 
 
     private void logParcelShipment(ShipmentParcel parcel) {
-        logger.info("Detected service to create shipment for parcel {0}", parcel.getClass());
+        logger.info("Detected service to create shipment for parcel {}", parcel.getClass());
     }
 
     private void logDeleteParcel(Long parcelId) {
-        logger.info("Parcel to delete with id: {0}", parcelId);
+        logger.info("Parcel to delete with id: {}", parcelId);
     }
 
 }

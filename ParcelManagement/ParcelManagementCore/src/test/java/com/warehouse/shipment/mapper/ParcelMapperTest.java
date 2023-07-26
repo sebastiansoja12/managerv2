@@ -1,17 +1,17 @@
 package com.warehouse.shipment.mapper;
 
-import com.warehouse.shipment.ShipmentAdapter;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
-import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapperImpl;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.model.ShipmentParcel;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapperImpl;
 
 public class ParcelMapperTest {
 
