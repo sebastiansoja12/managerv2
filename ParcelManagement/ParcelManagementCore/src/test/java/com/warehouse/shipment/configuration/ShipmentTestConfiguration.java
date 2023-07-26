@@ -17,7 +17,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 @EntityScan(basePackages = { "com.warehouse.shipment" })
 @EnableJpaRepositories(basePackages = { "com.warehouse.shipment" })
 @Configuration
-public class ShipmentConfigurationTest {
+public class ShipmentTestConfiguration {
 
     @MockBean
     public JavaMailSender javaMailSender;

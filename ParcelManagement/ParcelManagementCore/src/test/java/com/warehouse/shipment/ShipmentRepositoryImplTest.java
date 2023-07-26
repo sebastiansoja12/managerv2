@@ -2,7 +2,7 @@ package com.warehouse.shipment;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.shipment.configuration.ShipmentConfigurationTest;
+import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-@ContextConfiguration(classes = ShipmentConfigurationTest.class)
+@ContextConfiguration(classes = ShipmentTestConfiguration.class)
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
