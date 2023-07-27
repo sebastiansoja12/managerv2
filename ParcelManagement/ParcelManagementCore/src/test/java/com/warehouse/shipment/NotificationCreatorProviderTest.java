@@ -16,7 +16,6 @@ public class NotificationCreatorProviderTest {
     private final NotificationCreatorProvider notificationCreatorProvider =
             new NotificationCreatorProviderImpl();
 
-
     @Test
     void shouldBuildNotification() {
         // given
