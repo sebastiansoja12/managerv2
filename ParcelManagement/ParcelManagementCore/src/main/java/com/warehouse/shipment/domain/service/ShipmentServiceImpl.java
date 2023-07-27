@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.service;
 
+import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.*;
@@ -28,10 +29,12 @@ public class ShipmentServiceImpl implements ShipmentService {
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
 
 		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
+        shipmentParcel.setDestination(city.getValue());
 
-		if (city.getValue() != null) {
-			shipmentParcel.setDestination(city.getValue());
+        if (city.getValue() == null) {
+            throw new DestinationDepotDeterminationException("Delivery depot could not be determined");
 		}
+
 		final Parcel parcel = shipmentRepository.save(shipmentParcel);
 
         logParcel(parcel);
