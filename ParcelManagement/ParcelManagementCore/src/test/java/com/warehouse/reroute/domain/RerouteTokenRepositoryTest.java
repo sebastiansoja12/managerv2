@@ -2,12 +2,10 @@ package com.warehouse.reroute.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenReadRepository;
-import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -17,6 +15,8 @@ import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.vo.ParcelId;
+import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenReadRepository;
+import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenRepositoryImpl;
 import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
@@ -43,9 +43,6 @@ public class RerouteTokenRepositoryTest {
     @Test
     public void shouldReturnRerouteTokenByParcelIdAndTokenValue() {
         // given
-        final Token token = Token.builder()
-                .value(TOKEN).build();
-        final ParcelId parcelId = new ParcelId(PARCEL_ID);
         final RerouteToken rerouteToken = new RerouteToken();
         final RerouteTokenEntity rerouteTokenEntity = new RerouteTokenEntity();
 
@@ -54,7 +51,7 @@ public class RerouteTokenRepositoryTest {
         when(rerouteTokenMapper.map(rerouteTokenEntity)).thenReturn(rerouteToken);
 
         // when
-        final RerouteToken result = rerouteTokenRepository.loadByTokenAndParcelId(token, parcelId);
+        final RerouteToken result = rerouteTokenRepository.loadByTokenAndParcelId(TOKEN, PARCEL_ID);
 
         // then
         assertEquals(rerouteToken, result);
@@ -71,7 +68,7 @@ public class RerouteTokenRepositoryTest {
 
         // when && then
         assertThrows(RerouteTokenNotFoundException.class,
-                () -> rerouteTokenRepository.loadByTokenAndParcelId(token, parcelId));
+                () -> rerouteTokenRepository.loadByTokenAndParcelId(TOKEN, PARCEL_ID));
     }
 
     @Test

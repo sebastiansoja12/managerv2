@@ -1,5 +1,6 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary.mapper;
 
+import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.model.UpdateParcelRequest;
 import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
 import com.warehouse.reroute.infrastructure.adapter.secondary.entity.ParcelEntity;
@@ -7,6 +8,8 @@ import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.Optional;
 
 @Mapper
 public interface ParcelMapper {
@@ -56,4 +59,22 @@ public interface ParcelMapper {
     @Mapping(source = "parcel.status", target = "status")
     ParcelUpdateResponse map(UpdateParcelResponseDto updateParcelResponse);
 
+    @Mapping(source = "sender.firstName", target = "firstName")
+    @Mapping(source = "sender.lastName", target = "lastName")
+    @Mapping(source = "sender.email", target = "senderEmail")
+    @Mapping(source = "sender.telephoneNumber", target = "senderTelephone")
+    @Mapping(source = "sender.city", target = "senderCity")
+    @Mapping(source = "sender.postalCode", target = "senderPostalCode")
+    @Mapping(source = "sender.street", target = "senderStreet")
+    @Mapping(source = "recipient.firstName", target = "recipientFirstName")
+    @Mapping(source = "recipient.lastName", target = "recipientLastName")
+    @Mapping(source = "recipient.email", target = "recipientEmail")
+    @Mapping(source = "recipient.telephoneNumber", target = "recipientTelephone")
+    @Mapping(source = "recipient.city", target = "recipientCity")
+    @Mapping(source = "recipient.postalCode", target = "recipientPostalCode")
+    @Mapping(source = "recipient.street", target = "recipientStreet")
+    @Mapping(source = "parcelSize", target = "parcelSize")
+    @Mapping(source = "parcelId.value", target = "id")
+    @Mapping(target = "destination", ignore = true)
+    ParcelEntity map(Parcel parcel);
 }

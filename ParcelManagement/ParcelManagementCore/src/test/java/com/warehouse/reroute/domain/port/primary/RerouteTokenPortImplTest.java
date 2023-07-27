@@ -44,17 +44,13 @@ public class RerouteTokenPortImplTest {
     @Test
     void shouldLoadByTokenAndParcelId() {
         // given
-        final Token token = Token.builder()
-                .value(TOKEN_VALUE)
-                .build();
-        final ParcelId parcelId = new ParcelId(PARCEL_ID);
         final RerouteToken rerouteTokenResponse = RerouteToken.builder()
                 .token(TOKEN_VALUE)
                 .parcelId(PARCEL_ID)
                 .build();
-        when(port.loadByTokenAndParcelId(token, parcelId)).thenReturn(rerouteTokenResponse);
+        when(port.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteTokenResponse);
         // when
-        final RerouteToken actual = port.loadByTokenAndParcelId(token, parcelId);
+        final RerouteToken actual = port.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID);
         // then
         assertAll(
                 () -> assertThat(actual.getToken().intValue()).isEqualTo(TOKEN_VALUE),

@@ -9,9 +9,9 @@ public interface RerouteService {
 
     RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest);
 
-    ParcelUpdateResponse update(UpdateParcelRequest parcelRequest);
+    ParcelUpdateResponse update(Parcel parcel, RerouteToken rerouteToken);
 
     RerouteToken findByToken(Token token);
 
-    RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId);
+    RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId);
 }

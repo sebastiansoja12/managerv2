@@ -25,7 +25,7 @@ public class RouteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @Column(name = "created", nullable = false)
     private LocalDateTime created;

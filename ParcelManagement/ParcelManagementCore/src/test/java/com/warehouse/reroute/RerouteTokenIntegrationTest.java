@@ -24,6 +24,7 @@ import com.warehouse.reroute.domain.enumeration.ParcelType;
 import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.EmailNotFoundException;
+import com.warehouse.reroute.domain.exception.RerouteException;
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.RerouteResponse;
@@ -135,11 +136,11 @@ public class RerouteTokenIntegrationTest {
 
 
         // then
-        final IllegalArgumentException illegalArgumentException =
-                      assertThrows(IllegalArgumentException.class, executable);
+        final RerouteException illegalArgumentException =
+                      assertThrows(RerouteException.class, executable);
         assertAll(
                 () -> assertThat(illegalArgumentException.getMessage())
-                        .isEqualTo("Parcel cannot be rerouted because it was already sent")
+                        .isEqualTo("Parcel cannot be rerouted")
         );
     }
 
@@ -164,11 +165,11 @@ public class RerouteTokenIntegrationTest {
 
 
         // then
-        final IllegalArgumentException illegalArgumentException =
-                assertThrows(IllegalArgumentException.class, executable);
+        final RerouteException illegalArgumentException =
+                assertThrows(RerouteException.class, executable);
         assertAll(
                 () -> assertThat(illegalArgumentException.getMessage())
-                        .isEqualTo("Parcel cannot be rerouted after redirection")
+                        .isEqualTo("Parcel cannot be rerouted")
         );
     }
 
