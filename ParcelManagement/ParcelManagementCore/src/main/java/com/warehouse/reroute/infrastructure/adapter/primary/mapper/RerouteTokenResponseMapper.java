@@ -1,7 +1,7 @@
 package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.reroute.domain.model.RerouteResponse;
-import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
+import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 import com.warehouse.reroute.infrastructure.api.dto.ParcelResponseDto;
 import com.warehouse.reroute.infrastructure.api.dto.RerouteResponseDto;
@@ -11,14 +11,14 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
-public interface PrimaryResponseMapper {
+public interface RerouteTokenResponseMapper {
 
     RerouteResponseDto map(RerouteResponse rerouteResponse);
 
     RerouteResponse map(RerouteResponseDto rerouteResponse);
 
     @Mapping(source = "parcelSize", target = "parcelSize")
-    ParcelResponseDto map(ParcelUpdateResponse parcelUpdateResponse);
+    ParcelResponseDto map(RerouteParcelResponse rerouteParcelResponse);
 
     @Mapping(source = "parcelId.value", target = "parcelId")
     RerouteTokenResponseDto map(RerouteTokenResponse rerouteTokenResponse);

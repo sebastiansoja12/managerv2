@@ -6,11 +6,11 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateParcelRequest {
+public class RerouteParcelRequest {
 
     Long id;
 
-    Parcel parcel;
+    RerouteParcel parcel;
 
     Integer token;
 

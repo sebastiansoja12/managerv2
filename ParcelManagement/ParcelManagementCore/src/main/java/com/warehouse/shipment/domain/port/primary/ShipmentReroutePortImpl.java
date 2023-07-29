@@ -1,11 +1,11 @@
 package com.warehouse.shipment.domain.port.primary;
 
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
 import com.warehouse.shipment.domain.model.ParcelUpdate;
 import com.warehouse.shipment.domain.model.UpdateParcelRequest;
 import com.warehouse.shipment.domain.model.UpdateParcelResponse;
 import com.warehouse.shipment.domain.service.ShipmentService;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -16,19 +16,17 @@ public class ShipmentReroutePortImpl implements ShipmentReroutePort {
     @Override
     public UpdateParcelResponse reroute(UpdateParcelRequest updateParcelRequest) {
         validateParcelRequest(updateParcelRequest);
-        final ParcelUpdate parcelUpdate = ParcelUpdate.builder().build();
-        buildParcelProperties(ParcelUpdate.builder(), updateParcelRequest);
-        buildParcelSender(ParcelUpdate.builder(), updateParcelRequest);
-        buildParcelRecipient(ParcelUpdate.builder(), updateParcelRequest);
-        return service.update(parcelUpdate);
+        final ParcelUpdate.ParcelUpdateBuilder parcelUpdate = ParcelUpdate.builder();
+        buildParcelProperties(parcelUpdate, updateParcelRequest);
+        buildParcelSender(parcelUpdate, updateParcelRequest);
+        buildParcelRecipient(parcelUpdate, updateParcelRequest);
+        return service.update(parcelUpdate.build());
     }
 
     
     private void validateParcelRequest(UpdateParcelRequest updateParcelRequest) {
         if (updateParcelRequest.getParcel() == null) {
             throw new ParcelNotFoundException("Parcel ID is null");
-        } else if (updateParcelRequest.getToken() == null) {
-            throw new RerouteTokenNotFoundException("Reroute token is null");
         } else if (updateParcelRequest.getParcel().getId() == null) {
             throw new ParcelNotFoundException("Parcel is null");
         }
@@ -61,6 +59,7 @@ public class ShipmentReroutePortImpl implements ShipmentReroutePort {
 		parcelUpdate.id(updateParcelRequest.getParcel().getId());
 		parcelUpdate.parcelType(updateParcelRequest.getParcel().getParcelType());
 		parcelUpdate.parcelSize(updateParcelRequest.getParcel().getParcelSize());
+		parcelUpdate.status(updateParcelRequest.getParcel().getStatus());
 	}
 
 }

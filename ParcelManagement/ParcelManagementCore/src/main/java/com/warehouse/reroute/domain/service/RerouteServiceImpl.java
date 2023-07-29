@@ -2,7 +2,7 @@ package com.warehouse.reroute.domain.service;
 
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.*;
-import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
+import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -12,19 +12,10 @@ public class RerouteServiceImpl implements RerouteService {
 
     private final RerouteTokenRepository rerouteTokenRepository;
 
-    private final ParcelRepository parcelRepository;
-
-    private final PathFinderServicePort pathFinderServicePort;
-
     @Override
-    public ParcelUpdateResponse update(Parcel parcel, RerouteToken rerouteToken) {
-        final City city = pathFinderServicePort.determineNewDeliveryDepot(parcel);
-
-        final ParcelUpdateResponse parcelUpdateResponse = parcelRepository.updateParcel(parcel, city);
-
+    public TokenDeletionStatus deleteToken(RerouteToken rerouteToken) {
         rerouteTokenRepository.deleteByToken(rerouteToken);
-
-        return parcelUpdateResponse;
+        return new TokenDeletionStatus("OK");
     }
 
     @Override

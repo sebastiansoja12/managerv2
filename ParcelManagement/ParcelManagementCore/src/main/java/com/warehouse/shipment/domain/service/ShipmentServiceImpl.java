@@ -29,13 +29,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
 
 		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
-        shipmentParcel.setDestination(city.getValue());
 
         if (city.getValue() == null) {
             throw new DestinationDepotDeterminationException("Delivery depot could not be determined");
 		}
 
-		final Parcel parcel = shipmentRepository.save(shipmentParcel);
+        updateParcelDestination(shipmentParcel, city);
+
+        final Parcel parcel = shipmentRepository.save(shipmentParcel);
 
         logParcel(parcel);
 
@@ -57,6 +58,19 @@ public class ShipmentServiceImpl implements ShipmentService {
 		return shipmentServicePort.registerParcel(parcel.getId(), paymentStatus.getLink());
 	}
 
+    @Override
+    public UpdateParcelResponse update(ParcelUpdate parcelUpdate) {
+        final City city = pathFinderServicePort.determineDeliveryDepot(parcelUpdate);
+
+        if (city.getValue() == null) {
+            throw new DestinationDepotDeterminationException("Delivery depot could not be determined");
+        }
+        updateParcelDestinationForReroute(parcelUpdate, city);
+
+        final Parcel parcel = shipmentRepository.update(parcelUpdate);
+
+        return new UpdateParcelResponse(parcel);
+    }
 
     @Override
     public Parcel loadParcel(Long parcelId) {
@@ -64,13 +78,16 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public UpdateParcelResponse update(ParcelUpdate parcelUpdate) {
-        return shipmentServicePort.update(parcelUpdate);
-    }
-
-    @Override
     public void delete(Long parcelId) {
         shipmentRepository.delete(parcelId);
+    }
+
+    private void updateParcelDestination(ShipmentParcel shipmentParcel, City city) {
+        shipmentParcel.setDestination(city.getValue());
+    }
+
+    private void updateParcelDestinationForReroute(ParcelUpdate parcelUpdate, City city) {
+        parcelUpdate.setDestination(city.getValue());
     }
 
     private void logNotification(Notification notification) {
