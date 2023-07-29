@@ -1,5 +1,6 @@
 package com.warehouse.shipment.configuration;
 
+import com.warehouse.shipment.domain.port.primary.*;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
@@ -14,8 +15,6 @@ import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
@@ -92,5 +91,15 @@ public class ShipmentConfiguration {
 	public MailServicePort mailServicePort(MailService mailService) {
 		final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
 		return new MailAdapter(mailService, notificationMapper);
+	}
+
+	@Bean
+	public ShipmentReroutePort shipmentReroutePort(ShipmentService service) {
+		return new ShipmentReroutePortImpl(service);
+	}
+
+	@Bean
+	public ShipmentRestPort shipmentRestPort(ShipmentService service) {
+		return new ShipmentRestPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentRestPortImpl.class));
 	}
 }

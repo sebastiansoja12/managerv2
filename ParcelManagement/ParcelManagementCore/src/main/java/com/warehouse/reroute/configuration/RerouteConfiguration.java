@@ -1,5 +1,6 @@
 package com.warehouse.reroute.configuration;
 
+import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,10 +71,10 @@ public class RerouteConfiguration {
 	}
 
 	@Bean
-	public ShipmentService shipmentService(ShipmentPort shipmentPort) {
+	public ShipmentService shipmentService(ShipmentReroutePort shipmentReroutePort) {
 		final ShipmentRequestMapper requestMapper = Mappers.getMapper(ShipmentRequestMapper.class);
 		final ShipmentResponseMapper responseMapper = Mappers.getMapper(ShipmentResponseMapper.class);
-		return new ShipmentServiceAdapter(requestMapper, responseMapper, shipmentPort);
+		return new ShipmentServiceAdapter(requestMapper, responseMapper, shipmentReroutePort);
 	}
 
 	@Bean

@@ -1,18 +1,14 @@
 package com.warehouse.shipment;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.Logger;
@@ -20,6 +16,7 @@ import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 
+@ExtendWith(MockitoExtension.class)
 class ShipmentPrimaryPortTest {
 
     @Mock
@@ -29,11 +26,8 @@ class ShipmentPrimaryPortTest {
 
     private ShipmentPortImpl shipmentPort;
 
-    private final Integer VALID_TOKEN = 12345;
-
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         logger = mock(Logger.class);
         shipmentPort = new ShipmentPortImpl(shipmentService, logger);
     }
@@ -48,92 +42,11 @@ class ShipmentPrimaryPortTest {
         // create expected response from service
         final ShipmentResponse expectedResponse = new ShipmentResponse("paymentUrl", 1L);
 
-        when(shipmentService.createShipment(createShipmentParcel())).thenReturn(expectedResponse);
+        when(shipmentService.createShipment(request.getParcel())).thenReturn(expectedResponse);
         // when
         final ShipmentResponse response = shipmentPort.ship(request);
         // then
         assertEquals(response, expectedToBeEqualTo(response));
-    }
-
-    @Test
-    void shouldDeleteParcel() {
-        // given
-        final Long parcelId = 1L;
-
-        // when
-        shipmentPort.delete(parcelId);
-
-        // then
-        verify(shipmentService, times(1)).delete(parcelId);
-    }
-
-    @Test
-    void shouldLoadParcel() {
-        // given
-        final Long parcelId = 1L;
-
-        final Parcel expectedParcel = new Parcel();
-        when(shipmentService.loadParcel(parcelId)).thenReturn(expectedParcel);
-
-        // when
-        final Parcel parcel = shipmentPort.loadParcel(parcelId);
-
-        // then
-        verify(shipmentService, times(1)).loadParcel(parcelId);
-        assertEquals(expectedParcel, parcel);
-
-    }
-
-    @Test
-    void shouldUpdateParcel() {
-        // given
-        final UpdateParcelRequest updateParcelRequest = new UpdateParcelRequest();
-        updateParcelRequest.setParcel(createParcel());
-        updateParcelRequest.setToken(VALID_TOKEN);
-
-        final Parcel parcel =  createParcel();
-        parcel.setStatus(Status.REROUTE);
-
-        final UpdateParcelResponse expectedResponse = new UpdateParcelResponse();
-        expectedResponse.setParcel(parcel);
-
-        when(shipmentService.update(any(ParcelUpdate.class))).thenReturn(expectedResponse);
-        // when
-        final UpdateParcelResponse response = shipmentPort.update(updateParcelRequest);
-
-        // then
-        verify(shipmentService, times(1)).update(any(ParcelUpdate.class));
-        assertEquals(expectedResponse, response);
-
-        // and status changed to reroute
-        assertThat(response.getParcel().getStatus().name()).isEqualTo("REROUTE");
-    }
-
-    @Test
-    void shouldThrowExceptionWhenParcelIsNull() {
-        // given
-        final String errorMessage = "Parcel is null";
-        final UpdateParcelRequest updateParcelRequest = new UpdateParcelRequest();
-
-        doThrow(new ParcelNotFoundException(errorMessage)).when(shipmentService).update(any(ParcelUpdate.class));
-
-        // when, then
-        assertThrows(ParcelNotFoundException.class, () -> shipmentPort.update(updateParcelRequest));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenTokenIsNull() {
-        // given
-        final String errorMessage = "Reroute token is null";
-        final UpdateParcelRequest updateParcelRequest = new UpdateParcelRequest();
-        updateParcelRequest.setToken(null);
-        updateParcelRequest.setParcel(mock(Parcel.class));
-
-        doThrow(new RerouteTokenNotFoundException(errorMessage)).when(shipmentService)
-                .update(any(ParcelUpdate.class));
-
-        // when && then
-        assertThrows(RerouteTokenNotFoundException.class, () -> shipmentPort.update(updateParcelRequest));
     }
 
     private Parcel createParcel() {

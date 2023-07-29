@@ -4,6 +4,7 @@ import com.itextpdf.text.DocumentException;
 import com.warehouse.csv.domain.service.CsvExporterService;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.domain.port.primary.ShipmentRestPort;
 import lombok.AllArgsConstructor;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,13 +16,13 @@ import java.util.Date;
 @AllArgsConstructor
 public class CsvPortImpl implements CsvPort {
 
-    private final ShipmentPort shipmentPort;
+    private final ShipmentRestPort shipmentRestPort;
 
     private final CsvExporterService exporterService;
 
     @Override
     public void exportToCSV(HttpServletResponse response, Long id) throws DocumentException, IOException {
-        final Parcel parcel = shipmentPort.loadParcel(id);
+        final Parcel parcel = shipmentRestPort.loadParcel(id);
         response.setContentType("text/csv");
         final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         final String currentDateTime = dateFormatter.format(new Date());
