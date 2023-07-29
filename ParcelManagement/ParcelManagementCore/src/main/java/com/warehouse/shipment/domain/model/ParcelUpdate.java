@@ -39,6 +39,8 @@ public class ParcelUpdate {
 
     String recipientPostalCode;
 
+    String destination;
+
     Size parcelSize;
 
     Status status;

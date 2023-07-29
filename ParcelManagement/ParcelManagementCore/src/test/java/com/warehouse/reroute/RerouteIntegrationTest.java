@@ -1,9 +1,9 @@
 package com.warehouse.reroute;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
+import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -14,10 +14,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.reroute.configuration.RerouteTokenTestConfiguration;
 import com.warehouse.reroute.domain.enumeration.ParcelType;
@@ -25,11 +23,12 @@ import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.EmailNotFoundException;
 import com.warehouse.reroute.domain.exception.RerouteException;
-import com.warehouse.reroute.domain.model.Parcel;
+import com.warehouse.reroute.domain.model.RerouteParcel;
+import com.warehouse.reroute.domain.model.RerouteParcelRequest;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.RerouteResponse;
-import com.warehouse.reroute.domain.model.UpdateParcelRequest;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
+import com.warehouse.reroute.domain.port.primary.RerouteUpdatePort;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
@@ -38,15 +37,15 @@ import com.warehouse.shipment.infrastructure.api.dto.*;
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ContextConfiguration(classes = RerouteTokenTestConfiguration.class)
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class })
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class RerouteTokenIntegrationTest {
+public class RerouteIntegrationTest {
 
     @Autowired
     private RerouteTokenPort rerouteTokenPort;
+
+    @Autowired
+    private RerouteUpdatePort rerouteUpdatePort;
 
     private final static Long PARCEL_ID = 100001L;
 
@@ -72,6 +71,13 @@ public class RerouteTokenIntegrationTest {
     }
 
     @Test
+    @DatabaseSetup("/dataset/rerouteToken.xml")
+    void shouldRerouteParcel() {
+        shouldSendRequestToRerouteParcel();
+    }
+
+
+    @Test
     void shouldNotSendRequest() {
         shouldThrowExceptionWhenEmailIsNull();
     }
@@ -95,16 +101,30 @@ public class RerouteTokenIntegrationTest {
     }
 
 
+    private void shouldSendRequestToRerouteParcel() {
+        // given
+        final RerouteParcelRequest request = RerouteParcelRequest.builder()
+                .id(100001L)
+                .parcel(createParcel())
+                .token(12345)
+                .build();
+        // when
+        final RerouteParcelResponse response = rerouteUpdatePort.update(request);
+        // then
+        assertEquals("updatedTest", response.getSender().getFirstName());
+    }
+
+
     void shouldNotUpdateParcelRequestWhenTokenDoesntExistInDb() {
         // given
-        final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder()
+        final RerouteParcelRequest updateParcelRequest = RerouteParcelRequest.builder()
                 .parcel(createParcel())
                 .id(PARCEL_ID)
                 .token(INVALID_TOKEN)
                 .build();
 
         // when
-        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteUpdatePort.update(updateParcelRequest);
 
         final RerouteTokenNotFoundException rerouteTokenNotFoundException =
                 assertThrows(RerouteTokenNotFoundException.class, executable);
@@ -117,7 +137,7 @@ public class RerouteTokenIntegrationTest {
 
     void shouldThrowExceptionWhenStatusIsNotCreated() {
         // given
-        final Parcel parcel = Parcel.builder()
+        final RerouteParcel parcel = RerouteParcel.builder()
                 .recipient(createRecipient())
                 .parcelSize(Size.TEST)
                 .sender(createSender())
@@ -125,14 +145,14 @@ public class RerouteTokenIntegrationTest {
                 .status(Status.SENT)
                 .build();
 
-        final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder()
+        final RerouteParcelRequest updateParcelRequest = RerouteParcelRequest.builder()
                 .parcel(parcel)
                 .id(PARCEL_ID_2)
                 .token(VALID_TOKEN)
                 .build();
 
         // when
-        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteUpdatePort.update(updateParcelRequest);
 
 
         // then
@@ -146,7 +166,7 @@ public class RerouteTokenIntegrationTest {
 
     void shouldThrowExceptionWhileTryingToUpdateParcelWithTypeChild() {
         // given
-        final Parcel parcel = Parcel.builder()
+        final RerouteParcel parcel = RerouteParcel.builder()
                 .recipient(createRecipient())
                 .parcelSize(Size.TEST)
                 .sender(createSender())
@@ -154,14 +174,14 @@ public class RerouteTokenIntegrationTest {
                 .status(Status.CREATED)
                 .build();
 
-        final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder()
+        final RerouteParcelRequest updateParcelRequest = RerouteParcelRequest.builder()
                 .parcel(parcel)
                 .id(PARCEL_ID_3)
                 .token(VALID_TOKEN)
                 .build();
 
         // when
-        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteUpdatePort.update(updateParcelRequest);
 
 
         // then
@@ -202,8 +222,8 @@ public class RerouteTokenIntegrationTest {
     }
 
 
-    private Parcel createParcel() {
-        return Parcel.builder()
+    private RerouteParcel createParcel() {
+        return RerouteParcel.builder()
                 .recipient(createRecipient())
                 .parcelSize(Size.TEST)
                 .sender(createSender())

@@ -1,17 +1,18 @@
 package com.warehouse.reroute.domain.port.primary;
 
-import com.warehouse.reroute.domain.enumeration.Size;
-import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.model.Parcel;
-import com.warehouse.reroute.domain.vo.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.when;
+import com.warehouse.reroute.domain.model.RerouteRequest;
+import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.model.RerouteToken;
+import com.warehouse.reroute.domain.model.Token;
 
 @ExtendWith(MockitoExtension.class)
 public class RerouteTokenPortImplTest {
@@ -77,36 +78,6 @@ public class RerouteTokenPortImplTest {
         assertAll(
                 () -> assertThat(actualResponse.getToken().intValue()).isEqualTo(TOKEN_VALUE),
                 () -> assertThat(actualResponse.getParcelId()).isEqualTo(PARCEL_ID)
-        );
-    }
-
-    @Test
-    void shouldUpdate() {
-        // given
-        final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder()
-                .parcel(Parcel.builder()
-                        .parcelSize(Size.TEST)
-                        .recipient(Recipient.builder().build())
-                        .sender(Sender.builder().build())
-                        .build()
-                )
-                .token(TOKEN_VALUE)
-                .id(PARCEL_ID)
-                .build();
-        final ParcelUpdateResponse expectedResponse = ParcelUpdateResponse.builder()
-                .parcelId(new ParcelId(PARCEL_ID))
-                .parcelSize(Size.TEST)
-                .recipient(Recipient.builder().build())
-                .sender(Sender.builder().build())
-                .build();
-        when(port.update(updateParcelRequest)).thenReturn(expectedResponse);
-        // when
-        final ParcelUpdateResponse actualResponse = port.update(updateParcelRequest);
-
-        // then
-        assertAll(
-                () -> assertThat(actualResponse.getSender().getFirstName()).isEqualTo(null),
-                () -> assertThat(actualResponse.getParcelId().getValue()).isEqualTo(PARCEL_ID)
         );
     }
 }

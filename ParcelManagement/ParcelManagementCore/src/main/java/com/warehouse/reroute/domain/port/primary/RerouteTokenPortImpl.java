@@ -1,12 +1,10 @@
 package com.warehouse.reroute.domain.port.primary;
 
-import com.warehouse.reroute.domain.enumeration.Status;
-import com.warehouse.reroute.domain.exception.RerouteException;
-import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
+import com.warehouse.reroute.domain.model.RerouteRequest;
+import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.model.RerouteToken;
+import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.service.RerouteService;
-import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
-import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 
 import lombok.AllArgsConstructor;
 
@@ -14,35 +12,6 @@ import lombok.AllArgsConstructor;
 public class RerouteTokenPortImpl implements RerouteTokenPort {
 
     private final RerouteService rerouteService;
-
-    private final RerouteTokenRepository rerouteTokenRepository;
-
-    @Override
-    public ParcelUpdateResponse update(UpdateParcelRequest request) {
-        final Parcel parcel = extractParcelFromRequest(request);
-
-        if (!parcel.isRequiredToReroute()) {
-            throw new RerouteException("Parcel cannot be rerouted");
-        }
-
-        final RerouteToken rerouteToken = extractTokenFromRequest(request);
-
-        if (!rerouteToken.isValid()) {
-            throw new RerouteTokenNotFoundException("Reroute token is not valid");
-        }
-
-        parcel.setStatus(Status.REROUTE);
-
-        return rerouteService.update(parcel, rerouteToken);
-    }
-
-    private RerouteToken extractTokenFromRequest(UpdateParcelRequest request) {
-        return rerouteTokenRepository.loadByTokenAndParcelId(request.getToken(), request.getId());
-    }
-
-    private Parcel extractParcelFromRequest(UpdateParcelRequest request) {
-        return request.getParcel();
-    }
 
     @Override
     public RerouteToken findByToken(Token token) {

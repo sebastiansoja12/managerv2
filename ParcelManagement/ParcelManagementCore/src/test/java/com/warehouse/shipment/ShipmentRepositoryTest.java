@@ -1,7 +1,7 @@
 package com.warehouse.shipment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
@@ -15,8 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.model.ParcelUpdate;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
-import com.warehouse.shipment.domain.model.UpdateParcelResponse;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentRepositoryImpl;
@@ -98,17 +98,15 @@ public class ShipmentRepositoryTest {
     @Test
     void shouldUpdate() {
         // given
-        final Parcel parcelUpdate = new Parcel();
+        final ParcelUpdate parcelUpdate = ParcelUpdate.builder().build();
         final ParcelEntity entity = new ParcelEntity();
-        final UpdateParcelResponse updateParcelResponse = new UpdateParcelResponse();
 
-        when(parcelMapper.mapForUpdate(parcelUpdate)).thenReturn(entity);
+        when(parcelMapper.map(parcelUpdate)).thenReturn(entity);
         when(readRepository.save(entity)).thenReturn(entity);
-        when(parcelMapper.mapToUpdateParcelResponse(entity)).thenReturn(updateParcelResponse);
         // when
-        final UpdateParcelResponse result = shipmentRepository.update(parcelUpdate);
+        final Parcel result = shipmentRepository.update(parcelUpdate);
 
         // then
-        assertEquals(updateParcelResponse, result);
+        verify(readRepository, times(1)).save(entity);
     }
 }

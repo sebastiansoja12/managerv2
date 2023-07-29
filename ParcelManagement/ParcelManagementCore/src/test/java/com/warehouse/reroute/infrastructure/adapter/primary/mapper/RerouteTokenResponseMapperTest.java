@@ -14,18 +14,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class PrimaryResponseMapperTest {
+public class RerouteTokenResponseMapperTest {
 
-    private PrimaryResponseMapper mapper;
+    private RerouteTokenResponseMapper responseMapper;
 
     private final static Integer TOKEN = 123456;
 
     private final static java.lang.Long PARCEL_ID = 12345L;
 
-    @BeforeEach
-    void setUp() {
-       mapper = new PrimaryResponseMapperImpl();
-    }
+	@BeforeEach
+	void setUp() {
+		responseMapper = new RerouteTokenResponseMapperImpl();
+	}
 
     @Test
     void shouldMapFromRerouteResponseDtoToRerouteResponse() {
@@ -34,7 +34,7 @@ public class PrimaryResponseMapperTest {
                 TOKEN, PARCEL_ID
         );
         // when
-        final RerouteResponse rerouteResponse = mapper.map(rerouteResponseDto);
+        final RerouteResponse rerouteResponse = responseMapper.map(rerouteResponseDto);
 
         // then
         assertThat(rerouteResponse.getParcelId()).isEqualTo(PARCEL_ID);
@@ -44,14 +44,14 @@ public class PrimaryResponseMapperTest {
     @Test
     void shouldMapFromParcelResponseToParcelResponseDto() {
         // given
-        final ParcelUpdateResponse parcelUpdateResponse = ParcelUpdateResponse.builder()
+        final RerouteParcelResponse rerouteParcelResponse = RerouteParcelResponse.builder()
                 .parcelId(new ParcelId(PARCEL_ID))
                 .parcelSize(Size.AVERAGE)
                 .recipient(Recipient.builder().build())
                 .sender(Sender.builder().build())
                 .build();
         // when
-        final ParcelResponseDto parcelResponseDto = mapper.map(parcelUpdateResponse);
+        final ParcelResponseDto parcelResponseDto = responseMapper.map(rerouteParcelResponse);
 
         // then
         assertThat(parcelResponseDto.getParcelId().getValue()).isEqualTo(PARCEL_ID);
@@ -67,7 +67,7 @@ public class PrimaryResponseMapperTest {
         rerouteTokenResponseDto.setCreated("2022-08-10 21:37:00");
 
         // when
-        final RerouteTokenResponse tokenResponse = mapper.map(rerouteTokenResponseDto);
+        final RerouteTokenResponse tokenResponse = responseMapper.map(rerouteTokenResponseDto);
         // then
         assertThat(tokenResponse.getToken()).isEqualTo(TOKEN);
         assertThat(tokenResponse.isValid()).isTrue();

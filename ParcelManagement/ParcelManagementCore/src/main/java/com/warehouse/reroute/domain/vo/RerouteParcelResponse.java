@@ -8,7 +8,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class ParcelUpdateResponse {
+public class RerouteParcelResponse {
     ParcelId parcelId;
     Sender sender;
     Recipient recipient;
@@ -17,4 +17,6 @@ public class ParcelUpdateResponse {
     Status status;
 
     ParcelType parcelType;
+
+    Long parcelRelatedId;
 }

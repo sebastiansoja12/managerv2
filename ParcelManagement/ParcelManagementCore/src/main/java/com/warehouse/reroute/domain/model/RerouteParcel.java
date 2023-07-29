@@ -4,18 +4,20 @@ package com.warehouse.reroute.domain.model;
 import com.warehouse.reroute.domain.enumeration.ParcelType;
 import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
-import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Parcel {
+public class RerouteParcel {
 
-	ParcelId parcelId;
 	Sender sender;
 	Recipient recipient;
 	Size parcelSize;

@@ -1,10 +1,7 @@
 package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.reroute.domain.enumeration.Size;
-import com.warehouse.reroute.domain.model.Parcel;
-import com.warehouse.reroute.domain.model.RerouteRequest;
-import com.warehouse.reroute.domain.model.Token;
-import com.warehouse.reroute.domain.model.UpdateParcelRequest;
+import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
 import com.warehouse.reroute.infrastructure.api.dto.*;
@@ -18,10 +15,10 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class PrimaryRequestMapperTest {
+public class RerouteTokenRequestMapperTest {
 
     @Mock
-    private PrimaryRequestMapper mapper;
+    private RerouteTokenRequestMapper requestMapper;
 
     private final static long PARCEL_ID = 100001L;
 
@@ -35,12 +32,12 @@ public class PrimaryRequestMapperTest {
         final RerouteRequestDto requestDto = new RerouteRequestDto();
         requestDto.setParcelId(parcelId());
         requestDto.setEmail(email());
-        when(mapper.map(requestDto)).thenReturn(RerouteRequest.builder()
+        when(requestMapper.map(requestDto)).thenReturn(RerouteRequest.builder()
                 .parcelId(PARCEL_ID)
                 .email(EMAIL)
                 .build());
         // when
-        final RerouteRequest request = mapper.map(requestDto);
+        final RerouteRequest request = requestMapper.map(requestDto);
         // then
         assertThat(request).isNotNull();
         assertThat(request.getParcelId()).isEqualTo(PARCEL_ID);
@@ -50,17 +47,17 @@ public class PrimaryRequestMapperTest {
     @Test
     void shouldMapFromUpdateParcelRequestDtoToUpdateParcelRequest() {
         // given
-        final UpdateParcelRequestDto requestDto = new UpdateParcelRequestDto();
+        final RerouteParcelRequestDto requestDto = new RerouteParcelRequestDto();
         requestDto.setParcelId(parcelIdDto());
         requestDto.setToken(tokenDto());
         requestDto.setParcel(parcelDto());
-        when(mapper.map(requestDto)).thenReturn(UpdateParcelRequest.builder()
+        when(requestMapper.map(requestDto)).thenReturn(RerouteParcelRequest.builder()
                 .id(PARCEL_ID)
                 .parcel(parcel())
                 .token(TOKEN)
                 .build());
         // when
-        final UpdateParcelRequest updateParcelRequest = mapper.map(requestDto);
+        final RerouteParcelRequest updateParcelRequest = requestMapper.map(requestDto);
         // then
         assertThat(updateParcelRequest).isNotNull();
         assertThat(updateParcelRequest.getId()).isEqualTo(PARCEL_ID);
@@ -71,14 +68,14 @@ public class PrimaryRequestMapperTest {
     void shouldMapFromParcelDtoToParcel() {
         // given
         final ParcelDto parcelDto = parcelDto();
-        when(mapper.map(parcelDto)).thenReturn(Parcel.builder()
+        when(requestMapper.map(parcelDto)).thenReturn(Parcel.builder()
                 .parcelSize(Size.AVERAGE)
                 .recipient(Recipient.builder().build())
                 .sender(Sender.builder().build())
                 .build());
 
         // when
-        final Parcel parcel = mapper.map(parcelDto);
+        final Parcel parcel = requestMapper.map(parcelDto);
         // then
         assertThat(parcel.getParcelSize().getSize()).isEqualTo(parcelDto.getParcelSize().getSize());
     }
@@ -88,8 +85,8 @@ public class PrimaryRequestMapperTest {
         // given
         final TokenDto tokenDto = tokenDto();
         // when
-        when(mapper.map(tokenDto)).thenReturn(Token.builder().value(TOKEN).build());
-        final Token token = mapper.map(tokenDto);
+        when(requestMapper.map(tokenDto)).thenReturn(Token.builder().value(TOKEN).build());
+        final Token token = requestMapper.map(tokenDto);
         // then
         assertThat(token.getValue()).isEqualTo(TOKEN);
 
@@ -99,9 +96,9 @@ public class PrimaryRequestMapperTest {
     void shouldMapFromParcelIdDtoToParcelId() {
         // given
         final ParcelIdDto parcelIdDto = parcelIdDto();
-        when(mapper.map(parcelIdDto)).thenReturn(new com.warehouse.reroute.domain.vo.ParcelId(PARCEL_ID));
+        when(requestMapper.map(parcelIdDto)).thenReturn(new com.warehouse.reroute.domain.vo.ParcelId(PARCEL_ID));
         // when
-        final com.warehouse.reroute.domain.vo.ParcelId parcelId = mapper.map(parcelIdDto);
+        final com.warehouse.reroute.domain.vo.ParcelId parcelId = requestMapper.map(parcelIdDto);
         // then
         assertThat(parcelId.getValue()).isEqualTo(PARCEL_ID);
     }
@@ -134,7 +131,7 @@ public class PrimaryRequestMapperTest {
         return parcel;
     }
 
-    private Parcel parcel() {
-        return Parcel.builder().build();
+    private RerouteParcel parcel() {
+        return RerouteParcel.builder().build();
     }
 }

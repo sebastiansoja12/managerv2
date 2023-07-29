@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.exception.RerouteTokenNotFoundException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentReroutePortImpl;
 import com.warehouse.shipment.domain.service.ShipmentService;
@@ -23,14 +22,10 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Statu
 @ExtendWith(MockitoExtension.class)
 public class ShipmentReroutePortImplTest {
 
-
-
     @Mock
     private ShipmentService service;
 
     private ShipmentReroutePortImpl shipmentReroutePort;
-
-    private final Integer VALID_TOKEN = 12345;
 
     @BeforeEach
     void setup() {
@@ -42,7 +37,6 @@ public class ShipmentReroutePortImplTest {
         // given
         final UpdateParcelRequest updateParcelRequest = new UpdateParcelRequest();
         updateParcelRequest.setParcel(createParcel());
-        updateParcelRequest.setToken(VALID_TOKEN);
 
         final Parcel parcel =  createParcel();
         parcel.setStatus(Status.REROUTE);
@@ -68,17 +62,6 @@ public class ShipmentReroutePortImplTest {
         final UpdateParcelRequest updateParcelRequest = new UpdateParcelRequest();
         // when, then
         assertThrows(ParcelNotFoundException.class, () -> shipmentReroutePort.reroute(updateParcelRequest));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenTokenIsNull() {
-        // given
-        final UpdateParcelRequest updateParcelRequest = new UpdateParcelRequest();
-        updateParcelRequest.setToken(null);
-        updateParcelRequest.setParcel(mock(Parcel.class));
-
-        // when && then
-        assertThrows(RerouteTokenNotFoundException.class, () -> shipmentReroutePort.reroute(updateParcelRequest));
     }
 
 
