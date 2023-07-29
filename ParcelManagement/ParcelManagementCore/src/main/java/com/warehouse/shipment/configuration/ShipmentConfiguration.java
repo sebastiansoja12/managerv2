@@ -4,7 +4,6 @@ import com.warehouse.shipment.domain.port.primary.*;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
-import io.micrometer.common.util.internal.logging.Slf4JLoggerFactory;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

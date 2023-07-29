@@ -15,7 +15,7 @@ import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationExce
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.service.MailServicePort;
+import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
 import com.warehouse.shipment.domain.vo.Notification;
@@ -175,10 +175,6 @@ public class ShipmentServiceImplTest {
         // then
         verify(shipmentRepository, times(1)).delete(parcelId);
     }
-
-
-
-
 
     private Long expectedToBe(Long value) {
         return value;

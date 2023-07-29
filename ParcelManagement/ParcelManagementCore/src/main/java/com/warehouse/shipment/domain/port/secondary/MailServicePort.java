@@ -1,4 +1,4 @@
-package com.warehouse.shipment.domain.service;
+package com.warehouse.shipment.domain.port.secondary;
 
 import com.warehouse.shipment.domain.vo.Notification;
 
