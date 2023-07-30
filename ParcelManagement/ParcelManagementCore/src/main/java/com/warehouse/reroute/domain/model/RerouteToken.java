@@ -1,33 +1,29 @@
 package com.warehouse.reroute.domain.model;
 
-import lombok.*;
-
 import java.time.Instant;
-import java.util.Random;
 
-@Getter
-@EqualsAndHashCode
-@ToString
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
 @Builder
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RerouteToken {
 
-    private Long id;
-    private Integer token;
+    Long id;
 
-    private Instant createdDate;
+    Integer token;
 
-    private Instant expiryDate;
+    Instant createdDate;
 
-    private Long parcelId;
+    Instant expiryDate;
 
-    public Integer generateToken() {
-        final Random r = new Random( System.currentTimeMillis() );
-        this.token = ((1 + r.nextInt(2)) * 10000 + r.nextInt(10000));
-        return this.token;
-    }
+    Long parcelId;
+
+    String email;
 
     public boolean isValid() {
         return getExpiryDate().isAfter(Instant.now());

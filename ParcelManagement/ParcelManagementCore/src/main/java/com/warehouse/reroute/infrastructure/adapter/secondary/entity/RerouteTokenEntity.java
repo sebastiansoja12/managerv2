@@ -1,9 +1,9 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary.entity;
 
-import lombok.*;
+import java.time.Instant;
 
 import jakarta.persistence.*;
-import java.time.Instant;
+import lombok.*;
 
 @Getter
 @Builder
@@ -28,7 +28,9 @@ public class RerouteTokenEntity {
     @Column(name = "timeout", updatable = false)
     private Instant expiryDate;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "parcel_id", nullable = false, updatable = false)
     private Long parcelId;
 
+    @Column(name = "email", nullable = false, updatable = false)
+    private String email;
 }

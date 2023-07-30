@@ -1,6 +1,5 @@
 package com.warehouse.reroute.domain.service;
 
-import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.RerouteResponse;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.model.Token;
@@ -27,8 +26,15 @@ public class RerouteServiceImpl implements RerouteService {
     }
 
     @Override
-    public RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest) {
-        return rerouteTokenServicePort.sendReroutingInformation(rerouteRequest);
+    public RerouteResponse createRerouteToken(RerouteToken rerouteToken) {
+        final RerouteToken token = rerouteTokenRepository.saveReroutingToken(rerouteToken);
+
+        rerouteTokenServicePort.sendReroutingInformation(token);
+
+        return RerouteResponse.builder()
+                .parcelId(token.getParcelId())
+                .token(token.getToken())
+                .build();
     }
 
     @Override
