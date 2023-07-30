@@ -18,4 +18,10 @@ public class MailAdapter implements MailServicePort {
         final com.warehouse.mail.domain.vo.Notification shipmentNotification = notificationMapper.map(notification);
         mailService.sendNotification(shipmentNotification);
     }
+
+    @Override
+    public void sendRerouteNotification(Notification notification) {
+        final com.warehouse.mail.domain.vo.Notification rerouteNotification = notificationMapper.map(notification);
+        mailService.sendNotification(rerouteNotification);
+    }
 }

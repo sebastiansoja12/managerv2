@@ -49,6 +49,8 @@ public interface ParcelMapper {
     @Mapping(source = "status", target = "status")
     ParcelEntity mapForUpdate(Parcel parcel);
 
+    @Mapping(source = "senderFirstName", target = "firstName")
+    @Mapping(source = "senderLastName", target = "lastName")
     ParcelEntity map(ParcelUpdate parcel);
 
     @Mapping(target = "sender.firstName", source = "firstName")

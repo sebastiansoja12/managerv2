@@ -1,8 +1,12 @@
 package com.warehouse.reroute.domain.service;
 
-import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.port.secondary.*;
-import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
+import com.warehouse.reroute.domain.model.RerouteRequest;
+import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.model.RerouteToken;
+import com.warehouse.reroute.domain.model.Token;
+import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
+import com.warehouse.reroute.domain.port.secondary.RerouteTokenServicePort;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -13,9 +17,8 @@ public class RerouteServiceImpl implements RerouteService {
     private final RerouteTokenRepository rerouteTokenRepository;
 
     @Override
-    public TokenDeletionStatus deleteToken(RerouteToken rerouteToken) {
+    public void deleteToken(RerouteToken rerouteToken) {
         rerouteTokenRepository.deleteByToken(rerouteToken);
-        return new TokenDeletionStatus("OK");
     }
 
     @Override

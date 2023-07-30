@@ -31,7 +31,7 @@ public class MailAdapterTest {
     }
 
     @Test
-    void shouldSendNotification() {
+    void shouldSendShipmentNotification() {
         // given
         final Notification notification = new Notification();
 
@@ -40,6 +40,21 @@ public class MailAdapterTest {
 
         // when
         mailAdapter.sendShipmentNotification(notification);
+
+        // then
+        verify(mailService, times(1)).sendNotification(mappedNotification);
+    }
+
+    @Test
+    void shouldSendRerouteNotification() {
+        // given
+        final Notification notification = new Notification();
+
+        final com.warehouse.mail.domain.vo.Notification mappedNotification =
+                new com.warehouse.mail.domain.vo.Notification();
+
+        // when
+        mailAdapter.sendRerouteNotification(notification);
 
         // then
         verify(mailService, times(1)).sendNotification(mappedNotification);

@@ -28,7 +28,6 @@ import com.warehouse.reroute.domain.model.RerouteParcelRequest;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.RerouteResponse;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
-import com.warehouse.reroute.domain.port.primary.RerouteUpdatePort;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
@@ -43,9 +42,6 @@ public class RerouteIntegrationTest {
 
     @Autowired
     private RerouteTokenPort rerouteTokenPort;
-
-    @Autowired
-    private RerouteUpdatePort rerouteUpdatePort;
 
     private final static Long PARCEL_ID = 100001L;
 
@@ -109,7 +105,7 @@ public class RerouteIntegrationTest {
                 .token(12345)
                 .build();
         // when
-        final RerouteParcelResponse response = rerouteUpdatePort.update(request);
+        final RerouteParcelResponse response = rerouteTokenPort.update(request);
         // then
         assertEquals("updatedTest", response.getSender().getFirstName());
     }
@@ -124,7 +120,7 @@ public class RerouteIntegrationTest {
                 .build();
 
         // when
-        final Executable executable = () -> rerouteUpdatePort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
 
         final RerouteTokenNotFoundException rerouteTokenNotFoundException =
                 assertThrows(RerouteTokenNotFoundException.class, executable);
@@ -152,7 +148,7 @@ public class RerouteIntegrationTest {
                 .build();
 
         // when
-        final Executable executable = () -> rerouteUpdatePort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
 
 
         // then
@@ -181,7 +177,7 @@ public class RerouteIntegrationTest {
                 .build();
 
         // when
-        final Executable executable = () -> rerouteUpdatePort.update(updateParcelRequest);
+        final Executable executable = () -> rerouteTokenPort.update(updateParcelRequest);
 
 
         // then
