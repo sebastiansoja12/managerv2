@@ -1,9 +1,5 @@
 package com.warehouse.shipment.configuration;
 
-import com.warehouse.shipment.domain.port.primary.*;
-import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
-import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +10,14 @@ import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.shipment.domain.service.*;
+import com.warehouse.shipment.domain.port.primary.*;
+import com.warehouse.shipment.domain.port.secondary.*;
+import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
+import com.warehouse.shipment.domain.service.NotificationCreatorProviderImpl;
+import com.warehouse.shipment.domain.service.ShipmentService;
+import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
+import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
+import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;

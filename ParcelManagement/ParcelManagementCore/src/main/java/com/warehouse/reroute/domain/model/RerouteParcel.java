@@ -19,7 +19,9 @@ import lombok.NoArgsConstructor;
 public class RerouteParcel {
 
 	Sender sender;
+
 	Recipient recipient;
+
 	Size parcelSize;
 
 	Status status;
@@ -38,7 +40,15 @@ public class RerouteParcel {
 		return status.equals(Status.CREATED);
 	}
 
+	public boolean hasStatusReroute() {
+		return status.equals(Status.REROUTE);
+	}
+
+	public boolean hasStatusCreatedOrReroute() {
+		return hasStatusCreated() || hasStatusReroute();
+	}
+
 	public boolean isRequiredToReroute() {
-		return hasStatusCreated() && isParent();
+		return hasStatusCreatedOrReroute() && isParent();
 	}
 }

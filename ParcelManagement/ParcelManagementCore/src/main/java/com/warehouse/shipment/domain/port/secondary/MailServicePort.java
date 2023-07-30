@@ -4,4 +4,5 @@ import com.warehouse.shipment.domain.vo.Notification;
 
 public interface MailServicePort {
     void sendShipmentNotification(Notification notification);
+    void sendRerouteNotification(Notification notification);
 }

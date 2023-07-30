@@ -1,13 +1,5 @@
 package com.warehouse.reroute.configuration;
 
-import com.warehouse.reroute.domain.port.primary.RerouteUpdatePort;
-import com.warehouse.reroute.domain.port.primary.RerouteUpdatePortImpl;
-import com.warehouse.reroute.domain.port.secondary.*;
-import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapper;
-import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapperImpl;
-import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapper;
-import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapperImpl;
-import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,13 +8,18 @@ import com.warehouse.depot.api.DepotService;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
+import com.warehouse.reroute.domain.port.secondary.*;
 import com.warehouse.reroute.domain.service.*;
+import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapper;
+import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapperImpl;
+import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapper;
+import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapperImpl;
 import com.warehouse.reroute.infrastructure.adapter.secondary.*;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RequestMapper;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.ResponseMapper;
-import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentServiceAdapter;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
@@ -31,6 +28,8 @@ import com.warehouse.voronoi.VoronoiService;
 
 @Configuration
 public class RerouteConfiguration {
+
+	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
 
 	@Bean
 	public RerouteTokenRepository rerouteTokenRepository(RerouteTokenReadRepository repository) {
@@ -48,10 +47,11 @@ public class RerouteConfiguration {
 
 	@Bean
 	public RerouteTokenPort rerouteTokenPort(RerouteTokenServicePort rerouteTokenServicePort,
-			RerouteTokenRepository rerouteTokenRepository) {
+			RerouteTokenRepository rerouteTokenRepository, ParcelReroutePort parcelReroutePort) {
 		final com.warehouse.reroute.domain.service.RerouteService rerouteService = new RerouteServiceImpl(
 				rerouteTokenServicePort, rerouteTokenRepository);
-		return new RerouteTokenPortImpl(rerouteService);
+		return new RerouteTokenPortImpl(rerouteService, parcelReroutePort,
+				LOGGER_FACTORY.getLogger(RerouteTokenPort.class));
 	}
 
 	@Bean
@@ -93,11 +93,6 @@ public class RerouteConfiguration {
 	@Bean
 	public ExpiredRerouteTokenJobDeleter expiredRerouteTokenJobDeleter(RerouteTokenReadRepository repository) {
 		return new ExpiredRerouteTokenJobDeleter(repository);
-	}
-
-	@Bean
-	public RerouteUpdatePort rerouteUpdatePort(RerouteService rerouteService, ParcelReroutePort parcelReroutePort) {
-		return new RerouteUpdatePortImpl(rerouteService, parcelReroutePort);
 	}
 
 	@Bean

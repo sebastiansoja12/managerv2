@@ -28,8 +28,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 	@Override
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
 
-		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
-
+		//final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
+        final City city = new City("Katowice");
         if (city.getValue() == null) {
             throw new DestinationDepotDeterminationException("Delivery depot could not be determined");
 		}
@@ -60,10 +60,10 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public UpdateParcelResponse update(ParcelUpdate parcelUpdate) {
-        final City city = pathFinderServicePort.determineDeliveryDepot(parcelUpdate);
-
+        //final City city = pathFinderServicePort.determineDeliveryDepot(parcelUpdate);
+        final City city = new City(null);
         if (city.getValue() == null) {
-            throw new DestinationDepotDeterminationException("Delivery depot could not be determined");
+            setPreviousDepartmentForDelivery(parcelUpdate, city);
         }
         updateParcelDestinationForReroute(parcelUpdate, city);
 
@@ -80,6 +80,10 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public void delete(Long parcelId) {
         shipmentRepository.delete(parcelId);
+    }
+
+    private void setPreviousDepartmentForDelivery(ParcelUpdate parcelUpdate, City city) {
+        city.setValue(parcelUpdate.getDestination());
     }
 
     private void updateParcelDestination(ShipmentParcel shipmentParcel, City city) {
