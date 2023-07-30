@@ -7,10 +7,13 @@ import com.warehouse.reroute.domain.port.secondary.Logger;
 import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
 import com.warehouse.reroute.domain.service.RerouteService;
 
+import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 import lombok.AllArgsConstructor;
+
+import java.time.Instant;
 
 @AllArgsConstructor
 public class RerouteTokenPortImpl implements RerouteTokenPort {
@@ -19,7 +22,12 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
 
     private final ParcelReroutePort parcelReroutePort;
 
+    private final RerouteTokenGeneratorService tokenGeneratorService;
+
     private final Logger logger;
+
+    private static final long EXPIRY_TIME = 600L;
+
 
     @Override
     public RerouteToken findByToken(Token token) {
@@ -33,7 +41,18 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
 
     @Override
     public RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest) {
-        return rerouteService.sendReroutingInformation(rerouteRequest);
+        final RerouteToken rerouteToken = buildRerouteTokenFromRequest(rerouteRequest);
+        return rerouteService.createRerouteToken(rerouteToken);
+    }
+
+    private RerouteToken buildRerouteTokenFromRequest(RerouteRequest request) {
+        return RerouteToken.builder()
+                .parcelId(request.getParcelId())
+                .createdDate(Instant.now())
+                .expiryDate(Instant.now().plusSeconds(EXPIRY_TIME))
+                .token(tokenGeneratorService.generate(request.getParcelId(), request.getEmail()))
+                .email(request.getEmail())
+                .build();
     }
 
     @Override

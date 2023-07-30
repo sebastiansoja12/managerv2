@@ -12,6 +12,8 @@ import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.Logger;
 import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
 import com.warehouse.reroute.domain.service.RerouteService;
+import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
+import com.warehouse.reroute.domain.service.RerouteTokenGeneratorServiceImpl;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
@@ -40,13 +42,15 @@ public class RerouteTokenPortImplTest {
 
     private RerouteTokenPortImpl port;
 
+    private final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
+
     private final Integer TOKEN_VALUE = 27150;
 
     private final Long PARCEL_ID = 123456L;
 
     @BeforeEach
     void setup() {
-        port = new RerouteTokenPortImpl(rerouteService, parcelReroutePort, logger);
+        port = new RerouteTokenPortImpl(rerouteService, parcelReroutePort, rerouteTokenGeneratorService, logger);
     }
 
     @Test
@@ -65,7 +69,7 @@ public class RerouteTokenPortImplTest {
                 .build();
 
         final RerouteToken rerouteToken = new RerouteToken(1L, 12345, Instant.now(),
-                Instant.now().plusSeconds(600L), PARCEL_ID);
+                Instant.now().plusSeconds(600L), PARCEL_ID, "");
 
         when(rerouteService.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteToken);
         when(parcelReroutePort.reroute(updateParcelRequest.getParcel(), new ParcelId(PARCEL_ID))).thenReturn(mock(Parcel.class));
@@ -92,7 +96,7 @@ public class RerouteTokenPortImplTest {
                 .build();
 
         final RerouteToken rerouteToken = new RerouteToken(1L, 12345, Instant.now(),
-                Instant.now(), PARCEL_ID);
+                Instant.now(), PARCEL_ID, "");
 
         when(rerouteService.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteToken);
         // when
@@ -151,7 +155,6 @@ public class RerouteTokenPortImplTest {
                 .token(TOKEN_VALUE)
                 .build();
 
-        when(rerouteService.sendReroutingInformation(rerouteRequest)).thenReturn(expectedResponse);
         // when
         final RerouteResponse actualResponse = port.sendReroutingInformation(rerouteRequest);
         // then
