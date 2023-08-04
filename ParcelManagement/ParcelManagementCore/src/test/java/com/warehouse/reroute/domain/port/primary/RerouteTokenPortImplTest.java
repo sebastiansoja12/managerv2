@@ -2,6 +2,7 @@ package com.warehouse.reroute.domain.port.primary;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -146,15 +147,20 @@ public class RerouteTokenPortImplTest {
     @Test
     void shouldSendReroutingInformation() {
         // given
+        final String email = "test.pl";
+
+        // create reroute request
         final RerouteRequest rerouteRequest = new RerouteRequest();
-        rerouteRequest.setEmail("test.pl");
+        rerouteRequest.setEmail(email);
         rerouteRequest.setParcelId(PARCEL_ID);
 
+        // expected response
         final RerouteResponse expectedResponse = RerouteResponse.builder()
                 .parcelId(PARCEL_ID)
                 .token(TOKEN_VALUE)
                 .build();
 
+        when(rerouteService.createRerouteToken(any())).thenReturn(expectedResponse);
         // when
         final RerouteResponse actualResponse = port.sendReroutingInformation(rerouteRequest);
         // then

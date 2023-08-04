@@ -5,6 +5,7 @@
         parcel_id="100001"
         token="12345"
         timeout="2137-05-25 20:23:54"
+        email="test@test.pl"
     />
 
     <reroute_token
@@ -12,6 +13,7 @@
             parcel_id="100001"
             token="54321"
             timeout="2137-05-25 20:23:54"
+            email="test@test.pl"
     />
 
     <reroute_token
@@ -19,6 +21,7 @@
             parcel_id="100001"
             token="21370"
             timeout="2018-05-25 20:23:54"
+            email="test@test.pl"
     />
 
     <shipment

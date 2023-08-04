@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -43,10 +42,10 @@ public class ShipmentIntegrationTest {
     @Autowired
     private ShipmentPort shipmentPort;
 
-    @Mock
+    @Autowired
     private PathFinderServicePort pathFinderServicePort;
 
-    @Mock
+    @Autowired
     private ShipmentService shipmentService;
 
 
@@ -105,12 +104,13 @@ public class ShipmentIntegrationTest {
         final ShipmentRequest request = ShipmentRequest.builder()
                 .parcel(parcel)
                 .build();
+
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then
         final DestinationDepotDeterminationException exception =
                 assertThrows(DestinationDepotDeterminationException.class, executable);
-        assertEquals(expectedToBe("Delivery depot could not be determined"), exception.getMessage());
+		assertEquals(expectedToBe("Delivery depot could not be determined"), exception.getMessage());
     }
 
     private ShipmentParcel createParcel() {
