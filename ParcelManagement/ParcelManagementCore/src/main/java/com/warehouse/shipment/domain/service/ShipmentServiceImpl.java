@@ -28,8 +28,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 	@Override
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
 
-		//final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
-        final City city = new City("Katowice");
+		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
+
         if (city.getValue() == null) {
             throw new DestinationDepotDeterminationException("Delivery depot could not be determined");
 		}
