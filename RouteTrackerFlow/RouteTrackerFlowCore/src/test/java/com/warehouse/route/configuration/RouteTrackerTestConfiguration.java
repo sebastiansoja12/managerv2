@@ -1,7 +1,6 @@
 package com.warehouse.route.configuration;
 
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.depot.api.DepotService;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
@@ -14,9 +13,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = { "com.warehouse.route", "com.warehouse.depot"})
 @EnableJpaRepositories(basePackages = { "com.warehouse.route", "com.warehouse.depot"})
 public class RouteTrackerTestConfiguration {
-
-    @MockBean
-    public DepotService depotService;
 
     @MockBean
     public AuthenticationPort authenticationPort;
