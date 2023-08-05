@@ -1,17 +1,18 @@
 package com.warehouse.shipment.configuration;
 
-import com.warehouse.voronoi.VoronoiService;
-import com.warehouse.depot.api.DepotService;
-import com.warehouse.mail.domain.service.MailService;
-import com.warehouse.paypal.domain.port.primary.PaypalPort;
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
+
+import com.warehouse.depot.domain.port.primary.DepotPort;
+import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.paypal.domain.port.primary.PaypalPort;
+import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
+import com.warehouse.voronoi.VoronoiService;
 
 @ComponentScan(basePackages = { "com.warehouse.shipment" })
 @EntityScan(basePackages = { "com.warehouse.shipment" })
@@ -32,7 +33,7 @@ public class ShipmentTestConfiguration {
     public ShipmentController shipmentController;
 
     @MockBean
-    public DepotService depotService;
+    public DepotPort depotPort;
 
     @MockBean
     public VoronoiService voronoiService;

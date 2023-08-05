@@ -11,11 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.depot.api.DepotService;
 import com.warehouse.depot.api.dto.CoordinatesDto;
 import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.shipment.domain.model.Recipient;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderAdapter;
 import com.warehouse.voronoi.VoronoiService;
 
@@ -26,7 +25,7 @@ public class PathFinderAdapterTest {
     private VoronoiService voronoiService;
     
     @Mock
-    private DepotService depotService;
+    private DepotPort depotPort;
     
     private PathFinderAdapter pathFinderAdapter;
     
@@ -35,7 +34,7 @@ public class PathFinderAdapterTest {
     
     @BeforeEach
     void setup() {
-        pathFinderAdapter = new PathFinderAdapter(voronoiService, depotService);
+        pathFinderAdapter = new PathFinderAdapter(voronoiService, depotPort);
     }
     
     @Test

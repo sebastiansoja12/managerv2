@@ -1,26 +1,41 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
-import com.warehouse.depot.api.DepotService;
+import java.util.List;
+
+import com.warehouse.depot.api.dto.CoordinatesDto;
 import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.depot.domain.model.Depot;
+import com.warehouse.depot.domain.port.primary.DepotPort;
+import com.warehouse.depot.domain.vo.Coordinates;
 import com.warehouse.reroute.domain.model.City;
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.voronoi.VoronoiService;
-import lombok.AllArgsConstructor;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class PathFinderAdapter implements PathFinderServicePort {
 
     private final VoronoiService voronoiService;
 
-    private final DepotService depotService;
+    private final DepotPort depotPort;
 
     @Override
     public City determineNewDeliveryDepot(Parcel parcel) {
-        final List<DepotDto> depots = depotService.findAll();
-        final String cityToDeliver = voronoiService.findFastestRoute(depots, parcel.getRecipient().getCity());
+		final List<Depot> depots = depotPort.findAll();
+		final List<DepotDto> depotsRequest = depots.stream().map(this::prepareDepotRequest).toList();
+        final String cityToDeliver = voronoiService.findFastestRoute(depotsRequest, parcel.getRecipient().getCity());
         return new City(cityToDeliver);
     }
+    
+    private DepotDto prepareDepotRequest(Depot depot) {
+		return new DepotDto(depot.getCity(), depot.getStreet(), depot.getCountry(), depot.getDepotCode(),
+				mapToCoordinatesDto(depot.getCoordinates()));
+    }
+    
+    private CoordinatesDto mapToCoordinatesDto(Coordinates coordinates) {
+        return new CoordinatesDto(coordinates.getLat(), coordinates.getLon());
+    }
+    
 }
