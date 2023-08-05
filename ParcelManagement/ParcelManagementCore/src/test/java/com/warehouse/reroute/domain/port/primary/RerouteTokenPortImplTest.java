@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.warehouse.reroute.domain.enumeration.ParcelType;
 import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
+import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.Logger;
 import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
@@ -104,9 +105,9 @@ public class RerouteTokenPortImplTest {
         final Executable executable = () -> port.update(updateParcelRequest);
 
         // then
-        final RerouteTokenNotFoundException exception =
-                assertThrows(RerouteTokenNotFoundException.class, executable);
-        assertEquals("Reroute token is not valid", exception.getMessage());
+        final RerouteTokenExpiredException exception =
+                assertThrows(RerouteTokenExpiredException.class, executable);
+        assertEquals("Reroute token expired", exception.getMessage());
     }
 
     @Test

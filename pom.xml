@@ -30,6 +30,7 @@
         <module>PositionDetermination</module>
         <module>Generator</module>
 		<module>Properties</module>
+		<module>ExceptionHandler</module>
 	</modules>
 
 	<properties>

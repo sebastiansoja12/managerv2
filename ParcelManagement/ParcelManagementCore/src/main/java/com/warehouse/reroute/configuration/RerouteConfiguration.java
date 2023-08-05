@@ -56,12 +56,6 @@ public class RerouteConfiguration {
 		return new RerouteTokenValidatorServiceImpl(repository);
 	}
 
-	@Bean(name = "reroute.parcelRepository")
-	public ParcelRepository parcelRepository(ParcelShipmentReadRepository repository) {
-		final ParcelMapper parcelMapper = Mappers.getMapper(ParcelMapper.class);
-		return new ParcelRepositoryImpl(parcelMapper, repository);
-	}
-
 	@Bean
 	public ShipmentService shipmentService(ShipmentReroutePort shipmentReroutePort) {
 		final ShipmentRequestMapper requestMapper = Mappers.getMapper(ShipmentRequestMapper.class);

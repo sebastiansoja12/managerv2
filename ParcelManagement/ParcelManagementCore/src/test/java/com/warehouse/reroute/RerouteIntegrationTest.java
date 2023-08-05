@@ -3,6 +3,8 @@ package com.warehouse.reroute;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
+import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -24,10 +26,6 @@ import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.EmailNotFoundException;
 import com.warehouse.reroute.domain.exception.RerouteException;
-import com.warehouse.reroute.domain.model.RerouteParcel;
-import com.warehouse.reroute.domain.model.RerouteParcelRequest;
-import com.warehouse.reroute.domain.model.RerouteRequest;
-import com.warehouse.reroute.domain.model.RerouteResponse;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.vo.Recipient;
 import com.warehouse.reroute.domain.vo.Sender;
@@ -210,7 +208,7 @@ public class RerouteIntegrationTest {
         request.setParcelId(PARCEL_ID);
         request.setEmail(null);
 
-        final String exceptionMessage = "E-Mail cannot be null";
+        final String exceptionMessage = "E-mail cannot be null";
 
         // when
         final Executable executable = () -> rerouteTokenPort.sendReroutingInformation(request);

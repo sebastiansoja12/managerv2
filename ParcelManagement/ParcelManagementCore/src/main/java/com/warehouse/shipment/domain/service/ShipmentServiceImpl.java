@@ -60,12 +60,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public UpdateParcelResponse update(ParcelUpdate parcelUpdate) {
-        //final City city = pathFinderServicePort.determineDeliveryDepot(parcelUpdate);
-        final City city = new City(null);
-        if (city.getValue() == null) {
-            setPreviousDepartmentForDelivery(parcelUpdate, city);
+        final City city = pathFinderServicePort.determineDeliveryDepot(parcelUpdate);
+
+        if (!city.getValue().equals(parcelUpdate.getDestination())) {
+            updateParcelDestinationForReroute(parcelUpdate, city);
         }
-        updateParcelDestinationForReroute(parcelUpdate, city);
 
         final Parcel parcel = shipmentRepository.update(parcelUpdate);
 
@@ -80,10 +79,6 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public void delete(Long parcelId) {
         shipmentRepository.delete(parcelId);
-    }
-
-    private void setPreviousDepartmentForDelivery(ParcelUpdate parcelUpdate, City city) {
-        city.setValue(parcelUpdate.getDestination());
     }
 
     private void updateParcelDestination(ShipmentParcel shipmentParcel, City city) {
