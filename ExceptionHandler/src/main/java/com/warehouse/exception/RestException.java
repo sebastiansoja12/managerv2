@@ -9,12 +9,6 @@ public class RestException extends RuntimeException {
 
     String message;
 
-    public RestException(int code, String exMessage, Exception exception) {
-        super(exMessage, exception);
-        this.code = code;
-        this.message = exMessage;
-    }
-
     public RestException(int code, String exMessage) {
         super(exMessage);
         this.code = code;

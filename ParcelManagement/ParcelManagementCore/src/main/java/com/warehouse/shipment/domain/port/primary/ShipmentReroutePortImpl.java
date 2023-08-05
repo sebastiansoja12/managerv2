@@ -1,15 +1,14 @@
 package com.warehouse.shipment.domain.port.primary;
 
+import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_204;
+
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 import com.warehouse.shipment.domain.model.ParcelUpdate;
 import com.warehouse.shipment.domain.model.UpdateParcelRequest;
 import com.warehouse.shipment.domain.model.UpdateParcelResponse;
 import com.warehouse.shipment.domain.service.ShipmentService;
 
 import lombok.AllArgsConstructor;
-
-import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_204;
 
 @AllArgsConstructor
 public class ShipmentReroutePortImpl implements ShipmentReroutePort {

@@ -1,5 +1,9 @@
 package com.warehouse.reroute.domain.port.primary;
 
+import static com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes.REROUTE_102;
+
+import java.time.Instant;
+
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.RerouteException;
 import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
@@ -8,16 +12,11 @@ import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.Logger;
 import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
 import com.warehouse.reroute.domain.service.RerouteService;
-
 import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
-import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
+
 import lombok.AllArgsConstructor;
-
-import java.time.Instant;
-
-import static com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes.REROUTE_102;
 
 @AllArgsConstructor
 public class RerouteTokenPortImpl implements RerouteTokenPort {
