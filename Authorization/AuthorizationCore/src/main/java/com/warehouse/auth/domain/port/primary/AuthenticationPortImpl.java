@@ -1,6 +1,12 @@
 package com.warehouse.auth.domain.port.primary;
 
+import com.warehouse.auth.domain.service.JwtService;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
@@ -17,12 +23,27 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     private final AuthenticationService authenticationService;
 
     private final PasswordEncoder passwordEncoder;
+    
+    private final AuthenticationManager authenticationManager;
+
+    private final JwtService jwtService;
 
 
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
+		final Authentication authenticate = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        return AuthenticationResponse.builder().build();
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+
+        final String authenticationToken = jwtService.generateToken((UserDetails) authenticate.getDetails());
+
+        final LoginResponse loginResponse = authenticationService.login(authenticate);
+
+        return AuthenticationResponse.builder()
+                .authenticationToken(authenticationToken)
+                .refreshToken(loginResponse.getRefreshToken().getValue())
+                .build();
     }
 
     @Override

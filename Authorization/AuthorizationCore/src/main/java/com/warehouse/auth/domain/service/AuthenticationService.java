@@ -9,4 +9,6 @@ import java.util.List;
 public interface AuthenticationService {
 
     RegisterResponse register(User user);
+
+    LoginResponse login(Authentication authentication);
 }

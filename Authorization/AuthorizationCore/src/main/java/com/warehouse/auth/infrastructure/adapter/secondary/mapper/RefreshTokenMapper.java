@@ -9,4 +9,5 @@ import org.mapstruct.Mapper;
 public interface RefreshTokenMapper {
 
     RefreshToken map(RefreshTokenEntity refreshToken);
+    RefreshTokenEntity map(RefreshToken refreshToken);
 }
