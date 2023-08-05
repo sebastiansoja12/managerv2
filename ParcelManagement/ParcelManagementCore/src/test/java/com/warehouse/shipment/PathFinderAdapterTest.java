@@ -5,14 +5,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import com.warehouse.dto.CoordinatesDto;
+import com.warehouse.dto.DepotDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.depot.api.dto.CoordinatesDto;
-import com.warehouse.depot.api.dto.DepotDto;
+
 import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.shipment.domain.model.Recipient;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderAdapter;

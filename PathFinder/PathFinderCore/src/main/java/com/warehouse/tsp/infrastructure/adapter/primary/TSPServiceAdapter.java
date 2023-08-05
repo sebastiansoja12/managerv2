@@ -1,6 +1,6 @@
 package com.warehouse.tsp.infrastructure.adapter.primary;
 
-import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.dto.DepotDto;
 import com.warehouse.tsp.TSPService;
 import com.warehouse.tsp.domain.model.Depot;
 import com.warehouse.tsp.domain.port.primary.TravellingSalesManPort;

@@ -2,11 +2,11 @@ package com.warehouse.reroute.infrastructure.adapter.secondary;
 
 import java.util.List;
 
-import com.warehouse.depot.api.dto.CoordinatesDto;
-import com.warehouse.depot.api.dto.DepotDto;
 import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.depot.domain.vo.Coordinates;
+import com.warehouse.dto.CoordinatesDto;
+import com.warehouse.dto.DepotDto;
 import com.warehouse.reroute.domain.model.City;
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.port.secondary.PathFinderServicePort;

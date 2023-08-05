@@ -9,16 +9,13 @@
         <version>2023.8-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
-    <artifactId>PathFinderApi</artifactId>
-
     <dependencies>
         <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>DepotServicesApi</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
-
+    <artifactId>PathFinderApi</artifactId>
 
 
 </project>

@@ -1,7 +1,6 @@
 package com.warehouse.voronoi.domain.service;
 
 import com.warehouse.voronoi.domain.model.Coordinates;
-import com.warehouse.depot.api.dto.DepotDto;
 import com.warehouse.voronoi.domain.model.Depot;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

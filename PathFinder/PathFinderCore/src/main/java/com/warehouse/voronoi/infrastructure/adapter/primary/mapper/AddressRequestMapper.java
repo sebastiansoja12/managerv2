@@ -1,8 +1,8 @@
 package com.warehouse.voronoi.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.dto.CoordinatesDto;
+import com.warehouse.dto.DepotDto;
 import com.warehouse.voronoi.domain.model.Coordinates;
-import com.warehouse.depot.api.dto.CoordinatesDto;
 import com.warehouse.voronoi.domain.model.Depot;
 import org.mapstruct.Mapper;
 

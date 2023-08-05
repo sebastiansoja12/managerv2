@@ -1,23 +1,25 @@
 package com.warehouse.tsp;
 
-import com.warehouse.depot.api.dto.CoordinatesDto;
-import com.warehouse.depot.api.dto.DepotDto;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
+
+import java.util.List;
+
+import com.warehouse.dto.CoordinatesDto;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.warehouse.dto.DepotDto;
 import com.warehouse.tsp.domain.model.Coordinates;
 import com.warehouse.tsp.domain.model.Depot;
 import com.warehouse.tsp.domain.port.primary.TravellingSalesManPort;
 import com.warehouse.tsp.infrastructure.adapter.primary.TSPServiceAdapter;
 import com.warehouse.tsp.infrastructure.adapter.primary.mapper.TSPRequestMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-
+@ExtendWith(MockitoExtension.class)
 public class TSPServiceAdapterTest {
 
     @Mock
@@ -29,7 +31,6 @@ public class TSPServiceAdapterTest {
     private TSPServiceAdapter tspServiceAdapter;
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
         tspServiceAdapter = new TSPServiceAdapter(requestMapper, travellingSalesManPort);
     }
 

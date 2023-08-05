@@ -1,7 +1,8 @@
 package com.warehouse.star.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.depot.api.dto.CoordinatesDto;
-import com.warehouse.depot.api.dto.DepotDto;
+
+import com.warehouse.dto.CoordinatesDto;
+import com.warehouse.dto.DepotDto;
 import com.warehouse.star.domain.model.Coordinates;
 import com.warehouse.star.domain.model.Depot;
 import org.mapstruct.Mapper;
