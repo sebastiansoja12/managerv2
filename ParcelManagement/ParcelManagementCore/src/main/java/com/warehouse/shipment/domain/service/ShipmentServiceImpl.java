@@ -1,5 +1,8 @@
 package com.warehouse.shipment.domain.service;
 
+import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_201;
+import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_202;
+
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
@@ -31,7 +34,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
 
         if (city.getValue() == null) {
-            throw new DestinationDepotDeterminationException("Delivery depot could not be determined");
+            throw new DestinationDepotDeterminationException(SHIPMENT_202);
 		}
 
         updateParcelDestination(shipmentParcel, city);
@@ -45,7 +48,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         logPayment(paymentStatus, parcel);
 
 		if (paymentStatus.getLink().isEmpty()) {
-			throw new ShipmentPaymentException("URL for payment has not been generated");
+			throw new ShipmentPaymentException(SHIPMENT_201);
 		}
 
 		final Notification notification = notificationCreatorProvider.createNotification(parcel,

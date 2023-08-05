@@ -1,11 +1,11 @@
 package com.warehouse.shipment.domain.exception;
 
-public class DestinationDepotDeterminationException extends RuntimeException {
-    public DestinationDepotDeterminationException(String exMessage, Exception exception) {
-        super(exMessage, exception);
-    }
+import com.warehouse.exception.RestException;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 
-    public DestinationDepotDeterminationException(String exMessage) {
-        super(exMessage);
+public class DestinationDepotDeterminationException extends RestException {
+
+    public DestinationDepotDeterminationException(ShipmentExceptionCodes code) {
+        super(code.getCode(), code.getMessage());
     }
 }

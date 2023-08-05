@@ -1,12 +1,11 @@
 package com.warehouse.shipment.domain.exception;
 
-public class ShipmentPaymentException extends RuntimeException {
+import com.warehouse.exception.RestException;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 
-    public ShipmentPaymentException(String exMessage, Exception exception) {
-        super(exMessage, exception);
-    }
+public class ShipmentPaymentException extends RestException {
 
-    public ShipmentPaymentException(String exMessage) {
-        super(exMessage);
+    public ShipmentPaymentException(ShipmentExceptionCodes code) {
+        super(code.getCode(), code.getMessage());
     }
 }

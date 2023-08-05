@@ -1,11 +1,11 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.ParcelUpdate;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
 
 import lombok.AllArgsConstructor;

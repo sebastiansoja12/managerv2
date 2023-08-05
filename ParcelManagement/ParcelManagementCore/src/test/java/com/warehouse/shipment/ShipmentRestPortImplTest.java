@@ -3,7 +3,7 @@ package com.warehouse.shipment;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
-import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.port.primary.ShipmentRestPort;
 import org.junit.jupiter.api.Test;

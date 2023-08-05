@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.port.primary;
 
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.shipment.domain.enumeration.ParcelType;
@@ -26,7 +27,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ShipmentParcel parcel = extractParcelFromRequest(request);
 
         if (ObjectUtils.isEmpty(parcel)) {
-            throw new ParcelNotFoundException("Parcel not found in request");
+            throw new ParcelNotFoundException(ShipmentExceptionCodes.SHIPMENT_204);
         }
 
         logParcelShipment(parcel);
