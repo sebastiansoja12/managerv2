@@ -41,7 +41,7 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
-    private final RsaKeyProperties rsaKeyProperties;
+    //private final RsaKeyProperties rsaKeyProperties;
 
     // TODO create api urls for every rest api in app
     @Bean
@@ -79,6 +79,7 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(rsaKeyProperties.publicKey()).build();
@@ -92,4 +93,5 @@ public class SecurityConfiguration {
         final JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
+    **/
 }

@@ -1,10 +1,10 @@
 package com.warehouse.shipment;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
-import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +14,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
+import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ContextConfiguration(classes = ShipmentTestConfiguration.class)
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class })
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ShipmentRepositoryImplTest {
 
