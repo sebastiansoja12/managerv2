@@ -1,6 +1,6 @@
 package com.warehouse.voronoi.infrastructure.adapter.primary;
 
-import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.dto.DepotDto;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPort;

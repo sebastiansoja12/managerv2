@@ -45,3 +45,13 @@ recipient_telephone varchar(255) DEFAULT NULL,
 parcel_size varchar(255) DEFAULT NULL,
 primary key (id)
 );
+CREATE TABLE IF NOT EXISTS DEPOT (
+    id bigint NOT NULL,
+    depot_code varchar(255) default null,
+    street varchar(255) default null,
+    country varchar(255) default null,
+    city varchar(255) default null,
+    lat bigint default null,
+    lon bigint default null,
+    primary key(id)
+);

@@ -38,7 +38,6 @@ public class RefreshTokenEntity {
     @Column(nullable = false)
     public boolean expired;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    public UserEntity user;
+    @Column(nullable = false)
+    public Long userId;
 }

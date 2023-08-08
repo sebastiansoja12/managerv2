@@ -1,23 +1,26 @@
 package com.warehouse.voronoi;
 
-import com.warehouse.voronoi.domain.exception.MissingDepotsException;
-import com.warehouse.voronoi.domain.exception.MissingRequestCityException;
-import com.warehouse.voronoi.domain.model.Depot;
-import com.warehouse.voronoi.domain.port.primary.VoronoiPortImpl;
-import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.warehouse.voronoi.DepotInMemoryData.buildDepots;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.warehouse.voronoi.domain.exception.MissingDepotsException;
+import com.warehouse.voronoi.domain.exception.MissingRequestCityException;
+import com.warehouse.voronoi.domain.model.Depot;
+import com.warehouse.voronoi.domain.port.primary.VoronoiPortImpl;
+import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
+
+@ExtendWith(MockitoExtension.class)
 public class VoronoiPortImplTest {
 
 
@@ -28,7 +31,6 @@ public class VoronoiPortImplTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
         voronoiPort = new VoronoiPortImpl(voronoiServicePort);
     }
 

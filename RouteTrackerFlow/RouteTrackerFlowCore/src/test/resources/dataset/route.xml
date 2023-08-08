@@ -39,6 +39,8 @@
         street="Test"
         country="Test"
         depot_code="TST"
+        lat="20"
+        lon="20"
     />
 
     <supplier

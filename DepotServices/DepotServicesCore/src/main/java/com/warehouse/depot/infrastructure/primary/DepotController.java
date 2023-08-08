@@ -1,9 +1,9 @@
 package com.warehouse.depot.infrastructure.primary;
 
-import com.warehouse.depot.api.DepotService;
-import com.warehouse.depot.api.dto.DepotCodeDto;
-import com.warehouse.depot.api.dto.DepotDto;
-import com.warehouse.depot.api.dto.DepotIdDto;
+import com.warehouse.depot.domain.model.Depot;
+import com.warehouse.depot.domain.model.DepotCode;
+import com.warehouse.depot.domain.model.DepotId;
+import com.warehouse.depot.domain.port.primary.DepotPort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,34 +16,34 @@ import java.util.List;
 @AllArgsConstructor
 public class DepotController {
 
-    private final DepotService depotService;
+    private final DepotPort depotPort;
 
     @PostMapping("/save")
-    public ResponseEntity<?> add(@RequestBody DepotDto depot) {
-        depotService.add(depot);
+    public ResponseEntity<?> add(@RequestBody Depot depot) {
+        depotPort.add(depot);
         return ResponseEntity.ok().body(HttpStatus.OK);
     }
 
     @PostMapping("/save/multiple")
-    public ResponseEntity<?> add(@RequestBody List<DepotDto> depots) {
-        depotService.addMultipleDepots(depots);
+    public ResponseEntity<?> add(@RequestBody List<Depot> depots) {
+        depotPort.addMultipleDepots(depots);
         return ResponseEntity.ok().body(HttpStatus.OK);
     }
 
     @GetMapping("/depotId/{value}")
-    public ResponseEntity<?> viewDepotById(DepotIdDto depotId) {
-        final DepotDto depot = depotService.viewDepotById(depotId);
+    public ResponseEntity<?> viewDepotById(DepotId depotId) {
+        final Depot depot = depotPort.viewDepotById(depotId);
         return ResponseEntity.status(HttpStatus.FOUND).body(depot);
     }
 
     @GetMapping("/depotCode/{value}")
-    public ResponseEntity<?> viewDepotByCode(DepotCodeDto depotCode) {
-        final DepotDto depot = depotService.viewDepotByCode(depotCode);
+    public ResponseEntity<?> viewDepotByCode(DepotCode depotCode) {
+        final Depot depot = depotPort.viewDepotByCode(depotCode);
         return ResponseEntity.status(HttpStatus.FOUND).body(depot);
     }
 
     @GetMapping("/all")
     public ResponseEntity<?> allDepots() {
-        return ResponseEntity.status(HttpStatus.FOUND).body(depotService.findAll());
+        return ResponseEntity.status(HttpStatus.FOUND).body(depotPort.findAll());
     }
 }

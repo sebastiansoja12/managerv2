@@ -8,7 +8,6 @@ import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType
 import lombok.AllArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
 
 
 @AllArgsConstructor
@@ -24,7 +23,7 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     @Override
     public String save(UserEntity userEntity, String token) {
         final RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
-                .user(userEntity)
+                .userId(userEntity.getId())
                 .tokenType(TokenType.BEARER)
                 .createdDate(Instant.now())
                 .expired(false)

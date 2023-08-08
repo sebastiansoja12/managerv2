@@ -1,7 +1,7 @@
 package com.warehouse.star.infrastructure.adapter.primary;
 
-import com.warehouse.depot.api.dto.CoordinatesDto;
-import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.dto.CoordinatesDto;
+import com.warehouse.dto.DepotDto;
 import com.warehouse.star.StarService;
 import com.warehouse.star.domain.model.Coordinates;
 import com.warehouse.star.domain.model.Depot;

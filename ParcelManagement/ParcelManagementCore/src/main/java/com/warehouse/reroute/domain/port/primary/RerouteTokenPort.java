@@ -1,16 +1,15 @@
 package com.warehouse.reroute.domain.port.primary;
 
 import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
+import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 
 public interface RerouteTokenPort {
 
-    ParcelUpdateResponse update(UpdateParcelRequest request);
-
     RerouteToken findByToken(Token token);
 
-    RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId);
+    RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId);
 
     RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest);
+
+    RerouteParcelResponse update(RerouteParcelRequest request);
 }

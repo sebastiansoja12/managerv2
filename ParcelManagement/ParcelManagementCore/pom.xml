@@ -6,13 +6,18 @@
     <parent>
         <artifactId>ParcelManagement</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2023.7-SNAPSHOT</version>
+        <version>2023.8-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
 
     <artifactId>ParcelManagementCore</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>DepotServicesCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>ParcelManagementApi</artifactId>
@@ -36,6 +41,13 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>RouteTrackerFlowApi</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ExceptionHandler</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

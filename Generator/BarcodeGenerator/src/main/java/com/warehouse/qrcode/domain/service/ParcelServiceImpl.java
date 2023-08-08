@@ -2,6 +2,7 @@ package com.warehouse.qrcode.domain.service;
 
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.domain.port.primary.ShipmentRestPort;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,14 +14,14 @@ import java.text.SimpleDateFormat;
 @Slf4j
 public class ParcelServiceImpl implements ParcelService {
 
-    private final ShipmentPort shipmentPort;
+    private final ShipmentRestPort shipmentRestPort;
 
     private final ParcelExportService parcelExportService;
 
     @Override
     public void exportParcelToPdfById(HttpServletResponse response, Long id) throws Exception {
         log.info("Request label generate has been recorded for parcel: {}", id);
-        final Parcel parcel = shipmentPort.loadParcel(id);
+        final Parcel parcel = shipmentRestPort.loadParcel(id);
         response.setContentType("application/pdf");
         final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         final String currentDateTime = dateFormatter.format(new java.util.Date());

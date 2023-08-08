@@ -1,25 +1,24 @@
 package com.warehouse.tsp;
 
-import com.warehouse.tsp.domain.exception.MissingDepotsException;
-import com.warehouse.tsp.domain.model.Depot;
-import com.warehouse.tsp.domain.port.primary.TravellingSalesManPort;
-import com.warehouse.tsp.domain.port.primary.TravellingSalesManPortImpl;
-import com.warehouse.tsp.domain.port.secondary.SalesManServicePort;
+import static com.warehouse.tsp.DepotInMemoryData.depots;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.warehouse.tsp.DepotInMemoryData.depots;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import com.warehouse.tsp.domain.exception.MissingDepotsException;
+import com.warehouse.tsp.domain.model.Depot;
+import com.warehouse.tsp.domain.port.primary.TravellingSalesManPortImpl;
+import com.warehouse.tsp.domain.port.secondary.SalesManServicePort;
 
 @ExtendWith(MockitoExtension.class)
 public class TravellingSalesManPortImplTest {
@@ -30,7 +29,6 @@ public class TravellingSalesManPortImplTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
         travellingSalesManPort = new TravellingSalesManPortImpl(salesManServicePort);
     }
 

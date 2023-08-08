@@ -1,15 +1,17 @@
 package com.warehouse.shipment.mapper;
 
-import com.warehouse.shipment.domain.enumeration.Size;
-import com.warehouse.shipment.domain.enumeration.Status;
-import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapperImpl;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.model.ShipmentParcel;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapperImpl;
 
 public class ParcelMapperTest {
 
@@ -24,7 +26,7 @@ public class ParcelMapperTest {
     @Test
     void shouldMapFromParcelToEntity() {
         // given
-        final Parcel parcel = createParcel();
+        final ShipmentParcel parcel = createParcel();
 
         // when
         final ParcelEntity parcelEntity = mapper.map(parcel);
@@ -54,10 +56,9 @@ public class ParcelMapperTest {
         // and status is enum type CREATED
         assertThat(parcel.getStatus()).isEqualTo(Status.CREATED);
     }
-    private Parcel createParcel() {
-        return Parcel.builder()
+    private ShipmentParcel createParcel() {
+        return ShipmentParcel.builder()
                 .parcelSize(Size.TEST)
-                .id(1L)
                 .price(20)
                 .destination("KT1")
                 .status(Status.CREATED)

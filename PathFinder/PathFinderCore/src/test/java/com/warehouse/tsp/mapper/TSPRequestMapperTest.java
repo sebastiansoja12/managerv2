@@ -1,6 +1,6 @@
 package com.warehouse.tsp.mapper;
 
-import com.warehouse.depot.api.dto.DepotDto;
+import com.warehouse.dto.DepotDto;
 import com.warehouse.tsp.domain.model.Depot;
 import com.warehouse.tsp.infrastructure.adapter.primary.mapper.TSPRequestMapper;
 import com.warehouse.tsp.infrastructure.adapter.primary.mapper.TSPRequestMapperImpl;

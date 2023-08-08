@@ -1,11 +1,10 @@
 package com.warehouse.shipment.domain.exception;
 
-public class ParcelNotFoundException extends RuntimeException {
-    public ParcelNotFoundException(String exMessage, Exception exception) {
-        super(exMessage, exception);
-    }
+import com.warehouse.exception.RestException;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 
-    public ParcelNotFoundException(String exMessage) {
-        super(exMessage);
+public class ParcelNotFoundException extends RestException {
+    public ParcelNotFoundException(ShipmentExceptionCodes code) {
+        super(code.getCode(), code.getMessage());
     }
 }
