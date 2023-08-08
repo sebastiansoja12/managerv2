@@ -77,7 +77,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 try {
                     chain.doFilter(req, res);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn(e.getMessage());
                 }
             } else {
                 log.info("Pre-flight");

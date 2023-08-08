@@ -6,11 +6,10 @@ import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
-import lombok.AllArgsConstructor;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class AuthenticationRepositoryImpl implements UserRepository {
@@ -51,5 +50,11 @@ public class AuthenticationRepositoryImpl implements UserRepository {
     @Override
     public void logout(String token) {
         refreshTokenReadRepository.deleteByToken(token);
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return repository.findByUsername(username).map(userMapper::map).orElseThrow(
+                () -> new UserNotFoundException("User was not found"));
     }
 }

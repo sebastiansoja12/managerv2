@@ -65,6 +65,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     @Override
+    public User findUser(String username) {
+        return authenticationService.findUser(username);
+    }
+
+    @Override
     public void logout(RefreshTokenRequest refreshTokenRequest) {
         log.info("Token of user: " + refreshTokenRequest.getUsername() + " has been successfully deleted" +
                 ". Logging out");

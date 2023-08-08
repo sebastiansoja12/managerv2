@@ -1,14 +1,16 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.model.*;
-import com.warehouse.auth.domain.vo.AuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import java.util.List;
+import com.warehouse.auth.domain.model.LoginResponse;
+import com.warehouse.auth.domain.model.RegisterResponse;
+import com.warehouse.auth.domain.model.User;
 
 public interface AuthenticationService {
 
     RegisterResponse register(User user);
 
     LoginResponse login(Authentication authentication);
+
+    User findUser(String username);
 }

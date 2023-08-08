@@ -29,15 +29,18 @@ public class RefreshTokenEntity {
     @Column(nullable = false)
     private Instant createdDate;
 
+    @Column(nullable = false)
+    private Instant expiryDate;
+
     @Enumerated(EnumType.STRING)
-    public TokenType tokenType = TokenType.BEARER;
+    private TokenType tokenType = TokenType.BEARER;
 
     @Column(nullable = false)
-    public boolean revoked;
+    private boolean revoked;
 
     @Column(nullable = false)
-    public boolean expired;
+    private boolean expired;
 
     @Column(nullable = false)
-    public Long userId;
+    private String username;
 }

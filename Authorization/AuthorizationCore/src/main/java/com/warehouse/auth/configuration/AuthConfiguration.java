@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -18,10 +17,16 @@ import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.AuthenticationService;
+import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationRepositoryImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenRepositoryImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
 
 import jakarta.servlet.ServletException;
@@ -34,9 +39,9 @@ public class AuthConfiguration  {
 
 	@Bean
 	public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
-			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
-		return new AuthenticationPortImpl(authenticationService, passwordEncoder);
-    }
+			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService) {
+		return new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager, jwtService);
+	}
 
 	@Bean
 	public UserRepository userRepository(AuthenticationReadRepository repository,
@@ -47,7 +52,8 @@ public class AuthConfiguration  {
 
     @Bean
     public RefreshTokenRepository refreshTokenRepository(RefreshTokenReadRepository repository) {
-        return new RefreshTokenRepositoryImpl(repository);
+        final RefreshTokenMapper refreshTokenMapper = Mappers.getMapper(RefreshTokenMapper.class);
+        return new RefreshTokenRepositoryImpl(repository, refreshTokenMapper);
     }
 
     @Bean
@@ -86,4 +92,16 @@ public class AuthConfiguration  {
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+
+    // request and response mappers
+    @Bean(name = "authentication.requestMapper")
+    public AuthenticationRequestMapper requestMapper() {
+        return new AuthenticationRequestMapperImpl();
+    }
+
+    @Bean(name = "authentication.responseMapper")
+    public AuthenticationResponseMapper responseMapper() {
+        return new AuthenticationResponseMapperImpl();
+    }
+
 }

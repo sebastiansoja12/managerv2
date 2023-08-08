@@ -1,47 +1,52 @@
 package com.warehouse.auth;
 
-import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.domain.model.RegisterRequest;
-import com.warehouse.auth.domain.model.RegisterResponse;
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
-import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.service.AuthenticationService;
-import com.warehouse.auth.domain.service.AuthenticationServiceImpl;
-import com.warehouse.auth.domain.vo.UserResponse;
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import com.warehouse.auth.domain.exception.AuthenticationErrorException;
+import com.warehouse.auth.domain.model.RegisterRequest;
+import com.warehouse.auth.domain.model.RegisterResponse;
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
+import com.warehouse.auth.domain.service.AuthenticationService;
+import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.vo.UserResponse;
+import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationPortImplTest {
 
 
+    @Mock
+    private AuthenticationService authenticationService;
+    
+    @Mock
+    private AuthenticationManager authenticationManager;
+    
+    @Mock
+    private JwtService jwtService;
+
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private AuthenticationPortImpl authenticationPort;
 
-    @Mock
-    private AuthenticationService authenticationService;
-
-
-
-    @BeforeEach
-    void setup() {
-        authenticationPort = new AuthenticationPortImpl(authenticationService, passwordEncoder);
-    }
+	@BeforeEach
+	void setup() {
+		authenticationPort = new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager,
+				jwtService);
+	}
 
     @Test
     void shouldSignUpUser() {
@@ -89,7 +94,7 @@ public class AuthenticationPortImplTest {
                 "Test",
                 Role.USER.name(),
                 "TST"
-        );;
+        );
         // when
         final Executable executable = () -> authenticationPort.signup(request);
         // then

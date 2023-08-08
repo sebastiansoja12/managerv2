@@ -10,4 +10,6 @@ import java.time.Instant;
 public class RefreshToken {
     String token;
     Instant createdDate;
+    Instant expiryDate;
+    String username;
 }
