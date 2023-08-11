@@ -3,14 +3,15 @@ package com.warehouse.auth.domain.filter;
 
 import java.io.IOException;
 
+import com.warehouse.auth.domain.model.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
 
@@ -27,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
-    private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
 	private final RefreshTokenReadRepository refreshTokenReadRepository;
 
@@ -38,6 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		final String jwt;
 		final String username;
 
+		if (request.getServletPath().contains("/v2/api/auth")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
 			return;
@@ -47,12 +53,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		username = jwtService.extractUsername(authHeader);
 
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			final UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+			final User user = this.userRepository.findByUsername(username);
 			final var isTokenValid = refreshTokenReadRepository.findByToken(jwt)
 					.map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
-			if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
+			if (jwtService.isTokenValid(jwt, user) && isTokenValid) {
 				final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
+						user, null, null);
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authToken);
 			}

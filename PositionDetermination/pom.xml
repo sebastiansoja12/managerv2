@@ -38,6 +38,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
             </resource>
         </resources>
     </build>

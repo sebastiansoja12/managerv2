@@ -2,49 +2,45 @@ package com.warehouse.auth;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.JwtServiceImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.common.util.StringUtils;
 
+
 public class JwtServiceTest {
 
-    private final JwtProvider jwtProvider = new JwtProvider();
+    private JwtProvider jwtProvider;
 
     private JwtService jwtService;
 
-
     @BeforeEach
     void setup() {
+        jwtProvider = new JwtProvider();
         jwtService = new JwtServiceImpl(jwtProvider);
     }
 
     @Test
     void shouldGenerateToken() {
         // given
-        final Map<String, Object> extraClaims = new HashMap<>();
-        final UserEntity user = UserEntity.builder()
+        final User user = User.builder()
                 .depotCode("TST")
                 .email("test@test.pl")
                 .firstName("Test")
                 .lastName("Test")
-                .role(Role.ADMIN)
-                .id(1L)
+                .role(Role.ADMIN.name())
                 .username("test")
                 .build();
         // when
-        final String jwtToken = jwtService.generateToken(extraClaims, user);
+        final String jwtToken = jwtService.generateToken(user);
         // then
         assertTrue(StringUtils.isNotEmpty(jwtToken));
         assertTrue(jwtToken.startsWith("eyJhbGciOiJIUzI1NiJ9"));
@@ -53,13 +49,12 @@ public class JwtServiceTest {
     @Test
     void shouldCheckIfTokenIsValid() {
         // given
-        final UserEntity user = UserEntity.builder()
+        final User user = User.builder()
                 .depotCode("TST")
                 .email("test@test.pl")
                 .firstName("Test")
                 .lastName("Test")
-                .role(Role.ADMIN)
-                .id(1L)
+                .role(Role.ADMIN.name())
                 .username("test")
                 .build();
 
@@ -78,13 +73,12 @@ public class JwtServiceTest {
     @Test
     void shouldTokenBeInvalid() {
         // given
-        final UserEntity user = UserEntity.builder()
+        final User user = User.builder()
                 .depotCode("TST")
                 .email("test@test.pl")
                 .firstName("Test")
                 .lastName("Test")
-                .role(Role.ADMIN)
-                .id(1L)
+                .role(Role.ADMIN.name())
                 .username("fake")
                 .build();
 

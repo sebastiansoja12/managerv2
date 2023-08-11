@@ -6,9 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
 
 import io.jsonwebtoken.Claims;
@@ -20,7 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
 @AllArgsConstructor
-@Service
 public class JwtServiceImpl implements JwtService {
 
 
@@ -36,26 +33,30 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims, User user, Long expiration) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     @Override
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(User user) {
+        final Map<String, Object> claimsMap = new HashMap<>();
+        claimsMap.put("firstName", user.getFirstName());
+        claimsMap.put("role", user.getRole());
+        final Long expiration = 360000L;
+        return generateToken(claimsMap, user, expiration);
     }
 
     @Override
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, User user) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(user.getUsername())) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -81,7 +82,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSigningKey() {
-        final byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        final byte[] keyBytes = Decoders.BASE64.decode(String.valueOf(jwtProvider.getSecretKey()));
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

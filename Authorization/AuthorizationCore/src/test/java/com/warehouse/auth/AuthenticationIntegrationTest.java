@@ -1,11 +1,9 @@
 package com.warehouse.auth;
 
-
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.auth.configuration.AuthTestConfiguration;
-import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
+import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,38 +14,23 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ContextConfiguration(classes = AuthTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DatabaseSetup("/dataset/refresh_token.xml")
-public class RefreshTokenReadRepositoryTest {
+@DatabaseSetup("/dataset/user_repository.xml")
+public class AuthenticationIntegrationTest {
 
     @Autowired
-    private RefreshTokenReadRepository repository;
+    private AuthenticationPort authenticationPort;
 
     @Test
-    void shouldFindByToken() {
+    void shouldLoginUser() {
         // given
-        final String token = "12345";
-        // when
-        final Optional<RefreshTokenEntity> refreshToken = repository.findByToken(token);
-        // then
-        assertTrue(refreshToken.isPresent());
-    }
 
-    @Test
-    void shouldNotFindByToken() {
-        // given
-        final String token = "0";
         // when
-        final Optional<RefreshTokenEntity> refreshToken = repository.findByToken(token);
+
         // then
-        assertTrue(refreshToken.isEmpty());
     }
 }

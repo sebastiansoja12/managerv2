@@ -1,6 +1,8 @@
 package com.warehouse.auth.domain.service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
 import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
@@ -21,7 +23,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     
     private final RefreshTokenRepository refreshTokenRepository;
 
-    private final Long EXPIRY_TIME = 600L;
+    private final Long EXPIRY_TIME = 6000L;
 
     @Override
     public RegisterResponse register(User user) {
@@ -30,12 +32,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public LoginResponse login(Authentication authentication) {
+    public LoginResponse login(User user) {
 		final RefreshToken refreshToken = RefreshToken.builder()
                 .createdDate(Instant.now())
-                .expiryDate(Instant.now().plusSeconds(EXPIRY_TIME))
+                .expiryDate(Instant.now().plus(ChronoUnit.HALF_DAYS.getDuration()))
 				.token(UUID.randomUUID().toString())
-                .username(authentication.getName())
+                .username(user.getUsername())
                 .build();
 		final Token token = refreshTokenRepository.save(refreshToken);
 		return new LoginResponse(token);

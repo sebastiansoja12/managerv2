@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -15,71 +16,69 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.warehouse.auth.domain.filter.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity
-@Slf4j
-@CrossOrigin
+@EnableConfigurationProperties(RsaKeyProperties.class)
 public class SecurityConfiguration {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationFilter authenticationFilter;
     private final LogoutHandler logoutHandler;
-    //private final RsaKeyProperties rsaKeyProperties;
+    private final RsaKeyProperties rsaKeyProperties;
 
     // TODO create api urls for every rest api in app
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest()
+                        .permitAll())
+                .csrf(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
+
+    public SecurityFilterChain securityFilterChaisn(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorization -> authorization.requestMatchers(
+                .authorizeHttpRequests(requests -> requests.requestMatchers(
+                        "/v2/api-docs",
                         "/swagger-resources",
                         "/swagger-resources/**",
                         "/configuration/ui",
                         "/configuration/security",
                         "/swagger-ui/**",
                         "/webjars/**",
-                        "/swagger-ui.html"
-                ).authenticated());
-
-
-        http
-                .authorizeHttpRequests(request -> request.requestMatchers("/v2/api/depots/all").access(
-                                new WebExpressionAuthorizationManager("isAnonymous()")).anyRequest()
-                        .anonymous()
-                );
-
-        http
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http
-                .logout(logout -> logout.addLogoutHandler(logoutHandler).logoutUrl("/v2/api/auth/logout"));
-
+                        "/swagger-ui.html",
+                        "/v2/api/depots/**",
+                        "/v2/api/suppliers/**",
+                        "/v2/api/routes/**",
+                        "/v2/api/auth/**"
+                ).permitAll()).csrf(AbstractHttpConfigurer::disable);
         http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
+        http
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout.logoutUrl("/v2/api/auth/logout").addLogoutHandler(logoutHandler)
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
 
         return http.build();
     }
 
-    /**
+
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(rsaKeyProperties.publicKey()).build();
@@ -93,5 +92,5 @@ public class SecurityConfiguration {
         final JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
-    **/
+
 }

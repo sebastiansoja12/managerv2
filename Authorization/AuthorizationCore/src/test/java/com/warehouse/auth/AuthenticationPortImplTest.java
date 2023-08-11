@@ -3,7 +3,7 @@ package com.warehouse.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,18 +12,19 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.domain.model.RegisterRequest;
-import com.warehouse.auth.domain.model.RegisterResponse;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationPortImplTest {
@@ -45,7 +46,7 @@ public class AuthenticationPortImplTest {
 	@BeforeEach
 	void setup() {
 		authenticationPort = new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager,
-				jwtService);
+                jwtService);
 	}
 
     @Test
@@ -71,6 +72,74 @@ public class AuthenticationPortImplTest {
                 () -> assertThat(registerResponse.getUserRegisterResponse().getId()).isNotNull()
         );
     }
+
+    @Test
+    void shouldLogin() {
+        // given
+        final String authenticationToken = "authenticationToken";
+        final LoginRequest loginRequest = new LoginRequest("s-soja", "test");
+        final LoginResponse loginResponse = new LoginResponse(new Token(authenticationToken));
+        final Authentication authentication = new UsernamePasswordAuthenticationToken("s-soja", "test");
+        final UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+
+        final User userDetails = User.builder()
+                .username("s-soja")
+                .firstName("Sebastian")
+                .lastName("Soja")
+                .depotCode("TST")
+                .email("sebastian5152@wp.pl")
+                .password("test")
+                .role(Role.USER.name())
+                .build();
+
+        doReturn(authentication)
+                .when(authenticationManager)
+                .authenticate(usernamePasswordAuthenticationToken);
+
+        doReturn(userDetails)
+                .when(authenticationService)
+                .findUser("s-soja");
+
+        doReturn(loginResponse)
+                .when(authenticationService)
+                .login(userDetails);
+        // when
+        final AuthenticationResponse response = authenticationPort.login(loginRequest);
+
+        // then
+		assertTrue(response.getAuthenticationToken().startsWith("eyJhbGciOiJIUzI1NiJ9"));
+
+        // check if generated refresh token is correct
+		assertEquals(expectedToBe(loginResponse.getRefreshToken().getValue().length()),
+				response.getRefreshToken().length());
+    }
+
+    @Test
+    void shouldNotLoginWhenUserIsNotFound() {
+        // given
+        final String username = "fakeUser";
+        final String password = "test";
+        final LoginRequest loginRequest = new LoginRequest(username, password);
+        final Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        final UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+
+        doReturn(authentication)
+                .when(authenticationManager)
+                .authenticate(usernamePasswordAuthenticationToken);
+
+        doThrow(new UserNotFoundException("User was not found"))
+                .when(authenticationService)
+                .findUser(username);
+        // when
+        final Executable executable = () -> authenticationPort.login(loginRequest);
+
+        // then
+        final UserNotFoundException exception = assertThrows(UserNotFoundException.class, executable);
+        assertEquals(expectedToBe("User was not found"), exception.getMessage());
+    }
+
 
     @Test
     void shouldThrowAuthenticationErrorException() {
@@ -112,5 +181,9 @@ public class AuthenticationPortImplTest {
                 Role.USER.name(),
                 "TST"
         );
+    }
+
+    private <T> T expectedToBe(T value) {
+        return value;
     }
 }

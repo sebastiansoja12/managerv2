@@ -10,7 +10,7 @@ public interface AuthenticationService {
 
     RegisterResponse register(User user);
 
-    LoginResponse login(Authentication authentication);
+    LoginResponse login(User user);
 
     User findUser(String username);
 }

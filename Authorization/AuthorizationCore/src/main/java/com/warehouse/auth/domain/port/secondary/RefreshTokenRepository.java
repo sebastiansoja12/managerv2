@@ -7,5 +7,5 @@ public interface RefreshTokenRepository {
 
     Token save(RefreshToken refreshToken);
 
-    void validateRefreshToken(String token);
+    RefreshToken validateRefreshToken(String token);
 }

@@ -1,23 +1,25 @@
 package com.warehouse.auth.configuration;
 
 import org.mapstruct.factory.Mappers;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.service.JwtServiceImpl;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
@@ -29,19 +31,25 @@ import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenRepositor
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
 
-import jakarta.servlet.ServletException;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 
 @Configuration
-@Slf4j
+@RequiredArgsConstructor
 public class AuthConfiguration  {
+    
+    private final UserDetailsService userDetailsService;
 
 	@Bean
 	public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
 			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService) {
 		return new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager, jwtService);
 	}
+
+    @Bean
+    public JwtService jwtService(JwtProvider jwtProvider, RsaKeyProperties rsaKeyProperties) {
+        return new JwtServiceImpl(jwtProvider);
+    }
 
 	@Bean
 	public UserRepository userRepository(AuthenticationReadRepository repository,
@@ -57,40 +65,21 @@ public class AuthConfiguration  {
     }
 
     @Bean
+    public AuthenticationProvider authenticationProvider() {
+        final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-	@Bean
-	public AuthenticationProvider authenticationProvider() {
-		return new AuthenticationProvider() {
-			@Override
-			public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-				return authentication;
-			}
-
-			@Override
-			public boolean supports(Class<?> authentication) {
-				return authentication.isAnnotation();
-			}
-		};
-	}
-
-    @Bean
-    public LogoutHandler logoutHandler() {
-        return (request, response, authentication) -> {
-            try {
-                request.logout();
-                authentication.setAuthenticated(false);
-            } catch (ServletException e) {
-                throw new RuntimeException(e);
-            }
-        };
-    }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     // request and response mappers

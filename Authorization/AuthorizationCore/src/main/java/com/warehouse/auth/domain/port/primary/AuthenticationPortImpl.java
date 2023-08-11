@@ -1,17 +1,16 @@
 package com.warehouse.auth.domain.port.primary;
 
-import com.warehouse.auth.domain.service.JwtService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.service.AuthenticationService;
+import com.warehouse.auth.domain.service.JwtService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +30,16 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
-		final Authentication authenticate = authenticationManager.authenticate(
+		final Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        final String authenticationToken = jwtService.generateToken((UserDetails) authenticate.getDetails());
+        final User user = findUser(loginRequest.getUsername());
 
-        final LoginResponse loginResponse = authenticationService.login(authenticate);
+        final String authenticationToken = jwtService.generateToken(user);
+
+        final LoginResponse loginResponse = authenticationService.login(user);
 
         return AuthenticationResponse.builder()
                 .authenticationToken(authenticationToken)
@@ -71,6 +72,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     @Override
     public void logout(RefreshTokenRequest refreshTokenRequest) {
+        // TODO
         log.info("Token of user: " + refreshTokenRequest.getUsername() + " has been successfully deleted" +
                 ". Logging out");
     }
