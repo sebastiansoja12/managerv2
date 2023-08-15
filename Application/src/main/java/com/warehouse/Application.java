@@ -1,6 +1,5 @@
 package com.warehouse;
 
-import com.warehouse.auth.configuration.RsaKeyProperties;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.positionstack.PositionStackProperties;
 import org.springframework.boot.SpringApplication;

@@ -1,6 +1,5 @@
 package com.warehouse.auth.configuration;
 
-import com.warehouse.auth.domain.provider.JwtProvider;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -8,7 +7,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.depot.api.DepotService;
 
 @ComponentScan(basePackages = { "com.warehouse.auth"})
@@ -20,9 +19,6 @@ public class AuthTestConfiguration {
 
     @MockBean
     public DepotService depotService;
-
-    @MockBean
-    public RsaKeyProperties rsaKeyProperties;
 
 
 }

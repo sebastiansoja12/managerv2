@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS USERS (
 id int NOT NULL,
 email varchar(255) NOT NULL,

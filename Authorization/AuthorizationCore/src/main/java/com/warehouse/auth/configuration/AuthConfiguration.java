@@ -1,7 +1,6 @@
 package com.warehouse.auth.configuration;
 
 import org.mapstruct.factory.Mappers;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,7 +46,7 @@ public class AuthConfiguration  {
 	}
 
     @Bean
-    public JwtService jwtService(JwtProvider jwtProvider, RsaKeyProperties rsaKeyProperties) {
+    public JwtService jwtService(JwtProvider jwtProvider) {
         return new JwtServiceImpl(jwtProvider);
     }
 

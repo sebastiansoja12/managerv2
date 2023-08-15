@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.domain.service.JwtServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,8 +37,10 @@ public class AuthenticationPortImplTest {
     
     @Mock
     private AuthenticationManager authenticationManager;
-    
+
     @Mock
+    private JwtProvider jwtProvider;
+
     private JwtService jwtService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -45,6 +49,7 @@ public class AuthenticationPortImplTest {
 
 	@BeforeEach
 	void setup() {
+        jwtService = new JwtServiceImpl(jwtProvider);
 		authenticationPort = new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager,
                 jwtService);
 	}
