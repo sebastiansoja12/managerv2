@@ -95,7 +95,7 @@ public class AuthenticationPortImplTest {
                 .depotCode("TST")
                 .email("sebastian5152@wp.pl")
                 .password("test")
-                .role(Role.USER.name())
+                .role(Role.USER)
                 .build();
 
         doReturn(authentication)

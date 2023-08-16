@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -36,10 +37,10 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 public class AuthConfiguration  {
-    
-    private final UserDetailsService userDetailsService;
 
-	@Bean
+    private final AuthenticationReadRepository repository;
+
+    @Bean
 	public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
 			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService) {
 		return new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager, jwtService);
@@ -66,9 +67,15 @@ public class AuthConfiguration  {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> repository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean

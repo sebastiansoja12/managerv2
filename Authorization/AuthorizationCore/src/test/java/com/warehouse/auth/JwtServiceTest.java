@@ -36,7 +36,7 @@ public class JwtServiceTest {
                 .email("test@test.pl")
                 .firstName("Test")
                 .lastName("Test")
-                .role(Role.ADMIN.name())
+                .role(Role.ADMIN)
                 .username("test")
                 .build();
         // when
@@ -54,7 +54,7 @@ public class JwtServiceTest {
                 .email("test@test.pl")
                 .firstName("Test")
                 .lastName("Test")
-                .role(Role.ADMIN.name())
+                .role(Role.ADMIN)
                 .username("test")
                 .build();
 
@@ -78,7 +78,7 @@ public class JwtServiceTest {
                 .email("test@test.pl")
                 .firstName("Test")
                 .lastName("Test")
-                .role(Role.ADMIN.name())
+                .role(Role.ADMIN)
                 .username("fake")
                 .build();
 

@@ -45,7 +45,7 @@ public class AuthenticationServiceTest {
                 .firstName("test")
                 .lastName("test")
                 .password("password")
-                .role(Role.ADMIN.name())
+                .role(Role.ADMIN)
                 .build();
 
         doReturn(mock(UserResponse.class))

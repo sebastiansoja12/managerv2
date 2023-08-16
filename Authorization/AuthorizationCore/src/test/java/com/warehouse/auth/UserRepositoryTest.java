@@ -49,7 +49,7 @@ public class UserRepositoryTest {
                 .firstName("test")
                 .lastName("test")
                 .password("password")
-                .role(Role.ADMIN.name())
+                .role(Role.ADMIN)
                 .build();
         // when
         userRepository.signup(user);

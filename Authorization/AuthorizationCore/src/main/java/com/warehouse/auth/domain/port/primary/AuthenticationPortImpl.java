@@ -1,5 +1,6 @@
 package com.warehouse.auth.domain.port.primary;
 
+import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,10 +31,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
-		final Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+		authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword())
+        );
 
         final User user = findUser(loginRequest.getUsername());
 
@@ -58,7 +60,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .role(mapRole(request.getRole()))
                 .depotCode(request.getDepotCode())
                 .build();
 
@@ -81,5 +83,14 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         if (ObjectUtils.isEmpty(request)) {
             throw new AuthenticationErrorException("Request is not correct");
         }
+    }
+
+    private Role mapRole(String value) {
+        final String role = value.toUpperCase();
+        return switch (role) {
+            case "ADMIN" -> Role.ADMIN;
+            case "MANAGER" -> Role.MANAGER;
+            default -> Role.USER;
+        };
     }
 }

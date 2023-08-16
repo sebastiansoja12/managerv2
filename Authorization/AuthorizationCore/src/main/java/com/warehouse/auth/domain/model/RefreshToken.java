@@ -12,4 +12,10 @@ public class RefreshToken {
     Instant createdDate;
     Instant expiryDate;
     String username;
+    boolean expired;
+    boolean revoked;
+
+    public boolean isActual() {
+        return !isExpired() && !isRevoked();
+    }
 }

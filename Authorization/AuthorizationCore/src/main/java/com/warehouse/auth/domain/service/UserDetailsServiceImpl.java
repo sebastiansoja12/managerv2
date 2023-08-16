@@ -1,24 +1,24 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
-import lombok.AllArgsConstructor;
+import static java.util.Collections.singletonList;
+
+import java.util.Collection;
+import java.util.Optional;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Optional;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
-import static java.util.Collections.singletonList;
+import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
-@Service("userDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final AuthenticationReadRepository authenticationReadRepository;

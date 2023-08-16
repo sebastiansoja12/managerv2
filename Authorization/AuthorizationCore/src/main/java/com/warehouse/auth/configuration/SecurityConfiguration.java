@@ -1,6 +1,7 @@
 package com.warehouse.auth.configuration;
 
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -31,7 +32,36 @@ public class SecurityConfiguration {
     // TODO create api urls for every rest api in app
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+        httpSecurity.headers().frameOptions().disable();
+
+        httpSecurity.cors().and().csrf().disable();
+        //@formatter:off
+        httpSecurity
+                .authorizeHttpRequests()
+                .requestMatchers("/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(
+                        (request, response, authException)
+                                -> response.sendError(
+                                HttpServletResponse.SC_UNAUTHORIZED,
+                                authException.getLocalizedMessage()
+                        )
+                )
+                .and()
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        //@formatter:on
+        return httpSecurity.build();
+    }
+
+    public SecurityFilterChain securityFilterChaian(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest()
                         .permitAll())
                 .csrf(AbstractHttpConfigurer::disable);

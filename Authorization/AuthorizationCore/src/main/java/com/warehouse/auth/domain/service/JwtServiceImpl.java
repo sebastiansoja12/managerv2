@@ -29,7 +29,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return getUsername(token);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class JwtServiceImpl implements JwtService {
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.forSigningKey(getSigningKey()))
                 .compact();
     }
 
@@ -70,6 +70,11 @@ public class JwtServiceImpl implements JwtService {
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
+    }
+
+    private String getUsername(String token) {
+        final Claims claims = extractAllClaims(token);
+        return claims.get("username", String.class);
     }
 
     private Claims extractAllClaims(String token) {
