@@ -1,13 +1,17 @@
 package com.warehouse.auth.infrastructure.adapter.secondary;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+import com.warehouse.auth.domain.model.RefreshToken;
+import com.warehouse.auth.domain.model.Token;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
-
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType;
-import lombok.AllArgsConstructor;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.RefreshTokenNotFoundException;
+import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
 
-import java.time.Instant;
+import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
@@ -15,22 +19,27 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
 
     private final RefreshTokenReadRepository repository;
 
+    private final RefreshTokenMapper refreshTokenMapper;
+
     @Override
-    public void save(RefreshTokenEntity refreshToken) {
-        repository.save(refreshToken);
+    public Token save(RefreshToken refreshToken) {
+        final RefreshTokenEntity entity = refreshTokenMapper.map(refreshToken);
+        entity.setCreatedDate(Instant.now());
+        entity.setExpiryDate(Instant.now().plus(ChronoUnit.HALF_DAYS.getDuration()));
+        entity.setTokenType(TokenType.BEARER);
+        repository.save(entity);
+
+        return refreshTokenMapper.mapToToken(entity);
     }
 
     @Override
-    public String save(UserEntity userEntity, String token) {
-        final RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
-                .userId(userEntity.getId())
-                .tokenType(TokenType.BEARER)
-                .createdDate(Instant.now())
-                .expired(false)
-                .revoked(false)
-                .token(token)
-                .build();
+    public RefreshToken validateRefreshToken(String token) {
+        return repository.findByToken(token).map(refreshTokenMapper::map)
+                .orElseThrow(() -> new RefreshTokenNotFoundException("Invalid refresh Token"));
+    }
 
-        return refreshToken.getId().toString();
+    @Override
+    public void delete(String refreshToken) {
+        repository.deleteByToken(refreshToken);
     }
 }

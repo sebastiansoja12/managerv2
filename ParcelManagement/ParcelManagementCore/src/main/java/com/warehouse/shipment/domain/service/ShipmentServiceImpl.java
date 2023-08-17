@@ -32,6 +32,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
 
 		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
+        city.setValue("KT1");
 
         if (city.getValue() == null) {
             throw new DestinationDepotDeterminationException(SHIPMENT_202);
@@ -43,6 +44,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logParcel(parcel);
 
+        //paypalServicePort.payment(parcel);
 		final PaymentStatus paymentStatus = paypalServicePort.payment(parcel);
 
         logPayment(paymentStatus, parcel);

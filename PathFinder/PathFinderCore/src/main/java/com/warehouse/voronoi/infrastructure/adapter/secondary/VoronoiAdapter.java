@@ -11,11 +11,13 @@ import com.warehouse.voronoi.domain.service.UrlJsonReaderService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Logger;
 
 @AllArgsConstructor
 @Slf4j
@@ -40,16 +42,16 @@ public class VoronoiAdapter implements VoronoiServicePort {
         return findFastestRoute(depots, requestCity, voronoiAdapterConfiguration);
     }
 
-    // TODO temporary solution until bug with URL will be fixed
+
     private String findFastestRoute(List<Depot> depots, String requestCity,
 			VoronoiAdapterConfiguration voronoiAdapterConfiguration) {
-		final String url = positionStackProperties.createTemporaryRequest(requestCity);
+		final String url = voronoiAdapterConfiguration.requestUrl(requestCity);
 		JsonNode jsonNode = null;
 		try {
 			final URL requestUrl = urlConverter(url);
 			jsonNode = result(requestUrl);
 		} catch (MalformedURLException e) {
-			log.error("Error registered: {0} ", e.getCause());
+            log.warn("Error registered: {} ", e.getCause());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

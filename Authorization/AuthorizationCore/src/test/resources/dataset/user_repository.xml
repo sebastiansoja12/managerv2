@@ -4,11 +4,11 @@
     <users
             id = "1"
             username = "s-soja"
-            password ="$2a$10$m0ZdN0WH0B4O7FL9o1p.pejO4VF0yTlTB.aYJMd/GxyDtm05IAk4q"
+            password ="password"
             first_name = "Sebastian"
             last_name = "Soja"
             email = "sebastian5152@wp.pl"
-            role = "[admin]"
-            depot_code = "Test"
+            role = "1"
+            depot_code = "TST"
     />
 </dataset>

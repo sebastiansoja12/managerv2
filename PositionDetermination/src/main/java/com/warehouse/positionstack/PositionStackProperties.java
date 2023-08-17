@@ -3,16 +3,12 @@ package com.warehouse.positionstack;
 import com.warehouse.properties.Properties;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @Getter
+@Component
 @ConfigurationProperties(prefix = "positionstack")
 public class PositionStackProperties extends Properties {
-
-    private static final String URL = "positionstack.url";
-
-    private static final String STAGE = "positionstack.stage";
-
-    private static final String TOKEN = "positionstack.token";
 
     private final static String DIVIDER = "?";
 
@@ -40,10 +36,5 @@ public class PositionStackProperties extends Properties {
 
     public String createRequest(String value) {
         return getUrl() + DIVIDER + ACCESS_KEY + getToken() + QUERY + value;
-    }
-
-    public String createTemporaryRequest(String value) {
-        return "http://api.positionstack.com/v1/forward" + DIVIDER + ACCESS_KEY
-                + "5e64e700b4085324cbaa97b59be0e9d0" + QUERY + value;
     }
 }
