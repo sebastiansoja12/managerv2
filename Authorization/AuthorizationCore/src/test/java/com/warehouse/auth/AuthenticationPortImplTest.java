@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.warehouse.auth.domain.provider.JwtProvider;
-import com.warehouse.auth.domain.service.JwtServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,9 +20,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
+import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.service.JwtServiceImpl;
 import com.warehouse.auth.domain.vo.UserResponse;
+import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
 import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 
@@ -38,20 +39,27 @@ public class AuthenticationPortImplTest {
     @Mock
     private AuthenticationManager authenticationManager;
 
+
+    @Mock
+    private Logger logger;
+
     @Mock
     private JwtProvider jwtProvider;
 
     private JwtService jwtService;
 
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     private AuthenticationPortImpl authenticationPort;
+
+    private final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+
+    private final Long EXPIRATION = 86400000L;
 
 	@BeforeEach
 	void setup() {
+        final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         jwtService = new JwtServiceImpl(jwtProvider);
 		authenticationPort = new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager,
-                jwtService);
+                jwtService, logger);
 	}
 
     @Test
@@ -98,22 +106,31 @@ public class AuthenticationPortImplTest {
                 .role(Role.USER)
                 .build();
 
-        doReturn(authentication)
+        /*doReturn(authentication)
                 .when(authenticationManager)
-                .authenticate(usernamePasswordAuthenticationToken);
+                .authenticate(usernamePasswordAuthenticationToken);*/
 
         doReturn(userDetails)
                 .when(authenticationService)
                 .findUser("s-soja");
 
+        doReturn(EXPIRATION)
+                .when(jwtProvider)
+                .getExpiration();
+
+        doReturn(SECRET_KEY)
+                .when(jwtProvider)
+                .getSecretKey();
+
         doReturn(loginResponse)
                 .when(authenticationService)
                 .login(userDetails);
+
         // when
         final AuthenticationResponse response = authenticationPort.login(loginRequest);
 
         // then
-		assertTrue(response.getAuthenticationToken().startsWith("eyJhbGciOiJIUzI1NiJ9"));
+		assertTrue(response.getAuthenticationToken().startsWith("eyJhbGciOiJIUzM4NCJ9"));
 
         // check if generated refresh token is correct
 		assertEquals(expectedToBe(loginResponse.getRefreshToken().getValue().length()),
@@ -130,9 +147,9 @@ public class AuthenticationPortImplTest {
         final UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
 
-        doReturn(authentication)
+       /* doReturn(authentication)
                 .when(authenticationManager)
-                .authenticate(usernamePasswordAuthenticationToken);
+                .authenticate(usernamePasswordAuthenticationToken);*/
 
         doThrow(new UserNotFoundException("User was not found"))
                 .when(authenticationService)
@@ -174,6 +191,22 @@ public class AuthenticationPortImplTest {
         // then
         final AuthenticationErrorException exception = assertThrows(AuthenticationErrorException.class, executable);
         assertEquals("Username cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void shouldLogout() {
+        // given
+        final String refreshToken = "refreshToken";
+        final String username = "s-soja";
+        final RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(refreshToken, username);
+        final UserLogout userLogout = UserLogout.builder()
+                .refreshToken(refreshToken)
+                .username(username)
+                .build();
+        // when
+        authenticationPort.logout(refreshTokenRequest);
+        // then
+        verify(authenticationService, times(1)).logout(userLogout);
     }
 
     private RegisterRequest buildRegisterRequest() {

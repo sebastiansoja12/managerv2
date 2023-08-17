@@ -14,7 +14,7 @@ public class JwtProvider {
     private String secretKey;
 
     @NotNull
-    private String expiration;
+    private Long expiration;
 
     @NotNull
     private String refreshTokenExpiration;
@@ -23,7 +23,7 @@ public class JwtProvider {
         this.secretKey = secretKey;
     }
 
-    public void setExpiration(String expiration) {
+    public void setExpiration(Long expiration) {
         this.expiration = expiration;
     }
 

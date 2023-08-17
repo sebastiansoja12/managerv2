@@ -8,4 +8,6 @@ public interface RefreshTokenRepository {
     Token save(RefreshToken refreshToken);
 
     RefreshToken validateRefreshToken(String token);
+
+    void delete(String refreshToken);
 }

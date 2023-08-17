@@ -1,10 +1,8 @@
 package com.warehouse.auth.infrastructure.adapter.secondary;
 
-import com.warehouse.auth.domain.model.AuthenticationResponse;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.vo.UserResponse;
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
@@ -16,23 +14,10 @@ public class AuthenticationRepositoryImpl implements UserRepository {
 
     private final AuthenticationReadRepository repository;
 
-    private final RefreshTokenReadRepository refreshTokenReadRepository;
-
     private final UserMapper userMapper;
 
-
     @Override
-    public AuthenticationResponse login(AuthenticationResponse authentication) {
-        // TODO INPL-9606
-        final RefreshTokenEntity refreshToken = new RefreshTokenEntity();
-        refreshToken.setToken(authentication.getRefreshToken());
-        //refreshToken.setCreatedDate(authentication.getCreatedAt());
-        refreshTokenReadRepository.save(refreshToken);
-        return authentication;
-    }
-
-    @Override
-    public UserResponse signup(User user) {
+    public UserResponse saveUser(User user) {
         final UserEntity userEntity = userMapper.map(user);
 
         repository.save(userEntity);
@@ -45,11 +30,6 @@ public class AuthenticationRepositoryImpl implements UserRepository {
                 .enabled(userEntity.isEnabled())
                 .nonLocked(userEntity.isAccountNonLocked())
                 .build();
-    }
-
-    @Override
-    public void logout(String token) {
-        refreshTokenReadRepository.deleteByToken(token);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType;
 
@@ -20,10 +19,10 @@ import lombok.NoArgsConstructor;
 public class RefreshTokenEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
 
     @Column(name = "created_date", nullable = false)

@@ -1,5 +1,8 @@
 package com.warehouse.auth.infrastructure.adapter.secondary;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.model.Token;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
@@ -21,16 +24,22 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     @Override
     public Token save(RefreshToken refreshToken) {
         final RefreshTokenEntity entity = refreshTokenMapper.map(refreshToken);
+        entity.setCreatedDate(Instant.now());
+        entity.setExpiryDate(Instant.now().plus(ChronoUnit.HALF_DAYS.getDuration()));
         entity.setTokenType(TokenType.BEARER);
-
         repository.save(entity);
 
-        return new Token(entity.getToken());
+        return refreshTokenMapper.mapToToken(entity);
     }
 
     @Override
     public RefreshToken validateRefreshToken(String token) {
         return repository.findByToken(token).map(refreshTokenMapper::map)
                 .orElseThrow(() -> new RefreshTokenNotFoundException("Invalid refresh Token"));
+    }
+
+    @Override
+    public void delete(String refreshToken) {
+        repository.deleteByToken(refreshToken);
     }
 }

@@ -2,6 +2,7 @@ package com.warehouse.auth.domain.service;
 
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

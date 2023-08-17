@@ -3,18 +3,17 @@ package com.warehouse.auth.domain.filter;
 
 import java.io.IOException;
 
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.warehouse.auth.domain.exception.WarehouseException;
+import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.JwtService;
 
@@ -24,7 +23,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.util.WebUtils;
 
 @RequiredArgsConstructor
 @Component
@@ -36,34 +34,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final RefreshTokenRepository refreshTokenRepository;
 
+	private final UserDetailsService userDetailsService;
+
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 			@NonNull FilterChain filterChain) throws ServletException, IOException {
-		final String authHeader = request.getHeader("Authorization");
-		final String jwt;
-		final String username;
+		final String jwt = getJwtFromRequest(request);
 
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			filterChain.doFilter(request, response);
-			return;
-		}
+		try {
+			if (StringUtils.hasText(jwt) && true) {
+				final String username = jwtService.extractUsername(jwt);
 
-		jwt = authHeader.split(" ")[1].trim();
-		username = jwtService.extractUsername(jwt);
+				final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+				final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+						userDetails, null, userDetails.getAuthorities());
+				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			final User user = this.userRepository.findByUsername(username);
-			final var refreshToken = refreshTokenRepository.validateRefreshToken(jwt);
-
-			if (jwtService.isTokenValid(jwt, user) && refreshToken.isActual()) {
-				final SecurityContext context = SecurityContextHolder.createEmptyContext();
-				final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-						user, null, user.getAuthorities());
-				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				context.setAuthentication(authToken);
-				SecurityContextHolder.setContext(context);
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
+		} catch (Exception e) {
+			throw new WarehouseException("Zaloguj sie ponownie");
 		}
 		filterChain.doFilter(request, response);
+	}
+
+	private String getJwtFromRequest(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			return bearerToken.substring(7);
+		}
+		return bearerToken;
 	}
 }

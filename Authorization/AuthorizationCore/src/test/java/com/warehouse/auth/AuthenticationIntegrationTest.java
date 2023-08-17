@@ -1,8 +1,6 @@
 package com.warehouse.auth;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +8,6 @@ import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,10 +18,15 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.auth.configuration.AuthTestConfiguration;
 import com.warehouse.auth.domain.model.AuthenticationResponse;
 import com.warehouse.auth.domain.model.LoginRequest;
+import com.warehouse.auth.domain.model.RefreshTokenRequest;
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
+import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -40,6 +42,12 @@ public class AuthenticationIntegrationTest {
     @Autowired
     private AuthenticationReadRepository repository;
 
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private RefreshTokenReadRepository refreshTokenReadRepository;
+
     private final static String USERNAME = "s-soja";
 
     private final static String PASSWORD = "password";
@@ -51,7 +59,8 @@ public class AuthenticationIntegrationTest {
         // when
         final AuthenticationResponse response = authenticationPort.login(loginRequest);
         // then
-        assertThat(response.getAuthenticationToken()).isEqualTo("XD");
+        assertTrue(response.getAuthenticationToken().startsWith("eyJhbGciOiJIUzM4NCJ9"));
+        assertThatJwtUsernameTokenIsCorrect(response.getAuthenticationToken());
     }
 
     @Test
@@ -61,8 +70,65 @@ public class AuthenticationIntegrationTest {
         // when
         final Executable executable = () -> authenticationPort.login(loginRequest);
         // then
-        final BadCredentialsException exception = assertThrows(BadCredentialsException.class, executable);
-        assertEquals(expectedToBe("Bad credentials"), exception.getMessage());
+        final UserNotFoundException exception = assertThrows(UserNotFoundException.class, executable);
+        assertEquals(expectedToBe("User was not found"), exception.getMessage());
+    }
+
+    @Test
+    void shouldFindUserByUsername() {
+        // given
+        final String username = "s-soja";
+        // when
+        final User user = authenticationPort.findUser(username);
+        // then
+        assertAll(
+                () -> assertEquals(expectedToBe("s-soja"), user.getUsername()),
+                () -> assertEquals(expectedToBe(Role.ADMIN), user.getRole()),
+                () -> assertEquals(expectedToBe(Role.ADMIN.getAuthorities()), user.getAuthorities()),
+                () -> assertEquals(expectedToBe("Sebastian"), user.getFirstName())
+        );
+    }
+
+    @Test
+    void shouldNotFindUser() {
+        // given
+        final String username = "fakeUser";
+        // when
+        final Executable executable = () -> authenticationPort.findUser(username);
+        // then
+        final UserNotFoundException exception = assertThrows(UserNotFoundException.class, executable);
+        assertEquals(expectedToBe("User was not found"), exception.getMessage());
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/refresh_token.xml")
+    void shouldLogoutUser() {
+        // given
+        final String refreshToken = "12345";
+        final String username = "s-soja";
+        final RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(refreshToken, username);
+        // when
+        authenticationPort.logout(refreshTokenRequest);
+        // then
+        assertFalse(refreshTokenReadRepository.findByToken(refreshToken).isPresent());
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/refresh_token.xml")
+    void shouldNotLogoutUser() {
+        // given
+        final String refreshToken = "0";
+        final String username = "s-soja";
+        final RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest(refreshToken, username);
+        // when
+        authenticationPort.logout(refreshTokenRequest);
+        // then
+        assertFalse(refreshTokenReadRepository.findByToken(refreshToken).isPresent());
+    }
+
+    private void assertThatJwtUsernameTokenIsCorrect(String authenticationToken) {
+        final String username = jwtService.extractUsername(authenticationToken);
+        assertEquals(expectedToBe(USERNAME), username);
     }
 
     private UserEntity createUser() {

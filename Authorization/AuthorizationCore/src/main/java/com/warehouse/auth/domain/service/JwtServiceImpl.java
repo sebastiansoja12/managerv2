@@ -24,9 +24,6 @@ public class JwtServiceImpl implements JwtService {
     @NonNull
     private final JwtProvider jwtProvider;
 
-    // temporary solution till bug will be fixed
-    private final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
-
     @Override
     public String extractUsername(String token) {
         return getUsername(token);
@@ -49,7 +46,7 @@ public class JwtServiceImpl implements JwtService {
         final Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("firstName", user.getFirstName());
         claimsMap.put("role", user.getRole());
-        final Long expiration = 360000L;
+        final Long expiration = jwtProvider.getExpiration();
         return generateToken(claimsMap, user, expiration);
     }
 
@@ -74,7 +71,7 @@ public class JwtServiceImpl implements JwtService {
 
     private String getUsername(String token) {
         final Claims claims = extractAllClaims(token);
-        return claims.get("username", String.class);
+        return claims.get("sub", String.class);
     }
 
     private Claims extractAllClaims(String token) {
@@ -87,7 +84,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSigningKey() {
-        final byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        final byte[] keyBytes = Decoders.BASE64.decode(jwtProvider.getSecretKey());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

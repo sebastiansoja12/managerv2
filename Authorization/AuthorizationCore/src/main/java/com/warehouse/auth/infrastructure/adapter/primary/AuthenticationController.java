@@ -40,10 +40,11 @@ public class AuthenticationController {
         return new ResponseEntity<>(responseMapper.map(registerResponse), HttpStatus.OK);
     }
 
-    @PostMapping("/logout")
-    public void logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequest) {
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequest) {
         final RefreshTokenRequest request = requestMapper.map(refreshTokenRequest);
         authenticationPort.logout(request);
+        return ResponseEntity.ok().build();
     }
     @GetMapping("/{username}")
     public ResponseEntity<?> findUserByUsername(@PathVariable String username) {

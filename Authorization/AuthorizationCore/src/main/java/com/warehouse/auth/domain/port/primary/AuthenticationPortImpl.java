@@ -1,17 +1,15 @@
 package com.warehouse.auth.domain.port.primary;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
+import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,14 +26,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final JwtService jwtService;
 
+    private final Logger logger;
+
 
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword())
-        );
 
         final User user = findUser(loginRequest.getUsername());
 
@@ -74,15 +69,15 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     @Override
     public void logout(RefreshTokenRequest refreshTokenRequest) {
-        // TODO
-        log.info("Token of user: " + refreshTokenRequest.getUsername() + " has been successfully deleted" +
-                ". Logging out");
-    }
 
-    private void handleRequest(RegisterRequest request) {
-        if (ObjectUtils.isEmpty(request)) {
-            throw new AuthenticationErrorException("Request is not correct");
-        }
+        final UserLogout userLogout = UserLogout.builder()
+                .refreshToken(refreshTokenRequest.getRefreshToken())
+                .username(refreshTokenRequest.getUsername())
+                .build();
+
+        authenticationService.logout(userLogout);
+
+        logLogoutInformation(refreshTokenRequest.getUsername());
     }
 
     private Role mapRole(String value) {
@@ -93,4 +88,16 @@ public class AuthenticationPortImpl implements AuthenticationPort {
             default -> Role.USER;
         };
     }
+
+    private void logLogoutInformation(String username) {
+        logger.info("User {} has been successfully logged out", username);
+    }
+
+    private void handleRequest(RegisterRequest request) {
+        if (ObjectUtils.isEmpty(request)) {
+            throw new AuthenticationErrorException("Request is not correct");
+        }
+    }
+
+
 }

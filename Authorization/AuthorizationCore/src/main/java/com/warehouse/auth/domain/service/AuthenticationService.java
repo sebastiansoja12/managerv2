@@ -1,10 +1,9 @@
 package com.warehouse.auth.domain.service;
 
-import org.springframework.security.core.Authentication;
-
 import com.warehouse.auth.domain.model.LoginResponse;
 import com.warehouse.auth.domain.model.RegisterResponse;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.UserLogout;
 
 public interface AuthenticationService {
 
@@ -13,4 +12,6 @@ public interface AuthenticationService {
     LoginResponse login(User user);
 
     User findUser(String username);
+
+    void logout(UserLogout userLogout);
 }
