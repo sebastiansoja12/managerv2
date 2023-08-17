@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS USERS (
 id int NOT NULL,
 email varchar(255) NOT NULL,
@@ -7,7 +6,7 @@ last_name varchar(255) DEFAULT NULL,
 password varchar(255) NOT NULL,
 role varchar(255) DEFAULT NULL,
 username varchar(255) NOT NULL,
-depot_id bigint DEFAULT NULL
+depot_code varchar(255) DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS PAYMENT (

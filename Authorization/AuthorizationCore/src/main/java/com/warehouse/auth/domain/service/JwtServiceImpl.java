@@ -1,6 +1,14 @@
 package com.warehouse.auth.domain.service;
 
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -8,18 +16,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
-import java.security.Key;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 @AllArgsConstructor
-@Service
 public class JwtServiceImpl implements JwtService {
 
 
@@ -28,30 +26,34 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return getUsername(token);
     }
 
     @Override
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims, User user, Long expiration) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.forSigningKey(getSigningKey()))
                 .compact();
     }
 
     @Override
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(User user) {
+        final Map<String, Object> claimsMap = new HashMap<>();
+        claimsMap.put("firstName", user.getFirstName());
+        claimsMap.put("role", user.getRole());
+        final Long expiration = jwtProvider.getExpiration();
+        return generateToken(claimsMap, user, expiration);
     }
 
     @Override
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, User user) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(user.getUsername())) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -67,6 +69,11 @@ public class JwtServiceImpl implements JwtService {
         return claimsResolver.apply(claims);
     }
 
+    private String getUsername(String token) {
+        final Claims claims = extractAllClaims(token);
+        return claims.get("sub", String.class);
+    }
+
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
@@ -77,7 +84,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSigningKey() {
-        final byte[] keyBytes = Decoders.BASE64.decode("404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970");
+        final byte[] keyBytes = Decoders.BASE64.decode(jwtProvider.getSecretKey());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

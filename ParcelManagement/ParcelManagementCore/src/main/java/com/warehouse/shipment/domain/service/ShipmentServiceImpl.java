@@ -43,6 +43,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logParcel(parcel);
 
+        //paypalServicePort.payment(parcel);
 		final PaymentStatus paymentStatus = paypalServicePort.payment(parcel);
 
         logPayment(paymentStatus, parcel);

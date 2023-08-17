@@ -4,6 +4,7 @@ package com.warehouse.shipment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -22,6 +24,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.paypal.domain.model.LinkInformation;
+import com.warehouse.paypal.domain.model.PaymentRequest;
+import com.warehouse.paypal.domain.model.PaymentResponse;
+import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
@@ -42,11 +48,14 @@ public class ShipmentIntegrationTest {
     @Autowired
     private ShipmentPort shipmentPort;
 
-    @Autowired
+    @Mock
     private PathFinderServicePort pathFinderServicePort;
 
     @Autowired
     private ShipmentService shipmentService;
+
+    @Mock
+    private PaypalPort paypalPort;
 
 
     @Test
@@ -54,13 +63,23 @@ public class ShipmentIntegrationTest {
     @Disabled
     void shouldShipParcel() {
         // given
+        final ShipmentParcel parcel = createParcel();
+        parcel.setDestination("KT1");
         final ShipmentRequest request = ShipmentRequest.builder()
-                .parcel(createParcel())
+                .parcel(parcel)
                 .build();
+        final LinkInformation linkInformation = new LinkInformation();
+        final PaymentResponse paymentResponse = PaymentResponse.builder()
+                .paymentMethod("paypal")
+                .createTime("now")
+                .link(linkInformation)
+                .build();
+        final PaymentRequest paymentRequest = new PaymentRequest(1000000000L, 99);
+        when(paypalPort.payment(paymentRequest)).thenReturn(paymentResponse);
         // when
         final ShipmentResponse response = shipmentPort.ship(request);
         // then
-        assertThat(response.getParcelId()).isEqualTo(1L);
+        assertThat(response.getParcelId()).isEqualTo(1000000000L);
     }
 
     @Test
@@ -147,7 +166,7 @@ public class ShipmentIntegrationTest {
                 .build();
     }
 
-    private String expectedToBe(String value) {
+    private <T> T expectedToBe(T value) {
         return value;
     }
 

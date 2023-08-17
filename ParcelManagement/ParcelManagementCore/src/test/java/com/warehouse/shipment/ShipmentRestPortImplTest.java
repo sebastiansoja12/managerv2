@@ -85,7 +85,7 @@ public class ShipmentRestPortImplTest {
         assertEquals(expectedToBe("Parcel was not found"), exception.getMessage());
     }
 
-    private String expectedToBe(String value) {
+    private <T> T expectedToBe(T value) {
         return value;
     }
 }

@@ -31,4 +31,14 @@
         lat = "50"
         lon = "20"
         street = "test"/>
+
+    <depot
+            id = "2"
+            country = "Poland"
+            depot_code = "KT2"
+            city = "Katowice"
+            lat = "40"
+            lon = "10"
+            street = "test"/>
+
 </dataset>
