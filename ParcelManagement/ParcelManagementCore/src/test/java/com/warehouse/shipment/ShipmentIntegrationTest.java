@@ -4,16 +4,10 @@ package com.warehouse.shipment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
 
-import com.warehouse.paypal.domain.model.LinkInformation;
-import com.warehouse.paypal.domain.model.PaymentRequest;
-import com.warehouse.paypal.domain.model.PaymentResponse;
-import com.warehouse.paypal.domain.port.primary.PaypalPort;
-import com.warehouse.shipment.domain.port.secondary.PaypalServicePort;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +24,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.paypal.domain.model.LinkInformation;
+import com.warehouse.paypal.domain.model.PaymentRequest;
+import com.warehouse.paypal.domain.model.PaymentResponse;
+import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
@@ -50,7 +48,7 @@ public class ShipmentIntegrationTest {
     @Autowired
     private ShipmentPort shipmentPort;
 
-    @Autowired
+    @Mock
     private PathFinderServicePort pathFinderServicePort;
 
     @Autowired
