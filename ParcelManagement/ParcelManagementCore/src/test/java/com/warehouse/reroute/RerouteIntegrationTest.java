@@ -100,7 +100,7 @@ public class RerouteIntegrationTest {
 
 
     private void shouldSendRequestToRerouteParcel() {
-        // TODO analyse and fix bug - secondary adapter not activated
+        // TODO analyse and fix bug - secondary infrastructure not activated
         // given
         final RerouteParcelRequest request = RerouteParcelRequest.builder()
                 .id(100001L)
