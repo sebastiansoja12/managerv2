@@ -32,8 +32,7 @@ public class VoronoiConfiguration {
 
     @Bean
     public VoronoiServicePort addressDeterminationServicePort(ComputeService computeService,
-          UrlJsonReaderService urlJsonReaderService) {
-        final PositionStackProperties positionStackProperties = new PositionStackProperties();
+          UrlJsonReaderService urlJsonReaderService, PositionStackProperties positionStackProperties) {
         return new VoronoiAdapter(positionStackProperties, computeService, urlJsonReaderService);
     }
 

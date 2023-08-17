@@ -18,8 +18,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
                         url = "https://gitlab.com/sebastiansoja"
                 ),
                 description = "OpenApi documentation for Spring Security",
-                title = "OpenApi specification - InParcel Project)",
-                version = "2023.7",
+                title = "OpenApi specification - InParcel Spring Boot Project",
+                version = "2023.8",
                 license = @License(
                         name = "Licence name",
                         url = ""
@@ -28,12 +28,12 @@ import io.swagger.v3.oas.annotations.servers.Server;
         ),
         servers = {
                 @Server(
-                        description = "Local ENV",
-                        url = "http://localhost:8080"
+                        description = "Local environment",
+                        url = "http://localhost:8080/v2/api"
                 ),
                 @Server(
-                        description = "TEST ENV",
-                        url = "https://inparcel-dev-v2.herokuapp.com/"
+                        description = "Development environment",
+                        url = "https://inparcel-dev-v2.herokuapp.com/v2/api"
                 )
         },
         security = {

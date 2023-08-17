@@ -1,7 +1,8 @@
 package com.warehouse.shipment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,7 +95,7 @@ class ShipmentPrimaryPortTest {
                 .build();
     }
 
-    private ShipmentResponse expectedToBeEqualTo(ShipmentResponse response) {
-        return response;
+    private <T> T expectedToBeEqualTo(T value) {
+        return value;
     }
 }

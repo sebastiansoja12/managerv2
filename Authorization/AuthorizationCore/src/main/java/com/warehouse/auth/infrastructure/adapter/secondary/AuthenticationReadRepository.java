@@ -1,16 +1,14 @@
 package com.warehouse.auth.infrastructure.adapter.secondary;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
 @Repository
 public interface AuthenticationReadRepository extends JpaRepository<UserEntity, Long> {
-
-    Optional<UserEntity> getByUsername(String username);
 
     Optional<UserEntity> findByUsername(String username);
 }

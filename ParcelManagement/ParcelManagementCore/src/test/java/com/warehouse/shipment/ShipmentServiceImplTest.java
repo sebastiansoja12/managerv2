@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,12 +14,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
 import com.warehouse.shipment.domain.vo.Notification;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipmentServiceImplTest {
@@ -176,11 +175,7 @@ public class ShipmentServiceImplTest {
         verify(shipmentRepository, times(1)).delete(parcelId);
     }
 
-    private Long expectedToBe(Long value) {
-        return value;
-    }
-
-    private String expectedToBe(String value) {
+    private <T> T expectedToBe(T value) {
         return value;
     }
 
