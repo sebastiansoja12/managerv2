@@ -5,6 +5,6 @@ import com.warehouse.redirect.domain.vo.RedirectNotification;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface MailRequestMapper {
+public interface NotificationMapper {
     Notification map(RedirectNotification redirectNotification);
 }

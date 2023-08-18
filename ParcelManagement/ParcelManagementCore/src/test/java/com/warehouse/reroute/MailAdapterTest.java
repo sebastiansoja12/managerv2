@@ -1,17 +1,17 @@
-package com.warehouse.redirect;
+package com.warehouse.reroute;
 
-import com.warehouse.mail.domain.service.MailService;
-import com.warehouse.redirect.domain.vo.RedirectToken;
-import com.warehouse.redirect.infrastructure.adapter.secondary.MailAdapter;
-import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.NotificationMapper;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.reroute.domain.model.RerouteToken;
+import com.warehouse.reroute.infrastructure.adapter.secondary.MailAdapter;
+import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.NotificationMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class MailAdapterTest {
@@ -31,21 +31,20 @@ public class MailAdapterTest {
 
 
     @Test
-    void shouldSendRedirectNotification() {
+    void shouldSendRerouteNotification() {
         // given
-        final RedirectToken redirectToken = new RedirectToken();
+        final RerouteToken rerouteToken = new RerouteToken();
 
         final com.warehouse.mail.domain.vo.Notification mappedNotification =
                 new com.warehouse.mail.domain.vo.Notification();
 
         doReturn(mappedNotification)
                 .when(notificationMapper)
-                .map(any());
+                        .map(any());
         // when
-        mailAdapter.sendRedirectInformation(redirectToken);
+        mailAdapter.sendReroutingInformation(rerouteToken);
 
         // then
         verify(mailService, times(1)).sendNotification(mappedNotification);
     }
 }
-

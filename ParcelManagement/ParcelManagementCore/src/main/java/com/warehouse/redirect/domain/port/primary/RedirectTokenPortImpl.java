@@ -2,15 +2,17 @@ package com.warehouse.redirect.domain.port.primary;
 
 import com.warehouse.redirect.domain.model.RedirectRequest;
 import com.warehouse.redirect.domain.model.RedirectResponse;
-
 import com.warehouse.redirect.domain.port.secondary.MailServicePort;
-import com.warehouse.redirect.domain.vo.RedirectToken;
-import com.warehouse.redirect.domain.vo.Token;
 import com.warehouse.redirect.domain.service.RedirectService;
 import com.warehouse.redirect.domain.service.RedirectTokenGenerator;
+import com.warehouse.redirect.domain.vo.RedirectToken;
+import com.warehouse.redirect.domain.vo.Token;
+
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
+@Slf4j
 public class RedirectTokenPortImpl implements RedirectTokenPort {
 
     private final RedirectService redirectService;
@@ -18,6 +20,7 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
 	private final RedirectTokenGenerator redirectTokenGenerator;
 
 	private final MailServicePort mailServicePort;
+
 
     @Override
     public RedirectResponse sendRedirectInformation(RedirectRequest request) {
@@ -33,7 +36,7 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
     }
 
 	private void logRedirectToken(RedirectToken redirectToken) {
-		System.out.println("Request for redirecting parcel has been recorded");
+		log.info("Request for redirecting parcel {0} has been recorded", redirectToken.getParcelId());
 	}
 
 	private RedirectToken buildRedirectTokenFromRequest(RedirectRequest request) {

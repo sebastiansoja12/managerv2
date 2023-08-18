@@ -15,8 +15,8 @@ import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenR
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapper;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapperImpl;
 import com.warehouse.reroute.infrastructure.adapter.secondary.*;
+import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.ParcelMapper;
-import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RequestMapper;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
 import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentServiceAdapter;
@@ -37,18 +37,18 @@ public class RerouteConfiguration {
 	}
 
 	@Bean
-	public RerouteTokenPort rerouteTokenPort(RerouteTokenServicePort rerouteTokenServicePort,
+	public RerouteTokenPort rerouteTokenPort(MailServicePort mailServicePort,
 			RerouteTokenRepository rerouteTokenRepository, ParcelReroutePort parcelReroutePort) {
 		final com.warehouse.reroute.domain.service.RerouteService rerouteService = new RerouteServiceImpl(
-				rerouteTokenServicePort, rerouteTokenRepository);
+				mailServicePort, rerouteTokenRepository);
 		final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
 		return new RerouteTokenPortImpl(rerouteService, parcelReroutePort, rerouteTokenGeneratorService,
 				LOGGER_FACTORY.getLogger(RerouteTokenPort.class));
 	}
 
-	@Bean
-	public RerouteTokenServicePort rerouteTokenServicePort(MailService mailService) {
-		return new RerouteTokenAdapter(Mappers.getMapper(RequestMapper.class), mailService);
+	@Bean(name = "reroute.mailServicePort")
+	public MailServicePort mailServicePort(MailService mailService) {
+		return new MailAdapter(mailService, Mappers.getMapper(NotificationMapper.class));
 	}
 
 	@Bean
@@ -64,9 +64,9 @@ public class RerouteConfiguration {
 	}
 
 	@Bean
-	public RerouteService rerouteService(RerouteTokenServicePort rerouteTokenServicePort,
-			RerouteTokenRepository rerouteTokenRepository) {
-		return new RerouteServiceImpl(rerouteTokenServicePort, rerouteTokenRepository);
+	public RerouteService rerouteService(MailServicePort mailServicePort,
+										 RerouteTokenRepository rerouteTokenRepository) {
+		return new RerouteServiceImpl(mailServicePort, rerouteTokenRepository);
 	}
 
 	@Bean
