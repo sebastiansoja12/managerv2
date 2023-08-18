@@ -1,8 +1,9 @@
 package com.warehouse.redirect.domain.service;
 
-import com.warehouse.redirect.domain.model.RedirectToken;
-import com.warehouse.redirect.domain.model.Token;
 import com.warehouse.redirect.domain.port.secondary.RedirectTokenRepository;
+import com.warehouse.redirect.domain.vo.RedirectToken;
+import com.warehouse.redirect.domain.vo.Token;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

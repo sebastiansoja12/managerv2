@@ -2,16 +2,14 @@ package com.warehouse.redirect.domain.service;
 
 import java.time.Instant;
 
-import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenReadRepository;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenReadRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
-@EqualsAndHashCode(callSuper = true)
+
 @Slf4j
-@Data
 public record ExpiredRedirectTokenJobDeleter(RedirectTokenReadRepository repository) {
 
     @Scheduled(cron = "${purge.cron.expression}")
