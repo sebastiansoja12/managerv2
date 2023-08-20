@@ -3,6 +3,7 @@ package com.warehouse.voronoi;
 import static com.warehouse.voronoi.DepotInMemoryData.buildDepots;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,17 +49,28 @@ public class VoronoiPortImplTest {
         // request city to send
         final String requestCity = "Gliwice";
 
-        //when(voronoiServicePort.obtainCoordinates(depotsList, requestCity)).thenReturn(expectedNearestDepot);
+        doReturn(depotsList)
+                .when(depotServicePort)
+                .downloadDepots();
+
+        doReturn("KT1")
+                .when(computeService)
+                .calculate(requestCity, depotsList);
+
         // when
         final String nearestDepot = voronoiPort.findFastestRoute(requestCity);
         // then
-        assertEquals(nearestDepot, expectedNearestDepot);
+        assertEquals(expectedNearestDepot, nearestDepot);
     }
 
     @Test
     void shouldThrowMissingDepotsException() {
         // given empty arraylist
         final List<Depot> depotsList = new ArrayList<>();
+
+        doReturn(depotsList)
+                .when(depotServicePort)
+                .downloadDepots();
 
         // when && then
         assertThrows(MissingDepotsException.class, () -> {
@@ -70,6 +82,10 @@ public class VoronoiPortImplTest {
     void shouldThrowMissingRequestCityException() {
         // given empty arraylist
         final List<Depot> depotsList = buildDepots();
+
+        doReturn(depotsList)
+                .when(depotServicePort)
+                .downloadDepots();
 
         // when && then
         assertThrows(MissingRequestCityException.class, () -> {
