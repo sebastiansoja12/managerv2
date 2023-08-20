@@ -1,24 +1,24 @@
 package com.warehouse.voronoi;
 
 
-import com.warehouse.dto.CoordinatesDto;
-import com.warehouse.dto.DepotDto;
-import com.warehouse.voronoi.domain.model.Coordinates;
-import com.warehouse.voronoi.domain.model.Depot;
-import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
-import com.warehouse.voronoi.infrastructure.adapter.primary.VoronoiServiceAdapter;
-import com.warehouse.voronoi.infrastructure.adapter.primary.mapper.AddressRequestMapper;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import com.warehouse.dto.DepotDto;
+import com.warehouse.voronoi.domain.model.Coordinates;
+import com.warehouse.voronoi.domain.model.Depot;
+import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
+import com.warehouse.voronoi.infrastructure.adapter.primary.VoronoiServiceAdapter;
+import com.warehouse.voronoi.infrastructure.adapter.primary.mapper.AddressRequestMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class VoronoiServiceAdapterTest {
@@ -49,10 +49,10 @@ public class VoronoiServiceAdapterTest {
 
 
         when(addressRequestMapper.map(depotRequestList)).thenReturn(depotList);
-        when(voronoiPort.findFastestRoute(depotList, requestCity)).thenReturn(expectedDepotCode);
+        when(voronoiPort.findFastestRoute(requestCity)).thenReturn(expectedDepotCode);
 
         // when
-        final String actualDepotCode = adapter.findFastestRoute(depotRequestList, requestCity);
+        final String actualDepotCode = adapter.findFastestRoute(requestCity);
         // then
         assertEquals(expectedDepotCode, actualDepotCode);
     }
@@ -60,11 +60,6 @@ public class VoronoiServiceAdapterTest {
     List<DepotDto> depotDtoList() {
         final DepotDto depotDto = new DepotDto();
         depotDto.setDepotCode("KT1");
-        depotDto.setCoordinates(CoordinatesDto.builder()
-                .lat(10)
-                .lon(10)
-                .build());
-
         return List.of(depotDto);
     }
 

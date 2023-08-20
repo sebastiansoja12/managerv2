@@ -1,11 +1,10 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.shipment.domain.enumeration.ParcelType;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.model.ShipmentRequest;
 import com.warehouse.shipment.domain.model.ShipmentResponse;
@@ -47,7 +46,8 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     private void logParcelShipment(ShipmentParcel parcel) {
-        logger.info("Detected service to create shipment for parcel {}", parcel.getClass());
+		logger.info("Detected service to create shipment for parcel with telephone number {}",
+				parcel.getSender().getTelephoneNumber());
     }
 
     private void logDeleteParcel(Long parcelId) {

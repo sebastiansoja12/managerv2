@@ -67,7 +67,7 @@ public class ShipmentServiceImplTest {
 
         doReturn(city)
                 .when(pathFinderServicePort)
-                .determineDeliveryDepot(shipmentParcel);
+                .determineDeliveryDepot(any(Address.class));
 
         doReturn(parcel)
                 .when(shipmentRepository)
@@ -106,7 +106,7 @@ public class ShipmentServiceImplTest {
 
         doReturn(new City(null))
                 .when(pathFinderServicePort)
-                .determineDeliveryDepot(shipmentParcel);
+                .determineDeliveryDepot(any(Address.class));
         // when
         final Executable executable = () -> service.createShipment(shipmentParcel);
         // then

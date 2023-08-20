@@ -31,7 +31,9 @@ public class ShipmentServiceImpl implements ShipmentService {
 	@Override
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
 
-		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
+        final Address address = buildAddress(shipmentParcel);
+
+		final City city = pathFinderServicePort.determineDeliveryDepot(address);
 
         if (city.getValue() == null) {
             throw new DestinationDepotDeterminationException(SHIPMENT_202);
@@ -43,7 +45,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logParcel(parcel);
 
-        //paypalServicePort.payment(parcel);
 		final PaymentStatus paymentStatus = paypalServicePort.payment(parcel);
 
         logPayment(paymentStatus, parcel);
@@ -62,9 +63,13 @@ public class ShipmentServiceImpl implements ShipmentService {
 		return shipmentServicePort.registerParcel(parcel.getId(), paymentStatus.getLink());
 	}
 
+
     @Override
     public UpdateParcelResponse update(ParcelUpdate parcelUpdate) {
-        final City city = pathFinderServicePort.determineDeliveryDepot(parcelUpdate);
+
+        final Address address = buildAddress(parcelUpdate);
+
+        final City city = pathFinderServicePort.determineDeliveryDepot(address);
 
         if (!city.getValue().equals(parcelUpdate.getDestination())) {
             updateParcelDestinationForReroute(parcelUpdate, city);
@@ -83,6 +88,22 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public void delete(Long parcelId) {
         shipmentRepository.delete(parcelId);
+    }
+
+    private Address buildAddress(ShipmentParcel shipmentParcel) {
+        return Address.builder()
+                .street(shipmentParcel.getRecipient().getStreet())
+                .city(shipmentParcel.getRecipient().getCity())
+                .postalCode(shipmentParcel.getRecipient().getPostalCode())
+                .build();
+    }
+
+    private Address buildAddress(ParcelUpdate parcelUpdate) {
+        return Address.builder()
+                .street(parcelUpdate.getRecipientStreet())
+                .city(parcelUpdate.getRecipientCity())
+                .postalCode(parcelUpdate.getRecipientPostalCode())
+                .build();
     }
 
     private void updateParcelDestination(ShipmentParcel shipmentParcel, City city) {

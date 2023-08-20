@@ -4,7 +4,6 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
@@ -70,8 +69,8 @@ public class RerouteConfiguration {
 	}
 
 	@Bean
-	public PathFinderServicePort pathFinderServicePort(VoronoiService voronoiService, DepotPort depotPort) {
-		return new PathFinderAdapter(voronoiService, depotPort);
+	public PathFinderServicePort pathFinderServicePort(VoronoiService voronoiService) {
+		return new PathFinderAdapter(voronoiService);
 	}
 
 	@Bean

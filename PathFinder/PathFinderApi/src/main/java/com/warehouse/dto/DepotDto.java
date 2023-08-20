@@ -15,6 +15,4 @@ public class DepotDto {
 	String country;
 
 	String depotCode;
-
-	CoordinatesDto coordinates;
 }

@@ -150,8 +150,6 @@ public class RouteLogServiceTest {
                 .city("Test")
                 .country("Test")
                 .street("test")
-                .lat(20.0)
-                .lon(20.0)
                 .build();
     }
 

@@ -30,11 +30,4 @@ public class DepotEntity {
 
     @Column(nullable = false, unique = true)
     private String depotCode;
-
-    @Column(nullable = false, unique = true)
-    private double lat;
-
-    @Column(nullable = false, unique = true)
-    private double lon;
-
 }

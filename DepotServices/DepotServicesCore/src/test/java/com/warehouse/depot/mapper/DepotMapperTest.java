@@ -19,18 +19,16 @@ public class DepotMapperTest {
     @Test
     public void shouldMapDepotToDepotEntity() {
         // Given
-        Depot depot = Depot.builder()
+        final Depot depot = Depot.builder()
                 .city(KATOWICE)
                 .build();
 
-        DepotEntity expectedEntity = new DepotEntity();
+        final DepotEntity expectedEntity = new DepotEntity();
         expectedEntity.setId(1L);
         expectedEntity.setCity(KATOWICE);
-        expectedEntity.setLon(10.0);
-        expectedEntity.setLat(20.0);
 
         // When
-        DepotEntity result = mapper.map(depot);
+        final DepotEntity result = mapper.map(depot);
 
         // Then
         assertEquals(expectedEntity.getCity(), result.getCity());
@@ -39,19 +37,17 @@ public class DepotMapperTest {
     @Test
     public void shouldMapDepotEntityToDepot() {
         // Given
-        DepotEntity depotEntity = new DepotEntity();
+        final DepotEntity depotEntity = new DepotEntity();
         depotEntity.setCity("Katowice");
         depotEntity.setId(1L);
-        depotEntity.setLon(10.0);
-        depotEntity.setLat(20.0);
 
 
-        Depot expectedDepot = Depot.builder()
+        final Depot expectedDepot = Depot.builder()
                 .city(KATOWICE)
                 .build();
 
         // When
-        Depot result = mapper.map(depotEntity);
+        final Depot result = mapper.map(depotEntity);
 
         // Then
         assertEquals(expectedDepot.getCity(), result.getCity());
@@ -60,10 +56,10 @@ public class DepotMapperTest {
     @Test
     public void shouldMapListDepotEntityToListDepot() {
         // Given
-        List<DepotEntity> depotEntities = Arrays.asList(new DepotEntity(), new DepotEntity());
+        final List<DepotEntity> depotEntities = Arrays.asList(new DepotEntity(), new DepotEntity());
 
         // When
-        List<Depot> result = mapper.map(depotEntities);
+        final List<Depot> result = mapper.map(depotEntities);
 
         // Then
         assertEquals(depotEntities.size(), result.size());

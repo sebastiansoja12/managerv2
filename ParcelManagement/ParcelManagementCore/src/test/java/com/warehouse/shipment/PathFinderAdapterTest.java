@@ -1,21 +1,16 @@
 package com.warehouse.shipment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
-import java.util.List;
-
-import com.warehouse.dto.CoordinatesDto;
-import com.warehouse.dto.DepotDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-
-import com.warehouse.depot.domain.port.primary.DepotPort;
-import com.warehouse.shipment.domain.model.Recipient;
+import com.warehouse.shipment.domain.model.Address;
+import com.warehouse.shipment.domain.model.City;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderAdapter;
 import com.warehouse.voronoi.VoronoiService;
 
@@ -25,42 +20,34 @@ public class PathFinderAdapterTest {
     @Mock
     private VoronoiService voronoiService;
     
-    @Mock
-    private DepotPort depotPort;
-    
     private PathFinderAdapter pathFinderAdapter;
-    
-    
     
     
     @BeforeEach
     void setup() {
-        pathFinderAdapter = new PathFinderAdapter(voronoiService, depotPort);
+        pathFinderAdapter = new PathFinderAdapter(voronoiService);
     }
     
     @Test
     void shouldDetermineNewDeliveryDepot() {
         // given
-        final Recipient recipient = Recipient.builder()
-                .city("Krakow")
-                .build();
+        final Address address = Address.builder()
+                .street("Krakowska 11")
+                .postalCode("00-000")
+                .city("Kraków").build();
 
-        // mock list of depots
-		final List<DepotDto> depots = List
-				.of(new DepotDto("Krakow", "krakowska", "POL", "KR1", new CoordinatesDto(10.0, 10.0)));
-
-        // mock the nearest depot to deliver
-        when(voronoiService.findFastestRoute(depots, recipient.getCity())).thenReturn("Krakow");
-        
+        doReturn("KR1")
+                .when(voronoiService)
+                .findFastestRoute(address.getCity());
         // when
-        final String city = voronoiService.findFastestRoute(depots, recipient.getCity());
+        final City city = pathFinderAdapter.determineDeliveryDepot(address);
         
         // then
-        assertEquals(city, expectedToBe(recipient.getCity()));
+        assertEquals(expectedToBe("KR1"), city.getValue());
     }
 
-    private String expectedToBe(String city) {
-        return city;
+    private <T> T expectedToBe(T value) {
+        return value;
     }
 
 }

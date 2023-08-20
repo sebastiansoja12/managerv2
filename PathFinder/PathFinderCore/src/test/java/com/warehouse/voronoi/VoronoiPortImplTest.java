@@ -3,7 +3,6 @@ package com.warehouse.voronoi;
 import static com.warehouse.voronoi.DepotInMemoryData.buildDepots;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,20 +17,24 @@ import com.warehouse.voronoi.domain.exception.MissingDepotsException;
 import com.warehouse.voronoi.domain.exception.MissingRequestCityException;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPortImpl;
-import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
+import com.warehouse.voronoi.domain.port.secondary.DepotServicePort;
+import com.warehouse.voronoi.domain.service.ComputeService;
 
 @ExtendWith(MockitoExtension.class)
 public class VoronoiPortImplTest {
 
 
     @Mock
-    private VoronoiServicePort voronoiServicePort;
+    private DepotServicePort depotServicePort;
+
+    @Mock
+    private ComputeService computeService;
 
     private VoronoiPortImpl voronoiPort;
 
     @BeforeEach
     void setup() {
-        voronoiPort = new VoronoiPortImpl(voronoiServicePort);
+        voronoiPort = new VoronoiPortImpl(depotServicePort, computeService);
     }
 
     @Test
@@ -45,9 +48,9 @@ public class VoronoiPortImplTest {
         // request city to send
         final String requestCity = "Gliwice";
 
-        when(voronoiServicePort.findFastestRoute(depotsList, requestCity)).thenReturn(expectedNearestDepot);
+        //when(voronoiServicePort.obtainCoordinates(depotsList, requestCity)).thenReturn(expectedNearestDepot);
         // when
-        final String nearestDepot = voronoiPort.findFastestRoute(depotsList, requestCity);
+        final String nearestDepot = voronoiPort.findFastestRoute(requestCity);
         // then
         assertEquals(nearestDepot, expectedNearestDepot);
     }
@@ -59,7 +62,7 @@ public class VoronoiPortImplTest {
 
         // when && then
         assertThrows(MissingDepotsException.class, () -> {
-            voronoiPort.findFastestRoute(depotsList, "KR1");
+            voronoiPort.findFastestRoute("KR1");
         });
     }
 
@@ -70,7 +73,7 @@ public class VoronoiPortImplTest {
 
         // when && then
         assertThrows(MissingRequestCityException.class, () -> {
-            voronoiPort.findFastestRoute(depotsList, null);
+            voronoiPort.findFastestRoute(null);
         });
     }
 }

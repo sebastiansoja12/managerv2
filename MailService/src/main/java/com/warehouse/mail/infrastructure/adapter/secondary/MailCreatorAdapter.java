@@ -1,17 +1,18 @@
 package com.warehouse.mail.infrastructure.adapter.secondary;
 
-import com.warehouse.mail.domain.port.secondary.MailPort;
-import com.warehouse.mail.domain.vo.Notification;
-import com.warehouse.mail.infrastructure.adapter.secondary.exception.WarehouseMailException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
+
+import com.warehouse.mail.domain.port.secondary.MailPort;
+import com.warehouse.mail.domain.vo.Notification;
+import com.warehouse.mail.infrastructure.adapter.secondary.exception.WarehouseMailException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class for managing email sending.
@@ -40,7 +41,6 @@ public class MailCreatorAdapter implements MailPort {
         };
         try {
             mailSender.send(messagePreparator);
-            log.info("Notification has been sent");
         } catch (MailException e) {
             log.error("Error", e);
             throw new WarehouseMailException("E-mail was not sent because of: " + e.getMessage());
