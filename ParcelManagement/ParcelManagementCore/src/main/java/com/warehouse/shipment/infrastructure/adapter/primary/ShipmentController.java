@@ -1,6 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import com.warehouse.shipment.domain.port.primary.ShipmentRestPort;
 import com.warehouse.shipment.infrastructure.api.dto.ParcelDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +22,6 @@ public class ShipmentController {
 
     private final ShipmentPort shipmentPort;
 
-    private final ShipmentRestPort shipmentRestPort;
-
     private final ShipmentRequestMapper requestMapper;
 
     private final ShipmentResponseMapper responseMapper;
@@ -38,14 +35,8 @@ public class ShipmentController {
 
     @GetMapping("/{parcelId}")
     public ResponseEntity<?> get(@PathVariable Long parcelId) {
-        final Parcel parcel = shipmentRestPort.loadParcel(parcelId);
+        final Parcel parcel = shipmentPort.loadParcel(parcelId);
         final ParcelDto parcelResponse = responseMapper.map(parcel);
         return new ResponseEntity<>(parcelResponse, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{parcelId}")
-    public ResponseEntity<?> delete(@PathVariable Long parcelId) {
-        shipmentRestPort.delete(parcelId);
-        return ResponseEntity.ok().build();
     }
 }

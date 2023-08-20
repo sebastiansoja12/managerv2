@@ -98,9 +98,4 @@ public class ShipmentConfiguration {
 	public ShipmentReroutePort shipmentReroutePort(ShipmentService service) {
 		return new ShipmentReroutePortImpl(service);
 	}
-
-	@Bean
-	public ShipmentRestPort shipmentRestPort(ShipmentService service) {
-		return new ShipmentRestPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentRestPortImpl.class));
-	}
 }
