@@ -90,6 +90,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipmentRepository.delete(parcelId);
     }
 
+    @Override
+    public boolean exists(Long parcelId) {
+        return shipmentRepository.exists(parcelId);
+    }
+
     private Address buildAddress(ShipmentParcel shipmentParcel) {
         return Address.builder()
                 .street(shipmentParcel.getRecipient().getStreet())

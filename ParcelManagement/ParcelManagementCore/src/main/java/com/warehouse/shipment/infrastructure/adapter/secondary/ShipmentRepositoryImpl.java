@@ -48,4 +48,9 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         return repository.findParcelEntityById(parcelId).map(parcelMapper::map).orElseThrow(
                 () -> new ParcelNotFoundException("Parcel was not found"));
     }
+
+    @Override
+    public boolean exists(Long parcelId) {
+        return repository.existsById(parcelId);
+    }
 }

@@ -8,4 +8,6 @@ public interface ShipmentPort {
 
     ShipmentResponse ship(ShipmentRequest request);
     Parcel loadParcel(Long parcelId);
+
+    boolean exists(Long parcelId);
 }

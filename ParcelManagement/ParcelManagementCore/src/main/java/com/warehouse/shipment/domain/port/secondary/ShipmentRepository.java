@@ -13,4 +13,6 @@ public interface ShipmentRepository {
     void delete(Long parcelId);
 
     Parcel loadParcelById(Long parcelId);
+
+    boolean exists(Long parcelId);
 }

@@ -11,4 +11,6 @@ public interface ShipmentService {
     UpdateParcelResponse update(ParcelUpdate parcelUpdate);
 
     void delete(Long parcelId);
+
+    boolean exists(Long parcelId);
 }

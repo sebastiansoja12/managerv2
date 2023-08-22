@@ -20,6 +20,7 @@ import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenRead
 import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenRepositoryImpl;
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.RedirectTokenMapper;
+import com.warehouse.shipment.infrastructure.api.ShipmentService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +29,10 @@ import org.springframework.context.annotation.Configuration;
 public class RedirectConfiguration {
     
 	@Bean
-	public RedirectTokenPort redirectTokenPort(RedirectService redirectService, MailServicePort mailServicePort) {
-        final RedirectTokenGenerator redirectTokenGenerator = new RedirectTokenGeneratorImpl();
-		return new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort);
+	public RedirectTokenPort redirectTokenPort(RedirectService redirectService, MailServicePort mailServicePort,
+			RedirectServicePort redirectServicePort) {
+		final RedirectTokenGenerator redirectTokenGenerator = new RedirectTokenGeneratorImpl();
+		return new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort, redirectServicePort);
 	}
 
     @Bean(name = "redirect.mailServicePort")
@@ -51,8 +53,8 @@ public class RedirectConfiguration {
     }
 
     @Bean
-    public RedirectServicePort redirectServicePort() {
-        return new RedirectParcelAdapter();
+    public RedirectServicePort redirectServicePort(ShipmentService service) {
+        return new RedirectParcelAdapter(service);
     }
 
     // Request mapper

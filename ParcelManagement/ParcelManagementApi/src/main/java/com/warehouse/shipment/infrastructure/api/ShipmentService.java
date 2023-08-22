@@ -5,4 +5,6 @@ import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelResponseDto;
 
 public interface ShipmentService {
     UpdateParcelResponseDto update(UpdateParcelRequestDto parcelRequest);
+
+    boolean exists(Long parcelId);
 }

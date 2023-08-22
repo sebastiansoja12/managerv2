@@ -17,6 +17,7 @@ import com.warehouse.reroute.infrastructure.adapter.secondary.*;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
+import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentServiceAdapter;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
@@ -56,15 +57,15 @@ public class RerouteConfiguration {
 	}
 
 	@Bean
-	public ShipmentService shipmentService(ShipmentReroutePort shipmentReroutePort) {
+	public ShipmentService shipmentService(ShipmentReroutePort shipmentReroutePort, ShipmentPort shipmentPort) {
 		final ShipmentRequestMapper requestMapper = Mappers.getMapper(ShipmentRequestMapper.class);
 		final ShipmentResponseMapper responseMapper = Mappers.getMapper(ShipmentResponseMapper.class);
-		return new ShipmentServiceAdapter(requestMapper, responseMapper, shipmentReroutePort);
+		return new ShipmentServiceAdapter(requestMapper, responseMapper, shipmentReroutePort, shipmentPort);
 	}
 
 	@Bean
 	public RerouteService rerouteService(MailServicePort mailServicePort,
-										 RerouteTokenRepository rerouteTokenRepository) {
+			RerouteTokenRepository rerouteTokenRepository) {
 		return new RerouteServiceImpl(mailServicePort, rerouteTokenRepository);
 	}
 

@@ -42,6 +42,11 @@ public class ShipmentPortImpl implements ShipmentPort {
         return service.loadParcel(parcelId);
     }
 
+    @Override
+    public boolean exists(Long parcelId) {
+        return service.exists(parcelId);
+    }
+
 
     private ShipmentParcel extractParcelFromRequest(ShipmentRequest request) {
         return request.getParcel();
