@@ -2,7 +2,6 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.shipment.domain.model.Address;
 import com.warehouse.shipment.domain.model.City;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.voronoi.VoronoiService;
 
@@ -12,12 +11,6 @@ import lombok.AllArgsConstructor;
 public class PathFinderAdapter implements PathFinderServicePort {
 
     private final VoronoiService voronoiService;
-
-    @Override
-    public City determineDeliveryDepot(ShipmentParcel parcel) {
-        final String cityToDeliver = voronoiService.findFastestRoute(parcel.getRecipient().getCity());
-        return new City(cityToDeliver);
-    }
 
     @Override
     public City determineDeliveryDepot(Address address) {
