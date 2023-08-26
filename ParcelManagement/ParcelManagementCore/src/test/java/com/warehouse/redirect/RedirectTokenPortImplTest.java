@@ -5,10 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
-import com.warehouse.redirect.domain.exception.EmptyEmailException;
-import com.warehouse.redirect.domain.exception.NullParcelIdException;
-import com.warehouse.redirect.domain.exception.ParcelRedirectException;
-import com.warehouse.redirect.domain.exception.RedirectRequestNotFoundException;
+import com.warehouse.redirect.domain.exception.*;
+import com.warehouse.redirect.domain.model.RedirectParcelRequest;
 import com.warehouse.redirect.domain.port.secondary.RedirectServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -141,6 +139,44 @@ public class RedirectTokenPortImplTest {
         final EmptyEmailException exception = assertThrows(EmptyEmailException.class, executable);
         assertEquals(expectedToBe("Email is empty"), exception.getMessage());
         assertEquals(expectedToBe(502), exception.getCode());
+    }
+
+    @Test
+    void shouldNotRedirectWhenRequestIsNull() {
+        // given && when
+        final Executable executable = () -> redirectTokenPort.redirect(null);
+        // then
+		final RedirectRequestNotFoundException exception = assertThrows(RedirectRequestNotFoundException.class,
+				executable);
+        assertEquals(expectedToBe("Redirect request is null"), exception.getMessage());
+        assertEquals(expectedToBe(500), exception.getCode());
+    }
+
+    @Test
+    void shouldNotRedirectWhenTokenIsEmpty() {
+        // given
+        final RedirectParcelRequest request = new RedirectParcelRequest();
+        request.setToken(null);
+        // when
+        final Executable executable = () -> redirectTokenPort.redirect(request);
+        // then
+        final TokenNotFoundException exception = assertThrows(TokenNotFoundException.class, executable);
+        assertEquals(expectedToBe("Redirect token is empty"), exception.getMessage());
+        assertEquals(expectedToBe(504), exception.getCode());
+    }
+
+    @Test
+    void shouldNotRedirectWhenParcelIdIsNull() {
+        // given
+        final RedirectParcelRequest request = new RedirectParcelRequest();
+        request.setParcelId(null);
+        request.setToken(new Token("12345"));
+        // when
+        final Executable executable = () -> redirectTokenPort.redirect(request);
+        // then
+        final NullParcelIdException exception = assertThrows(NullParcelIdException.class, executable);
+        assertEquals(expectedToBe("Parcel id is null"), exception.getMessage());
+        assertEquals(expectedToBe(503), exception.getCode());
     }
 
     private <T> T expectedToBe(T value) {

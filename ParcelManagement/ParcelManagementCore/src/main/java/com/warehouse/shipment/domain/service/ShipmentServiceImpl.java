@@ -3,6 +3,8 @@ package com.warehouse.shipment.domain.service;
 import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_201;
 import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_202;
 
+import java.util.Objects;
+
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
@@ -35,7 +37,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
 		final City city = pathFinderServicePort.determineDeliveryDepot(address);
 
-        if (city.getValue() == null) {
+        if (Objects.isNull(city) || city.getValue() == null) {
             throw new DestinationDepotDeterminationException(SHIPMENT_202);
 		}
 
@@ -116,7 +118,9 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     private void updateParcelDestinationForReroute(ParcelUpdate parcelUpdate, City city) {
-        parcelUpdate.setDestination(city.getValue());
+        if (!Objects.isNull(city) && city.getValue() != null) {
+            parcelUpdate.setDestination(city.getValue());
+        }
     }
 
     private void logNotification(Notification notification) {

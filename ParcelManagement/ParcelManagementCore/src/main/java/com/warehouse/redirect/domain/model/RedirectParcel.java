@@ -28,10 +28,6 @@ public class RedirectParcel {
         return status.equals(Status.CREATED);
     }
 
-    public boolean hasStatusReroute() {
-        return status.equals(Status.REROUTE);
-    }
-
     public boolean isRequiredToRedirect() {
         return hasStatusCreated() && isParent();
     }

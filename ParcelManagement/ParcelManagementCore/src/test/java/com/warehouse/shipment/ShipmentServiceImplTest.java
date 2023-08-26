@@ -161,9 +161,87 @@ public class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldUpdateParcel() {
-        // TODO
+    void shouldUpdateParcelWithUpdatingDeliveryDepotWhenItsChanged() {
+        // given
+        final ParcelUpdate parcelUpdate = ParcelUpdate.builder()
+                .destination("KR1")
+                .build();
+
+        final Parcel parcel = createParcel();
+        parcel.setDestination("KT1");
+
+        final City city = new City("KT1");
+
+        doReturn(city)
+                .when(pathFinderServicePort)
+                .determineDeliveryDepot(any(Address.class));
+
+        doReturn(parcel)
+                .when(shipmentRepository)
+                .update(parcelUpdate);
+
+        // when
+        final UpdateParcelResponse response = service.update(parcelUpdate);
+        // then
+        assertEquals(expectedToBe("KT1"), response.getParcel().getDestination());
     }
+
+    @Test
+    void shouldUpdateParcelAndDontUpdateDeliveryDepotWhenItWasNotChanged() {
+        // given
+        final ParcelUpdate parcelUpdate = ParcelUpdate.builder()
+                .destination("KT1")
+                .build();
+
+        final Parcel parcel = createParcel();
+        parcel.setDestination("KT1");
+
+        final City city = new City("KT1");
+
+        doReturn(city)
+                .when(pathFinderServicePort)
+                .determineDeliveryDepot(any(Address.class));
+
+        doReturn(parcel)
+                .when(shipmentRepository)
+                .update(parcelUpdate);
+
+        // when
+        final UpdateParcelResponse response = service.update(parcelUpdate);
+        // then
+        assertEquals(expectedToBe("KT1"), response.getParcel().getDestination());
+    }
+
+    @Test
+    void shouldExist() {
+        // given
+        final Long parcelId = 1L;
+
+        doReturn(true)
+                .when(shipmentRepository)
+                .exists(parcelId);
+
+        // when
+        final boolean doesExist = service.exists(parcelId);
+        // then
+        assertEquals(expectedToBe(true), doesExist);
+    }
+
+    @Test
+    void shouldNotExist() {
+        // given
+        final Long parcelId = 1L;
+
+        doReturn(false)
+                .when(shipmentRepository)
+                .exists(parcelId);
+
+        // when
+        final boolean doesExist = service.exists(parcelId);
+        // then
+        assertEquals(expectedToBe(false), doesExist);
+    }
+
 
     @Test
     void shouldDeleteParcelById() {
