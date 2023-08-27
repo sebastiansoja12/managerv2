@@ -18,6 +18,8 @@ public interface EventMapper {
 
     SupplyInformation map(SupplyInformationDto supplyInformationDto);
 
+    List<SupplyInformation> map(List<SupplyInformationDto> supplyInformationDto);
+
     ShipmentRequest map(ShipmentRequestDto shipmentRequestDto);
 
     RouteRequest map(RouteRequestDto routeRequestDto);

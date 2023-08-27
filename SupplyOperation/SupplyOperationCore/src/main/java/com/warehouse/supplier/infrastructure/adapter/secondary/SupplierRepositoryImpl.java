@@ -1,6 +1,5 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary;
 
-import com.warehouse.route.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
@@ -45,9 +44,7 @@ public class SupplierRepositoryImpl implements SupplierRepository {
 
     @Override
     public Supplier findByCode(String supplierCode) {
-        final SupplierEntity supplierEntity = supplierReadRepository.findBySupplierCode(supplierCode).orElseThrow(
-                () -> new SupplierNotFoundException("Supplier was not found")
-        );
+        final SupplierEntity supplierEntity = supplierReadRepository.findBySupplierCode(supplierCode).orElseThrow();
         return supplierEntityMapper.map(supplierEntity);
     }
 }

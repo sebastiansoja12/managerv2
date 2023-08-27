@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,13 +36,13 @@ public class RouteTrackerLogTest {
                 .created(LocalDateTime.now())
                 .depotCode("KT1")
                 .parcelId(100001L)
-                .supplierId(1L)
+               // .supplierId(1L)
                 .username("s-soja")
                 .build();
         final RouteResponse response = new RouteResponse(ROUTE_ID);
-        when(routeTrackerLogPort.saveSupplyRoute(supplyInformation)).thenReturn(response);
+        when(routeTrackerLogPort.saveSupplyRoute(Collections.singletonList(supplyInformation))).thenReturn(response);
         // when
-        final RouteResponse route = routeTrackerLogPort.saveSupplyRoute(supplyInformation);
+        final RouteResponse route = routeTrackerLogPort.saveSupplyRoute(Collections.singletonList(supplyInformation));
         // then
         assertThat(route.getId()).isNotNull();
     }

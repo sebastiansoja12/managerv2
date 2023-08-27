@@ -16,7 +16,7 @@ public interface RouteModelMapper {
     @Mapping(source = "parcel.id", target = "parcelId")
     @Mapping(source = "depot.id", target = "depotId")
     @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "supplier.id", target = "supplierId")
+    @Mapping(source = "supplier.supplierCode", target = "supplierCode")
     Route map(RouteEntity routeEntity);
 
     List<Route> map(List<RouteEntity> routeEntityList);
@@ -43,7 +43,7 @@ public interface RouteModelMapper {
 
 
     @Mapping(target = "parcel.id", source = "parcelId")
-    @Mapping(target = "supplier.id", source = "supplierId")
+    @Mapping(target = "supplier.supplierCode", source = "supplierCode")
     @Mapping(target = "depot.id", source = "depotId")
     @Mapping(target = "user.id", source = "userId")
     RouteEntity map(Route route);

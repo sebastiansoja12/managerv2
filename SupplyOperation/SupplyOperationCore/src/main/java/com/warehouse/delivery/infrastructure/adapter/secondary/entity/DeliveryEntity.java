@@ -1,16 +1,16 @@
 package com.warehouse.delivery.infrastructure.adapter.secondary.entity;
 
 
-import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import com.warehouse.delivery.infrastructure.adapter.secondary.enumeration.Status;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor

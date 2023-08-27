@@ -10,6 +10,8 @@ import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.domain.model.Delivery;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
+import com.warehouse.delivery.domain.model.DeliveryRouteRequest;
+import com.warehouse.delivery.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.delivery.domain.service.DeliveryService;
 
 import lombok.AllArgsConstructor;
@@ -18,6 +20,8 @@ import lombok.AllArgsConstructor;
 public class DeliveryPortImpl implements DeliveryPort {
 
     private final DeliveryService deliveryService;
+
+    private final RouteLogServicePort logServicePort;
 
     @Override
     public List<DeliveryResponse> deliver(List<DeliveryRequest> deliveryRequest) {
@@ -30,11 +34,35 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .map(this::mapToDelivery)
                 .toList();
 
-        final List<Delivery> delivery = deliveryService.save(deliveries);
+        final List<Delivery> signedDeliveries = deliveryService.save(deliveries);
 
-        return delivery.stream()
+        registerDeliveryRoute(signedDeliveries);
+
+        return signedDeliveries.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private void registerDeliveryRoute(List<Delivery> signedDeliveries) {
+        final Set<DeliveryRouteRequest> deliveryRouteRequests = signedDeliveries.stream()
+                .map(this::mapToDeliveryRouteRequest)
+                .collect(Collectors.toSet());
+
+        signedDeliveries.stream()
+                .map(Delivery::getToken)
+                .filter(Objects::nonNull)
+                .forEach(delivery -> logServicePort.deliver(deliveryRouteRequests));
+    }
+
+    private DeliveryRouteRequest mapToDeliveryRouteRequest(Delivery delivery) {
+        return DeliveryRouteRequest.builder()
+                .id(delivery.getId())
+                .parcelId(delivery.getParcelId())
+                .deliveryStatus(delivery.getDeliveryStatus())
+                .depotCode(delivery.getDepotCode())
+                .supplierCode(delivery.getSupplierCode())
+                .token(delivery.getToken())
+                .build();
     }
 
 

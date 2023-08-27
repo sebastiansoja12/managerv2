@@ -41,7 +41,7 @@ public class RouteLogEventListener {
     @EventListener
     public void handle(SupplyLogEvent event) {
         logEvent(event);
-        final SupplyInformation supplyInformation = null;
+        final List<SupplyInformation> supplyInformation = eventMapper.map(event.getSupplyInformation());
         trackerLogPort.saveSupplyRoute(supplyInformation);
     }
 

@@ -13,7 +13,8 @@ public class SupplyInformation {
     Long parcelId;
     LocalDateTime created;
     String depotCode;
-    Long supplierId;
+    String supplierCode;
+    String token;
 
 
     public LocalDateTime created() {

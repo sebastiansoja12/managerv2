@@ -7,6 +7,8 @@ import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryEn
 import lombok.AllArgsConstructor;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 public class DeliveryRepositoryImpl implements DeliveryRepository {
 
@@ -17,6 +19,7 @@ public class DeliveryRepositoryImpl implements DeliveryRepository {
     @Override
     public Delivery saveDelivery(Delivery delivery) {
         final DeliveryEntity entity = mapper.map(delivery);
+        entity.setCreated(LocalDateTime.now());
         repository.save(entity);
         return mapper.map(entity);
     }

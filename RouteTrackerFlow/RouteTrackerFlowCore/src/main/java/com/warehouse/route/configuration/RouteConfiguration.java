@@ -1,6 +1,9 @@
 package com.warehouse.route.configuration;
 
+import com.warehouse.route.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
+import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import org.mapstruct.factory.Mappers;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,6 +25,11 @@ public class  RouteConfiguration {
     public RouteRepository routeRepository(RouteReadRepository routeReadRepository) {
         final RouteModelMapper routeModelMapper = Mappers.getMapper(RouteModelMapper.class);
         return new RouteRepositoryImpl(routeReadRepository, routeModelMapper);
+    }
+
+    @Bean
+    public RouteLogEventPublisher routeLogEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        return new RouteLogEventPublisherImpl(applicationEventPublisher);
     }
 
     @Bean
