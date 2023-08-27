@@ -1,4 +1,4 @@
-package com.warehouse.delivery;
+package com.warehouse.delivery.configuration;
 
 import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
 import com.warehouse.delivery.domain.service.DeliveryService;
