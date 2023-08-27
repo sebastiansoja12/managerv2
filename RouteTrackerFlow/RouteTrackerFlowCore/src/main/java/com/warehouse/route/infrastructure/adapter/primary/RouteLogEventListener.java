@@ -1,5 +1,13 @@
 package com.warehouse.route.infrastructure.adapter.primary;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.ShipmentRequest;
@@ -7,20 +15,16 @@ import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.route.domain.vo.SupplyInformation;
 import com.warehouse.route.infrastructure.adapter.primary.mapper.EventMapper;
 import com.warehouse.route.infrastructure.api.event.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Slf4j
 @Component
 public class RouteLogEventListener {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSSS");
+    
+    private final Logger logger = LoggerFactory.getLogger(RouteLogEventListener.class);
 
     private final EventMapper eventMapper;
 
@@ -37,7 +41,7 @@ public class RouteLogEventListener {
     @EventListener
     public void handle(SupplyLogEvent event) {
         logEvent(event);
-        final SupplyInformation supplyInformation = eventMapper.map(event.getSupplyInformation());
+        final SupplyInformation supplyInformation = null;
         trackerLogPort.saveSupplyRoute(supplyInformation);
     }
 
@@ -63,7 +67,7 @@ public class RouteLogEventListener {
     }
 
     private void logEvent(RouteLogBaseEvent event) {
-        log.info("Detected event " + event.getClass().getSimpleName() + " at " +
-                event.getLocalDateTime().format(FORMATTER));
+		logger.info("Detected event {} at {}", event.getClass().getSimpleName(),
+				event.getLocalDateTime().format(FORMATTER));
     }
 }
