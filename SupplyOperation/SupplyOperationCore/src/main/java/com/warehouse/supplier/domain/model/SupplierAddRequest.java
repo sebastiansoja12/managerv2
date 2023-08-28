@@ -1,8 +1,10 @@
-package com.warehouse.supplier.dto;
+package com.warehouse.supplier.domain.model;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class SupplierAddRequest {
 
     private String firstName;
@@ -11,5 +13,5 @@ public class SupplierAddRequest {
 
     private String telephone;
 
-    private DepotDto depot;
+    private String depotCode;
 }

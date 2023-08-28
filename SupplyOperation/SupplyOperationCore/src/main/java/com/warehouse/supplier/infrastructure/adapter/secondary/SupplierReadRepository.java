@@ -21,5 +21,7 @@ public interface SupplierReadRepository extends JpaRepository<SupplierEntity, Lo
     @EntityGraph(value = "SupplierEntity.full", type = EntityGraph.EntityGraphType.FETCH)
     @NotNull
     List<SupplierEntity> findAll();
+
+    List<SupplierEntity> findAllBySupplierCode(String supplierCode);
 }
 

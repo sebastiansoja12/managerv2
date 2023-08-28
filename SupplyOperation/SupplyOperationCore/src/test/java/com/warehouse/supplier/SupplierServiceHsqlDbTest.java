@@ -3,7 +3,7 @@ package com.warehouse.supplier;
 import com.warehouse.supplier.configuration.SupplierTestConfiguration;
 import com.warehouse.supplier.domain.model.Depot;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.port.secondary.SupplierServicePort;
+import com.warehouse.supplier.domain.service.SupplierService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,20 +21,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ContextConfiguration(classes = SupplierTestConfiguration.class)
-public class SupplierServicePortTest {
+public class SupplierServiceHsqlDbTest {
 
     @Autowired
-    private SupplierServicePort servicePort;
+    private SupplierService service;
 
     @BeforeEach
     void setUp() {
-        servicePort.create(createSupplier());
+        service.create(createSupplier());
     }
 
     @Test
     void shouldReturnAllSuppliers() {
         // given && when
-        final List<Supplier> suppliers = servicePort.findAll();
+        final List<Supplier> suppliers = service.findAll();
         // then
         assertThat(suppliers.size()).isGreaterThan(0);
     }
@@ -44,7 +44,7 @@ public class SupplierServicePortTest {
         // given
         final String supplierCode = "test";
         // when
-        final Supplier supplierByCode = servicePort.findSupplierByCode(supplierCode);
+        final Supplier supplierByCode = service.findSupplierByCode(supplierCode);
         // then
         assertThat(supplierByCode).isNotNull();
     }
@@ -67,10 +67,10 @@ public class SupplierServicePortTest {
         final List<Supplier> suppliers = Arrays.asList(supplier1, supplier2);
 
         // when
-        servicePort.createMultipleSuppliers(suppliers);
+        service.createMultipleSuppliers(suppliers);
 
         // then
-        final List<Supplier> supplierList = servicePort.findAll();
+        final List<Supplier> supplierList = service.findAll();
         assertTrue(supplierList.size() == 3);
     }
 
@@ -83,7 +83,7 @@ public class SupplierServicePortTest {
         supplier.setSupplierCode("test");
         supplier.setTelephone("123");
         // when
-        final Executable executable = () -> servicePort.create(supplier);
+        final Executable executable = () -> service.create(supplier);
 
         // then
         Assertions.assertThrows(DataIntegrityViolationException.class, executable);
@@ -114,7 +114,7 @@ public class SupplierServicePortTest {
         final List<Supplier> suppliers = Arrays.asList(supplier, supplier2, supplier3);
 
         // when
-        final Executable executable = () -> servicePort.createMultipleSuppliers(suppliers);
+        final Executable executable = () -> service.createMultipleSuppliers(suppliers);
 
         // then
         Assertions.assertThrows(DataIntegrityViolationException.class, executable);

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Supplier {
+public class SupplierModelRequest {
 
     private Long id;
 

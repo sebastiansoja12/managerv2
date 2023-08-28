@@ -1,9 +1,9 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.model.SupplierModelRequest;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
@@ -12,6 +12,9 @@ import java.util.List;
 public interface SupplierEntityMapper {
 
     SupplierEntity map(Supplier supplier);
+
+    SupplierModelRequest mapToModel(SupplierEntity supplier);
+
 
     Supplier map(SupplierEntity supplier);
 

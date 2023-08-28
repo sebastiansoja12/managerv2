@@ -3,9 +3,7 @@ package com.warehouse.supplier.dto;
 import lombok.Data;
 
 @Data
-public class SupplierDto {
-
-    private String supplierCode;
+public class SupplierAddRequestDto {
 
     private String firstName;
 
