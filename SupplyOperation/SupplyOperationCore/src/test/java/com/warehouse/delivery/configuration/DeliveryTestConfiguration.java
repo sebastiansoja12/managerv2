@@ -1,5 +1,6 @@
 package com.warehouse.delivery.configuration;
 
+import com.warehouse.delivery.domain.port.secondary.SupplierTokenServicePort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -13,4 +14,7 @@ public class DeliveryTestConfiguration {
 
     @MockBean
     public RouteLogEventPublisher routeLogEventPublisher;
+
+    @MockBean
+    public SupplierTokenServicePort supplierTokenServicePort;
 }

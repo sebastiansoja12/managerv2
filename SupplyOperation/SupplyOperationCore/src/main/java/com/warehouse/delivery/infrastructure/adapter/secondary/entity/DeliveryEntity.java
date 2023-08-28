@@ -2,7 +2,6 @@ package com.warehouse.delivery.infrastructure.adapter.secondary.entity;
 
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import com.warehouse.delivery.infrastructure.adapter.secondary.enumeration.Status;
 
@@ -22,7 +21,7 @@ public class DeliveryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	UUID id;
+	String id;
 
     @Column(name = "parcel_id", nullable = false)
     Long parcelId;

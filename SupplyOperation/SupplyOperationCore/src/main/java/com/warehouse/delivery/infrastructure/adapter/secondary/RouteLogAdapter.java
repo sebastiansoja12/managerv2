@@ -32,13 +32,13 @@ public class RouteLogAdapter implements RouteLogServicePort {
     }
 
 
-    public SupplyLogEvent buildEvent(List<SupplyInformationDto> supplyInformation) {
+    private SupplyLogEvent buildEvent(List<SupplyInformationDto> supplyInformation) {
         return SupplyLogEvent.builder()
                 .supplyInformation(supplyInformation)
                 .build();
     }
 
-    public void sendEvent(SupplyLogEvent event) {
+    private void sendEvent(SupplyLogEvent event) {
         routeLogEventPublisher.send(event);
     }
 }

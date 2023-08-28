@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +46,30 @@ public class DeliveryPortImplTest {
     void shouldDeliver() {
         // given
         final List<DeliveryRequest> deliveryRequestList = Collections.singletonList(createDeliveryRequest());
+        final List<Delivery> delivery = Collections.singletonList(createDelivery());
+
+        final Delivery updatedDelivery = createDelivery();
+        updatedDelivery.setId(UUID.fromString(DELIVERY_ID));
+        updatedDelivery.setParcelId(1L);
+
+        doReturn(Collections.singletonList(updatedDelivery))
+                .when(deliveryService)
+                .save(delivery);
+
+        // when
+        final List<DeliveryResponse> deliveries = deliveryPort.deliver(deliveryRequestList);
+        // then
+        assertThat(deliveries.size()).isEqualTo(1);
+        final UUID id = deliveries.stream().map(DeliveryResponse::getId).findAny().orElse(null);
+        assertEquals(expectedToBe(UUID.fromString(DELIVERY_ID)), id);
+    }
+
+    @Test
+    void shouldDeliverOnlyOneWhenRequestAreDuplicated() {
+        // given
+        final List<DeliveryRequest> deliveryRequestList = Arrays.asList(createDeliveryRequest(),
+                createDeliveryRequest());
+
         final List<Delivery> delivery = Collections.singletonList(createDelivery());
 
         final Delivery updatedDelivery = createDelivery();

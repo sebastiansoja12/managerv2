@@ -50,12 +50,13 @@ public class DeliveryServiceImpl implements DeliveryService {
         return new SupplierTokenRequest(delivery.getSupplierCode(), delivery.getId());
     }
 
-	private void assignTokenToDelivery(Map<UUID, SupplierTokenResponse> supplierTokenResponseMap, List<Delivery> deliveries) {
+	private void assignTokenToDelivery(Map<UUID, SupplierTokenResponse> supplierTokenResponseMap,
+			List<Delivery> deliveries) {
 		deliveries.forEach(delivery -> {
 			final SupplierTokenResponse supplierTokenResponse = supplierTokenResponseMap.get(delivery.getId());
 			delivery.setToken(supplierTokenResponse.getSupplierSignature().getToken());
 		});
-    }
+	}
 
     private Map<UUID, SupplierTokenResponse> assignToHashMap(List<SupplierTokenResponse> responses) {
         return responses.stream()
