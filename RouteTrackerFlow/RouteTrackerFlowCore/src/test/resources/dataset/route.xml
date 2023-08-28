@@ -34,7 +34,6 @@
     />
 
     <depot
-        id="1"
         city="Test"
         street="Test"
         country="Test"

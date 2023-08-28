@@ -24,7 +24,7 @@ public class DepotMapperTest {
                 .build();
 
         final DepotEntity expectedEntity = new DepotEntity();
-        expectedEntity.setId(1L);
+        expectedEntity.setDepotCode("KT3");
         expectedEntity.setCity(KATOWICE);
 
         // When
@@ -39,7 +39,7 @@ public class DepotMapperTest {
         // Given
         final DepotEntity depotEntity = new DepotEntity();
         depotEntity.setCity("Katowice");
-        depotEntity.setId(1L);
+        depotEntity.setDepotCode("KT3");
 
 
         final Depot expectedDepot = Depot.builder()

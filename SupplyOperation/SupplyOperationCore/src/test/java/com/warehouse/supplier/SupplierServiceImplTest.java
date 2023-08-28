@@ -2,8 +2,7 @@ package com.warehouse.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
+import com.warehouse.supplier.domain.model.SupplierModelRequest;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.port.secondary.SupplierServicePort;
 import com.warehouse.supplier.domain.service.SupplierServiceImpl;
@@ -44,8 +44,10 @@ public class SupplierServiceImplTest {
         // given
         final Supplier supplier = createSupplier();
 
-        when(service.createMultipleSuppliers(Collections.singletonList(supplier))).thenReturn(
-                Collections.singletonList(supplier));
+        final SupplierModelRequest request = mock(SupplierModelRequest.class);
+
+        when(supplierRepository.createMultipleSuppliers(Collections.singletonList(supplier))).thenReturn(
+                Collections.singletonList(request));
         // when
         final List<Supplier> supplierAddResponseList = service
                 .createMultipleSuppliers(List.of(supplier));

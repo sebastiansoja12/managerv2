@@ -1,6 +1,7 @@
 package com.warehouse.supplier.domain.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,9 @@ public class SupplierServiceImpl implements SupplierService {
                 .map(this::mapToSupplier)
                 .collect(Collectors.toList());
          **/
-        return suppliers;
+        return supplierList.stream()
+                .map(this::mapToSupplier)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -59,7 +62,14 @@ public class SupplierServiceImpl implements SupplierService {
         return supplierRepository.findByCode(supplierCode);
     }
 
-    private Supplier mapToSupplier(SupplierModelResponse supplierModelResponse) {
-        return Supplier.builder().build();
+    private Supplier mapToSupplier(SupplierModelRequest supplierModelRequest) {
+        return Supplier.builder()
+                .id(supplierModelRequest.getId())
+                .firstName(supplierModelRequest.getFirstName())
+                .telephone(supplierModelRequest.getTelephone())
+                .lastName(supplierModelRequest.getTelephone())
+                .supplierCode(supplierModelRequest.getSupplierCode())
+                .depotCode(supplierModelRequest.getDepotCode())
+                .build();
     }
 }

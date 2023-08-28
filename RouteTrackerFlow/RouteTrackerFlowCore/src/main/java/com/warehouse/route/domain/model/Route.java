@@ -21,7 +21,7 @@ public class Route {
 
     Long parcelId;
 
-    Long depotId;
+    String depotCode;
 
     String supplierCode;
 

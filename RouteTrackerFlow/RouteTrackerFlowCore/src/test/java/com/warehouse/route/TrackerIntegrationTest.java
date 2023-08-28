@@ -123,7 +123,6 @@ public class TrackerIntegrationTest {
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
                 .userId((long) user.getId())
-                .depotId(depot.getId())
                 //.supplierId(supplier.getId())
                 .created(LocalDateTime.now())
                 .build();
@@ -151,7 +150,6 @@ public class TrackerIntegrationTest {
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
                 //.supplierId(supplier.getId())
-                .depotId(depot.getId())
                 .userId((long) user.getId())
                 .created(LocalDateTime.now())
                 .build();

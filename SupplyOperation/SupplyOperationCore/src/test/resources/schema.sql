@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS ROUTE (
 id varchar(255) NOT NULL,
 created datetime DEFAULT NULL,
-depot_id bigint DEFAULT NULL,
+depot_code varchar(255) DEFAULT NULL,
 parcel_id bigint DEFAULT NULL,
 supplier_id bigint DEFAULT NULL,
 user_id int DEFAULT NULL,

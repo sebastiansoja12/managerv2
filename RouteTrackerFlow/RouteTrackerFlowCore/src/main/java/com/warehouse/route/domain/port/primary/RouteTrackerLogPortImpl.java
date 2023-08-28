@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.warehouse.route.domain.model.*;
+import org.apache.commons.lang3.StringUtils;
+
+import com.warehouse.route.domain.model.Route;
+import com.warehouse.route.domain.model.RouteDeleteRequest;
+import com.warehouse.route.domain.model.RouteRequest;
+import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.port.secondary.RouteLogService;
 import com.warehouse.route.domain.vo.SupplyInformation;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 
 
 @AllArgsConstructor
@@ -34,7 +38,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                     .created(request.created())
                     .supplierCode(request.getSupplierCode())
 					.parcelId(request.getParcelId())
-                    .depotId(1L)
+                    .depotCode(request.getDepotCode())
                     .build();
 			// routeLogService.saveSupplyRoute(route);
 		});
@@ -48,7 +52,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                 .parcelId(routeRequest.getParcelId())
                 .created(LocalDateTime.now())
                 //.supplierId(routeRequest.getSupplierId())
-                .depotId(routeRequest.getDepotId())
+                //.depotCode(routeRequest.getDepotId())
                 .userId(routeRequest.getUserId())
                 .build();
         return routeLogService.saveRoute(route);
@@ -70,7 +74,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                 .parcelId(routeRequest.getParcelId())
                 .created(LocalDateTime.now())
                 //.supplierId(routeRequest.getSupplierId())
-                .depotId(routeRequest.getDepotId())
+                //.depotId(routeRequest.getDepotId())
                 .userId(routeRequest.getUserId())
                 .build();
     }

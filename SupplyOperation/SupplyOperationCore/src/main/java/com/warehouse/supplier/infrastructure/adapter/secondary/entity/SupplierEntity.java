@@ -34,8 +34,8 @@ public class SupplierEntity {
     @Column(nullable = false)
     private String telephone;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "depot_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "depotCode", referencedColumnName = "depotCode")
     private DepotEntity depot;
 
 }

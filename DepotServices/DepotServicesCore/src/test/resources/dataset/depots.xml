@@ -2,7 +2,6 @@
 
 <dataset>
     <depot
-           id="1"
            city="Poznań"
            street="Polska 11"
            depot_code="PL1"
