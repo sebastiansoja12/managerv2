@@ -1,4 +1,4 @@
-package com.warehouse.auth.configuration;
+package com.warehouse.configuration;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
