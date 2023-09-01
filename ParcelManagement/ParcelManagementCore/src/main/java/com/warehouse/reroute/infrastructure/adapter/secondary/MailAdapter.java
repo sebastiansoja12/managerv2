@@ -1,0 +1,34 @@
+package com.warehouse.reroute.infrastructure.adapter.secondary;
+
+import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.reroute.domain.model.RerouteToken;
+import com.warehouse.reroute.domain.port.secondary.MailServicePort;
+import com.warehouse.reroute.domain.vo.Notification;
+import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.NotificationMapper;
+
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
+public class MailAdapter implements MailServicePort {
+
+    private final MailService mailService;
+
+    private final NotificationMapper notificationMapper;
+
+
+    @Override
+    public void sendReroutingInformation(RerouteToken rerouteToken) {
+        final Notification rerouteNotification = buildNotification(rerouteToken);
+        final com.warehouse.mail.domain.vo.Notification notification = notificationMapper.map(rerouteNotification);
+        mailService.sendNotification(notification);
+    }
+
+    public Notification buildNotification(RerouteToken rerouteToken) {
+        return Notification.builder()
+                .body("Prosimy wejść w link: " + "http://localhost:4200/reroute-edit/" + rerouteToken.getParcelId()
+                        + "/" + rerouteToken.getToken())
+                .recipient(rerouteToken.getEmail())
+                .subject("Zmiana danych przesyłki: " + rerouteToken.getParcelId())
+                .build();
+    }
+}

@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import java.net.MalformedURLException;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +33,8 @@ import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.service.ShipmentService;
+import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockAdapter;
+import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 
@@ -48,8 +48,12 @@ public class ShipmentIntegrationTest {
     @Autowired
     private ShipmentPort shipmentPort;
 
+
     @Mock
-    private PathFinderServicePort pathFinderServicePort;
+    private PathFinderMockService mockService;
+
+    @Autowired
+    private final PathFinderServicePort pathFinderServicePort = new PathFinderMockAdapter(mockService);
 
     @Autowired
     private ShipmentService shipmentService;
@@ -96,7 +100,6 @@ public class ShipmentIntegrationTest {
     }
 
     @Test
-    @Disabled
     void shouldNotShipParcelWhenPathFinderServiceIsNotAvailable() {
         // given
         final ShipmentRequest request = ShipmentRequest.builder()
@@ -105,8 +108,8 @@ public class ShipmentIntegrationTest {
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then
-        final MalformedURLException exception = assertThrows(MalformedURLException.class, executable);
-        assertEquals(expectedToBe("Error registered"), exception.getMessage());
+        final Exception exception = assertThrows(Exception.class, executable);
+        assertEquals(expectedToBe("Delivery depot could not be determined"), exception.getMessage());
     }
 
     @Test

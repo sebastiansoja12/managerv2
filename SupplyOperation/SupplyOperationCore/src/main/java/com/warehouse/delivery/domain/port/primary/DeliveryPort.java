@@ -1,9 +1,11 @@
 package com.warehouse.delivery.domain.port.primary;
 
-import com.warehouse.delivery.domain.model.SupplyInformation;
-import com.warehouse.delivery.domain.model.SupplyResponse;
+import com.warehouse.delivery.domain.model.DeliveryRequest;
+import com.warehouse.delivery.domain.model.DeliveryResponse;
+
+import java.util.List;
 
 public interface DeliveryPort {
 
-    SupplyResponse deliver(SupplyInformation supplyInformation);
+    List<DeliveryResponse> deliver(List<DeliveryRequest> deliveryRequest);
 }

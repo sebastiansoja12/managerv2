@@ -1,3 +1,16 @@
+qodana:
+  only:
+    - master
+    - branches
+    - merge_requests
+  image:
+    name: jetbrains/qodana-jvm
+    entrypoint: [""]
+  variables:
+    QODANA_TOKEN: $qodana_token
+  script:
+    - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana
+
 variables:
   MAVEN_OPTS: -Dmaven.repo.local=.m2/repository
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache

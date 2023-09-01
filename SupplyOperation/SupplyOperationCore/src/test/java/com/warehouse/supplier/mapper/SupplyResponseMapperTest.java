@@ -1,47 +1,66 @@
 package com.warehouse.supplier.mapper;
 
 import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.model.SupplierAddResponse;
+import com.warehouse.supplier.dto.SupplierAddResponseDto;
 import com.warehouse.supplier.dto.SupplierDto;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierResponseMapper;
-import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierResponseMapperImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SupplyResponseMapperTest {
 
-    private SupplierResponseMapper responseMapper;
+    private final SupplierResponseMapper mapper = Mappers.getMapper(SupplierResponseMapper.class);
 
-    @BeforeEach
-    void setup() {
-        responseMapper = new SupplierResponseMapperImpl();
-    }
 
     @Test
     void shouldMapFromSupplierToDto() {
         // given
         final Supplier supplier = new Supplier();
-        supplier.setFirstName("test");
+        supplier.setSupplierCode("code");
         // when
-        final SupplierDto supplierDto = responseMapper.map(supplier);
+        final SupplierDto supplierDto = mapper.map(supplier);
         // then
-        assertThat(supplierDto.getFirstName()).isEqualTo(supplier.getFirstName());
+        assertEquals(supplierDto.getSupplierCode(), supplier.getSupplierCode());
     }
 
     @Test
-    void shouldMapFromListToDtoList() {
+    void shouldMapFromSupplierListToDtoList() {
         // given
         final Supplier supplier = new Supplier();
-        supplier.setFirstName("test");
-        final List<Supplier> suppliers = new ArrayList<>();
-        suppliers.add(supplier);
+        supplier.setSupplierCode("code");
         // when
-        final List<SupplierDto> supplierDtos = responseMapper.map(suppliers);
+        final List<SupplierDto> supplierDto = mapper.mapToDto(Collections.singletonList(supplier));
         // then
-        assertThat(suppliers.get(0).getFirstName()).isEqualTo(supplierDtos.get(0).getFirstName());
+        assertEquals(supplierDto.get(0).getSupplierCode(), supplier.getSupplierCode());
+    }
+
+    @Test
+    void shouldMapRequestToDto() {
+        // given
+        final Supplier supplier = new Supplier();
+        supplier.setSupplierCode("code");
+        final SupplierAddResponse response = new SupplierAddResponse(supplier);
+        // when
+        final SupplierAddResponseDto responseDto = mapper.map(response);
+        // then
+        assertEquals(supplier.getSupplierCode(), responseDto.getSupplierCode());
+    }
+
+    @Test
+    void shouldMapRequestListToDtoList() {
+        // given
+        final Supplier supplier = new Supplier();
+        supplier.setSupplierCode("code");
+        final SupplierAddResponse response = new SupplierAddResponse(supplier);
+        // when
+        final List<SupplierAddResponseDto> responseDto = mapper.map(Collections.singletonList(response));
+        // then
+        assertEquals(supplier.getSupplierCode(), responseDto.get(0).getSupplierCode());
     }
 }

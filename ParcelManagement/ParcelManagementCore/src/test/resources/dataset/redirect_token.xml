@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<dataset>
+    <redirect_token
+            id = "1"
+            parcel_id="100001"
+            token="12345"
+            timeout="2137-05-25 20:23:54"
+            email="test@test.pl"
+    />
+</dataset>

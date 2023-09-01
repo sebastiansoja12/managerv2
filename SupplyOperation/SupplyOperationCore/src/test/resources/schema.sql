@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS ROUTE (
 id varchar(255) NOT NULL,
 created datetime DEFAULT NULL,
-depot_id bigint DEFAULT NULL,
+depot_code varchar(255) DEFAULT NULL,
 parcel_id bigint DEFAULT NULL,
 supplier_id bigint DEFAULT NULL,
 user_id int DEFAULT NULL,
@@ -55,3 +55,12 @@ price DOUBLE NOT NULL,
 parcel_size varchar(255) DEFAULT NULL,
 primary key (id)
 );
+
+CREATE TABLE IF NOT EXISTS DELIVERY (
+id VARCHAR(16) PRIMARY KEY,
+parcel_id BIGINT NOT NULL,
+created TIMESTAMP NOT NULL,
+depot_code VARCHAR(255) NOT NULL,
+supplier_code VARCHAR(255) NOT NULL,
+delivery_status VARCHAR(255) NOT NULL
+)

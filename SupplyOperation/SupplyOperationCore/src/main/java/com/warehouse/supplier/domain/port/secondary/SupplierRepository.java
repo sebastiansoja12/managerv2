@@ -1,17 +1,20 @@
 package com.warehouse.supplier.domain.port.secondary;
 
-import com.warehouse.supplier.domain.model.Supplier;
-
 import java.util.List;
 
+import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.model.SupplierModelRequest;
+
 public interface SupplierRepository {
-    void create(Supplier supplier);
+    Supplier create(Supplier supplier);
 
     List<Supplier> findAll();
 
-    void createMultipleSuppliers(List<Supplier> suppliers);
+    List<SupplierModelRequest> createMultipleSuppliers(List<Supplier> suppliers);
 
     List<Supplier> findByDepotCode(String depotCode);
+
+    List<Supplier> findBySupplierCode(String supplierCode);
 
     Supplier findByCode(String supplierCode);
 }

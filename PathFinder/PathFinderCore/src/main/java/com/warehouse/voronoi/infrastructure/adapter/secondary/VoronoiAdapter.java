@@ -1,34 +1,23 @@
 package com.warehouse.voronoi.infrastructure.adapter.secondary;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.support.RestGatewaySupport;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.warehouse.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.domain.model.Coordinates;
-import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServiceConfiguration;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
-import com.warehouse.voronoi.domain.service.ComputeService;
-import com.warehouse.voronoi.domain.service.UrlJsonReaderService;
+import com.warehouse.voronoi.infrastructure.adapter.secondary.exception.CoordinatesTechnicalException;
+
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.logging.Logger;
 
 @AllArgsConstructor
-@Slf4j
-public class VoronoiAdapter implements VoronoiServicePort {
+public class VoronoiAdapter extends RestGatewaySupport implements VoronoiServicePort {
 
     @NonNull
     private final PositionStackProperties positionStackProperties;
-
-    private final ComputeService computeService;
-
-    private final UrlJsonReaderService jsonReaderService;
 
     private final String DATA = "data";
 
@@ -37,29 +26,24 @@ public class VoronoiAdapter implements VoronoiServicePort {
     private final String LONGITUDE = "longitude";
 
     @Override
-    public String findFastestRoute(List<Depot> depots, String requestCity) {
+    public Coordinates obtainCoordinates(String requestCity) {
         final VoronoiAdapterConfiguration voronoiAdapterConfiguration = new VoronoiAdapterConfiguration();
-        return findFastestRoute(depots, requestCity, voronoiAdapterConfiguration);
+        return calculate(requestCity, voronoiAdapterConfiguration);
     }
 
+    private Coordinates calculate(String city, VoronoiAdapterConfiguration voronoiAdapterConfiguration) {
+        final String url = voronoiAdapterConfiguration.requestUrl(city);
+        final ResponseEntity<JsonNode> responseEntity = getRestTemplate().getForEntity(url, JsonNode.class);
+        final JsonNode jsonNode = responseEntity.getBody();
 
-    private String findFastestRoute(List<Depot> depots, String requestCity,
-			VoronoiAdapterConfiguration voronoiAdapterConfiguration) {
-		final String url = voronoiAdapterConfiguration.requestUrl(requestCity);
-		JsonNode jsonNode = null;
-		try {
-			final URL requestUrl = urlConverter(url);
-			jsonNode = result(requestUrl);
-		} catch (MalformedURLException e) {
-            log.warn("Error registered: {} ", e.getCause());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		final String lat = jsonNode.get(DATA).get(0).get(LATITUDE).asText();
-		final String lon = jsonNode.get(DATA).get(0).get(LONGITUDE).asText();
-		final Coordinates coordinates = getCoordinates(lon, lat);
-		return computeService.computeLength(coordinates, depots);
-	}
+        if (jsonNode == null) {
+            throw new CoordinatesTechnicalException("Failed to retrieve coordinates from the API.");
+        }
+
+        final String lat = jsonNode.get(DATA).get(0).get(LATITUDE).asText();
+        final String lon = jsonNode.get(DATA).get(0).get(LONGITUDE).asText();
+        return getCoordinates(lon, lat);
+    }
 
     private Coordinates getCoordinates(String lon, String lat) {
         return Coordinates.builder()
@@ -67,20 +51,6 @@ public class VoronoiAdapter implements VoronoiServicePort {
                 .lon(Double.parseDouble(lon))
                 .build();
     }
-
-    private JsonNode result(URL url) throws IOException {
-        return jsonReaderService.get(url);
-    }
-
-    private String createRequest(String city) {
-        return positionStackProperties.createRequest(city);
-    }
-
-
-    private URL urlConverter(String url) throws MalformedURLException {
-        return new URL(url);
-    }
-
 
     private class VoronoiAdapterConfiguration implements VoronoiServiceConfiguration {
 

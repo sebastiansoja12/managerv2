@@ -107,7 +107,7 @@ public class TrackerIntegrationTest {
         // given
         final Route supplyRoute = Route.builder()
                 .parcelId(parcel.getId())
-                .supplierId(supplier.getId())
+                //.supplierId(supplier.getId())
                 .created(LocalDateTime.now())
                 .build();
         // when
@@ -123,8 +123,7 @@ public class TrackerIntegrationTest {
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
                 .userId((long) user.getId())
-                .depotId(depot.getId())
-                .supplierId(supplier.getId())
+                //.supplierId(supplier.getId())
                 .created(LocalDateTime.now())
                 .build();
         // when
@@ -144,14 +143,13 @@ public class TrackerIntegrationTest {
 
         final Route supplyRoute = Route.builder()
                 .parcelId(parcel.getId())
-                .supplierId(supplier.getId())
+                //.supplierId(supplier.getId())
                 .created(LocalDateTime.now())
                 .build();
 
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
-                .supplierId(supplier.getId())
-                .depotId(depot.getId())
+                //.supplierId(supplier.getId())
                 .userId((long) user.getId())
                 .created(LocalDateTime.now())
                 .build();

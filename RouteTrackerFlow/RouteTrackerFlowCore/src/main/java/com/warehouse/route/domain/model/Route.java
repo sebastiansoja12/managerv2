@@ -1,13 +1,12 @@
 package com.warehouse.route.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Value;
-import org.hibernate.annotations.Type;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import lombok.Builder;
+import lombok.Value;
 
 @Value
 @Builder
@@ -22,8 +21,8 @@ public class Route {
 
     Long parcelId;
 
-    Long depotId;
+    String depotCode;
 
-    Long supplierId;
+    String supplierCode;
 
 }

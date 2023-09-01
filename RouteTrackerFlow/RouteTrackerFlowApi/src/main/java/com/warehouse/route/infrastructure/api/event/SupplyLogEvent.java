@@ -1,7 +1,10 @@
 package com.warehouse.route.infrastructure.api.event;
 
+import java.util.List;
+
 import com.warehouse.route.infrastructure.api.RouteLogEvent;
 import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -10,10 +13,10 @@ import lombok.NonNull;
 public class SupplyLogEvent extends RouteLogBaseEvent implements RouteLogEvent {
 
     @NonNull
-    private final SupplyInformationDto supplyInformation;
+    private final List<SupplyInformationDto> supplyInformation;
 
     @Builder
-    SupplyLogEvent(@NonNull SupplyInformationDto supplyInformation) {
+    SupplyLogEvent(@NonNull List<SupplyInformationDto> supplyInformation) {
         super();
         this.supplyInformation = supplyInformation;
     }

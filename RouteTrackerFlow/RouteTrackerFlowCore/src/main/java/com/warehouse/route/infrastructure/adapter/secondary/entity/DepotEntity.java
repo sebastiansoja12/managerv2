@@ -1,11 +1,13 @@
 package com.warehouse.route.infrastructure.adapter.secondary.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.persistence.*;
 
 
 @Data
@@ -17,8 +19,8 @@ import jakarta.persistence.*;
 public class DepotEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(nullable = false, unique = true)
+    private String depotCode;
 
     @Column(nullable = false)
     private String city;
@@ -28,15 +30,5 @@ public class DepotEntity {
 
     @Column(nullable = false)
     private String country;
-
-    @Column(nullable = false, unique = true)
-    private String depotCode;
-
-    @Column(nullable = true)
-    private double lat;
-
-    @Column(nullable = true)
-    private double lon;
-
 }
 

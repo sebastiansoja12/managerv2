@@ -1,9 +1,17 @@
 package com.warehouse.supplier.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Supplier {
+
+    private Long id;
 
     private String supplierCode;
 
@@ -13,6 +21,6 @@ public class Supplier {
 
     private String telephone;
 
-    private Depot depot;
+    private String depotCode;
 
 }

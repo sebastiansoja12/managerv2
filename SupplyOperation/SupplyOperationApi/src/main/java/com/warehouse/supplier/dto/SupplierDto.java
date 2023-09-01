@@ -13,5 +13,5 @@ public class SupplierDto {
 
     private String telephone;
 
-    private DepotDto depot;
+    private String depotCode;
 }

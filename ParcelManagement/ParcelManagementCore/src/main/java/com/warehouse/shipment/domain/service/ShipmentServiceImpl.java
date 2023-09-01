@@ -3,6 +3,8 @@ package com.warehouse.shipment.domain.service;
 import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_201;
 import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_202;
 
+import java.util.Objects;
+
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
@@ -31,9 +33,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 	@Override
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
 
-		final City city = pathFinderServicePort.determineDeliveryDepot(shipmentParcel);
+        final Address address = buildAddress(shipmentParcel);
 
-        if (city.getValue() == null) {
+		final City city = pathFinderServicePort.determineDeliveryDepot(address);
+
+        if (Objects.isNull(city) || city.getValue() == null) {
             throw new DestinationDepotDeterminationException(SHIPMENT_202);
 		}
 
@@ -43,7 +47,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logParcel(parcel);
 
-        //paypalServicePort.payment(parcel);
 		final PaymentStatus paymentStatus = paypalServicePort.payment(parcel);
 
         logPayment(paymentStatus, parcel);
@@ -62,9 +65,13 @@ public class ShipmentServiceImpl implements ShipmentService {
 		return shipmentServicePort.registerParcel(parcel.getId(), paymentStatus.getLink());
 	}
 
+
     @Override
     public UpdateParcelResponse update(ParcelUpdate parcelUpdate) {
-        final City city = pathFinderServicePort.determineDeliveryDepot(parcelUpdate);
+
+        final Address address = buildAddress(parcelUpdate);
+
+        final City city = pathFinderServicePort.determineDeliveryDepot(address);
 
         if (!city.getValue().equals(parcelUpdate.getDestination())) {
             updateParcelDestinationForReroute(parcelUpdate, city);
@@ -85,12 +92,35 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipmentRepository.delete(parcelId);
     }
 
+    @Override
+    public boolean exists(Long parcelId) {
+        return shipmentRepository.exists(parcelId);
+    }
+
+    private Address buildAddress(ShipmentParcel shipmentParcel) {
+        return Address.builder()
+                .street(shipmentParcel.getRecipient().getStreet())
+                .city(shipmentParcel.getRecipient().getCity())
+                .postalCode(shipmentParcel.getRecipient().getPostalCode())
+                .build();
+    }
+
+    private Address buildAddress(ParcelUpdate parcelUpdate) {
+        return Address.builder()
+                .street(parcelUpdate.getRecipientStreet())
+                .city(parcelUpdate.getRecipientCity())
+                .postalCode(parcelUpdate.getRecipientPostalCode())
+                .build();
+    }
+
     private void updateParcelDestination(ShipmentParcel shipmentParcel, City city) {
         shipmentParcel.setDestination(city.getValue());
     }
 
     private void updateParcelDestinationForReroute(ParcelUpdate parcelUpdate, City city) {
-        parcelUpdate.setDestination(city.getValue());
+        if (!Objects.isNull(city) && city.getValue() != null) {
+            parcelUpdate.setDestination(city.getValue());
+        }
     }
 
     private void logNotification(Notification notification) {

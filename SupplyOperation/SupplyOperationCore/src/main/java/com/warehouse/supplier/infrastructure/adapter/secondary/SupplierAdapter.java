@@ -1,39 +1,20 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary;
 
-import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
-import com.warehouse.supplier.domain.port.secondary.SupplierServicePort;
-import lombok.AllArgsConstructor;
-
 import java.util.List;
+
+import com.warehouse.supplier.domain.model.SupplierModelRequest;
+import com.warehouse.supplier.domain.model.SupplierModelResponse;
+import com.warehouse.supplier.domain.port.secondary.SupplierServicePort;
+
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class SupplierAdapter implements SupplierServicePort {
 
-    private final SupplierRepository supplierRepository;
-
+    // TODO INPL-6150
+    // send supplier request to STS to save in db
     @Override
-    public void create(Supplier supplier) {
-        supplierRepository.create(supplier);
-    }
-
-    @Override
-    public List<Supplier> findAll() {
-        return supplierRepository.findAll();
-    }
-
-    @Override
-    public void createMultipleSuppliers(List<Supplier> suppliers) {
-        supplierRepository.createMultipleSuppliers(suppliers);
-    }
-
-    @Override
-    public List<Supplier> findSuppliersByDepotCode(String depotCode) {
-        return supplierRepository.findByDepotCode(depotCode);
-    }
-
-    @Override
-    public Supplier findSupplierByCode(String supplierCode) {
-        return supplierRepository.findByCode(supplierCode);
+    public List<SupplierModelResponse> createSuppliers(List<SupplierModelRequest> suppliers) {
+        return null;
     }
 }

@@ -1,7 +1,6 @@
 package com.warehouse.route.infrastructure.adapter.secondary.entity;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,7 +38,7 @@ public class RouteEntity {
     private ParcelEntity parcel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "depot_id", referencedColumnName = "id")
+    @JoinColumn(name = "depotCode", referencedColumnName = "depotCode")
     private DepotEntity depot;
 
     @ManyToOne(fetch = FetchType.LAZY)

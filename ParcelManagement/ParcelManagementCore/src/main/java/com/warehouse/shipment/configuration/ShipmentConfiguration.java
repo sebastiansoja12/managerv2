@@ -1,16 +1,19 @@
 package com.warehouse.shipment.configuration;
 
 import org.mapstruct.factory.Mappers;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.shipment.domain.port.primary.*;
+import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
+import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
+import com.warehouse.shipment.domain.port.primary.ShipmentReroutePortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.NotificationCreatorProviderImpl;
@@ -78,11 +81,6 @@ public class ShipmentConfiguration {
 				LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class));
 	}
 
-	@Bean(name = "shipment.pathFinderServicePort")
-	public PathFinderServicePort pathFinderServicePort(VoronoiService voronoiService, DepotPort depotPort) {
-		return new PathFinderAdapter(voronoiService, depotPort);
-	}
-
 	@Bean
 	public PaypalServicePort paypalServicePort(PaypalPort paypalPort) {
 		final PaymentMapper paymentMapper = Mappers.getMapper(PaymentMapper.class);
@@ -101,7 +99,15 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentRestPort shipmentRestPort(ShipmentService service) {
-		return new ShipmentRestPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentRestPortImpl.class));
+	@ConditionalOnProperty(name="service.mock", havingValue="false")
+	public PathFinderServicePort pathFinderServicePort(VoronoiService voronoiService) {
+		return new PathFinderAdapter(voronoiService);
+	}
+
+	//MOCK
+	@Bean
+	@ConditionalOnProperty(name="service.mock", havingValue="true")
+	public PathFinderServicePort pathFinderMockServicePort(PathFinderMockService pathFinderMockService) {
+		return new PathFinderMockAdapter(pathFinderMockService);
 	}
 }

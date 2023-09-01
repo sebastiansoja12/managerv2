@@ -1,37 +1,69 @@
 package com.warehouse.delivery.configuration;
 
-import com.warehouse.delivery.DeliveryService;
-import com.warehouse.delivery.domain.port.primary.DeliveryPort;
-import com.warehouse.delivery.domain.port.primary.DeliveryPortImpl;
-import com.warehouse.delivery.domain.port.secondary.DeliveryServicePort;
-import com.warehouse.delivery.infrastructure.adapter.primary.DeliveryServiceAdapter;
-import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
-import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
-import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryAdapter;
-import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.SupplyMapper;
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import org.mapstruct.factory.Mappers;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.warehouse.delivery.domain.port.primary.DeliveryPort;
+import com.warehouse.delivery.domain.port.primary.DeliveryPortImpl;
+import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
+import com.warehouse.delivery.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.delivery.domain.port.secondary.SupplierTokenServicePort;
+import com.warehouse.delivery.domain.service.DeliveryService;
+import com.warehouse.delivery.domain.service.DeliveryServiceImpl;
+import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
+import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
+import com.warehouse.delivery.infrastructure.adapter.secondary.*;
+import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryMapper;
+import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 
 @Configuration
 public class DeliveryConfiguration {
 
+	@Bean
+	public DeliveryPort deliveryPort(DeliveryService service, RouteLogServicePort logServicePort) {
+		return new DeliveryPortImpl(service, logServicePort);
+	}
+
+	@Bean
+	public DeliveryService deliveryService(DeliveryRepository deliveryRepository,
+			SupplierTokenServicePort servicePort) {
+		return new DeliveryServiceImpl(deliveryRepository, servicePort);
+	}
+
     @Bean
-    public DeliveryService deliveryService(DeliveryPort deliveryPort) {
-        final DeliveryRequestMapper requestMapper = Mappers.getMapper(DeliveryRequestMapper.class);
-        final DeliveryResponseMapper responseMapper = Mappers.getMapper(DeliveryResponseMapper.class);
-        return new DeliveryServiceAdapter(deliveryPort, requestMapper, responseMapper);
+    public DeliveryRepository deliveryRepository(DeliveryReadRepository repository) {
+        return new DeliveryRepositoryImpl(repository);
     }
 
     @Bean
-    public DeliveryPort deliveryPort(DeliveryServicePort servicePort) {
-        return new DeliveryPortImpl(servicePort);
+    public RouteLogServicePort deliveryServicePort(RouteLogEventPublisher routeLogEventPublisher) {
+        final DeliveryMapper deliveryMapper = Mappers.getMapper(DeliveryMapper.class);
+        return new RouteLogAdapter(routeLogEventPublisher, deliveryMapper);
     }
 
     @Bean
-    public DeliveryServicePort deliveryServicePort(RouteLogEventPublisher routeLogEventPublisher) {
-        final SupplyMapper supplyMapper = Mappers.getMapper(SupplyMapper.class);
-        return new DeliveryAdapter(routeLogEventPublisher, supplyMapper);
+    @ConditionalOnProperty(name="service.mock", havingValue="false")
+    public SupplierTokenServicePort supplierTokenServicePort() {
+        return new SupplierTokenAdapter();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name="service.mock", havingValue="true")
+    public SupplierTokenServicePort supplierTokenMockServicePort() {
+        final SupplierTokenMockGenerator mockGenerator = new SupplierTokenMockGeneratorImpl();
+        return new SupplierTokenMockAdapter(mockGenerator);
+    }
+
+    // Mappers
+    @Bean(name = "delivery.requestMapper")
+    public DeliveryRequestMapper requestMapper() {
+        return Mappers.getMapper(DeliveryRequestMapper.class);
+    }
+
+    @Bean(name = "delivery.responseMapper")
+    public DeliveryResponseMapper responseMapper() {
+        return Mappers.getMapper(DeliveryResponseMapper.class);
     }
 }

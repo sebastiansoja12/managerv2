@@ -21,10 +21,17 @@ public class ShipmentServiceAdapter implements ShipmentService {
 
     private final ShipmentReroutePort shipmentReroutePort;
 
+    private final ShipmentPort shipmentPort;
+
     @Override
     public UpdateParcelResponseDto update(UpdateParcelRequestDto parcelRequest) {
         final UpdateParcelRequest updateParcelRequest = requestMapper.map(parcelRequest);
         final UpdateParcelResponse updateParcelResponse = shipmentReroutePort.reroute(updateParcelRequest);
         return responseMapper.map(updateParcelResponse);
+    }
+
+    @Override
+    public boolean exists(Long parcelId) {
+        return shipmentPort.exists(parcelId);
     }
 }

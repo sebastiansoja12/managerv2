@@ -1,11 +1,11 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
+import com.warehouse.shipment.domain.model.Parcel;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.shipment.domain.enumeration.ParcelType;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.model.ShipmentRequest;
 import com.warehouse.shipment.domain.model.ShipmentResponse;
@@ -37,6 +37,17 @@ public class ShipmentPortImpl implements ShipmentPort {
         return service.createShipment(parcel);
     }
 
+    @Override
+    public Parcel loadParcel(Long parcelId) {
+        return service.loadParcel(parcelId);
+    }
+
+    @Override
+    public boolean exists(Long parcelId) {
+        return service.exists(parcelId);
+    }
+
+
     private ShipmentParcel extractParcelFromRequest(ShipmentRequest request) {
         return request.getParcel();
     }
@@ -47,11 +58,8 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     private void logParcelShipment(ShipmentParcel parcel) {
-        logger.info("Detected service to create shipment for parcel {}", parcel.getClass());
-    }
-
-    private void logDeleteParcel(Long parcelId) {
-        logger.info("Parcel to delete with id: {}", parcelId);
+		logger.info("Detected service to create shipment for parcel with telephone number {}",
+				parcel.getSender().getTelephoneNumber());
     }
 
 }

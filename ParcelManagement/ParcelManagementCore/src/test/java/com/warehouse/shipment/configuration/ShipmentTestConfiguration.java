@@ -1,5 +1,6 @@
 package com.warehouse.shipment.configuration;
 
+import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -40,5 +41,8 @@ public class ShipmentTestConfiguration {
 
     @MockBean
     public RouteLogEventPublisher routeLogEventPublisher;
+
+    @MockBean
+    public PathFinderServicePort pathFinderServicePort;
 
 }

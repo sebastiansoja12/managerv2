@@ -5,7 +5,6 @@ import static org.mockito.Mockito.doReturn;
 
 import java.util.List;
 
-import com.warehouse.dto.CoordinatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,17 +80,9 @@ public class TSPServiceAdapterTest {
     private List<DepotDto> buildDepots() {
         final DepotDto depot1 = new DepotDto();
         depot1.setDepotCode("KR1");
-        depot1.setCoordinates(CoordinatesDto.builder()
-                .lon(50.0468548)
-                .lat(19.9348336)
-                .build());
 
         final DepotDto depot2 = new DepotDto();
         depot2.setDepotCode("KT1");
-        depot2.setCoordinates(CoordinatesDto.builder()
-                .lon(50.3013283)
-                .lat(18.5795769)
-                .build());
 
         return List.of(depot1, depot2);
     }
