@@ -7,8 +7,6 @@ import com.warehouse.parcelstate.infrastructure.adapter.secondary.entity.ParcelE
 import com.warehouse.parcelstate.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import lombok.AllArgsConstructor;
 
-import java.util.Optional;
-
 
 @AllArgsConstructor
 public class PackageRepositoryImpl implements ParcelStateRepository {

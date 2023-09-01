@@ -1,4 +1,4 @@
-package com.warehouse.parcelstate.infrastructure.adapter.primary.dto;
+package com.warehouse.parcelstate.infrastructure.api.dto;
 
 import lombok.Data;
 

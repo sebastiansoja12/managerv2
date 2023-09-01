@@ -1,9 +1,9 @@
 package com.warehouse.parcelstate.domain.port.primary;
 
-import com.warehouse.parcelstate.domain.model.RerouteParcel;
-import com.warehouse.parcelstate.domain.model.RerouteResponse;
+import com.warehouse.parcelstate.domain.model.DeliveryStateRequest;
+import com.warehouse.parcelstate.domain.model.DeliveryStateResponse;
 
 public interface ParcelStatePort {
 
-    RerouteResponse rerouteParcel(RerouteParcel parcel);
+    DeliveryStateResponse updateStatus(DeliveryStateRequest request);
 }
