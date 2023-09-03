@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +24,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.paypal.domain.model.LinkInformation;
+import com.warehouse.paypal.domain.model.Link;
 import com.warehouse.paypal.domain.model.PaymentRequest;
 import com.warehouse.paypal.domain.model.PaymentResponse;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
@@ -63,7 +65,6 @@ public class ShipmentIntegrationTest {
 
 
     @Test
-    @DatabaseSetup("/database/db.xml")
     @Disabled
     void shouldShipParcel() {
         // given
@@ -72,13 +73,13 @@ public class ShipmentIntegrationTest {
         final ShipmentRequest request = ShipmentRequest.builder()
                 .parcel(parcel)
                 .build();
-        final LinkInformation linkInformation = new LinkInformation();
+        final Link linkInformation = new Link("paymentUrl");
         final PaymentResponse paymentResponse = PaymentResponse.builder()
                 .paymentMethod("paypal")
                 .createTime("now")
                 .link(linkInformation)
                 .build();
-        final PaymentRequest paymentRequest = new PaymentRequest(1000000000L, 99);
+		final PaymentRequest paymentRequest = null;
         when(paypalPort.payment(paymentRequest)).thenReturn(paymentResponse);
         // when
         final ShipmentResponse response = shipmentPort.ship(request);

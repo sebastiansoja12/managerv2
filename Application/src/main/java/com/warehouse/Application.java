@@ -1,8 +1,5 @@
 package com.warehouse;
 
-import com.warehouse.auth.domain.provider.JwtProvider;
-import com.warehouse.auth.domain.provider.RefreshTokenProvider;
-import com.warehouse.positionstack.PositionStackProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -10,11 +7,11 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication
+@EnableConfigurationProperties
+@SpringBootApplication(scanBasePackages = "com.warehouse.*")
 @EntityScan(basePackages = {"com.warehouse.*"})
 @EnableJpaRepositories(basePackages = {"com.warehouse.*"})
-@ConfigurationPropertiesScan(basePackages = {"com.warehouse.*"})
-@EnableConfigurationProperties({JwtProvider.class, PositionStackProperties.class, RefreshTokenProvider.class})
+@ConfigurationPropertiesScan("com.warehouse.*")
 public class Application {
 
 	public static void main(String[] args) {
