@@ -3,7 +3,6 @@ package com.warehouse.paypal.configuration;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.OAuthTokenCredential;
 import com.paypal.base.rest.PayPalRESTException;
-import com.warehouse.paypal.domain.model.PaymentInformation;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.paypal.domain.port.primary.PaypalPortImpl;
 import com.warehouse.paypal.domain.port.secondary.PaymentRepository;
@@ -15,39 +14,32 @@ import com.warehouse.paypal.infrastructure.adapter.secondary.PaypalReadRepositor
 import com.warehouse.paypal.infrastructure.adapter.secondary.PaypalRepositoryImpl;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalMapper;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalResponseMapper;
+import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@PropertySource("classpath:application-payment.properties")
+@RequiredArgsConstructor
 public class PaymentConfiguration {
 
-    @Value("${paypal.client.id}")
-    private String clientId;
-
-    @Value("${paypal.client.secret}")
-    private String clientSecret;
-
-    @Value("${paypal.mode}")
-    private String mode;
-
+    private final PaypalConfigurationProperties paypalConfigurationProperties;
 
     @Bean
     public Map<String, String> paypalSdkConfig() {
         final Map<String, String> configMap = new HashMap<String, String>();
-        configMap.put("mode", mode);
+        configMap.put("mode", paypalConfigurationProperties.getMode());
         return configMap;
     }
 
     @Bean
     public OAuthTokenCredential oAuthTokenCredential() {
+        final String clientId = paypalConfigurationProperties.getClientId();
+        final String clientSecret = paypalConfigurationProperties.getClientSecret();
         return new OAuthTokenCredential(clientId, clientSecret, paypalSdkConfig());
     }
 
@@ -86,5 +78,4 @@ public class PaymentConfiguration {
     public PaymentService paymentService(PaymentSecondaryPort port) {
         return new PaymentServiceImpl(port);
     }
-
 }
