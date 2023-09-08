@@ -2,11 +2,11 @@ package com.warehouse.paypal.domain.port.secondary;
 
 import com.warehouse.paypal.domain.model.PaymentInformation;
 
-public interface PaymentRepository {
+public interface PaypalRepository {
 
     void savePayment(PaymentInformation payment);
 
-    void updatePayment(String paymentId);
+    void updatePayment(Long paymentId);
 
-    PaymentInformation findByPaymentId(String paypalId);
+    PaymentInformation findByPaymentId(Long paypalId);
 }

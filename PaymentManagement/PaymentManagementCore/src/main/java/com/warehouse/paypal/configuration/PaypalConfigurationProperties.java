@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Configuration
 @Getter
-@ConfigurationProperties("paypal")
+@ConfigurationProperties(prefix = "paypal")
 public class PaypalConfigurationProperties {
 
     private String clientId;

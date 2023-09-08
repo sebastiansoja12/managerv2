@@ -2,6 +2,8 @@ package com.warehouse;
 
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
+import com.warehouse.paypal.configuration.PaypalConfigurationProperties;
+import com.warehouse.paypal.domain.model.RedirectUrls;
 import com.warehouse.positionstack.PositionStackProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +16,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = {"com.warehouse.*"})
 @EnableJpaRepositories(basePackages = {"com.warehouse.*"})
 @ConfigurationPropertiesScan(basePackages = {"com.warehouse.*"})
-@EnableConfigurationProperties({JwtProvider.class, PositionStackProperties.class, RefreshTokenProvider.class})
+@EnableConfigurationProperties({JwtProvider.class, PositionStackProperties.class, RefreshTokenProvider.class,
+		PaypalConfigurationProperties.class, RedirectUrls.class})
 public class Application {
 
 	public static void main(String[] args) {

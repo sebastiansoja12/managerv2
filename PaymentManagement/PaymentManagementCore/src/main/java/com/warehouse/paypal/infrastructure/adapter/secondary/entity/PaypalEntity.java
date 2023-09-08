@@ -1,5 +1,7 @@
 package com.warehouse.paypal.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.paypal.infrastructure.adapter.secondary.enumeration.PaymentMethod;
+import com.warehouse.paypal.infrastructure.adapter.secondary.enumeration.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,17 +17,22 @@ import jakarta.persistence.*;
 @Entity(name = "payment.PaypalEntity")
 public class PaypalEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@Column(name = "id", nullable = false)
+	private Long id;
 
-    private double amount;
+	@Column(name = "amount", nullable = false)
+	private double amount;
 
-    private String paymentId;
+	@Column(name = "payment_status", nullable = false)
+	private PaymentStatus paymentStatus;
 
-    private String parcelStatus;
+	@Column(name = "payment_method", nullable = false)
+	private PaymentMethod paymentMethod;
 
-    private String paymentUrl;
+	@Column(name = "paymentUrl", nullable = false)
+	private String paymentUrl;
 
-    private Long parcelId;
+	@Column(name = "parcelId", nullable = false)
+	private Long parcelId;
 }

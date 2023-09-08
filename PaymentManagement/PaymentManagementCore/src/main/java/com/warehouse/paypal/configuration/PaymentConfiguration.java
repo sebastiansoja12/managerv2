@@ -1,27 +1,32 @@
 package com.warehouse.paypal.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.warehouse.paypal.domain.model.RedirectUrls;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.OAuthTokenCredential;
 import com.paypal.base.rest.PayPalRESTException;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.paypal.domain.port.primary.PaypalPortImpl;
-import com.warehouse.paypal.domain.port.secondary.PaymentRepository;
-import com.warehouse.paypal.domain.port.secondary.PaymentSecondaryPort;
-import com.warehouse.paypal.domain.service.PaymentService;
-import com.warehouse.paypal.domain.service.PaymentServiceImpl;
+import com.warehouse.paypal.domain.port.secondary.PaypalRepository;
+import com.warehouse.paypal.domain.port.secondary.PaypalServicePort;
+import com.warehouse.paypal.domain.service.PaypalService;
+import com.warehouse.paypal.domain.service.PaypalServiceImpl;
 import com.warehouse.paypal.infrastructure.adapter.secondary.PaypalAdapter;
 import com.warehouse.paypal.infrastructure.adapter.secondary.PaypalReadRepository;
 import com.warehouse.paypal.infrastructure.adapter.secondary.PaypalRepositoryImpl;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalMapper;
+import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalRequestMapper;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalResponseMapper;
-import lombok.RequiredArgsConstructor;
-import org.mapstruct.factory.Mappers;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import java.util.HashMap;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -31,15 +36,15 @@ public class PaymentConfiguration {
 
     @Bean
     public Map<String, String> paypalSdkConfig() {
-        final Map<String, String> configMap = new HashMap<String, String>();
-        configMap.put("mode", paypalConfigurationProperties.getMode());
+        final Map<String, String> configMap = new HashMap<>();
+        configMap.put("mode", "sandbox");
         return configMap;
     }
 
     @Bean
     public OAuthTokenCredential oAuthTokenCredential() {
-        final String clientId = paypalConfigurationProperties.getClientId();
-        final String clientSecret = paypalConfigurationProperties.getClientSecret();
+        final String clientId = "AZJujCejHaxVGZrpN6VUYjDsKj-VRbX--t29eT6Xe2HBJpdh3o8hZ4s_ijN_PSn6ByIAD0ijicHOq0P4";
+        final String clientSecret = "EGgeKU4Zo-6LIUxEvKkM9O9EM_r4ueRXBz2jrVq6TIoeYO4mJQZZW-BcYuGIAMCVlqZiPDIZ7LIiiqGx";
         return new OAuthTokenCredential(clientId, clientSecret, paypalSdkConfig());
     }
 
@@ -55,27 +60,28 @@ public class PaymentConfiguration {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean(name = "PaymentRepositoryImpl")
-    public PaymentRepository paymentRepository(PaypalReadRepository readRepository) {
+    @Bean
+    public PaypalRepository paypalRepository(PaypalReadRepository readRepository) {
         final PaypalMapper paypalMapper = Mappers.getMapper(PaypalMapper.class);
         return new PaypalRepositoryImpl(readRepository, paypalMapper);
     }
 
     @Bean
-    public PaymentSecondaryPort paymentSecondaryPort(APIContext apiContext, PaymentRepository paymentRepository) {
-        final PaypalMapper paypalMapper = Mappers.getMapper(PaypalMapper.class);
+    public PaypalServicePort paymentSecondaryPort(APIContext apiContext) {
         final PaypalResponseMapper responseMapper = Mappers.getMapper(PaypalResponseMapper.class);
-        return new PaypalAdapter(apiContext, paypalMapper, responseMapper, paymentRepository);
+        final PaypalRequestMapper requestMapper = Mappers.getMapper(PaypalRequestMapper.class);
+        return new PaypalAdapter(apiContext, requestMapper, responseMapper);
     }
 
 
     @Bean
-    public PaypalPort paymentPort(PaymentService paymentService) {
-        return new PaypalPortImpl(paymentService);
+    public PaypalPort paymentPort(PaypalService paypalService) {
+        return new PaypalPortImpl(paypalService);
     }
 
-    @Bean
-    public PaymentService paymentService(PaymentSecondaryPort port) {
-        return new PaymentServiceImpl(port);
-    }
+	@Bean
+	public PaypalService paymentService(PaypalServicePort port, PaypalRepository paypalRepository,
+			 RedirectUrls redirectUrls) {
+		return new PaypalServiceImpl(port, paypalRepository, redirectUrls);
+	}
 }

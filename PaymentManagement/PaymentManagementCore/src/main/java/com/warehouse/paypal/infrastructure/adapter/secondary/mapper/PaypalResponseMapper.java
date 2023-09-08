@@ -1,28 +1,27 @@
 package com.warehouse.paypal.infrastructure.adapter.secondary.mapper;
 
-import com.paypal.api.payments.Links;
-import com.paypal.api.payments.Payment;
-import com.warehouse.paypal.domain.model.LinkInformation;
-import com.warehouse.paypal.domain.model.PaymentResponse;
+import java.util.List;
+
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+
+import com.paypal.api.payments.Payment;
+import com.warehouse.paypal.domain.model.Links;
+import com.warehouse.paypal.domain.model.PaypalResponse;
+import org.mapstruct.ReportingPolicy;
 
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface PaypalResponseMapper {
 
-    @Mapping(source = "href", target = "paymentUrl")
-    LinkInformation map(Links links);
-
-    default PaymentResponse map(Payment payment) {
-        final LinkInformation linkInformation = new LinkInformation();
-        for (Links link : payment.getLinks()) {
+    default PaypalResponse map(Payment payment) {
+        final Links links = new Links();
+        for (com.paypal.api.payments.Links link : payment.getLinks()) {
             if (link.getRel().equals("approval_url")) {
-                linkInformation.setPaymentUrl(link.getHref());
+                link.setHref(link.getHref());
             }
         }
-        return PaymentResponse.builder()
-                .link(linkInformation)
+        return PaypalResponse.builder()
+                .links(List.of(links))
                 .createTime(payment.getCreateTime())
                 .paymentMethod(payment.getPayer().getPaymentMethod())
                 .failureReason(payment.getFailureReason())

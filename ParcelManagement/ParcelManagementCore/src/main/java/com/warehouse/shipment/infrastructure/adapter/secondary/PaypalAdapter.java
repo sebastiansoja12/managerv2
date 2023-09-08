@@ -10,6 +10,8 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.PaymentMap
 
 import lombok.AllArgsConstructor;
 
+import java.math.BigDecimal;
+
 @AllArgsConstructor
 public class PaypalAdapter implements PaypalServicePort {
 
@@ -19,7 +21,7 @@ public class PaypalAdapter implements PaypalServicePort {
 
     @Override
     public PaymentStatus payment(Parcel parcel) {
-        final PaymentRequest paymentRequest = new PaymentRequest(parcel.getId(), parcel.getPrice());
+        final PaymentRequest paymentRequest = new PaymentRequest(parcel.getId(), BigDecimal.valueOf(parcel.getPrice()));
         final PaymentResponse paymentResponse = paypalPort.payment(paymentRequest);
         return paymentMapper.map(paymentResponse);
     }
