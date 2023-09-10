@@ -1,6 +1,13 @@
 package com.warehouse.paypal.infrastructure.adapter.secondary;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.List;
+import java.util.Scanner;
 
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
@@ -8,15 +15,19 @@ import com.paypal.base.rest.PayPalRESTException;
 import com.warehouse.paypal.domain.model.PaypalRequest;
 import com.warehouse.paypal.domain.model.PaypalResponse;
 import com.warehouse.paypal.domain.port.secondary.PaypalServicePort;
+import com.warehouse.paypal.domain.properties.PayeeProperties;
 import com.warehouse.paypal.infrastructure.adapter.secondary.exception.PaypalErrorException;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalRequestMapper;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalResponseMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.support.RestGatewaySupport;
 
 @AllArgsConstructor
-public class PaypalAdapter implements PaypalServicePort {
+public class PaypalAdapter extends RestGatewaySupport implements PaypalServicePort {
 
     @NonNull
     private final APIContext apiContext;
@@ -24,6 +35,8 @@ public class PaypalAdapter implements PaypalServicePort {
     private final PaypalRequestMapper requestMapper;
 
     private final PaypalResponseMapper responseMapper;
+
+    private final PayeeProperties payeeProperties = new PayeeProperties();
 
     @Override
     public PaypalResponse payment(PaypalRequest paypalRequest) {
@@ -63,9 +76,9 @@ public class PaypalAdapter implements PaypalServicePort {
         return payer;
     }
 
-    private List<Transaction> transactions(Long parcelId, Amount amount) {
+    private List<Transaction> transactions(Amount amount) {
         final Transaction transaction = new Transaction();
-        transaction.setDescription("Payment for shipment: " + parcelId);
+        transaction.setDescription("Payment for shipment");
         transaction.setAmount(amount);
         return List.of(transaction);
     }
@@ -76,5 +89,15 @@ public class PaypalAdapter implements PaypalServicePort {
         final PaymentExecution paymentExecute = new PaymentExecution();
         paymentExecute.setPayerId(payerId);
         return payment.execute(apiContext, paymentExecute);
+    }
+
+    private Payee createPayee() {
+        final Payee payee = new Payee();
+        payee.setEmail(payeeProperties.getEmail());
+        payee.setFirstName(payeeProperties.getFirstName());
+        payee.setLastName(payeeProperties.getLastName());
+        payee.setAccountNumber(payeeProperties.getAccountNumber());
+        payee.setMerchantId(payeeProperties.getMerchantId());
+        return payee;
     }
 }

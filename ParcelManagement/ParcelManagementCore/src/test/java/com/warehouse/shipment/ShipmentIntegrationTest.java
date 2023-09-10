@@ -65,7 +65,6 @@ public class ShipmentIntegrationTest {
 
 
     @Test
-    @DatabaseSetup("/database/db.xml")
     @Disabled
     void shouldShipParcel() {
         // given
@@ -80,7 +79,7 @@ public class ShipmentIntegrationTest {
                 .createTime("now")
                 .link(linkInformation)
                 .build();
-        final PaymentRequest paymentRequest = new PaymentRequest(1000000000L, new BigDecimal(99));
+		final PaymentRequest paymentRequest = null;
         when(paypalPort.payment(paymentRequest)).thenReturn(paymentResponse);
         // when
         final ShipmentResponse response = shipmentPort.ship(request);

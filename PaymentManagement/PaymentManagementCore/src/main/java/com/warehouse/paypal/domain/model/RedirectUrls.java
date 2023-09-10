@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 @ConfigurationProperties(prefix = "redirect")
 public class RedirectUrls {
-    private String returnUrl = "/v2/api/payments/success";
-    private String cancelUrl = "/v2/api/payments/error";
+    private String returnUrl;
+    private String cancelUrl;
 }

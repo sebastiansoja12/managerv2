@@ -12,11 +12,4 @@ public class PaypalRequest {
     private List<Transaction> transaction;
     private RedirectUrls redirectUrls;
     private Payer payer;
-
-    public Payee getPayee() {
-        return transaction.stream()
-                .map(Transaction::getPayee)
-                .findAny()
-                .orElse(null);
-    }
 }

@@ -51,7 +51,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logPayment(paymentStatus, parcel);
 
-		if (paymentStatus.getLink().isEmpty()) {
+		if (paymentStatus.getLink() == null) {
 			throw new ShipmentPaymentException(SHIPMENT_201);
 		}
 

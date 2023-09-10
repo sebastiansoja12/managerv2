@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 public class PaymentRequest {
-    Long parcelId;
-    BigDecimal price;
+    private Long parcelId;
+    private BigDecimal price;
+    private Payer payer;
 }

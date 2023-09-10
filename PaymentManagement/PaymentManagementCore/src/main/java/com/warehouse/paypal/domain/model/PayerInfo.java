@@ -1,8 +1,10 @@
 package com.warehouse.paypal.domain.model;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class PayerInfo {
     private String email;
     private String externalRememberMeId;

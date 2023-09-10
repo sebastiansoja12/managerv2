@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.warehouse.paypal.domain.model.RedirectUrls;
+import com.warehouse.paypal.domain.properties.PayeeProperties;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -75,13 +75,13 @@ public class PaymentConfiguration {
 
 
     @Bean
-    public PaypalPort paymentPort(PaypalService paypalService) {
-        return new PaypalPortImpl(paypalService);
+    public PaypalPort paymentPort(PaypalService paypalService, PayeeProperties payeeProperties) {
+        return new PaypalPortImpl(paypalService, payeeProperties);
     }
 
 	@Bean
 	public PaypalService paymentService(PaypalServicePort port, PaypalRepository paypalRepository,
-			 RedirectUrls redirectUrls) {
+			RedirectUrls redirectUrls) {
 		return new PaypalServiceImpl(port, paypalRepository, redirectUrls);
 	}
 }

@@ -10,4 +10,7 @@ import java.math.BigDecimal;
 public class Payment {
     private Long parcelId;
     private BigDecimal price;
+    private String email;
+    private String firstName;
+    private String lastName;
 }
