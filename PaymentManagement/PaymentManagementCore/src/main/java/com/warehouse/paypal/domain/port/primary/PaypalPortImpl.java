@@ -14,8 +14,7 @@ public class PaypalPortImpl implements PaypalPort {
 
     @Override
     public PaymentResponse payment(PaymentRequest request) {
-        final Payee payee = createPayee();
-        final PaymentInformation paymentInformation = paypalService.payment(request, payee);
+        final PaymentInformation paymentInformation = paypalService.payment(request);
         return PaymentResponse.builder()
                 .createTime(paymentInformation.getCreateTime())
                 .paymentMethod(paymentInformation.getPaymentMethod())
@@ -26,16 +25,6 @@ public class PaypalPortImpl implements PaypalPort {
 
     public String update(PaymentInformation paymentInformation) {
         return paypalService.update(paymentInformation);
-    }
-    
-    private Payee createPayee() {
-        return new Payee(
-                "sebastian5152@wp.pl",
-                "2283821193",
-                "Sebastian",
-                "Soja",
-                "47544077932802225870952690"
-        );
     }
     
 }

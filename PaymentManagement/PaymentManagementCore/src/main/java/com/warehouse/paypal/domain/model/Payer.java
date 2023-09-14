@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class Payer {
-    private PaymentMethod paymentMethod = PaymentMethod.PAYPAL;
+    private PaymentMethod paymentMethod;
     private String status;
     private String accountType;
     private String accountAge;

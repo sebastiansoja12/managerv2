@@ -27,14 +27,15 @@ public class PaypalServiceImpl implements PaypalService {
 	private static final String MESSAGE_PAYMENT = "Payment for shipment: ";
 
     @Override
-    public PaymentInformation payment(PaymentRequest paymentRequest, Payee payee) {
-		final PaypalRequest request = buildPaypalRequest(paymentRequest, payee);
+    public PaymentInformation payment(PaymentRequest paymentRequest) {
+		final PaypalRequest request = buildPaypalRequest(paymentRequest);
 		final PaypalResponse paypalResponse = paypalServicePort.payment(request);
 		return payment(paypalResponse, PaymentInformation.builder()
                 .parcelId(paymentRequest.getParcelId())
                 .price(paymentRequest.getPrice())
 				.failureReason(paypalResponse.getFailureReason())
 				.paymentMethod(paypalResponse.getPaymentMethod())
+				.amount(paymentRequest.getPrice().intValue())
                 .build());
     }
 
@@ -44,7 +45,6 @@ public class PaypalServiceImpl implements PaypalService {
     }
 
 	private PaymentInformation payment(PaypalResponse response, PaymentInformation paymentInformation) {
-		paymentInformation.setAmount(response.getTransactions().size());
 		final List<Links> links = response.getLinks();
 		if (links != null) {
 			links.forEach(link -> {
@@ -58,26 +58,24 @@ public class PaypalServiceImpl implements PaypalService {
 		return paymentInformation;
 	}
 
-    private PaypalRequest buildPaypalRequest(PaymentRequest payment, Payee payee) {
+    private PaypalRequest buildPaypalRequest(PaymentRequest paymentRequest) {
 		final Details details = Details.builder()
-				.subtotal(payment.getPrice().toString())
+				.subtotal(paymentRequest.getPrice().toString())
 				.build();
+
         return PaypalRequest.builder()
-				.intent("ORDER")
-				.transaction(
-						createTransaction(payment.getParcelId(), new Amount(payment.getPrice().toString(), details),
-								payee))
-				.payer(payment.getPayer())
+				.intent(paymentRequest.getIntent())
+				.transaction(createTransaction(paymentRequest.getParcelId(),
+						new Amount(paymentRequest.getPrice().toString(), details)))
+				.payer(paymentRequest.getPayer())
 				.redirectUrls(redirectUrls)
                 .build();
     }
 
-	private List<Transaction> createTransaction(Long parcelId, Amount amount, Payee payee) {
+	private List<Transaction> createTransaction(Long parcelId, Amount amount) {
 		final Transaction transaction = new Transaction();
 		transaction.setDescription(MESSAGE_PAYMENT + parcelId);
 		transaction.setAmount(amount);
-		transaction.setPayee(payee);
-		transaction.setTransactions(List.of(transaction));
 		return List.of(transaction);
 	}
 }

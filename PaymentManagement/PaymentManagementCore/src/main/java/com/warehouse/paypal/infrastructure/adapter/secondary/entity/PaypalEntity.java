@@ -1,6 +1,4 @@
 package com.warehouse.paypal.infrastructure.adapter.secondary.entity;
-
-import com.warehouse.paypal.infrastructure.adapter.secondary.enumeration.PaymentMethod;
 import com.warehouse.paypal.infrastructure.adapter.secondary.enumeration.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +17,7 @@ public class PaypalEntity {
 
 	@Id
 	@Column(name = "id", nullable = false)
-	private Long id;
+	private String id;
 
 	@Column(name = "amount", nullable = false)
 	private double amount;
@@ -28,7 +26,7 @@ public class PaypalEntity {
 	private PaymentStatus paymentStatus;
 
 	@Column(name = "payment_method", nullable = false)
-	private PaymentMethod paymentMethod;
+	private String paymentMethod;
 
 	@Column(name = "paymentUrl", nullable = false)
 	private String paymentUrl;

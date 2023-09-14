@@ -64,6 +64,36 @@
 		<sonar.organization>sebastiansoja</sonar.organization>
 	</properties>
 
+	<profiles>
+		<profile>
+			<id>app</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<environment>app</environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<environment>dev</environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<environment>test</environment>
+			</properties>
+		</profile>
+	</profiles>
+
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
@@ -265,11 +295,22 @@
 				<artifactId>spring-boot-starter-data-mongodb</artifactId>
 				<version>${spring-starter.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.braintreepayments.gateway</groupId>
+				<artifactId>braintree-java</artifactId>
+				<version>3.26.0</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<pluginManagement>
 			<plugins>
 				<plugin>

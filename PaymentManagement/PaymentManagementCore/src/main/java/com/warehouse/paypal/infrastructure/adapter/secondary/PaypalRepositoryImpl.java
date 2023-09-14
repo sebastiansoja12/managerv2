@@ -23,14 +23,14 @@ public class PaypalRepositoryImpl implements PaypalRepository {
 
     @Override
     public void updatePayment(Long paymentId) {
-        final PaypalEntity entity = readRepository.findById(paymentId).orElseThrow();
+        final PaypalEntity entity = null;
         entity.setPaymentStatus(PaymentStatus.PAID);
         readRepository.save(entity);
     }
 
     @Override
     public PaymentInformation findByPaymentId(Long paymentId) {
-        final PaypalEntity paypalEntity = readRepository.findById(paymentId).orElseThrow();
+        final PaypalEntity paypalEntity = null;
         return mapper.map(paypalEntity);
     }
 }

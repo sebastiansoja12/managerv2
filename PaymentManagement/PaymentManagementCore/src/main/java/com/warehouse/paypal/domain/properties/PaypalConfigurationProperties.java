@@ -1,11 +1,9 @@
-package com.warehouse.paypal.configuration;
+package com.warehouse.paypal.domain.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 import lombok.Getter;
 
-@Configuration
 @Getter
 @ConfigurationProperties(prefix = "paypal")
 public class PaypalConfigurationProperties {
@@ -15,6 +13,9 @@ public class PaypalConfigurationProperties {
     private String clientSecret;
 
     private String mode;
+
+    private String url;
+
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
@@ -26,5 +27,9 @@ public class PaypalConfigurationProperties {
 
     public void setMode(String mode) {
         this.mode = mode;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

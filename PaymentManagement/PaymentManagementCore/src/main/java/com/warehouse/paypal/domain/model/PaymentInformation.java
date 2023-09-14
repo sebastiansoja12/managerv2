@@ -2,6 +2,7 @@ package com.warehouse.paypal.domain.model;
 
 import java.math.BigDecimal;
 
+import com.warehouse.paypal.domain.enumeration.PaymentMethod;
 import com.warehouse.paypal.infrastructure.adapter.secondary.enumeration.PaymentStatus;
 
 import lombok.Builder;

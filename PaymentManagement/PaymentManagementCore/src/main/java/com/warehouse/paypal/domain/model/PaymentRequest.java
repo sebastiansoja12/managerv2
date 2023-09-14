@@ -10,4 +10,5 @@ public class PaymentRequest {
     private Long parcelId;
     private BigDecimal price;
     private Payer payer;
+    private String intent;
 }

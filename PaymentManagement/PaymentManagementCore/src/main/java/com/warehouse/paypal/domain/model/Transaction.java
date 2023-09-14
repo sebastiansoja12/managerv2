@@ -5,19 +5,14 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Transaction extends TransactionBase {
-
-    private List<Transaction> transactions;
-
-    public Transaction() {
-    }
-
-    public Transaction setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
-        return this;
-    }
-
-    public List<Transaction> getTransactions() {
-        return this.transactions;
-    }
+public class Transaction {
+    private String referenceId;
+    private Amount amount;
+    private Payee payee;
+    private String description;
+    private String noteToPayee;
+    private String custom;
+    private String invoiceNumber;
+    private String softDescriptor;
+    private String softDescriptorCity;
 }

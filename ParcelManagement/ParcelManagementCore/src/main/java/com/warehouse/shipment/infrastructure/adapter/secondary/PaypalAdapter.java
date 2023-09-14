@@ -23,10 +23,12 @@ public class PaypalAdapter implements PaypalServicePort {
 
     private final PaymentMapper paymentMapper;
 
+    private final String INTENT = "ORDER";
+
     @Override
     public PaymentStatus payment(Parcel parcel) {
 		final PaymentRequest paymentRequest = new PaymentRequest(parcel.getId(), BigDecimal.valueOf(parcel.getPrice()),
-				createPayer(parcel.getSender()));
+				createPayer(parcel.getSender()), INTENT);
         final PaymentResponse paymentResponse = paypalPort.payment(paymentRequest);
         return paymentMapper.map(paymentResponse);
     }
