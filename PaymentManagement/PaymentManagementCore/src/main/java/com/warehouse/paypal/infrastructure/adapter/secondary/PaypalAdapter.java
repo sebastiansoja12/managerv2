@@ -31,8 +31,6 @@ public class PaypalAdapter extends RestGatewaySupport implements PaypalServicePo
 
     private final Logger logger = LoggerFactory.getLogger(PaypalAdapter.class);
 
-
-
     @Override
     public PaypalResponse payment(PaypalRequest paypalRequest) {
         final Payment payment = requestMapper.map(paypalRequest);
@@ -55,7 +53,7 @@ public class PaypalAdapter extends RestGatewaySupport implements PaypalServicePo
             response = executePayment(payment);
         } catch (PayPalRESTException e) {
             logger.info("Error while executing payment: {}", e.getMessage());
-            throw new PaypalErrorException(0, "Error");
+            throw new PaypalErrorException(0, e.getMessage());
         }
         return responseMapper.mapToUpdateResponse(response);
     }
