@@ -51,4 +51,8 @@ public interface PaypalResponseMapper {
 		final Details details = Details.builder().subtotal(amount.getTotal()).build();
 		return new Amount(amount.getTotal(), details);
 	}
+
+	default PaypalUpdateResponse mapToUpdateResponse(Payment payment) {
+		return new PaypalUpdateResponse(payment.getState());
+	}
 }

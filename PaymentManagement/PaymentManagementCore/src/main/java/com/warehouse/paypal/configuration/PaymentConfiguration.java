@@ -16,7 +16,6 @@ import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.paypal.domain.port.primary.PaypalPortImpl;
 import com.warehouse.paypal.domain.port.secondary.PaypalRepository;
 import com.warehouse.paypal.domain.port.secondary.PaypalServicePort;
-import com.warehouse.paypal.domain.properties.PayeeProperties;
 import com.warehouse.paypal.domain.properties.PaypalConfigurationProperties;
 import com.warehouse.paypal.domain.service.PaypalService;
 import com.warehouse.paypal.domain.service.PaypalServiceImpl;
@@ -71,13 +70,13 @@ public class PaymentConfiguration {
     public PaypalServicePort paymentSecondaryPort(APIContext apiContext) {
         final PaypalResponseMapper responseMapper = Mappers.getMapper(PaypalResponseMapper.class);
         final PaypalRequestMapper requestMapper = Mappers.getMapper(PaypalRequestMapper.class);
-        return new PaypalAdapter(requestMapper, responseMapper, paypalConfigurationProperties, apiContext);
+        return new PaypalAdapter(requestMapper, responseMapper, apiContext);
     }
 
 
     @Bean
-    public PaypalPort paymentPort(PaypalService paypalService, PayeeProperties payeeProperties) {
-        return new PaypalPortImpl(paypalService, payeeProperties);
+    public PaypalPort paymentPort(PaypalService paypalService) {
+        return new PaypalPortImpl(paypalService);
     }
 
 	@Bean

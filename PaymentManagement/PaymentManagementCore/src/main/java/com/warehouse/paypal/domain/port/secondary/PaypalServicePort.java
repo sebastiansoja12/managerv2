@@ -1,12 +1,13 @@
 package com.warehouse.paypal.domain.port.secondary;
 
-import com.paypal.api.payments.Payment;
+import com.warehouse.paypal.domain.model.PaymentUpdateRequest;
 import com.warehouse.paypal.domain.model.PaypalRequest;
 import com.warehouse.paypal.domain.model.PaypalResponse;
+import com.warehouse.paypal.domain.model.PaypalUpdateResponse;
 
 public interface PaypalServicePort {
 
-    Payment update(String paymentId, String payerId);
+    PaypalUpdateResponse update(PaymentUpdateRequest updateRequest);
 
     PaypalResponse payment(PaypalRequest paypalRequest);
 }

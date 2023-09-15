@@ -1,14 +1,13 @@
 package com.warehouse.paypal.domain.service;
 
+import java.util.List;
+
 import com.warehouse.paypal.domain.model.*;
 import com.warehouse.paypal.domain.port.secondary.PaypalRepository;
 import com.warehouse.paypal.domain.port.secondary.PaypalServicePort;
-
-import com.warehouse.paypal.domain.properties.PayeeProperties;
 import com.warehouse.paypal.infrastructure.adapter.secondary.enumeration.PaymentStatus;
-import lombok.AllArgsConstructor;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
@@ -40,9 +39,14 @@ public class PaypalServiceImpl implements PaypalService {
     }
 
 	@Override
-    public String update(PaymentInformation paymentInformation) {
-        return "";
-    }
+	public PaymentUpdateResponse update(PaymentUpdateRequest paymentUpdateRequest) {
+		final PaypalUpdateResponse response = paypalServicePort.update(paymentUpdateRequest);
+		if (response.getState().equals("approved")) {
+			paypalRepository.updatePayment(paymentUpdateRequest);
+			return PaymentUpdateResponse.builder().status(response.getState()).build();
+		}
+		return PaymentUpdateResponse.builder().build();
+	}
 
 	private PaymentInformation payment(PaypalResponse response, PaymentInformation paymentInformation) {
 		final List<Links> links = response.getLinks();
@@ -50,6 +54,7 @@ public class PaypalServiceImpl implements PaypalService {
 			links.forEach(link -> {
 				if (link.getRel() != null && link.getRel().equals("approval_url")) {
 					paymentInformation.setPaymentUrl(link.getHref());
+					paymentInformation.setPaymentId(response.getId());
 					paymentInformation.setPaymentStatus(PaymentStatus.NOT_PAID);
 					paypalRepository.savePayment(paymentInformation);
 				}

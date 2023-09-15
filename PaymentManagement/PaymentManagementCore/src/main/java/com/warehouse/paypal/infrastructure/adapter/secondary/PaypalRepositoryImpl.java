@@ -1,9 +1,11 @@
 package com.warehouse.paypal.infrastructure.adapter.secondary;
 
 import com.warehouse.paypal.domain.model.PaymentInformation;
+import com.warehouse.paypal.domain.model.PaymentUpdateRequest;
 import com.warehouse.paypal.domain.port.secondary.PaypalRepository;
 import com.warehouse.paypal.infrastructure.adapter.secondary.entity.PaypalEntity;
 import com.warehouse.paypal.infrastructure.adapter.secondary.enumeration.PaymentStatus;
+import com.warehouse.paypal.infrastructure.adapter.secondary.exception.PaymentNotFoundException;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalMapper;
 import lombok.AllArgsConstructor;
 
@@ -22,15 +24,20 @@ public class PaypalRepositoryImpl implements PaypalRepository {
     }
 
     @Override
-    public void updatePayment(Long paymentId) {
-        final PaypalEntity entity = null;
+    public void updatePayment(PaymentUpdateRequest request) {
+        final PaypalEntity entity = readRepository.findByPaymentId(request.getPaymentId()).orElseThrow(
+                () -> new PaymentNotFoundException(404, "Payment not found")
+        );
+        entity.setPayerId(request.getPayerId());
         entity.setPaymentStatus(PaymentStatus.PAID);
         readRepository.save(entity);
     }
 
     @Override
     public PaymentInformation findByPaymentId(Long paymentId) {
-        final PaypalEntity paypalEntity = null;
+        final PaypalEntity paypalEntity = readRepository.findById(paymentId).orElseThrow(
+                () -> new PaymentNotFoundException(404, "Payment not found")
+        );
         return mapper.map(paypalEntity);
     }
 }

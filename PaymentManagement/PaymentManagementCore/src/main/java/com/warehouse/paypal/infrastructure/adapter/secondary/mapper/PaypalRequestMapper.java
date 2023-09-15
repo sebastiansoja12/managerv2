@@ -1,13 +1,14 @@
 package com.warehouse.paypal.infrastructure.adapter.secondary.mapper;
 
-import com.paypal.api.payments.Payment;
-import com.warehouse.paypal.domain.model.*;
-import com.warehouse.paypal.domain.properties.PayeeProperties;
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+
+import com.paypal.api.payments.Payment;
+import com.warehouse.paypal.domain.model.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface PaypalRequestMapper {
@@ -60,4 +61,8 @@ public interface PaypalRequestMapper {
         d.setSubtotal(details.getSubtotal());
         return d;
     }
+
+    @Mapping(source = "payerId", target = "payer.payerInfo.payerId")
+    @Mapping(source = "paymentId", target = "id")
+    Payment map(PaymentUpdateRequest request);
 }

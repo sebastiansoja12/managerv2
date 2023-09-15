@@ -13,7 +13,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PaypalMapper {
 
-    @Mapping(target = "id", source = "paypalId")
+    @Mapping(target = "id", ignore = true)
     PaypalEntity map(PaymentInformation paymentInformation);
 
     @Mapping(source = "price", target = "details.subtotal")

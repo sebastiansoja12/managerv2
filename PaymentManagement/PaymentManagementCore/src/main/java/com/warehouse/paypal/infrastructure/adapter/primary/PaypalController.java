@@ -1,9 +1,10 @@
 package com.warehouse.paypal.infrastructure.adapter.primary;
 
 
-import com.warehouse.paypal.domain.model.PaymentInformation;
 import com.warehouse.paypal.domain.model.PaymentRequest;
 import com.warehouse.paypal.domain.model.PaymentResponse;
+import com.warehouse.paypal.domain.model.PaymentUpdateRequest;
+import com.warehouse.paypal.domain.model.PaymentUpdateResponse;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.paypal.infrastructure.adapter.primary.dto.PaymentRequestDto;
 import com.warehouse.paypal.infrastructure.adapter.primary.mapper.PaymentRequestMapper;
@@ -32,16 +33,15 @@ public class PaypalController {
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
 
-    @GetMapping
-    public String successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
-        final PaymentInformation paymentInformation = PaymentInformation.builder().build();
-        paymentInformation.setPaymentId(paymentId);
-        paymentInformation.setPayerId(payerId);
+	@GetMapping("/success")
+	public ResponseEntity<?> successPay(@RequestParam("paymentId") String paymentId,
+			@RequestParam("PayerID") String payerId) {
+		final PaymentUpdateRequest paymentUpdateRequest = requestMapper.map(paymentId, payerId);
+		final PaymentUpdateResponse response = paypalPort.update(paymentUpdateRequest);
+		return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+	}
 
-        return paypalPort.update(paymentInformation);
-    }
-
-    @GetMapping(value = "/pay/cancel")
+    @GetMapping(value = "/cancel")
     public String cancelPay() {
         return "Payment has been cancelled";
     }

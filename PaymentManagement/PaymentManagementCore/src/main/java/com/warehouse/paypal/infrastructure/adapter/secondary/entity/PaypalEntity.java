@@ -16,8 +16,8 @@ import jakarta.persistence.*;
 public class PaypalEntity {
 
 	@Id
-	@Column(name = "id", nullable = false)
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
 	@Column(name = "amount", nullable = false)
 	private double amount;
@@ -33,4 +33,10 @@ public class PaypalEntity {
 
 	@Column(name = "parcelId", nullable = false)
 	private Long parcelId;
+
+	@Column(name = "payerId")
+	private String payerId;
+
+	@Column(name = "paymentId")
+	private String paymentId;
 }

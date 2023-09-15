@@ -1,6 +1,5 @@
 package com.warehouse.paypal.infrastructure.adapter.secondary;
 
-import com.warehouse.paypal.infrastructure.adapter.secondary.exception.PaypalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.support.RestGatewaySupport;
@@ -9,15 +8,16 @@ import com.paypal.api.payments.Payment;
 import com.paypal.api.payments.PaymentExecution;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import com.warehouse.paypal.domain.model.PaymentUpdateRequest;
 import com.warehouse.paypal.domain.model.PaypalRequest;
 import com.warehouse.paypal.domain.model.PaypalResponse;
+import com.warehouse.paypal.domain.model.PaypalUpdateResponse;
 import com.warehouse.paypal.domain.port.secondary.PaypalServicePort;
-import com.warehouse.paypal.domain.properties.PaypalConfigurationProperties;
+import com.warehouse.paypal.infrastructure.adapter.secondary.exception.PaypalErrorException;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalRequestMapper;
 import com.warehouse.paypal.infrastructure.adapter.secondary.mapper.PaypalResponseMapper;
 
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 
 @AllArgsConstructor
 public class PaypalAdapter extends RestGatewaySupport implements PaypalServicePort {
@@ -27,11 +27,10 @@ public class PaypalAdapter extends RestGatewaySupport implements PaypalServicePo
 
     private final PaypalResponseMapper responseMapper;
 
-    @NonNull
-    private final PaypalConfigurationProperties paypalProperties;
+    private final APIContext apiContext;
+
     private final Logger logger = LoggerFactory.getLogger(PaypalAdapter.class);
 
-    private final APIContext apiContext;
 
 
     @Override
@@ -49,24 +48,21 @@ public class PaypalAdapter extends RestGatewaySupport implements PaypalServicePo
     }
 
     @Override
-    public Payment update(String paymentId, String payerId) {
-        Payment response = null;
+    public PaypalUpdateResponse update(PaymentUpdateRequest updateRequest) {
+        final Payment payment = requestMapper.map(updateRequest);
+        final Payment response;
         try {
-            response = executePayment(paymentId, payerId);
-            if (response.getState().equals("approved")) {
-                //paypalRepository.updatePayment(paymentId);
-            }
+            response = executePayment(payment);
         } catch (PayPalRESTException e) {
-            e.printStackTrace();
+            logger.info("Error while executing payment: {}", e.getMessage());
+            throw new PaypalErrorException(0, "Error");
         }
-        return response;
+        return responseMapper.mapToUpdateResponse(response);
     }
 
-    private Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
-        final Payment payment = new Payment();
-        payment.setId(paymentId);
+    private Payment executePayment(Payment payment) throws PayPalRESTException {
         final PaymentExecution paymentExecute = new PaymentExecution();
-        paymentExecute.setPayerId(payerId);
-        return null;
+        paymentExecute.setPayerId(payment.getPayer().getPayerInfo().getPayerId());
+        return payment.execute(apiContext, paymentExecute);
     }
 }

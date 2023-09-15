@@ -1,8 +1,8 @@
 package com.warehouse.paypal.domain.port.primary;
 
 import com.warehouse.paypal.domain.model.*;
-import com.warehouse.paypal.domain.properties.PayeeProperties;
 import com.warehouse.paypal.domain.service.PaypalService;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -10,7 +10,6 @@ public class PaypalPortImpl implements PaypalPort {
 
     private final PaypalService paypalService;
 
-    private final PayeeProperties payeeProperties;
 
     @Override
     public PaymentResponse payment(PaymentRequest request) {
@@ -23,8 +22,8 @@ public class PaypalPortImpl implements PaypalPort {
                 .build();
     }
 
-    public String update(PaymentInformation paymentInformation) {
-        return paypalService.update(paymentInformation);
+    public PaymentUpdateResponse update(PaymentUpdateRequest paymentUpdateRequest) {
+        return paypalService.update(paymentUpdateRequest);
     }
     
 }
