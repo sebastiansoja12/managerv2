@@ -33,8 +33,15 @@
 		<module>ExceptionHandler</module>
 	</modules>
 
+	<repositories>
+		<repository>
+			<id>projectlombok.org</id>
+			<url>https://projectlombok.org/edge-releases</url>
+		</repository>
+	</repositories>
+
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 		<org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
 		<org.projectlombok.version>1.18.24</org.projectlombok.version>
 		<spring-starter.version>3.1.2</spring-starter.version>
@@ -91,7 +98,7 @@
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
-				<version>1.18.26</version>
+				<version>edge-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mapstruct</groupId>
@@ -256,9 +263,9 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.9.0</version>
+					<version>3.11.0</version>
 					<configuration>
-						<release>17</release>
+						<release>21</release>
 						<annotationProcessorPaths>
 							<path>
 								<groupId>org.mapstruct</groupId>
@@ -268,7 +275,7 @@
 							<path>
 								<groupId>org.projectlombok</groupId>
 								<artifactId>lombok</artifactId>
-								<version>${org.projectlombok.version}</version>
+								<version>edge-SNAPSHOT</version>
 							</path>
 							<path>
 								<groupId>org.projectlombok</groupId>
