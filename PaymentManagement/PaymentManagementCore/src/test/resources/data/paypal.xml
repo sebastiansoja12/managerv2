@@ -4,8 +4,9 @@
             ID="1"
             PAYMENT_URL="test.pl"
             PARCEL_ID="10001"
-            PARCEL_STATUS="PAID"
             AMOUNT="1"
-            PAYMENT_ID="payment"
+            PAYMENT_ID="paymentId"
+            PAYMENT_STATUS="0"
+            PAYMENT_METHOD="PAYPAL"
     />
 </dataset>

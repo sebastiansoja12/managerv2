@@ -4,10 +4,14 @@ package com.warehouse.shipment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
+import com.warehouse.shipment.domain.port.secondary.PaypalServicePort;
+import com.warehouse.shipment.infrastructure.adapter.secondary.PaypalAdapter;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +44,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockSer
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 
-@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@ExtendWith({SpringExtension.class})
 @DataJpaTest
 @ContextConfiguration(classes = ShipmentTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
@@ -50,37 +54,47 @@ public class ShipmentIntegrationTest {
     @Autowired
     private ShipmentPort shipmentPort;
 
-
-    @Mock
+    @Autowired
     private PathFinderMockService mockService;
 
     @Autowired
-    private final PathFinderServicePort pathFinderServicePort = new PathFinderMockAdapter(mockService);
+    private PathFinderServicePort pathFinderServicePort;
 
     @Autowired
     private ShipmentService shipmentService;
 
-    @Mock
-    private PaypalPort paypalPort;
+    @Autowired
+    private PaypalServicePort paypalServicePort;
 
 
     @Test
     @Disabled
     void shouldShipParcel() {
         // given
-        final ShipmentParcel parcel = createParcel();
-        parcel.setDestination("KT1");
+        final ShipmentParcel shipmentParcel = createShipmentParcel();
+        shipmentParcel.setDestination("KT1");
+
         final ShipmentRequest request = ShipmentRequest.builder()
-                .parcel(parcel)
+                .parcel(shipmentParcel)
                 .build();
-        final Link linkInformation = new Link("paymentUrl");
-        final PaymentResponse paymentResponse = PaymentResponse.builder()
-                .paymentMethod("paypal")
-                .createTime("now")
-                .link(linkInformation)
+
+        final Address address = Address.builder()
+                .street("test")
+                .city("Katowice")
+                .postalCode("00-000")
                 .build();
-		final PaymentRequest paymentRequest = null;
-        when(paypalPort.payment(paymentRequest)).thenReturn(paymentResponse);
+
+        final Parcel parcel = createParcel();
+
+        final PaymentStatus status = new PaymentStatus();
+        status.setLink("payment.pl");
+        status.setPaymentMethod("PAYPAL");
+        status.setCreateTime("2023-10-10");
+
+        when(pathFinderServicePort.determineDeliveryDepot(address)).thenReturn(new City("KT1"));
+        doReturn(status)
+                .when(paypalServicePort)
+                .payment(parcel);
         // when
         final ShipmentResponse response = shipmentPort.ship(request);
         // then
@@ -104,7 +118,7 @@ public class ShipmentIntegrationTest {
     void shouldNotShipParcelWhenPathFinderServiceIsNotAvailable() {
         // given
         final ShipmentRequest request = ShipmentRequest.builder()
-                .parcel(createParcel())
+                .parcel(createShipmentParcel())
                 .build();
         // when
         final Executable executable = () -> shipmentPort.ship(request);
@@ -116,7 +130,7 @@ public class ShipmentIntegrationTest {
     @Test
     void shouldNotDetermineNearestDepotForParcelDelivery() {
         // given
-        final ShipmentParcel parcel = createParcel();
+        final ShipmentParcel parcel = createShipmentParcel();
 
         final Recipient recipient = createRecipient();
         recipient.setCity("");
@@ -136,8 +150,18 @@ public class ShipmentIntegrationTest {
 		assertEquals(expectedToBe("Delivery depot could not be determined"), exception.getMessage());
     }
 
-    private ShipmentParcel createParcel() {
+    private ShipmentParcel createShipmentParcel() {
         return ShipmentParcel.builder()
+                .parcelSize(Size.TEST)
+                .price(99)
+                .status(Status.CREATED)
+                .sender(createSender())
+                .recipient(createRecipient())
+                .build();
+    }
+
+    private Parcel createParcel() {
+        return Parcel.builder()
                 .parcelSize(Size.TEST)
                 .price(99)
                 .status(Status.CREATED)

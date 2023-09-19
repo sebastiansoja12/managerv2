@@ -39,11 +39,6 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     }
 
     @Override
-    public void delete(Long parcelId) {
-        repository.deleteById(parcelId);
-    }
-
-    @Override
     public Parcel loadParcelById(Long parcelId) {
         return repository.findParcelEntityById(parcelId).map(parcelMapper::map).orElseThrow(
                 () -> new ParcelNotFoundException("Parcel was not found"));

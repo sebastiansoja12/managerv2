@@ -10,8 +10,6 @@ public interface ShipmentRepository {
 
     Parcel update(ParcelUpdate parcel);
 
-    void delete(Long parcelId);
-
     Parcel loadParcelById(Long parcelId);
 
     boolean exists(Long parcelId);
