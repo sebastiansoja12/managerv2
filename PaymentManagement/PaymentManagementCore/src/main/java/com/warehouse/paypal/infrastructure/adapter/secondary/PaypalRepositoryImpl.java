@@ -32,12 +32,4 @@ public class PaypalRepositoryImpl implements PaypalRepository {
         entity.setPaymentStatus(PaymentStatus.PAID);
         readRepository.save(entity);
     }
-
-    @Override
-    public PaymentInformation findByPaymentId(Long paymentId) {
-        final PaypalEntity paypalEntity = readRepository.findById(paymentId).orElseThrow(
-                () -> new PaymentNotFoundException(404, "Payment not found")
-        );
-        return mapper.map(paypalEntity);
-    }
 }

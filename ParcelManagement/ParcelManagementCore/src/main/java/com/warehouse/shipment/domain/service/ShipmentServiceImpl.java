@@ -88,11 +88,6 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void delete(Long parcelId) {
-        shipmentRepository.delete(parcelId);
-    }
-
-    @Override
     public boolean exists(Long parcelId) {
         return shipmentRepository.exists(parcelId);
     }

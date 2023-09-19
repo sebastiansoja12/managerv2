@@ -19,10 +19,6 @@ public class PaypalServiceImpl implements PaypalService {
 
 	private final RedirectUrls redirectUrls;
 
-	private final static String HANDLING_FEE = "5";
-
-	private final static String TAX = "23";
-
 	private static final String MESSAGE_PAYMENT = "Payment for shipment: ";
 
     @Override
@@ -45,7 +41,9 @@ public class PaypalServiceImpl implements PaypalService {
 			paypalRepository.updatePayment(paymentUpdateRequest);
 			return PaymentUpdateResponse.builder().status(response.getState()).build();
 		}
-		return PaymentUpdateResponse.builder().build();
+		return PaymentUpdateResponse.builder()
+				.status("NOT_OK")
+				.build();
 	}
 
 	private PaymentInformation payment(PaypalResponse response, PaymentInformation paymentInformation) {

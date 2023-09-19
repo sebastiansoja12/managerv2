@@ -242,17 +242,6 @@ public class ShipmentServiceImplTest {
         assertEquals(expectedToBe(false), doesExist);
     }
 
-
-    @Test
-    void shouldDeleteParcelById() {
-        // given
-        final Long parcelId = 1L;
-        // when
-        service.delete(parcelId);
-        // then
-        verify(shipmentRepository, times(1)).delete(parcelId);
-    }
-
     private <T> T expectedToBe(T value) {
         return value;
     }

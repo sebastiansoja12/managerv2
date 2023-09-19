@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

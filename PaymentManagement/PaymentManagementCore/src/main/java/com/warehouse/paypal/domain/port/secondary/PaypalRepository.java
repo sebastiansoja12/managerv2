@@ -8,6 +8,4 @@ public interface PaypalRepository {
     void savePayment(PaymentInformation payment);
 
     void updatePayment(PaymentUpdateRequest request);
-
-    PaymentInformation findByPaymentId(Long paypalId);
 }
