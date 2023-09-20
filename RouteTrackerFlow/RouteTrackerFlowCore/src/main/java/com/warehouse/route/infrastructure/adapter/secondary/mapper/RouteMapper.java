@@ -5,10 +5,8 @@ import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.infrastructure.api.dto.RouteRequestDto;
 import com.warehouse.route.infrastructure.api.dto.RouteResponseDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
+//@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface RouteMapper {
 
     RouteResponseDto map(RouteResponse response);

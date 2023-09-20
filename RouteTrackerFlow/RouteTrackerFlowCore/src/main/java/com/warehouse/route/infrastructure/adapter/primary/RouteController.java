@@ -5,13 +5,11 @@ import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sun.mail.iap.Response.OK;
+import static org.springframework.http.HttpStatus.OK;
+
 
 @RestController
 @RequestMapping("/routes")

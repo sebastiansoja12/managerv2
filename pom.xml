@@ -5,8 +5,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.2</version>
-		<relativePath/>
+		<version>3.2.0-M2</version>
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.warehouse</groupId>
 	<artifactId>warehouse</artifactId>
@@ -35,20 +35,33 @@
 
 	<repositories>
 		<repository>
-			<id>projectlombok.org</id>
-			<url>https://projectlombok.org/edge-releases</url>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<properties>
 		<java.version>21</java.version>
-		<org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
-		<org.projectlombok.version>1.18.24</org.projectlombok.version>
-		<spring-starter.version>3.1.2</spring-starter.version>
+		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+		<org.projectlombok.version>1.18.30</org.projectlombok.version>
+		<spring-starter.version>3.2.0-M2</spring-starter.version>
 		<maven-jaxb2-plugin.version>0.15.1</maven-jaxb2-plugin.version>
 		<maven-jaxb2-basics-plugin.version>1.11.1</maven-jaxb2-basics-plugin.version>
 		<sonar.organization>sebastiansoja</sonar.organization>
-		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 
 	<distributionManagement>
@@ -98,7 +111,7 @@
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
-				<version>edge-SNAPSHOT</version>
+				<version>${org.projectlombok.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mapstruct</groupId>
@@ -275,7 +288,7 @@
 							<path>
 								<groupId>org.projectlombok</groupId>
 								<artifactId>lombok</artifactId>
-								<version>edge-SNAPSHOT</version>
+								<version>${org.projectlombok.version}</version>
 							</path>
 							<path>
 								<groupId>org.projectlombok</groupId>
@@ -289,7 +302,7 @@
 							</path>
 						</annotationProcessorPaths>
 						<compilerArgs>
-							<arg>-Amapstruct.unmappedTargetPolicy=ERROR</arg>
+							<arg>-Amapstruct.unmappedTargetPolicy=IGNORE</arg>
 						</compilerArgs>
 						<fork>true</fork>
 						<meminitial>256m</meminitial>
