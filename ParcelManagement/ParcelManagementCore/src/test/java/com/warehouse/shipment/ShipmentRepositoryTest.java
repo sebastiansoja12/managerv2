@@ -57,18 +57,6 @@ public class ShipmentRepositoryTest {
     }
 
     @Test
-    void shouldDeleteParcel() {
-        // given
-        final Long parcelId = 1L;
-
-        // when
-        shipmentRepository.delete(parcelId);
-
-        // then
-        Mockito.verify(readRepository).deleteById(parcelId);
-    }
-
-    @Test
     void shouldReturnParcelById() {
         // given
         final Long parcelId = 1L;

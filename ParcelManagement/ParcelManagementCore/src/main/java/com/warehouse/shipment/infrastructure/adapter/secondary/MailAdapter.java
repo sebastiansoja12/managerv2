@@ -1,27 +1,28 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.vo.Notification;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class MailAdapter implements MailServicePort {
 
-    private final MailService mailService;
+    private final MailPort mailPort;
 
     private final NotificationMapper notificationMapper;
 
     @Override
     public void sendShipmentNotification(Notification notification) {
         final com.warehouse.mail.domain.vo.Notification shipmentNotification = notificationMapper.map(notification);
-        mailService.sendNotification(shipmentNotification);
+        mailPort.sendNotification(shipmentNotification);
     }
 
     @Override
     public void sendRerouteNotification(Notification notification) {
         final com.warehouse.mail.domain.vo.Notification rerouteNotification = notificationMapper.map(notification);
-        mailService.sendNotification(rerouteNotification);
+        mailPort.sendNotification(rerouteNotification);
     }
 }

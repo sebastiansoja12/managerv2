@@ -21,12 +21,14 @@ import static org.mockito.Mockito.doReturn;
 @ExtendWith(MockitoExtension.class)
 public class PaypalPortImplTest {
 
-    public static final BigDecimal PRICE = new BigDecimal(1);
-    public static final long PARCEL_ID = 1L;
     @Mock
     private PaypalService paypalService;
 
     private PaypalPortImpl paypalPort;
+
+    private static final BigDecimal PRICE = new BigDecimal(1);
+
+    private static final long PARCEL_ID = 1L;
 
     @BeforeEach
     void setup() {

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import com.warehouse.depot.domain.port.primary.DepotPort;
+import com.warehouse.reroute.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.infrastructure.api.ShipmentService;
 import com.warehouse.voronoi.VoronoiService;
@@ -30,4 +31,7 @@ public class RerouteTokenTestConfiguration {
 
     @MockBean
     public DepotPort depotPort;
+
+    @MockBean
+    public MailServicePort mailServicePort;
 }

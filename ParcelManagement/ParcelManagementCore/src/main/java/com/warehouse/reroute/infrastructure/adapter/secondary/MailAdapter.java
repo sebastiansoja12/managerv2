@@ -1,6 +1,6 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
-import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.port.secondary.MailServicePort;
 import com.warehouse.reroute.domain.vo.Notification;
@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MailAdapter implements MailServicePort {
 
-    private final MailService mailService;
+    private final MailPort mailPort;
 
     private final NotificationMapper notificationMapper;
 
@@ -20,7 +20,7 @@ public class MailAdapter implements MailServicePort {
     public void sendReroutingInformation(RerouteToken rerouteToken) {
         final Notification rerouteNotification = buildNotification(rerouteToken);
         final com.warehouse.mail.domain.vo.Notification notification = notificationMapper.map(rerouteNotification);
-        mailService.sendNotification(notification);
+        mailPort.sendNotification(notification);
     }
 
     public Notification buildNotification(RerouteToken rerouteToken) {

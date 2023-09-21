@@ -1,6 +1,6 @@
 package com.warehouse.redirect.configuration;
 
-import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPort;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPortImpl;
 import com.warehouse.redirect.domain.port.secondary.MailServicePort;
@@ -36,9 +36,9 @@ public class RedirectConfiguration {
 	}
 
     @Bean(name = "redirect.mailServicePort")
-    public MailServicePort mailServicePort(MailService mailService) {
+    public MailServicePort mailServicePort(MailPort mailPort) {
         final NotificationMapper mapper = Mappers.getMapper(NotificationMapper.class);
-        return new MailAdapter(mailService, mapper);
+        return new MailAdapter(mailPort, mapper);
     }
 
     @Bean

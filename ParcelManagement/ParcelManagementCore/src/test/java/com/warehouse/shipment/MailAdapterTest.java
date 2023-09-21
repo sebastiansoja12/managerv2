@@ -1,24 +1,26 @@
 package com.warehouse.shipment;
 
-import com.warehouse.mail.domain.service.MailService;
-import com.warehouse.shipment.domain.vo.Notification;
-import com.warehouse.shipment.infrastructure.adapter.secondary.MailAdapter;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapperImpl;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.*;
+import com.warehouse.mail.domain.port.primary.MailPort;
+import com.warehouse.shipment.domain.vo.Notification;
+import com.warehouse.shipment.infrastructure.adapter.secondary.MailAdapter;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapperImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class MailAdapterTest {
 
 
     @Mock
-    private MailService mailService;
+    private MailPort mailPort;
 
     private MailAdapter mailAdapter;
 
@@ -27,7 +29,7 @@ public class MailAdapterTest {
     @BeforeEach
     void setup() {
         notificationMapper = new NotificationMapperImpl();
-        mailAdapter = new MailAdapter(mailService, notificationMapper);
+        mailAdapter = new MailAdapter(mailPort, notificationMapper);
     }
 
     @Test
@@ -42,7 +44,7 @@ public class MailAdapterTest {
         mailAdapter.sendShipmentNotification(notification);
 
         // then
-        verify(mailService, times(1)).sendNotification(mappedNotification);
+        verify(mailPort, times(1)).sendNotification(mappedNotification);
     }
 
     @Test
@@ -57,6 +59,6 @@ public class MailAdapterTest {
         mailAdapter.sendRerouteNotification(notification);
 
         // then
-        verify(mailService, times(1)).sendNotification(mappedNotification);
+        verify(mailPort, times(1)).sendNotification(mappedNotification);
     }
 }

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.infrastructure.adapter.secondary.MailAdapter;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.NotificationMapper;
@@ -17,7 +17,7 @@ import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.Notificatio
 public class MailAdapterTest {
 
     @Mock
-    private MailService mailService;
+    private MailPort mailPort;
 
     private MailAdapter mailAdapter;
 
@@ -26,7 +26,7 @@ public class MailAdapterTest {
 
     @BeforeEach
     void setup() {
-        mailAdapter = new MailAdapter(mailService, notificationMapper);
+        mailAdapter = new MailAdapter(mailPort, notificationMapper);
     }
 
 
@@ -45,6 +45,6 @@ public class MailAdapterTest {
         mailAdapter.sendReroutingInformation(rerouteToken);
 
         // then
-        verify(mailService, times(1)).sendNotification(mappedNotification);
+        verify(mailPort, times(1)).sendNotification(mappedNotification);
     }
 }

@@ -1,5 +1,6 @@
 package com.warehouse.redirect.configuration;
 
+import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.shipment.infrastructure.api.ShipmentService;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -17,4 +18,7 @@ public class RedirectTokenTestConfiguration {
 
     @MockBean
     public ShipmentService service;
+
+    @MockBean
+    public MailPort mailPort;
 }
