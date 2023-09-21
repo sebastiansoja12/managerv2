@@ -1,6 +1,6 @@
 package com.warehouse.redirect.infrastructure.adapter.secondary;
 
-import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.vo.Notification;
 import com.warehouse.redirect.domain.port.secondary.MailServicePort;
 import com.warehouse.redirect.domain.vo.RedirectNotification;
@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MailAdapter implements MailServicePort {
 
-    private final MailService mailService;
+    private final MailPort mailPort;
 
     private final NotificationMapper mapper;
 
@@ -20,7 +20,7 @@ public class MailAdapter implements MailServicePort {
     public void sendRedirectInformation(RedirectToken redirectToken) {
         final RedirectNotification redirectNotification = buildNotification(redirectToken);
         final Notification notification = mapper.map(redirectNotification);
-        mailService.sendNotification(notification);
+        mailPort.sendNotification(notification);
     }
 
     // TODO INPL-3106
