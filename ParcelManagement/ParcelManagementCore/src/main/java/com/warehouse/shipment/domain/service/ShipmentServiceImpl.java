@@ -12,6 +12,7 @@ import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.vo.Notification;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 @AllArgsConstructor
 public class ShipmentServiceImpl implements ShipmentService {
@@ -51,7 +52,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logPayment(paymentStatus, parcel);
 
-		if (paymentStatus.getLink() == null) {
+		if (StringUtils.isEmpty(paymentStatus.getLink())) {
 			throw new ShipmentPaymentException(SHIPMENT_201);
 		}
 

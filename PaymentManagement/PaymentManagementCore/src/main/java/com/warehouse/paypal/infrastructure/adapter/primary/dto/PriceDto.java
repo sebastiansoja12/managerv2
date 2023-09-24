@@ -1,10 +1,10 @@
 package com.warehouse.paypal.infrastructure.adapter.primary.dto;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
 
-@Data
+import lombok.Value;
+
+@Value
 public class PriceDto {
     BigDecimal value;
 }

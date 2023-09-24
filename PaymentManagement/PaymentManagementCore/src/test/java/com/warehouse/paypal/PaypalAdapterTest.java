@@ -3,12 +3,12 @@ package com.warehouse.paypal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -100,6 +100,63 @@ public class PaypalAdapterTest {
         assertEquals("Payment error", exception.getMessage());
     }
 
+    @Test
+    @Disabled
+    void shouldUpdatePayment() throws PayPalRESTException {
+        // given
+        final PaymentUpdateRequest updateRequest = PaymentUpdateRequest.builder()
+                .paymentId("paymentId")
+                .payerId("payerId")
+                .build();
+
+        final PaypalUpdateResponse expectedResponse = new PaypalUpdateResponse("OK");
+
+        final Payment mockedPayment = new Payment("ORDER", createPayer());
+        mockedPayment.setId("id");
+
+        final com.paypal.api.payments.PaymentExecution paymentExecution =
+                mock(com.paypal.api.payments.PaymentExecution.class);
+
+        // Mock the behavior of requestMapper
+        when(requestMapper.map(updateRequest)).thenReturn(mockedPayment);
+
+        mockApiContext();
+
+        // Mock the behavior of executePayment
+        when(mockedPayment.execute(apiContext, paymentExecution)).thenReturn(mockedPayment);
+
+        // Mock the behavior of responseMapper
+        when(responseMapper.mapToUpdateResponse(mockedPayment)).thenReturn(expectedResponse);
+
+        // when
+        final PaypalUpdateResponse result = paypalAdapter.update(updateRequest);
+
+        // then
+        verify(requestMapper).map(updateRequest);
+        verify(mockedPayment).execute(apiContext, paymentExecution);
+        verify(responseMapper).mapToUpdateResponse(mockedPayment);
+        assertEquals("OK", result.getState());
+    }
+
+
+    private void mockApiContext() {
+        when(apiContext.getAccessToken()).thenReturn("AccessToken");
+        when(apiContext.getRequestId()).thenReturn("RequestId");
+    }
+
+    private com.paypal.api.payments.Payer createPayer() {
+        final com.paypal.api.payments.Payer payer = new com.paypal.api.payments.Payer();
+        payer.setPayerInfo(createPayerInfo());
+        return payer;
+    }
+
+    private com.paypal.api.payments.PayerInfo createPayerInfo() {
+        final com.paypal.api.payments.PayerInfo payerInfo = new com.paypal.api.payments.PayerInfo();
+        payerInfo.setPayerId("payerId");
+        return payerInfo;
+    }
+
+
     private <T> T expectedToBe(T t) {
         return t;
     }
@@ -107,6 +164,18 @@ public class PaypalAdapterTest {
     private List<Transaction> createTransactions() {
         return List.of(Transaction.builder()
                 .description("Payment for parcel")
+                .amount(createAmount())
                 .build());
     }
+
+    private Amount createAmount() {
+        return new Amount("30", createDetails());
+    }
+
+    private Details createDetails() {
+        return Details.builder()
+                .subtotal("30")
+                .build();
+    }
+
 }
