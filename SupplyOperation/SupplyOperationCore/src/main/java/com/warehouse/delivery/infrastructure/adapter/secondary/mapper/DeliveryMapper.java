@@ -4,7 +4,7 @@ import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.model.DeliveryRouteRequest;
 import com.warehouse.delivery.domain.model.DeliveryRouteResponse;
-import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.dto.SupplyInformationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

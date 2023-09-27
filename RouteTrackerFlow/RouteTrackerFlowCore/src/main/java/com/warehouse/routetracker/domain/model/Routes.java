@@ -1,0 +1,30 @@
+package com.warehouse.routetracker.domain.model;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.Value;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Data
+@Value
+@Builder
+public class Routes {
+
+    UUID id;
+
+    LocalDateTime created;
+
+    Parcel parcel;
+
+    User user;
+
+    Supplier supplier;
+
+    Depot depot;
+
+    public LocalDateTime getCreated() {
+        return created;
+    }
+}

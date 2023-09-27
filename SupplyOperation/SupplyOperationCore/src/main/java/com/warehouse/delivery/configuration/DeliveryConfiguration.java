@@ -16,7 +16,7 @@ import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequ
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import com.warehouse.delivery.infrastructure.adapter.secondary.*;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryMapper;
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.RouteLogEventPublisher;
 
 @Configuration
 public class DeliveryConfiguration {

@@ -295,11 +295,6 @@
 				<artifactId>spring-boot-starter-data-mongodb</artifactId>
 				<version>${spring-starter.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>com.braintreepayments.gateway</groupId>
-				<artifactId>braintree-java</artifactId>
-				<version>3.26.0</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

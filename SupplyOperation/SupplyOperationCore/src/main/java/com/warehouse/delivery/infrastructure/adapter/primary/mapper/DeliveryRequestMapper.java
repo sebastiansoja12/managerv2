@@ -2,7 +2,7 @@ package com.warehouse.delivery.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.dto.DeliveryRequestDto;
-import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.dto.SupplyInformationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

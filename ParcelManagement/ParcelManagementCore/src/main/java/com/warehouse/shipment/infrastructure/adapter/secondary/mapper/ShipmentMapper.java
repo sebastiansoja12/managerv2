@@ -4,11 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.route.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.ParcelUpdate;
 import com.warehouse.shipment.domain.model.ShipmentRequest;
-import com.warehouse.shipment.domain.model.ShipmentResponse;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentMapper {
@@ -48,6 +46,4 @@ public interface ShipmentMapper {
     @Mapping(target = "parcelSize", source = "parcelSize")
     @Mapping(target = "id", source = "id")
     Parcel map(ParcelUpdate parcelUpdate);
-
-    ShipmentRequestDto mapToRequestDto(ShipmentResponse response);
 }

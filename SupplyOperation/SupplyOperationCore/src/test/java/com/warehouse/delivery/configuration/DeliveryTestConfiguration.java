@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.warehouse.delivery.domain.port.secondary.SupplierTokenServicePort;
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.RouteLogEventPublisher;
 
 @ComponentScan(basePackages = { "com.warehouse.delivery" })
 @EntityScan(basePackages = { "com.warehouse.delivery" })
