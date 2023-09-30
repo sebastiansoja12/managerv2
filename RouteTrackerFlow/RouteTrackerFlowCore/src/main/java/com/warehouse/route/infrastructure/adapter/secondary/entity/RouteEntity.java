@@ -38,7 +38,7 @@ public class RouteEntity {
     private ParcelEntity parcel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "depotCode", referencedColumnName = "depotCode")
+    @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
     private DepotEntity depot;
 
     @ManyToOne(fetch = FetchType.LAZY)

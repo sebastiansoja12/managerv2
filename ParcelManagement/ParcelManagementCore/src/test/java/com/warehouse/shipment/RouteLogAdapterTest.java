@@ -10,24 +10,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.model.ShipmentResponse;
-import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentAdapter;
+import com.warehouse.shipment.infrastructure.adapter.secondary.RouteLogAdapter;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapperImpl;
 
 @ExtendWith(MockitoExtension.class)
-public class ShipmentAdapterTest {
+public class RouteLogAdapterTest {
 
 
     @Mock
     private RouteLogEventPublisher routeLogEventPublisher;
 
-    private ShipmentAdapter shipmentAdapter;
+    private RouteLogAdapter routeLogAdapter;
 
     private final ShipmentMapper shipmentMapper = new ShipmentMapperImpl();
 
     @BeforeEach
     void setup() {
-        shipmentAdapter = new ShipmentAdapter(shipmentMapper, routeLogEventPublisher);
+        routeLogAdapter = new RouteLogAdapter(shipmentMapper, routeLogEventPublisher);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class ShipmentAdapterTest {
         // given
         final ShipmentResponse shipmentResponse = new ShipmentResponse("paymentUrl", 1L);
         // when
-        shipmentAdapter.sendEvent(shipmentResponse);
+        routeLogAdapter.sendEvent(shipmentResponse);
         // then
         verify(routeLogEventPublisher, times(1)).send(any());
     }

@@ -1,6 +1,4 @@
-package com.warehouse.route.domain.model;
-
-import java.util.UUID;
+package com.warehouse.route.domain.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RouteRequest {
-
-    UUID id;
+@Builder
+public class DeliveryInformation {
     Long parcelId;
-    Long userId;
-    Long supplierId;
     String depotCode;
+    String supplierCode;
+    String token;
+    String deliveryStatus;
 }

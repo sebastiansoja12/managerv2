@@ -1,5 +1,6 @@
 package com.warehouse.route.configuration;
 
+import com.warehouse.route.infrastructure.adapter.secondary.RouteDepotReadRepository;
 import com.warehouse.route.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import org.mapstruct.factory.Mappers;
@@ -21,11 +22,12 @@ import com.warehouse.route.infrastructure.adapter.secondary.mapper.RouteModelMap
 @Configuration
 public class  RouteConfiguration {
 
-    @Bean
-    public RouteRepository routeRepository(RouteReadRepository routeReadRepository) {
-        final RouteModelMapper routeModelMapper = Mappers.getMapper(RouteModelMapper.class);
-        return new RouteRepositoryImpl(routeReadRepository, routeModelMapper);
-    }
+	@Bean
+	public RouteRepository routeRepository(RouteReadRepository routeReadRepository,
+			RouteDepotReadRepository routeDepotReadRepository) {
+		final RouteModelMapper routeModelMapper = Mappers.getMapper(RouteModelMapper.class);
+		return new RouteRepositoryImpl(routeReadRepository, routeDepotReadRepository, routeModelMapper);
+	}
 
     @Bean
     public RouteLogEventPublisher routeLogEventPublisher(ApplicationEventPublisher applicationEventPublisher) {

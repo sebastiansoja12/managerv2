@@ -3,8 +3,7 @@ package com.warehouse.route;
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
-import com.warehouse.route.domain.vo.SupplyInformation;
-import org.assertj.core.util.Lists;
+import com.warehouse.route.domain.vo.DeliveryInformation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -12,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,17 +30,15 @@ public class RouteTrackerLogTest {
     @Test
     void shouldSaveRoute() {
         // given
-        final SupplyInformation supplyInformation = SupplyInformation.builder()
-                .created(LocalDateTime.now())
+        final DeliveryInformation deliveryInformation = DeliveryInformation.builder()
                 .depotCode("KT1")
                 .parcelId(100001L)
-               // .supplierId(1L)
-                .username("s-soja")
+                .supplierCode("supplierCode")
                 .build();
         final RouteResponse response = new RouteResponse(ROUTE_ID);
-        when(routeTrackerLogPort.saveSupplyRoute(Collections.singletonList(supplyInformation))).thenReturn(response);
+        when(routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation))).thenReturn(response);
         // when
-        final RouteResponse route = routeTrackerLogPort.saveSupplyRoute(Collections.singletonList(supplyInformation));
+        final RouteResponse route = routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation));
         // then
         assertThat(route.getId()).isNotNull();
     }
@@ -51,14 +47,12 @@ public class RouteTrackerLogTest {
     void shouldSaveMultipleRoutes() {
         // given
         final RouteRequest routeRequest = RouteRequest.builder()
-                .depotId(1L)
                 .id(ROUTE_ID)
                 .parcelId(100001L)
                 .supplierId(1L)
                 .build();
 
         final RouteRequest routeRequest2 = RouteRequest.builder()
-                .depotId(1L)
                 .id(ROUTE_ID_2)
                 .parcelId(100002L)
                 .supplierId(1L)

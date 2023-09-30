@@ -1,16 +1,18 @@
 package com.warehouse.delivery.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.delivery.domain.model.DeliveryRequest;
-import com.warehouse.delivery.dto.DeliveryRequestDto;
-import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
+import java.util.List;
+
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.List;
+import com.warehouse.delivery.domain.model.DeliveryRequest;
+import com.warehouse.delivery.dto.DeliveryRequestDto;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DeliveryRequestMapper {
 
-    DeliveryRequest map(SupplyInformationDto supplyInformationDto);
+    @Mapping(target = "deliveryStatus", ignore = true)
+    DeliveryRequest map(DeliveryRequestDto deliveryRequest);
     List<DeliveryRequest> map(List<DeliveryRequestDto> deliveryRequest);
 }

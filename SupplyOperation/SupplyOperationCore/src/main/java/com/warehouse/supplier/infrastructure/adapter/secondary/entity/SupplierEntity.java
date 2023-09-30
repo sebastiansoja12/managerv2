@@ -22,20 +22,20 @@ public class SupplierEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "supplier_code", nullable = false, unique = true)
     private String supplierCode;
 
-    @Column(nullable = false)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(name = "telephone", nullable = false)
     private String telephone;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "depotCode", referencedColumnName = "depotCode")
+    @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
     private DepotEntity depot;
 
 }

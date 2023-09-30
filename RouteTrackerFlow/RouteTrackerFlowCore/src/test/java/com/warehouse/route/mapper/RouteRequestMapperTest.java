@@ -27,23 +27,23 @@ public class RouteRequestMapperTest {
     void shouldMapFromRequestToRequestDto() {
         // given
         final RouteRequest routeRequest = RouteRequest.builder()
-                .depotId(1L)
+                .supplierId(1L)
                 .build();
         // when
         final RouteRequestDto routeRequestDto = routeRequestMapper.map(routeRequest);
         // then
-        assertThat(routeRequest.getDepotId()).isEqualTo(routeRequestDto.getDepotId());
+        assertThat(routeRequest.getSupplierId()).isEqualTo(routeRequestDto.getSupplierId());
     }
 
     @Test
     void shouldMapFromRequestDtoToRequest() {
         // given
         final RouteRequestDto routeRequestDto = RouteRequestDto.builder()
-                .depotId(1L)
+                .supplierId(1L)
                 .build();
         // when
         final RouteRequest routeRequest = routeRequestMapper.map(routeRequestDto);
         // then
-        assertThat(routeRequest.getDepotId()).isEqualTo(routeRequestDto.getDepotId());
+        assertThat(routeRequest.getSupplierId()).isEqualTo(routeRequestDto.getSupplierId());
     }
 }

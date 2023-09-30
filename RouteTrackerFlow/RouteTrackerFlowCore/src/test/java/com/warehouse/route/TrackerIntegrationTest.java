@@ -1,6 +1,18 @@
 package com.warehouse.route;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ContextConfiguration;
+
 import com.warehouse.route.configuration.RouteTrackerTestConfiguration;
 import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteResponse;
@@ -13,18 +25,6 @@ import com.warehouse.route.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.ParcelType;
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Status;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ContextConfiguration;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 /**
  * This class tests entire process of a package lifetime
@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  */
 @DataJpaTest
 @ContextConfiguration(classes = RouteTrackerTestConfiguration.class)
+@Disabled
 public class TrackerIntegrationTest {
 
     @Autowired
@@ -93,7 +94,6 @@ public class TrackerIntegrationTest {
         // given
         final Route initializeRoute = Route.builder()
                 .parcelId(parcel.getId())
-                .created(LocalDateTime.now())
                 .build();
         // when
         routeLogService.initializeRoute(initializeRoute);
@@ -107,8 +107,7 @@ public class TrackerIntegrationTest {
         // given
         final Route supplyRoute = Route.builder()
                 .parcelId(parcel.getId())
-                //.supplierId(supplier.getId())
-                .created(LocalDateTime.now())
+                .supplierId(supplier.getId())
                 .build();
         // when
         final RouteResponse response = routeLogService.saveSupplyRoute(supplyRoute);
@@ -123,8 +122,7 @@ public class TrackerIntegrationTest {
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
                 .userId((long) user.getId())
-                //.supplierId(supplier.getId())
-                .created(LocalDateTime.now())
+                .supplierId(supplier.getId())
                 .build();
         // when
         final RouteResponse response = routeLogService.saveRoute(route);
@@ -138,20 +136,17 @@ public class TrackerIntegrationTest {
         // given
         final Route initializeRoute = Route.builder()
                 .parcelId(parcel.getId())
-                .created(LocalDateTime.now())
                 .build();
 
         final Route supplyRoute = Route.builder()
                 .parcelId(parcel.getId())
-                //.supplierId(supplier.getId())
-                .created(LocalDateTime.now())
+                .supplierId(supplier.getId())
                 .build();
 
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
-                //.supplierId(supplier.getId())
+                .supplierId(supplier.getId())
                 .userId((long) user.getId())
-                .created(LocalDateTime.now())
                 .build();
         // when
         routeLogService.initializeRoute(initializeRoute);

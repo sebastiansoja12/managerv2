@@ -3,6 +3,7 @@ package com.warehouse.route.infrastructure.adapter.primary;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import com.warehouse.route.domain.vo.DeliveryInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -12,7 +13,6 @@ import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.ShipmentRequest;
 import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
-import com.warehouse.route.domain.vo.SupplyInformation;
 import com.warehouse.route.infrastructure.adapter.primary.mapper.EventMapper;
 import com.warehouse.route.infrastructure.api.event.*;
 
@@ -22,13 +22,14 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class RouteLogEventListener {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSSS");
-    
-    private final Logger logger = LoggerFactory.getLogger(RouteLogEventListener.class);
-
     private final EventMapper eventMapper;
 
     private final RouteTrackerLogPort trackerLogPort;
+
+    private final Logger logger = LoggerFactory.getLogger(RouteLogEventListener.class);
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSSS");
+
 
 
     @EventListener
@@ -39,10 +40,10 @@ public class RouteLogEventListener {
     }
 
     @EventListener
-    public void handle(SupplyLogEvent event) {
+    public void handle(DeliveryLogEvent event) {
         logEvent(event);
-        final List<SupplyInformation> supplyInformation = eventMapper.map(event.getSupplyInformation());
-        trackerLogPort.saveSupplyRoute(supplyInformation);
+        final List<DeliveryInformation> deliveryInformation = eventMapper.map(event.getDeliveryInformation());
+        trackerLogPort.saveDelivery(deliveryInformation);
     }
 
     @EventListener

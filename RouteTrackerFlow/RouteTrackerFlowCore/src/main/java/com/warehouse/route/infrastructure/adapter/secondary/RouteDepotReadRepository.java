@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface RouteDepotReadRepository extends JpaRepository<DepotEntity, Long> {
+public interface RouteDepotReadRepository extends JpaRepository<DepotEntity, String> {
 
     Optional<DepotEntity> findByDepotCode(String depotCode);
 }

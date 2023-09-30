@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.domain.model.Delivery;
@@ -25,7 +24,7 @@ public class DeliveryPortImpl implements DeliveryPort {
 
     @Override
     public List<DeliveryResponse> deliver(List<DeliveryRequest> deliveryRequest) {
-        final Set<DeliveryRequest> deliveryRequests =  deliveryRequest.stream()
+        final Set<DeliveryRequest> deliveryRequests = deliveryRequest.stream()
                 .filter(Objects::nonNull)
                 .map(this::determineDeliveryStatus)
                 .collect(Collectors.toSet());
@@ -48,10 +47,7 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .map(this::mapToDeliveryRouteRequest)
                 .collect(Collectors.toSet());
 
-        signedDeliveries.stream()
-                .map(Delivery::getToken)
-                .filter(Objects::nonNull)
-                .forEach(delivery -> logServicePort.deliver(deliveryRouteRequests));
+        logServicePort.deliver(deliveryRouteRequests);
     }
 
     private DeliveryRouteRequest mapToDeliveryRouteRequest(Delivery delivery) {
@@ -74,6 +70,8 @@ public class DeliveryPortImpl implements DeliveryPort {
     private DeliveryResponse mapToResponse(Delivery delivery) {
         return DeliveryResponse.builder()
                 .id(delivery.getId())
+                .parcelId(delivery.getParcelId())
+                .deliveryStatus(delivery.getDeliveryStatus().name())
                 .build();
     }
 

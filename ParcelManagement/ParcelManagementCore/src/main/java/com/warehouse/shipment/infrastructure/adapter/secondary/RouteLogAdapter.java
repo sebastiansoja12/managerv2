@@ -9,7 +9,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMa
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ShipmentAdapter implements ShipmentServicePort {
+public class RouteLogAdapter implements ShipmentServicePort {
 
     private final ShipmentMapper shipmentMapper;
 

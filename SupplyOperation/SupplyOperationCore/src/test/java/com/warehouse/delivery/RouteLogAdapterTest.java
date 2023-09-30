@@ -22,7 +22,6 @@ import com.warehouse.delivery.domain.model.DeliveryRouteResponse;
 import com.warehouse.delivery.infrastructure.adapter.secondary.RouteLogAdapter;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryMapper;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
 
 @ExtendWith(MockitoExtension.class)
 public class RouteLogAdapterTest {
@@ -52,16 +51,6 @@ public class RouteLogAdapterTest {
         // then
         assertEquals(expectedToBe(1), response.size());
         verify(routeLogEventPublisher, times(1)).send(any());
-    }
-
-    private SupplyInformationDto createSupplyInformation() {
-        final SupplyInformationDto supplyInformation = new SupplyInformationDto();
-        supplyInformation.setDeliveryStatus("DELIVERY");
-        supplyInformation.setParcelId(1L);
-        supplyInformation.setDepotCode("KT1");
-        supplyInformation.setSupplierCode("code");
-        supplyInformation.setId(UUID.fromString("2ea6ba6b-3f01-4d04-ad6d-952a186f48ac"));
-        return supplyInformation;
     }
 
     private DeliveryRouteRequest request() {

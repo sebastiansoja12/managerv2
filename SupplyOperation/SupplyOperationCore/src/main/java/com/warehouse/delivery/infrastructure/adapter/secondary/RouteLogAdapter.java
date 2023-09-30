@@ -8,8 +8,8 @@ import com.warehouse.delivery.domain.model.DeliveryRouteResponse;
 import com.warehouse.delivery.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryMapper;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
-import com.warehouse.route.infrastructure.api.event.SupplyLogEvent;
+import com.warehouse.route.infrastructure.api.dto.DeliveryInformationDto;
+import com.warehouse.route.infrastructure.api.event.DeliveryLogEvent;
 
 import lombok.AllArgsConstructor;
 
@@ -24,21 +24,21 @@ public class RouteLogAdapter implements RouteLogServicePort {
 
     @Override
     public List<DeliveryRouteResponse> deliver(Set<DeliveryRouteRequest> deliveryRequest) {
-        final List<SupplyInformationDto> supplyInformationDto = deliveryMapper.map(deliveryRequest);
-        sendEvent(buildEvent(supplyInformationDto));
+        final List<DeliveryInformationDto> deliveryInformationDto = deliveryMapper.map(deliveryRequest);
+        sendEvent(buildEvent(deliveryInformationDto));
         return deliveryRequest.stream()
                 .map(deliveryMapper::map)
                 .toList();
     }
 
 
-    private SupplyLogEvent buildEvent(List<SupplyInformationDto> supplyInformation) {
-        return SupplyLogEvent.builder()
-                .supplyInformation(supplyInformation)
+    private DeliveryLogEvent buildEvent(List<DeliveryInformationDto> deliveryInformation) {
+        return DeliveryLogEvent.builder()
+                .deliveryInformation(deliveryInformation)
                 .build();
     }
 
-    private void sendEvent(SupplyLogEvent event) {
+    private void sendEvent(DeliveryLogEvent event) {
         routeLogEventPublisher.send(event);
     }
 }

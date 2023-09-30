@@ -33,9 +33,9 @@ public class ShipmentConfiguration {
 	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
 
 	@Bean
-	public ShipmentAdapter shipmentAdapter(RouteLogEventPublisher routeLogEventPublisher) {
+	public RouteLogAdapter shipmentAdapter(RouteLogEventPublisher routeLogEventPublisher) {
 		final ShipmentMapper shipmentMapper = Mappers.getMapper(ShipmentMapper.class);
-		return new ShipmentAdapter(shipmentMapper, routeLogEventPublisher);
+		return new RouteLogAdapter(shipmentMapper, routeLogEventPublisher);
 	}
 
 	@Bean

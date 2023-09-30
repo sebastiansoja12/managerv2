@@ -1,23 +1,23 @@
 package com.warehouse.route;
 
-import com.warehouse.route.domain.model.RouteRequest;
-import com.warehouse.route.domain.model.RouteResponse;
-import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
-import com.warehouse.route.domain.vo.SupplyInformation;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.warehouse.route.domain.model.RouteRequest;
+import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
+import com.warehouse.route.domain.vo.DeliveryInformation;
 
 @ExtendWith(MockitoExtension.class)
 public class RouteTrackerLogPortTest {
@@ -42,17 +42,15 @@ public class RouteTrackerLogPortTest {
     @Test
     void shouldSaveSupplyInformation() {
         // given
-        final SupplyInformation supplyInformation = SupplyInformation.builder()
-                .username("")
-                //.supplierId(1L)
-                .created(LocalDateTime.now())
+        final DeliveryInformation deliveryInformation = DeliveryInformation.builder()
+                .supplierCode("abc")
                 .parcelId(1L)
                 .depotCode("")
                 .build();
         final RouteResponse expectedResponse = new RouteResponse(UUID.randomUUID());
-        when(logPort.saveSupplyRoute(Collections.singletonList(supplyInformation))).thenReturn(expectedResponse);
+        when(logPort.saveDelivery(Collections.singletonList(deliveryInformation))).thenReturn(expectedResponse);
         // when
-        final RouteResponse actualResponse = logPort.saveSupplyRoute(Collections.singletonList(supplyInformation));
+        final RouteResponse actualResponse = logPort.saveDelivery(Collections.singletonList(deliveryInformation));
         // then
         assertEquals(actualResponse.getId(), expectedResponse.getId());
     }
@@ -77,7 +75,6 @@ public class RouteTrackerLogPortTest {
                 .supplierId(1L)
                 .parcelId(10001L)
                 .id(ROUTE_ID)
-                .depotId(1L)
                 .userId(1L)
                 .build();
 
@@ -85,7 +82,6 @@ public class RouteTrackerLogPortTest {
                 .supplierId(1L)
                 .parcelId(10002L)
                 .id(ROUTE_ID_2)
-                .depotId(1L)
                 .userId(1L)
                 .build();
 

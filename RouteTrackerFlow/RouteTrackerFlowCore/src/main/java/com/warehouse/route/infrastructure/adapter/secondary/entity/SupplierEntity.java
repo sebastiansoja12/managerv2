@@ -1,12 +1,10 @@
 package com.warehouse.route.infrastructure.adapter.secondary.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.persistence.*;
 
 @Data
 @AllArgsConstructor
@@ -20,21 +18,20 @@ public class SupplierEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(name = "supplier_code", nullable = false, unique = true)
     private String supplierCode;
 
-    @Column(nullable = false)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(name = "telephone", nullable = false)
     private String telephone;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "depotCode", referencedColumnName = "depotCode")
+    @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
     private DepotEntity depot;
 
 }
