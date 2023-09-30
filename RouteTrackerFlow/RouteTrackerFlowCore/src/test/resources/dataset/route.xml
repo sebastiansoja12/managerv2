@@ -38,6 +38,7 @@
         street="Test"
         country="Test"
         depot_code="TST"
+        id="1"
     />
 
     <supplier
