@@ -1,13 +1,12 @@
 package com.warehouse.route;
 
-import com.warehouse.route.domain.model.Route;
-import com.warehouse.route.domain.model.RouteRequest;
-import com.warehouse.route.domain.model.RouteResponse;
-import com.warehouse.route.domain.port.primary.RouteTrackerLogPort;
-import com.warehouse.route.domain.port.primary.RouteTrackerLogPortImpl;
-import com.warehouse.route.domain.port.secondary.RouteLogService;
-import com.warehouse.route.domain.vo.DeliveryInformation;
-import org.dbunit.Assertion;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,20 +14,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import com.warehouse.route.domain.model.Route;
+import com.warehouse.route.domain.model.RouteRequest;
+import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.port.primary.RouteTrackerLogPortImpl;
+import com.warehouse.route.domain.port.secondary.RouteLogService;
+import com.warehouse.route.domain.vo.DeliveryInformation;
 
 @ExtendWith(MockitoExtension.class)
 public class RouteTrackerLogTest {
 
 
-    public static final long PARCEL_ID2 = 100002L;
     @Mock
     private RouteLogService routeLogService;
 
@@ -39,6 +35,8 @@ public class RouteTrackerLogTest {
     private final UUID ROUTE_ID_2 = UUID.fromString("f0a45a51-6d0f-45ab-a839-41f161208c65");
 
     public static final Long PARCEL_ID = 100001L;
+
+    public static final long PARCEL_ID2 = 100002L;
 
 
     @BeforeEach
