@@ -20,6 +20,7 @@ import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenRead
 import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenRepositoryImpl;
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.RedirectTokenMapper;
+import com.warehouse.redirect.infrastructure.adapter.secondary.properties.RedirectTokenProperties;
 import com.warehouse.shipment.infrastructure.api.ShipmentService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
@@ -36,9 +37,14 @@ public class RedirectConfiguration {
 	}
 
     @Bean(name = "redirect.mailServicePort")
-    public MailServicePort mailServicePort(MailPort mailPort) {
+    public MailServicePort mailServicePort(MailPort mailPort, RedirectTokenProperties properties) {
         final NotificationMapper mapper = Mappers.getMapper(NotificationMapper.class);
-        return new MailAdapter(mailPort, mapper);
+        return new MailAdapter(mailPort, mapper, properties);
+    }
+
+    @Bean
+    public RedirectTokenProperties properties() {
+        return new RedirectTokenProperties();
     }
 
     @Bean

@@ -3,6 +3,7 @@ package com.warehouse.redirect;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.warehouse.redirect.infrastructure.adapter.secondary.properties.RedirectTokenProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,14 +21,17 @@ public class MailAdapterTest {
     @Mock
     private MailPort mailPort;
 
-    private MailAdapter mailAdapter;
-
     @Mock
     private NotificationMapper notificationMapper;
 
+    @Mock
+    private RedirectTokenProperties properties;
+
+    private MailAdapter mailAdapter;
+
     @BeforeEach
     void setup() {
-        mailAdapter = new MailAdapter(mailPort, notificationMapper);
+        mailAdapter = new MailAdapter(mailPort, notificationMapper, properties);
     }
 
 
