@@ -16,9 +16,6 @@ import lombok.NoArgsConstructor;
 public class DepotEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
     @Column(name = "depot_code", nullable = false)
     private String depotCode;
 

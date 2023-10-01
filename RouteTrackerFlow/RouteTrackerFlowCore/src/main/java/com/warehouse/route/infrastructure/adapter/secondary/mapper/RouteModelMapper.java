@@ -3,10 +3,7 @@ package com.warehouse.route.infrastructure.adapter.secondary.mapper;
 import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.Routes;
-import com.warehouse.route.infrastructure.adapter.secondary.entity.DepotEntity;
-import com.warehouse.route.infrastructure.adapter.secondary.entity.ParcelEntity;
-import com.warehouse.route.infrastructure.adapter.secondary.entity.RouteEntity;
-import com.warehouse.route.infrastructure.adapter.secondary.entity.SupplierEntity;
+import com.warehouse.route.infrastructure.adapter.secondary.entity.*;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -60,7 +57,18 @@ public interface RouteModelMapper {
                 .depot(mapDepotEntity(route))
                 .parcel(mapParcelEntity(route))
                 .supplier(mapSupplierEntity(route))
+                .user(mapUserEntity(route))
                 .build();
+    }
+
+    default UserEntity mapUserEntity(Route route) {
+        final Long userId = route.getUserId();
+        if (Objects.nonNull(userId)) {
+            return UserEntity.builder()
+                    .id(userId.intValue())
+                    .build();
+        }
+        return null;
     }
 
     default ParcelEntity mapParcelEntity(Route route) {
@@ -69,19 +77,24 @@ public interface RouteModelMapper {
                 .build();
     }
 
-    default DepotEntity mapDepotEntity(Route route) {
-        final String depotCode = route.getDepotCode();
-        return DepotEntity.builder()
-                .depotCode(StringUtils.isNotEmpty(depotCode) ? depotCode : "NCS")
-                .id(StringUtils.isNotEmpty(depotCode) ? 1L : 11L)
-                .build();
-    }
+	default DepotEntity mapDepotEntity(Route route) {
+		final String depotCode = route.getDepotCode();
+		if (StringUtils.isNotEmpty(depotCode)) {
+			return DepotEntity.builder()
+                    .depotCode(depotCode)
+                    .build();
+		}
+		return null;
+	}
 
     default SupplierEntity mapSupplierEntity(Route route) {
         final Long supplierId = route.getSupplierId();
-        return SupplierEntity.builder()
-                .id(Objects.nonNull(supplierId) ? supplierId : 1L)
-                .build();
+        if (Objects.nonNull(supplierId)) {
+            return SupplierEntity.builder()
+                    .id(supplierId)
+                    .build();
+        }
+        return null;
     }
 
 }

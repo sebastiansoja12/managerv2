@@ -48,11 +48,11 @@ public class RouteTrackerLogPortTest {
                 .depotCode("")
                 .build();
         final RouteResponse expectedResponse = new RouteResponse(UUID.randomUUID());
-        when(logPort.saveDelivery(Collections.singletonList(deliveryInformation))).thenReturn(expectedResponse);
+        //when(logPort.saveDelivery(Collections.singletonList(deliveryInformation))).thenReturn(expectedResponse);
         // when
-        final RouteResponse actualResponse = logPort.saveDelivery(Collections.singletonList(deliveryInformation));
+        logPort.saveDelivery(Collections.singletonList(deliveryInformation));
         // then
-        assertEquals(actualResponse.getId(), expectedResponse.getId());
+        assertEquals(deliveryInformation.getParcelId(), expectedResponse.getId());
     }
 
     @Test
@@ -61,11 +61,11 @@ public class RouteTrackerLogPortTest {
         final RouteRequest routeRequest = RouteRequest.builder().build();
 
         final RouteResponse expectedResponse = new RouteResponse(UUID.randomUUID());
-        when(logPort.saveRoute(routeRequest)).thenReturn(expectedResponse);
+        when(logPort.saveRoutes(List.of(routeRequest))).thenReturn(List.of(expectedResponse));
         // when
-        final RouteResponse actualResponse = logPort.saveRoute(routeRequest);
+        final List<RouteResponse> actualResponse = logPort.saveRoutes(List.of(routeRequest));
         // then
-        assertEquals(expectedResponse.getId(), actualResponse.getId());
+        assertEquals(expectedResponse.getId(), actualResponse.get(0).getId());
     }
 
     @Test

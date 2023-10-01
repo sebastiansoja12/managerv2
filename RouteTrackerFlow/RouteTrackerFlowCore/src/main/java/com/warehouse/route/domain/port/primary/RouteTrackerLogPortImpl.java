@@ -2,13 +2,11 @@ package com.warehouse.route.domain.port.primary;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.warehouse.route.domain.model.Route;
-import com.warehouse.route.domain.model.RouteDeleteRequest;
-import com.warehouse.route.domain.model.RouteRequest;
-import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.model.*;
 import com.warehouse.route.domain.port.secondary.RouteLogService;
 import com.warehouse.route.domain.vo.DeliveryInformation;
 
@@ -29,7 +27,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public RouteResponse saveDelivery(List<DeliveryInformation> deliveryInformation) {
+    public void saveDelivery(List<DeliveryInformation> deliveryInformation) {
 		deliveryInformation.stream().filter(this::existsToken).forEach(request -> {
 			final Route route = Route.builder()
                     .supplierId(1L)
@@ -38,30 +36,24 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                     .build();
 			 routeLogService.saveSupplyRoute(route);
 		});
-
-        return new RouteResponse(null);
     }
 
     @Override
-    public RouteResponse saveRoute(RouteRequest routeRequest) {
-        final Route route = Route.builder()
-                .parcelId(routeRequest.getParcelId())
-                .supplierId(routeRequest.getSupplierId())
-                .depotCode(routeRequest.getDepotCode())
-                .userId(routeRequest.getUserId())
-                .build();
-        return routeLogService.saveRoute(route);
-    }
-
-    @Override
-    public void saveMultipleRoutes(List<RouteRequest> routeRequests) {
-        routeRequests.stream()
+    public List<RouteResponse> saveRoutes(List<RouteRequest> routeRequests) {
+		return routeRequests.stream()
                 .map(this::mapToRoute)
-                .forEach(routeLogService::saveRoute);
+                .map(routeLogService::saveRoute)
+				.collect(Collectors.toList());
     }
+
     @Override
     public void deleteRoute(RouteDeleteRequest request) {
         routeLogService.deleteRoute(request);
+    }
+
+    @Override
+    public List<Routes> getRouteListByParcelId(Long parcelId) {
+        return routeLogService.getRouteListByParcelId(parcelId);
     }
 
     private Route mapToRoute(RouteRequest routeRequest) {

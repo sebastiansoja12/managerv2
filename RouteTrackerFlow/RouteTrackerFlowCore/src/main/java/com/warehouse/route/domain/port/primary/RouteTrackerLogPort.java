@@ -5,6 +5,7 @@ import java.util.List;
 import com.warehouse.route.domain.model.RouteDeleteRequest;
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.vo.DeliveryInformation;
 
 public interface RouteTrackerLogPort {
@@ -12,11 +13,11 @@ public interface RouteTrackerLogPort {
 
     void initializeRoute(Long parcelId);
 
-    RouteResponse saveDelivery(List<DeliveryInformation> deliveryInformation);
+    void saveDelivery(List<DeliveryInformation> deliveryInformation);
 
-    RouteResponse saveRoute(RouteRequest routeRequest);
-
-    void saveMultipleRoutes(List<RouteRequest> routeRequests);
+    List<RouteResponse> saveRoutes(List<RouteRequest> routeRequest);
 
     void deleteRoute(RouteDeleteRequest request);
+
+    List<Routes> getRouteListByParcelId(Long parcelId);
 }

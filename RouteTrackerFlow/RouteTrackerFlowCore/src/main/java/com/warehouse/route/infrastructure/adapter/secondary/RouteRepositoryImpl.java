@@ -36,9 +36,6 @@ public class RouteRepositoryImpl implements RouteRepository {
     @Override
     public void initializeRoute(Route route) {
         final RouteEntity routeEntity = mapper.map(route);
-        final DepotEntity depotEntity =
-                depotReadRepository.getReferenceById(String.valueOf(routeEntity.getDepot().getId()));
-        routeEntity.setDepot(depotEntity);
         routeReadRepository.saveAndFlush(routeEntity);
     }
 
