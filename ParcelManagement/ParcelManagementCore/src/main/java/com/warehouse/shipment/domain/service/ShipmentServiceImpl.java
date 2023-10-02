@@ -50,11 +50,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
 		final PaymentStatus paymentStatus = paypalServicePort.payment(parcel);
 
-        logPayment(paymentStatus, parcel);
-
-		if (StringUtils.isEmpty(paymentStatus.getLink())) {
+		if (Objects.isNull(paymentStatus) || StringUtils.isEmpty(paymentStatus.getLink())) {
 			throw new ShipmentPaymentException(SHIPMENT_201);
 		}
+
+        logPayment(paymentStatus, parcel);
 
 		final Notification notification = notificationCreatorProvider.createNotification(parcel,
 				paymentStatus.getLink());
