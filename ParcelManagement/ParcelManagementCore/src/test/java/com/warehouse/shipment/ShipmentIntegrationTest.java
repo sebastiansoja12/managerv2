@@ -4,20 +4,13 @@ package com.warehouse.shipment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
-
-import com.warehouse.shipment.domain.port.secondary.PaypalServicePort;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PaypalAdapter;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -27,20 +20,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.paypal.domain.model.Link;
-import com.warehouse.paypal.domain.model.PaymentRequest;
-import com.warehouse.paypal.domain.model.PaymentResponse;
-import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockAdapter;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockService;
+import com.warehouse.shipment.domain.port.secondary.PaypalServicePort;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 
@@ -55,17 +42,10 @@ public class ShipmentIntegrationTest {
     private ShipmentPort shipmentPort;
 
     @Autowired
-    private PathFinderMockService mockService;
-
-    @Autowired
     private PathFinderServicePort pathFinderServicePort;
 
     @Autowired
-    private ShipmentService shipmentService;
-
-    @Autowired
     private PaypalServicePort paypalServicePort;
-
 
     @Test
     @Disabled
@@ -115,16 +95,18 @@ public class ShipmentIntegrationTest {
     }
 
     @Test
-    void shouldNotShipParcelWhenPathFinderServiceIsNotAvailable() {
+    void shouldNotShipParcelWhenPaymentIsNotAvailable() {
         // given
         final ShipmentRequest request = ShipmentRequest.builder()
                 .parcel(createShipmentParcel())
                 .build();
+        final Parcel parcel = createParcel();
+        when(paypalServicePort.payment(parcel)).thenReturn(null);
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then
-        final Exception exception = assertThrows(Exception.class, executable);
-        assertEquals(expectedToBe("Delivery depot could not be determined"), exception.getMessage());
+        final ShipmentPaymentException exception = assertThrows(ShipmentPaymentException.class, executable);
+        assertEquals(expectedToBe("URL for payment has not been generated"), exception.getMessage());
     }
 
     @Test
@@ -141,7 +123,6 @@ public class ShipmentIntegrationTest {
         final ShipmentRequest request = ShipmentRequest.builder()
                 .parcel(parcel)
                 .build();
-
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then
