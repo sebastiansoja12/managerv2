@@ -1,16 +1,7 @@
 package com.warehouse.shipment;
 
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
-import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockAdapter;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockService;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -23,8 +14,14 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
+import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.domain.model.*;
+import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 @DataJpaTest
