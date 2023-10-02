@@ -27,15 +27,4 @@ public class PaymentMapperTest {
         // then
         assertThat(paymentRequest.getParcelId()).isEqualTo(1L);
     }
-
-    @Test
-    void shouldMapFromModelPaymentResponseToMailPaymentResponse() {
-        // given
-        final PaymentResponse response = new PaymentResponse();
-        response.setPaymentUrl("test.pl");
-        // when
-        final com.warehouse.paypal.domain.model.PaymentResponse paymentResponse = mapper.map(response);
-        // then
-        assertThat(paymentResponse.getLink().getPaymentUrl()).isEqualTo("test.pl");
-    }
 }

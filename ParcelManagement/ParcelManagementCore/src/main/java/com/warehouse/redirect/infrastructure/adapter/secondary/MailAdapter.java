@@ -1,34 +1,38 @@
 package com.warehouse.redirect.infrastructure.adapter.secondary;
 
-import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.vo.Notification;
+import com.warehouse.redirect.domain.model.ConstantBodyMailMessage;
 import com.warehouse.redirect.domain.port.secondary.MailServicePort;
 import com.warehouse.redirect.domain.vo.RedirectNotification;
 import com.warehouse.redirect.domain.vo.RedirectToken;
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.NotificationMapper;
 
+import com.warehouse.redirect.infrastructure.adapter.secondary.properties.RedirectTokenProperties;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class MailAdapter implements MailServicePort {
 
-    private final MailService mailService;
+    private final MailPort mailPort;
 
     private final NotificationMapper mapper;
+
+    private final RedirectTokenProperties properties;
 
     @Override
     public void sendRedirectInformation(RedirectToken redirectToken) {
         final RedirectNotification redirectNotification = buildNotification(redirectToken);
         final Notification notification = mapper.map(redirectNotification);
-        mailService.sendNotification(notification);
+        mailPort.sendNotification(notification);
     }
 
-    // TODO INPL-3106
     private RedirectNotification buildNotification(RedirectToken redirectToken) {
+        final ConstantBodyMailMessage message = new ConstantBodyMailMessage(redirectToken.getToken());
         return RedirectNotification.builder()
-                .body(redirectToken.getEmail())
+                .body(message.getBody())
                 .recipient(redirectToken.getEmail())
-                .subject(redirectToken.getToken())
+                .subject(properties.getSubject())
                 .build();
     }
 }

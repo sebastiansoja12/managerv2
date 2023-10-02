@@ -26,16 +26,6 @@ public class RouteResponseMapperTest {
     }
 
     @Test
-    void shouldMapFromResponseDtoToResponse() {
-        // given
-        final RouteResponseDto routeResponseDto = new RouteResponseDto(UUID.randomUUID());
-        // when
-        final RouteResponse response = routeResponseMapper.map(routeResponseDto);
-        // then
-        assertThat(response.getId()).isEqualTo(routeResponseDto.getId());
-    }
-
-    @Test
     void shouldMapFromResponseToResponseDto() {
         // given
         final RouteResponse response = new RouteResponse(UUID.randomUUID());

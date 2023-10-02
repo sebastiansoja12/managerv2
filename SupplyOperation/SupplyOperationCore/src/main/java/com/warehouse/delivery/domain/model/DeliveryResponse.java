@@ -9,4 +9,6 @@ import java.util.UUID;
 @Builder
 public class DeliveryResponse {
     UUID id;
+    Long parcelId;
+    String deliveryStatus;
 }

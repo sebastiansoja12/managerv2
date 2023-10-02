@@ -1,8 +1,11 @@
 package com.warehouse.route.domain.model;
 
-import lombok.*;
-
 import java.util.UUID;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -14,5 +17,5 @@ public class RouteRequest {
     Long parcelId;
     Long userId;
     Long supplierId;
-    Long depotId;
+    String depotCode;
 }

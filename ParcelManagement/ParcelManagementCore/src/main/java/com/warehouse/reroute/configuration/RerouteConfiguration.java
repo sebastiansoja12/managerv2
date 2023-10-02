@@ -4,7 +4,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
 import com.warehouse.reroute.domain.port.secondary.*;
@@ -47,8 +47,8 @@ public class RerouteConfiguration {
 	}
 
 	@Bean(name = "reroute.mailServicePort")
-	public MailServicePort mailServicePort(MailService mailService) {
-		return new MailAdapter(mailService, Mappers.getMapper(NotificationMapper.class));
+	public MailServicePort mailServicePort(MailPort mailPort) {
+		return new MailAdapter(mailPort, Mappers.getMapper(NotificationMapper.class));
 	}
 
 	@Bean

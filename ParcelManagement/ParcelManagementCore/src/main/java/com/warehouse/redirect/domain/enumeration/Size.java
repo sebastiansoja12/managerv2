@@ -1,6 +1,9 @@
 package com.warehouse.redirect.domain.enumeration;
 
 
+import lombok.Getter;
+
+@Getter
 public enum Size {
     TINY("5cmx5cmx5cm", 10),
     SMALL("10cmx10cmx10cm", 15),
@@ -11,18 +14,11 @@ public enum Size {
     TEST("test", 99);
 
     private final String parcelSize;
-    public final double price;
+
+    private final double price;
 
     Size(String size, double price) {
         this.parcelSize = size;
         this.price = price;
     }
-
-    public String getSize() {
-        return parcelSize;
-    }
-
-    public double getPrice() { return price; }
-
-
 }

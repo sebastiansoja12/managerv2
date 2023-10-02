@@ -1,10 +1,10 @@
 package com.warehouse.route.mapper;
 
 
-import com.warehouse.route.domain.vo.SupplyInformation;
+import com.warehouse.route.domain.vo.DeliveryInformation;
 import com.warehouse.route.infrastructure.adapter.primary.mapper.EventMapper;
 import com.warehouse.route.infrastructure.adapter.primary.mapper.EventMapperImpl;
-import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
+import com.warehouse.route.infrastructure.api.dto.DeliveryInformationDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,11 +25,11 @@ public class EventMapperTest {
     @Test
     void shouldMapSupplyInformationDtoToSupplyInformation() {
         // given
-        final SupplyInformationDto supplyInformationDto = new SupplyInformationDto();
-        supplyInformationDto.setParcelId(1L);
+        final DeliveryInformationDto deliveryInformationDto = new DeliveryInformationDto();
+        deliveryInformationDto.setParcelId(1L);
         // when
-        final SupplyInformation supplyInformation = eventMapper.map(supplyInformationDto);
+        final DeliveryInformation deliveryInformation = eventMapper.map(deliveryInformationDto);
         // then
-        assertThat(supplyInformation.getParcelId()).isEqualTo(supplyInformationDto.getParcelId());
+        assertThat(deliveryInformation.getParcelId()).isEqualTo(deliveryInformationDto.getParcelId());
     }
 }

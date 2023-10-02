@@ -3,11 +3,11 @@ package com.warehouse.route.infrastructure.adapter.primary.mapper;
 import com.warehouse.route.domain.model.RouteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.ShipmentRequest;
-import com.warehouse.route.domain.vo.SupplyInformation;
+import com.warehouse.route.domain.vo.DeliveryInformation;
 import com.warehouse.route.infrastructure.api.dto.RouteRequestDto;
 import com.warehouse.route.infrastructure.api.dto.RouteResponseDto;
 import com.warehouse.route.infrastructure.api.dto.ShipmentRequestDto;
-import com.warehouse.route.infrastructure.api.dto.SupplyInformationDto;
+import com.warehouse.route.infrastructure.api.dto.DeliveryInformationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -16,9 +16,9 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface EventMapper {
 
-    SupplyInformation map(SupplyInformationDto supplyInformationDto);
+    DeliveryInformation map(DeliveryInformationDto deliveryInformationDto);
 
-    List<SupplyInformation> map(List<SupplyInformationDto> supplyInformationDto);
+    List<DeliveryInformation> map(List<DeliveryInformationDto> deliveryInformationDto);
 
     ShipmentRequest map(ShipmentRequestDto shipmentRequestDto);
 

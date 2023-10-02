@@ -1,5 +1,17 @@
 package com.warehouse.route;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ContextConfiguration;
+
 import com.warehouse.route.configuration.RouteTrackerTestConfiguration;
 import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteResponse;
@@ -16,18 +28,6 @@ import com.warehouse.route.infrastructure.adapter.secondary.entity.SupplierEntit
 import com.warehouse.route.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.ParcelType;
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Size;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ContextConfiguration;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ContextConfiguration(classes = RouteTrackerTestConfiguration.class)
@@ -83,7 +83,6 @@ public class RouteLogServiceTest {
         // given
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
-                .created(LocalDateTime.now())
                 .build();
         // when
         routeLogService.initializeRoute(route);
@@ -97,7 +96,6 @@ public class RouteLogServiceTest {
         // given
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
-                .created(LocalDateTime.now())
                 .build();
         // when
         final RouteResponse response = routeLogService.saveSupplyRoute(route);
@@ -111,7 +109,6 @@ public class RouteLogServiceTest {
         // given
         final Route route = Route.builder()
                 .parcelId(parcel.getId())
-                .created(LocalDateTime.now())
                 .build();
         // when
         final RouteResponse response = routeLogService.saveRoute(route);

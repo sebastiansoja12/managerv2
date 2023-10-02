@@ -5,6 +5,7 @@ import com.warehouse.route.domain.model.RouteDeleteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
 import com.warehouse.route.domain.model.Routes;
 import com.warehouse.route.domain.port.secondary.RouteRepository;
+import com.warehouse.route.infrastructure.adapter.secondary.entity.DepotEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.entity.RouteEntity;
 import com.warehouse.route.infrastructure.adapter.secondary.enumeration.Status;
@@ -19,6 +20,8 @@ public class RouteRepositoryImpl implements RouteRepository {
 
     private final RouteReadRepository routeReadRepository;
 
+    private final RouteDepotReadRepository depotReadRepository;
+
     private final RouteModelMapper mapper;
 
 
@@ -32,8 +35,8 @@ public class RouteRepositoryImpl implements RouteRepository {
 
     @Override
     public void initializeRoute(Route route) {
-        final RouteEntity routeEntity = mapper.mapInitialize(route);
-        routeReadRepository.save(routeEntity);
+        final RouteEntity routeEntity = mapper.map(route);
+        routeReadRepository.saveAndFlush(routeEntity);
     }
 
     @Override

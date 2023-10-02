@@ -3,7 +3,8 @@ package com.warehouse.redirect;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import com.warehouse.redirect.infrastructure.adapter.secondary.entity.RedirectTokenEntity;
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,9 +15,8 @@ import com.warehouse.redirect.domain.vo.RedirectToken;
 import com.warehouse.redirect.domain.vo.Token;
 import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenReadRepository;
 import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenRepositoryImpl;
+import com.warehouse.redirect.infrastructure.adapter.secondary.entity.RedirectTokenEntity;
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.RedirectTokenMapper;
-
-import java.time.Instant;
 
 @ExtendWith(MockitoExtension.class)
 class RedirectTokenRepositoryImplTest {
@@ -42,8 +42,8 @@ class RedirectTokenRepositoryImplTest {
         final RedirectToken redirectToken = new RedirectToken("12345", 1L, "test@test.pl");
 
         final RedirectTokenEntity entity = new RedirectTokenEntity();
-        entity.setExpiryDate(Instant.now().plusSeconds(86400L));
-        entity.setCreatedDate(Instant.now());
+        entity.setExpiryDate(LocalDateTime.now().plusSeconds(86400L));
+        entity.setCreatedDate(LocalDateTime.now());
         entity.setToken("12345");
         entity.setEmail("test@test.pl");
         entity.setParcelId(1L);

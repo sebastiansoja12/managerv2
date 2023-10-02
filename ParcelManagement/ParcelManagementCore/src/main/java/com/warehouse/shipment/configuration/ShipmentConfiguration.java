@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
-import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
@@ -34,9 +33,9 @@ public class ShipmentConfiguration {
 	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
 
 	@Bean
-	public ShipmentAdapter shipmentAdapter(RouteLogEventPublisher routeLogEventPublisher) {
+	public RouteLogAdapter shipmentAdapter(RouteLogEventPublisher routeLogEventPublisher) {
 		final ShipmentMapper shipmentMapper = Mappers.getMapper(ShipmentMapper.class);
-		return new ShipmentAdapter(shipmentMapper, routeLogEventPublisher);
+		return new RouteLogAdapter(shipmentMapper, routeLogEventPublisher);
 	}
 
 	@Bean
@@ -87,10 +86,10 @@ public class ShipmentConfiguration {
 		return new PaypalAdapter(paypalPort, paymentMapper);
 	}
 
-	@Bean
-	public MailServicePort mailServicePort(MailService mailService) {
+	@Bean(name = "shipment.mailServicePort")
+	public MailServicePort mailServicePort(MailPort mailPort) {
 		final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
-		return new MailAdapter(mailService, notificationMapper);
+		return new MailAdapter(mailPort, notificationMapper);
 	}
 
 	@Bean

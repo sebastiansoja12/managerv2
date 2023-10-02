@@ -19,16 +19,16 @@ import lombok.NoArgsConstructor;
 public class DepotEntity {
 
     @Id
-    @Column(nullable = false, unique = true)
+    @Column(name = "depot_code", nullable = false, unique = true)
     private String depotCode;
 
-    @Column(nullable = false)
+    @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(nullable = false)
+    @Column(name = "street", nullable = false)
     private String street;
 
-    @Column(nullable = false)
+    @Column(name = "country", nullable = false)
     private String country;
 
 }

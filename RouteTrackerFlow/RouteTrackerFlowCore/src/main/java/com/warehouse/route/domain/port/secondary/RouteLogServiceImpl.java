@@ -3,7 +3,10 @@ package com.warehouse.route.domain.port.secondary;
 import com.warehouse.route.domain.model.Route;
 import com.warehouse.route.domain.model.RouteDeleteRequest;
 import com.warehouse.route.domain.model.RouteResponse;
+import com.warehouse.route.domain.model.Routes;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 @AllArgsConstructor
 public class RouteLogServiceImpl implements RouteLogService {
@@ -28,5 +31,10 @@ public class RouteLogServiceImpl implements RouteLogService {
     @Override
     public void deleteRoute(RouteDeleteRequest request) {
         routeRepository.deleteRoute(request);
+    }
+
+    @Override
+    public List<Routes> getRouteListByParcelId(Long parcelId) {
+        return routeRepository.findByParcelId(parcelId);
     }
 }

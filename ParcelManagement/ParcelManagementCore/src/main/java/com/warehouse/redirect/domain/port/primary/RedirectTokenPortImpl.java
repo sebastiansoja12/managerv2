@@ -13,6 +13,8 @@ import com.warehouse.redirect.domain.vo.RedirectToken;
 import com.warehouse.redirect.domain.vo.Token;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +62,6 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
 
 		logRedirectParcelRequest(request);
 
-		// TODO in 2023.10
 		return new RedirectParcelResponse();
 	}
 
@@ -80,9 +81,9 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
 	private void handleRequest(RedirectRequest request) { 
 		if (request == null) {
 			throw new RedirectRequestNotFoundException(500, "Redirect request is null");
-		} else if (request.getEmail().isEmpty()) {
+		} else if (StringUtils.isEmpty(request.getEmail())) {
 			throw new EmptyEmailException(502, "Email is empty");
-		} else if (request.getParcelId() == null) {
+		} else if (ObjectUtils.isEmpty(request.getParcelId())) {
 			throw new NullParcelIdException(503, "Parcel id is null");
 		}
 	}
