@@ -1,6 +1,6 @@
 package com.warehouse.redirect.infrastructure.adapter.secondary.entity;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,10 +25,10 @@ public class RedirectTokenEntity {
     private String token;
 
     @Column(name = "created", updatable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "timeout", updatable = false)
-    private Instant expiryDate;
+    private LocalDateTime expiryDate;
 
     @Column(name = "parcel_id", nullable = false, updatable = false)
     private Long parcelId;

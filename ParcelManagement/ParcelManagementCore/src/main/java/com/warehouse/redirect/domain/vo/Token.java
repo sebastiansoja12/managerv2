@@ -1,10 +1,8 @@
 package com.warehouse.redirect.domain.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
+@Value
 public class Token {
    String value;
 }

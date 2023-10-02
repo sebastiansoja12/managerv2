@@ -22,23 +22,16 @@
             status="0"
             type="0"
     />
+    <depot
+            country="Poland"
+            depot_code="KT1"
+            city="Gliwice"
+            street="test"/>
 
     <depot
-        id = "1"
-        country = "Poland"
-        depot_code = "KT1"
-        city = "Gliwice"
-        lat = "50"
-        lon = "20"
-        street = "test"/>
-
-    <depot
-            id = "2"
-            country = "Poland"
-            depot_code = "KT2"
-            city = "Katowice"
-            lat = "40"
-            lon = "10"
-            street = "test"/>
+            country="Poland"
+            depot_code="KT2"
+            city="Katowice"
+            street="test"/>
 
 </dataset>

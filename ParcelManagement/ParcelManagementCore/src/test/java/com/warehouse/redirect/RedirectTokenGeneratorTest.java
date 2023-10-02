@@ -19,6 +19,6 @@ public class RedirectTokenGeneratorTest {
         // when
         final String token = generator.generateToken(parcelId, email);
         // then
-        assertThat(token.length()).isGreaterThan(6);
+        assertThat(token.length()).isEqualTo(8);
     }
 }

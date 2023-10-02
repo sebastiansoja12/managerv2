@@ -26,7 +26,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEnti
 @ContextConfiguration(classes = ShipmentTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ShipmentRepositoryImplTest {
+public class ShipmentReadRepositoryTest {
 
     @Autowired
     private ShipmentReadRepository repository;

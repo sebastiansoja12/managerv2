@@ -1,10 +1,8 @@
 package com.warehouse.shipment.configuration;
 
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -15,10 +13,9 @@ import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
 import com.warehouse.voronoi.VoronoiService;
 
-@ComponentScan(basePackages = { "com.warehouse.shipment" })
-@EntityScan(basePackages = { "com.warehouse.shipment" })
-@EnableJpaRepositories(basePackages = { "com.warehouse.shipment" })
-@Configuration
+@ComponentScan(basePackages = { "com.warehouse.shipment"})
+@EntityScan(basePackages = { "com.warehouse.shipment"})
+@EnableJpaRepositories(basePackages = { "com.warehouse.shipment"})
 public class ShipmentTestConfiguration {
 
     @MockBean
@@ -41,8 +38,5 @@ public class ShipmentTestConfiguration {
 
     @MockBean
     public RouteLogEventPublisher routeLogEventPublisher;
-
-    @MockBean
-    public PathFinderServicePort pathFinderServicePort;
 
 }
