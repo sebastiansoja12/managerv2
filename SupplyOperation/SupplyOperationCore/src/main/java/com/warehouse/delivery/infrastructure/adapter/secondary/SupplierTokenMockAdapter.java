@@ -13,7 +13,7 @@ public class SupplierTokenMockAdapter implements SupplierTokenServicePort {
     private final SupplierTokenMockGenerator supplierTokenMockGenerator;
 
     @Override
-    public SupplierTokenResponse sign(SupplierTokenRequest request) {
+    public SupplierTokenResponse protect(SupplierTokenRequest request) {
         final SupplierSignature signature = SupplierSignature.builder()
                 .id(request.getRequestId())
                 .supplierCode(request.getSupplierCode())

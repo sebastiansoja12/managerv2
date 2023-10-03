@@ -63,7 +63,7 @@ public class DeliveryServiceImplTest {
 
         doReturn(new SupplierTokenResponse(signature))
                 .when(supplierTokenServicePort)
-                .sign(request);
+                .protect(request);
         // when
         final List<Delivery> deliveryWithToken = deliveryService.save(deliveries);
         // then
@@ -107,11 +107,11 @@ public class DeliveryServiceImplTest {
 
         doReturn(new SupplierTokenResponse(signature))
                 .when(supplierTokenServicePort)
-                .sign(request);
+                .protect(request);
 
         doReturn(new SupplierTokenResponse(signature2))
                 .when(supplierTokenServicePort)
-                .sign(request2);
+                .protect(request2);
 
         // when
         final List<Delivery> deliveryWithToken = deliveryService.save(deliveries);
@@ -152,7 +152,7 @@ public class DeliveryServiceImplTest {
 
         doReturn(new SupplierTokenResponse(signature))
                 .when(supplierTokenServicePort)
-                .sign(request);
+                .protect(request);
         // when
         final List<Delivery> deliveryWithToken = deliveryService.save(deliveries);
         // then

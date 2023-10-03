@@ -30,7 +30,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         final List<SupplierTokenRequest> supplierTokenRequests = buildTokenRequests(deliveries);
 
-        final List<SupplierTokenResponse> supplierTokenResponses = signSupplier(supplierTokenRequests);
+        final List<SupplierTokenResponse> supplierTokenResponses = secureDelivery(supplierTokenRequests);
 
         final Map<UUID, SupplierTokenResponse> supplierTokenResponseMap = assignToHashMap(supplierTokenResponses);
 
@@ -70,9 +70,9 @@ public class DeliveryServiceImpl implements DeliveryService {
 		return null;
 	}
 
-    private List<SupplierTokenResponse> signSupplier(List<SupplierTokenRequest> requests) {
+    private List<SupplierTokenResponse> secureDelivery(List<SupplierTokenRequest> requests) {
         final List<SupplierTokenResponse> responses = new ArrayList<>();
-        requests.forEach(request -> responses.add(supplierTokenServicePort.sign(request)));
+        requests.forEach(request -> responses.add(supplierTokenServicePort.protect(request)));
         return responses;
     }
 }

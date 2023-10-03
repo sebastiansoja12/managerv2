@@ -1,5 +1,6 @@
 package com.warehouse.delivery.configuration;
 
+import com.warehouse.suppliertoken.infrastructure.adapter.primary.api.SupplierTokenService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -45,8 +46,8 @@ public class DeliveryConfiguration {
 
     @Bean
     @ConditionalOnProperty(name="service.mock", havingValue="false")
-    public SupplierTokenServicePort supplierTokenServicePort() {
-        return new SupplierTokenAdapter();
+    public SupplierTokenServicePort supplierTokenServicePort(SupplierTokenService service) {
+        return new SupplierTokenAdapter(service);
     }
 
     @Bean
