@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ContextConfiguration(classes = RouteTrackerTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DatabaseSetup("/dataset/route.xml")
+@DatabaseSetup("/dataset/db.xml")
 public class ParcelStatusUpdateRepositoryImplTest {
 
     @Autowired

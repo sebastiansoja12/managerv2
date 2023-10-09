@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Data
 @AllArgsConstructor
@@ -21,6 +23,7 @@ import lombok.NoArgsConstructor;
         @NamedAttributeNode("depot"),
         @NamedAttributeNode("supplier")
 })
+@DynamicInsert
 public class RouteEntity {
 
     @Id

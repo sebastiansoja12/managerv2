@@ -25,8 +25,7 @@ public class EventMapperTest {
     @Test
     void shouldMapSupplyInformationDtoToSupplyInformation() {
         // given
-        final DeliveryInformationDto deliveryInformationDto = new DeliveryInformationDto();
-        deliveryInformationDto.setParcelId(1L);
+		final DeliveryInformationDto deliveryInformationDto = new DeliveryInformationDto(1L, null, null, null, null);
         // when
         final DeliveryInformation deliveryInformation = eventMapper.map(deliveryInformationDto);
         // then

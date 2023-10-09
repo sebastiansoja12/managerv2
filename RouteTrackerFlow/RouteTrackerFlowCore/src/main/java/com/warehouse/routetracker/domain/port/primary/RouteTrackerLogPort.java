@@ -15,9 +15,9 @@ public interface RouteTrackerLogPort {
 
     void saveDelivery(List<DeliveryInformation> deliveryInformation);
 
-    List<RouteResponse> saveRoutes(List<RouteRequest> routeRequest);
-
     void deleteRoute(RouteDeleteRequest request);
+
+    List<RouteResponse> saveRoutes(List<RouteRequest> routeRequest);
 
     List<RouteInformation> getRouteListByParcelId(Long parcelId);
 

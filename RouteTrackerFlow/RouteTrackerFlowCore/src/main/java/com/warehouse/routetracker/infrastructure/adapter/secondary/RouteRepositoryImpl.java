@@ -1,24 +1,23 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary;
 
-import com.warehouse.routetracker.domain.model.*;
+import java.util.List;
+
+import com.warehouse.routetracker.domain.model.Route;
+import com.warehouse.routetracker.domain.model.RouteInformation;
+import com.warehouse.routetracker.domain.model.SupplyRoute;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
 import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.RouteModelMapper;
-import lombok.AllArgsConstructor;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
 public class RouteRepositoryImpl implements RouteRepository {
 
     private final RouteReadRepository routeReadRepository;
-
-    private final ParcelReadRepository parcelReadRepository;
 
     private final RouteModelMapper mapper;
 
@@ -34,16 +33,14 @@ public class RouteRepositoryImpl implements RouteRepository {
     @Override
     public void initializeRoute(Route route) {
         final RouteEntity routeEntity = mapper.map(route);
-        routeReadRepository.saveAndFlush(routeEntity);
+        routeReadRepository.save(routeEntity);
     }
 
     @Override
-    public RouteResponse saveSupplyRoute(SupplyRoute route) {
+    public void saveSupplyRoute(SupplyRoute route) {
         final RouteEntity routeEntity = mapper.map(route);
 
         routeReadRepository.save(routeEntity);
-
-        return mapper.mapToRouteResponse(routeEntity);
     }
 
     @Override

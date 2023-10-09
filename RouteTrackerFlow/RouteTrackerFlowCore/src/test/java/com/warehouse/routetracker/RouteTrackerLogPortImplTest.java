@@ -1,5 +1,7 @@
 package com.warehouse.routetracker;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -7,24 +9,34 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
+import com.warehouse.routetracker.domain.model.Parcel;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.warehouse.routetracker.domain.enumeration.Status;
 import com.warehouse.routetracker.domain.model.Route;
-import com.warehouse.routetracker.domain.vo.RouteRequest;
-import com.warehouse.routetracker.domain.vo.RouteResponse;
+import com.warehouse.routetracker.domain.model.RouteInformation;
+import com.warehouse.routetracker.domain.model.SupplyRoute;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
+import com.warehouse.routetracker.domain.port.secondary.ParcelStatusUpdateRepository;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
 import com.warehouse.routetracker.domain.vo.DeliveryInformation;
+import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
+import com.warehouse.routetracker.domain.vo.RouteRequest;
+import com.warehouse.routetracker.domain.vo.RouteResponse;
 
 @ExtendWith(MockitoExtension.class)
-public class RouteTrackerLogTest {
+public class RouteTrackerLogPortImplTest {
 
+
+    @Mock
+    private ParcelStatusUpdateRepository updateRepository;
 
     @Mock
     private RouteRepository repository;
@@ -48,40 +60,42 @@ public class RouteTrackerLogTest {
         final String supplierCode = "abc";
         final DeliveryInformation deliveryInformation = DeliveryInformation.builder()
                 .depotCode(depotCode)
+                .deliveryStatus(Status.DELIVERY)
                 .parcelId(PARCEL_ID)
-                .supplierCode("supplierCode")
+                .supplierCode(supplierCode)
                 .token("token")
                 .build();
+
         final Route route = Route.builder()
                 .supplierCode(supplierCode)
                 .parcelId(PARCEL_ID)
                 .depotCode(depotCode)
                 .build();
+
+        final SupplyRoute supplyRoute = SupplyRoute.builder()
+                .status(Status.DELIVERY)
+                .route(route)
+                .build();
+
+        // mock repository
+        doNothing()
+                .when(updateRepository)
+                .updateStatus(PARCEL_ID, Status.DELIVERY);
         // when
         routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation));
         // then
-        //verify(repository, times(1)).saveSupplyRoute(route);
+        verify(repository, times(1)).saveSupplyRoute(supplyRoute);
     }
 
     @Test
     void shouldNotSaveSupplyRouteWhenTokenDoesNotExist() {
         // given
-        final String depotCode = "KT1";
-        final String supplierCode = "abc";
-        final DeliveryInformation deliveryInformation = DeliveryInformation.builder()
-                .depotCode(depotCode)
-                .parcelId(PARCEL_ID)
-                .supplierCode("supplierCode")
-                .build();
-        final Route route = Route.builder()
-                .supplierCode(supplierCode)
-                .parcelId(PARCEL_ID)
-                .depotCode(depotCode)
-                .build();
+        final DeliveryInformation deliveryInformation = DeliveryInformation.builder().build();
+        final SupplyRoute supplyRoute = SupplyRoute.builder().build();
         // when
         routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation));
         // then
-        //verify(repository, times(0)).saveSupplyRoute(route);
+        verify(repository, times(0)).saveSupplyRoute(supplyRoute);
     }
 
     @Test
@@ -141,6 +155,49 @@ public class RouteTrackerLogTest {
         routeTrackerLogPort.deleteRoute(deleteRequest);
         // then
         verify(repository, times(1)).deleteRoute(deleteRequest);
+    }
+
+    @Test
+    void shouldFindByUsername() {
+        // given
+        final String username = "s-soja";
+        final List<RouteInformation> expectedRouteInformations = Collections.singletonList(
+                RouteInformation.builder()
+                        .status(Status.RETURN)
+                        .build()
+        );
+        doReturn(expectedRouteInformations)
+                .when(repository)
+                .findByUsername(username);
+        // when
+        final List<RouteInformation> routeInformations = routeTrackerLogPort.findRoutesByUsername(username);
+        // then
+        routeInformations.forEach(
+                routeInformation -> assertEquals(expectedToBe(routeInformation.getStatus()), Status.RETURN)
+        );
+
+    }
+
+    @Test
+    void shouldFindByParcelId() {
+        // given
+        final Long parcelId = 1L;
+        final List<RouteInformation> expectedRouteInformations = Collections.singletonList(
+                RouteInformation.builder()
+                        .parcel(Parcel.builder().id(parcelId).build())
+                        .status(Status.RETURN)
+                        .build()
+        );
+        doReturn(expectedRouteInformations)
+                .when(repository)
+                .findByParcelId(parcelId);
+        // when
+        final List<RouteInformation> routeInformations = routeTrackerLogPort.getRouteListByParcelId(parcelId);
+        // then
+        routeInformations.forEach(
+                routeInformation -> assertEquals(expectedToBe(routeInformation.getStatus()), Status.RETURN)
+        );
+
     }
 
     private <T> T expectedToBe(T t) {

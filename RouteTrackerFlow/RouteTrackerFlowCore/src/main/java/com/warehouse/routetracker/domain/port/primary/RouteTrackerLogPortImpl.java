@@ -44,8 +44,8 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                     .route(route)
                     .status(request.getDeliveryStatus())
                     .build();
-            repository.saveSupplyRoute(supplyRoute);
             updateParcelStatus(supplyRoute);
+            repository.saveSupplyRoute(supplyRoute);
 		});
     }
 

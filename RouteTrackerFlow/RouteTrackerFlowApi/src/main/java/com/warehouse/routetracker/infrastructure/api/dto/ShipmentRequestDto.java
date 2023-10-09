@@ -1,8 +1,8 @@
 package com.warehouse.routetracker.infrastructure.api.dto;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class ShipmentRequestDto {
 
     Long parcelId;

@@ -1,26 +1,41 @@
 package com.warehouse.routetracker;
 
 
-import org.junit.jupiter.api.Disabled;
+import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import com.warehouse.routetracker.configuration.RouteTrackerTestConfiguration;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.*;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.DepotEntity;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.ParcelEntity;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.SupplierEntity;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.ParcelReadRepository;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteReadRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ParcelType;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+@ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ContextConfiguration(classes = RouteTrackerTestConfiguration.class)
-@Disabled
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DatabaseSetup("/dataset/db.xml")
 public class TrackerIntegrationTest {
+
+    @Autowired
+    private RouteTrackerLogPort routeTrackerLogPort;
 
     @Autowired
     private ParcelReadRepository parcelReadRepository;
@@ -28,24 +43,45 @@ public class TrackerIntegrationTest {
     @Autowired
     private RouteReadRepository routeReadRepository;
 
-    @Autowired
-    private RouteSupplierReadRepository routeSupplierReadRepository;
-
-    @Autowired
-    private RouteDepotReadRepository depotReadRepository;
-
-    @Autowired
-    private UserReadRepository userReadRepository;
-
-    private ParcelEntity parcel;
-
-    private SupplierEntity supplier;
-
-    private DepotEntity depot;
-
-    private UserEntity user;
-
     private static final Long PARENT_RELATED_ID = 100001L;
+
+    @Test
+    void shouldInitializeRoute() {
+        // given
+        final Long parcelId = 100L;
+        // when
+        routeTrackerLogPort.initializeRoute(parcelId);
+        // then
+        final List<RouteEntity> routeEntityList = routeReadRepository.findByParcelId(parcelId);
+        assertFalse(routeEntityList.isEmpty());
+    }
+
+    @Test
+    void shouldSaveDelivery() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    void shouldDeleteRoute() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @Test
+    void shouldSaveRoutes() {
+        // given
+
+        // when
+
+        // then
+    }
 
     private ParcelEntity createParcelEntity() {
         return ParcelEntity.builder()

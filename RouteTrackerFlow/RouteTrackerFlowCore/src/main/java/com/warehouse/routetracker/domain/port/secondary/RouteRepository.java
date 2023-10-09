@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface RouteRepository {
 
-    List<RouteInformation> findByParcelId(Long parcelId);
-
     void initializeRoute(Route route);
 
-    RouteResponse saveSupplyRoute(SupplyRoute route);
+    void saveSupplyRoute(SupplyRoute route);
+
+    void deleteRoute(RouteDeleteRequest request);
+
+    List<RouteInformation> findByParcelId(Long parcelId);
 
     RouteResponse save(Route route);
 
     List<RouteInformation> findByUsername(String username);
-
-    void deleteRoute(RouteDeleteRequest request);
 }

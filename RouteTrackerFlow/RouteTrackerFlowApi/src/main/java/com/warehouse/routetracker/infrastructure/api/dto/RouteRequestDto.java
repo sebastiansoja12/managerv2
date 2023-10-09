@@ -11,6 +11,6 @@ public class RouteRequestDto {
 
     Long parcelId;
     Long userId;
-    Long supplierId;
+    String supplierCode;
     Long depotId;
 }
