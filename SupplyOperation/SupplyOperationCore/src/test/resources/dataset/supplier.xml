@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dataset>
     <depot
-        city="Test"
-        street="Test"
-        country="Test"
-        depot_code="TST"
+            city="Test"
+            street="Test"
+            country="Test"
+            depot_code="TST"
     />
 
     <supplier
-    id = "1"
-    supplier_code = "abcdef"
-    first_name = "test"
-    last_name = "test"
-    telephone = "123"
-    depot_code = "TST"
+            supplier_code="abcdef"
+            first_name="test"
+            last_name="test"
+            telephone="123"
+            depot_code="TST"
     />
 
 </dataset>
