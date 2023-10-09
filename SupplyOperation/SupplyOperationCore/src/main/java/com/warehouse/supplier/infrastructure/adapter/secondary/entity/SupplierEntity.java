@@ -19,9 +19,6 @@ import jakarta.persistence.*;
 public class SupplierEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
     @Column(name = "supplier_code", nullable = false, unique = true)
     private String supplierCode;
 

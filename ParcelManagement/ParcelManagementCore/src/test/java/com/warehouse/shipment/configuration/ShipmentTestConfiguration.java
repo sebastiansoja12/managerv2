@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
 import com.warehouse.voronoi.VoronoiService;
 
