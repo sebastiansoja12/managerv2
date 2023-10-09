@@ -1,7 +1,6 @@
 package com.warehouse.routetracker;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -9,17 +8,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import com.warehouse.routetracker.domain.model.Parcel;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.routetracker.domain.enumeration.Status;
+import com.warehouse.routetracker.domain.model.Parcel;
 import com.warehouse.routetracker.domain.model.Route;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.SupplyRoute;
@@ -102,12 +99,10 @@ public class RouteTrackerLogPortImplTest {
     void shouldSaveRoutes() {
         // given
         final RouteRequest routeRequest = RouteRequest.builder()
-                .id(ROUTE_ID)
                 .parcelId(100001L)
                 .build();
 
         final RouteRequest routeRequest2 = RouteRequest.builder()
-                .id(ROUTE_ID_2)
                 .parcelId(PARCEL_ID2)
                 .build();
 
@@ -147,7 +142,7 @@ public class RouteTrackerLogPortImplTest {
         // given
         final String username = "s-soja";
         final RouteDeleteRequest deleteRequest = RouteDeleteRequest.builder()
-                .id(ROUTE_ID)
+                .id("d8d53e7d-9175-4b5b-bf0d-bc209549c3a9")
                 .parcelId(PARCEL_ID)
                 .username(username)
                 .build();

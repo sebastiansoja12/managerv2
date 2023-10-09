@@ -14,7 +14,7 @@ import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.RouteM
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 
 @Configuration
-public class RouteConfiguration {
+public class RouteTrackerConfiguration {
 
 	@Bean
 	public RouteRepository routeRepository(RouteReadRepository routeReadRepository) {
