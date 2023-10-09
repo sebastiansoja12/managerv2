@@ -21,7 +21,7 @@ import com.warehouse.delivery.domain.model.DeliveryRouteRequest;
 import com.warehouse.delivery.domain.model.DeliveryRouteResponse;
 import com.warehouse.delivery.infrastructure.adapter.secondary.RouteLogAdapter;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryMapper;
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 public class RouteLogAdapterTest {

@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.route.infrastructure.api.event.ShipmentLogEvent;
+import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.routetracker.infrastructure.api.event.ShipmentLogEvent;
 import com.warehouse.shipment.domain.model.ShipmentResponse;
 import com.warehouse.shipment.domain.port.secondary.ShipmentServicePort;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;

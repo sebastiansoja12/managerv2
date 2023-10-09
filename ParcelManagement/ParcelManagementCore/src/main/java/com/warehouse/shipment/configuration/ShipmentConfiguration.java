@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.paypal.domain.port.primary.PaypalPort;
-import com.warehouse.route.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;

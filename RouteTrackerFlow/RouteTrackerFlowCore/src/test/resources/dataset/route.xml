@@ -41,7 +41,6 @@
     />
 
     <supplier
-    id = "1"
     supplier_code = "TS_TST"
     first_name = "test"
     last_name = "test"

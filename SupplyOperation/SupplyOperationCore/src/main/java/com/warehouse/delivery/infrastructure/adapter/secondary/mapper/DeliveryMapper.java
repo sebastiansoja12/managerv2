@@ -10,7 +10,7 @@ import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.model.DeliveryRouteRequest;
 import com.warehouse.delivery.domain.model.DeliveryRouteResponse;
-import com.warehouse.route.infrastructure.api.dto.DeliveryInformationDto;
+import com.warehouse.routetracker.infrastructure.api.dto.DeliveryInformationDto;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DeliveryMapper {
