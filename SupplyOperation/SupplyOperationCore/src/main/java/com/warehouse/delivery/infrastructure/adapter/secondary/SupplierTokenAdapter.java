@@ -3,8 +3,8 @@ package com.warehouse.delivery.infrastructure.adapter.secondary;
 import com.warehouse.delivery.domain.model.SupplierTokenRequest;
 import com.warehouse.delivery.domain.model.SupplierTokenResponse;
 import com.warehouse.delivery.domain.port.secondary.SupplierTokenServicePort;
-import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.SupplierTokenRequestMapper;
-import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.SupplierTokenResponseMapper;
+import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryTokenRequestMapper;
+import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryTokenResponseMapper;
 import com.warehouse.suppliertoken.infrastructure.adapter.primary.api.SupplierTokenService;
 
 import com.warehouse.suppliertoken.infrastructure.adapter.primary.api.dto.SupplierTokenRequestDto;
@@ -18,9 +18,9 @@ public class SupplierTokenAdapter implements SupplierTokenServicePort {
 
     private final SupplierTokenService service;
 
-    private final SupplierTokenRequestMapper requestMapper = getMapper(SupplierTokenRequestMapper.class);
+    private final DeliveryTokenRequestMapper requestMapper = getMapper(DeliveryTokenRequestMapper.class);
 
-    private final SupplierTokenResponseMapper responseMapper = getMapper(SupplierTokenResponseMapper.class);
+    private final DeliveryTokenResponseMapper responseMapper = getMapper(DeliveryTokenResponseMapper.class);
 
     @Override
     public SupplierTokenResponse protect(SupplierTokenRequest supplierTokenRequest) {

@@ -1,9 +1,12 @@
 package com.warehouse.suppliertoken.domain.model;
 
 import com.warehouse.suppliertoken.domain.enumeration.ParcelType;
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Parcel {
     Long id;
 

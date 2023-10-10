@@ -44,17 +44,9 @@ public class DeliveryConfiguration {
         return new RouteLogAdapter(routeLogEventPublisher, deliveryMapper);
     }
 
-    @Bean
-    @ConditionalOnProperty(name="service.mock", havingValue="false")
+    @Bean(name = "delivery.supplierTokenServicePort")
     public SupplierTokenServicePort supplierTokenServicePort(SupplierTokenService service) {
         return new SupplierTokenAdapter(service);
-    }
-
-    @Bean
-    @ConditionalOnProperty(name="service.mock", havingValue="true")
-    public SupplierTokenServicePort supplierTokenMockServicePort() {
-        final SupplierTokenMockGenerator mockGenerator = new SupplierTokenMockGeneratorImpl();
-        return new SupplierTokenMockAdapter(mockGenerator);
     }
 
     // Mappers

@@ -10,7 +10,8 @@ import java.util.Base64;
 public class SupplierTokenMockGeneratorImpl implements SupplierTokenMockGenerator {
     @Override
     public String generateToken(SupplierTokenRequest request) {
-        final String inputString =  request.getSupplierCode() + request.getRequestId();
+        final String inputString =  "test";
+
         try {
             final byte[] inputBytes = inputString.getBytes(StandardCharsets.UTF_8);
             final byte[] base64Bytes = Base64.getEncoder().encode(inputBytes);

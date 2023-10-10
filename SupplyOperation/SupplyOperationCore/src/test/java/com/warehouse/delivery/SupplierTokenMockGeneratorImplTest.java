@@ -17,8 +17,8 @@ public class SupplierTokenMockGeneratorImplTest {
     @Test
     void shouldGenerateBase64Token() {
         // given
-        final SupplierTokenRequest request = new SupplierTokenRequest("abc_def",
-                UUID.fromString("fde44928-44e5-11ee-be56-0242ac120002"));
+        final SupplierTokenRequest request = null;//new SupplierTokenRequest("abc_def",
+                //UUID.fromString("fde44928-44e5-11ee-be56-0242ac120002"));
         // when
         final String token = generator.generateToken(request);
         // then

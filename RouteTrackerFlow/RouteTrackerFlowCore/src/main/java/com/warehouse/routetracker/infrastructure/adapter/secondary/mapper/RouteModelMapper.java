@@ -77,7 +77,7 @@ public interface RouteModelMapper {
         final Long userId = route.getUserId();
         if (Objects.nonNull(userId)) {
             return UserEntity.builder()
-                    .id(userId.intValue())
+                    .id(userId)
                     .build();
         }
         return null;
