@@ -8,7 +8,7 @@
             first_name = "Sebastian"
             last_name = "Soja"
             email = "sebastian5152@wp.pl"
-            role = "[admin]"
+            role = "2"
             depot_code = "Test"
     />
     <parcel

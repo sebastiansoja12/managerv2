@@ -12,6 +12,7 @@ public class SupplierTokenAdapter extends RestGatewaySupport implements Supplier
 
     @Override
     public SupplierTokenResponse protect(SupplierTokenRequest request) {
+        // TODO INPL-6151
         return null;
     }
 }

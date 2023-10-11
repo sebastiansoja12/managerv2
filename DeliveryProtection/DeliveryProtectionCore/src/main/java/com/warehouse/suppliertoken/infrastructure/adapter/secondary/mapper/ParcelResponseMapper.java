@@ -2,7 +2,7 @@ package com.warehouse.suppliertoken.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.suppliertoken.domain.enumeration.ParcelType;
 import com.warehouse.suppliertoken.domain.model.Parcel;
-import com.warehouse.suppliertoken.infrastructure.adapter.secondary.api.ParcelDto;
+import com.warehouse.suppliertoken.infrastructure.adapter.secondary.api.dto.ParcelDto;
 import com.warehouse.suppliertoken.infrastructure.adapter.secondary.api.enumeration.ParcelTypeDto;
 import org.mapstruct.Mapper;
 

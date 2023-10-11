@@ -1,4 +1,4 @@
-package com.warehouse.suppliertoken.infrastructure.adapter.secondary.api;
+package com.warehouse.suppliertoken.infrastructure.adapter.secondary.api.dto;
 
 import com.warehouse.suppliertoken.infrastructure.adapter.secondary.api.enumeration.ParcelTypeDto;
 import lombok.*;

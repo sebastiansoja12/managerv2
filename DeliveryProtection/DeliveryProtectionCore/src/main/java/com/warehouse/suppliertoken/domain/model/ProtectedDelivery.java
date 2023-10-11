@@ -5,5 +5,5 @@ import lombok.Value;
 @Value
 public class ProtectedDelivery {
     String protectionToken;
-    Long deliveryId;
+    String deliveryId;
 }
