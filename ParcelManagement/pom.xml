@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>Q2_2023.1-SNAPSHOT</version>
+        <version>2023.10-SNAPSHOT</version>
     </parent>
 
     <artifactId>ParcelManagement</artifactId>
@@ -16,6 +16,7 @@
     <modules>
         <module>ParcelManagementApi</module>
         <module>ParcelManagementCore</module>
+        <module>ParcelManagementState</module>
     </modules>
 
 </project>

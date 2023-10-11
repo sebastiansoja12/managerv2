@@ -1,17 +1,16 @@
 package com.warehouse.reroute.domain.service;
 
-import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
-import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
+import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.model.RerouteToken;
+import com.warehouse.reroute.domain.model.Token;
 
 public interface RerouteService {
 
-    RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest);
+    RerouteResponse createRerouteToken(RerouteToken rerouteToken);
 
-    ParcelUpdateResponse update(UpdateParcelRequest parcelRequest);
+    void deleteToken(RerouteToken rerouteToken);
 
     RerouteToken findByToken(Token token);
 
-    RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId);
+    RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId);
 }

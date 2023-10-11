@@ -5,5 +5,9 @@
             id = "100001"
             token = "12345"
             created_date = "2018-05-25 20:23:54"
+            expiry_date = "3018-05-25 20:23:54"
+            revoked = "0"
+            expired = "0"
+            username = "s-soja"
     />
 </dataset>

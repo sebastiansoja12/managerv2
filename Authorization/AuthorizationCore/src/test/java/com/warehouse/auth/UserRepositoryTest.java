@@ -1,8 +1,16 @@
 package com.warehouse.auth;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationRepositoryImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
@@ -10,15 +18,6 @@ import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapperImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserRepositoryTest {
@@ -35,8 +34,7 @@ public class UserRepositoryTest {
     
     @BeforeEach
     void setup() {
-		userRepository = new AuthenticationRepositoryImpl(authenticationReadRepository, refreshTokenReadRepository,
-				userMapper);
+		userRepository = new AuthenticationRepositoryImpl(authenticationReadRepository, userMapper);
     }
 
     @Test
@@ -49,10 +47,10 @@ public class UserRepositoryTest {
                 .firstName("test")
                 .lastName("test")
                 .password("password")
-                .role(Role.ADMIN.name())
+                .role(Role.ADMIN)
                 .build();
         // when
-        userRepository.signup(user);
+        userRepository.saveUser(user);
         // then
         verify(authenticationReadRepository).save(any(UserEntity.class));
     }

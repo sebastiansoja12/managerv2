@@ -1,10 +1,10 @@
 package com.warehouse.tracker.infrastructure.api;
 
-import com.warehouse.tracker.infrastructure.api.dto.RoutesDto;
+import com.warehouse.routetracker.infrastructure.api.dto.RouteInformationDto;
 
 import java.util.List;
 
 public interface TrackerService<T> {
 
-    List<RoutesDto> findByArg(T arg);
+    List<RouteInformationDto> findByArg(T arg);
 }

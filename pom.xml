@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.0</version>
-		<relativePath/>
+		<version>3.2.0-M2</version>
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.warehouse</groupId>
 	<artifactId>warehouse</artifactId>
-	<version>Q2_2023.1-SNAPSHOT</version>
+	<version>2023.10-SNAPSHOT</version>
 	<name>warehouse</name>
 	<description>Pom file for all modules</description>
 	<packaging>pom</packaging>
@@ -27,20 +27,72 @@
 		<module>PathFinder</module>
 		<module>Authorization</module>
 		<module>Utility</module>
-        <module>TokenStage</module>
+        <module>PositionDetermination</module>
         <module>Generator</module>
-    </modules>
+		<module>Properties</module>
+		<module>ExceptionHandler</module>
+	</modules>
+
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<properties>
 		<java.version>17</java.version>
-		<org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
-		<org.projectlombok.version>1.18.24</org.projectlombok.version>
-		<spring-starter.version>3.1.0</spring-starter.version>
+		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+		<org.projectlombok.version>1.18.30</org.projectlombok.version>
+		<spring-starter.version>3.2.0-M2</spring-starter.version>
 		<maven-jaxb2-plugin.version>0.15.1</maven-jaxb2-plugin.version>
 		<maven-jaxb2-basics-plugin.version>1.11.1</maven-jaxb2-basics-plugin.version>
 		<sonar.organization>sebastiansoja</sonar.organization>
-		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
+
+	<profiles>
+		<profile>
+			<id>app</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<environment>app</environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<environment>dev</environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<environment>test</environment>
+			</properties>
+		</profile>
+	</profiles>
 
 	<distributionManagement>
 		<repository>
@@ -89,7 +141,7 @@
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
-				<version>1.18.26</version>
+				<version>${org.projectlombok.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mapstruct</groupId>
@@ -125,20 +177,10 @@
 				<version>5.8.2</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-web</artifactId>
-				<version>6.0.9</version>
-			</dependency>
-			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
 				<version>2.14.2</version>
 				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springdoc</groupId>
-				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-				<version>2.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
@@ -182,24 +224,6 @@
 				<version>2.4.0</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-core</artifactId>
-				<version>6.1.0</version>
-				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-config</artifactId>
-				<version>6.1.0</version>
-				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-web</artifactId>
-				<version>6.1.0</version>
-				<scope>compile</scope>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.tomcat</groupId>
 				<artifactId>tomcat-servlet-api</artifactId>
 				<version>11.0.0-M7</version>
@@ -239,6 +263,43 @@
 				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 				<version>2.1.0</version>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-oauth2-client</artifactId>
+				<version>${spring-starter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.auth0</groupId>
+				<artifactId>java-jwt</artifactId>
+				<version>4.3.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-library</artifactId>
+				<version>2.2</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.jayway.jsonpath</groupId>
+				<artifactId>json-path</artifactId>
+				<version>2.5.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-api</artifactId>
+				<version>0.11.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-mongodb</artifactId>
+				<version>${spring-starter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.braintreepayments.gateway</groupId>
+				<artifactId>braintree-java</artifactId>
+				<version>3.26.0</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -261,7 +322,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.9.0</version>
+					<version>3.11.0</version>
 					<configuration>
 						<release>17</release>
 						<annotationProcessorPaths>
@@ -287,7 +348,7 @@
 							</path>
 						</annotationProcessorPaths>
 						<compilerArgs>
-							<arg>-Amapstruct.unmappedTargetPolicy=ERROR</arg>
+							<arg>-Amapstruct.unmappedTargetPolicy=IGNORE</arg>
 						</compilerArgs>
 						<fork>true</fork>
 						<meminitial>256m</meminitial>

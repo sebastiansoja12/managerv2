@@ -1,32 +1,23 @@
 package com.warehouse.reroute.domain.service;
 
-import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.port.secondary.ParcelPort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenServicePort;
+import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.model.RerouteToken;
+import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
-import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
+import com.warehouse.reroute.domain.port.secondary.MailServicePort;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class RerouteServiceImpl implements RerouteService {
 
-    private final RerouteTokenServicePort rerouteTokenServicePort;
-
-    private final ParcelPort parcelPort;
+    private final MailServicePort mailServicePort;
 
     private final RerouteTokenRepository rerouteTokenRepository;
 
     @Override
-    public ParcelUpdateResponse update(UpdateParcelRequest parcelRequest) {
-
-        final ParcelUpdateResponse parcelUpdateResponse = parcelPort.update(parcelRequest);
-
-        final Token token = token(parcelRequest.getToken());
-
-        rerouteTokenRepository.deleteByToken(token);
-
-        return parcelUpdateResponse;
+    public void deleteToken(RerouteToken rerouteToken) {
+        rerouteTokenRepository.deleteByToken(rerouteToken);
     }
 
     @Override
@@ -35,13 +26,20 @@ public class RerouteServiceImpl implements RerouteService {
     }
 
     @Override
-    public RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest) {
-        return rerouteTokenServicePort.sendReroutingInformation(rerouteRequest);
+    public RerouteResponse createRerouteToken(RerouteToken rerouteToken) {
+        final RerouteToken token = rerouteTokenRepository.saveReroutingToken(rerouteToken);
+
+        mailServicePort.sendReroutingInformation(token);
+
+        return RerouteResponse.builder()
+                .parcelId(token.getParcelId())
+                .token(token.getToken())
+                .build();
     }
 
     @Override
-    public RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
-        return rerouteTokenRepository.loadByTokenAndParcelId(token, aParcelId);
+    public RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId) {
+        return rerouteTokenRepository.loadByTokenAndParcelId(token, parcelId);
     }
 
     public Token token(Integer value) {

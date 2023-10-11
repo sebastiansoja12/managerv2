@@ -1,41 +1,48 @@
 package com.warehouse.voronoi.configuration;
 
-import com.fire.positionstack.PositionStackProperties;
+import org.mapstruct.factory.Mappers;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.warehouse.depot.domain.port.primary.DepotPort;
+import com.warehouse.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPortImpl;
+import com.warehouse.voronoi.domain.port.secondary.DepotServicePort;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
 import com.warehouse.voronoi.domain.service.ComputeService;
 import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
 import com.warehouse.voronoi.domain.service.UrlJsonReaderService;
 import com.warehouse.voronoi.domain.service.UrlReaderServiceImpl;
 import com.warehouse.voronoi.infrastructure.adapter.primary.VoronoiServiceAdapter;
-import com.warehouse.voronoi.infrastructure.adapter.primary.mapper.AddressRequestMapper;
+import com.warehouse.voronoi.infrastructure.adapter.secondary.DepotServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.VoronoiAdapter;
-import org.mapstruct.factory.Mappers;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.warehouse.voronoi.infrastructure.adapter.secondary.mapper.DepotResponseMapper;
 
 @Configuration
 public class VoronoiConfiguration {
 
+
     @Bean
     public VoronoiService addressDeterminationService(VoronoiPort voronoiPort) {
-        final AddressRequestMapper addressRequestMapper = Mappers.getMapper(AddressRequestMapper.class);
-        return new VoronoiServiceAdapter(voronoiPort, addressRequestMapper);
+        return new VoronoiServiceAdapter(voronoiPort);
     }
 
-    @Bean
-    public VoronoiPort addressDeterminationPort(VoronoiServicePort determinationServicePort) {
-        return new VoronoiPortImpl(determinationServicePort);
-    }
+	@Bean
+	public VoronoiPort addressDeterminationPort(DepotServicePort depotServicePort, ComputeService computeService) {
+		return new VoronoiPortImpl(depotServicePort, computeService);
+	}
 
     @Bean
-    public VoronoiServicePort addressDeterminationServicePort(ComputeService computeService,
-          UrlJsonReaderService urlJsonReaderService) {
-        final PositionStackProperties positionStackProperties = new PositionStackProperties();
-        return new VoronoiAdapter(positionStackProperties, computeService, urlJsonReaderService);
+    public DepotServicePort depotServicePort(DepotPort depotPort) {
+        return new DepotServiceAdapter(depotPort, Mappers.getMapper(DepotResponseMapper.class));
     }
+
+	@Bean
+	public VoronoiServicePort addressDeterminationServicePort(PositionStackProperties positionStackProperties) {
+		return new VoronoiAdapter(positionStackProperties);
+	}
 
     @Bean
     public UrlJsonReaderService urlJsonReaderService() {
@@ -43,7 +50,7 @@ public class VoronoiConfiguration {
     }
 
     @Bean
-    public ComputeService computeService() {
-        return new ComputeServiceImpl();
+    public ComputeService computeService(VoronoiServicePort voronoiServicePort) {
+        return new ComputeServiceImpl(voronoiServicePort);
     }
 }

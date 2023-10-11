@@ -1,11 +1,13 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.persistence.*;
 
 
 @Data
@@ -17,20 +19,17 @@ import jakarta.persistence.*;
 public class DepotEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "depot_code", nullable = false, unique = true)
+    private String depotCode;
 
-    @Column(nullable = false)
+    @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(nullable = false)
+    @Column(name = "street", nullable = false)
     private String street;
 
-    @Column(nullable = false)
+    @Column(name = "country", nullable = false)
     private String country;
-
-    @Column(nullable = false, unique = true)
-    private String depotCode;
 
 }
 

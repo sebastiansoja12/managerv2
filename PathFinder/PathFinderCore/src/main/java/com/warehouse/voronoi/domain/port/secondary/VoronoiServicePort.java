@@ -1,10 +1,8 @@
 package com.warehouse.voronoi.domain.port.secondary;
 
-import com.warehouse.voronoi.domain.model.Depot;
-
-import java.util.List;
+import com.warehouse.voronoi.domain.model.Coordinates;
 
 public interface VoronoiServicePort {
 
-    String findFastestRoute(List<Depot> depots, String requestCity);
+    Coordinates obtainCoordinates(String requestCity);
 }

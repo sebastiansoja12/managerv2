@@ -10,4 +10,12 @@ import java.time.Instant;
 public class RefreshToken {
     String token;
     Instant createdDate;
+    Instant expiryDate;
+    String username;
+    boolean expired;
+    boolean revoked;
+
+    public boolean isActual() {
+        return !isExpired() && !isRevoked();
+    }
 }

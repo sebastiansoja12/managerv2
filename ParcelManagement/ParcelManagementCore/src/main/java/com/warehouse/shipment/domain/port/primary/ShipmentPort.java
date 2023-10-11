@@ -1,14 +1,14 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import com.warehouse.shipment.domain.model.*;
+import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.model.ShipmentRequest;
+import com.warehouse.shipment.domain.model.ShipmentResponse;
 
 public interface ShipmentPort {
 
     ShipmentResponse ship(ShipmentRequest request);
 
-    void delete(Long parcelId);
-
     Parcel loadParcel(Long parcelId);
 
-    UpdateParcelResponse update(UpdateParcelRequest updateParcelRequest);
+    boolean exists(Long parcelId);
 }

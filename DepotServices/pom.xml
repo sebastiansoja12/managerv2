@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>Q2_2023.1-SNAPSHOT</version>
+        <version>2023.10-SNAPSHOT</version>
     </parent>
 
     <artifactId>DepotServices</artifactId>
@@ -14,7 +14,6 @@
 
 
     <modules>
-        <module>DepotServicesApi</module>
         <module>DepotServicesCore</module>
     </modules>
 

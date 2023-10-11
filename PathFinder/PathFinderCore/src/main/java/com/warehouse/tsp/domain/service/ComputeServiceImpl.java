@@ -1,6 +1,5 @@
 package com.warehouse.tsp.domain.service;
 
-import com.warehouse.tsp.domain.exception.MissingDepotsException;
 import com.warehouse.tsp.domain.model.Depot;
 import lombok.AllArgsConstructor;
 

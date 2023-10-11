@@ -1,22 +1,23 @@
 package com.warehouse.star;
 
-import com.warehouse.depot.api.dto.CoordinatesDto;
-import com.warehouse.depot.api.dto.DepotDto;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import com.warehouse.dto.CoordinatesDto;
+import com.warehouse.dto.DepotDto;
 import com.warehouse.star.domain.model.Coordinates;
 import com.warehouse.star.domain.model.Depot;
 import com.warehouse.star.domain.port.primary.StarPort;
 import com.warehouse.star.infrastructure.adapter.primary.StarServiceAdapter;
 import com.warehouse.star.infrastructure.adapter.primary.mapper.StarRequestMapper;
 import com.warehouse.star.infrastructure.adapter.primary.mapper.StarRequestMapperImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 
 public class StarServiceAdapterTest {
@@ -84,17 +85,10 @@ public class StarServiceAdapterTest {
     private List<DepotDto> buildDepots() {
         final DepotDto depot1 = new DepotDto();
         depot1.setDepotCode("KR1");
-        depot1.setCoordinates(CoordinatesDto.builder()
-                .lon(50.0468548)
-                .lat(19.9348336)
-                .build());
+
 
         final DepotDto depot2 = new DepotDto();
         depot2.setDepotCode("KT1");
-        depot2.setCoordinates(CoordinatesDto.builder()
-                .lon(50.3013283)
-                .lat(18.5795769)
-                .build());
 
         return List.of(depot1, depot2);
     }

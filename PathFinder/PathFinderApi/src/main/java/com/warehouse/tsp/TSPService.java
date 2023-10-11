@@ -1,6 +1,7 @@
 package com.warehouse.tsp;
 
-import com.warehouse.depot.api.dto.DepotDto;
+
+import com.warehouse.dto.DepotDto;
 
 import java.util.List;
 

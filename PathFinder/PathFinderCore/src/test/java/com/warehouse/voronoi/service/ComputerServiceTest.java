@@ -1,52 +1,76 @@
 package com.warehouse.voronoi.service;
 
-import com.warehouse.voronoi.domain.model.Coordinates;
-import com.warehouse.voronoi.domain.model.Depot;
-import com.warehouse.voronoi.domain.service.ComputeService;
-import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import static com.warehouse.voronoi.service.DepotInMemoryData.depots;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
 
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.warehouse.voronoi.domain.exception.MissingCoordinatesException;
+import com.warehouse.voronoi.domain.model.Coordinates;
+import com.warehouse.voronoi.domain.model.Depot;
+import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
+import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
+
+@ExtendWith(MockitoExtension.class)
 public class ComputerServiceTest {
 
-    private final ComputeService computerService = new ComputeServiceImpl();
+    @Mock
+    private VoronoiServicePort voronoiServicePort;
+    private ComputeServiceImpl computerService;
+
+	@BeforeEach
+	void setup() {
+		computerService = new ComputeServiceImpl(voronoiServicePort);
+	}
 
     @Test
     void shouldCompute() {
         // given
         final List<Depot> depotsList = depots();
+        final String requestCity = "Lublin";
+
         final Coordinates coordinates = Coordinates.builder()
-                .lon(50.1097081)
-                .lat(18.4792279)
+                .lat(50)
+                .lon(50)
                 .build();
 
+        doReturn(coordinates)
+                .when(voronoiServicePort)
+                .obtainCoordinates(requestCity);
+        
         // when
-        final String compute = computerService.computeLength(coordinates, depotsList);
-        // then nearest depot is KT1
-        assertThat(compute).isEqualTo("KT1");
+        final String compute = computerService.calculate(requestCity, depotsList);
+        // then nearest depot is LUB
+        assertThat(compute).isEqualTo("LUB");
     }
 
     @Test
     void shouldComputeWhenGivenCoordinatesAreSameAsDepots() {
         // given
         final List<Depot> depotsList = depots();
+        final String requestCity = "Wroclaw";
 
-        // Wroclaws coordinates
         final Coordinates coordinates = Coordinates.builder()
                 .lon(51.1271647)
                 .lat(16.9218245)
                 .build();
 
+        doReturn(coordinates)
+                .when(voronoiServicePort)
+                .obtainCoordinates(requestCity);
+
         // when
-        final String compute = computerService.computeLength(coordinates, depotsList);
+        final String compute = computerService.calculate(requestCity, depotsList);
         // then nearest depot is WRO
         assertThat(compute).isEqualTo("WRO");
     }
@@ -54,14 +78,22 @@ public class ComputerServiceTest {
     @Test
     void shouldThrowException() {
         // given
-        final List<Depot> depotsList = new ArrayList<>();
-        final Coordinates coordinates = Coordinates.builder()
-                .build();
+        final List<Depot> depotsList = depots();
+        final String requestCity = "Wroclaw";
+
+        doReturn(null)
+                .when(voronoiServicePort)
+                .obtainCoordinates(requestCity);
+
         // when
-        final Executable executable = () -> computerService.computeLength(coordinates, depotsList);
+        final Executable executable = () -> computerService.calculate(requestCity, depotsList);
         // then
-        final NoSuchElementException exception = assertThrows(NoSuchElementException.class, executable);
-        assertThat(exception.getClass()).isInstanceOf(Class.class);
+        final MissingCoordinatesException exception = assertThrows(MissingCoordinatesException.class, executable);
+        assertEquals(expectedToBe("Coordinates missing"), exception.getMessage());
+    }
+
+    private <T> T expectedToBe(T s) {
+        return s;
     }
 
 }

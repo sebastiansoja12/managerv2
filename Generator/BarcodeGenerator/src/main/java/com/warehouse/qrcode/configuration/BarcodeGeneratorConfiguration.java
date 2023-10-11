@@ -1,8 +1,7 @@
 package com.warehouse.qrcode.configuration;
 
-import com.warehouse.qrcode.domain.service.*;
-import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapper;
-import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapperImpl;
+import java.awt.image.BufferedImage;
+
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 
-import java.awt.image.BufferedImage;
+import com.warehouse.qrcode.domain.service.*;
+import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapper;
+import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapperImpl;
 
 @Configuration
 public class BarcodeGeneratorConfiguration {
@@ -36,9 +37,8 @@ public class BarcodeGeneratorConfiguration {
         return new ParcelEntityMapperImpl();
     }
 
-    @Bean(name="barcodeGeneratorParcelService")
-    public ParcelService parcelService(ShipmentPort shipmentPort,
-                                       ParcelExportService parcelExportService) {
-        return new ParcelServiceImpl(shipmentPort, parcelExportService);
-    }
+	@Bean(name = "barcodeGeneratorParcelService")
+	public ParcelService parcelService(ShipmentPort shipmentPort, ParcelExportService parcelExportService) {
+		return new ParcelServiceImpl(shipmentPort, parcelExportService);
+	}
 }

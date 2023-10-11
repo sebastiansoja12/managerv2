@@ -109,7 +109,7 @@ public class DepotRepositoryTest {
 
         final DepotId id = new DepotId(1L);
         final DepotEntity entity = new DepotEntity();
-        entity.setId(1L);
+        entity.setDepotCode("KT1");
 
         when(repository.findById(1L)).thenReturn(Optional.of(entity));
         when(mapper.map(entity)).thenReturn(depot);

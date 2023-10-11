@@ -1,9 +1,9 @@
 package com.warehouse.voronoi.mapper;
 
+import com.warehouse.dto.CoordinatesDto;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.infrastructure.adapter.primary.mapper.AddressRequestMapper;
 import com.warehouse.voronoi.infrastructure.adapter.primary.mapper.AddressRequestMapperImpl;
-import com.warehouse.depot.api.dto.CoordinatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType;
 
@@ -20,25 +19,28 @@ import lombok.NoArgsConstructor;
 public class RefreshTokenEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
 
-    @Column(nullable = false)
+    @Column(name = "created_date", nullable = false)
     private Instant createdDate;
 
+    @Column(name = "expiry_date", nullable = false)
+    private Instant expiryDate;
+
     @Enumerated(EnumType.STRING)
-    public TokenType tokenType = TokenType.BEARER;
+    @Column(name = "token_type")
+    private TokenType tokenType = TokenType.BEARER;
 
-    @Column(nullable = false)
-    public boolean revoked;
+    @Column(name = "revoked", nullable = false)
+    private boolean revoked;
 
-    @Column(nullable = false)
-    public boolean expired;
+    @Column(name = "expired", nullable = false)
+    private boolean expired;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    public UserEntity user;
+    @Column(name = "username", nullable = false)
+    private String username;
 }

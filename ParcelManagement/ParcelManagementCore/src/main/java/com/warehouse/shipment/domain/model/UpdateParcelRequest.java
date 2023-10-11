@@ -12,7 +12,4 @@ import lombok.NoArgsConstructor;
 public class UpdateParcelRequest {
 
     Parcel parcel;
-
-    Integer token;
-
 }

@@ -1,23 +1,24 @@
 package com.warehouse.tsp;
 
-import com.warehouse.depot.api.dto.CoordinatesDto;
-import com.warehouse.depot.api.dto.DepotDto;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.warehouse.dto.DepotDto;
 import com.warehouse.tsp.domain.model.Coordinates;
 import com.warehouse.tsp.domain.model.Depot;
 import com.warehouse.tsp.domain.port.primary.TravellingSalesManPort;
 import com.warehouse.tsp.infrastructure.adapter.primary.TSPServiceAdapter;
 import com.warehouse.tsp.infrastructure.adapter.primary.mapper.TSPRequestMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-
+@ExtendWith(MockitoExtension.class)
 public class TSPServiceAdapterTest {
 
     @Mock
@@ -29,7 +30,6 @@ public class TSPServiceAdapterTest {
     private TSPServiceAdapter tspServiceAdapter;
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
         tspServiceAdapter = new TSPServiceAdapter(requestMapper, travellingSalesManPort);
     }
 
@@ -80,17 +80,9 @@ public class TSPServiceAdapterTest {
     private List<DepotDto> buildDepots() {
         final DepotDto depot1 = new DepotDto();
         depot1.setDepotCode("KR1");
-        depot1.setCoordinates(CoordinatesDto.builder()
-                .lon(50.0468548)
-                .lat(19.9348336)
-                .build());
 
         final DepotDto depot2 = new DepotDto();
         depot2.setDepotCode("KT1");
-        depot2.setCoordinates(CoordinatesDto.builder()
-                .lon(50.3013283)
-                .lat(18.5795769)
-                .build());
 
         return List.of(depot1, depot2);
     }

@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>Q2_2023.1-SNAPSHOT</version>
+        <version>2023.10-SNAPSHOT</version>
     </parent>
     <artifactId>Application</artifactId>
 
@@ -20,12 +20,18 @@
         </profile>
         <profile>
             <id>dev</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
             <properties>
                 <environment>dev</environment>
             </properties>
         </profile>
         <profile>
             <id>test</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
             <properties>
                 <environment>test</environment>
             </properties>
@@ -75,10 +81,19 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>TokenStage</artifactId>
+            <artifactId>PositionDetermination</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>AuthorizationCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ExceptionHandler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -97,7 +112,16 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test-autoconfigure</artifactId>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>

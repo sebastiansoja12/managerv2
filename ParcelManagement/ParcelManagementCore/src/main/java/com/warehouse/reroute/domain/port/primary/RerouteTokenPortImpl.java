@@ -1,13 +1,21 @@
 package com.warehouse.reroute.domain.port.primary;
 
-import com.warehouse.reroute.domain.enumeration.ParcelType;
+import static com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes.REROUTE_102;
+
+import java.time.Instant;
+
 import com.warehouse.reroute.domain.enumeration.Status;
+import com.warehouse.reroute.domain.exception.RerouteException;
+import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
+import com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes;
 import com.warehouse.reroute.domain.model.*;
+import com.warehouse.reroute.domain.port.secondary.Logger;
+import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
 import com.warehouse.reroute.domain.service.RerouteService;
-import com.warehouse.reroute.domain.service.RerouteTokenValidatorService;
+import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
 import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.ParcelUpdateResponse;
-import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
+import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -15,13 +23,14 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
 
     private final RerouteService rerouteService;
 
-    private final RerouteTokenValidatorService rerouteTokenValidatorService;
+    private final ParcelReroutePort parcelReroutePort;
 
-    @Override
-    public ParcelUpdateResponse update(UpdateParcelRequest request) {
-        validateRequest(request);
-        return rerouteService.update(request);
-    }
+    private final RerouteTokenGeneratorService tokenGeneratorService;
+
+    private final Logger logger;
+
+    private static final long EXPIRY_TIME = 600L;
+
 
     @Override
     public RerouteToken findByToken(Token token) {
@@ -29,24 +38,72 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
     }
 
     @Override
-    public RerouteToken loadByTokenAndParcelId(Token token, ParcelId aParcelId) {
-        return rerouteService.loadByTokenAndParcelId(token, aParcelId);
+    public RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId) {
+        return rerouteService.loadByTokenAndParcelId(token, parcelId);
     }
 
     @Override
     public RerouteResponse sendReroutingInformation(RerouteRequest rerouteRequest) {
-        return rerouteService.sendReroutingInformation(rerouteRequest);
+        final RerouteToken rerouteToken = buildRerouteTokenFromRequest(rerouteRequest);
+        return rerouteService.createRerouteToken(rerouteToken);
     }
 
-    public void validateRequest(UpdateParcelRequest request) {
-        final boolean rerouteTokenValidate = rerouteTokenValidatorService.validate(request.getToken());
-        if (!rerouteTokenValidate) {
-            throw new RerouteTokenNotFoundException("Reroute token was not found");
+    private RerouteToken buildRerouteTokenFromRequest(RerouteRequest request) {
+        return RerouteToken.builder()
+                .parcelId(request.getParcelId())
+                .createdDate(Instant.now())
+                .expiryDate(Instant.now().plusSeconds(EXPIRY_TIME))
+                .token(tokenGeneratorService.generate(request.getParcelId(), request.getEmail()))
+                .email(request.getEmail())
+                .build();
+    }
+
+    @Override
+    public RerouteParcelResponse update(RerouteParcelRequest request) {
+        logReroute(request);
+
+        final RerouteParcel parcel = extractParcelFromRequest(request);
+
+        if (!parcel.isRequiredToReroute()) {
+            throw new RerouteException(RerouteExceptionCodes.REROUTE_100);
         }
-        if (request.getParcel().getParcelType().equals(ParcelType.CHILD)) {
-            throw new IllegalArgumentException("Parcel cannot be rerouted after redirection");
-        } else if (!request.getParcel().getStatus().equals(Status.CREATED)) {
-            throw new IllegalArgumentException("Parcel cannot be rerouted because it was already sent");
+
+        final RerouteToken rerouteToken = extractTokenFromRequest(request);
+
+        if (!rerouteToken.isValid()) {
+            throw new RerouteTokenExpiredException(REROUTE_102);
         }
+
+        prepareToReroute(parcel);
+
+        final Parcel parcelUpdate = parcelReroutePort.reroute(parcel, new ParcelId(request.getId()));
+
+        rerouteService.deleteToken(rerouteToken);
+
+        return RerouteParcelResponse.builder()
+                .parcelId(parcelUpdate.getParcelId())
+                .parcelSize(parcelUpdate.getParcelSize())
+                .parcelType(parcelUpdate.getParcelType())
+                .recipient(parcelUpdate.getRecipient())
+                .sender(parcelUpdate.getSender())
+                .status(parcelUpdate.getStatus())
+                .parcelRelatedId(parcelUpdate.getParcelRelatedId())
+                .build();
+    }
+
+    private void logReroute(RerouteParcelRequest request) {
+        logger.info("Detected reroute service for parcel: {} ", request.getId());
+    }
+
+    private void prepareToReroute(RerouteParcel parcel) {
+        parcel.setStatus(Status.REROUTE);
+    }
+
+    private RerouteParcel extractParcelFromRequest(RerouteParcelRequest request) {
+        return request.getParcel();
+    }
+
+    private RerouteToken extractTokenFromRequest(RerouteParcelRequest request) {
+        return rerouteService.loadByTokenAndParcelId(request.getToken(), request.getId());
     }
 }

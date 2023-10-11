@@ -19,4 +19,6 @@ public class ParcelDto {
 
     Long parcelRelatedId;
 
+    String destination;
+
 }

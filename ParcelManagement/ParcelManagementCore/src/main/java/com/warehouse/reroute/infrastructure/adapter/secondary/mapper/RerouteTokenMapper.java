@@ -1,7 +1,7 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.reroute.domain.model.RerouteToken;
-import com.warehouse.reroute.domain.model.UpdateParcelRequest;
+import com.warehouse.reroute.domain.model.RerouteParcelRequest;
 import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -13,6 +13,6 @@ public interface RerouteTokenMapper {
 
     RerouteTokenEntity map(RerouteToken rerouteToken);
 
-    RerouteTokenEntity map(UpdateParcelRequest parcelRequest);
+    RerouteTokenEntity map(RerouteParcelRequest parcelRequest);
 
 }

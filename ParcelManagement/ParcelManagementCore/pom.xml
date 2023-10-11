@@ -6,13 +6,18 @@
     <parent>
         <artifactId>ParcelManagement</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>Q2_2023.1-SNAPSHOT</version>
+        <version>2023.10-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
 
     <artifactId>ParcelManagementCore</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>DepotServicesCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>ParcelManagementApi</artifactId>
@@ -36,6 +41,13 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>RouteTrackerFlowApi</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ExceptionHandler</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -77,11 +89,6 @@
         <dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -131,4 +138,28 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>app</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <environment>app</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <environment>dev</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <environment>test</environment>
+            </properties>
+        </profile>
+    </profiles>
 </project>

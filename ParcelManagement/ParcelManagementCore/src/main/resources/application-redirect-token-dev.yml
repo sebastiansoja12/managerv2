@@ -1,0 +1,7 @@
+service.mock: false
+
+
+
+purge:
+  cron:
+    expression: "@midnight"

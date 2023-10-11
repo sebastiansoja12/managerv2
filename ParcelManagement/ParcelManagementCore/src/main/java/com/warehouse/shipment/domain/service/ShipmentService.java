@@ -4,11 +4,11 @@ import com.warehouse.shipment.domain.model.*;
 
 public interface ShipmentService {
 
-    ShipmentResponse ship(ShipmentRequest request);
+    ShipmentResponse createShipment(ShipmentParcel parcel);
 
     Parcel loadParcel(Long parcelId);
 
     UpdateParcelResponse update(ParcelUpdate parcelUpdate);
 
-    void delete(Long parcelId);
+    boolean exists(Long parcelId);
 }

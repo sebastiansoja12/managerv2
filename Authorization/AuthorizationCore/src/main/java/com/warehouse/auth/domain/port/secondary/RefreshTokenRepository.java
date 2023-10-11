@@ -1,11 +1,13 @@
 package com.warehouse.auth.domain.port.secondary;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.auth.domain.model.RefreshToken;
+import com.warehouse.auth.domain.model.Token;
 
 public interface RefreshTokenRepository {
 
-    void save(RefreshTokenEntity refreshToken);
+    Token save(RefreshToken refreshToken);
 
-    String save(UserEntity userEntity, String token);
+    RefreshToken validateRefreshToken(String token);
+
+    void delete(String refreshToken);
 }
