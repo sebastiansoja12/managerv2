@@ -11,10 +11,13 @@ import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTo
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.ParcelServiceAdapter;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenAdapter;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenMockAdapter;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.model.SupplierToken;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Map;
 
 @Configuration
 public class DeliveryTokenSignatureConfiguration {
@@ -51,6 +54,8 @@ public class DeliveryTokenSignatureConfiguration {
 	@Bean
 	@ConditionalOnProperty(name = "service.mock", havingValue = "true")
 	public DeliveryTokenServicePort deliveryTokenMockServicePort() {
-		return new DeliveryTokenMockAdapter();
+		final Map<String, SupplierToken> supplierTokenMap =
+				Map.of("dwvscq", new SupplierToken("tokenProtection"));
+		return new DeliveryTokenMockAdapter(supplierTokenMap);
 	}
 }

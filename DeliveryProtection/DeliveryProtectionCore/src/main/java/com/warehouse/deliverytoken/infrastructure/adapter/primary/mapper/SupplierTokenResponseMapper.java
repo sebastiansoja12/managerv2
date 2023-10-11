@@ -9,7 +9,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper
@@ -26,7 +25,7 @@ public interface SupplierTokenResponseMapper {
 				.collect(Collectors.toList());
     }
 
-    @Mapping(target = "id", source = "protectedDelivery.deliveryId")
+    @Mapping(target = "deliveryId", source = "protectedDelivery.deliveryId")
     @Mapping(target = "token", source = "protectedDelivery.protectionToken")
     SupplierSignatureDto map(DeliveryPackageResponse deliveryPackageResponse);
 }

@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class SupplierTokenResponse {
+public class DeliveryTokenResponse {
     List<SupplierSignature> supplierSignature;
 }

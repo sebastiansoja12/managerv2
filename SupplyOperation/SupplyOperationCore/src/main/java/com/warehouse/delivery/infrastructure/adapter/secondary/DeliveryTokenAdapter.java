@@ -1,7 +1,7 @@
 package com.warehouse.delivery.infrastructure.adapter.secondary;
 
 import com.warehouse.delivery.domain.model.DeliveryTokenRequest;
-import com.warehouse.delivery.domain.model.SupplierTokenResponse;
+import com.warehouse.delivery.domain.model.DeliveryTokenResponse;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryTokenRequestMapper;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryTokenResponseMapper;
@@ -23,7 +23,7 @@ public class DeliveryTokenAdapter implements DeliveryTokenServicePort {
     private final DeliveryTokenResponseMapper responseMapper = getMapper(DeliveryTokenResponseMapper.class);
 
     @Override
-    public SupplierTokenResponse protect(DeliveryTokenRequest deliveryTokenRequest) {
+    public DeliveryTokenResponse protect(DeliveryTokenRequest deliveryTokenRequest) {
         final DeliveryTokenRequestDto request = requestMapper.map(deliveryTokenRequest);
         final DeliveryTokenResponseDto response = service.protect(request);
         return responseMapper.map(response);

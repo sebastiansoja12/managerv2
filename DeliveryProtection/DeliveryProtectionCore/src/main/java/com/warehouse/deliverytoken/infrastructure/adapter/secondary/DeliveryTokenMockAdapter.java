@@ -2,9 +2,13 @@ package com.warehouse.deliverytoken.infrastructure.adapter.secondary;
 
 import com.warehouse.deliverytoken.domain.model.*;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.model.SupplierToken;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @AllArgsConstructor
 public class DeliveryTokenMockAdapter implements DeliveryTokenServicePort {
@@ -13,11 +17,22 @@ public class DeliveryTokenMockAdapter implements DeliveryTokenServicePort {
 
     private final String tokenProtection = "abcdefghjklk";
 
+	private final Map<String, SupplierToken> supplierTokenMap;
+
 	@Override
 	public DeliveryTokenResponse protect(DeliveryTokenRequest request) {
+		validateSupplier(request);
 		final List<DeliveryPackageResponse> deliveryPackageResponses = deliveryPackageRequests(
 				request.getDeliveryPackageRequests());
 		return new DeliveryTokenResponse(deliveryPackageResponses);
+	}
+
+	private void validateSupplier(DeliveryTokenRequest request) {
+		final String supplierCode = request.extractSupplierCode();
+		final SupplierToken token = supplierTokenMap.get(supplierCode);
+		if (Objects.isNull(token)) {
+			throw new SupplierNotAllowedException(supplierCode);
+		}
 	}
 
 	private List<DeliveryPackageResponse> deliveryPackageRequests(List<DeliveryPackageRequest> requests) {

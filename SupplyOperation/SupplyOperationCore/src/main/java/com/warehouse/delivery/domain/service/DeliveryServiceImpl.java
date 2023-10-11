@@ -28,11 +28,11 @@ public class DeliveryServiceImpl implements DeliveryService {
 
         final List<DeliveryTokenRequest> deliveryTokenRequests = buildTokenRequests(deliveries);
 
-        final List<SupplierTokenResponse> supplierTokenResponses = secureDelivery(deliveryTokenRequests);
+        final List<DeliveryTokenResponse> deliveryTokenResponse = secureDelivery(deliveryTokenRequests);
 
-        final Map<UUID, SupplierTokenResponse> supplierTokenResponseMap = assignToHashMap(supplierTokenResponses);
+        final Map<UUID, DeliveryTokenResponse> deliveryTokenResponseMap = assignToHashMap(deliveryTokenResponse);
 
-        assignTokenToDelivery(supplierTokenResponseMap, deliveries);
+        assignTokenToDelivery(deliveryTokenResponseMap, deliveries);
 
 		return deliveries;
     }
@@ -57,21 +57,21 @@ public class DeliveryServiceImpl implements DeliveryService {
                 delivery.getParcelId(), new Supplier(delivery.getSupplierCode()), delivery);
     }
 
-    private void assignTokenToDelivery(Map<UUID, SupplierTokenResponse> supplierTokenResponseMap,
+    private void assignTokenToDelivery(Map<UUID, DeliveryTokenResponse> supplierTokenResponseMap,
 			List<Delivery> deliveries) {
 		deliveries.forEach(delivery -> {
-			final SupplierTokenResponse supplierTokenResponse = supplierTokenResponseMap.get(delivery.getId());
-			supplierTokenResponse.getSupplierSignature()
+			final DeliveryTokenResponse deliveryTokenResponse = supplierTokenResponseMap.get(delivery.getId());
+			deliveryTokenResponse.getSupplierSignature()
                     .forEach(tokenSignature -> delivery.setToken(tokenSignature.getToken()));
 		});
 	}
 
-    private Map<UUID, SupplierTokenResponse> assignToHashMap(List<SupplierTokenResponse> responses) {
+    private Map<UUID, DeliveryTokenResponse> assignToHashMap(List<DeliveryTokenResponse> responses) {
         return responses.stream()
                 .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
     }
 
-	private UUID generateKeyFromResponse(SupplierTokenResponse response) {
+	private UUID generateKeyFromResponse(DeliveryTokenResponse response) {
 		if (response != null && !CollectionUtils.isEmpty(response.getSupplierSignature())) {
 			return response.getSupplierSignature().stream()
                     .map(SupplierSignature::getDeliveryId)
@@ -82,8 +82,8 @@ public class DeliveryServiceImpl implements DeliveryService {
 		return null;
 	}
 
-    private List<SupplierTokenResponse> secureDelivery(List<DeliveryTokenRequest> requests) {
-        final List<SupplierTokenResponse> responses = new ArrayList<>();
+    private List<DeliveryTokenResponse> secureDelivery(List<DeliveryTokenRequest> requests) {
+        final List<DeliveryTokenResponse> responses = new ArrayList<>();
         requests.forEach(request -> responses.add(deliveryTokenServicePort.protect(request)));
         return responses;
     }
