@@ -6,7 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import com.warehouse.delivery.domain.port.secondary.SupplierTokenServicePort;
+import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 
 @ComponentScan(basePackages = { "com.warehouse.delivery" })
@@ -19,5 +19,5 @@ public class DeliveryTestConfiguration {
     public RouteLogEventPublisher routeLogEventPublisher;
 
     @MockBean
-    public SupplierTokenServicePort supplierTokenServicePort;
+    public DeliveryTokenServicePort deliveryTokenServicePort;
 }

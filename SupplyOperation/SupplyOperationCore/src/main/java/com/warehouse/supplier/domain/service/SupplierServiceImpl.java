@@ -64,7 +64,6 @@ public class SupplierServiceImpl implements SupplierService {
 
     private Supplier mapToSupplier(SupplierModelRequest supplierModelRequest) {
         return Supplier.builder()
-                .id(supplierModelRequest.getId())
                 .firstName(supplierModelRequest.getFirstName())
                 .telephone(supplierModelRequest.getTelephone())
                 .lastName(supplierModelRequest.getTelephone())

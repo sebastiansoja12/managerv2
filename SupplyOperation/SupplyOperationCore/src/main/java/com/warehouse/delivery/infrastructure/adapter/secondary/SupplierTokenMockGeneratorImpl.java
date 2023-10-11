@@ -1,6 +1,6 @@
 package com.warehouse.delivery.infrastructure.adapter.secondary;
 
-import com.warehouse.delivery.domain.model.SupplierTokenRequest;
+import com.warehouse.delivery.domain.model.DeliveryTokenRequest;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -9,7 +9,7 @@ import java.util.Base64;
 @Service
 public class SupplierTokenMockGeneratorImpl implements SupplierTokenMockGenerator {
     @Override
-    public String generateToken(SupplierTokenRequest request) {
+    public String generateToken(DeliveryTokenRequest request) {
         final String inputString =  "test";
 
         try {

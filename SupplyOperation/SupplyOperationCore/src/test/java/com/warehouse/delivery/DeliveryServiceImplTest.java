@@ -1,27 +1,7 @@
 package com.warehouse.delivery;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
-import com.warehouse.delivery.domain.model.Delivery;
-import com.warehouse.delivery.domain.model.SupplierSignature;
-import com.warehouse.delivery.domain.model.SupplierTokenRequest;
-import com.warehouse.delivery.domain.model.SupplierTokenResponse;
-import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
-import com.warehouse.delivery.domain.port.secondary.SupplierTokenServicePort;
-import com.warehouse.delivery.domain.service.DeliveryServiceImpl;
 
 // TODO INPL-6150
 @ExtendWith(MockitoExtension.class)

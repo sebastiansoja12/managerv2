@@ -2,11 +2,9 @@ package com.warehouse.delivery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.delivery.domain.model.SupplierTokenRequest;
+import com.warehouse.delivery.domain.model.DeliveryTokenRequest;
 import com.warehouse.delivery.infrastructure.adapter.secondary.SupplierTokenMockGeneratorImpl;
 
 public class SupplierTokenMockGeneratorImplTest {
@@ -17,7 +15,7 @@ public class SupplierTokenMockGeneratorImplTest {
     @Test
     void shouldGenerateBase64Token() {
         // given
-        final SupplierTokenRequest request = null;//new SupplierTokenRequest("abc_def",
+        final DeliveryTokenRequest request = null;//new SupplierTokenRequest("abc_def",
                 //UUID.fromString("fde44928-44e5-11ee-be56-0242ac120002"));
         // when
         final String token = generator.generateToken(request);
