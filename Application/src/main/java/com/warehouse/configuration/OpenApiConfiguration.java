@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 ),
                 description = "OpenApi documentation for Spring Security",
                 title = "OpenApi specification - InParcel Spring Boot Project",
-                version = "2023.10",
+                version = "Q3_2023",
                 license = @License(
                         name = "Licence name",
                         url = ""

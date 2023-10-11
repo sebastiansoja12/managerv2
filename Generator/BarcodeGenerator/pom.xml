@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Generator</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2023.10-SNAPSHOT</version>
+        <version>Q3_2023-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>

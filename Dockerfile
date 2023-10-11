@@ -1,8 +1,8 @@
 # Use an official OpenJDK runtime as a parent image
-FROM openjdk:21
+FROM openjdk:17
 
 # Copy the Spring Boot application
-COPY  Application/target/Application-2023.10-SNAPSHOT.jar app.jar
+COPY  Application/target/Application-Q3_2023-SNAPSHOT.jar app.jar
 
 # Expose the default Spring Boot port
 EXPOSE 8080
