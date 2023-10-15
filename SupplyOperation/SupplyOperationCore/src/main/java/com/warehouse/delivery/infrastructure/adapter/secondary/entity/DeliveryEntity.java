@@ -21,20 +21,20 @@ public class DeliveryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	String id;
+	private String id;
 
     @Column(name = "parcel_id", nullable = false)
-    Long parcelId;
+    private Long parcelId;
 
     @Column(name = "created", nullable = false)
-    LocalDateTime created;
+    private LocalDateTime created;
 
     @Column(name = "depot_code", nullable = false)
-    String depotCode;
+    private String depotCode;
 
     @Column(name = "supplier_code", nullable = false)
-    String supplierCode;
+    private String supplierCode;
 
     @Column(name = "delivery_status", nullable = false)
-    Status deliveryStatus;
+    private Status deliveryStatus;
 }
