@@ -2,12 +2,15 @@ package com.warehouse.deliverytoken;
 
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -27,6 +30,7 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.deliverytoken.domain.model.Parcel;
 import com.warehouse.deliverytoken.domain.model.ParcelId;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.ParcelServiceAdapter;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -72,5 +76,18 @@ public class ParcelServiceAdapterIntegrationTest {
         // then
         mockRestServiceServer.verify();
         assertNotNull(parcel);
+    }
+
+    @Test
+    void shouldFailAndThrowTechnicalException() {
+        // given
+        final ParcelId parcelId = new ParcelId(PARCEL_ID);
+        mockRestServiceServer.expect(requestTo(String.format(URL, PARCEL_ID)))
+                .andRespond(withServerError());
+        // when
+        final Executable executable = () -> parcelServiceAdapter.downloadParcel(parcelId);
+        // then
+        assertThrows(TechnicalException.class, executable);
+        mockRestServiceServer.verify();
     }
 }

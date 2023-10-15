@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,6 +92,25 @@ public class DeliveryTokenIntegrationTest {
         final Executable executable = () -> deliveryTokenPort.protect(request);
         // then
         final CommunicationException exception = assertThrows(CommunicationException.class, executable);
+        assertEquals(String.format(exceptionMessage, domainName), exception.getMessage());
+        assertEquals(code, exception.getCode());
+    }
+
+    @Test
+    void shouldThrowTechnicalException() {
+        // given
+        final String exceptionMessage = "Http exception while connecting with %s service";
+        final String domainName = "Shipment";
+        final int code = 8002;
+        final DeliveryTokenRequest request = new DeliveryTokenRequest(
+                createDeliveryRequests(1L, null, null, null, "abc", "1")
+        );
+        when(parcelServicePort.downloadParcel(new ParcelId(1L)))
+                .thenThrow(new TechnicalException(domainName));
+        // when
+        final Executable executable = () -> deliveryTokenPort.protect(request);
+        // then
+        final TechnicalException exception = assertThrows(TechnicalException.class, executable);
         assertEquals(String.format(exceptionMessage, domainName), exception.getMessage());
         assertEquals(code, exception.getCode());
     }

@@ -1,10 +1,11 @@
 package com.warehouse.deliverytoken.infrastructure.adapter.secondary.mapper;
 
+import org.mapstruct.Mapper;
+
 import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
 import com.warehouse.deliverytoken.domain.model.Parcel;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.api.dto.ParcelDto;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.api.enumeration.ParcelTypeDto;
-import org.mapstruct.Mapper;
 
 @Mapper
 public interface ParcelResponseMapper {

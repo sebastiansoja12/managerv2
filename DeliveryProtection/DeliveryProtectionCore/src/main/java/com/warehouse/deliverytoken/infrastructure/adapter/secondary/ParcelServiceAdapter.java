@@ -4,7 +4,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.Objects;
 
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.support.RestGatewaySupport;
 
@@ -36,6 +38,9 @@ public class ParcelServiceAdapter extends RestGatewaySupport implements ParcelSe
         } catch (ResourceAccessException exception) {
             log.info("Connection with {} could not be established", shipmentConfiguration.getName());
             throw new CommunicationException(shipmentConfiguration.getName());
+        } catch (HttpServerErrorException exception) {
+            log.info("Technical exception while connecting with {}", shipmentConfiguration.getName());
+            throw new TechnicalException(shipmentConfiguration.getName());
         }
     }
 
