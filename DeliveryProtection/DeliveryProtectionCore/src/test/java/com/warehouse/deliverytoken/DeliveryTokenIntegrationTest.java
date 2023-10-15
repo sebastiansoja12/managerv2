@@ -1,16 +1,16 @@
 package com.warehouse.deliverytoken;
 
 
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.deliverytoken.configuration.DeliveryTokenTestConfiguration;
-import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
-import com.warehouse.deliverytoken.domain.model.*;
-import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPort;
-import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
-import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -22,14 +22,16 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.warehouse.deliverytoken.configuration.DeliveryTokenTestConfiguration;
+import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
+import com.warehouse.deliverytoken.domain.model.*;
+import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPort;
+import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -50,14 +52,20 @@ public class DeliveryTokenIntegrationTest {
     @Autowired
     private ShipmentProperty shipmentProperty;
 
+    @BeforeEach
+    void setup() {
+        reset(parcelServicePort);
+    }
+
     @Test
     void shouldProtectDelivery() {
         // given
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
-                createDeliveryRequests(1L, null, null, null, "abc", "1")
+                createDeliveryRequests(1L, null, null, null, "dwvscq", "1")
         );
         final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
-        when(parcelServicePort.downloadParcel(new ParcelId(1L))).thenReturn(parcel);
+        when(parcelServicePort.downloadParcel(new ParcelId(1L)))
+                .thenReturn(parcel);
         // when
         final DeliveryTokenResponse response = deliveryTokenPort.protect(request);
         // then
@@ -87,13 +95,23 @@ public class DeliveryTokenIntegrationTest {
         assertEquals(code, exception.getCode());
     }
 
-	private List<DeliveryPackageResponse> createDeliveryPackageResponses(Long parcelId, Long parcelRelatedId,
-			ParcelType parcelType, String destination, String supplierCode, String supplierTokenServiceApplicationId,
-			String deliveryId) {
-		return Collections.singletonList(
-				new DeliveryPackageResponse(createParcel(parcelId, parcelRelatedId, parcelType, destination),
-						supplierCode, supplierTokenServiceApplicationId, createProtectedDelivery(deliveryId)));
-	}
+    @Test
+    void shouldThrowExceptionWhenSupplierIsNotAllowed() {
+        // given
+        final String exceptionMessage = "Supplier %s does not have any access to deliveries";
+        final String supplierCode = "abc";
+        final DeliveryTokenRequest request = new DeliveryTokenRequest(
+                createDeliveryRequests(1L, null, null, null, supplierCode, "1")
+        );
+        final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
+        when(parcelServicePort.downloadParcel(new ParcelId(1L)))
+                .thenReturn(parcel);
+        // when
+        final Executable executable = () -> deliveryTokenPort.protect(request);
+        // then
+        final SupplierNotAllowedException exception = assertThrows(SupplierNotAllowedException.class, executable);
+        assertEquals(String.format(exceptionMessage, supplierCode), exception.getMessage());
+    }
 
 	private List<DeliveryPackageRequest> createDeliveryRequests(Long parcelId, Long parcelRelatedId,
 			ParcelType parcelType, String destination, String supplierCode, String deliveryId) {
@@ -112,9 +130,5 @@ public class DeliveryTokenIntegrationTest {
 
     private Parcel createParcel(Long id, Long parcelRelatedId, ParcelType parcelType, String destination) {
         return new Parcel(id, parcelRelatedId, parcelType, destination);
-    }
-
-    private ProtectedDelivery createProtectedDelivery(String deliveryId) {
-        return new ProtectedDelivery("abcdefghjklk", deliveryId);
     }
 }

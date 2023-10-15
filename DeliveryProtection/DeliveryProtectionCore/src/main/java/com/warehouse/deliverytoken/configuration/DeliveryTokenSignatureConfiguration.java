@@ -13,6 +13,7 @@ import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryToke
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenMockAdapter;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.model.SupplierToken;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,26 +37,25 @@ public class DeliveryTokenSignatureConfiguration {
 	}
 
 	@Bean
-	public ParcelServicePort parcelServicePort(ShipmentProperty shipmentProperty) {
-		return new ParcelServiceAdapter(shipmentProperty);
-	}
-
-	@Bean
 	public ShipmentProperty shipmentProperty() {
 		return new ShipmentProperty();
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "service.mock", havingValue = "false")
-	public DeliveryTokenServicePort deliveryTokenServicePort() {
+	public DeliveryTokenAdapter deliveryTokenAdapter() {
 		return new DeliveryTokenAdapter();
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "service.mock", havingValue = "true")
-	public DeliveryTokenServicePort deliveryTokenMockServicePort() {
-		final Map<String, SupplierToken> supplierTokenMap =
-				Map.of("dwvscq", new SupplierToken("tokenProtection"));
+	public DeliveryTokenMockAdapter deliveryTokenMockAdapter(@Value("${allowed.supplier}") String supplier) {
+		final Map<String, SupplierToken> supplierTokenMap = Map.of(supplier, new SupplierToken("tokenProtection"));
 		return new DeliveryTokenMockAdapter(supplierTokenMap);
+	}
+
+	@Bean
+	public ParcelServiceAdapter parcelServiceAdapter(ShipmentProperty shipmentProperty) {
+		return new ParcelServiceAdapter(shipmentProperty);
 	}
 }
