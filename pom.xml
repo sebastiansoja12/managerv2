@@ -350,7 +350,7 @@
 							</path>
 						</annotationProcessorPaths>
 						<compilerArgs>
-							<arg>-Amapstruct.unmappedTargetPolicy=IGNORE</arg>
+							<arg>-Amapstruct.unmappedTargetPolicy=WARN</arg>
 						</compilerArgs>
 						<fork>true</fork>
 						<meminitial>256m</meminitial>
