@@ -32,6 +32,7 @@
 		<module>Properties</module>
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
+		<module>ParcelStatusControlChange</module>
 	</modules>
 
 	<repositories>
