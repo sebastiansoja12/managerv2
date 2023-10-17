@@ -1,23 +1,20 @@
 package com.warehouse.paypal.domain.model;
 
-
-import java.util.Date;
 import java.util.List;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class PaypalResponse {
-    public String id;
-    public String intent;
-    public Payer payer;
-    public String state;
-    public Date create_time;
-    private List<Links> links;
-    private List<Transaction> transactions;
-    private String createTime;
-    private String paymentMethod;
-    private String failureReason;
+	String id;
+	String intent;
+	Payer payer;
+	String state;
+	List<Links> links;
+	List<Transaction> transactions;
+	String createTime;
+	String paymentMethod;
+	String failureReason;
 }

@@ -67,6 +67,7 @@ public class PaypalServiceImpl implements PaypalService {
 				.build();
 
         return PaypalRequest.builder()
+				.parcelId(paymentRequest.getParcelId())
 				.intent(paymentRequest.getIntent())
 				.transaction(createTransaction(paymentRequest.getParcelId(),
 						new Amount(paymentRequest.getPrice().toString(), details)))
