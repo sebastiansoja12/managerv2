@@ -1,4 +1,4 @@
-package com.warehouse.depot.infrastructure.secondary.entity;
+package com.warehouse.depot.infrastructure.adapter.secondary.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package com.warehouse.depot.infrastructure.secondary.exception;
+package com.warehouse.depot.infrastructure.adapter.secondary.exception;
 
 
 public class DepotNotFoundException extends RuntimeException {

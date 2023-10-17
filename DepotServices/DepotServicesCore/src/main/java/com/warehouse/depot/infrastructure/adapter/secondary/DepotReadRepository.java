@@ -1,6 +1,6 @@
-package com.warehouse.depot.infrastructure.secondary;
+package com.warehouse.depot.infrastructure.adapter.secondary;
 
-import com.warehouse.depot.infrastructure.secondary.entity.DepotEntity;
+import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

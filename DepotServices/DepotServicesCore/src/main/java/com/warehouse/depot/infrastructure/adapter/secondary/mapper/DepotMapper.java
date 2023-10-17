@@ -1,4 +1,4 @@
-package com.warehouse.depot.infrastructure.secondary.mapper;
+package com.warehouse.depot.infrastructure.adapter.secondary.mapper;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.depot.domain.model.Depot;
-import com.warehouse.depot.infrastructure.secondary.entity.DepotEntity;
+import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DepotMapper {
