@@ -73,6 +73,7 @@ public class PaymentConfiguration {
     @Bean
     @ConditionalOnProperty(name = "service.mock", havingValue = "false")
     public PaypalAdapter paypalAdapter(APIContext apiContext) {
+        log.warn("Using real PAYPAL implementation");
         final PaypalResponseMapper responseMapper = Mappers.getMapper(PaypalResponseMapper.class);
         final PaypalRequestMapper requestMapper = Mappers.getMapper(PaypalRequestMapper.class);
         return new PaypalAdapter(requestMapper, responseMapper, apiContext);

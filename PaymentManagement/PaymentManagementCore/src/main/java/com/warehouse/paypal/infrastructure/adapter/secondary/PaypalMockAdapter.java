@@ -46,6 +46,7 @@ public class PaypalMockAdapter implements PaypalServicePort {
                 .paymentMethod(PaymentMethod.PAYPAL.name())
                 .state("OK")
                 .createTime(LocalDateTime.now().toString())
+				.failureReason("NONE")
                 .build();
     }
 }

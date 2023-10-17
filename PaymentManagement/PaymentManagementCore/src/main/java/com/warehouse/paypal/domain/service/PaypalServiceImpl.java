@@ -30,6 +30,7 @@ public class PaypalServiceImpl implements PaypalService {
                 .price(paymentRequest.getPrice())
 				.failureReason(paypalResponse.getFailureReason())
 				.paymentMethod(paypalResponse.getPaymentMethod())
+				.createTime(paypalResponse.getCreateTime())
 				.amount(paymentRequest.getPrice().intValue())
                 .build());
     }
