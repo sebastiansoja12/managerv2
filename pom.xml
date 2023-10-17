@@ -33,6 +33,7 @@
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
 		<module>ParcelStatusControlChange</module>
+		<module>Documentation</module>
 	</modules>
 
 	<repositories>
