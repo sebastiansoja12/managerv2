@@ -12,6 +12,7 @@ import com.warehouse.deliverytoken.infrastructure.adapter.secondary.ParcelServic
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenAdapter;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenMockAdapter;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.model.SupplierToken;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.STSProperty;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,8 +44,8 @@ public class DeliveryTokenSignatureConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name = "service.mock", havingValue = "false")
-	public DeliveryTokenAdapter deliveryTokenAdapter() {
-		return new DeliveryTokenAdapter();
+	public DeliveryTokenAdapter deliveryTokenAdapter(STSProperty stsProperty) {
+		return new DeliveryTokenAdapter(stsProperty);
 	}
 
 	@Bean
