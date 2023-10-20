@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 public class SupplierAdapter implements SupplierServicePort {
 
     // TODO INPL-6151
-    // send supplier request to STS to save in db
+    // send supplier request to STS to save in liquibase
     @Override
     public List<SupplierModelResponse> createSuppliers(List<SupplierModelRequest> suppliers) {
         return null;

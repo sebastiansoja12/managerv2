@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <!-- Change Set to Create the 'payment' Table -->
+    <changeSet author="s-soja" id="createPaymentTable">
+        <createTable tableName="payment">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="amount" type="double"/>
+            <column name="parcel_id" type="bigint"/>
+            <column name="payer_id" type="varchar(255)"/>
+            <column name="payment_id" type="varchar(255)"/>
+            <column name="payment_method" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_status" type="tinyint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_url" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

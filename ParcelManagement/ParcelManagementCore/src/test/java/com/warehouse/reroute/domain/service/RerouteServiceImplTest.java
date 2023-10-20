@@ -44,7 +44,7 @@ public class RerouteServiceImplTest {
                 .valid(true)
                 .build();
 
-        // insert into fake db
+        // insert into fake liquibase
         database.insertRerouteToken(rerouteToken);
 
         // when
