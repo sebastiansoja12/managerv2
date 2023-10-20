@@ -14,5 +14,10 @@
     <include file="/liquibase/db/refresh_token.xml"/>
     <include file="/liquibase/db/reroute_token.xml"/>
     <include file="/liquibase/db/route.xml"/>
+    <include file="/liquibase/db/message_sequence.xml"/>
+
+    <!--Insert default start data-->
+    <include file="/liquibase/changelog/insertDepots.xml"/>
+    <include file="/liquibase/changelog/insertSuppliers.xml"/>
 
 </databaseChangeLog>

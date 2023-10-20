@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="s-soja" id="insertSuppliers">
+        <sql>
+            INSERT INTO supplier (supplier_code, first_name, last_name, telephone, depot_code)
+            VALUES ('ANG_POZ', 'Angelika', 'Lipinska', '123456789', 'POZ'),
+                   ('dwvscq', 'Sebastian', 'Soja', '799024163', 'KT1'),
+                   ('ADA_WA1', 'Adam', 'Kowalski', '981273645', 'WA1'),
+                   ('POL_KT1', 'Pola', 'Wisniowska', '1971643712', 'KT1'),
+                   ('DEN_GW1', 'Denis', 'Wozkowiak', '1971643323', 'GW1'),
+                   ('LOL_GD1', 'Lola', 'Nowak', '19731243323', 'GD1'),
+                   ('KAR_GD2', 'Karolina', 'Nowak', '19731241323', 'GD2'),
+                   ('ILO_TOR', 'Ilona', 'Kowalska', '19731211323', 'TOR'),
+                   ('ADM_WA3', 'Adam', 'Kowalczyk', '19731211324', 'WA3'),
+                   ('MAR_ZGR', 'Marcin', 'Kowal', '19711211324', 'ZGR');
+        </sql>
+
+    </changeSet>
+</databaseChangeLog>
