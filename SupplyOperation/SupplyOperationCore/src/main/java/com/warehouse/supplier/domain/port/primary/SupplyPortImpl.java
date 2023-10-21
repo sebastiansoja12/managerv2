@@ -3,6 +3,8 @@ package com.warehouse.supplier.domain.port.primary;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
 import com.warehouse.supplier.domain.model.SupplierAddResponse;
@@ -29,8 +31,6 @@ public class SupplyPortImpl implements SupplyPort {
                 .map(this::buildSupplierFromRequest)
                 .toList();
 
-        suppliers.forEach(this::assignSupplierCode);
-
 		final List<Supplier> supplierList = service.createMultipleSuppliers(suppliers);
 
         return supplierList
@@ -56,6 +56,9 @@ public class SupplyPortImpl implements SupplyPort {
 
     private Supplier buildSupplierFromRequest(SupplierAddRequest supplierRequest) {
         return Supplier.builder()
+				.supplierCode(
+						StringUtils.isNotEmpty(supplierRequest.getSupplierCode()) ? supplierRequest.getSupplierCode()
+								: generatorService.generate())
                 .depotCode(supplierRequest.getDepotCode())
                 .firstName(supplierRequest.getFirstName())
                 .lastName(supplierRequest.getLastName())
@@ -65,10 +68,5 @@ public class SupplyPortImpl implements SupplyPort {
 
     private SupplierAddResponse mapToAddResponse(Supplier supplier) {
         return new SupplierAddResponse(supplier);
-    }
-
-    private void assignSupplierCode(Supplier supplier) {
-        final String supplierCode = generatorService.generate();
-        supplier.setSupplierCode(supplierCode);
     }
 }
