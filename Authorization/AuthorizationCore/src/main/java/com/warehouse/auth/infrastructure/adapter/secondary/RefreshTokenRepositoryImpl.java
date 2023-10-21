@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import com.warehouse.auth.domain.model.RefreshToken;
-import com.warehouse.auth.domain.model.Token;
+import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType;

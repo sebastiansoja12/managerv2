@@ -3,7 +3,7 @@ package com.warehouse.auth.infrastructure.adapter.secondary.mapper;
 
 import java.time.Instant;
 
-import com.warehouse.auth.domain.model.Token;
+import com.warehouse.auth.domain.vo.Token;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -17,7 +17,7 @@ public interface RefreshTokenMapper {
     RefreshToken map(RefreshTokenEntity refreshToken);
 
     @Mapping(target = "revoked", ignore = true)
-    @Mapping(target = "token", ignore = true)
+    @Mapping(target = "token", source = "token")
     @Mapping(target = "tokenType", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "expired", ignore = true)

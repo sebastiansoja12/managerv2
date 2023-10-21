@@ -1,5 +1,6 @@
 package com.warehouse.auth.domain.service;
 
+import com.warehouse.auth.domain.vo.Token;
 import org.springframework.stereotype.Service;
 
 import com.warehouse.auth.domain.model.*;
