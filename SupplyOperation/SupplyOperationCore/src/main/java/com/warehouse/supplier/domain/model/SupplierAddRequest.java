@@ -14,4 +14,6 @@ public class SupplierAddRequest {
     private String telephone;
 
     private String depotCode;
+
+    private String supplierCode;
 }

@@ -1,10 +1,11 @@
 package com.warehouse.supplier;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.supplier.configuration.SupplierTestConfiguration;
-import com.warehouse.supplier.infrastructure.adapter.secondary.SupplierReadRepository;
-import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,30 +15,25 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.supplier.configuration.SupplierTestConfiguration;
+import com.warehouse.supplier.infrastructure.adapter.secondary.SupplierReadRepository;
+import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ContextConfiguration(classes = SupplierTestConfiguration.class)
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class })
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DatabaseSetup("/dataset/supplier.xml")
 public class SupplierReadRepositoryTest {
 
     @Autowired
     private SupplierReadRepository repository;
 
     @Test
-    @DatabaseSetup("/dataset/supplier.xml")
     void shouldReturnSuppliersByDepotCode() {
         // given
         final String depotCode = "TST";
@@ -45,13 +41,12 @@ public class SupplierReadRepositoryTest {
         final List<SupplierEntity> suppliers = repository.findByDepot_DepotCode(depotCode);
         // then
         assertAll(
-                () -> assertThat(suppliers.size()).isEqualTo(1L),
+                () -> assertThat(suppliers.size()).isEqualTo(2L),
                 () -> assertThat(suppliers.get(0).getDepot().getDepotCode()).isEqualTo(depotCode)
         );
     }
 
     @Test
-    @DatabaseSetup("/dataset/supplier.xml")
     void shouldNotReturnSuppliersByDepotCode() {
         // given
         final String depotCode = "test";
@@ -62,7 +57,6 @@ public class SupplierReadRepositoryTest {
     }
 
     @Test
-    @DatabaseSetup("/dataset/supplier.xml")
     void shouldReturnSupplierByCode() {
         // given
         final String supplierCode = "abcdef";

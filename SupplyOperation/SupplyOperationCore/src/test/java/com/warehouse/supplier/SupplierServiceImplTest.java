@@ -18,25 +18,21 @@ import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
 import com.warehouse.supplier.domain.model.SupplierModelRequest;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
-import com.warehouse.supplier.domain.port.secondary.SupplierServicePort;
 import com.warehouse.supplier.domain.service.SupplierServiceImpl;
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class DeliveryServiceImplTest {
+public class SupplierServiceImplTest {
 
 
     @Mock
     private SupplierRepository supplierRepository;
 
-    @Mock
-    private SupplierServicePort servicePort;
-
     private SupplierServiceImpl service;
 
     @BeforeEach
     void setup() {
-        service = new SupplierServiceImpl(supplierRepository, servicePort);
+        service = new SupplierServiceImpl(supplierRepository);
     }
 
     @Test
