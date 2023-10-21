@@ -22,7 +22,7 @@ import com.warehouse.supplier.domain.service.SupplierServiceImpl;
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class DeliveryServiceImplTest {
+public class SupplierServiceImplTest {
 
 
     @Mock

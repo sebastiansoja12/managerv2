@@ -15,4 +15,12 @@
             depot_code="TST"
     />
 
+    <supplier
+            supplier_code="code"
+            first_name="test"
+            last_name="test"
+            telephone="123"
+            depot_code="TST"
+    />
+
 </dataset>

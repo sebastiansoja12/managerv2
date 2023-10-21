@@ -2,39 +2,52 @@ package com.warehouse.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doReturn;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
+import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.supplier.configuration.SupplierTestConfiguration;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
 import com.warehouse.supplier.domain.model.SupplierAddResponse;
-import com.warehouse.supplier.domain.model.SupplierModelRequest;
 import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
-import com.warehouse.supplier.domain.service.SupplierCodeGeneratorServiceImpl;
 import com.warehouse.supplier.domain.service.SupplierService;
-import com.warehouse.supplier.domain.service.SupplierServiceImpl;
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
 
-@ExtendWith(MockitoExtension.class)
-public class SupplierPortImplTest {
+@ExtendWith(SpringExtension.class)
+@DataJpaTest
+@ContextConfiguration(classes = SupplierTestConfiguration.class)
+@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DatabaseSetup("/dataset/supplier.xml")
+public class SupplierRestIntegrationTest {
 
 
-    @Mock
+    @Autowired
     private SupplierRepository supplierRepository;
 
+    @Autowired
     private SupplyPortImpl supplyPort;
+
+    @Autowired
+    private SupplierService supplierService;
+
+    @Autowired
+    private SupplierCodeGeneratorService supplierCodeGeneratorService;
 
     private final String depotCode = "KT1";
     private final String firstName = "Sebastian";
@@ -43,36 +56,10 @@ public class SupplierPortImplTest {
     private final String supplierCode = "supplierCode";
 
 
-    @BeforeEach
-    void setup() {
-        final SupplierService service = new SupplierServiceImpl(supplierRepository);
-        final SupplierCodeGeneratorService generatorService = new SupplierCodeGeneratorServiceImpl();
-        supplyPort = new SupplyPortImpl(service, generatorService);
-    }
-
     @Test
     void shouldCreateSuppliers() {
         // given
         final SupplierAddRequest request = buildSupplierAddRequest();
-
-        final Supplier supplier = new Supplier();
-        supplier.setFirstName("Sebastian");
-        supplier.setLastName("Soja");
-        supplier.setSupplierCode("code");
-        supplier.setTelephone("123");
-        supplier.setDepotCode("KT1");
-
-        final List<SupplierModelRequest> supplierModelRequests = Collections
-                .singletonList(SupplierModelRequest.builder()
-                        .depotCode(depotCode)
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .telephone(telephone)
-                        .build());
-
-        doReturn(supplierModelRequests)
-                .when(supplierRepository)
-                .createMultipleSuppliers(List.of(supplier));
         // when
 		final List<SupplierAddResponse> supplierAddResponseList = supplyPort
 				.createMultipleSuppliers(List.of(request));
@@ -90,35 +77,16 @@ public class SupplierPortImplTest {
                 .telephone(telephone)
                 .supplierCode(supplierCode)
                 .build();
-
-        final Supplier supplier = new Supplier(
-                "supplierCode", "Sebastian", "Soja", "123", "KT1"
-        );
-
-		final List<SupplierModelRequest> supplierModelRequests = Collections
-				.singletonList(SupplierModelRequest.builder()
-                        .depotCode(depotCode)
-                        .supplierCode(supplierCode)
-						.firstName(firstName)
-                        .lastName(lastName)
-                        .telephone(telephone)
-                        .build());
-        
-        doReturn(supplierModelRequests)
-                .when(supplierRepository)
-                .createMultipleSuppliers(List.of(supplier));
-
         // when
         final List<SupplierAddResponse> supplierAddResponseList = supplyPort
-                .createMultipleSuppliers(Stream.of(request).toList());
+                .createMultipleSuppliers(List.of(request));
         // then
         assertThat(supplierAddResponseList.get(0).getSupplier()).isNotNull();
+        assertEquals(supplierAddResponseList.get(0).getSupplier().getSupplierCode(), supplierCode);
     }
 
     @Test
     void shouldFindAllSuppliers() {
-        // given
-        final Supplier supplier = createSupplier();
         // when
         final List<Supplier> suppliers = supplyPort.findAllSuppliers();
         // then
@@ -131,7 +99,7 @@ public class SupplierPortImplTest {
         // when
         final List<Supplier> suppliers = supplyPort.findAllSuppliers();
         // then
-        assertTrue(suppliers.isEmpty());
+        assertFalse(suppliers.isEmpty());
     }
 
     @Test
@@ -147,9 +115,7 @@ public class SupplierPortImplTest {
     @Test
     void shouldNotFindSupplierByCode() {
         // given
-        final String code = "code";
-        final SupplierNotFoundException exception = new SupplierNotFoundException("Supplier was not found");
-
+        final String code = "fakeCode";
         // when
         final Executable executable = () -> supplyPort.findSupplierByCode(code);
         // then
@@ -171,7 +137,7 @@ public class SupplierPortImplTest {
     @Test
     void shouldNotFindManyBySupplierCode() {
         // given
-        final String code = "code";
+        final String code = "fakeCode";
         // when
         final List<Supplier> supplier = supplyPort.findSuppliersByCode(code);
         // then
@@ -205,16 +171,6 @@ public class SupplierPortImplTest {
                 .lastName("Soja")
                 .telephone("123")
                 .build();
-    }
-
-    private Supplier createSupplier() {
-        final Supplier supplier = new Supplier();
-        supplier.setFirstName("Sebastian");
-        supplier.setLastName("Soja");
-        supplier.setSupplierCode("code");
-        supplier.setTelephone("123");
-        supplier.setDepotCode("KT1");
-        return supplier;
     }
 
     private <T> T expectedToBe(T t) {
