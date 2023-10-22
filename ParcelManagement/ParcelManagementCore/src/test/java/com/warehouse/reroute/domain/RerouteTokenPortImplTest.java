@@ -1,8 +1,7 @@
-package com.warehouse.reroute.domain.port.primary;
+package com.warehouse.reroute.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,21 +19,26 @@ import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
 import com.warehouse.reroute.domain.model.*;
+import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
 import com.warehouse.reroute.domain.port.secondary.Logger;
+import com.warehouse.reroute.domain.port.secondary.MailServicePort;
 import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
+import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.service.RerouteService;
+import com.warehouse.reroute.domain.service.RerouteServiceImpl;
 import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
 import com.warehouse.reroute.domain.service.RerouteTokenGeneratorServiceImpl;
-import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.Recipient;
-import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
-import com.warehouse.reroute.domain.vo.Sender;
+import com.warehouse.reroute.domain.vo.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RerouteTokenPortImplTest {
 
+
     @Mock
-    private RerouteService rerouteService;
+    private MailServicePort mailServicePort;
+
+    @Mock
+    private RerouteTokenRepository rerouteTokenRepository;
 
     @Mock
     private ParcelReroutePort parcelReroutePort;
@@ -44,14 +48,14 @@ public class RerouteTokenPortImplTest {
 
     private RerouteTokenPortImpl port;
 
-    private final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
-
     private final Integer TOKEN_VALUE = 27150;
 
     private final Long PARCEL_ID = 123456L;
 
     @BeforeEach
     void setup() {
+        final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
+        final RerouteService rerouteService = new RerouteServiceImpl(mailServicePort, rerouteTokenRepository);
         port = new RerouteTokenPortImpl(rerouteService, parcelReroutePort, rerouteTokenGeneratorService, logger);
     }
 
@@ -73,7 +77,7 @@ public class RerouteTokenPortImplTest {
         final RerouteToken rerouteToken = new RerouteToken(1L, 12345, Instant.now(),
                 Instant.now().plusSeconds(600L), PARCEL_ID, "");
 
-        when(rerouteService.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteToken);
+        when(rerouteTokenRepository.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteToken);
         when(parcelReroutePort.reroute(updateParcelRequest.getParcel(), new ParcelId(PARCEL_ID))).thenReturn(mock(Parcel.class));
         // when
         final RerouteParcelResponse actualResponse = port.update(updateParcelRequest);
@@ -100,7 +104,7 @@ public class RerouteTokenPortImplTest {
         final RerouteToken rerouteToken = new RerouteToken(1L, 12345, Instant.now(),
                 Instant.now(), PARCEL_ID, "");
 
-        when(rerouteService.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteToken);
+        when(rerouteTokenRepository.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteToken);
         // when
         final Executable executable = () -> port.update(updateParcelRequest);
 
@@ -113,10 +117,8 @@ public class RerouteTokenPortImplTest {
     @Test
     void shouldFindByToken() {
         // given
-        final Token token = Token.builder()
-                .value(TOKEN_VALUE)
-                .build();
-        when(rerouteService.findByToken(token)).thenReturn(
+        final Token token = new Token(TOKEN_VALUE);
+        when(rerouteTokenRepository.findByToken(token)).thenReturn(
                 RerouteToken.builder()
                         .token(TOKEN_VALUE)
                         .parcelId(PARCEL_ID)
@@ -135,7 +137,7 @@ public class RerouteTokenPortImplTest {
                 .token(TOKEN_VALUE)
                 .parcelId(PARCEL_ID)
                 .build();
-        when(rerouteService.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteTokenResponse);
+        when(rerouteTokenRepository.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID)).thenReturn(rerouteTokenResponse);
         // when
         final RerouteToken actual = port.loadByTokenAndParcelId(TOKEN_VALUE, PARCEL_ID);
         // then
@@ -149,24 +151,26 @@ public class RerouteTokenPortImplTest {
     void shouldSendReroutingInformation() {
         // given
         final String email = "test.pl";
-
+        final Integer token = 5309900;
         // create reroute request
         final RerouteRequest rerouteRequest = new RerouteRequest();
         rerouteRequest.setEmail(email);
         rerouteRequest.setParcelId(PARCEL_ID);
 
-        // expected response
-        final RerouteResponse expectedResponse = RerouteResponse.builder()
-                .parcelId(PARCEL_ID)
-                .token(TOKEN_VALUE)
-                .build();
+        final RerouteProcessor rerouteProcessor = new RerouteProcessor(
+                email, PARCEL_ID, new GeneratedToken(token)
+        );
 
-        when(rerouteService.createRerouteToken(any())).thenReturn(expectedResponse);
+        final RerouteToken savedRerouteToken = new RerouteToken(
+                1L, token, Instant.now(), Instant.now(), PARCEL_ID, email
+        );
+
+        when(rerouteTokenRepository.saveReroutingToken(rerouteProcessor)).thenReturn(savedRerouteToken);
         // when
         final RerouteResponse actualResponse = port.sendReroutingInformation(rerouteRequest);
         // then
         assertAll(
-                () -> assertThat(actualResponse.getToken().intValue()).isEqualTo(TOKEN_VALUE),
+                () -> assertThat(actualResponse.getToken().intValue()).isEqualTo(token),
                 () -> assertThat(actualResponse.getParcelId()).isEqualTo(PARCEL_ID)
         );
     }

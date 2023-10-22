@@ -36,19 +36,22 @@ import lombok.RequiredArgsConstructor;
 @Slf4j
 public class PaymentConfiguration {
 
-    private final PaypalConfigurationProperties paypalConfigurationProperties;
+    @Bean
+    public PaypalConfigurationProperties paypalConfigurationProperties() {
+        return new PaypalConfigurationProperties();
+    }
 
     @Bean
     public Map<String, String> paypalSdkConfig() {
         final Map<String, String> configMap = new HashMap<>();
-        configMap.put("mode", paypalConfigurationProperties.getMode());
+        configMap.put("mode", paypalConfigurationProperties().getMode());
         return configMap;
     }
 
     @Bean
     public OAuthTokenCredential oAuthTokenCredential() {
-        final String clientId = paypalConfigurationProperties.getClientId();
-        final String clientSecret = paypalConfigurationProperties.getClientSecret();
+        final String clientId = paypalConfigurationProperties().getClientId();
+        final String clientSecret = paypalConfigurationProperties().getClientSecret();
         return new OAuthTokenCredential(clientId, clientSecret, paypalSdkConfig());
     }
 

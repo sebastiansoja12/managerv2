@@ -1,7 +1,6 @@
 package com.warehouse.shipment.mapper;
 
 import com.warehouse.shipment.domain.vo.PaymentRequest;
-import com.warehouse.shipment.domain.vo.PaymentResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.PaymentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.PaymentMapperImpl;
 import org.junit.jupiter.api.BeforeEach;

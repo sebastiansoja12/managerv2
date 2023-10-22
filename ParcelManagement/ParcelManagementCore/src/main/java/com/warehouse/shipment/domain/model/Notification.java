@@ -1,4 +1,4 @@
-package com.warehouse.reroute.domain.vo;
+package com.warehouse.shipment.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

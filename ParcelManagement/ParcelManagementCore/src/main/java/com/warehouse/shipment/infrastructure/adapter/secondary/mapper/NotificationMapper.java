@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.shipment.domain.vo.Notification;
+import com.warehouse.shipment.domain.model.Notification;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

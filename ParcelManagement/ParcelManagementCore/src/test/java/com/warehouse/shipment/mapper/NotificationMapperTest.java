@@ -1,6 +1,6 @@
 package com.warehouse.shipment.mapper;
 
-import com.warehouse.shipment.domain.vo.Notification;
+import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapperImpl;
 import org.junit.jupiter.api.Test;

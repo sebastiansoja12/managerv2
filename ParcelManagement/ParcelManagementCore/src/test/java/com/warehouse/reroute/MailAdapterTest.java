@@ -33,7 +33,9 @@ public class MailAdapterTest {
     @Test
     void shouldSendRerouteNotification() {
         // given
-        final RerouteToken rerouteToken = new RerouteToken();
+        final RerouteToken rerouteToken = RerouteToken.builder()
+                .token(12345)
+                .build();
 
         final com.warehouse.mail.domain.vo.Notification mappedNotification =
                 new com.warehouse.mail.domain.vo.Notification();

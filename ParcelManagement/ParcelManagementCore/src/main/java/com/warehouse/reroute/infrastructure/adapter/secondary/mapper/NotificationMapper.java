@@ -3,7 +3,7 @@ package com.warehouse.reroute.infrastructure.adapter.secondary.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.reroute.domain.vo.Notification;
+import com.warehouse.reroute.domain.model.Notification;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface NotificationMapper {

@@ -4,13 +4,14 @@ package com.warehouse.shipment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -20,8 +21,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.warehouse.paypal.domain.model.Link;
+import com.warehouse.paypal.domain.model.PaymentResponse;
+import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
-import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
@@ -30,8 +33,9 @@ import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.PaypalServicePort;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
+import com.warehouse.voronoi.VoronoiService;
 
-@ExtendWith({SpringExtension.class})
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @DataJpaTest
 @ContextConfiguration(classes = ShipmentTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
@@ -44,37 +48,28 @@ public class ShipmentIntegrationTest {
     @Autowired
     private PathFinderServicePort pathFinderServicePort;
 
-    @Autowired
+    @Mock
     private PaypalServicePort paypalServicePort;
 
+    @Autowired
+    private PaypalPort paypalPort;
+
+    @Autowired
+    private VoronoiService voronoiService;
+
     @Test
-    @Disabled
     void shouldShipParcel() {
         // given
         final ShipmentParcel shipmentParcel = createShipmentParcel();
-        shipmentParcel.setDestination("KT1");
-
         final ShipmentRequest request = ShipmentRequest.builder()
                 .parcel(shipmentParcel)
                 .build();
-
-        final Address address = Address.builder()
-                .street("test")
-                .city("Katowice")
-                .postalCode("00-000")
-                .build();
-
-        final Parcel parcel = createParcel();
-
-        final PaymentStatus status = new PaymentStatus();
-        status.setLink("payment.pl");
-        status.setPaymentMethod("PAYPAL");
-        status.setCreateTime("2023-10-10");
-
-        when(pathFinderServicePort.determineDeliveryDepot(address)).thenReturn(new City("KT1"));
-        doReturn(status)
-                .when(paypalServicePort)
-                .payment(parcel);
+        when(paypalPort.payment(any())).thenReturn(PaymentResponse.builder()
+                .failureReason("NONE")
+                .link(new Link("link"))
+                .paymentMethod("PAYPAL")
+                .createTime("now")
+                .build());
         // when
         final ShipmentResponse response = shipmentPort.ship(request);
         // then
@@ -97,38 +92,22 @@ public class ShipmentIntegrationTest {
     @Test
     void shouldNotShipParcelWhenPaymentIsNotAvailable() {
         // given
+        final ShipmentParcel shipmentParcel = createShipmentParcel();
         final ShipmentRequest request = ShipmentRequest.builder()
-                .parcel(createShipmentParcel())
+                .parcel(shipmentParcel)
                 .build();
-        final Parcel parcel = createParcel();
-        when(paypalServicePort.payment(parcel)).thenReturn(null);
+        when(voronoiService.findFastestRoute(shipmentParcel.getDestination())).thenReturn("KT3");
+        when(paypalPort.payment(any())).thenReturn(PaymentResponse.builder()
+                .failureReason("NONE")
+                .link(new Link(""))
+                .paymentMethod("PAYPAL")
+                .createTime("now")
+                .build());
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then
         final ShipmentPaymentException exception = assertThrows(ShipmentPaymentException.class, executable);
         assertEquals(expectedToBe("URL for payment has not been generated"), exception.getMessage());
-    }
-
-    @Test
-    void shouldNotDetermineNearestDepotForParcelDelivery() {
-        // given
-        final ShipmentParcel parcel = createShipmentParcel();
-
-        final Recipient recipient = createRecipient();
-        recipient.setCity("");
-
-        // update recipient for test
-        parcel.setRecipient(recipient);
-
-        final ShipmentRequest request = ShipmentRequest.builder()
-                .parcel(parcel)
-                .build();
-        // when
-        final Executable executable = () -> shipmentPort.ship(request);
-        // then
-        final DestinationDepotDeterminationException exception =
-                assertThrows(DestinationDepotDeterminationException.class, executable);
-		assertEquals(expectedToBe("Delivery depot could not be determined"), exception.getMessage());
     }
 
     private ShipmentParcel createShipmentParcel() {

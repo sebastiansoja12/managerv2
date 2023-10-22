@@ -3,6 +3,7 @@ package com.warehouse.reroute.infrastructure.adapter.secondary;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
+import com.warehouse.reroute.domain.vo.RerouteProcessor;
 import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
@@ -15,6 +16,8 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
     private final RerouteTokenMapper rerouteTokenMapper;
 
     private final RerouteTokenReadRepository repository;
+
+    private static final long EXPIRY_TIME = 600L;
 
 	@Override
 	public RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId) {
@@ -29,8 +32,8 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
     }
 
     @Override
-    public RerouteToken saveReroutingToken(RerouteToken rerouteToken) {
-        final RerouteTokenEntity entity = rerouteTokenMapper.map(rerouteToken);
+    public RerouteToken saveReroutingToken(RerouteProcessor rerouteProcessor) {
+        final RerouteTokenEntity entity = rerouteTokenMapper.map(rerouteProcessor);
         repository.save(entity);
         return rerouteTokenMapper.map(entity);
     }

@@ -1,4 +1,4 @@
-package com.warehouse.reroute.domain.vo;
+package com.warehouse.reroute.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RerouteNotification {
+public class Notification {
     private String subject;
     private String recipient;
     private String body;

@@ -36,9 +36,7 @@ public class RerouteTokenReadRepositoryTest {
     @DatabaseSetup("/dataset/rerouteToken.xml")
     void shouldReturnRerouteToken() {
         // given
-        final Token token = Token.builder()
-                .value(12345)
-                .build();
+        final Token token = new Token(12345);
         // when
         final Optional<RerouteTokenEntity> rerouteToken = repository.findByToken(token.getValue());
         // then
@@ -49,9 +47,7 @@ public class RerouteTokenReadRepositoryTest {
     @DatabaseSetup("/dataset/rerouteToken.xml")
     void shouldNotReturnRerouteToken() {
         // given
-        final Token token = Token.builder()
-                .value(0)
-                .build();
+        final Token token = new Token(0);
         // when
         final Optional<RerouteTokenEntity> rerouteToken = repository.findByToken(token.getValue());
         // then

@@ -2,6 +2,7 @@ package com.warehouse.reroute.domain.port.secondary;
 
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.model.Token;
+import com.warehouse.reroute.domain.vo.RerouteProcessor;
 
 public interface RerouteTokenRepository {
 
@@ -9,7 +10,7 @@ public interface RerouteTokenRepository {
 
     RerouteToken findByToken(Token token);
 
-    RerouteToken saveReroutingToken(RerouteToken rerouteToken);
+    RerouteToken saveReroutingToken(RerouteProcessor rerouteProcessor);
 
     void deleteByToken(RerouteToken token);
 }

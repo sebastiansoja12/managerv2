@@ -9,7 +9,7 @@ import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.Recipient;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.NotificationCreatorProviderImpl;
-import com.warehouse.shipment.domain.vo.Notification;
+import com.warehouse.shipment.domain.model.Notification;
 
 public class NotificationCreatorProviderTest {
 

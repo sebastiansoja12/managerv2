@@ -3,7 +3,7 @@ package com.warehouse.reroute.infrastructure.adapter.secondary;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.port.secondary.MailServicePort;
-import com.warehouse.reroute.domain.vo.Notification;
+import com.warehouse.reroute.domain.model.Notification;
 import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.NotificationMapper;
 
 import lombok.AllArgsConstructor;

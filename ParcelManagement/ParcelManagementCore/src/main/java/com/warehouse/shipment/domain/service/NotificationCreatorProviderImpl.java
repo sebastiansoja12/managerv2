@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.shipment.domain.vo.Notification;
+import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.ConstantBodyMailMessage;
 import com.warehouse.shipment.domain.model.Parcel;
 import lombok.AllArgsConstructor;
