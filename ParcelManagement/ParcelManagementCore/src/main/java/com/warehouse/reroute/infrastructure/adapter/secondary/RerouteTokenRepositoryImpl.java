@@ -17,8 +17,6 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
 
     private final RerouteTokenReadRepository repository;
 
-    private static final long EXPIRY_TIME = 600L;
-
 	@Override
 	public RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId) {
 		return repository.loadByTokenAndParcelId(token, parcelId).map(rerouteTokenMapper::map)

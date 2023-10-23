@@ -61,6 +61,12 @@
             <column name="type" type="tinyint">
                 <constraints nullable="false"/>
             </column>
+            <column name="created_at" type="time">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="time">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 </databaseChangeLog>

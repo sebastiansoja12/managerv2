@@ -24,7 +24,7 @@
             email="test@test.pl"
     />
 
-    <shipment
+    <parcel
             id = "100001"
             first_name="test"
             last_name="test"
@@ -48,7 +48,7 @@
             updated_at="2023-10-23 17:27:49.254626"
     />
 
-    <shipment
+    <parcel
             id = "100002"
             first_name="test"
             last_name="test"
@@ -72,7 +72,7 @@
             updated_at="2023-10-23 17:27:49.254626"
     />
 
-    <shipment
+    <parcel
             id = "100003"
             first_name="test"
             last_name="test"
