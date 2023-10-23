@@ -124,7 +124,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     private void logParcel(Parcel parcel) {
-        logger.info("Parcel {} has been created", parcel.getId());
+        logger.info("Parcel {} has been created at {}", parcel.getId(), parcel.getCreatedAt());
     }
 
     private void logPayment(PaymentStatus status, Parcel parcel) {

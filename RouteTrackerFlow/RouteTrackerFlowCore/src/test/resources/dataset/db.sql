@@ -8,16 +8,17 @@ VALUES
 -- Insert fake data into PARCEL table
 INSERT INTO PARCEL (id, first_name, last_name, sender_email, sender_city, sender_street, sender_postal_code,
                     recipient_city, recipient_email, recipient_first_name, recipient_last_name, recipient_postal_code,
-                    recipient_street, recipient_telephone, price, parcel_size, status, destination, parcel_related_id)
+                    recipient_street, recipient_telephone, price, parcel_size, status, destination, parcel_related_id, createdAt, updatedAt)
 VALUES (1001, 'John', 'Doe', 'john@example.com', 'SenderCity1', 'SenderStreet1', '12345', 'RecipientCity1',
         'recipient1@example.com', 'RecipientFirstName1', 'RecipientLastName1', '54321', 'RecipientStreet1',
-        '1234567890', 25.00, 0, 1, 'WA1', null),
+        '1234567890', 25.00, 0, 1, 'WA1', null, '2023-10-23T17:27:49.254626', '2023-10-23T17:27:49.254626'),
        (1002, 'Jane', 'Smith', 'jane@example.com', 'SenderCity2', 'SenderStreet2', '54321', 'RecipientCity2',
         'recipient2@example.com', 'RecipientFirstName2', 'RecipientLastName2', '12345', 'RecipientStreet2',
-        '9876543210', 35.00, 0, 2, 'KT2', null),
+        '9876543210', 35.00, 0, 2, 'KT2', null, '2023-10-23T17:27:49.254626', '2023-10-23T17:27:49.254626'),
        (1003, 'Alice', 'Johnson', 'alice@example.com', 'SenderCity3', 'SenderStreet3', '98765', 'RecipientCity3',
         'recipient3@example.com', 'RecipientFirstName3', 'RecipientLastName3', '67890', 'RecipientStreet3',
-        '1237894560', 45.00, 0, 3, 'GD1', null);
+        '1237894560', 45.00, 0, 3, 'GD1', null, '2023-10-23T17:27:49.254626', '2023-10-23T17:27:49.254626');
+
 
 -- Insert fake data into USERS table
 INSERT INTO USERS (id, email, first_name, last_name, password, role, username, depot_code)

@@ -1,5 +1,7 @@
 package com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.entity;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.enumeration.Status;
@@ -22,4 +24,7 @@ public class ParcelEntity {
 
     @Column(name = "status", nullable = false)
     private Status status;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }

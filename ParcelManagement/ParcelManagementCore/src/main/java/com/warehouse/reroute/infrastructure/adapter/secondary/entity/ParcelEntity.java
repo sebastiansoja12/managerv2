@@ -9,6 +9,8 @@ import lombok.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -92,4 +94,10 @@ public class ParcelEntity {
 
     @Column(name = "parentRelatedId")
     private Long parcelRelatedId;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }

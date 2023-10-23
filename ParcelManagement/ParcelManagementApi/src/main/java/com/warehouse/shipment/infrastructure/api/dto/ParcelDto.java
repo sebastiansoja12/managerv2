@@ -21,4 +21,8 @@ public class ParcelDto {
 
     String destination;
 
+    String createdAt;
+
+    String updatedAt;
+
 }

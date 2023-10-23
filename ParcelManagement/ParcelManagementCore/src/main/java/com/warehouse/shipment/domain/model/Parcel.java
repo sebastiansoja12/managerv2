@@ -8,29 +8,35 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Parcel {
 
-    Long id;
+    private Long id;
 
-    Sender sender;
+    private Sender sender;
 
-    Recipient recipient;
+    private Recipient recipient;
 
-    Size parcelSize;
+    private Size parcelSize;
 
-    String destination;
+    private String destination;
 
-    Status status;
+    private Status status;
 
-    ParcelType parcelType;
+    private ParcelType parcelType;
 
-    Long parcelRelatedId;
+    private Long parcelRelatedId;
 
-    double price;
+    private double price;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
     public double getPrice() {
         return this.price = parcelSize.getPrice();
