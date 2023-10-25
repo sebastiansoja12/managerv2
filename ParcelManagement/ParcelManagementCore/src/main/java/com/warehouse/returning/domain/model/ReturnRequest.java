@@ -1,46 +1,33 @@
 package com.warehouse.returning.domain.model;
 
-import lombok.Data;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.warehouse.returning.domain.model.ReturnStatus.CANCELLED;
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.Builder;
+import lombok.Data;
 
 @Data
+@Builder
 public class ReturnRequest {
     private List<ReturnPackageRequest> requests;
     private String depotCode;
-
-    public List<Long> extractParcelIds() {
-        return requests.stream()
-                .map(ReturnPackageRequest::getParcel)
-                .map(Parcel::getId)
-                .collect(Collectors.toList());
-    }
-
-    public void processReturnPackage(String reason) {
-        requests
-                .forEach(returnPackage -> returnPackage.processReturn(reason));
-    }
+    private String username;
 
     public void revertStatus(Long parcelId, ReturnStatus returnStatus) {
         requests = requests.stream()
-                .filter(returnPackage -> returnPackage.getParcel().getId().equals(parcelId))
-                .map(returnPackage -> returnPackage.revertStatus(returnStatus))
+                .peek(returnPackage -> {
+                    if (returnPackage.getParcel().getId().equals(parcelId)) {
+                        returnPackage.revertStatus(returnStatus);
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
     public boolean isReturnTokenAvailable() {
-        return requests.stream()
-                .map(ReturnPackageRequest::getReturnToken)
-                .noneMatch(String::isEmpty);
-    }
-
-    public boolean isCancelled() {
-        return requests.stream()
-                .map(ReturnPackageRequest::getReturnStatus)
-                .anyMatch(this::isCancelled);
+		return requests.stream()
+                .anyMatch(ReturnPackageRequest::isReturnTokenAvailable);
     }
 
     public List<ReturnPackageRequest> cleanReturnRequest() {
@@ -48,14 +35,23 @@ public class ReturnRequest {
                 .filter(ReturnPackageRequest::isCancelled)
                 .collect(Collectors.toList());
     }
-
-    public void revertStatus() {
+    public void assignDepotToReturnPackages() {
         requests = requests.stream()
-                .map(returnPackageRequest -> returnPackageRequest.revertStatus(ReturnStatus.CREATED))
+                .peek(returnPackageRequest -> returnPackageRequest.updateDepot(depotCode))
                 .collect(Collectors.toList());
     }
 
-    private boolean isCancelled(ReturnStatus returnStatus) {
-        return CANCELLED.equals(returnStatus);
+    public void assignUserToReturnPackages() {
+        requests = requests.stream()
+                .peek(returnPackageRequest -> returnPackageRequest.updateUser(username))
+                .collect(Collectors.toList());
+    }
+
+    public boolean isUserMissing() {
+        return StringUtils.isEmpty(username);
+    }
+
+    public boolean isDepotCodeMissing() {
+        return StringUtils.isEmpty(depotCode);
     }
 }

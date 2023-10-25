@@ -13,6 +13,7 @@ public class ReturnPackage {
     private String returnToken;
     private String supplierCode;
     private String depotCode;
+    private String username;
 
     public void processReturn() {
         this.returnStatus = ReturnStatus.PROCESSING;
@@ -23,6 +24,6 @@ public class ReturnPackage {
     }
 
     public ReturnPackage revertStatus(ReturnStatus returnStatus) {
-        return new ReturnPackage(parcelId, reason, returnStatus, returnToken, supplierCode, depotCode);
+        return new ReturnPackage(parcelId, reason, returnStatus, returnToken, supplierCode, depotCode, username);
     }
 }

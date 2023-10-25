@@ -10,9 +10,6 @@ import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnEnt
 @Mapper
 public interface ReturnMapper {
 
-    @Mapping(target = "depotCode", constant = "KT1")
-    @Mapping(target = "supplierCode", constant = "abcdef")
-    @Mapping(target = "username", constant = "s-soja")
     ReturnEntity map(ReturnPackage returning);
 
     @Mapping(target = "returnId", source = "id")

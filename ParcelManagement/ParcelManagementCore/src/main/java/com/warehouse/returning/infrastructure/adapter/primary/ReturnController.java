@@ -9,10 +9,7 @@ import com.warehouse.returning.infrastructure.api.dto.ReturningRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
@@ -30,9 +27,17 @@ public class ReturnController {
 
 
     @PostMapping
-    public ResponseEntity<?> processReturning(@RequestBody ReturningRequestDto returningRequest) {
+    public ResponseEntity<?> process(@RequestBody ReturningRequestDto returningRequest) {
         final ReturnRequest request = requestMapper.map(returningRequest);
         final ReturnResponse response = returnPort.process(request);
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
+
+    @PutMapping
+    public ResponseEntity<?> update() {
+        // TODO
+        return ResponseEntity.ok().build();
+    }
+
+    // TODO GetMapping, DeleteMapping
 }

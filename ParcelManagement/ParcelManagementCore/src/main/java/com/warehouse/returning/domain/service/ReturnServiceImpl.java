@@ -44,6 +44,7 @@ public class ReturnServiceImpl implements ReturnService {
                 .reason(returnPackageRequest.getReason())
                 .supplierCode(returnPackageRequest.getSupplierCode())
                 .depotCode(returnPackageRequest.getDepotCode())
+                .username(returnPackageRequest.getUsername())
                 .build();
     }
 }

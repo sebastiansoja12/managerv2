@@ -9,4 +9,5 @@ public class ReturnPackageRequestDto {
     private ReturnStatusDto returnStatus;
     private String returnToken;
     private String supplierCode;
+    private String depotCode;
 }
