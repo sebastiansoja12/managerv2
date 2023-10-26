@@ -14,5 +14,6 @@ public interface ReturnRequestMapper {
     @Mapping(target = "username", source = "username.value")
     ReturnRequest map(ReturningRequestDto returningRequest);
 
+    @Mapping(target = "supplierCode", source = "supplierCode.value")
     ReturnPackageRequest map(ReturnPackageRequestDto request);
 }

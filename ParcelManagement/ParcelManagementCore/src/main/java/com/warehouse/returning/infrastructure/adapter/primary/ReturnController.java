@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import static org.mapstruct.factory.Mappers.getMapper;
 
 
-@RequestMapping("/returns")
 @RestController
+@RequestMapping("/returns")
 @RequiredArgsConstructor
 public class ReturnController {
 

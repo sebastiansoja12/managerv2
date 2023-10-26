@@ -1,0 +1,42 @@
+{
+  "requests": [
+    {
+      "parcel": {
+        "id": "1",
+        "parcelSize": "TEST",
+        "destination": "KT1",
+        "status": "CREATED",
+        "parcelType": "PARENT",
+        "parcelRelatedId": null
+      },
+      "supplierCode": {
+        "value":"abcdefg"
+      },
+      "reason": "Recipient not available",
+      "returnStatus": "CANCELLED",
+      "returnToken": "token"
+    },
+    {
+      "parcel": {
+        "id": "2",
+        "parcelSize": "AVERAGE",
+        "destination": "KT1",
+        "status": "CREATED",
+        "parcelType": "PARENT",
+        "parcelRelatedId": null
+      },
+      "supplierCode": {
+        "value":"abcdefg"
+      },
+      "reason": "Recipient not available",
+      "returnStatus": "CREATED",
+      "returnToken": "token"
+    }
+  ],
+  "depotCode": {
+    "value": "KT1"
+  },
+  "username": {
+    "value": "s-soja"
+  }
+}

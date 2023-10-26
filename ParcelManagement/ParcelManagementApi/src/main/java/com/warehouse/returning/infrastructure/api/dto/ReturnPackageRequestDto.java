@@ -8,6 +8,5 @@ public class ReturnPackageRequestDto {
     private String reason;
     private ReturnStatusDto returnStatus;
     private String returnToken;
-    private String supplierCode;
-    private String depotCode;
+    private SupplierCodeDto supplierCode;
 }

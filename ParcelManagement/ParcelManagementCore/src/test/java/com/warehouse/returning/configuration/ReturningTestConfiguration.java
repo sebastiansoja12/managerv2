@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = { "com.warehouse.returning" })
 @EnableJpaRepositories(basePackages = { "com.warehouse.returning" })
 public class ReturningTestConfiguration {
+
 }

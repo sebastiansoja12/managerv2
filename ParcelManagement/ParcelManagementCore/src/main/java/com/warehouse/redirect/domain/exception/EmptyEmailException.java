@@ -1,6 +1,6 @@
 package com.warehouse.redirect.domain.exception;
 
-import com.warehouse.exception.RestException;
+import com.warehouse.exceptionhandler.exception.RestException;
 
 public class EmptyEmailException extends RestException {
     public EmptyEmailException(int code, String exMessage) {

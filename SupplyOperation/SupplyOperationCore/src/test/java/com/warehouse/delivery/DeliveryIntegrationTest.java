@@ -63,8 +63,13 @@ public class DeliveryIntegrationTest {
                         DeliveryResponse::getId,
                         DeliveryResponse::getParcelId,
                         DeliveryResponse::getDeliveryStatus
-                )
-                .allSatisfy(deliveryResponse -> assertThat(deliveryResponse).isNotNull());
+				).hasOnlyOneElementSatisfying(
+						tuple -> assertThat(tuple)
+                                .extracting(
+                                        id -> 1L,
+                                        parcelId -> 1L,
+                                        deliveryStatus -> "DELIVERY")
+                );
     }
 
     @Test

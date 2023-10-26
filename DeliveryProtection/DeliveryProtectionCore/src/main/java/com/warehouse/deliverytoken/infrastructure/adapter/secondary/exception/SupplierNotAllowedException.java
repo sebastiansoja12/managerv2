@@ -1,6 +1,6 @@
 package com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception;
 
-import com.warehouse.exception.RestException;
+import com.warehouse.exceptionhandler.exception.RestException;
 
 public class SupplierNotAllowedException extends RestException {
 

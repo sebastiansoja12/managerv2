@@ -1,6 +1,6 @@
 package com.warehouse.reroute.domain.exception;
 
-import com.warehouse.exception.RestException;
+import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes;
 
 public class RerouteException extends RestException {

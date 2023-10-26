@@ -1,4 +1,4 @@
-package com.warehouse.exception;
+package com.warehouse.exceptionhandler.exception;
 
 import lombok.Getter;
 

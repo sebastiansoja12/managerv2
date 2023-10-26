@@ -36,8 +36,6 @@ public class ReturnPortImplTest {
 
     private static final String USERNAME = "s-soja";
 
-
-
     @BeforeEach
     void setup() {
         final ReturnService returnService = new ReturnServiceImpl(returnRepository);
