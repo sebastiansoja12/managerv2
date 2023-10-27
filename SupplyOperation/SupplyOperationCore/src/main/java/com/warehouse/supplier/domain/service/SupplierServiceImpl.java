@@ -32,7 +32,7 @@ public class SupplierServiceImpl implements SupplierService {
         final List<SupplierModelRequest> supplierList = supplierRepository.createMultipleSuppliers(suppliers);
 
 
-        /** INPL-6150
+        /** TODO
          * final List<SupplierModelResponse> response = servicePort.createSuppliers(supplierList);
          * return response
                 .stream()
