@@ -1,8 +1,6 @@
-
-
 CREATE TABLE IF NOT EXISTS USERS
 (
-    id         INT          NOT NULL,
+    id         BIGINT       NOT NULL,
     email      VARCHAR(255) NOT NULL,
     first_name VARCHAR(255) DEFAULT NULL,
     last_name  VARCHAR(255) DEFAULT NULL,

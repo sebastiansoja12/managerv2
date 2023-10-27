@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <!-- Change Set to Create the 'reroute_token' Table -->
+    <changeSet author="s-soja" id="createRerouteTokenTable">
+        <createTable tableName="reroute_token">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created" type="datetime(6)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="timeout" type="datetime(6)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="parcel_id" type="bigint">
+                <constraints primaryKey="false" nullable="false" foreignKeyName="FK_reroute_token_parcel_id" references="parcel(id)"/>
+            </column>
+            <column name="token" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

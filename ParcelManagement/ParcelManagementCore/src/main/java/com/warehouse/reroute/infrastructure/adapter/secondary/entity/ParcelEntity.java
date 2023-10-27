@@ -1,84 +1,83 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.reroute.domain.enumeration.ParcelType;
 import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
-import com.warehouse.reroute.infrastructure.adapter.secondary.enumeration.ParcelType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "shipment")
+@Table(name = "parcel")
 @Entity(name = "reroute.ParcelEntity")
 public class ParcelEntity {
 
     @Id
-    @TableGenerator(name = "id", initialValue = 1000000, allocationSize = 100)
-    @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @Column(name = "firstName", nullable = false)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "lastName", nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "senderTelephone", nullable = false)
+    @Column(name = "sender_telephone", nullable = false)
     private String senderTelephone;
 
     @Valid
-    @Column(name = "senderEmail", nullable = false)
+    @Column(name = "sender_email", nullable = false)
     private String senderEmail;
 
     @Valid
-    @Column(name = "senderCity", nullable = false)
+    @Column(name = "sender_city", nullable = false)
     private String senderCity;
 
     @Valid
-    @Column(name = "senderStreet", nullable = false)
+    @Column(name = "sender_street", nullable = false)
     private String senderStreet;
 
     @Valid
-    @Pattern(regexp="\\d{2}-\\d{3}")
-    @Column(name = "senderPostalCode", nullable = false)
+    @Column(name = "sender_postal_code", nullable = false)
     private String senderPostalCode;
 
     @Valid
-    @Column(name = "recipientEmail", nullable = false)
+    @Column(name = "recipient_email", nullable = false)
     private String recipientEmail;
 
     @Valid
-    @Column(name = "recipientTelephone", nullable = false)
+    @Column(name = "recipient_telephone", nullable = false)
     private String recipientTelephone;
 
     @Valid
-    @Column(name = "recipientFirstName", nullable = false)
+    @Column(name = "recipient_first_name", nullable = false)
     private String recipientFirstName;
 
     @Valid
-    @Column(name = "recipientLastName", nullable = false)
+    @Column(name = "recipient_last_name", nullable = false)
     private String recipientLastName;
 
     @Valid
-    @Column(name = "recipientCity", nullable = false)
+    @Column(name = "recipient_city", nullable = false)
     private String recipientCity;
 
     @Valid
-    @Column(name = "recipientStreet", nullable = false)
+    @Column(name = "recipient_street", nullable = false)
     private String recipientStreet;
 
     @Valid
     @Pattern(regexp="\\d{2}-\\d{3}")
-    @Column(name = "recipientPostalCode", nullable = false)
+    @Column(name = "recipient_postal_code", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "parcelSize", nullable = false)
+    @Column(name = "parcel_size", nullable = false)
     private Size parcelSize;
 
     @Column(name = "destination", nullable = false)
@@ -90,6 +89,12 @@ public class ParcelEntity {
     @Column(name = "type", nullable = false)
     private ParcelType parcelType;
 
-    @Column(name = "parentRelatedId")
+    @Column(name = "parent_related_id")
     private Long parcelRelatedId;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }

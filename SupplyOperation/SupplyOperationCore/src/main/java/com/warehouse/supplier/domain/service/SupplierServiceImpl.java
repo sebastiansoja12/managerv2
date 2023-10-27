@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierModelRequest;
-import com.warehouse.supplier.domain.model.SupplierModelResponse;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
-import com.warehouse.supplier.domain.port.secondary.SupplierServicePort;
 
 import lombok.AllArgsConstructor;
 
@@ -18,8 +16,6 @@ import lombok.AllArgsConstructor;
 public class SupplierServiceImpl implements SupplierService {
 
     private final SupplierRepository supplierRepository;
-
-    private final SupplierServicePort servicePort;
 
     @Override
     public Supplier create(Supplier supplier) {
@@ -34,9 +30,10 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public List<Supplier> createMultipleSuppliers(List<Supplier> suppliers) {
         final List<SupplierModelRequest> supplierList = supplierRepository.createMultipleSuppliers(suppliers);
-        final List<SupplierModelResponse> response = servicePort.createSuppliers(supplierList);
 
-        /** INPL-6150
+
+        /** TODO
+         * final List<SupplierModelResponse> response = servicePort.createSuppliers(supplierList);
          * return response
                 .stream()
                 .map(this::mapToSupplier)
@@ -64,7 +61,6 @@ public class SupplierServiceImpl implements SupplierService {
 
     private Supplier mapToSupplier(SupplierModelRequest supplierModelRequest) {
         return Supplier.builder()
-                .id(supplierModelRequest.getId())
                 .firstName(supplierModelRequest.getFirstName())
                 .telephone(supplierModelRequest.getTelephone())
                 .lastName(supplierModelRequest.getTelephone())

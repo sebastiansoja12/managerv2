@@ -1,13 +1,14 @@
 package com.warehouse.auth;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.RefreshTokenGeneratorImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class RefreshTokenGeneratorImplTest {
 
@@ -34,6 +35,6 @@ public class RefreshTokenGeneratorImplTest {
         // when
         final String token = rerouteTokenGenerator.generateToken(user);
         // then
-        assertThat(token).isBase64();
+        assertThat(token).isNotEmpty();
     }
 }

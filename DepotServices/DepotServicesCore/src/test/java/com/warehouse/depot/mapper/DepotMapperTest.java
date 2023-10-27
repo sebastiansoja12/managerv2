@@ -1,9 +1,9 @@
 package com.warehouse.depot.mapper;
 
 import com.warehouse.depot.domain.model.Depot;
-import com.warehouse.depot.infrastructure.secondary.entity.DepotEntity;
-import com.warehouse.depot.infrastructure.secondary.mapper.DepotMapper;
-import com.warehouse.depot.infrastructure.secondary.mapper.DepotMapperImpl;
+import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;
+import com.warehouse.depot.infrastructure.adapter.secondary.mapper.DepotMapper;
+import com.warehouse.depot.infrastructure.adapter.secondary.mapper.DepotMapperImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

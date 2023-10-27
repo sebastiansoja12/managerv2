@@ -12,6 +12,8 @@ import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -102,4 +104,10 @@ public class ParcelEntity {
 
     @Column(name = "parent_related_id")
     private Long parcelRelatedId;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }

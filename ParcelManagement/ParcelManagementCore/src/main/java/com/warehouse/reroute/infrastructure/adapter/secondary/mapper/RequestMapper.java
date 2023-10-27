@@ -3,7 +3,7 @@ package com.warehouse.reroute.infrastructure.adapter.secondary.mapper;
 import com.warehouse.mail.domain.vo.Notification;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.domain.vo.RerouteNotification;
+import com.warehouse.reroute.domain.model.RerouteNotification;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SupplierModelRequest {
 
-    private Long id;
-
     private String supplierCode;
 
     private String firstName;

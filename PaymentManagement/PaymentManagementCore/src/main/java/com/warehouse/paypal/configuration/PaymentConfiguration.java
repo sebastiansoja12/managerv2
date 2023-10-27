@@ -3,7 +3,10 @@ package com.warehouse.paypal.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.warehouse.paypal.infrastructure.adapter.secondary.PaypalMockAdapter;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -30,21 +33,25 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentConfiguration {
 
-    private final PaypalConfigurationProperties paypalConfigurationProperties;
+    @Bean
+    public PaypalConfigurationProperties paypalConfigurationProperties() {
+        return new PaypalConfigurationProperties();
+    }
 
     @Bean
     public Map<String, String> paypalSdkConfig() {
         final Map<String, String> configMap = new HashMap<>();
-        configMap.put("mode", paypalConfigurationProperties.getMode());
+        configMap.put("mode", paypalConfigurationProperties().getMode());
         return configMap;
     }
 
     @Bean
     public OAuthTokenCredential oAuthTokenCredential() {
-        final String clientId = paypalConfigurationProperties.getClientId();
-        final String clientSecret = paypalConfigurationProperties.getClientSecret();
+        final String clientId = paypalConfigurationProperties().getClientId();
+        final String clientSecret = paypalConfigurationProperties().getClientSecret();
         return new OAuthTokenCredential(clientId, clientSecret, paypalSdkConfig());
     }
 
@@ -67,12 +74,20 @@ public class PaymentConfiguration {
     }
 
     @Bean
-    public PaypalServicePort paymentSecondaryPort(APIContext apiContext) {
+    @ConditionalOnProperty(name = "service.mock", havingValue = "false")
+    public PaypalAdapter paypalAdapter(APIContext apiContext) {
+        log.warn("Using real PAYPAL implementation");
         final PaypalResponseMapper responseMapper = Mappers.getMapper(PaypalResponseMapper.class);
         final PaypalRequestMapper requestMapper = Mappers.getMapper(PaypalRequestMapper.class);
         return new PaypalAdapter(requestMapper, responseMapper, apiContext);
     }
 
+    @Bean
+    @ConditionalOnProperty(name = "service.mock", havingValue = "true")
+    public PaypalMockAdapter paypalMockAdapter() {
+        log.warn("Using PAYPAL MOCK for development purposes");
+        return new PaypalMockAdapter();
+    }
 
     @Bean
     public PaypalPort paymentPort(PaypalService paypalService) {

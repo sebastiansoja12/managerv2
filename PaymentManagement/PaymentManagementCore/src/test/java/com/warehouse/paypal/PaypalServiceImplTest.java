@@ -50,7 +50,7 @@ public class PaypalServiceImplTest {
         );
         final PaypalRequest paypalRequest = buildPaypalRequest(request);
         final PaypalResponse paypalResponse = PaypalResponse.builder()
-                .state("ORDER")
+                .state("OK")
                 .id("id")
                 .links(createLinks())
                 .paymentMethod("PAYPAL")
@@ -207,6 +207,7 @@ public class PaypalServiceImplTest {
                 .build();
 
         return PaypalRequest.builder()
+                .parcelId(paymentRequest.getParcelId())
                 .intent(paymentRequest.getIntent())
                 .transaction(createTransaction(paymentRequest.getParcelId(),
                         new Amount(paymentRequest.getPrice().toString(), details)))

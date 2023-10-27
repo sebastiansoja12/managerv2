@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = { "com.warehouse.supplier"})
 @EnableJpaRepositories(basePackages = { "com.warehouse.supplier"})
 public class SupplierTestConfiguration {
+
 }

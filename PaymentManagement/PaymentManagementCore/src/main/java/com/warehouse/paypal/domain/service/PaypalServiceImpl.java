@@ -30,6 +30,7 @@ public class PaypalServiceImpl implements PaypalService {
                 .price(paymentRequest.getPrice())
 				.failureReason(paypalResponse.getFailureReason())
 				.paymentMethod(paypalResponse.getPaymentMethod())
+				.createTime(paypalResponse.getCreateTime())
 				.amount(paymentRequest.getPrice().intValue())
                 .build());
     }
@@ -67,6 +68,7 @@ public class PaypalServiceImpl implements PaypalService {
 				.build();
 
         return PaypalRequest.builder()
+				.parcelId(paymentRequest.getParcelId())
 				.intent(paymentRequest.getIntent())
 				.transaction(createTransaction(paymentRequest.getParcelId(),
 						new Amount(paymentRequest.getPrice().toString(), details)))

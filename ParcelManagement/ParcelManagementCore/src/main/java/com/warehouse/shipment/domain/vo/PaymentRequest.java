@@ -1,10 +1,8 @@
 package com.warehouse.shipment.domain.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
+@Value
 public class PaymentRequest {
     Long parcelId;
     double price;

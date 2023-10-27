@@ -3,6 +3,7 @@ package com.warehouse.reroute.domain.vo;
 import com.warehouse.reroute.domain.enumeration.ParcelType;
 import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
+import com.warehouse.reroute.domain.model.Recipient;
 import lombok.Builder;
 import lombok.Value;
 

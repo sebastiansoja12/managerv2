@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <!-- Change Set to Create the 'paypal' Table -->
+    <changeSet author="s-soja" id="createPaypalTable">
+        <createTable tableName="paypal">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="amount" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parcel_status" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_pass" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_url" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="paypal_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parcel_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Add Foreign Key Constraint -->
+    <changeSet author="your_name" id="addPaypalForeignKey">
+        <addForeignKeyConstraint baseTableName="paypal"
+                                 baseColumnNames="parcel_id"
+                                 constraintName="FK_paypal_parcel"
+                                 referencedTableName="parcel"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

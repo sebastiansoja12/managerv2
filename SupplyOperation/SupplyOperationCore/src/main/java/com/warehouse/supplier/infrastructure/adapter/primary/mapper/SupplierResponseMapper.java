@@ -22,7 +22,6 @@ public interface SupplierResponseMapper {
     @Mapping(source = "supplier.telephone", target = "telephone")
     @Mapping(source = "supplier.depotCode", target = "depotCode")
     @Mapping(source = "supplier.supplierCode", target = "supplierCode")
-    @Mapping(source = "supplier.id", target = "id")
     SupplierAddResponseDto map(SupplierAddResponse response);
 
     List<SupplierAddResponseDto> map(List<SupplierAddResponse> response);

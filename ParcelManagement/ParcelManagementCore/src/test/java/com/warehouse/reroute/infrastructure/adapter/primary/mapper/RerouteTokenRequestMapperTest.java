@@ -1,24 +1,22 @@
 package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.reroute.domain.enumeration.Size;
-import com.warehouse.reroute.domain.model.*;
-import com.warehouse.reroute.domain.vo.Recipient;
-import com.warehouse.reroute.domain.vo.Sender;
-import com.warehouse.reroute.infrastructure.api.dto.*;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mapstruct.factory.Mappers.getMapper;
+
+import org.junit.jupiter.api.Test;
+
+import com.warehouse.reroute.domain.model.Parcel;
+import com.warehouse.reroute.domain.model.RerouteParcelRequest;
+import com.warehouse.reroute.domain.model.RerouteRequest;
+import com.warehouse.reroute.domain.model.Token;
+import com.warehouse.reroute.infrastructure.api.dto.*;
 
 
-@ExtendWith(MockitoExtension.class)
+
 public class RerouteTokenRequestMapperTest {
 
-    @Mock
-    private RerouteTokenRequestMapper requestMapper;
+
+    private final RerouteTokenRequestMapper requestMapper = getMapper(RerouteTokenRequestMapper.class);
 
     private final static long PARCEL_ID = 100001L;
 
@@ -32,10 +30,6 @@ public class RerouteTokenRequestMapperTest {
         final RerouteRequestDto requestDto = new RerouteRequestDto();
         requestDto.setParcelId(parcelId());
         requestDto.setEmail(email());
-        when(requestMapper.map(requestDto)).thenReturn(RerouteRequest.builder()
-                .parcelId(PARCEL_ID)
-                .email(EMAIL)
-                .build());
         // when
         final RerouteRequest request = requestMapper.map(requestDto);
         // then
@@ -49,13 +43,8 @@ public class RerouteTokenRequestMapperTest {
         // given
         final RerouteParcelRequestDto requestDto = new RerouteParcelRequestDto();
         requestDto.setParcelId(parcelIdDto());
-        requestDto.setToken(tokenDto());
+        requestDto.setToken(new TokenDto(TOKEN));
         requestDto.setParcel(parcelDto());
-        when(requestMapper.map(requestDto)).thenReturn(RerouteParcelRequest.builder()
-                .id(PARCEL_ID)
-                .parcel(parcel())
-                .token(TOKEN)
-                .build());
         // when
         final RerouteParcelRequest updateParcelRequest = requestMapper.map(requestDto);
         // then
@@ -68,12 +57,6 @@ public class RerouteTokenRequestMapperTest {
     void shouldMapFromParcelDtoToParcel() {
         // given
         final ParcelDto parcelDto = parcelDto();
-        when(requestMapper.map(parcelDto)).thenReturn(Parcel.builder()
-                .parcelSize(Size.AVERAGE)
-                .recipient(Recipient.builder().build())
-                .sender(Sender.builder().build())
-                .build());
-
         // when
         final Parcel parcel = requestMapper.map(parcelDto);
         // then
@@ -83,9 +66,8 @@ public class RerouteTokenRequestMapperTest {
     @Test
     void shouldMapFromTokenDtoToToken() {
         // given
-        final TokenDto tokenDto = tokenDto();
+        final TokenDto tokenDto = new TokenDto(TOKEN);
         // when
-        when(requestMapper.map(tokenDto)).thenReturn(Token.builder().value(TOKEN).build());
         final Token token = requestMapper.map(tokenDto);
         // then
         assertThat(token.getValue()).isEqualTo(TOKEN);
@@ -96,7 +78,6 @@ public class RerouteTokenRequestMapperTest {
     void shouldMapFromParcelIdDtoToParcelId() {
         // given
         final ParcelIdDto parcelIdDto = parcelIdDto();
-        when(requestMapper.map(parcelIdDto)).thenReturn(new com.warehouse.reroute.domain.vo.ParcelId(PARCEL_ID));
         // when
         final com.warehouse.reroute.domain.vo.ParcelId parcelId = requestMapper.map(parcelIdDto);
         // then
@@ -117,12 +98,6 @@ public class RerouteTokenRequestMapperTest {
         return parcelId;
     }
 
-    private TokenDto tokenDto() {
-        final TokenDto token = new TokenDto();
-        token.setValue(TOKEN);
-        return token;
-    }
-
     private ParcelDto parcelDto() {
         final ParcelDto parcel = new ParcelDto();
         parcel.setParcelSize(ParcelSizeDto.AVERAGE);
@@ -131,7 +106,4 @@ public class RerouteTokenRequestMapperTest {
         return parcel;
     }
 
-    private RerouteParcel parcel() {
-        return RerouteParcel.builder().build();
-    }
 }

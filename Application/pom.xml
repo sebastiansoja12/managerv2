@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2023.10-SNAPSHOT</version>
+        <version>2023.11-SNAPSHOT</version>
     </parent>
     <artifactId>Application</artifactId>
 
@@ -95,6 +95,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>DeliveryProtectionCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ParcelStatusControlChangeCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
@@ -119,6 +129,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-test-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,10 +1,13 @@
 package com.warehouse.reroute.domain.service;
 
+import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.RerouteResponse;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.model.Token;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.port.secondary.MailServicePort;
+import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
+import com.warehouse.reroute.domain.vo.GeneratedToken;
+import com.warehouse.reroute.domain.vo.RerouteProcessor;
 
 import lombok.AllArgsConstructor;
 
@@ -26,25 +29,18 @@ public class RerouteServiceImpl implements RerouteService {
     }
 
     @Override
-    public RerouteResponse createRerouteToken(RerouteToken rerouteToken) {
-        final RerouteToken token = rerouteTokenRepository.saveReroutingToken(rerouteToken);
+    public RerouteResponse createRerouteToken(RerouteRequest request, GeneratedToken generatedToken) {
+        final RerouteToken rerouteToken = rerouteTokenRepository.saveReroutingToken(
+            new RerouteProcessor(request.getEmail(), request.getParcelId(), generatedToken)
+        );
 
-        mailServicePort.sendReroutingInformation(token);
+        mailServicePort.sendReroutingInformation(rerouteToken);
 
-        return RerouteResponse.builder()
-                .parcelId(token.getParcelId())
-                .token(token.getToken())
-                .build();
+        return new RerouteResponse(rerouteToken.getParcelId(), rerouteToken.getToken());
     }
 
     @Override
     public RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId) {
         return rerouteTokenRepository.loadByTokenAndParcelId(token, parcelId);
-    }
-
-    public Token token(Integer value) {
-        return Token.builder()
-                .value(value)
-                .build();
     }
 }

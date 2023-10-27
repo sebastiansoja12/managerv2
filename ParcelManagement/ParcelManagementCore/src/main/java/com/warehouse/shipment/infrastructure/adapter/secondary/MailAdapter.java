@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.shipment.domain.port.secondary.MailServicePort;
-import com.warehouse.shipment.domain.vo.Notification;
+import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 
 import lombok.AllArgsConstructor;

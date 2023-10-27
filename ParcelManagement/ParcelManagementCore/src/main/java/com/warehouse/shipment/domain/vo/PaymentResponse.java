@@ -1,8 +1,8 @@
 package com.warehouse.shipment.domain.vo;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class PaymentResponse {
     String paymentUrl;
     String createTime;

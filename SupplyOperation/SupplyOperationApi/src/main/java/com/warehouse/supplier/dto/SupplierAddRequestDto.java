@@ -12,4 +12,6 @@ public class SupplierAddRequestDto {
     private String telephone;
 
     private String depotCode;
+
+    private String supplierCode;
 }

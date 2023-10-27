@@ -9,7 +9,7 @@ import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationExce
 import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.vo.Notification;
+import com.warehouse.shipment.domain.model.Notification;
 
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -124,7 +124,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     private void logParcel(Parcel parcel) {
-        logger.info("Parcel {} has been created", parcel.getId());
+        logger.info("Parcel {} has been created at {}", parcel.getId(), parcel.getCreatedAt());
     }
 
     private void logPayment(PaymentStatus status, Parcel parcel) {

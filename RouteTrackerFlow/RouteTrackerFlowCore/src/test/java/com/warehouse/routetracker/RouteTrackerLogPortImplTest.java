@@ -112,7 +112,7 @@ public class RouteTrackerLogPortImplTest {
         final RouteResponse response = new RouteResponse(ROUTE_ID);
         final RouteResponse response2 = new RouteResponse(ROUTE_ID_2);
 
-        // model route objects sent to db
+        // model route objects sent to liquibase
         final Route route = Route.builder()
                 .parcelId(PARCEL_ID)
                 .build();

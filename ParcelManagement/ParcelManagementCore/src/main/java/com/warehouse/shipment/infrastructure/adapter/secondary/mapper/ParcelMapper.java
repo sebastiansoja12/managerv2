@@ -28,6 +28,8 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.street", target = "recipientStreet")
     @Mapping(source = "parcelSize", target = "parcelSize")
     @Mapping(source = "status", target = "status")
+    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     ParcelEntity map(ShipmentParcel parcel);
 
     @Mapping(target = "id", source = "id")

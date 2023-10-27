@@ -8,6 +8,8 @@ import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.Par
 import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.StatusMapper;
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDateTime;
+
 import static org.mapstruct.factory.Mappers.getMapper;
 
 @AllArgsConstructor
@@ -24,11 +26,15 @@ public class ParcelStatusUpdateRepositoryImpl implements ParcelStatusUpdateRepos
     public void updateStatus(Long parcelId, Status status) {
         final ParcelEntity parcelEntity = parcelReadRepository
                 .findById(parcelId)
-                .map(parcel -> {
-                    parcel.updateStatus(mapper.map(status));
-                    return parcel;
-                }).orElseThrow(() -> new ParcelNotFoundException(String.format(ERROR_MESSAGE, parcelId)));
+                .map(parcel -> update(status, parcel))
+                .orElseThrow(() -> new ParcelNotFoundException(String.format(ERROR_MESSAGE, parcelId)));
 
         parcelReadRepository.save(parcelEntity);
+    }
+
+    private ParcelEntity update(Status status, ParcelEntity parcel) {
+        parcel.updateStatus(mapper.map(status));
+        parcel.setUpdatedAt(LocalDateTime.now());
+        return parcel;
     }
 }

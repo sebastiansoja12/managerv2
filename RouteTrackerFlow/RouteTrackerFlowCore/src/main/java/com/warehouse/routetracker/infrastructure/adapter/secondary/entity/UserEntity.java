@@ -1,5 +1,6 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,8 +17,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
-    private int id;
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -35,7 +35,7 @@ public class UserEntity {
     private String email;
 
     @Column(nullable = false)
-    private String role;
+    private Role role;
 
     @Column(nullable = false)
     private String depotCode;

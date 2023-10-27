@@ -9,6 +9,6 @@ import java.util.UUID;
 @Builder
 public class SupplierSignature {
     String supplierCode;
-    UUID id;
+    UUID deliveryId;
     String token;
 }

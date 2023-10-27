@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.warehouse.paypal.domain.model.*;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -27,7 +28,7 @@ public interface PaypalResponseMapper {
                 .links(List.of(links))
                 .createTime(payment.getCreateTime())
                 .paymentMethod(payment.getPayer().getPaymentMethod())
-                .failureReason(payment.getFailureReason())
+                .failureReason(StringUtils.isEmpty(payment.getFailureReason()) ? "NONE" : payment.getFailureReason())
                 .transactions(map(payment.getTransactions()))
                 .id(payment.getId())
                 .state(payment.getState())
