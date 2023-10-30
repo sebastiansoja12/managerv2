@@ -26,7 +26,7 @@ public class DeliveryPortImpl implements DeliveryPort {
     public List<DeliveryResponse> deliver(List<DeliveryRequest> deliveryRequest) {
         final Set<DeliveryRequest> deliveryRequests = deliveryRequest.stream()
                 .filter(Objects::nonNull)
-                .map(this::determineDeliveryStatus)
+                .peek(DeliveryRequest::updateDeliveryStatus)
                 .collect(Collectors.toSet());
 
         final List<Delivery> deliveries = deliveryRequests.stream()
@@ -59,12 +59,6 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .supplierCode(delivery.getSupplierCode())
                 .token(delivery.getToken())
                 .build();
-    }
-
-
-    private DeliveryRequest determineDeliveryStatus(DeliveryRequest deliveryRequest) {
-        deliveryRequest.setDeliveryStatus(DeliveryStatus.DELIVERY);
-        return deliveryRequest;
     }
 
     private DeliveryResponse mapToResponse(Delivery delivery) {

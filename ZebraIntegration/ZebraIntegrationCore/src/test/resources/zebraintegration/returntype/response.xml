@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ZebraResponse>
+    <ZebraID>1</ZebraID>
+    <Version>1.0</Version>
+    <ResponsibleUser>s-soja</ResponsibleUser>
+    <ProcessReturns>
+        <ProcessReturn>
+            <ReturnID>1</ReturnID>
+            <ProcessStatus>PROCESSING</ProcessStatus>
+        </ProcessReturn>
+        <ProcessReturn>
+            <ReturnID>2</ReturnID>
+            <ProcessStatus>PROCESSING</ProcessStatus>
+        </ProcessReturn>
+    </ProcessReturns>
+</ZebraResponse>

@@ -8,7 +8,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="parcel_id" type="BIGINT">
-                <constraints unique="true" nullable="false"/>
+                <constraints nullable="false"/>
             </column>
             <column name="return_status" type="VARCHAR(255)">
                 <constraints nullable="false"/>
