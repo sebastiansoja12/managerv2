@@ -14,7 +14,7 @@ public class ReturnEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "parcel_id", nullable = false, unique = true)
+    @Column(name = "parcel_id", nullable = false)
     private Long parcelId;
 
     @Column(name = "return_status", nullable = false)

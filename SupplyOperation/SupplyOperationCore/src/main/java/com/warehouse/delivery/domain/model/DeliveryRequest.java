@@ -17,4 +17,8 @@ public class DeliveryRequest {
     String depotCode;
     String supplierCode;
     DeliveryStatus deliveryStatus;
+
+    public void updateDeliveryStatus() {
+        this.deliveryStatus = DeliveryStatus.DELIVERY;
+    }
 }

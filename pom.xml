@@ -33,7 +33,8 @@
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
 		<module>ParcelStatusControlChange</module>
-	</modules>
+        <module>ZebraIntegration</module>
+    </modules>
 
 	<repositories>
 		<repository>
@@ -324,6 +325,7 @@
 				<version>3.5.1</version>
 				<scope>test</scope>
 			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
