@@ -1,7 +1,6 @@
 package com.warehouse.returning;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
@@ -20,7 +19,7 @@ import com.warehouse.returning.configuration.ReturningTestConfiguration;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadRepository;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnEntity;
 import com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
@@ -93,5 +92,19 @@ public class ReturnReadRepositoryTest {
         // then
         assertTrue(entity.isEmpty());
     }
+
+    @Test
+    @DatabaseSetup("/dataset/returningWithInformation.xml")
+    void shouldFindByReturnIdWithInformation() {
+        // given
+        final Long returnId = 1L;
+        // when
+        final Optional<ReturnEntity> entity = repository.findById(returnId);
+        // then
+        assertTrue(entity.isPresent());
+        assertTrue(entity.map(ReturnEntity::getReturnInformationEntity).isPresent());
+    }
+
+
 
 }

@@ -14,6 +14,7 @@
     <include file="/liquibase/db/refresh_token.xml"/>
     <include file="/liquibase/db/reroute_token.xml"/>
     <include file="/liquibase/db/route.xml"/>
+    <include file="/liquibase/db/returning_information.xml"/>
     <include file="/liquibase/db/returning.xml"/>
     <include file="/liquibase/db/message_sequence.xml"/>
 

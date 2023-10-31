@@ -3,18 +3,19 @@ package com.warehouse.returning.infrastructure.adapter.secondary;
 import static com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus.PROCESSING;
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import java.util.Optional;
+
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.domain.vo.ReturnId;
 import com.warehouse.returning.domain.vo.ReturnModel;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnEntity;
+import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnInformationEntity;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.ReturnEntityNotFoundException;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnMapper;
 
 import lombok.AllArgsConstructor;
-
-import java.util.Optional;
 
 @AllArgsConstructor
 public class ReturningRepositoryImpl implements ReturnRepository {
@@ -24,6 +25,7 @@ public class ReturningRepositoryImpl implements ReturnRepository {
     private final ReturnMapper returnMapper = getMapper(ReturnMapper.class);
     
     private final String exceptionMessage = "Return Entity for parcel %s was not found";
+
     private final String returnEntityExceptionMessage = "Return Entity with id [%s] was not found";
 
     @Override

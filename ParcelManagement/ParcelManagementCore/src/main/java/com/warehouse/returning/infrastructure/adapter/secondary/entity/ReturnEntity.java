@@ -4,10 +4,13 @@ package com.warehouse.returning.infrastructure.adapter.secondary.entity;
 import com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "returning")
-@Data
 public class ReturnEntity {
 
     @Id
@@ -31,6 +34,14 @@ public class ReturnEntity {
 
     @Column(name = "depot_code", nullable = false)
     private String depotCode;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "returning_information_id", referencedColumnName = "id")
+    private ReturnInformationEntity returnInformationEntity;
+
+    public void attachReturnInformation(ReturnInformationEntity returnInformationEntity) {
+        this.returnInformationEntity = returnInformationEntity;
+    }
 
     public void completeReturn() {
         this.returnStatus = ReturnStatus.COMPLETED;

@@ -8,7 +8,6 @@ import static org.mockito.Mockito.doReturn;
 
 import java.util.Optional;
 
-import com.warehouse.returning.domain.vo.ReturnId;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.vo.ProcessReturn;
+import com.warehouse.returning.domain.vo.ReturnId;
+import com.warehouse.returning.infrastructure.adapter.secondary.ReturnInformationReadRepository;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadRepository;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturningRepositoryImpl;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnEntity;
@@ -28,6 +29,9 @@ public class ReturnRepositoryImplTest {
 
     @Mock
     private ReturnReadRepository repository;
+
+    @Mock
+    private ReturnInformationReadRepository returnInformationReadRepository;
 
     private ReturningRepositoryImpl returningRepository;
 

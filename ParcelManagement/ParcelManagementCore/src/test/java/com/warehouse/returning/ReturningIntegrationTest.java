@@ -39,7 +39,6 @@ import com.warehouse.returning.infrastructure.api.dto.*;
 @EnableAutoConfiguration
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-@DatabaseSetup("/dataset/returning.xml")
 public class ReturningIntegrationTest {
 
     @ComponentScan(basePackages = { "com.warehouse.returning", "com.warehouse.exceptionhandler" })
@@ -90,6 +89,7 @@ public class ReturningIntegrationTest {
     }
 
     @Test
+    @DatabaseSetup("/dataset/returning.xml")
     void shouldCompleteProcessReturning() throws Exception {
         // given
         final String request = readFileAsString(UPDATE_RETURN_REQUEST_JSON_PATH);
@@ -175,6 +175,7 @@ public class ReturningIntegrationTest {
     }
 
     @Test
+    @DatabaseSetup("/dataset/returning.xml")
     void shouldGetReturn() {
         // given
         final Long id = 1L;
