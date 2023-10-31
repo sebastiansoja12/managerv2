@@ -11,6 +11,8 @@ import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.service.ReturnService;
+import com.warehouse.returning.domain.vo.ReturnId;
+import com.warehouse.returning.domain.vo.ReturnModel;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 
 import lombok.AllArgsConstructor;
@@ -53,9 +55,19 @@ public class ReturnPortImpl implements ReturnPort {
                     .username(request.getUsername())
                     .depotCode(request.getDepotCode())
                     .build();
-            return returnService.updateReturning(processingRequest);
+            return returnService.updateReturn(processingRequest);
         }
-        return returnService.processReturning(request);
+        return returnService.processReturn(request);
+    }
+
+    @Override
+    public ReturnModel getReturn(ReturnId returnId) {
+        return returnService.getReturn(returnId);
+    }
+
+    @Override
+    public void delete(ReturnId returnId) {
+        returnService.deleteReturn(returnId);
     }
 
     private void validateRequest(ReturnRequest request) {

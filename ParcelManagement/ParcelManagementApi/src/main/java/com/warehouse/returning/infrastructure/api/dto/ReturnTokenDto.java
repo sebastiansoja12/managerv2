@@ -6,6 +6,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UsernameDto {
-    private String value;
+public class ReturnTokenDto {
+    String value;
 }

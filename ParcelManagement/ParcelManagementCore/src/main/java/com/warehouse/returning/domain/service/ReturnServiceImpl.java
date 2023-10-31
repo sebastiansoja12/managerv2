@@ -6,6 +6,8 @@ import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.model.Returning;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.ProcessReturn;
+import com.warehouse.returning.domain.vo.ReturnId;
+import com.warehouse.returning.domain.vo.ReturnModel;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 import lombok.AllArgsConstructor;
 
@@ -18,7 +20,7 @@ public class ReturnServiceImpl implements ReturnService {
     private final ReturnRepository returnRepository;
 
     @Override
-    public ReturnResponse processReturning(ReturnRequest request) {
+    public ReturnResponse processReturn(ReturnRequest request) {
         final List<ReturnPackage> returnPackages = request.getRequests().stream()
                 .map(this::buildReturnPackage)
                 .collect(Collectors.toList());
@@ -37,7 +39,7 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
-    public ReturnResponse updateReturning(ReturnRequest request) {
+    public ReturnResponse updateReturn(ReturnRequest request) {
         final List<ReturnPackage> returnPackages = request.getRequests().stream()
                 .map(this::buildReturnPackage)
                 .toList();
@@ -53,6 +55,16 @@ public class ReturnServiceImpl implements ReturnService {
                 .toList();
 
         return new ReturnResponse(processReturns);
+    }
+
+    @Override
+    public ReturnModel getReturn(ReturnId returnId) {
+        return returnRepository.get(returnId);
+    }
+
+    @Override
+    public void deleteReturn(ReturnId returnId) {
+        returnRepository.delete(returnId);
     }
 
     private ReturnPackage buildReturnPackage(ReturnPackageRequest returnPackageRequest) {

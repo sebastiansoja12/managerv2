@@ -72,4 +72,26 @@ public class ReturnReadRepositoryTest {
         assertTrue(entity.isEmpty());
     }
 
+    @Test
+    @DatabaseSetup("/dataset/returning.xml")
+    void shouldFindByReturnId() {
+        // given
+        final Long returnId = 1L;
+        // when
+        final Optional<ReturnEntity> entity = repository.findById(returnId);
+        // then
+        assertTrue(entity.isPresent());
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/returning.xml")
+    void shouldNotFindByReturnId() {
+        // given
+        final Long returnId = 2137L;
+        // when
+        final Optional<ReturnEntity> entity = repository.findById(returnId);
+        // then
+        assertTrue(entity.isEmpty());
+    }
+
 }

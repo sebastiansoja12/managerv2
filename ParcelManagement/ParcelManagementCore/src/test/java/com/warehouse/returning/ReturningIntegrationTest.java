@@ -9,6 +9,8 @@ import java.util.List;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.returning.infrastructure.adapter.primary.api.response.DeleteReturnResponse;
+import com.warehouse.returning.infrastructure.adapter.primary.api.response.ResponseStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -72,7 +74,8 @@ public class ReturningIntegrationTest {
         // given
         final String request = readFileAsString(RETURN_REQUEST_JSON_PATH);
         // when
-        final ResponseEntity<ReturningResponseDto> response = restClient.post()
+        final ResponseEntity<ReturningResponseDto> response = restClient
+                .post()
                 .uri("/v2/api/returns")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +94,8 @@ public class ReturningIntegrationTest {
         // given
         final String request = readFileAsString(UPDATE_RETURN_REQUEST_JSON_PATH);
         // when
-        final ResponseEntity<ReturningResponseDto> returningResponse = restClient.post()
+        final ResponseEntity<ReturningResponseDto> returningResponse = restClient
+                .post()
                 .uri("/v2/api/returns")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +114,8 @@ public class ReturningIntegrationTest {
         final ReturningRequestDto returningRequest = createReturningRequest("", "KT1", "returnToken",
                 "abc");
         // when
-        final ResponseEntity<ErrorResponse> returningResponse = restClient.post()
+        final ResponseEntity<ErrorResponse> returningResponse = restClient
+                .post()
                 .uri("/v2/api/returns")
                 .body(returningRequest)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +136,8 @@ public class ReturningIntegrationTest {
         final ReturningRequestDto returningRequest = createReturningRequest("s-soja", "", "returnToken",
                 "abc");
         // when
-        final ResponseEntity<ErrorResponse> returningResponse = restClient.post()
+        final ResponseEntity<ErrorResponse> returningResponse = restClient
+                .post()
                 .uri("/v2/api/returns")
                 .body(returningRequest)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +158,8 @@ public class ReturningIntegrationTest {
         final String request = readFileAsString(WRONG_UPDATE_RETURN_REQUEST_JSON_PATH);
 
         // when
-        final ResponseEntity<ErrorResponse> returningResponse = restClient.post()
+        final ResponseEntity<ErrorResponse> returningResponse = restClient
+                .post()
                 .uri("/v2/api/returns")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -165,6 +172,37 @@ public class ReturningIntegrationTest {
         assertNotNull(returningResponse.getBody());
         assertEquals(readFileAsString(RETURN_MISSING_JSON_PATH),
                 returningErrorResponseAsJsonString(returningResponse.getBody()));
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/returning.xml")
+    void shouldGetReturn() {
+        // given
+        final Long id = 1L;
+        // when
+        final ReturnModelDto returningResponse = restClient
+                .get()
+                .uri("/v2/api/returns/{id}", id)
+                .retrieve()
+                .body(ReturnModelDto.class);
+        // then
+        assertNotNull(returningResponse);
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/returning.xml")
+    void shouldDeleteReturn() {
+        // given
+        final Long id = 1L;
+        // when
+        final DeleteReturnResponse deleteReturnResponse = restClient
+                .delete()
+                .uri("/v2/api/returns/{id}", id)
+                .retrieve()
+                .body(DeleteReturnResponse.class);
+        // then
+        assertNotNull(deleteReturnResponse);
+        assertEquals(ResponseStatus.OK, deleteReturnResponse.getResponseStatus());
     }
     
     private static String returningErrorResponseAsJsonString(ErrorResponse errorResponse) {
@@ -217,15 +255,11 @@ public class ReturningIntegrationTest {
     }
 
     private UsernameDto createUsername(String username) {
-        final UsernameDto user = new UsernameDto();
-        user.setValue(username);
-        return user;
+        return UsernameDto.builder().value(username).build();
     }
 
     private DepotCodeDto createDepotCode(String depotCode) {
-        final DepotCodeDto depot = new DepotCodeDto();
-        depot.setValue(depotCode);
-        return depot;
+        return DepotCodeDto.builder().value(depotCode).build();
     }
 
     private List<ReturnPackageRequestDto> createReturnPackageRequests(ReturnStatusDto returnStatusDto,
@@ -245,9 +279,7 @@ public class ReturningIntegrationTest {
 	}
 
     private SupplierCodeDto createSupplierCode(String supplierCode) {
-        final SupplierCodeDto supplier = new SupplierCodeDto();
-        supplier.setValue(supplierCode);
-        return supplier;
+        return SupplierCodeDto.builder().value(supplierCode).build();
     }
 
     private ParcelDto createParcel() {

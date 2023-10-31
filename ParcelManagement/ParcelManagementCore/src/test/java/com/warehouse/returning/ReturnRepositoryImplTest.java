@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 
 import java.util.Optional;
 
+import com.warehouse.returning.domain.vo.ReturnId;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ public class ReturnRepositoryImplTest {
     private ReturningRepositoryImpl returningRepository;
 
     private final String exceptionMessage = "Return Entity for parcel %s was not found";
+    private final String returnEntityExceptionMessage = "Return Entity with id [%s] was not found";
 
     @BeforeEach
     void setup() {
@@ -81,7 +83,7 @@ public class ReturnRepositoryImplTest {
     }
 
     @Test
-    void shouldThrowReturnEntityNotFoundException() {
+    void shouldThrowReturnEntityNotFoundByParcelIdException() {
         // given
         final Long parcelId = 1L;
         final ReturnPackage returnPackage = ReturnPackage.builder()
@@ -98,6 +100,18 @@ public class ReturnRepositoryImplTest {
         assertThatThrownBy(executable)
                 .isInstanceOf(ReturnEntityNotFoundException.class)
                 .hasMessageContaining(String.format(exceptionMessage, parcelId));
+    }
+
+    @Test
+    void shouldThrowReturnEntityNotFoundException() {
+        // given
+        final ReturnId returnId = new ReturnId(1L);
+        // when
+        final ThrowableAssert.ThrowingCallable executable = () -> returningRepository.get(returnId);
+        // then
+        assertThatThrownBy(executable)
+                .isInstanceOf(ReturnEntityNotFoundException.class)
+                .hasMessageContaining(String.format(returnEntityExceptionMessage, returnId.getValue()));
     }
 
     private ReturnEntity createReturnEntity() {

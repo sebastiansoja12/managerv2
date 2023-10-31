@@ -2,7 +2,11 @@ package com.warehouse.returning.infrastructure.adapter.primary;
 
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
+import com.warehouse.returning.domain.vo.ReturnId;
+import com.warehouse.returning.domain.vo.ReturnModel;
 import com.warehouse.returning.domain.vo.ReturnResponse;
+import com.warehouse.returning.infrastructure.adapter.primary.api.response.DeleteReturnResponse;
+import com.warehouse.returning.infrastructure.adapter.primary.api.response.ResponseStatus;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.ReturnRequestMapper;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.ReturnResponseMapper;
 import com.warehouse.returning.infrastructure.api.dto.ReturningRequestDto;
@@ -33,5 +37,17 @@ public class ReturnController {
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
 
-    // TODO GetMapping, DeleteMapping
+    @GetMapping("/{id}")
+    public ResponseEntity<?> get(@PathVariable Long id) {
+        final ReturnId returnId = new ReturnId(id);
+        final ReturnModel returnModel = returnPort.getReturn(returnId);
+        return new ResponseEntity<>(responseMapper.map(returnModel), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public DeleteReturnResponse delete(@PathVariable Long id) {
+        final ReturnId returnId = new ReturnId(id);
+        returnPort.delete(returnId);
+        return new DeleteReturnResponse(ResponseStatus.OK);
+    }
 }

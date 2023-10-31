@@ -1,9 +1,12 @@
 package com.warehouse.returning.infrastructure.api.dto;
 
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SupplierCodeDto {
     private String value;
 }
