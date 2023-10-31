@@ -38,7 +38,8 @@ import com.warehouse.returning.infrastructure.api.dto.*;
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @EnableAutoConfiguration
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@DatabaseSetup("/dataset/returning.xml")
 public class ReturningIntegrationTest {
 
     @ComponentScan(basePackages = { "com.warehouse.returning", "com.warehouse.exceptionhandler" })
@@ -89,7 +90,6 @@ public class ReturningIntegrationTest {
     }
 
     @Test
-    @DatabaseSetup("/dataset/returning.xml")
     void shouldCompleteProcessReturning() throws Exception {
         // given
         final String request = readFileAsString(UPDATE_RETURN_REQUEST_JSON_PATH);
@@ -175,7 +175,6 @@ public class ReturningIntegrationTest {
     }
 
     @Test
-    @DatabaseSetup("/dataset/returning.xml")
     void shouldGetReturn() {
         // given
         final Long id = 1L;
@@ -190,7 +189,6 @@ public class ReturningIntegrationTest {
     }
 
     @Test
-    @DatabaseSetup("/dataset/returning.xml")
     void shouldDeleteReturn() {
         // given
         final Long id = 1L;
@@ -219,10 +217,10 @@ public class ReturningIntegrationTest {
         return """
                 {
                   "processReturn" : [ {
-                    "returnId" : 1,
+                    "returnId" : 6,
                     "processStatus" : "%s"
                   }, {
-                    "returnId" : 2,
+                    "returnId" : 7,
                     "processStatus" : "%s"
                   } ]
                 }""";
