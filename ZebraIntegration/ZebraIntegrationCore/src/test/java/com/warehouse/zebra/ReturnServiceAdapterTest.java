@@ -68,6 +68,7 @@ public class ReturnServiceAdapterTest {
     private final String ENDPOINT = "returns";
 
     private final String PROCESS_RETURN_RESPONSE_PATH = "/returnintegration/returnResponse.json";
+    private final String UPDATE_PROCESS_RETURN_RESPONSE_PATH = "/returnintegration/updateReturnResponse.json";
 
     @BeforeEach
     void setup() {
@@ -110,5 +111,39 @@ public class ReturnServiceAdapterTest {
         mockRestServiceServer.verify();
     }
 
+    @Test
+    void shouldUpdateTheReturnRequestProcess() {
+        // given
+        final ReturnRequest returnRequest = ReturnRequest.builder()
+                .returnStatus(ReturnStatus.PROCESSING)
+                .returnToken("returnToken")
+                .parcel(Parcel.builder()
+                        .destination("KT1")
+                        .id(1L)
+                        .parcelRelatedId(null)
+                        .parcelSize(Size.TEST)
+                        .parcelType(ParcelType.PARENT)
+                        .build())
+                .reason("reason")
+                .supplierCode("abc")
+                .build();
 
+        final Request request = Request.builder()
+                .processType(ProcessType.RETURN)
+                .requests(List.of(returnRequest))
+                .zebraDeviceInformation(deviceInformation).build();
+
+        final Resource resource = new ClassPathResource(UPDATE_PROCESS_RETURN_RESPONSE_PATH);
+        mockRestServiceServer.expect(requestTo(String.format(URL, ENDPOINT)))
+                .andRespond(withSuccess(resource, MediaType.APPLICATION_JSON));
+        // when
+        final Response response = returnServiceAdapter.processReturn(request);
+        // then
+        assertNotNull(response.processReturns());
+        assertThat(response.processReturns())
+                .extracting(ProcessReturn::processStatus, ProcessReturn::returnId)
+                .containsExactly(tuple("COMPLETED", 1L), tuple( "COMPLETED", 2L));
+
+        mockRestServiceServer.verify();
+    }
 }

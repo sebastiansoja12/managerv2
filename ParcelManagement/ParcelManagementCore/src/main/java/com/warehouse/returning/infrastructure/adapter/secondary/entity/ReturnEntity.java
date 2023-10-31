@@ -31,4 +31,8 @@ public class ReturnEntity {
 
     @Column(name = "depot_code", nullable = false)
     private String depotCode;
+
+    public void completeReturn() {
+        this.returnStatus = ReturnStatus.COMPLETED;
+    }
 }

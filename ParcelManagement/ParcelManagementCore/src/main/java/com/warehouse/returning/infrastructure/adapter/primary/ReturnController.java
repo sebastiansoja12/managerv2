@@ -33,11 +33,5 @@ public class ReturnController {
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
 
-    @PutMapping
-    public ResponseEntity<?> update() {
-        // TODO
-        return ResponseEntity.ok().build();
-    }
-
     // TODO GetMapping, DeleteMapping
 }

@@ -1,0 +1,12 @@
+{
+  "processReturn": [
+    {
+      "returnId": 1,
+      "processStatus": "COMPLETED"
+    },
+    {
+      "returnId": 2,
+      "processStatus": "COMPLETED"
+    }
+  ]
+}

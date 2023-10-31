@@ -54,4 +54,15 @@ public class ReturnRequest {
     public boolean isDepotCodeMissing() {
         return StringUtils.isEmpty(depotCode);
     }
+
+    public List<ReturnPackageRequest> filterProcessingReturns() {
+        return requests.stream()
+                .filter(ReturnPackageRequest::isProcessing)
+                .collect(Collectors.toList());
+    }
+
+    public boolean isProcessing() {
+        return requests.stream()
+                .anyMatch(ReturnPackageRequest::isProcessing);
+    }
 }

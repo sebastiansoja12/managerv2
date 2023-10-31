@@ -6,4 +6,6 @@ import com.warehouse.returning.domain.vo.ProcessReturn;
 public interface ReturnRepository {
 
     ProcessReturn save(ReturnPackage returnPackage);
+
+    ProcessReturn update(ReturnPackage returnPackage);
 }

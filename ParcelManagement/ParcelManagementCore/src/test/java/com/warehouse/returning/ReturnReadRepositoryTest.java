@@ -2,7 +2,9 @@ package com.warehouse.returning;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import com.warehouse.returning.configuration.ReturningTestConfiguration;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadRepository;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnEntity;
 import com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus;
+
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -44,6 +48,28 @@ public class ReturnReadRepositoryTest {
         final ReturnEntity savedEntity = repository.save(returnEntity);
         // then
         assertThat(savedEntity.getId()).isGreaterThan(0);
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/returning.xml")
+    void shouldFindFirstByParcelId() {
+        // given
+        final Long parcelId = 1L;
+        // when
+        final Optional<ReturnEntity> entity = repository.findFirstByParcelId(parcelId);
+        // then
+        assertTrue(entity.isPresent());
+    }
+
+    @Test
+    @DatabaseSetup("/dataset/returning.xml")
+    void shouldNotFindReturningByParcelId() {
+        // given
+        final Long parcelId = 2137L;
+        // when
+        final Optional<ReturnEntity> entity = repository.findFirstByParcelId(parcelId);
+        // then
+        assertTrue(entity.isEmpty());
     }
 
 }

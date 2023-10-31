@@ -38,14 +38,23 @@ public class ReturnPortImpl implements ReturnPort {
 
         logCancelledParcels(cancelledParcels);
 
-        logRevertStatus();
-
-        cancelledParcels.forEach(parcel -> request.revertStatus(parcel.getId(), ReturnStatus.CREATED));
+        cancelledParcels.forEach(parcel -> {
+            logRevertStatus(parcel.getId());
+            request.revertStatus(parcel.getId(), ReturnStatus.CREATED);
+        });
 
         if (!request.isReturnTokenAvailable()) {
             throw new ReturnTokenMissingException(8080, "Return token is missing");
         }
 
+        if (request.isProcessing()) {
+            final ReturnRequest processingRequest = ReturnRequest.builder()
+                    .requests(request.filterProcessingReturns())
+                    .username(request.getUsername())
+                    .depotCode(request.getDepotCode())
+                    .build();
+            return returnService.updateReturning(processingRequest);
+        }
         return returnService.processReturning(request);
     }
 
@@ -58,8 +67,8 @@ public class ReturnPortImpl implements ReturnPort {
         }
     }
 
-    private void logRevertStatus() {
-        log.info("Reverting return status for given parcels...");
+    private void logRevertStatus(Long id) {
+        log.info("Reverting return status for parcel [ID:{}]", id);
     }
 
     private void logCancelledParcels(List<Parcel> cancelledParcels) {

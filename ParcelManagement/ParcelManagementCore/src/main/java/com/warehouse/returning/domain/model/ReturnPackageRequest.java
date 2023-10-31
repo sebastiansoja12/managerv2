@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import static com.warehouse.returning.domain.model.ReturnStatus.CANCELLED;
+import static com.warehouse.returning.domain.model.ReturnStatus.*;
 
 @Data
 @Builder
@@ -36,6 +36,14 @@ public class ReturnPackageRequest {
 
     public boolean isCancelled() {
         return CANCELLED.equals(returnStatus);
+    }
+
+    public boolean isProcessing() {
+        return PROCESSING.equals(returnStatus);
+    }
+
+    public boolean isCompleted() {
+        return COMPLETED.equals(returnStatus);
     }
 
     public void updateUser(String username) {

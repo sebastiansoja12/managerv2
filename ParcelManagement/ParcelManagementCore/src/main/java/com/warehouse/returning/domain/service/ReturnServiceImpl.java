@@ -36,6 +36,25 @@ public class ReturnServiceImpl implements ReturnService {
         return new ReturnResponse(processReturns);
     }
 
+    @Override
+    public ReturnResponse updateReturning(ReturnRequest request) {
+        final List<ReturnPackage> returnPackages = request.getRequests().stream()
+                .map(this::buildReturnPackage)
+                .toList();
+
+        returnPackages.forEach(ReturnPackage::completeReturn);
+
+        final Returning returning = new Returning(returnPackages);
+
+        final List<ProcessReturn> processReturns = returning
+                .returnPackages()
+                .stream()
+                .map(returnRepository::update)
+                .toList();
+
+        return new ReturnResponse(processReturns);
+    }
+
     private ReturnPackage buildReturnPackage(ReturnPackageRequest returnPackageRequest) {
         return ReturnPackage.builder()
                 .returnToken(returnPackageRequest.getReturnToken())

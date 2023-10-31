@@ -1,6 +1,21 @@
 package com.warehouse.returning;
 
 
+import static com.warehouse.returning.domain.model.ReturnStatus.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.warehouse.returning.domain.exception.ReturnTokenMissingException;
 import com.warehouse.returning.domain.model.*;
 import com.warehouse.returning.domain.port.primary.ReturnPortImpl;
@@ -9,20 +24,6 @@ import com.warehouse.returning.domain.service.ReturnService;
 import com.warehouse.returning.domain.service.ReturnServiceImpl;
 import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.domain.vo.ReturnResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-
-import static com.warehouse.returning.domain.model.ReturnStatus.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 public class ReturnPortImplTest {
@@ -52,7 +53,7 @@ public class ReturnPortImplTest {
                 .depotCode(depotCode)
                 .supplierCode("abc")
                 .returnToken("returnToken")
-                .returnStatus(ReturnStatus.PROCESSING)
+                .returnStatus(PROCESSING)
                 .parcelId(1L)
                 .reason(RECIPIENT_NOT_AVAILABLE)
                 .username(USERNAME)
@@ -141,6 +142,36 @@ public class ReturnPortImplTest {
         final RuntimeException exception = assertThrows(RuntimeException.class, executable);
         assertEquals("Depot code is missing", exception.getMessage());
     }
+
+    @Test
+    void shouldUpdateReturnToCompletedWhenWasProcessed() {
+        // given
+        final String depotCode = "KT1";
+        final String returnToken = "returnToken";
+        final ReturnRequest request = buildReturnRequest(depotCode, USERNAME, returnToken, PROCESSING);
+        final ReturnPackage returnPackage = ReturnPackage.builder()
+                .depotCode(depotCode)
+                .supplierCode("abc")
+                .returnToken(returnToken)
+                .returnStatus(COMPLETED)
+                .parcelId(1L)
+                .reason(RECIPIENT_NOT_AVAILABLE)
+                .username(USERNAME)
+                .build();
+
+        final ProcessReturn processReturn = new ProcessReturn(1L, "COMPLETED");
+
+        doReturn(processReturn)
+                .when(returnRepository)
+                .update(returnPackage);
+        // when
+        final ReturnResponse response = returnPort.process(request);
+        // then
+        assertThat(response.processReturn())
+                .flatExtracting(ProcessReturn::processStatus)
+                .contains("COMPLETED");
+    }
+
 
 
 	private ReturnRequest buildReturnRequest(String depotCode, String username, String returnToken,
