@@ -2,8 +2,8 @@ package com.warehouse.returning.infrastructure.adapter.secondary.entity;
 
 
 import com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus;
+
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
