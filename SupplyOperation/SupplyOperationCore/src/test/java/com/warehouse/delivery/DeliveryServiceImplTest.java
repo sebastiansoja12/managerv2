@@ -43,27 +43,26 @@ public class DeliveryServiceImplTest {
     @Test
     void shouldSave() {
         // given
-        final List<Delivery> deliveries = createDeliveryList();
         final DeliveryPackageRequest deliveryPackageRequest = createDeliveryPackageRequest(
-                1L, new Supplier("code"), DeliveryInformation.builder()
+                 DeliveryInformation.builder()
                         .id(DELIVERY_ID)
                         .deliveryStatus(DeliveryStatus.DELIVERY)
                         .parcelId(1L)
                         .depotCode("depotCode")
                         .build()
         );
-        final DeliveryTokenRequest request = new DeliveryTokenRequest(List.of(deliveryPackageRequest));
+        final DeliveryTokenRequest request = new DeliveryTokenRequest(List.of(deliveryPackageRequest),
+                new Supplier("code"));
         final SupplierSignature signature = SupplierSignature.builder()
                 .token("token")
                 .deliveryId(DELIVERY_ID)
-                .supplierCode("code")
                 .build();
 
         final DeliveryRequest delivery = createDeliveryRequest();
 
         when(repository.saveDelivery(createDeliveryRequest())).thenReturn(createDelivery());
 
-        doReturn(new DeliveryTokenResponse(List.of(signature)))
+        doReturn(new DeliveryTokenResponse(List.of(signature), "code"))
                 .when(supplierTokenServicePort)
                 .protect(request);
         // when
@@ -79,22 +78,21 @@ public class DeliveryServiceImplTest {
         final List<Delivery> deliveries = createDeliveryList();
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
                 List.of(createDeliveryPackageRequest(
-                        1L, new Supplier("code"), DeliveryInformation.builder()
+                        DeliveryInformation.builder()
                                 .id(DELIVERY_ID)
                                 .deliveryStatus(DeliveryStatus.DELIVERY)
                                 .parcelId(1L)
                                 .depotCode("depotCode")
-                                .build())));
+                                .build())), new Supplier("code"));
         final SupplierSignature signature = SupplierSignature.builder()
                 .deliveryId(DELIVERY_ID)
-                .supplierCode("code")
                 .build();
 
         final DeliveryRequest delivery = createDeliveryRequest();
 
         when(repository.saveDelivery(createDeliveryRequest())).thenReturn(createDelivery());
 
-        doReturn(new DeliveryTokenResponse(List.of(signature)))
+        doReturn(new DeliveryTokenResponse(List.of(signature), "code"))
                 .when(supplierTokenServicePort)
                 .protect(request);
         // when
@@ -103,9 +101,8 @@ public class DeliveryServiceImplTest {
         assertEquals(expectedToBe(null), deliveryWithToken.get(0).getToken());
     }
 
-	private DeliveryPackageRequest createDeliveryPackageRequest(Long id, Supplier supplier,
-			DeliveryInformation delivery) {
-        return new DeliveryPackageRequest(supplier, delivery);
+	private DeliveryPackageRequest createDeliveryPackageRequest(DeliveryInformation delivery) {
+        return new DeliveryPackageRequest(delivery);
     }
 
     private List<Delivery> createDeliveryList() {

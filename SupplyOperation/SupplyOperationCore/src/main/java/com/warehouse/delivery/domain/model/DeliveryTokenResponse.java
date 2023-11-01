@@ -8,5 +8,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DeliveryTokenResponse {
-    List<SupplierSignature> supplierSignature;
+    private List<SupplierSignature> supplierSignature;
+    private String supplierCode;
 }

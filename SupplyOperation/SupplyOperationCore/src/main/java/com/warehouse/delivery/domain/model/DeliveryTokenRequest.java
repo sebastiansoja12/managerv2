@@ -8,5 +8,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DeliveryTokenRequest {
-    List<DeliveryPackageRequest> deliveryPackageRequests;
+    private List<DeliveryPackageRequest> deliveryPackageRequests;
+    private Supplier supplier;
 }

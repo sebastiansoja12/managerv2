@@ -40,7 +40,12 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .map(this::createDeliveryPackageRequests)
                 .flatMap(Collection::stream)
                 .toList();
-        return new DeliveryTokenRequest(deliveryPackageRequests);
+        final Supplier supplier = deliveries.stream()
+                .map(Delivery::getSupplierCode)
+                .map(Supplier::new)
+                .findAny()
+                .orElse(null);
+        return new DeliveryTokenRequest(deliveryPackageRequests, supplier);
     }
 
     private List<DeliveryPackageRequest> createDeliveryPackageRequests(Delivery delivery) {
@@ -48,7 +53,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     private DeliveryPackageRequest createDeliveryPackageRequest(Delivery delivery) {
-        return new DeliveryPackageRequest(new Supplier(delivery.getSupplierCode()), buildDeliveryInformation(delivery));
+        return new DeliveryPackageRequest(buildDeliveryInformation(delivery));
     }
 
     private DeliveryInformation buildDeliveryInformation(Delivery delivery) {

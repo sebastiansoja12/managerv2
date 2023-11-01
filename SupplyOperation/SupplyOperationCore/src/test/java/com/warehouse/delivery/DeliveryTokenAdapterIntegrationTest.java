@@ -46,12 +46,11 @@ public class DeliveryTokenAdapterIntegrationTest {
     void shouldProtectDelivery() {
         // given
         final DeliveryTokenRequest request = new DeliveryTokenRequest( 
-             List.of(new DeliveryPackageRequest(new Supplier(SUPPLIER_CODE), DeliveryInformation.builder()
+             List.of(new DeliveryPackageRequest(DeliveryInformation.builder()
                      .deliveryStatus(DeliveryStatus.DELIVERY)
                      .parcelId(1L)
                      .depotCode("abc")
-                     .build()))
-        );
+                     .build())), new Supplier(SUPPLIER_CODE));
         final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenReturn(parcel);
@@ -60,7 +59,8 @@ public class DeliveryTokenAdapterIntegrationTest {
         // then
         assertThat(response.getSupplierSignature())
                 .hasSize(1)
-                .filteredOn(delivery -> delivery.getSupplierCode().equals(SUPPLIER_CODE));
+                .filteredOn(delivery -> delivery.getToken().equals(SUPPLIER_CODE));
+        assertThat(response.getSupplierCode()).isEqualTo(SUPPLIER_CODE);
 
     }
 }
