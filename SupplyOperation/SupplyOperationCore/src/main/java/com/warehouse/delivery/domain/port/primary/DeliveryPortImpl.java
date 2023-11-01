@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.domain.model.Delivery;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
@@ -29,11 +28,7 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .peek(DeliveryRequest::updateDeliveryStatus)
                 .collect(Collectors.toSet());
 
-        final List<Delivery> deliveries = deliveryRequests.stream()
-                .map(this::mapToDelivery)
-                .toList();
-
-        final List<Delivery> signedDeliveries = deliveryService.save(deliveries);
+        final List<Delivery> signedDeliveries = deliveryService.save(deliveryRequests);
 
         registerDeliveryRoute(signedDeliveries);
 

@@ -12,6 +12,6 @@ public interface DeliveryTokenRequestMapper {
 
     DeliveryTokenRequestDto map(DeliveryTokenRequest deliveryTokenRequest);
 
-    @Mapping(target = "parcelId.value", source = "parcelId")
+    @Mapping(target = "parcelId.value", source = "delivery.parcelId")
     DeliveryPackageRequestDto map(DeliveryPackageRequest deliveryPackageRequest);
 }

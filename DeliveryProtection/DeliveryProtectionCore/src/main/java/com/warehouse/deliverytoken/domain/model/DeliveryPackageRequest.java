@@ -5,6 +5,5 @@ import lombok.Value;
 @Value
 public class DeliveryPackageRequest {
     Parcel parcel;
-    Supplier supplier;
     Delivery delivery;
 }

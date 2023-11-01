@@ -7,4 +7,5 @@ import java.util.List;
 @Value
 public class DeliveryTokenResponse {
     List<DeliveryPackageResponse> packageResponses;
+    String supplierCode;
 }
