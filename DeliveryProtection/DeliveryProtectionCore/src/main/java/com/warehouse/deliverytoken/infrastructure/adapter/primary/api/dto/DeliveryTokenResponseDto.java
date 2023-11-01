@@ -7,4 +7,5 @@ import java.util.List;
 @Value
 public class DeliveryTokenResponseDto {
     List<SupplierSignatureDto> supplierSignature;
+    String supplierCode;
 }

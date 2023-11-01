@@ -24,7 +24,8 @@ public class DeliveryTokenMockAdapterTest {
     void shouldProtectDelivery() {
         // given
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
-                createDeliveryRequests(1L, null, null, null, "dwvscq", "1")
+                createDeliveryRequests(1L, null, null, null, "1"),
+                new Supplier("dwvscq")
         );
         // when
         final DeliveryTokenResponse response = deliveryTokenMockAdapter.protect(request);
@@ -36,22 +37,20 @@ public class DeliveryTokenMockAdapterTest {
     void shouldNotProtectDeliveryWhenSupplierHasNoneAccessToDeliveries() {
         // given
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
-                createDeliveryRequests(1L, null, null, null, "abc", "1")
+                createDeliveryRequests(1L, null, null, null, "1"),
+                new Supplier("abc")
         );
         // when && then
         assertThrows(SupplierNotAllowedException.class, ()
                 -> deliveryTokenMockAdapter.protect(request));
     }
 
-    private List<DeliveryPackageRequest> createDeliveryRequests(Long parcelId, Long parcelRelatedId,
-                                                                ParcelType parcelType, String destination, String supplierCode, String deliveryId) {
-        return Collections
-                .singletonList(new DeliveryPackageRequest(
-                        createParcel(parcelId, parcelRelatedId, parcelType, destination),
-                        createSupplier(supplierCode),
-                        createDelivery(deliveryId))
-                );
-    }
+	private List<DeliveryPackageRequest> createDeliveryRequests(Long parcelId, Long parcelRelatedId,
+			ParcelType parcelType, String destination, String deliveryId) {
+		return Collections.singletonList(
+				new DeliveryPackageRequest(createParcel(parcelId, parcelRelatedId, parcelType, destination),
+						 createDelivery(deliveryId)));
+	}
 
     private Delivery createDelivery(String id) {
         return new Delivery(id);

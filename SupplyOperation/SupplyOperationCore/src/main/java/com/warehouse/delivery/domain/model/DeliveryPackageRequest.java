@@ -1,11 +1,12 @@
 package com.warehouse.delivery.domain.model;
 
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Value
+@Data
+@AllArgsConstructor
 public class DeliveryPackageRequest {
-    Long parcelId;
     Supplier supplier;
-    Delivery delivery;
+    DeliveryInformation delivery;
 }

@@ -6,7 +6,6 @@ import java.util.UUID;
 
 @Value
 public class SupplierSignatureDto {
-    String supplierCode;
     UUID deliveryId;
     String token;
 }
