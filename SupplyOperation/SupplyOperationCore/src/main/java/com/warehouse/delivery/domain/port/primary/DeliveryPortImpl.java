@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.domain.model.Delivery;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;

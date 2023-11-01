@@ -2,8 +2,6 @@ package com.warehouse.delivery;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.warehouse.delivery.domain.model.DeliveryInformation;
-import com.warehouse.delivery.domain.model.DeliveryRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +17,7 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.delivery.configuration.DeliveryTestConfiguration;
 import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.domain.model.Delivery;
+import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryReadRepository;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryRepositoryImpl;
 
