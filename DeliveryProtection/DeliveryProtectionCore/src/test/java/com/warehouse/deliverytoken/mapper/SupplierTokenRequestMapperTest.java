@@ -24,7 +24,6 @@ public class SupplierTokenRequestMapperTest {
         // when
         final DeliveryPackageRequest deliveryPackageRequest = mapper.map(request);
         // then
-        assertEquals(request.getSupplier().getSupplierCode(), deliveryPackageRequest.getSupplier().getSupplierCode());
         assertEquals(request.getDelivery().getId(), deliveryPackageRequest.getDelivery().getId());
         assertEquals(request.getParcelId().getValue(), deliveryPackageRequest.getParcel().getId());
     }
@@ -33,7 +32,7 @@ public class SupplierTokenRequestMapperTest {
     void shouldMapDeliveryTokenRequest() {
         // given
         final DeliveryTokenRequestDto request = new DeliveryTokenRequestDto(
-                List.of(createDeliveryPackageRequestDto()));
+                List.of(createDeliveryPackageRequestDto()), new SupplierDto("abc"));
         // when
         final DeliveryTokenRequest deliveryTokenRequest = mapper.map(request);
         // then
@@ -43,7 +42,7 @@ public class SupplierTokenRequestMapperTest {
 
     private DeliveryPackageRequestDto createDeliveryPackageRequestDto() {
         return new DeliveryPackageRequestDto(
-                new DeliveryDto("1"), new SupplierDto("abc"), new ParcelIdDto(1L)
+                new DeliveryDto("1"), new ParcelIdDto(1L)
         );
     }
 }

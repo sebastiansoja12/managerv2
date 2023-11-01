@@ -29,11 +29,7 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .peek(DeliveryRequest::updateDeliveryStatus)
                 .collect(Collectors.toSet());
 
-        final List<Delivery> deliveries = deliveryRequests.stream()
-                .map(this::mapToDelivery)
-                .toList();
-
-        final List<Delivery> signedDeliveries = deliveryService.save(deliveries);
+        final List<Delivery> signedDeliveries = deliveryService.save(deliveryRequests);
 
         registerDeliveryRoute(signedDeliveries);
 

@@ -2,6 +2,8 @@ package com.warehouse.delivery;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.warehouse.delivery.domain.model.DeliveryInformation;
+import com.warehouse.delivery.domain.model.DeliveryRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,10 +43,10 @@ public class DeliveryRepositoryImplTest {
     @Test
     void shouldSaveDelivery() {
         // given
-        final Delivery delivery = Delivery.builder()
+        final DeliveryRequest delivery = DeliveryRequest.builder()
                 .deliveryStatus(DeliveryStatus.DELIVERY)
                 .parcelId(1L)
-                .supplierCode("abc")
+                .supplierCode("supplierCode")
                 .depotCode("abc")
                 .build();
         // when

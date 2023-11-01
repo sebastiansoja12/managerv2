@@ -24,7 +24,7 @@ public class DeliveryTokenMockAdapter implements DeliveryTokenServicePort {
 		validateSupplier(request);
 		final List<DeliveryPackageResponse> deliveryPackageResponses = deliveryPackageRequests(
 				request.getDeliveryPackageRequests());
-		return new DeliveryTokenResponse(deliveryPackageResponses);
+		return new DeliveryTokenResponse(deliveryPackageResponses, request.extractSupplierCode());
 	}
 
 	private void validateSupplier(DeliveryTokenRequest request) {
@@ -37,8 +37,8 @@ public class DeliveryTokenMockAdapter implements DeliveryTokenServicePort {
 
 	private List<DeliveryPackageResponse> deliveryPackageRequests(List<DeliveryPackageRequest> requests) {
 		return requests.stream()
-				.map(deliveryPackageRequest -> new DeliveryPackageResponse(deliveryPackageRequest.getParcel(),
-						deliveryPackageRequest.getSupplier().getSupplierCode(), supplierTokenServiceApplicationId,
+				.map(deliveryPackageRequest -> new DeliveryPackageResponse(
+						deliveryPackageRequest.getParcel(), supplierTokenServiceApplicationId,
 						createProtectedDelivery(deliveryPackageRequest.getDelivery().getId())))
 				.toList();
 	}

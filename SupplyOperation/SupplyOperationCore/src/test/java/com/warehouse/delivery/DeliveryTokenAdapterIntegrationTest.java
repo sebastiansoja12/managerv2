@@ -46,10 +46,9 @@ public class DeliveryTokenAdapterIntegrationTest {
     void shouldProtectDelivery() {
         // given
         final DeliveryTokenRequest request = new DeliveryTokenRequest( 
-             List.of(new DeliveryPackageRequest(1L, new Supplier(SUPPLIER_CODE), Delivery.builder()
+             List.of(new DeliveryPackageRequest(new Supplier(SUPPLIER_CODE), DeliveryInformation.builder()
                      .deliveryStatus(DeliveryStatus.DELIVERY)
                      .parcelId(1L)
-                     .supplierCode(SUPPLIER_CODE)
                      .depotCode("abc")
                      .build()))
         );

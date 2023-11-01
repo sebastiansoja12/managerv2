@@ -9,9 +9,6 @@ import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
 
 import lombok.AllArgsConstructor;
-import org.springframework.util.CollectionUtils;
-
-import static com.google.common.collect.MoreCollectors.onlyElement;
 
 @AllArgsConstructor
 public class DeliveryServiceImpl implements DeliveryService {
@@ -21,31 +18,29 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryTokenServicePort deliveryTokenServicePort;
 
     @Override
-    public List<Delivery> save(List<Delivery> deliveryRequest) {
+    public List<Delivery> save(Set<DeliveryRequest> deliveryRequest) {
         final List<Delivery> deliveries = deliveryRequest.stream()
                 .map(deliveryRepository::saveDelivery)
                 .toList();
 
-        final List<DeliveryTokenRequest> deliveryTokenRequests = buildTokenRequests(deliveries);
+        final DeliveryTokenRequest deliveryTokenRequest = buildTokenRequest(deliveries);
 
-        final List<DeliveryTokenResponse> deliveryTokenResponse = secureDelivery(deliveryTokenRequests);
+        final DeliveryTokenResponse deliveryTokenResponse = secureDelivery(deliveryTokenRequest);
 
-        final Map<UUID, DeliveryTokenResponse> deliveryTokenResponseMap = assignToHashMap(deliveryTokenResponse);
+        final Map<UUID, SupplierSignature> signaturesMap = assignToHashMap(deliveryTokenResponse);
 
-        assignTokenToDelivery(deliveryTokenResponseMap, deliveries);
+        assignTokenToDelivery(signaturesMap, deliveries);
 
 		return deliveries;
     }
 
-    private List<DeliveryTokenRequest> buildTokenRequests(List<Delivery> deliveries) {
-        return deliveries
+    private DeliveryTokenRequest buildTokenRequest(List<Delivery> deliveries) {
+        final List<DeliveryPackageRequest> deliveryPackageRequests = deliveries
                 .stream()
-                .map(this::obtainRequest)
-                .collect(Collectors.toList());
-    }
-
-    private DeliveryTokenRequest obtainRequest(Delivery delivery) {
-        return new DeliveryTokenRequest(createDeliveryPackageRequests(delivery));
+                .map(this::createDeliveryPackageRequests)
+                .flatMap(Collection::stream)
+                .toList();
+        return new DeliveryTokenRequest(deliveryPackageRequests);
     }
 
     private List<DeliveryPackageRequest> createDeliveryPackageRequests(Delivery delivery) {
@@ -53,38 +48,40 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     private DeliveryPackageRequest createDeliveryPackageRequest(Delivery delivery) {
-        return new DeliveryPackageRequest(
-                delivery.getParcelId(), new Supplier(delivery.getSupplierCode()), delivery);
+        return new DeliveryPackageRequest(new Supplier(delivery.getSupplierCode()), buildDeliveryInformation(delivery));
     }
 
-    private void assignTokenToDelivery(Map<UUID, DeliveryTokenResponse> supplierTokenResponseMap,
+    private DeliveryInformation buildDeliveryInformation(Delivery delivery) {
+        return DeliveryInformation.builder()
+                .deliveryStatus(delivery.getDeliveryStatus())
+                .id(delivery.getId())
+                .token(delivery.getToken())
+                .depotCode(delivery.getDepotCode())
+                .parcelId(delivery.getParcelId())
+                .build();
+    }
+
+    private void assignTokenToDelivery(Map<UUID, SupplierSignature> supplierTokenResponseMap,
 			List<Delivery> deliveries) {
 		deliveries.forEach(delivery -> {
-			final DeliveryTokenResponse deliveryTokenResponse = supplierTokenResponseMap.get(delivery.getId());
-			deliveryTokenResponse.getSupplierSignature()
-                    .forEach(tokenSignature -> delivery.setToken(tokenSignature.getToken()));
+			final SupplierSignature supplierSignature = supplierTokenResponseMap.get(delivery.getId());
+			delivery.setToken(supplierSignature.getToken());
 		});
 	}
 
-    private Map<UUID, DeliveryTokenResponse> assignToHashMap(List<DeliveryTokenResponse> responses) {
-        return responses.stream()
+    private Map<UUID, SupplierSignature> assignToHashMap(DeliveryTokenResponse responses) {
+        return responses.getSupplierSignature().stream()
                 .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
     }
 
-	private UUID generateKeyFromResponse(DeliveryTokenResponse response) {
-		if (response != null && !CollectionUtils.isEmpty(response.getSupplierSignature())) {
-			return response.getSupplierSignature().stream()
-                    .map(SupplierSignature::getDeliveryId)
-                    .map(UUID::toString)
-                    .map(UUID::fromString)
-                    .collect(onlyElement());
+    private UUID generateKeyFromResponse(SupplierSignature supplierSignature) {
+		if (supplierSignature != null) {
+			return supplierSignature.getDeliveryId();
 		}
 		return null;
 	}
 
-    private List<DeliveryTokenResponse> secureDelivery(List<DeliveryTokenRequest> requests) {
-        final List<DeliveryTokenResponse> responses = new ArrayList<>();
-        requests.forEach(request -> responses.add(deliveryTokenServicePort.protect(request)));
-        return responses;
+    private DeliveryTokenResponse secureDelivery(DeliveryTokenRequest request) {
+        return deliveryTokenServicePort.protect(request);
     }
 }
