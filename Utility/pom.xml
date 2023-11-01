@@ -12,5 +12,8 @@
     <artifactId>Utility</artifactId>
 
     <packaging>pom</packaging>
+    <modules>
+        <module>Caching</module>
+    </modules>
 
 </project>

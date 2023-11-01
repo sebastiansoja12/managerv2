@@ -35,7 +35,7 @@ public class SupplierController {
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<?> getSuppliers() {
         final List<Supplier> suppliers = supplyPort.findAllSuppliers();
         return new ResponseEntity<>(responseMapper.mapToDto(suppliers), HttpStatus.OK);
