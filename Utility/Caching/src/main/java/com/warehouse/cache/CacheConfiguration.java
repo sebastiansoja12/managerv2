@@ -52,7 +52,7 @@ public class CacheConfiguration {
     }
 
     @Scheduled(fixedRate = 3600000)
-    @CacheEvict(value = DEPOTS_CACHE, allEntries = true)
+    @CacheEvict(value = {SUPPLIERS_CACHE, SUPPLIER_CODE, SUPPLIERS_CODE, SUPPLIERS_DEPOT_CODE}, allEntries = true)
     public void clearSupplierCaches() {
         log.info("Cache for {} is being deleted", String.join(", ", SUPPLIERS_CACHE, SUPPLIER_CODE,
                 SUPPLIERS_CODE, SUPPLIERS_DEPOT_CODE));
