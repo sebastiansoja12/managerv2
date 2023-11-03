@@ -1,2 +1,10 @@
+parcel:
+  endpoint: parcel-updates
+  url: http://localhost
+  port: 8080
+
+
+
+
 service:
   mock: true

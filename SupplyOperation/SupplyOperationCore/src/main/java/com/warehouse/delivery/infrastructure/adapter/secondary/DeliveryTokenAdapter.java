@@ -1,7 +1,7 @@
 package com.warehouse.delivery.infrastructure.adapter.secondary;
 
-import com.warehouse.delivery.domain.model.DeliveryTokenRequest;
-import com.warehouse.delivery.domain.model.DeliveryTokenResponse;
+import com.warehouse.delivery.domain.vo.DeliveryTokenRequest;
+import com.warehouse.delivery.domain.vo.DeliveryTokenResponse;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryTokenRequestMapper;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryTokenResponseMapper;

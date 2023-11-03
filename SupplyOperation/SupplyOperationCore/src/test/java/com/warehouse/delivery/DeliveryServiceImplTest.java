@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.warehouse.delivery.domain.vo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,8 +52,10 @@ public class DeliveryServiceImplTest {
                         .depotCode("depotCode")
                         .build()
         );
-        final DeliveryTokenRequest request = new DeliveryTokenRequest(List.of(deliveryPackageRequest),
-                new Supplier("code"));
+        final DeliveryTokenRequest request = DeliveryTokenRequest.builder()
+                .deliveryPackageRequests(List.of(deliveryPackageRequest))
+                .supplier(new Supplier("code"))
+                .build();
         final SupplierSignature signature = SupplierSignature.builder()
                 .token("token")
                 .deliveryId(DELIVERY_ID)
@@ -62,7 +65,10 @@ public class DeliveryServiceImplTest {
 
         when(repository.saveDelivery(createDeliveryRequest())).thenReturn(createDelivery());
 
-        doReturn(new DeliveryTokenResponse(List.of(signature), "code"))
+        doReturn(DeliveryTokenResponse.builder()
+                .supplierSignature(List.of(signature))
+                .supplierCode("code")
+                .build())
                 .when(supplierTokenServicePort)
                 .protect(request);
         // when
@@ -75,15 +81,16 @@ public class DeliveryServiceImplTest {
     @Test
     void shouldNotSaveWhenSigningDeliveryIsNotPossible() {
         // given
-        final List<Delivery> deliveries = createDeliveryList();
-        final DeliveryTokenRequest request = new DeliveryTokenRequest(
-                List.of(createDeliveryPackageRequest(
+        final DeliveryTokenRequest request = DeliveryTokenRequest.builder()
+                .supplier(new Supplier("code"))
+                .deliveryPackageRequests(List.of(createDeliveryPackageRequest(
                         DeliveryInformation.builder()
                                 .id(DELIVERY_ID)
                                 .deliveryStatus(DeliveryStatus.DELIVERY)
                                 .parcelId(1L)
                                 .depotCode("depotCode")
-                                .build())), new Supplier("code"));
+                                .build())))
+                .build();
         final SupplierSignature signature = SupplierSignature.builder()
                 .deliveryId(DELIVERY_ID)
                 .build();
@@ -92,7 +99,10 @@ public class DeliveryServiceImplTest {
 
         when(repository.saveDelivery(createDeliveryRequest())).thenReturn(createDelivery());
 
-        doReturn(new DeliveryTokenResponse(List.of(signature), "code"))
+        doReturn(DeliveryTokenResponse.builder()
+                .supplierSignature(List.of(signature))
+                .supplierCode("code")
+                .build())
                 .when(supplierTokenServicePort)
                 .protect(request);
         // when
@@ -102,17 +112,9 @@ public class DeliveryServiceImplTest {
     }
 
 	private DeliveryPackageRequest createDeliveryPackageRequest(DeliveryInformation delivery) {
-        return new DeliveryPackageRequest(delivery);
-    }
-
-    private List<Delivery> createDeliveryList() {
-        final Delivery delivery = Delivery.builder()
-                .deliveryStatus(DeliveryStatus.DELIVERY)
-                .parcelId(1L)
-                .supplierCode("code")
-                .depotCode("depotCode")
+        return DeliveryPackageRequest.builder()
+                .delivery(delivery)
                 .build();
-        return List.of(delivery);
     }
 
     private DeliveryRequest createDeliveryRequest() {

@@ -8,6 +8,7 @@ import com.warehouse.delivery.domain.model.*;
 import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
 
+import com.warehouse.delivery.domain.vo.*;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -45,7 +46,10 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .map(Supplier::new)
                 .findAny()
                 .orElse(null);
-        return new DeliveryTokenRequest(deliveryPackageRequests, supplier);
+        return DeliveryTokenRequest.builder()
+                .deliveryPackageRequests(deliveryPackageRequests)
+                .supplier(supplier)
+                .build();
     }
 
     private List<DeliveryPackageRequest> createDeliveryPackageRequests(Delivery delivery) {
@@ -53,7 +57,9 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     private DeliveryPackageRequest createDeliveryPackageRequest(Delivery delivery) {
-        return new DeliveryPackageRequest(buildDeliveryInformation(delivery));
+        return DeliveryPackageRequest.builder()
+                .delivery(buildDeliveryInformation(delivery))
+                .build();
     }
 
     private DeliveryInformation buildDeliveryInformation(Delivery delivery) {

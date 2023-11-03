@@ -1,4 +1,4 @@
-package com.warehouse.delivery.domain.model;
+package com.warehouse.delivery.domain.vo;
 
 import lombok.Value;
 
