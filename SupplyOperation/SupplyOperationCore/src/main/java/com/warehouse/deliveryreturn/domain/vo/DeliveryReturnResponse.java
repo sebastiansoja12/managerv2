@@ -11,4 +11,6 @@ import lombok.Value;
 @Builder
 public class DeliveryReturnResponse {
     List<DeliveryReturnResponseDetails> deliveryReturnResponses;
+    String supplierCode;
+    String depotCode;
 }

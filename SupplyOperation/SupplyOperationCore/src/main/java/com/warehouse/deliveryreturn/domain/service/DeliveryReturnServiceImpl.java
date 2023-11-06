@@ -24,29 +24,28 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
     @Override
     public List<DeliveryReturn> deliverReturn(Set<DeliveryReturnDetails> deliveryReturnRequests) {
 
-        final List<DeliveryReturn> deliveries = deliveryReturnRequests.stream()
-                .map(deliveryReturnRepository::saveDeliveryReturn)
-                .toList();
-
-        final DeliveryReturnTokenRequest deliveryReturnTokenRequest = buildTokenRequest(deliveries);
+        final DeliveryReturnTokenRequest deliveryReturnTokenRequest = buildTokenRequest(deliveryReturnRequests);
 
         final DeliveryReturnTokenResponse deliveryReturnTokenResponse = secureDeliveryReturn(deliveryReturnTokenRequest);
 
-        final Map<UUID, DeliveryReturnSignature> signaturesMap = assignToHashMap(deliveryReturnTokenResponse);
+        final Map<Long, DeliveryReturnSignature> signaturesMap = assignToHashMap(deliveryReturnTokenResponse);
 
-        assignTokenToDeliveryReturn(signaturesMap, deliveries);
+        final List<DeliveryReturnDetails> deliveries = assignTokenToDeliveryReturn(signaturesMap, 
+                deliveryReturnRequests);
 
-        return deliveries;
+        return deliveries.stream()
+                .map(deliveryReturnRepository::saveDeliveryReturn)
+                .toList();
     }
 
-    private DeliveryReturnTokenRequest buildTokenRequest(List<DeliveryReturn> deliveries) {
+    private DeliveryReturnTokenRequest buildTokenRequest(Set<DeliveryReturnDetails> deliveries) {
         final List<DeliveryPackageRequest> deliveryPackageRequests = deliveries
                 .stream()
                 .map(this::createDeliveryPackageRequests)
                 .flatMap(Collection::stream)
                 .toList();
         final Supplier supplier = deliveries.stream()
-                .map(DeliveryReturn::getSupplierCode)
+                .map(DeliveryReturnDetails::getSupplierCode)
                 .map(Supplier::new)
                 .findAny()
                 .orElse(null);
@@ -56,49 +55,46 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .build();
     }
 
-    private List<DeliveryPackageRequest> createDeliveryPackageRequests(DeliveryReturn delivery) {
+    private List<DeliveryPackageRequest> createDeliveryPackageRequests(DeliveryReturnDetails delivery) {
         return List.of(createDeliveryPackageRequest(delivery));
     }
 
-    private DeliveryPackageRequest createDeliveryPackageRequest(DeliveryReturn delivery) {
+    private DeliveryPackageRequest createDeliveryPackageRequest(DeliveryReturnDetails delivery) {
         return DeliveryPackageRequest.builder()
                 .delivery(buildDeliveryInformation(delivery))
                 .build();
     }
 
-    private DeliveryReturnInformation buildDeliveryInformation(DeliveryReturn delivery) {
+    private DeliveryReturnInformation buildDeliveryInformation(DeliveryReturnDetails delivery) {
         return DeliveryReturnInformation.builder()
-                .deliveryStatus(delivery.getDeliveryStatus())
-                .id(delivery.getId())
-                .token(delivery.getToken())
+                .deliveryStatus(String.valueOf(delivery.getDeliveryStatus()))
                 .depotCode(delivery.getDepotCode())
                 .parcelId(delivery.getParcelId())
                 .build();
     }
 
-	private void assignTokenToDeliveryReturn(Map<UUID, DeliveryReturnSignature> deliveryReturnSignatureMap,
-			List<DeliveryReturn> deliveries) {
-		deliveries.stream().map(delivery -> {
-			final DeliveryReturnSignature deliveryReturnSignature = deliveryReturnSignatureMap.get(delivery.getId());
-            return DeliveryReturn.builder()
+	private List<DeliveryReturnDetails> assignTokenToDeliveryReturn(Map<Long, DeliveryReturnSignature> signaturesMap,
+			Set<DeliveryReturnDetails> deliveryReturnRequests) {
+        return deliveryReturnRequests.stream().map(delivery -> {
+			final DeliveryReturnSignature deliveryReturnSignature = signaturesMap.get(delivery.getParcelId());
+            return DeliveryReturnDetails.builder()
                     .supplierCode(delivery.getSupplierCode())
                     .deliveryStatus(delivery.getDeliveryStatus())
-                    .id(delivery.getId())
                     .token(deliveryReturnSignature.getToken())
                     .depotCode(delivery.getDepotCode())
                     .parcelId(delivery.getParcelId())
                     .build();
-		});
+		}).toList();
 	}
 
-    private Map<UUID, DeliveryReturnSignature> assignToHashMap(DeliveryReturnTokenResponse responses) {
+    private Map<Long, DeliveryReturnSignature> assignToHashMap(DeliveryReturnTokenResponse responses) {
         return responses.getDeliveryReturnSignatures().stream()
                 .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
     }
 
-    private UUID generateKeyFromResponse(DeliveryReturnSignature deliveryReturnSignature) {
+    private Long generateKeyFromResponse(DeliveryReturnSignature deliveryReturnSignature) {
         if (deliveryReturnSignature != null) {
-            return deliveryReturnSignature.getDeliveryId();
+            return deliveryReturnSignature.getParcelId();
         }
         return null;
     }

@@ -31,8 +31,9 @@ public class DeliveryReturnConfiguration {
 	}
 
     @Bean
-    public RouteLogServicePort logServicePort() {
-        return new RouteLogServiceAdapter();
+    public RouteLogServicePort logServicePort(RestClient.Builder builder) {
+        final RestClient restClient = builder.baseUrl("").build();
+        return new RouteLogServiceAdapter(restClient);
     }
 
     @Bean

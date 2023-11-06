@@ -3,8 +3,10 @@ parcel:
   url: http://localhost
   port: 8080
 
-
-
+route:
+  endpoint: routes
+  url: http://localhost
+  port: 8080
 
 service:
   mock: true

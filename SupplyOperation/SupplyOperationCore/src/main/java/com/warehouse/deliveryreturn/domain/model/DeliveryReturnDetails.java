@@ -12,9 +12,10 @@ import static com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus.RET
 @Builder
 public class DeliveryReturnDetails {
     private Long parcelId;
+    private DeliveryStatus deliveryStatus;
     private String depotCode;
     private String supplierCode;
-    private DeliveryStatus deliveryStatus;
+    private String token;
 
 
     public void validateDeliveryStatus() {
@@ -30,9 +31,9 @@ public class DeliveryReturnDetails {
     public DeliveryReturnDetails updateDeliveryStatus() {
         return DeliveryReturnDetails.builder()
                 .deliveryStatus(RETURN)
-                .depotCode(depotCode)
-                .supplierCode(supplierCode)
                 .parcelId(parcelId)
+                .supplierCode(supplierCode)
+                .depotCode(depotCode)
                 .build();
     }
 }

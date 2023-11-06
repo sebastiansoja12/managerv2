@@ -24,6 +24,9 @@
             <column name="supplier_code" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="token" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 </databaseChangeLog>

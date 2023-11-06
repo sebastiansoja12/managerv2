@@ -1,26 +1,33 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import com.warehouse.deliveryreturn.domain.enumeration.ProcessType;
+import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
-import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
+import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetail;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.request.ZebraDeliveryReturnRequest;
 import com.warehouse.deliveryreturn.infrastructure.api.zebradevice.ZebraDeviceInformation;
-import org.mapstruct.Mapper;
-
-import java.util.List;
 
 @Mapper
 public interface DeliveryReturnRequestMapper {
 
 
-    default DeliveryReturnRequest map(ZebraDeliveryReturnRequest deliveryReturnRequest) {
-        return new DeliveryReturnRequest(
-                map(deliveryReturnRequest.getZebraDeviceInformation()),
-                null, null, null, null
-        );
+    default DeliveryReturnRequest map(ZebraDeliveryReturnRequest request) {
+        return new DeliveryReturnRequest(map(request.getProcessType()), map(request.getZebraDeviceInformation()),
+                map(request.getDeliveryReturnDetails()));
     }
 
-    List<DeliveryReturnRequest> map(List<DeliveryReturnRequestDto> deliveryReturnRequests);
+    List<DeliveryReturnDetails> map(List<DeliveryReturnDetail> deliveryReturnRequests);
+
+    @Mapping(target = "token", ignore = true)
+    DeliveryReturnDetails map(DeliveryReturnDetail deliveryReturnDetail);
 
     DeviceInformation map(ZebraDeviceInformation zebraDeviceInformation);
+
+    ProcessType map(com.warehouse.deliveryreturn.infrastructure.api.dto.request.ProcessType processType);
 }

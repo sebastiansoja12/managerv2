@@ -3,6 +3,7 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.primary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +39,7 @@ public class DeliveryReturnAdapter {
 		log.info("Detected request for delivery {} process", deliveryReturnRequest.getProcessType());
         final DeliveryReturnRequest request = requestMapper.map(deliveryReturnRequest);
         final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
-        return null;
+        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
 
 }

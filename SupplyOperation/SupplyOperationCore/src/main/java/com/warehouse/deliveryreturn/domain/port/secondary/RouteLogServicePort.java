@@ -1,12 +1,8 @@
 package com.warehouse.deliveryreturn.domain.port.secondary;
 
-import com.warehouse.delivery.domain.model.DeliveryRouteRequest;
-import com.warehouse.delivery.domain.model.DeliveryRouteResponse;
-
-import java.util.List;
-import java.util.Set;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteRequest;
 
 public interface RouteLogServicePort {
-    List<DeliveryRouteResponse> logDeliverReturn(Set<DeliveryRouteRequest> deliveryRequest);
+    void logDeliverReturn(DeliveryReturnRouteRequest request);
 
 }

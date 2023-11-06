@@ -9,5 +9,6 @@ public class DeliveryReturnResponseDetails {
     UUID id;
     Long parcelId;
     String deliveryStatus;
+    String returnToken;
     UpdateStatus updateStatus;
 }

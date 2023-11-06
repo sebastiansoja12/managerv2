@@ -3,22 +3,30 @@ package com.warehouse.deliveryreturn.domain.model;
 
 import java.util.List;
 
+import com.warehouse.deliveryreturn.domain.enumeration.ProcessType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+
+import static com.warehouse.deliveryreturn.domain.enumeration.ProcessType.RETURN;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class DeliveryReturnRequest {
-    private DeviceInformation deviceInformation;
-    private List<DeliveryReturnDetails> deliveries;
+    private ProcessType processType;
+    private DeviceInformation zebraDeviceInformation;
+    private List<DeliveryReturnDetails> deliveryReturnDetails;
 
     public boolean isNotReturn() {
-        return deliveries.stream().anyMatch(DeliveryReturnDetails::isNotReturn);
+        return deliveryReturnDetails.stream().anyMatch(DeliveryReturnDetails::isNotReturn);
     }
 
     public void validateStatuses() {
-        deliveries.forEach(DeliveryReturnDetails::validateDeliveryStatus);
+        deliveryReturnDetails.forEach(DeliveryReturnDetails::validateDeliveryStatus);
+    }
+
+    public boolean isReturnProcessType() {
+        return RETURN.equals(processType);
     }
 }

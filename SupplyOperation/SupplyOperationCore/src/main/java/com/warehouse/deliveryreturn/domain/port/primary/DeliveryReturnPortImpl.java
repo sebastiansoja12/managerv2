@@ -12,9 +12,14 @@ import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.vo.*;
 
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteDetails;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteRequest;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 @AllArgsConstructor
+@Slf4j
 public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private final DeliveryReturnService deliveryReturnService;
@@ -26,9 +31,16 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
     @Override
     public DeliveryReturnResponse deliverReturn(DeliveryReturnRequest deliveryRequest) {
 
+        validateRequest(deliveryRequest);
+        
+        if (!deliveryRequest.isReturnProcessType()) {
+            logWrongProcessTypeInformation();
+            return DeliveryReturnResponse.builder().build();
+        }
+
         deliveryRequest.validateStatuses();
 
-        final Set<DeliveryReturnDetails> deliveryReturnRequests = deliveryRequest.getDeliveries()
+        final Set<DeliveryReturnDetails> deliveryReturnRequests = deliveryRequest.getDeliveryReturnDetails()
                 .stream()
                 .filter(Objects::nonNull)
                 .map(DeliveryReturnDetails::updateDeliveryStatus)
@@ -46,19 +58,60 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 					final UpdateStatus updateStatus = parcelStatusControlChangeServicePort
 							.updateStatus(updateStatusParcelRequest);
                     return new DeliveryReturnResponseDetails(deliveryReturn.getId(), deliveryReturn.getParcelId(),
-                            deliveryReturn.getDeliveryStatus(), updateStatus);
+                            deliveryReturn.getDeliveryStatus(), deliveryReturn.getToken(), updateStatus);
 				}).collect(Collectors.toList());
-
-        logRouteFlow();
 		
-		return DeliveryReturnResponse
+		final DeliveryReturnResponse deliveryReturnResponse = DeliveryReturnResponse
                 .builder()
-                .deliveryReturnResponses(deliveryReturnResponseDetails)
+				.deliveryReturnResponses(deliveryReturnResponseDetails)
+                .supplierCode(deliveryRequest.getZebraDeviceInformation().getUsername())
+                .depotCode(deliveryRequest.getZebraDeviceInformation().getDepotCode())
                 .build();
+
+        logRouteFlow(deliveryReturnResponse);
         
+        return deliveryReturnResponse;
     }
 
-    private void logRouteFlow() {
-        //ogServicePort.logDeliverReturn();
+    private void validateRequest(DeliveryReturnRequest deliveryRequest) {
+        if (Objects.isNull(deliveryRequest)) {
+            // exception
+        }
+        if (CollectionUtils.isEmpty(deliveryRequest.getDeliveryReturnDetails())) {
+            // exception
+        }
+    }
+
+    private void logRouteFlow(DeliveryReturnResponse deliveryReturnResponse) {
+        final DeliveryReturnRouteRequest request = DeliveryReturnRouteRequest.builder()
+                .depotCode(deliveryReturnResponse.getDepotCode())
+                .username(deliveryReturnResponse.getSupplierCode())
+				.deliveryReturnRouteDetails(
+						deliveryReturnRouteDetails(deliveryReturnResponse.getDeliveryReturnResponses()))
+                .supplierCode(deliveryReturnResponse.getSupplierCode())
+                .build();
+        //logServicePort.logDeliverReturn(request);
+    }
+    
+	private List<DeliveryReturnRouteDetails> deliveryReturnRouteDetails(
+			List<DeliveryReturnResponseDetails> deliveryReturnResponses) {
+        return deliveryReturnResponses.stream()
+                .map(this::convertToDeliveryReturnRouteDetails)
+                .collect(Collectors.toList());
+    }
+
+	private DeliveryReturnRouteDetails convertToDeliveryReturnRouteDetails(DeliveryReturnResponseDetails response) {
+        return DeliveryReturnRouteDetails.builder()
+                .deliveryStatus(response.getDeliveryStatus())
+                .id(response.getId())
+                .parcelId(response.getParcelId())
+                .updateStatus(response.getUpdateStatus().name())
+                .returnToken(response.getReturnToken())
+                .build();
+    }
+
+    private void logWrongProcessTypeInformation() {
+        log.warn("Process type is different than RETURN");
     }
 }
+

@@ -1,15 +1,16 @@
 package com.warehouse.deliveryreturn.infrastructure.api.dto.request;
 
 
-import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
+import java.util.List;
+
+import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetail;
 import com.warehouse.deliveryreturn.infrastructure.api.zebradevice.ZebraDeviceInformation;
+
 import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @XmlRootElement(name = "ZebraDeliveryReturnRequest")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -25,7 +26,7 @@ public class ZebraDeliveryReturnRequest {
     @XmlElement(name = "ZebraDeviceInformation")
     private ZebraDeviceInformation zebraDeviceInformation;
 
-    @XmlElementWrapper(name = "DeliveryReturnRequests")
-    @XmlElement(name = "DeliveryReturnRequest")
-    private List<DeliveryReturnRequestDto> deliveryReturnRequests;
+    @XmlElementWrapper(name = "DeliveryReturnDetails")
+    @XmlElement(name = "DeliveryReturnDetail")
+    private List<DeliveryReturnDetail> deliveryReturnDetails;
 }
