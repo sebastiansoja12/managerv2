@@ -1,7 +1,14 @@
 parcel:
   endpoint: parcel-updates
-  url: http://localhost
+  url: http://localhost:8080
   port: 8080
+
+server:
+  servlet:
+    contextPath: /v2/api
+local:
+  server:
+    port: 8080
 
 route:
   endpoint: routes
