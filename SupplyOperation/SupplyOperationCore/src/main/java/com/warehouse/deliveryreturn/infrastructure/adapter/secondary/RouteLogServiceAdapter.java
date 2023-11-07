@@ -7,7 +7,6 @@ import org.springframework.web.client.support.RestGatewaySupport;
 
 import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteRequest;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.DeliveryReturnRouteRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryRouteRequestMapper;
 
 import lombok.AllArgsConstructor;
@@ -23,7 +22,7 @@ public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteL
 
     @Override
     public void logDeliverReturn(DeliveryReturnRouteRequest deliveryReturnRouteRequest) {
-        final DeliveryReturnRouteRequestDto request = requestMapper.map(deliveryReturnRouteRequest);
-
+        // TODO 5711
+        //final DeliveryReturnRouteRequestDto request = requestMapper.map(deliveryReturnRouteRequest);
     }
 }

@@ -24,7 +24,8 @@ public class ParcelStatusRepositoryImpl implements ParcelStatusRepository {
     @Override
     public void update(StatusRequest statusRequest) {
 		final ParcelEntity parcel = parcelStatusReadRepository.findById(statusRequest.getParcel().getId()).orElseThrow(
-				() -> new ParcelNotFoundException(String.format(exceptionMessage, statusRequest.getParcel().getId())));
+				() -> new ParcelNotFoundException(8070,
+						String.format(exceptionMessage, statusRequest.getParcel().getId())));
 		final Status status = statusRequest.getParcel().getStatus();
 		parcel.setStatus(statusMapper.map(status));
         parcel.setUpdatedAt(LocalDateTime.now());

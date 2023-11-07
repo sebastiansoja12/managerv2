@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.warehouse.deliveryreturn.domain.exception.SupplierNotAvailableInRequestException;
 import com.warehouse.deliveryreturn.domain.model.*;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
@@ -13,6 +14,7 @@ import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnInformation;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 @AllArgsConstructor
 public class DeliveryReturnServiceImpl implements DeliveryReturnService {
@@ -44,14 +46,14 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .map(this::createDeliveryPackageRequests)
                 .flatMap(Collection::stream)
                 .toList();
-        final Supplier supplier = deliveries.stream()
+        final String supplierCode = deliveries.stream()
                 .map(DeliveryReturnDetails::getSupplierCode)
-                .map(Supplier::new)
+                .filter(StringUtils::isNotEmpty)
                 .findAny()
-                .orElse(null);
+                .orElseThrow(() -> new SupplierNotAvailableInRequestException("Supplier not available"));
         return DeliveryReturnTokenRequest.builder()
                 .requests(deliveryPackageRequests)
-                .supplier(supplier)
+                .supplier(new Supplier(supplierCode))
                 .build();
     }
 

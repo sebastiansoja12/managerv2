@@ -1,0 +1,17 @@
+<ZebraDeliveryReturnRequest>
+    <ProcessType>RETURN</ProcessType>
+    <ZebraDeviceInformation>
+        <ResponsibleUser>s-soja</ResponsibleUser>
+        <DepotCode>KT1</DepotCode>
+        <Version>1.0</Version>
+        <ZebraID>1</ZebraID>
+    </ZebraDeviceInformation>
+    <DeliveryReturnDetails>
+        <DeliveryReturnDetail>
+            <ParcelID>1000000000</ParcelID>
+            <DeliveryStatus>DELIVERY</DeliveryStatus>
+            <DepotCode>KT1</DepotCode>
+            <SupplierCode>abc</SupplierCode>
+        </DeliveryReturnDetail>
+    </DeliveryReturnDetails>
+</ZebraDeliveryReturnRequest>

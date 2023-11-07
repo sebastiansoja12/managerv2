@@ -10,6 +10,7 @@ import org.springframework.web.client.support.RestGatewaySupport;
 public class DeliveryReturnServiceAdapter extends RestGatewaySupport implements DeliveryReturnTokenServicePort {
     @Override
     public DeliveryReturnTokenResponse sign(DeliveryReturnTokenRequest deliveryReturnTokenRequest) {
+        // TODO
         return null;
     }
 }

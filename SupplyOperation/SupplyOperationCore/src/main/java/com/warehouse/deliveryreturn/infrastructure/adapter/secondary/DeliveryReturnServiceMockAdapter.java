@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class DeliveryReturnServiceMockAdapter implements DeliveryReturnTokenServicePort {
 
+    private final static String TOKEN = "12345";
+
     @Override
     public DeliveryReturnTokenResponse sign(DeliveryReturnTokenRequest deliveryReturnTokenRequest) {
 		return new DeliveryReturnTokenResponse(map(deliveryReturnTokenRequest.getRequests()),
@@ -23,7 +25,7 @@ public class DeliveryReturnServiceMockAdapter implements DeliveryReturnTokenServ
         return packageRequests.stream()
                 .map(packageRequest -> DeliveryReturnSignature.builder()
                         .parcelId(packageRequest.getDelivery().getParcelId())
-                        .token("12345")
+                        .token(TOKEN)
                         .build())
                 .collect(Collectors.toList());
     }

@@ -1,7 +1,10 @@
 package com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.exception;
 
-public class ParcelNotFoundException extends RuntimeException {
-    public ParcelNotFoundException(String message) {
-        super(message);
+import com.warehouse.exceptionhandler.exception.RestException;
+
+public class ParcelNotFoundException extends RestException {
+
+    public ParcelNotFoundException(int code, String exMessage) {
+        super(code, exMessage);
     }
 }

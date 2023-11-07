@@ -18,7 +18,7 @@ public class ParcelStatusPortImpl implements ParcelStatusPort {
     }
 
     private void logStatusRequest(StatusRequest statusRequest) {
-        log.warn("Update status of parcel {}, setting status {}", statusRequest.getParcel().getId(),
+        log.warn("Update status of parcel {}, trying to set status {}", statusRequest.getParcel().getId(),
                 statusRequest.getParcel().getStatus());
     }
 }

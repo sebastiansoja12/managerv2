@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ZebraDeliveryReturnResponse>
+    <DeliveryReturnResponses>
+        <DeliveryReturnResponse>
+            <DeliveryID>${xml.ignore}</DeliveryID>
+            <ParcelID>1000000000</ParcelID>
+            <DeliveryStatus>RETURN</DeliveryStatus>
+            <ReturnToken>12345</ReturnToken>
+            <UpdateStatus>OK</UpdateStatus>
+        </DeliveryReturnResponse>
+    </DeliveryReturnResponses>
+    <SupplierCode>s-soja</SupplierCode>
+    <DepotCode>KT1</DepotCode>
+</ZebraDeliveryReturnResponse>

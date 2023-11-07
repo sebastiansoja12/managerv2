@@ -26,7 +26,7 @@ import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.entity.Deli
 @ContextConfiguration(classes = DeliveryReturnReadRepositoryTest.DeliveryRepositoryTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DatabaseSetup("/dataset/delivery.xml")
+@DatabaseSetup("/deliveryreturn/repository/deliveryreturn.xml")
 public class DeliveryReturnReadRepositoryTest {
 
     @EntityScan(basePackages = { "com.warehouse.deliveryreturn" })

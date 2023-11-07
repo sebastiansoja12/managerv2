@@ -5,18 +5,22 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.util.CollectionUtils;
+
+import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
+import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
+import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.vo.*;
-
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteDetails;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteRequest;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
 @AllArgsConstructor
 @Slf4j
@@ -35,7 +39,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
         
         if (!deliveryRequest.isReturnProcessType()) {
             logWrongProcessTypeInformation();
-            return DeliveryReturnResponse.builder().build();
+            throw new WrongProcessTypeException(7001, "Wrong process type");
         }
 
         deliveryRequest.validateStatuses();
@@ -75,10 +79,10 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private void validateRequest(DeliveryReturnRequest deliveryRequest) {
         if (Objects.isNull(deliveryRequest)) {
-            // exception
+            throw new DeliveryRequestException("Delivery return request cannot be null");
         }
         if (CollectionUtils.isEmpty(deliveryRequest.getDeliveryReturnDetails())) {
-            // exception
+            throw new DeliveryReturnDetailsException("Delivery return details cannot be null");
         }
     }
 

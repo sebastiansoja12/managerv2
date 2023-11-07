@@ -1,6 +1,13 @@
 package com.warehouse.deliveryreturn.configuration;
 
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
+
+import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
+import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
@@ -9,13 +16,6 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelStatusProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
-import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
-import org.springframework.web.client.RestClient;
 
 @Configuration
 public class DeliveryReturnConfiguration {
@@ -54,14 +54,14 @@ public class DeliveryReturnConfiguration {
     }
 
     @Bean
-    public RestClient restClient(RestClient.Builder builder) {
-        return builder.baseUrl("http://localhost:8080").build();
+	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(ParcelStatusProperty parcelStatusProperty) {
+        final RestClient restClient = RestClient.builder().baseUrl("http://localhost:8080").build();
+        return new ParcelStatusControlChangeServiceAdapter(restClient, parcelStatusProperty);
     }
 
     @Bean
-	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(RestClient restClient,
-			ParcelStatusProperty parcelStatusProperty) {
-        return new ParcelStatusControlChangeServiceAdapter(restClient, parcelStatusProperty);
+    public ParcelStatusProperty parcelStatusProperty() {
+        return new ParcelStatusProperty();
     }
 
 }
