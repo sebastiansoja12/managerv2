@@ -2,14 +2,13 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 
 import java.time.LocalDateTime;
 
-import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status;
+import org.hibernate.annotations.DynamicInsert;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Data
 @AllArgsConstructor
@@ -34,7 +33,7 @@ public class RouteEntity {
     private LocalDateTime created;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "username", referencedColumnName = "username")
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,11 +48,5 @@ public class RouteEntity {
     @JoinColumn(name = "supplier_code", referencedColumnName = "supplier_code")
     private SupplierEntity supplier;
 
-
-    public void updateParcelStatus(Status newStatus) {
-        if (this.parcel != null) {
-            this.parcel.setStatus(newStatus);
-        }
-    }
 }
 

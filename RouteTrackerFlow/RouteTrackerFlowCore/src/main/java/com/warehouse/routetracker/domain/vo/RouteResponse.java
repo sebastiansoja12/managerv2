@@ -1,12 +1,12 @@
 package com.warehouse.routetracker.domain.vo;
 
-import lombok.Data;
-import lombok.Value;
-
 import java.util.UUID;
 
-@Data
+import lombok.Builder;
+import lombok.Value;
+
 @Value
+@Builder
 public class RouteResponse {
 
     UUID id;

@@ -2,7 +2,7 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary;
 
 import java.util.List;
 
-import com.warehouse.routetracker.domain.model.Route;
+import com.warehouse.routetracker.domain.vo.Route;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.SupplyRoute;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;

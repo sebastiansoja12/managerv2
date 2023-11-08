@@ -8,9 +8,8 @@ import lombok.Value;
 @Value
 @Builder
 public class RouteRequestDto {
-
     Long parcelId;
-    Long userId;
+    String username;
     String supplierCode;
-    Long depotId;
+    String depotCode;
 }

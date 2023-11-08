@@ -20,7 +20,7 @@
             <column name="supplier_code" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
-            <column name="user_id" type="int">
+            <column name="username" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
         </createTable>
@@ -50,9 +50,9 @@
         />
         <addForeignKeyConstraint
                 baseTableName="route"
-                baseColumnNames="user_id"
+                baseColumnNames="username"
                 referencedTableName="users"
-                referencedColumnNames="id"
+                referencedColumnNames="username"
                 constraintName="FKmnuaqyw0fgfusrgfg2628uo25"
         />
     </changeSet>

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
@@ -21,7 +20,6 @@ import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.Pa
 
 @SpringBootTest(classes = DeliveryReturnTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@EnableAutoConfiguration
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class ParcelStatusControlChangeServiceIntegrationAdapterTest {
