@@ -54,7 +54,8 @@ public class DeliveryReturnConfiguration {
     }
 
     @Bean
-	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(ParcelStatusProperty parcelStatusProperty) {
+	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
+			ParcelStatusProperty parcelStatusProperty) {
         final RestClient restClient = RestClient.builder().baseUrl("http://localhost:8080").build();
         return new ParcelStatusControlChangeServiceAdapter(restClient, parcelStatusProperty);
     }

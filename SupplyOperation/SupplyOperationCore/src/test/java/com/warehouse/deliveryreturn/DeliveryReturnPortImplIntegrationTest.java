@@ -34,7 +34,7 @@ import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatusParcelRequest;
 
 @SpringBootTest(classes = DeliveryReturnPortImplIntegrationTest.DeliveryReturnPortIntegrationTestConfiguration.class,
-        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DeliveryReturnPortImplIntegrationTest {
 
     @ComponentScan(basePackages = { "com.warehouse.deliveryreturn" })
