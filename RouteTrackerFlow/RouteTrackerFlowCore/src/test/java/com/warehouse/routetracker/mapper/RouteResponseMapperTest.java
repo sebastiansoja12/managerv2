@@ -33,7 +33,9 @@ public class RouteResponseMapperTest {
     @Test
     void shouldMapFromResponseToResponseDto() {
         // given
-        final RouteResponse response = new RouteResponse(UUID.randomUUID());
+        final RouteResponse response = RouteResponse.builder()
+                .id(UUID.randomUUID())
+                .build();
         // when
         final RouteResponseDto routeResponseDto = routeResponseMapper.map(response);
         // then

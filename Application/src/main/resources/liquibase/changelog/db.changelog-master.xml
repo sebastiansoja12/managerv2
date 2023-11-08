@@ -21,5 +21,6 @@
     <!--Insert default start data-->
     <include file="/liquibase/changelog/insertDepots.xml"/>
     <include file="/liquibase/changelog/insertSuppliers.xml"/>
+    <include file="/liquibase/changelog/insertUser.xml"/>
 
 </databaseChangeLog>

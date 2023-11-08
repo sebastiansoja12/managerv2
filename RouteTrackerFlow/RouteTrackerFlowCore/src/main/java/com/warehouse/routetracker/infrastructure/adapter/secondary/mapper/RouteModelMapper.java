@@ -2,26 +2,24 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.routetracker.domain.enumeration.Status;
-import com.warehouse.routetracker.domain.model.Route;
+import com.warehouse.routetracker.domain.vo.Route;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.SupplyRoute;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
+@Mapper
 public interface RouteModelMapper {
 
     @Mapping(source = "parcel.id", target = "parcelId")
     @Mapping(source = "depot.depotCode", target = "depotCode")
-    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.username", target = "username")
     @Mapping(source = "supplier.supplierCode", target = "supplierCode")
     Route map(RouteEntity routeEntity);
 
@@ -74,10 +72,10 @@ public interface RouteModelMapper {
     }
 
     default UserEntity mapUserEntity(Route route) {
-        final Long userId = route.getUserId();
-        if (Objects.nonNull(userId)) {
+        final String username = route.getUsername();
+        if (StringUtils.isNotEmpty(username)) {
             return UserEntity.builder()
-                    .id(userId)
+                    .username(username)
                     .build();
         }
         return null;

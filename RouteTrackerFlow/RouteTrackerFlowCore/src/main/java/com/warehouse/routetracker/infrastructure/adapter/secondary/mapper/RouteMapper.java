@@ -1,6 +1,6 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.routetracker.domain.model.Route;
+import com.warehouse.routetracker.domain.vo.Route;
 import com.warehouse.routetracker.domain.vo.RouteRequest;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.api.dto.RouteRequestDto;

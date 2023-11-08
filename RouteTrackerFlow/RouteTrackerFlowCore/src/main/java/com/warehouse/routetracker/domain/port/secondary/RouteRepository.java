@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.domain.port.secondary;
 
 import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.vo.Route;
 import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 

@@ -108,8 +108,6 @@ public class TrackerIntegrationTest {
         final String id = "d8d53e7d-9175-4b5b-bf0d-bc209549c3a9";
         final RouteDeleteRequest request = RouteDeleteRequest.builder()
                 .id(id)
-                .parcelId(PARCEL_ID)
-                .username("s-soja")
                 .build();
         // when
         routeTrackerLogPort.deleteRoute(request);

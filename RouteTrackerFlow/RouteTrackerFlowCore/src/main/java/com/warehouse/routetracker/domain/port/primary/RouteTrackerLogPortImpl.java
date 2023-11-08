@@ -5,14 +5,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.warehouse.routetracker.domain.port.secondary.ParcelStatusUpdateRepository;
-import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
-import com.warehouse.routetracker.domain.vo.RouteRequest;
-import com.warehouse.routetracker.domain.vo.RouteResponse;
+import com.warehouse.routetracker.domain.vo.*;
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.routetracker.domain.model.*;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
-import com.warehouse.routetracker.domain.vo.DeliveryInformation;
 
 import lombok.AllArgsConstructor;
 
@@ -81,7 +78,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                 .parcelId(routeRequest.getParcelId())
                 .supplierCode(routeRequest.getSupplierCode())
                 .depotCode(routeRequest.getDepotCode())
-                .userId(routeRequest.getUserId())
+                .username(routeRequest.getUsername())
                 .build();
     }
 

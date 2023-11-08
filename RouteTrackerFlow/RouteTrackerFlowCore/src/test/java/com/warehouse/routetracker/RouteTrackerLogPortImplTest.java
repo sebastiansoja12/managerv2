@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.routetracker.domain.enumeration.Status;
 import com.warehouse.routetracker.domain.model.Parcel;
-import com.warehouse.routetracker.domain.model.Route;
+import com.warehouse.routetracker.domain.vo.Route;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.SupplyRoute;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
@@ -109,9 +109,12 @@ public class RouteTrackerLogPortImplTest {
         final List<RouteRequest> requests = Arrays.asList(routeRequest, routeRequest2);
 
         // create expected route response objects with uuid
-        final RouteResponse response = new RouteResponse(ROUTE_ID);
-        final RouteResponse response2 = new RouteResponse(ROUTE_ID_2);
-
+        final RouteResponse response = RouteResponse.builder()
+                .id(ROUTE_ID)
+                .build();
+        final RouteResponse response2 = RouteResponse.builder()
+                .id(ROUTE_ID_2)
+                .build();
         // model route objects sent to liquibase
         final Route route = Route.builder()
                 .parcelId(PARCEL_ID)
@@ -143,8 +146,6 @@ public class RouteTrackerLogPortImplTest {
         final String username = "s-soja";
         final RouteDeleteRequest deleteRequest = RouteDeleteRequest.builder()
                 .id("d8d53e7d-9175-4b5b-bf0d-bc209549c3a9")
-                .parcelId(PARCEL_ID)
-                .username(username)
                 .build();
         // when
         routeTrackerLogPort.deleteRoute(deleteRequest);

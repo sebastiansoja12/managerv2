@@ -1,4 +1,4 @@
-package com.warehouse.routetracker.domain.model;
+package com.warehouse.routetracker.domain.vo;
 
 import lombok.Builder;
 import lombok.Value;
@@ -7,7 +7,7 @@ import lombok.Value;
 @Builder
 public class Route {
 
-    Long userId;
+    String username;
 
     Long parcelId;
 
