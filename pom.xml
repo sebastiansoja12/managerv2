@@ -34,6 +34,7 @@
 		<module>DeliveryProtection</module>
 		<module>ParcelStatusControlChange</module>
         <module>ZebraIntegration</module>
+        <module>ReturningTrackManager</module>
     </modules>
 
 	<repositories>
