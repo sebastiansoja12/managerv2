@@ -1,6 +1,7 @@
 package com.warehouse.auth.domain.port.primary;
 
 import com.warehouse.auth.domain.model.*;
+import com.warehouse.auth.domain.vo.AuthenticationResponse;
 
 public interface AuthenticationPort {
 

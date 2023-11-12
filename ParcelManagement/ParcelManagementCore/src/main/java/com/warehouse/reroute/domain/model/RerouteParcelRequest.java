@@ -8,10 +8,10 @@ import lombok.*;
 @Builder
 public class RerouteParcelRequest {
 
-    Long id;
+    private Long id;
 
-    RerouteParcel parcel;
+    private RerouteParcel parcel;
 
-    Integer token;
+    private Integer token;
 
 }

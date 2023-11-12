@@ -16,7 +16,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.auth.configuration.AuthTestConfiguration;
-import com.warehouse.auth.domain.model.AuthenticationResponse;
+import com.warehouse.auth.domain.vo.AuthenticationResponse;
 import com.warehouse.auth.domain.model.LoginRequest;
 import com.warehouse.auth.domain.model.RefreshTokenRequest;
 import com.warehouse.auth.domain.model.User;

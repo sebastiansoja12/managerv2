@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import com.warehouse.auth.domain.vo.AuthenticationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

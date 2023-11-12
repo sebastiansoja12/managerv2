@@ -1,6 +1,6 @@
 package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.vo.RerouteResponse;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 import com.warehouse.reroute.domain.vo.RerouteTokenResponse;
 import com.warehouse.reroute.infrastructure.api.dto.ParcelResponseDto;

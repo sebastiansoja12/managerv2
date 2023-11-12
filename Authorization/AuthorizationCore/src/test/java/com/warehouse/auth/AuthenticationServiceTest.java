@@ -3,21 +3,23 @@ package com.warehouse.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
-import com.warehouse.auth.domain.vo.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.auth.domain.model.*;
+import com.warehouse.auth.domain.model.LoginResponse;
+import com.warehouse.auth.domain.model.RefreshToken;
+import com.warehouse.auth.domain.model.RegisterResponse;
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.AuthenticationServiceImpl;
 import com.warehouse.auth.domain.service.RefreshTokenGenerator;
+import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 
@@ -54,7 +56,16 @@ public class AuthenticationServiceTest {
                 .role(Role.ADMIN)
                 .build();
 
-        doReturn(mock(UserResponse.class))
+        final UserResponse userResponse = UserResponse.builder()
+                .nonLocked(false)
+                .id(1L)
+                .enabled(true)
+                .nonExpired(false)
+                .username("s-soja")
+                .depotCode("TST")
+                .build();
+
+        doReturn(userResponse)
                 .when(userRepository)
                 .saveUser(user);
         // when

@@ -3,6 +3,7 @@ package com.warehouse.redirect;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.warehouse.mail.domain.vo.Notification;
 import com.warehouse.redirect.infrastructure.adapter.secondary.properties.RedirectTokenProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,8 +41,7 @@ public class MailAdapterTest {
         // given
         final RedirectToken redirectToken = new RedirectToken();
 
-        final com.warehouse.mail.domain.vo.Notification mappedNotification =
-                new com.warehouse.mail.domain.vo.Notification();
+        final com.warehouse.mail.domain.vo.Notification mappedNotification = Notification.builder().build();
 
         doReturn(mappedNotification)
                 .when(notificationMapper)

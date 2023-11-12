@@ -6,7 +6,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Recipient {
+public class Sender {
     private String firstName;
     private String lastName;
     private String email;

@@ -1,4 +1,4 @@
-package com.warehouse.reroute.domain.model;
+package com.warehouse.reroute.domain.vo;
 
 import lombok.Value;
 

@@ -3,7 +3,8 @@ package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.model.Recipient;
-import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.model.Sender;
+import com.warehouse.reroute.domain.vo.RerouteResponse;
 import com.warehouse.reroute.domain.vo.*;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.infrastructure.api.dto.*;

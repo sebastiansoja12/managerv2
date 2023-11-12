@@ -15,6 +15,7 @@ import com.warehouse.reroute.domain.vo.GeneratedToken;
 import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 
+import com.warehouse.reroute.domain.vo.RerouteResponse;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

@@ -1,14 +1,10 @@
-package com.warehouse.auth.domain.model;
+package com.warehouse.auth.domain.vo;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class AuthenticationResponse {
-
     String authenticationToken;
-
-    String refreshToken;
-
 }

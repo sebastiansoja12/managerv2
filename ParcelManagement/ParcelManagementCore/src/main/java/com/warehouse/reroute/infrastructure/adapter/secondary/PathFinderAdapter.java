@@ -2,7 +2,7 @@ package com.warehouse.reroute.infrastructure.adapter.secondary;
 
 import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.dto.DepotDto;
-import com.warehouse.reroute.domain.model.City;
+import com.warehouse.reroute.domain.vo.City;
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.voronoi.VoronoiService;
