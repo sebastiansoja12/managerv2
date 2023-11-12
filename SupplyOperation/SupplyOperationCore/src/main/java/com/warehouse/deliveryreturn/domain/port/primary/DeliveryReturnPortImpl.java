@@ -94,7 +94,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 						deliveryReturnRouteDetails(deliveryReturnResponse.getDeliveryReturnResponses()))
                 .supplierCode(deliveryReturnResponse.getSupplierCode())
                 .build();
-        //logServicePort.logDeliverReturn(request);
+        logServicePort.logDeliverReturn(request);
     }
     
 	private List<DeliveryReturnRouteDetails> deliveryReturnRouteDetails(

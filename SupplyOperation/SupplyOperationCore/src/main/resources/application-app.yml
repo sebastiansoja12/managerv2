@@ -12,7 +12,7 @@ local:
 
 route:
   endpoint: routes
-  url: http://localhost
+  url: http://localhost:8080
   port: 8080
 
 service:

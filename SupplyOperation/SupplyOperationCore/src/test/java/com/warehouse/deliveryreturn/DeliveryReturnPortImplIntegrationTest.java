@@ -3,11 +3,11 @@ package com.warehouse.deliveryreturn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 
+import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +46,9 @@ public class DeliveryReturnPortImplIntegrationTest {
         @MockBean
         public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
+        @MockBean
+        public RouteLogServicePort routeLogServicePort;
+
         @Bean
         public RestClient restClient(RestClient.Builder builder) {
             return builder.baseUrl("http://localhost:8080").build();
@@ -60,6 +63,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 
     @Autowired
     private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
+
+    @Autowired
+    private RouteLogServicePort routeLogServicePort;
 
     private final DeviceInformation deviceInformation = new DeviceInformation(
             "1", 1L, "s-soja", "KT1"
@@ -84,6 +90,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 
         when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest))
                 .thenReturn(UpdateStatus.NOT_OK);
+        doNothing()
+                .when(routeLogServicePort)
+                .logDeliverReturn(any());
         // when
         final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
         // then
@@ -111,6 +120,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 
         when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest))
                 .thenReturn(UpdateStatus.OK);
+        doNothing()
+                .when(routeLogServicePort)
+                .logDeliverReturn(any());
         // when
         final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
         // then

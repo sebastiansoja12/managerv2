@@ -4,7 +4,6 @@ package com.warehouse.deliveryreturn.configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestClient;
 
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
@@ -16,6 +15,7 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelStatusProperty;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.RouteLogProperty;
 
 @Configuration
 public class DeliveryReturnConfiguration {
@@ -31,9 +31,13 @@ public class DeliveryReturnConfiguration {
 	}
 
     @Bean
-    public RouteLogServicePort logServicePort(RestClient.Builder builder) {
-        final RestClient restClient = builder.baseUrl("").build();
-        return new RouteLogServiceAdapter(restClient);
+    public RouteLogProperty routeLogProperty() {
+        return new RouteLogProperty();
+    }
+
+    @Bean
+    public RouteLogServicePort logServicePort(RouteLogProperty routeLogProperty) {
+        return new RouteLogServiceAdapter(routeLogProperty);
     }
 
     @Bean
@@ -56,8 +60,7 @@ public class DeliveryReturnConfiguration {
     @Bean
 	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
 			ParcelStatusProperty parcelStatusProperty) {
-        final RestClient restClient = RestClient.builder().baseUrl("http://localhost:8080").build();
-        return new ParcelStatusControlChangeServiceAdapter(restClient, parcelStatusProperty);
+        return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperty);
     }
 
     @Bean
