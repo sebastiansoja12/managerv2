@@ -1,21 +1,21 @@
 package com.warehouse.zebra.domain.vo;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class Parcel {
 
-    private Long id;
+	Long id;
 
-    private Size parcelSize;
+	Size parcelSize;
 
-    private String destination;
+	String destination;
 
-    private ParcelStatus status;
+	ParcelStatus status;
 
-    private ParcelType parcelType;
+	ParcelType parcelType;
 
-    private Long parcelRelatedId;
+	Long parcelRelatedId;
 }
