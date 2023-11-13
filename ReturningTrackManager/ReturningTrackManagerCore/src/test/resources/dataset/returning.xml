@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<dataset>
+    <returning
+            id="1"
+            parcel_id="1"
+            return_status="0"
+            return_token="token"
+            username="s-soja"
+            supplier_code="abc"
+            depot_code="KT1"
+    />
+    <returning
+            id="2"
+            parcel_id="1"
+            return_status="1"
+            return_token="token"
+            username="s-soja"
+            supplier_code="abc"
+            depot_code="KT1"
+    />
+    <returning
+            id="3"
+            parcel_id="1"
+            return_status="2"
+            return_token="token"
+            username="s-soja"
+            supplier_code="abc"
+            depot_code="KT1"
+    />
+
+    <returning
+            id="4"
+            parcel_id="3"
+            return_status="1"
+            return_token="token"
+            username="s-soja"
+            supplier_code="abc"
+            depot_code="KT1"
+    />
+
+    <returning
+            id="5"
+            parcel_id="4"
+            return_status="1"
+            return_token="token"
+            username="s-soja"
+            supplier_code="abc"
+            depot_code="KT1"
+    />
+</dataset>
