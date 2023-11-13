@@ -50,8 +50,8 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
 
         if (logRoute.getStatusCode().is2xxSuccessful()) {
 			if (!CollectionUtils.isEmpty(logRoute.getBody())) {
-				logRoute.getBody().forEach(req -> log.info("Successfully logged route for parcel {} with route id: {}",
-						req.getParcelId(), req.getId()));
+				logRoute.getBody().forEach(res -> log.info("Successfully logged route for parcel {} with route id: {}",
+						res.getParcelId(), res.getId()));
 			}
 		}
     }

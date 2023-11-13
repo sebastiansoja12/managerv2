@@ -28,21 +28,22 @@ public class StarPortImplTest {
     @Test
     void shouldCompute() {
         // given
-        final String expectedPath = "KR1 \n" +
-                "↓ \n" +
-                "CZW \n" +
-                "↓ \n" +
-                "NCS \n" +
-                "↓ \n" +
-                "WA1 \n" +
-                "↓ \n" +
-                "CIE \n" +
-                "↓ \n" +
-                "OLS \n" +
-                "↓ \n" +
-                "GRU \n" +
-                "↓ \n" +
-                "GD1";
+        final String expectedPath = """
+                KR1\s
+                ↓\s
+                CZW\s
+                ↓\s
+                NCS\s
+                ↓\s
+                WA1\s
+                ↓\s
+                CIE\s
+                ↓\s
+                OLS\s
+                ↓\s
+                GRU\s
+                ↓\s
+                GD1""";
 
         final List<Depot> depotsList = buildDepots();
         // coordinates for Gdańsk
@@ -67,9 +68,7 @@ public class StarPortImplTest {
                 .build();
 
         // when && then
-        assertThrows(MissingDepotsException.class, () -> {
-            starPort.starPathFinder("KR1", depotsList, coordinates);
-        });
+        assertThrows(MissingDepotsException.class, () -> starPort.starPathFinder("KR1", depotsList, coordinates));
     }
 
     @Test
@@ -79,8 +78,6 @@ public class StarPortImplTest {
         // empty coordinates
         final Coordinates coordinates = null;
         // when && then
-        assertThrows(MissingCoordinatesException.class, () -> {
-            starPort.starPathFinder("KR1", depotsList, coordinates);
-        });
+        assertThrows(MissingCoordinatesException.class, () -> starPort.starPathFinder("KR1", depotsList, coordinates));
     }
 }

@@ -47,6 +47,7 @@ public interface RouteModelMapper {
     List<RouteInformation> mapToRoutes(List<RouteEntity> routeEntityList);
 
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "parcel.id", target = "parcelId")
     RouteResponse mapToRouteResponse(RouteEntity routeEntity);
 
     default RouteEntity map(Route route) {

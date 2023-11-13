@@ -111,6 +111,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>ReturningTrackManagerCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>Caching</artifactId>
             <version>${project.version}</version>
         </dependency>

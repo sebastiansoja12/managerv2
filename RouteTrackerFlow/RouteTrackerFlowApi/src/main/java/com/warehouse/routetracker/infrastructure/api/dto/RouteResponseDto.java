@@ -9,4 +9,5 @@ import java.util.UUID;
 @Value
 public class RouteResponseDto {
     UUID id;
+    Long parcelId;
 }
