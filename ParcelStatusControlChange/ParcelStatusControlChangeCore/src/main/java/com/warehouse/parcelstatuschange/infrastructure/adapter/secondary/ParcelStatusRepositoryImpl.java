@@ -1,7 +1,7 @@
 package com.warehouse.parcelstatuschange.infrastructure.adapter.secondary;
 
-import com.warehouse.parcelstatuschange.domain.enumeration.Status;
-import com.warehouse.parcelstatuschange.domain.model.StatusRequest;
+import com.warehouse.parcelstatuschange.domain.vo.Status;
+import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
 import com.warehouse.parcelstatuschange.domain.port.secondary.ParcelStatusRepository;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.exception.ParcelNotFoundException;

@@ -1,8 +1,8 @@
 package com.warehouse.parcelstatuschange.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.parcelstatuschange.domain.enumeration.Status;
-import com.warehouse.parcelstatuschange.domain.model.Parcel;
-import com.warehouse.parcelstatuschange.domain.model.StatusRequest;
+import com.warehouse.parcelstatuschange.domain.vo.Status;
+import com.warehouse.parcelstatuschange.domain.vo.Parcel;
+import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.primary.api.dto.ParcelDto;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.primary.api.dto.StatusDto;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.primary.api.dto.StatusRequestDto;

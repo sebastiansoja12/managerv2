@@ -1,4 +1,4 @@
-package com.warehouse.parcelstatuschange.domain.enumeration;
+package com.warehouse.parcelstatuschange.domain.vo;
 
 public enum Status {
     CREATED,

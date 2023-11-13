@@ -1,4 +1,4 @@
-package com.warehouse.parcelstatuschange.domain.model;
+package com.warehouse.parcelstatuschange.domain.vo;
 
 import lombok.Value;
 
