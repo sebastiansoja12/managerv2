@@ -14,10 +14,10 @@ import jakarta.servlet.http.HttpServletResponse;
 @AllArgsConstructor
 public class QRCodeGeneratorController {
 
-    private final QrCodePort service;
+    private final QrCodePort qrCodePort;
 
     @GetMapping("/{id}")
     public void exportParcelByIdToPdf(HttpServletResponse response, @PathVariable Long id) throws Exception {
-        service.exportParcelToPdfById(response, id);
+        qrCodePort.exportParcelToPdfById(response, id);
     }
 }

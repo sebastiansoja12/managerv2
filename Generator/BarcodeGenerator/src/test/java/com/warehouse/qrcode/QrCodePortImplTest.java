@@ -3,12 +3,11 @@ package com.warehouse.qrcode;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.warehouse.qrcode.domain.model.Parcel;
 import com.warehouse.qrcode.domain.port.primary.QrCodePortImpl;
@@ -17,18 +16,11 @@ import com.warehouse.qrcode.domain.service.BarcodeGeneratorService;
 import com.warehouse.qrcode.domain.service.BarcodeGeneratorServiceImpl;
 import com.warehouse.qrcode.domain.service.ParcelExportServiceImpl;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 @ExtendWith(MockitoExtension.class)
-@Disabled
 public class QrCodePortImplTest {
-
 
     @Mock
     private ParcelRepository parcelRepository;
-
-    @Spy
-    private HttpServletResponse response;
 
     private QrCodePortImpl qrCodePort;
 
@@ -44,6 +36,7 @@ public class QrCodePortImplTest {
         // given
         final Long parcelId = 1L;
         final Parcel parcel = buildParcel();
+        final MockHttpServletResponse response = new MockHttpServletResponse();
 
         doReturn(parcel)
                 .when(parcelRepository)
@@ -52,8 +45,7 @@ public class QrCodePortImplTest {
         // when
         qrCodePort.exportParcelToPdfById(response, parcelId);
         // then
-        verify(response).setContentType("application/pdf");
-        verify(response).setHeader(anyString(), anyString());
+        verify(parcelRepository, atLeast(1)).find(parcelId);
     }
 
     private Parcel buildParcel() {

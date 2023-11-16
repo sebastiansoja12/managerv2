@@ -1,26 +1,18 @@
-package com.warehouse.csv.domain.model;
+package com.warehouse.csv.domain.vo;
 
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 @Builder
 public class ParcelCsv {
-
     Long id;
-    String senderFirstName;
-    String senderLastName;
+    String firstName;
+    String lastName;
     String senderEmail;
     String senderTelephoneNumber;
     String senderCity;
     String senderPostalCode;
     String senderStreet;
-
     String recipientFirstName;
     String recipientLastName;
     String recipientEmail;
@@ -28,8 +20,4 @@ public class ParcelCsv {
     String recipientCity;
     String recipientPostalCode;
     String recipientStreet;
-
-    Size parcelSize;
-
-    double price;
 }
