@@ -27,7 +27,7 @@
 		<module>PathFinder</module>
 		<module>Authorization</module>
 		<module>Utility</module>
-        <module>PositionDetermination</module>
+        <module>DestinationDetermination</module>
         <module>Generator</module>
 		<module>Properties</module>
 		<module>ExceptionHandler</module>

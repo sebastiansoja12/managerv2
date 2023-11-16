@@ -9,7 +9,7 @@
         <version>2023.12-SNAPSHOT</version>
     </parent>
 
-    <artifactId>PositionDetermination</artifactId>
+    <artifactId>DestinationDetermination</artifactId>
 
     <packaging>jar</packaging>
 

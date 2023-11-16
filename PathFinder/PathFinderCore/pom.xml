@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>PositionDetermination</artifactId>
+            <artifactId>DestinationDetermination</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
