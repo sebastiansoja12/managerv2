@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.deliverytoken.domain.model.DeliveryPackageRequest;
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageRequest;
 import com.warehouse.deliverytoken.domain.model.DeliveryTokenRequest;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.mapper.SupplierTokenRequestMapper;

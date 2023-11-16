@@ -1,8 +1,8 @@
-package com.warehouse.deliverytoken.domain.model;
-
-import lombok.Value;
+package com.warehouse.deliverytoken.domain.vo;
 
 import java.util.List;
+
+import lombok.Value;
 
 @Value
 public class DeliveryTokenResponse {

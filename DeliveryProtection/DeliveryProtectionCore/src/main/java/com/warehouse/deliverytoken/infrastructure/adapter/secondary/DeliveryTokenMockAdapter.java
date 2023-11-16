@@ -2,6 +2,10 @@ package com.warehouse.deliverytoken.infrastructure.adapter.secondary;
 
 import com.warehouse.deliverytoken.domain.model.*;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageRequest;
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.ProtectedDelivery;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.model.SupplierToken;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
 import lombok.AllArgsConstructor;

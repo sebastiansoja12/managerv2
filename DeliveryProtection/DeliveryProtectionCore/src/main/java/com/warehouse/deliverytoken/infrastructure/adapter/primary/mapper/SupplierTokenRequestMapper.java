@@ -1,6 +1,10 @@
 package com.warehouse.deliverytoken.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.deliverytoken.domain.model.*;
+import com.warehouse.deliverytoken.domain.vo.Delivery;
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageRequest;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.Supplier;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.DeliveryPackageRequestDto;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.DeliveryTokenRequestDto;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.SupplierDto;

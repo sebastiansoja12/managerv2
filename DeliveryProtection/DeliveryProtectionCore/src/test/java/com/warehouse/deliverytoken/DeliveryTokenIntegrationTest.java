@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.warehouse.deliverytoken.domain.vo.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -138,7 +139,7 @@ public class DeliveryTokenIntegrationTest {
     }
 
 	private List<DeliveryPackageRequest> createDeliveryRequests(Long parcelId, Long parcelRelatedId,
-			ParcelType parcelType, String destination, String deliveryId) {
+                                                                ParcelType parcelType, String destination, String deliveryId) {
 		return Collections.singletonList(
 				new DeliveryPackageRequest(createParcel(parcelId, parcelRelatedId, parcelType, destination),
 						 createDelivery(deliveryId)));

@@ -27,8 +27,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.warehouse.deliverytoken.domain.model.Parcel;
-import com.warehouse.deliverytoken.domain.model.ParcelId;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.ParcelServiceAdapter;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 

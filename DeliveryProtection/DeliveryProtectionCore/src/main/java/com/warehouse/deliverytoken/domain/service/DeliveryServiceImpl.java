@@ -3,6 +3,8 @@ package com.warehouse.deliverytoken.domain.service;
 
 import com.warehouse.deliverytoken.domain.model.*;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
 import lombok.AllArgsConstructor;
 
 import java.util.List;

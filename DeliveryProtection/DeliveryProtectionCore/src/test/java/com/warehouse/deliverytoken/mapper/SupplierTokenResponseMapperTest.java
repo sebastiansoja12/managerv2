@@ -8,10 +8,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
-import com.warehouse.deliverytoken.domain.model.DeliveryPackageResponse;
-import com.warehouse.deliverytoken.domain.model.DeliveryTokenResponse;
-import com.warehouse.deliverytoken.domain.model.Parcel;
-import com.warehouse.deliverytoken.domain.model.ProtectedDelivery;
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.ProtectedDelivery;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.DeliveryTokenResponseDto;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.mapper.SupplierTokenResponseMapper;
 

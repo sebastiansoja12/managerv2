@@ -10,8 +10,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.support.RestGatewaySupport;
 
-import com.warehouse.deliverytoken.domain.model.Parcel;
-import com.warehouse.deliverytoken.domain.model.ParcelId;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.api.dto.ParcelDto;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;

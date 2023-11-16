@@ -2,7 +2,7 @@ package com.warehouse.deliverytoken.infrastructure.adapter.primary;
 
 
 import com.warehouse.deliverytoken.domain.model.DeliveryTokenRequest;
-import com.warehouse.deliverytoken.domain.model.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
 import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPort;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.DeliveryTokenResponseDto;

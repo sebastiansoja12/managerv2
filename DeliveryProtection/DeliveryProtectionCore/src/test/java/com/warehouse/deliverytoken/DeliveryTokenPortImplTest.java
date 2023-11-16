@@ -9,6 +9,7 @@ import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.deliverytoken.domain.service.DeliveryService;
 import com.warehouse.deliverytoken.domain.service.DeliveryServiceImpl;
+import com.warehouse.deliverytoken.domain.vo.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -120,7 +121,7 @@ public class DeliveryTokenPortImplTest {
 	}
 
 	private List<DeliveryPackageRequest> createDeliveryRequests(Long parcelId, Long parcelRelatedId,
-			ParcelType parcelType, String destination, String deliveryId) {
+                                                                ParcelType parcelType, String destination, String deliveryId) {
         return Collections
                 .singletonList(new DeliveryPackageRequest(
                         createParcel(parcelId, parcelRelatedId, parcelType, destination),

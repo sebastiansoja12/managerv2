@@ -1,11 +1,13 @@
-package com.warehouse.deliverytoken.domain.model;
+package com.warehouse.deliverytoken.domain.vo;
 
 import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
-import lombok.*;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+
+@Value
 @Builder
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Parcel {
     Long id;

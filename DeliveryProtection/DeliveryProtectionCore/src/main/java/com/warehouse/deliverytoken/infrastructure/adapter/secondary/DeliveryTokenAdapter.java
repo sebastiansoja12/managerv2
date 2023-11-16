@@ -1,6 +1,6 @@
 package com.warehouse.deliverytoken.infrastructure.adapter.secondary;
 
-import com.warehouse.deliverytoken.domain.model.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
 import com.warehouse.deliverytoken.domain.model.DeliveryTokenRequest;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.STSProperty;

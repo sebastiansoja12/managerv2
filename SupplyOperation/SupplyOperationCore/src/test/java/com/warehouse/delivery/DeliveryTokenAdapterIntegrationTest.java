@@ -22,8 +22,8 @@ import com.warehouse.delivery.configuration.DeliveryTestConfiguration;
 import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryTokenAdapter;
 import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
-import com.warehouse.deliverytoken.domain.model.Parcel;
-import com.warehouse.deliverytoken.domain.model.ParcelId;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 
 @ExtendWith(SpringExtension.class)

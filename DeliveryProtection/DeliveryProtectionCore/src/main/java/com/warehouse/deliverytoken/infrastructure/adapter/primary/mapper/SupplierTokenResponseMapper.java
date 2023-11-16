@@ -1,7 +1,7 @@
 package com.warehouse.deliverytoken.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.deliverytoken.domain.model.DeliveryPackageResponse;
-import com.warehouse.deliverytoken.domain.model.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.DeliveryTokenResponseDto;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.SupplierSignatureDto;
 import org.mapstruct.Mapper;
