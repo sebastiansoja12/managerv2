@@ -2,16 +2,18 @@ package com.warehouse.qrcode.configuration;
 
 import java.awt.image.BufferedImage;
 
-import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import org.mapstruct.factory.Mappers;
+import com.warehouse.qrcode.domain.port.primary.QrCodePort;
+import com.warehouse.qrcode.domain.port.primary.QrCodePortImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 
+import com.warehouse.qrcode.domain.port.secondary.ParcelRepository;
 import com.warehouse.qrcode.domain.service.*;
-import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapper;
-import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapperImpl;
+import com.warehouse.qrcode.infrastructure.adapter.secondary.ParcelReadRepository;
+import com.warehouse.qrcode.infrastructure.adapter.secondary.ParcelRepositoryImpl;
 
 @Configuration
 public class BarcodeGeneratorConfiguration {
@@ -22,9 +24,14 @@ public class BarcodeGeneratorConfiguration {
     }
 
     @Bean
-    public ParcelExportService parcelExportService(BarcodeGeneratorService generatorService) {
-        final ParcelEntityMapper entityMapper = Mappers.getMapper(ParcelEntityMapper.class);
-        return new ParcelExportServiceImpl(generatorService, entityMapper);
+    public ParcelExportService parcelExportService(ParcelRepository parcelRepository) {
+        return new ParcelExportServiceImpl(parcelRepository);
+    }
+
+    @Bean
+    public ParcelRepository parcelRepository(
+            @Qualifier("qrCode.parcelReadRepository") ParcelReadRepository parcelReadRepository) {
+        return new ParcelRepositoryImpl(parcelReadRepository);
     }
 
     @Bean
@@ -32,13 +39,9 @@ public class BarcodeGeneratorConfiguration {
         return new BarcodeGeneratorServiceImpl();
     }
 
-    @Bean
-    public ParcelEntityMapper parcelEntityMapper() {
-        return new ParcelEntityMapperImpl();
-    }
-
-	@Bean(name = "barcodeGeneratorParcelService")
-	public ParcelService parcelService(ShipmentPort shipmentPort, ParcelExportService parcelExportService) {
-		return new ParcelServiceImpl(shipmentPort, parcelExportService);
+	@Bean(name = "qrCode.parcelService")
+	public QrCodePort parcelService(ParcelExportService parcelExportService) {
+        final BarcodeGeneratorService barcodeGeneratorService = new BarcodeGeneratorServiceImpl();
+		return new QrCodePortImpl(parcelExportService, barcodeGeneratorService);
 	}
 }

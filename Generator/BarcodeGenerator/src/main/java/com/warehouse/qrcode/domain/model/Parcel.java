@@ -1,8 +1,5 @@
 package com.warehouse.qrcode.domain.model;
 
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
-import com.warehouse.shipment.domain.model.Recipient;
-import com.warehouse.shipment.domain.model.Sender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,14 +10,36 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Parcel {
-    Long id;
-    Sender sender;
-    Recipient recipient;
-    Size parcelSize;
 
-    double price;
+    private Long id;
 
-    public double price() {
-        return parcelSize.getPrice();
-    }
+    private String firstName;
+
+    private String lastName;
+
+    private String senderTelephone;
+
+    private String senderEmail;
+
+    private String senderCity;
+
+    private String senderStreet;
+
+    private String senderPostalCode;
+
+    private String recipientEmail;
+
+    private String recipientTelephone;
+
+    private String recipientFirstName;
+
+    private String recipientLastName;
+
+    private String recipientCity;
+
+    private String recipientStreet;
+
+    private String recipientPostalCode;
+
+    private String destination;
 }

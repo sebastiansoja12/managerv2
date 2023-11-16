@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dataset>
+    <parcel
+            id = "1"
+            first_name="test"
+            last_name="test"
+            sender_telephone="12345"
+            sender_email="sender@test.pl"
+            sender_city="test"
+            sender_street="test"
+            sender_postal_code="00-000"
+            recipient_email="recipient@test.pl"
+            recipient_first_name="test"
+            recipient_last_name="test"
+            recipient_telephone="123"
+            recipient_city="test"
+            recipient_street="test"
+            recipient_postal_code="00-000"
+            destination="KT1"
+    />
+</dataset>

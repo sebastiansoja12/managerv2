@@ -1,8 +1,8 @@
-package com.warehouse.qrcode.domain.service;
+package com.warehouse.qrcode.domain.port.primary;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-public interface ParcelService {
+public interface QrCodePort {
 
     void exportParcelToPdfById(HttpServletResponse response, Long id) throws Exception;
 }
