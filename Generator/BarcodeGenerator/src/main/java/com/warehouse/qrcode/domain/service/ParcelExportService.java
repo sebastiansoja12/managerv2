@@ -1,10 +1,10 @@
 package com.warehouse.qrcode.domain.service;
 
-import com.warehouse.shipment.domain.model.Parcel;
+import com.lowagie.text.Image;
 
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface ParcelExportService {
 
-    void exportToPdf(HttpServletResponse response, Parcel parcel) throws Exception;
+    void exportToPdf(HttpServletResponse response, Long id, Image image) throws Exception;
 }

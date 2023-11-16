@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public class BarcodeGeneratorServiceImpl implements BarcodeGeneratorService {
 
-    public void generateQRCodeImage(String text) throws WriterException, IOException {
+    private void generateQRCodeImage(String text) throws WriterException, IOException {
         final QRCodeWriter qrCodeWriter = new QRCodeWriter();
         final BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 400, 400);
         final String filePath = "./src/main/resources/" + text + UUID.randomUUID() + ".png";
