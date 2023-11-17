@@ -1,19 +1,19 @@
 package com.warehouse.zebra.domain.vo;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class ReturnRequest {
 
-    private Parcel parcel;
+	Parcel parcel;
 
-    private String reason;
+	String reason;
 
-    private ReturnStatus returnStatus;
+	ReturnStatus returnStatus;
 
-    private String returnToken;
+	String returnToken;
 
-    private String supplierCode;
+	String supplierCode;
 }
