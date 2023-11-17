@@ -8,12 +8,12 @@ import java.time.Instant;
 @Data
 @Builder
 public class RefreshToken {
-    String token;
-    Instant createdDate;
-    Instant expiryDate;
-    String username;
-    boolean expired;
-    boolean revoked;
+    private String token;
+    private Instant createdDate;
+    private Instant expiryDate;
+    private String username;
+    private boolean expired;
+    private boolean revoked;
 
     public boolean isActual() {
         return !isExpired() && !isRevoked();

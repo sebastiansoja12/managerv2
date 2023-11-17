@@ -1,6 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.auth.domain.model.LoginRequest;
+import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.domain.model.RefreshTokenRequest;
 import com.warehouse.auth.domain.model.RegisterRequest;
 import com.warehouse.auth.infrastructure.adapter.primary.dto.LoginRequestDto;

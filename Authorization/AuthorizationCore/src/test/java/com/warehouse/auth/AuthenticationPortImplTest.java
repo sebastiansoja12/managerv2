@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.warehouse.auth.domain.vo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,9 +24,6 @@ import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
-import com.warehouse.auth.domain.vo.AuthenticationResponse;
-import com.warehouse.auth.domain.vo.Token;
-import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
 import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;

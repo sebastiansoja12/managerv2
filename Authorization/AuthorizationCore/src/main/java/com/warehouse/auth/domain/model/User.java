@@ -11,20 +11,19 @@ import java.util.Collection;
 @Builder
 public class User {
 
-    String username;
+    private String username;
 
-    String password;
+    private String password;
 
-    String firstName;
+    private String firstName;
 
-    String lastName;
+    private String lastName;
 
-    String email;
+    private String email;
 
-    Role role;
+    private Role role;
 
-    String depotCode;
-
+    private String depotCode;
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();

@@ -22,14 +22,7 @@ public class AuthenticationRepositoryImpl implements UserRepository {
 
         repository.save(userEntity);
 
-        return UserResponse.builder()
-                .id(userEntity.getId())
-                .username(userEntity.getUsername())
-                .depotCode(userEntity.getDepotCode())
-                .nonExpired(userEntity.isAccountNonExpired())
-                .enabled(userEntity.isEnabled())
-                .nonLocked(userEntity.isAccountNonLocked())
-                .build();
+        return userMapper.mapToUserResponse(userEntity);
     }
 
     @Override

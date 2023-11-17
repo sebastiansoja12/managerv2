@@ -1,12 +1,11 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.vo.Token;
+import com.warehouse.auth.domain.vo.*;
 import org.springframework.stereotype.Service;
 
 import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.vo.UserResponse;
 
 import lombok.AllArgsConstructor;
 

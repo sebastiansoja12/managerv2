@@ -10,9 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.auth.domain.model.LoginResponse;
+import com.warehouse.auth.domain.vo.LoginResponse;
 import com.warehouse.auth.domain.model.RefreshToken;
-import com.warehouse.auth.domain.model.RegisterResponse;
+import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
