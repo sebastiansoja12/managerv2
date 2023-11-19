@@ -54,4 +54,8 @@ public class ReturnPackageRequest {
     public boolean isReturnTokenAvailable() {
         return StringUtils.isNotEmpty(returnToken);
     }
+
+    public boolean isReturnNotTokenAvailable() {
+        return StringUtils.isEmpty(returnToken);
+    }
 }

@@ -13,5 +13,7 @@ public interface ReturnRepository {
 
     ReturnModel get(ReturnId returnId);
 
+    ReturnModel get(Long parcelId, String returnToken);
+
     void delete(ReturnId returnId);
 }

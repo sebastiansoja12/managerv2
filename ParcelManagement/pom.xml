@@ -16,7 +16,6 @@
     <modules>
         <module>ParcelManagementApi</module>
         <module>ParcelManagementCore</module>
-        <module>ParcelManagementState</module>
     </modules>
 
 </project>

@@ -55,6 +55,13 @@ public class ReturningRepositoryImpl implements ReturnRepository {
 	}
 
     @Override
+    public ReturnModel get(Long parcelId, String returnToken) {
+        final Optional<ReturnEntity> returnEntity = repository.findFirstByParcelIdAndReturnToken(parcelId, returnToken);
+        return returnEntity.map(returnMapper::mapToReturnModel)
+                .orElseThrow(() -> new ReturnEntityNotFoundException(8083, String.format(exceptionMessage, parcelId)));
+    }
+
+    @Override
     public void delete(ReturnId returnId) {
         final Long id = returnMapper.map(returnId);
         repository.deleteById(id);

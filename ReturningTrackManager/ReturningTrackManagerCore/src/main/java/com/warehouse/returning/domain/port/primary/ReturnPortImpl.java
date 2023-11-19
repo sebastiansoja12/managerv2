@@ -11,6 +11,7 @@ import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.service.ReturnService;
+import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.domain.vo.ReturnId;
 import com.warehouse.returning.domain.vo.ReturnModel;
 import com.warehouse.returning.domain.vo.ReturnResponse;
@@ -46,7 +47,12 @@ public class ReturnPortImpl implements ReturnPort {
         });
 
         if (!request.isReturnTokenAvailable()) {
-            throw new ReturnTokenMissingException(8080, "Return token is missing");
+            final List<ProcessReturn> processReturns = request.getRequests()
+                    .stream()
+                    .filter(ReturnPackageRequest::isReturnNotTokenAvailable)
+                    .map(this::createProcessReturn)
+                    .toList();
+            return new ReturnResponse(processReturns);
         }
 
         if (request.isProcessing()) {
@@ -85,5 +91,9 @@ public class ReturnPortImpl implements ReturnPort {
 
     private void logCancelledParcels(List<Parcel> cancelledParcels) {
         log.warn("Given parcels were cancelled: {}", cancelledParcels);
+    }
+
+    private ProcessReturn createProcessReturn(ReturnPackageRequest process) {
+        return new ProcessReturn(process.getParcel().getId(), "Return token not available");
     }
 }

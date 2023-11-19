@@ -59,6 +59,16 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
+    public ReturnResponse unlockReturn(ReturnRequest request) {
+        final List<ReturnPackage> returnPackages = request.getRequests().stream()
+                .map(this::buildReturnPackage)
+                .toList();
+
+
+        return null;
+    }
+
+    @Override
     public ReturnModel getReturn(ReturnId returnId) {
         return returnRepository.get(returnId);
     }

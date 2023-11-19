@@ -10,6 +10,8 @@ public interface ReturnService {
 
     ReturnResponse updateReturn(ReturnRequest request);
 
+    ReturnResponse unlockReturn(ReturnRequest request);
+
     ReturnModel getReturn(ReturnId returnId);
 
     void deleteReturn(ReturnId returnId);
