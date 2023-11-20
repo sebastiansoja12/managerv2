@@ -51,7 +51,7 @@ public class RouteLogEventListenerIntegrationTest {
     @Autowired
     private ParcelReadRepository parcelReadRepository;
 
-    private final Long PARCEL_ID = 100L;
+    private final Long PARCEL_ID = 101L;
 
     private final String DEPOT_CODE = "TST";
 
