@@ -23,26 +23,23 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     @Override
     public void initializeRoute(Long parcelId) {
-        final Route route = Route.builder()
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                 .parcelId(parcelId)
                 .build();
-        repository.initializeRoute(route);
+        repository.save(routeLogRecord);
     }
 
     @Override
     public void saveDelivery(List<DeliveryInformation> deliveryInformation) {
 		deliveryInformation.stream().filter(this::existsToken).forEach(request -> {
-			final Route route = Route.builder()
+			final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                     .supplierCode(request.getSupplierCode())
 					.parcelId(request.getParcelId())
                     .depotCode(request.getDepotCode())
-                    .build();
-            final SupplyRoute supplyRoute = SupplyRoute.builder()
-                    .route(route)
                     .status(request.getDeliveryStatus())
                     .build();
-            updateParcelStatus(supplyRoute);
-            repository.saveSupplyRoute(supplyRoute);
+            updateParcelStatus(routeLogRecord);
+            repository.save(routeLogRecord);
 		});
     }
 
@@ -69,12 +66,12 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         return repository.findByUsername(username);
     }
 
-    private void updateParcelStatus(SupplyRoute supplyRoute) {
-        updateRepository.updateStatus(supplyRoute.getRoute().getParcelId(), supplyRoute.getStatus());
+    private void updateParcelStatus(RouteLogRecord routeLogRecord) {
+        updateRepository.updateStatus(routeLogRecord.getParcelId(), routeLogRecord.getStatus());
     }
 
-    private Route mapToRoute(RouteRequest routeRequest) {
-        return Route.builder()
+    private RouteLogRecord mapToRoute(RouteRequest routeRequest) {
+        return RouteLogRecord.builder()
                 .parcelId(routeRequest.getParcelId())
                 .supplierCode(routeRequest.getSupplierCode())
                 .depotCode(routeRequest.getDepotCode())
