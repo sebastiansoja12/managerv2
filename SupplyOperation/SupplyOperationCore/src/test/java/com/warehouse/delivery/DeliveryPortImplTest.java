@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,13 +34,16 @@ public class DeliveryPortImplTest {
     @Mock
     private RouteLogServicePort logServicePort;
 
+    @Mock
+    private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
+
     private DeliveryPortImpl deliveryPort;
 
     private static final String DELIVERY_ID = "053e792f-6201-4365-a87a-f16e7f34b978";
 
     @BeforeEach
     void setup() {
-        deliveryPort = new DeliveryPortImpl(deliveryService, logServicePort);
+        deliveryPort = new DeliveryPortImpl(deliveryService, logServicePort, parcelStatusControlChangeServicePort);
     }
 
     @Test

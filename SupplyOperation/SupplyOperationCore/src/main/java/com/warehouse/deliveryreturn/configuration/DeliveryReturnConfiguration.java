@@ -57,8 +57,8 @@ public class DeliveryReturnConfiguration {
         return new DeliveryReturnServiceMockAdapter();
     }
 
-    @Bean
-	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
+    @Bean("deliveryReturn.parcelStatusControlChangeServicePort")
+    public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
 			ParcelStatusProperty parcelStatusProperty) {
         return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperty);
     }

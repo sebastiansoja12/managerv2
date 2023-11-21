@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.warehouse.routetracker.domain.port.secondary.ParcelStatusUpdateRepository;
-import com.warehouse.routetracker.domain.vo.*;
 import org.apache.commons.lang3.StringUtils;
 
-import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
+import com.warehouse.routetracker.domain.vo.*;
 
 import lombok.AllArgsConstructor;
 
@@ -18,8 +17,6 @@ import lombok.AllArgsConstructor;
 public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     private final RouteRepository repository;
-
-    private final ParcelStatusUpdateRepository updateRepository;
 
     @Override
     public void initializeRoute(Long parcelId) {
@@ -38,7 +35,6 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                     .depotCode(request.getDepotCode())
                     .status(request.getDeliveryStatus())
                     .build();
-            updateParcelStatus(routeLogRecord);
             repository.save(routeLogRecord);
 		});
     }
@@ -64,10 +60,6 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public List<RouteInformation> findRoutesByUsername(String username) {
         return repository.findByUsername(username);
-    }
-
-    private void updateParcelStatus(RouteLogRecord routeLogRecord) {
-        updateRepository.updateStatus(routeLogRecord.getParcelId(), routeLogRecord.getStatus());
     }
 
     private RouteLogRecord mapToRoute(RouteRequest routeRequest) {

@@ -19,16 +19,12 @@ import com.warehouse.routetracker.domain.enumeration.Status;
 import com.warehouse.routetracker.domain.model.Parcel;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
-import com.warehouse.routetracker.domain.port.secondary.ParcelStatusUpdateRepository;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
 import com.warehouse.routetracker.domain.vo.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RouteTrackerLogPortImplTest {
 
-
-    @Mock
-    private ParcelStatusUpdateRepository updateRepository;
 
     @Mock
     private RouteRepository repository;
@@ -65,10 +61,6 @@ public class RouteTrackerLogPortImplTest {
                 .status(Status.DELIVERY)
                 .build();
 
-        // mock repository
-        doNothing()
-                .when(updateRepository)
-                .updateStatus(PARCEL_ID, Status.DELIVERY);
         // when
         routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation));
         // then
