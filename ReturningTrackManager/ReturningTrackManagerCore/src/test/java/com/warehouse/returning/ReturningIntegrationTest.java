@@ -246,11 +246,11 @@ public class ReturningIntegrationTest {
 
 	private ReturningRequestDto createReturningRequest(String username, String depotCode, String returnToken,
 			String supplierCode) {
-        final ReturningRequestDto request = new ReturningRequestDto();
-        request.setRequests(createReturnPackageRequests(ReturnStatusDto.CREATED, returnToken, supplierCode));
-        request.setUsername(createUsername(username));
-        request.setDepotCode(createDepotCode(depotCode));
-        return request;
+        return ReturningRequestDto.builder()
+                .requests(createReturnPackageRequests(ReturnStatusDto.CREATED, returnToken, supplierCode))
+                .depotCode(createDepotCode(depotCode))
+                .username(createUsername(username))
+                .build();
     }
 
     private UsernameDto createUsername(String username) {
@@ -268,13 +268,14 @@ public class ReturningIntegrationTest {
 
 	private ReturnPackageRequestDto createReturnPackageRequest(ReturnStatusDto returnStatus, String returnToken,
 			String supplierCode) {
-		final ReturnPackageRequestDto returnPackageRequest = new ReturnPackageRequestDto();
-		returnPackageRequest.setReturnStatus(returnStatus);
-		returnPackageRequest.setReturnToken(returnToken);
-		returnPackageRequest.setParcel(createParcel());
-		returnPackageRequest.setReason("Recipient not available");
-		returnPackageRequest.setSupplierCode(createSupplierCode(supplierCode));
-		return returnPackageRequest;
+		final ReturnPackageRequestDto.ReturnPackageRequestDtoBuilder returnPackageRequest = ReturnPackageRequestDto
+				.builder();
+		returnPackageRequest.returnStatus(returnStatus);
+		returnPackageRequest.returnToken(returnToken);
+		returnPackageRequest.parcel(createParcel());
+		returnPackageRequest.reason("Recipient not available");
+		returnPackageRequest.supplierCode(createSupplierCode(supplierCode));
+		return returnPackageRequest.build();
 	}
 
     private SupplierCodeDto createSupplierCode(String supplierCode) {
@@ -282,12 +283,12 @@ public class ReturningIntegrationTest {
     }
 
     private ParcelDto createParcel() {
-        final ParcelDto parcel = new ParcelDto();
-        parcel.setParcelSize(SizeDto.TEST);
-        parcel.setParcelType(ParcelTypeDto.PARENT);
-        parcel.setId(1L);
-        parcel.setParcelRelatedId(null);
-        parcel.setDestination("KT1");
-        return parcel;
+        final ParcelDto.ParcelDtoBuilder parcel = ParcelDto.builder();
+        parcel.parcelSize(SizeDto.TEST);
+        parcel.parcelType(ParcelTypeDto.PARENT);
+        parcel.id(1L);
+        parcel.parcelRelatedId(null);
+        parcel.destination("KT1");
+        return parcel.build();
     }
 }

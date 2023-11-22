@@ -1,18 +1,22 @@
 package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class ParcelDto {
-    private Long id;
+    Long id;
 
-    private SizeDto parcelSize;
+    SizeDto parcelSize;
 
-    private String destination;
+    String destination;
 
-    private StatusDto status;
+    StatusDto status;
 
-    private ParcelTypeDto parcelType;
+    ParcelTypeDto parcelType;
 
-    private Long parcelRelatedId;
+    Long parcelRelatedId;
 }

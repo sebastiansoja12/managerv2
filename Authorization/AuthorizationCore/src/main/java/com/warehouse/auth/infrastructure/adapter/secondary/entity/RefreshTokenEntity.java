@@ -32,7 +32,7 @@ public class RefreshTokenEntity {
     private Instant expiryDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "token_type")
+    @Column(name = "token_type", nullable = false)
     private TokenType tokenType = TokenType.BEARER;
 
     @Column(name = "revoked", nullable = false)

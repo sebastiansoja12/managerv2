@@ -1,14 +1,11 @@
 package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 @Builder
+@Jacksonized
 public class ReasonDto {
     String value;
 }

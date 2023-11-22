@@ -1,12 +1,16 @@
 package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class ReturnPackageRequestDto {
-    private ParcelDto parcel;
-    private String reason;
-    private ReturnStatusDto returnStatus;
-    private String returnToken;
-    private SupplierCodeDto supplierCode;
+    ParcelDto parcel;
+    String reason;
+    ReturnStatusDto returnStatus;
+    String returnToken;
+    SupplierCodeDto supplierCode;
 }
