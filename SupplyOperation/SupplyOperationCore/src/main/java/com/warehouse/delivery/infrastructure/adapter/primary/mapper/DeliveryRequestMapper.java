@@ -2,12 +2,12 @@ package com.warehouse.delivery.infrastructure.adapter.primary.mapper;
 
 import java.util.List;
 
+import com.warehouse.delivery.infrastructure.adapter.primary.dto.DeliveryRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.delivery.domain.model.DeliveryRequest;
-import com.warehouse.delivery.dto.DeliveryRequestDto;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DeliveryRequestMapper {
