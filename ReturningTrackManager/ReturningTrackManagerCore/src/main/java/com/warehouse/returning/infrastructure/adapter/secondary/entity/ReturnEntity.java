@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus.CANCELLED;
+
 @Getter
 @Setter
 @Entity
@@ -45,5 +47,13 @@ public class ReturnEntity {
 
     public void completeReturn() {
         this.returnStatus = ReturnStatus.COMPLETED;
+    }
+
+    public boolean isCancelled() {
+        return CANCELLED.equals(returnStatus);
+    }
+
+    public void unlockReturn() {
+        this.returnStatus = ReturnStatus.PROCESSING;
     }
 }

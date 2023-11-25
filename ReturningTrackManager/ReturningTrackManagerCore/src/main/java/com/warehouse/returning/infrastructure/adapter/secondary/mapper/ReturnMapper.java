@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import com.warehouse.returning.domain.model.ReturnPackage;
+import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.domain.vo.ReturnId;
 import com.warehouse.returning.domain.vo.ReturnModel;
@@ -17,10 +17,11 @@ import com.warehouse.returning.infrastructure.adapter.secondary.enumeration.Retu
 public interface ReturnMapper {
 
 
-    ReturnEntity map(ReturnPackage returning);
+    @Mapping(target = "parcelId", source = "parcel.id")
+    ReturnEntity map(ReturnPackageRequest returning);
 
     @AfterMapping
-    default void attachReturnInformation(@MappingTarget ReturnEntity returnEntity, ReturnPackage returnPackage) {
+    default void attachReturnInformation(@MappingTarget ReturnEntity returnEntity, ReturnPackageRequest returnPackage) {
         final ReturnInformationEntity returnInformationEntity = new ReturnInformationEntity();
         returnInformationEntity.setReturnStatus(returnEntity.getReturnStatus());
         returnInformationEntity.setReason(returnPackage.getReason());
@@ -41,4 +42,5 @@ public interface ReturnMapper {
         return returnId.getValue();
     }
 
+    com.warehouse.returning.domain.model.ReturnStatus map(ReturnStatus returnStatus);
 }

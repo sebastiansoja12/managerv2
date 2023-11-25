@@ -1,6 +1,7 @@
 package com.warehouse.returning.domain.model;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,19 +16,9 @@ public class ReturnRequest {
     private String depotCode;
     private String username;
 
-    public void revertStatus(Long parcelId, ReturnStatus returnStatus) {
-        requests = requests.stream()
-                .peek(returnPackage -> {
-                    if (returnPackage.getParcel().getId().equals(parcelId)) {
-                        returnPackage.revertStatus(returnStatus);
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    public boolean isReturnTokenAvailable() {
+    public boolean isReturnTokenNotAvailable() {
 		return requests.stream()
-                .anyMatch(ReturnPackageRequest::isReturnTokenAvailable);
+                .anyMatch(ReturnPackageRequest::isReturnNotTokenAvailable);
     }
 
     public List<ReturnPackageRequest> cleanReturnRequest() {
@@ -35,10 +26,17 @@ public class ReturnRequest {
                 .filter(ReturnPackageRequest::isCancelled)
                 .collect(Collectors.toList());
     }
+
     public void assignDepotToReturnPackages() {
         requests = requests.stream()
                 .peek(returnPackageRequest -> returnPackageRequest.updateDepot(depotCode))
                 .collect(Collectors.toList());
+    }
+
+    public void updateProcessing() {
+        requests.stream()
+                .filter(ReturnPackageRequest::isCreated)
+                .forEach(returnPackageRequest -> returnPackageRequest.processReturn(returnPackageRequest.getReason()));
     }
 
     public void assignUserToReturnPackages() {
@@ -55,14 +53,47 @@ public class ReturnRequest {
         return StringUtils.isEmpty(depotCode);
     }
 
-    public List<ReturnPackageRequest> filterProcessingReturns() {
-        return requests.stream()
+    public void filterProcessingReturns() {
+        requests = requests.stream()
                 .filter(ReturnPackageRequest::isProcessing)
+                .peek(ReturnPackageRequest::completeReturn)
                 .collect(Collectors.toList());
     }
 
+    public void filterCreatedReturns() {
+        requests = requests.stream()
+                .filter(ReturnPackageRequest::isCreated)
+                .peek(ReturnPackageRequest::processReturn)
+                .collect(Collectors.toList());
+    }
+
+    public void revertCancelledParcels(List<ReturnPackageRequest> requests) {
+        this.requests = requests;
+    }
+
+    public boolean isCancelled() {
+        return requests.stream().anyMatch(ReturnPackageRequest::isCancelled);
+    }
+
     public boolean isProcessing() {
-        return requests.stream()
-                .anyMatch(ReturnPackageRequest::isProcessing);
+        return checkStatus(ReturnPackageRequest::isProcessing);
+    }
+
+    public boolean isCreated() {
+        return checkStatus(ReturnPackageRequest::isCreated);
+    }
+
+    public boolean isCompleted() {
+        return checkStatus(ReturnPackageRequest::isCompleted);
+    }
+
+    private boolean checkStatus(Predicate<ReturnPackageRequest> condition) {
+        return requests.stream().anyMatch(condition);
+    }
+
+    public void filterCancelledReturns() {
+        requests = requests.stream()
+                .filter(ReturnPackageRequest::isCancelled)
+                .collect(Collectors.toList());
     }
 }

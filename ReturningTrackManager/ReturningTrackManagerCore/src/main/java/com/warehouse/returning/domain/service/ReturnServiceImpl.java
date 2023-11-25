@@ -1,17 +1,15 @@
 package com.warehouse.returning.domain.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
-import com.warehouse.returning.domain.model.Returning;
+import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.domain.vo.ReturnId;
 import com.warehouse.returning.domain.vo.ReturnModel;
-import com.warehouse.returning.domain.vo.ReturnResponse;
 
 import lombok.AllArgsConstructor;
 
@@ -21,41 +19,37 @@ public class ReturnServiceImpl implements ReturnService {
     private final ReturnRepository returnRepository;
 
     @Override
-    public ReturnResponse processReturn(ReturnRequest request) {
-        final List<ReturnPackage> returnPackages = request.getRequests().stream()
-                .map(this::buildReturnPackage)
-                .collect(Collectors.toList());
-
-        returnPackages.forEach(ReturnPackage::processReturn);
-
-        final Returning returning = new Returning(returnPackages);
-
-        final List<ProcessReturn> processReturns = returning
-                .returnPackages()
+    public List<ProcessReturn> processReturn(ReturnRequest request) {
+        return request
+                .getRequests()
                 .stream()
                 .map(returnRepository::save)
                 .toList();
-
-        return new ReturnResponse(processReturns);
     }
 
     @Override
-    public ReturnResponse updateReturn(ReturnRequest request) {
-        final List<ReturnPackage> returnPackages = request.getRequests().stream()
-                .map(this::buildReturnPackage)
-                .toList();
-
-        returnPackages.forEach(ReturnPackage::completeReturn);
-
-        final Returning returning = new Returning(returnPackages);
-
-        final List<ProcessReturn> processReturns = returning
-                .returnPackages()
+    public List<ProcessReturn> updateReturn(ReturnRequest request) {
+        return request
+                .getRequests()
                 .stream()
                 .map(returnRepository::update)
                 .toList();
+    }
 
-        return new ReturnResponse(processReturns);
+    @Override
+    public ReturnPackageRequest unlockReturn(ReturnPackageRequest request) {
+        final ReturnStatus returnStatus = returnRepository.unlockReturn(request.getParcel().getId(),
+                request.getReturnToken());
+
+        return ReturnPackageRequest.builder()
+                .supplierCode(request.getSupplierCode())
+                .returnStatus(returnStatus)
+                .returnToken(request.getReturnToken())
+                .parcel(request.getParcel())
+                .reason(request.getReason())
+                .depotCode(request.getDepotCode())
+                .username(request.getUsername())
+                .build();
     }
 
     @Override

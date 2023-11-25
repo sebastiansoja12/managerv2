@@ -11,4 +11,5 @@ import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnEnt
 public interface ReturnReadRepository extends JpaRepository<ReturnEntity, Long> {
 
     Optional<ReturnEntity> findFirstByParcelId(Long parcelId);
+    Optional<ReturnEntity> findFirstByParcelIdAndReturnToken(Long parcelId, String returnToken);
 }
