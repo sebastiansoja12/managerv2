@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.warehouse.routetracker.domain.port.secondary.ParcelStatusUpdateRepository;
-import com.warehouse.routetracker.domain.vo.*;
 import org.apache.commons.lang3.StringUtils;
 
-import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
+import com.warehouse.routetracker.domain.vo.*;
 
 import lombok.AllArgsConstructor;
 
@@ -19,30 +18,24 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     private final RouteRepository repository;
 
-    private final ParcelStatusUpdateRepository updateRepository;
-
     @Override
     public void initializeRoute(Long parcelId) {
-        final Route route = Route.builder()
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                 .parcelId(parcelId)
                 .build();
-        repository.initializeRoute(route);
+        repository.save(routeLogRecord);
     }
 
     @Override
     public void saveDelivery(List<DeliveryInformation> deliveryInformation) {
 		deliveryInformation.stream().filter(this::existsToken).forEach(request -> {
-			final Route route = Route.builder()
+			final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                     .supplierCode(request.getSupplierCode())
 					.parcelId(request.getParcelId())
                     .depotCode(request.getDepotCode())
-                    .build();
-            final SupplyRoute supplyRoute = SupplyRoute.builder()
-                    .route(route)
                     .status(request.getDeliveryStatus())
                     .build();
-            updateParcelStatus(supplyRoute);
-            repository.saveSupplyRoute(supplyRoute);
+            repository.save(routeLogRecord);
 		});
     }
 
@@ -69,12 +62,8 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         return repository.findByUsername(username);
     }
 
-    private void updateParcelStatus(SupplyRoute supplyRoute) {
-        updateRepository.updateStatus(supplyRoute.getRoute().getParcelId(), supplyRoute.getStatus());
-    }
-
-    private Route mapToRoute(RouteRequest routeRequest) {
-        return Route.builder()
+    private RouteLogRecord mapToRoute(RouteRequest routeRequest) {
+        return RouteLogRecord.builder()
                 .parcelId(routeRequest.getParcelId())
                 .supplierCode(routeRequest.getSupplierCode())
                 .depotCode(routeRequest.getDepotCode())

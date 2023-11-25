@@ -13,10 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class DeliveryRequest {
-    Long parcelId;
-    String depotCode;
-    String supplierCode;
-    DeliveryStatus deliveryStatus;
+    private Long parcelId;
+    private String depotCode;
+    private String supplierCode;
+    private DeliveryStatus deliveryStatus;
+    private final String token = "abcdefghjklk";
 
     public void updateDeliveryStatus() {
         this.deliveryStatus = DeliveryStatus.DELIVERY;

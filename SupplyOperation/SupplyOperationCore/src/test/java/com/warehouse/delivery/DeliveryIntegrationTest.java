@@ -22,10 +22,13 @@ import com.warehouse.delivery.configuration.DeliveryTestConfiguration;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.port.primary.DeliveryPort;
+import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
+import com.warehouse.delivery.domain.vo.UpdateStatusParcelRequest;
+import com.warehouse.delivery.infrastructure.adapter.secondary.api.UpdateStatus;
 import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
+import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.domain.vo.Parcel;
 import com.warehouse.deliverytoken.domain.vo.ParcelId;
-import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 
@@ -43,6 +46,9 @@ public class DeliveryIntegrationTest {
     private RouteLogEventPublisher routeLogEventPublisher;
 
     @Autowired
+    private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
+
+    @Autowired
     private com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort deliveryTokenServicePort;
 
     @Autowired
@@ -55,6 +61,8 @@ public class DeliveryIntegrationTest {
         final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenReturn(parcel);
+        when(parcelStatusControlChangeServicePort.updateParcelStatus(new UpdateStatusParcelRequest(1L)))
+                .thenReturn(UpdateStatus.OK);
         // when
         final List<DeliveryResponse> deliveryResponses = deliveryPort.deliver(deliveryRequestList);
         // then

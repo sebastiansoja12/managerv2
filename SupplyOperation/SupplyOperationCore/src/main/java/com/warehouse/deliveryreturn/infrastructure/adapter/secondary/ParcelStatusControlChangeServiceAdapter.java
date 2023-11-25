@@ -26,7 +26,7 @@ public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
             getMapper(UpdateStatusParcelRequestMapper.class);
 
     public ParcelStatusControlChangeServiceAdapter(ParcelStatusProperty parcelStatusProperty) {
-        this.restClient = RestClient.builder().baseUrl("http://localhost:8080").build();
+        this.restClient = RestClient.builder().baseUrl(parcelStatusProperty.getUrl()).build();
         this.parcelStatusProperty = parcelStatusProperty;
     }
 

@@ -9,9 +9,12 @@ import com.warehouse.delivery.domain.model.Delivery;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.model.DeliveryRouteRequest;
+import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.delivery.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.delivery.domain.service.DeliveryService;
 
+import com.warehouse.delivery.domain.vo.UpdateStatusParcelRequest;
+import com.warehouse.delivery.infrastructure.adapter.secondary.api.UpdateStatus;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -20,6 +23,8 @@ public class DeliveryPortImpl implements DeliveryPort {
     private final DeliveryService deliveryService;
 
     private final RouteLogServicePort logServicePort;
+    
+    private final ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
     @Override
     public List<DeliveryResponse> deliver(List<DeliveryRequest> deliveryRequest) {
@@ -32,9 +37,13 @@ public class DeliveryPortImpl implements DeliveryPort {
 
         registerDeliveryRoute(signedDeliveries);
 
-        return signedDeliveries.stream()
+        final List<DeliveryResponse> deliveryResponses = signedDeliveries.stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
+        
+        updateParcelStatus(deliveryResponses);
+        
+        return deliveryResponses;
     }
 
     private void registerDeliveryRoute(List<Delivery> signedDeliveries) {
@@ -43,6 +52,18 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .collect(Collectors.toSet());
 
         logServicePort.deliver(deliveryRouteRequests);
+    }
+    
+    private void updateParcelStatus(List<DeliveryResponse> deliveryResponses) {
+        deliveryResponses.forEach(this::updateParcelStatus);
+    }
+    
+    private void updateParcelStatus(DeliveryResponse deliveryResponse) {
+		final UpdateStatus updateStatus = parcelStatusControlChangeServicePort
+				.updateParcelStatus(new UpdateStatusParcelRequest(deliveryResponse.getParcelId()));
+        
+        deliveryResponse.updateStatus(updateStatus);
+
     }
 
     private DeliveryRouteRequest mapToDeliveryRouteRequest(Delivery delivery) {
@@ -61,15 +82,6 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .id(delivery.getId())
                 .parcelId(delivery.getParcelId())
                 .deliveryStatus(delivery.getDeliveryStatus().name())
-                .build();
-    }
-
-    private Delivery mapToDelivery(DeliveryRequest request) {
-        return Delivery.builder()
-                .deliveryStatus(request.getDeliveryStatus())
-                .supplierCode(request.getSupplierCode())
-                .depotCode(request.getDepotCode())
-                .parcelId(request.getParcelId())
                 .build();
     }
 }

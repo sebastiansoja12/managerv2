@@ -2,6 +2,7 @@ package com.warehouse.delivery.infrastructure.adapter.primary;
 
 import java.util.List;
 
+import com.warehouse.delivery.infrastructure.adapter.primary.dto.DeliveryRequestDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.port.primary.DeliveryPort;
-import com.warehouse.delivery.dto.DeliveryRequestDto;
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 

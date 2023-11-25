@@ -61,10 +61,10 @@
             <column name="type" type="tinyint">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="time">
+            <column name="created_at" type="timestamp(6)">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="time">
+            <column name="updated_at" type="timestamp(6)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

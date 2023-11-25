@@ -17,23 +17,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.routetracker.domain.enumeration.Status;
 import com.warehouse.routetracker.domain.model.Parcel;
-import com.warehouse.routetracker.domain.vo.Route;
 import com.warehouse.routetracker.domain.model.RouteInformation;
-import com.warehouse.routetracker.domain.model.SupplyRoute;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
-import com.warehouse.routetracker.domain.port.secondary.ParcelStatusUpdateRepository;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
-import com.warehouse.routetracker.domain.vo.DeliveryInformation;
-import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
-import com.warehouse.routetracker.domain.vo.RouteRequest;
-import com.warehouse.routetracker.domain.vo.RouteResponse;
+import com.warehouse.routetracker.domain.vo.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RouteTrackerLogPortImplTest {
 
-
-    @Mock
-    private ParcelStatusUpdateRepository updateRepository;
 
     @Mock
     private RouteRepository repository;
@@ -63,36 +54,28 @@ public class RouteTrackerLogPortImplTest {
                 .token("token")
                 .build();
 
-        final Route route = Route.builder()
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                 .supplierCode(supplierCode)
                 .parcelId(PARCEL_ID)
                 .depotCode(depotCode)
-                .build();
-
-        final SupplyRoute supplyRoute = SupplyRoute.builder()
                 .status(Status.DELIVERY)
-                .route(route)
                 .build();
 
-        // mock repository
-        doNothing()
-                .when(updateRepository)
-                .updateStatus(PARCEL_ID, Status.DELIVERY);
         // when
         routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation));
         // then
-        verify(repository, times(1)).saveSupplyRoute(supplyRoute);
+        verify(repository, times(1)).save(routeLogRecord);
     }
 
     @Test
     void shouldNotSaveSupplyRouteWhenTokenDoesNotExist() {
         // given
         final DeliveryInformation deliveryInformation = DeliveryInformation.builder().build();
-        final SupplyRoute supplyRoute = SupplyRoute.builder().build();
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder().build();
         // when
         routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation));
         // then
-        verify(repository, times(0)).saveSupplyRoute(supplyRoute);
+        verify(repository, times(0)).save(routeLogRecord);
     }
 
     @Test
@@ -116,21 +99,21 @@ public class RouteTrackerLogPortImplTest {
                 .id(ROUTE_ID_2)
                 .build();
         // model route objects sent to liquibase
-        final Route route = Route.builder()
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                 .parcelId(PARCEL_ID)
                 .build();
 
-        final Route route2 = Route.builder()
+        final RouteLogRecord routeLogRecord2 = RouteLogRecord.builder()
                 .parcelId(PARCEL_ID2)
                 .build();
 
         doReturn(response)
                 .when(repository)
-                .save(route);
+                .save(routeLogRecord);
 
         doReturn(response2)
                 .when(repository)
-                .save(route2);
+                .save(routeLogRecord2);
 
         // when
         final List<RouteResponse> responses = routeTrackerLogPort.saveRoutes(requests);

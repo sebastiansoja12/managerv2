@@ -7,7 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
-import com.warehouse.reroute.domain.port.secondary.*;
+import com.warehouse.reroute.domain.port.secondary.LoggerFactory;
+import com.warehouse.reroute.domain.port.secondary.MailServicePort;
+import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
+import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.service.*;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapper;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapperImpl;
@@ -23,7 +26,6 @@ import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentServiceAdap
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.api.ShipmentService;
-import com.warehouse.voronoi.VoronoiService;
 
 @Configuration
 public class RerouteConfiguration {
@@ -67,11 +69,6 @@ public class RerouteConfiguration {
 	public RerouteService rerouteService(MailServicePort mailServicePort,
 			RerouteTokenRepository rerouteTokenRepository) {
 		return new RerouteServiceImpl(mailServicePort, rerouteTokenRepository);
-	}
-
-	@Bean
-	public PathFinderServicePort pathFinderServicePort(VoronoiService voronoiService) {
-		return new PathFinderAdapter(voronoiService);
 	}
 
 	@Bean

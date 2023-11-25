@@ -58,7 +58,12 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
 
 	private List<RouteRequestDto> buildRouteRequest(DeliveryReturnRouteRequestDto request) {
 		return request.getDeliveryReturnRouteDetails().stream()
-				.map(req -> RouteRequestDto.builder().parcelId(req.getParcelId()).build())
+				.map(req -> RouteRequestDto
+                        .builder()
+                        .parcelId(req.getParcelId())
+                        .supplierCode(request.getSupplierCode())
+                        .depotCode(request.getDepotCode())
+                        .build())
                 .toList();
 
 	}

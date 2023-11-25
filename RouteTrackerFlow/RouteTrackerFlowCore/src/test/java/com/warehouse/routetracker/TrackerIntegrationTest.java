@@ -91,14 +91,14 @@ public class TrackerIntegrationTest {
                 DeliveryInformation.builder()
                         .deliveryStatus(com.warehouse.routetracker.domain.enumeration.Status.DELIVERY)
                         .depotCode("TST")
-                        .parcelId(PARCEL_ID)
+                        .parcelId(101L)
                         .supplierCode("TS_TST")
                         .build()
         );
         // when
         routeTrackerLogPort.saveDelivery(deliveryInformations);
         // then
-        final List<RouteEntity> routeEntityList = routeReadRepository.findByParcelId(PARCEL_ID);
+        final List<RouteEntity> routeEntityList = routeReadRepository.findByParcelId(101L);
         assertTrue(routeEntityList.isEmpty());
     }
 

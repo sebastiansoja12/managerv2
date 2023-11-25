@@ -1,8 +1,5 @@
 package com.warehouse.zebra.infrastructure.adapter.secondary.api;
 
-import com.warehouse.zebra.infrastructure.api.dto.ParcelDto;
-import com.warehouse.zebra.infrastructure.api.dto.ReturnStatusDto;
-import com.warehouse.zebra.infrastructure.api.dto.SupplierCodeDto;
 import lombok.Data;
 
 @Data
