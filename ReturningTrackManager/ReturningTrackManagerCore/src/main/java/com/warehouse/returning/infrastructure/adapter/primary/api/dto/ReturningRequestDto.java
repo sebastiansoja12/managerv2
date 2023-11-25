@@ -3,11 +3,15 @@ package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
 import java.util.List;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class ReturningRequestDto {
-    private List<ReturnPackageRequestDto> requests;
-    private DepotCodeDto depotCode;
-    private UsernameDto username;
+    List<ReturnPackageRequestDto> requests;
+    DepotCodeDto depotCode;
+    UsernameDto username;
 }

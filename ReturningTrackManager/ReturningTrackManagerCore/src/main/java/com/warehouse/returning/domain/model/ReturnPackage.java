@@ -4,6 +4,8 @@ package com.warehouse.returning.domain.model;
 import lombok.Builder;
 import lombok.Data;
 
+import static com.warehouse.returning.domain.model.Status.CREATED;
+
 @Data
 @Builder
 public class ReturnPackage {
@@ -25,5 +27,9 @@ public class ReturnPackage {
 
     public ReturnPackage revertStatus(ReturnStatus returnStatus) {
         return new ReturnPackage(parcelId, reason, returnStatus, returnToken, supplierCode, depotCode, username);
+    }
+
+    public boolean isCreated() {
+        return CREATED.equals(returnStatus);
     }
 }

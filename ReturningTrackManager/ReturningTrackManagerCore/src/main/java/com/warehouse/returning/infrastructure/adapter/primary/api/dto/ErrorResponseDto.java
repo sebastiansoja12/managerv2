@@ -2,11 +2,15 @@ package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
 import java.time.LocalDateTime;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class ErrorResponseDto {
-    private LocalDateTime timestamp;
-    private int status;
-    private String error;
+    LocalDateTime timestamp;
+    int status;
+    String error;
 }

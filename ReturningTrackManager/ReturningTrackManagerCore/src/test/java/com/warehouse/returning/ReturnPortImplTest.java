@@ -3,6 +3,7 @@ package com.warehouse.returning;
 
 import static com.warehouse.returning.domain.model.ReturnStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
@@ -16,7 +17,8 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.returning.domain.exception.ReturnTokenMissingException;
+import com.warehouse.returning.domain.exception.DepotCodeMissingException;
+import com.warehouse.returning.domain.exception.UsernameMissingException;
 import com.warehouse.returning.domain.model.*;
 import com.warehouse.returning.domain.port.primary.ReturnPortImpl;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
@@ -49,17 +51,17 @@ public class ReturnPortImplTest {
         final String depotCode = "KT1";
 		final ReturnRequest request = buildReturnRequest(depotCode, USERNAME, "returnToken", CREATED);
 
-        final ReturnPackage returnPackage = ReturnPackage.builder()
+        final ReturnPackageRequest returnPackage = ReturnPackageRequest.builder()
                 .depotCode(depotCode)
                 .supplierCode("abc")
                 .returnToken("returnToken")
                 .returnStatus(PROCESSING)
-                .parcelId(1L)
+                .parcel(createParcel())
                 .reason(RECIPIENT_NOT_AVAILABLE)
                 .username(USERNAME)
                 .build();
 
-        final ProcessReturn processReturn = new ProcessReturn(1L, "PROCESSING");
+        final ProcessReturn processReturn = new ProcessReturn(1L, 1L, "PROCESSING");
 
         doReturn(processReturn)
                 .when(returnRepository)
@@ -74,73 +76,55 @@ public class ReturnPortImplTest {
         // and status of request was changed to CREATED
         assertThat(request.getRequests())
                 .flatExtracting(ReturnPackageRequest::getReturnStatus)
-                .contains(CREATED);
+                .contains(PROCESSING);
     }
 
     @Test
-    void shouldChangeReturnStatusToCreatedForCancelledParcels() {
+    void shouldCompleteTheReturn() {
         // given
         final String depotCode = "KT1";
-        final ReturnRequest request = buildReturnRequest(depotCode, USERNAME, "returnToken", CANCELLED);
+        final ReturnRequest request = buildReturnRequest(depotCode, USERNAME, "returnToken", PROCESSING);
 
-        final ReturnPackage returnPackage = ReturnPackage.builder()
+        final ReturnPackageRequest returnPackage = ReturnPackageRequest.builder()
                 .depotCode(depotCode)
                 .supplierCode("abc")
                 .returnToken("returnToken")
-                .returnStatus(PROCESSING)
-                .parcelId(1L)
+                .returnStatus(COMPLETED)
+                .parcel(createParcel())
                 .reason(RECIPIENT_NOT_AVAILABLE)
                 .username(USERNAME)
                 .build();
 
-        final ProcessReturn processReturn = new ProcessReturn(1L, "PROCESSING");
+        final ProcessReturn processReturn = new ProcessReturn(1L, 1L, "COMPLETED");
 
         doReturn(processReturn)
                 .when(returnRepository)
-                .save(returnPackage);
+                .update(returnPackage);
 
         // when
         final ReturnResponse response = returnPort.process(request);
         // then
-        assertEquals(List.of(processReturn), response.processReturn());
-        // and status of request was changed to CREATED
+        assertThat(response.processReturn())
+                .flatExtracting(ProcessReturn::processStatus)
+                .contains(COMPLETED.name());
+    }
+
+    @Test
+    void shouldChangeReturnStatusToProcessingForCancelledParcels() {
+        // given
+        final String depotCode = "KT1";
+        final ReturnRequest request = buildReturnRequest(depotCode, USERNAME, "returnToken", CANCELLED);
+        
+        doReturn(PROCESSING)
+                .when(returnRepository)
+                .unlockReturn(1L, "returnToken");
+
+        // when
+        returnPort.process(request);
+        // then and status of request was changed to PROCESSING
         assertThat(request.getRequests())
                 .flatExtracting(ReturnPackageRequest::getReturnStatus)
-                .contains(CREATED);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenReturnTokenIsNotAvailable() {
-        // given
-        final ReturnRequest request = buildReturnRequest("depotCode", USERNAME, null, CREATED);
-        // when
-        final Executable executable = () -> returnPort.process(request);
-        // then
-        final ReturnTokenMissingException exception = assertThrows(ReturnTokenMissingException.class, executable);
-        assertEquals("Return token is missing", exception.getMessage());
-        assertEquals(8080, exception.getCode());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenUsernameIsNull() {
-        // given
-        final ReturnRequest request = buildReturnRequest("KT1", null, "returnToken", CANCELLED);
-        // when
-        final Executable executable = () -> returnPort.process(request);
-        // then
-        final RuntimeException exception = assertThrows(RuntimeException.class, executable);
-        assertEquals("Username is missing", exception.getMessage());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenDepotCodeIsNull() {
-        // given
-        final ReturnRequest request = buildReturnRequest(null, USERNAME, "returnToken", CANCELLED);
-        // when
-        final Executable executable = () -> returnPort.process(request);
-        // then
-        final RuntimeException exception = assertThrows(RuntimeException.class, executable);
-        assertEquals("Depot code is missing", exception.getMessage());
+                .contains(PROCESSING);
     }
 
     @Test
@@ -149,17 +133,17 @@ public class ReturnPortImplTest {
         final String depotCode = "KT1";
         final String returnToken = "returnToken";
         final ReturnRequest request = buildReturnRequest(depotCode, USERNAME, returnToken, PROCESSING);
-        final ReturnPackage returnPackage = ReturnPackage.builder()
+        final ReturnPackageRequest returnPackage = ReturnPackageRequest.builder()
                 .depotCode(depotCode)
                 .supplierCode("abc")
                 .returnToken(returnToken)
                 .returnStatus(COMPLETED)
-                .parcelId(1L)
+                .parcel(createParcel())
                 .reason(RECIPIENT_NOT_AVAILABLE)
                 .username(USERNAME)
                 .build();
 
-        final ProcessReturn processReturn = new ProcessReturn(1L, "COMPLETED");
+        final ProcessReturn processReturn = new ProcessReturn(1L, 1L, "COMPLETED");
 
         doReturn(processReturn)
                 .when(returnRepository)
@@ -172,7 +156,52 @@ public class ReturnPortImplTest {
                 .contains("COMPLETED");
     }
 
+    @Test
+    void shouldNotContinueProcessWhenReceivedCompletedReturn() {
+        // given
+        final String depotCode = "KT1";
+        final ReturnRequest request = buildReturnRequest(depotCode, USERNAME, "returnToken", COMPLETED);
+        // when
+        returnPort.process(request);
+        // then nothing changed in request
+        assertThat(request.getRequests())
+                .flatExtracting(ReturnPackageRequest::getReturnStatus)
+                .contains(COMPLETED);
+    }
 
+    @Test
+    void shouldCollectDataWithParcelsThatHaveNoReturnToken() {
+        // given
+        final ReturnRequest request = buildReturnRequest("depotCode", USERNAME, null, CREATED);
+        // when
+        final ReturnResponse response = returnPort.process(request);
+        // then
+		assertThat(response.processReturn())
+				.extracting(ProcessReturn::parcelId, ProcessReturn::returnId, ProcessReturn::processStatus)
+				.containsExactly(tuple(1L, null, "Return token not available"));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUsernameIsNull() {
+        // given
+        final ReturnRequest request = buildReturnRequest("KT1", null, "returnToken", CANCELLED);
+        // when
+        final Executable executable = () -> returnPort.process(request);
+        // then
+        final UsernameMissingException exception = assertThrows(UsernameMissingException.class, executable);
+        assertEquals("Username is missing", exception.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDepotCodeIsNull() {
+        // given
+        final ReturnRequest request = buildReturnRequest(null, USERNAME, "returnToken", CANCELLED);
+        // when
+        final Executable executable = () -> returnPort.process(request);
+        // then
+        final DepotCodeMissingException exception = assertThrows(DepotCodeMissingException.class, executable);
+        assertEquals("Depot code is missing", exception.getMessage());
+    }
 
 	private ReturnRequest buildReturnRequest(String depotCode, String username, String returnToken,
 			ReturnStatus returnStatus) {

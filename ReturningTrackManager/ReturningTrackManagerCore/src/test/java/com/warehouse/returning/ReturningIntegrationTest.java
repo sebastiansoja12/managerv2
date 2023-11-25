@@ -7,9 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import com.warehouse.returning.infrastructure.adapter.primary.api.DeleteReturnResponse;
-import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
-import com.warehouse.returning.infrastructure.adapter.primary.api.dto.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -33,6 +30,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.exceptionhandler.model.ErrorResponse;
+import com.warehouse.returning.infrastructure.adapter.primary.api.DeleteReturnResponse;
+import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.*;
 
 @SpringBootTest(classes = ReturningIntegrationTest.ReturningTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -63,6 +63,8 @@ public class ReturningIntegrationTest {
     private static final String USERNAME_MISSING_JSON_PATH = "src/test/resources/returning/usernameMissing.json";
     private static final String DEPOT_CODE_MISSING_JSON_PATH = "src/test/resources/returning/depotCodeMissing.json";
     private static final String RETURN_REQUEST_JSON_PATH = "src/test/resources/returning/returnRequest.json";
+    private static final String RETURN_REQUESTS_MISSING_RT_JSON_PATH = "src/test/resources/returning/returningsRequestWithMissingRT.json";
+    private static final String RETURN_RESPONSES_MISSING_RT_JSON_PATH = "src/test/resources/returning/returningsResponseWithMissingRT.json";
 	private static final String UPDATE_RETURN_REQUEST_JSON_PATH = "src/test/resources/returning/updateReturnRequest.json";
 	private static final String WRONG_UPDATE_RETURN_REQUEST_JSON_PATH = "src/test/resources/returning/wrongUpdateReturnRequest.json";
 
@@ -86,6 +88,24 @@ public class ReturningIntegrationTest {
         assertNotNull(response);
         assertEquals(String.format(returningResponseAsJsonString(), "PROCESSING", "PROCESSING"),
                 objectMapper.writeValueAsString(response.getBody()));
+    }
+
+    @Test
+    void shouldProcessReturningsWithMissingReturnTokenForOneReturn() throws Exception {
+        // given
+        final String request = readFileAsString(RETURN_REQUESTS_MISSING_RT_JSON_PATH);
+        final String expectedResponse = readFileAsString(RETURN_RESPONSES_MISSING_RT_JSON_PATH);
+        // when
+        final ResponseEntity<ReturningResponseDto> response = restClient
+                .post()
+                .uri("/v2/api/returns")
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(ReturningResponseDto.class);
+        // then
+        assertNotNull(response);
+        assertEquals(expectedResponse, objectMapper.writeValueAsString(response.getBody()));
     }
 
     @Test
@@ -218,11 +238,9 @@ public class ReturningIntegrationTest {
         return """
                 {
                   "processReturn" : [ {
+                    "parcelId" : 2,
                     "returnId" : 6,
-                    "processStatus" : "%s"
-                  }, {
-                    "returnId" : 7,
-                    "processStatus" : "%s"
+                    "processStatus" : "PROCESSING"
                   } ]
                 }""";
     }
@@ -231,11 +249,13 @@ public class ReturningIntegrationTest {
         return """
                 {
                   "processReturn" : [ {
+                    "parcelId" : 3,
                     "returnId" : 4,
-                    "processStatus" : "%s"
+                    "processStatus" : "COMPLETED"
                   }, {
+                    "parcelId" : 4,
                     "returnId" : 5,
-                    "processStatus" : "%s"
+                    "processStatus" : "COMPLETED"
                   } ]
                 }""";
     }
@@ -246,11 +266,11 @@ public class ReturningIntegrationTest {
 
 	private ReturningRequestDto createReturningRequest(String username, String depotCode, String returnToken,
 			String supplierCode) {
-        final ReturningRequestDto request = new ReturningRequestDto();
-        request.setRequests(createReturnPackageRequests(ReturnStatusDto.CREATED, returnToken, supplierCode));
-        request.setUsername(createUsername(username));
-        request.setDepotCode(createDepotCode(depotCode));
-        return request;
+        return ReturningRequestDto.builder()
+                .requests(createReturnPackageRequests(ReturnStatusDto.CREATED, returnToken, supplierCode))
+                .depotCode(createDepotCode(depotCode))
+                .username(createUsername(username))
+                .build();
     }
 
     private UsernameDto createUsername(String username) {
@@ -268,13 +288,13 @@ public class ReturningIntegrationTest {
 
 	private ReturnPackageRequestDto createReturnPackageRequest(ReturnStatusDto returnStatus, String returnToken,
 			String supplierCode) {
-		final ReturnPackageRequestDto returnPackageRequest = new ReturnPackageRequestDto();
-		returnPackageRequest.setReturnStatus(returnStatus);
-		returnPackageRequest.setReturnToken(returnToken);
-		returnPackageRequest.setParcel(createParcel());
-		returnPackageRequest.setReason("Recipient not available");
-		returnPackageRequest.setSupplierCode(createSupplierCode(supplierCode));
-		return returnPackageRequest;
+		return ReturnPackageRequestDto.builder()
+                .returnStatus(returnStatus)
+                .returnToken(returnToken)
+                .parcel(createParcel())
+                .reason("Recipient not available")
+                .supplierCode(createSupplierCode(supplierCode))
+                .build();
 	}
 
     private SupplierCodeDto createSupplierCode(String supplierCode) {
@@ -282,12 +302,12 @@ public class ReturningIntegrationTest {
     }
 
     private ParcelDto createParcel() {
-        final ParcelDto parcel = new ParcelDto();
-        parcel.setParcelSize(SizeDto.TEST);
-        parcel.setParcelType(ParcelTypeDto.PARENT);
-        parcel.setId(1L);
-        parcel.setParcelRelatedId(null);
-        parcel.setDestination("KT1");
-        return parcel;
+        return ParcelDto.builder()
+                .parcelSize(SizeDto.TEST)
+                .parcelType(ParcelTypeDto.PARENT)
+                .parcelRelatedId(null)
+                .id(1L)
+                .destination("KT1")
+                .build();
     }
 }

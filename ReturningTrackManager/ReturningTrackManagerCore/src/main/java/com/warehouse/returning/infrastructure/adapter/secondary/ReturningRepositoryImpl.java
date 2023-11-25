@@ -5,7 +5,8 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.Optional;
 
-import com.warehouse.returning.domain.model.ReturnPackage;
+import com.warehouse.returning.domain.model.ReturnPackageRequest;
+import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.domain.vo.ReturnId;
@@ -28,14 +29,14 @@ public class ReturningRepositoryImpl implements ReturnRepository {
     private final String returnEntityExceptionMessage = "Return Entity with id [%s] was not found";
 
     @Override
-    public ProcessReturn save(ReturnPackage returnPackage) {
+    public ProcessReturn save(ReturnPackageRequest returnPackage) {
         final ReturnEntity returnEntity = returnMapper.map(returnPackage);
         repository.save(returnEntity);
         return returnMapper.map(returnEntity);
     }
 
     @Override
-    public ProcessReturn update(ReturnPackage returnPackage) {
+    public ProcessReturn update(ReturnPackageRequest returnPackage) {
 		final ReturnEntity returnEntity = repository.findFirstByParcelId(returnPackage.getParcelId())
 				.orElseThrow(() -> new ReturnEntityNotFoundException(8083,
 						String.format(exceptionMessage, returnPackage.getParcelId())));
@@ -55,10 +56,15 @@ public class ReturningRepositoryImpl implements ReturnRepository {
 	}
 
     @Override
-    public ReturnModel get(Long parcelId, String returnToken) {
-        final Optional<ReturnEntity> returnEntity = repository.findFirstByParcelIdAndReturnToken(parcelId, returnToken);
-        return returnEntity.map(returnMapper::mapToReturnModel)
+    public ReturnStatus unlockReturn(Long parcelId, String returnToken) {
+        final ReturnEntity returnEntity = repository.findFirstByParcelIdAndReturnToken(parcelId, returnToken)
                 .orElseThrow(() -> new ReturnEntityNotFoundException(8083, String.format(exceptionMessage, parcelId)));
+
+        if (returnEntity.isCancelled()) {
+            returnEntity.unlockReturn();
+            repository.save(returnEntity);
+        }
+        return returnMapper.map(returnEntity.getReturnStatus());
     }
 
     @Override

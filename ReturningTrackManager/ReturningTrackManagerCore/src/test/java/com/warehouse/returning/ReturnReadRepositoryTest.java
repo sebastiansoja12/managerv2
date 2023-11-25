@@ -95,6 +95,18 @@ public class ReturnReadRepositoryTest {
     }
 
     @Test
+    @DatabaseSetup("/dataset/returning.xml")
+    void shouldFindFirstByParcelIdAndReturnToken() {
+        // given
+        final Long parcelId = 1L;
+        final String returnToken = "token";
+        // when
+        final Optional<ReturnEntity> entity = repository.findFirstByParcelIdAndReturnToken(parcelId, returnToken);
+        // then
+        assertTrue(entity.isPresent());
+    }
+
+    @Test
     @DatabaseSetup("/dataset/returningWithInformation.xml")
     void shouldFindByReturnIdWithInformation() {
         // given

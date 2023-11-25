@@ -1,4 +1,4 @@
 package com.warehouse.returning.domain.vo;
 
-public record ProcessReturn(Long returnId, String processStatus) {
+public record ProcessReturn(Long parcelId, Long returnId, String processStatus) {
 }

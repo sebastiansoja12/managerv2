@@ -1,7 +1,7 @@
 package com.warehouse.returning;
 
-import static com.warehouse.returning.domain.model.ReturnStatus.COMPLETED;
-import static com.warehouse.returning.domain.model.ReturnStatus.PROCESSING;
+import static com.warehouse.returning.domain.model.ReturnStatus.*;
+import static com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus.CANCELLED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
@@ -15,7 +15,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.returning.domain.model.ReturnPackage;
+import com.warehouse.returning.domain.model.Parcel;
+import com.warehouse.returning.domain.model.ReturnPackageRequest;
+import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.domain.vo.ReturnId;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnInformationReadRepository;
@@ -44,14 +46,14 @@ public class ReturnRepositoryImplTest {
     }
 
     @Test
-    void shouldSave() {
+    void shouldSaveProcessing() {
         // given
-        final ReturnPackage returnPackage = ReturnPackage.builder()
+        final ReturnPackageRequest returnPackage = ReturnPackageRequest.builder()
                 .username("s-soja")
                 .returnStatus(PROCESSING)
                 .reason("Unavailable")
                 .returnToken("returnToken")
-                .parcelId(1L)
+                .parcel(createParcel(1L))
                 .supplierCode("abc")
                 .build();
         // when
@@ -63,15 +65,53 @@ public class ReturnRepositoryImplTest {
     }
 
     @Test
+    void shouldSaveCreated() {
+        // given
+        final ReturnPackageRequest returnPackage = ReturnPackageRequest.builder()
+                .username("s-soja")
+                .returnStatus(CREATED)
+                .reason("Unavailable")
+                .returnToken("returnToken")
+                .parcel(createParcel(1L))
+                .supplierCode("abc")
+                .build();
+        // when
+        final ProcessReturn processReturn = returningRepository.save(returnPackage);
+        // then
+        assertThat(processReturn)
+                .extracting(ProcessReturn::processStatus)
+                .containsExactly("CREATED");
+    }
+
+    @Test
+    void shouldUnlock() {
+        // given
+        final ReturnEntity returnEntity = new ReturnEntity();
+        returnEntity.setReturnToken("returnToken");
+        returnEntity.setReturnStatus(CANCELLED);
+        returnEntity.setUsername("s-soja");
+        returnEntity.setSupplierCode("abc");
+        returnEntity.setParcelId(1L);
+
+        doReturn(Optional.of(returnEntity))
+                .when(repository)
+                .findFirstByParcelIdAndReturnToken(1L, "returnToken");
+        // when
+        final ReturnStatus returnStatus = returningRepository.unlockReturn(1L, "returnToken");
+        // then
+        assertThat(returnStatus).isEqualTo(PROCESSING);
+    }
+
+    @Test
     void shouldUpdate() {
         // given
         final Long parcelId = 1L;
-        final ReturnPackage returnPackage = ReturnPackage.builder()
+        final ReturnPackageRequest returnPackage = ReturnPackageRequest.builder()
                 .username("s-soja")
                 .returnStatus(COMPLETED)
                 .reason("Unavailable")
                 .returnToken("returnToken")
-                .parcelId(parcelId)
+                .parcel(createParcel(1L))
                 .supplierCode("abc")
                 .build();
         final ReturnEntity returnEntity = createReturnEntity();
@@ -90,12 +130,12 @@ public class ReturnRepositoryImplTest {
     void shouldThrowReturnEntityNotFoundByParcelIdException() {
         // given
         final Long parcelId = 1L;
-        final ReturnPackage returnPackage = ReturnPackage.builder()
+        final ReturnPackageRequest returnPackage = ReturnPackageRequest.builder()
                 .username("s-soja")
                 .returnStatus(COMPLETED)
                 .reason("Unavailable")
                 .returnToken("returnToken")
-                .parcelId(parcelId)
+                .parcel(createParcel(1L))
                 .supplierCode("abc")
                 .build();
         // when
@@ -104,6 +144,24 @@ public class ReturnRepositoryImplTest {
         assertThatThrownBy(executable)
                 .isInstanceOf(ReturnEntityNotFoundException.class)
                 .hasMessageContaining(String.format(exceptionMessage, parcelId));
+    }
+
+    @Test
+    void shouldThrowReturnEntityNotFoundByParcelIdExceptionWhenParcelIsEmpty() {
+        // given
+        final ReturnPackageRequest returnPackage = ReturnPackageRequest.builder()
+                .username("s-soja")
+                .returnStatus(COMPLETED)
+                .reason("Unavailable")
+                .returnToken("returnToken")
+                .supplierCode("abc")
+                .build();
+        // when
+        final ThrowableAssert.ThrowingCallable executable = () -> returningRepository.update(returnPackage);
+        // then
+        assertThatThrownBy(executable)
+                .isInstanceOf(ReturnEntityNotFoundException.class)
+                .hasMessageContaining(String.format(exceptionMessage, (Object) null));
     }
 
     @Test
@@ -118,8 +176,13 @@ public class ReturnRepositoryImplTest {
                 .hasMessageContaining(String.format(returnEntityExceptionMessage, returnId.getValue()));
     }
 
+    private Parcel createParcel(Long id) {
+        return Parcel.builder().id(id).build();
+    }
+
     private ReturnEntity createReturnEntity() {
         final ReturnEntity returnEntity = new ReturnEntity();
+        returnEntity.setId(1L);
         returnEntity.setReturnToken("returnToken");
         returnEntity.setReturnStatus(
                 com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus.PROCESSING);

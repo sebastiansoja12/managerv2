@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Objects;
+
 @Data
 @Builder
 public class ReturnPackageRequest {
@@ -20,6 +22,10 @@ public class ReturnPackageRequest {
 
     public void processReturn(String reason) {
         this.reason = reason;
+        this.returnStatus = PROCESSING;
+    }
+
+    public void processReturn() {
         this.returnStatus = PROCESSING;
     }
 
@@ -51,11 +57,18 @@ public class ReturnPackageRequest {
         this.username = username;
     }
 
-    public boolean isReturnTokenAvailable() {
-        return StringUtils.isNotEmpty(returnToken);
-    }
-
     public boolean isReturnNotTokenAvailable() {
         return StringUtils.isEmpty(returnToken);
+    }
+
+    public boolean isCreated() {
+        return CREATED.equals(returnStatus);
+    }
+
+    public Long getParcelId() {
+        if (Objects.nonNull(parcel)) {
+            return parcel.getId();
+        }
+        return null;
     }
 }
