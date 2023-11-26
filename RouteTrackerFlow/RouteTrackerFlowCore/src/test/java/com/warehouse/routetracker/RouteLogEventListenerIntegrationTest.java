@@ -62,7 +62,7 @@ public class RouteLogEventListenerIntegrationTest {
     void shouldHandleShipment() {
         // given
         final ShipmentLogEvent shipmentLogEvent = ShipmentLogEvent.builder()
-                .shipmentRequest(new ShipmentRequestDto(PARCEL_ID))
+                .shipmentRequest(ShipmentRequestDto.builder().parcelId(PARCEL_ID).build())
                 .build();
         // when
         eventListener.handle(shipmentLogEvent);
@@ -76,7 +76,7 @@ public class RouteLogEventListenerIntegrationTest {
         // given
         final DeliveryLogEvent deliveryLogEvent = DeliveryLogEvent.builder()
                 .deliveryInformation(Collections.singletonList(
-                        createDeliveryInformationDto("token")
+                        createDeliveryInformation("token")
                 ))
                 .build();
         // when
@@ -95,7 +95,7 @@ public class RouteLogEventListenerIntegrationTest {
         // given
         final DeliveryLogEvent deliveryLogEvent = DeliveryLogEvent.builder()
                 .deliveryInformation(Collections.singletonList(
-                        createDeliveryInformationDto(null)
+                        createDeliveryInformation(null)
                 ))
                 .build();
         // when
@@ -113,8 +113,14 @@ public class RouteLogEventListenerIntegrationTest {
         final Long parcelId = 1L;
         final DeliveryLogEvent deliveryLogEvent = DeliveryLogEvent.builder()
                 .deliveryInformation(Collections.singletonList(
-                        new DeliveryInformationDto(parcelId, DEPOT_CODE, SUPPLIER_CODE,"DELIVERY", "token"))
-                ).build();
+                        DeliveryInformationDto.builder()
+                                .parcelId(parcelId)
+                                .depotCode(DEPOT_CODE)
+                                .supplierCode(SUPPLIER_CODE)
+                                .deliveryStatus("DELIVERY")
+                                .token("token")
+                                .build()))
+                .build();
         // when
         final Executable executable = () -> eventListener.handle(deliveryLogEvent);
         // then
@@ -126,7 +132,13 @@ public class RouteLogEventListenerIntegrationTest {
         return t;
     }
 
-    private DeliveryInformationDto createDeliveryInformationDto(String token) {
-        return new DeliveryInformationDto(PARCEL_ID, DEPOT_CODE, SUPPLIER_CODE,"DELIVERY", token);
+    private DeliveryInformationDto createDeliveryInformation(String token) {
+        return DeliveryInformationDto.builder()
+                .parcelId(PARCEL_ID)
+                .depotCode(DEPOT_CODE)
+                .supplierCode(SUPPLIER_CODE)
+                .deliveryStatus("DELIVERY")
+                .token(token)
+                .build();
     }
 }

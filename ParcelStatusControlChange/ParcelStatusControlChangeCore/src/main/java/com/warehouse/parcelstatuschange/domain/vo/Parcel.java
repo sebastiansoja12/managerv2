@@ -7,5 +7,5 @@ public class Parcel {
 
     Long id;
 
-    Status status;
+    Status parcelStatus;
 }

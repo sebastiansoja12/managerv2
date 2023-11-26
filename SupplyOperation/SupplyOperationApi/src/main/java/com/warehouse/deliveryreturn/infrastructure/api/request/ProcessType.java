@@ -1,4 +1,4 @@
-package com.warehouse.deliveryreturn.infrastructure.api.dto.request;
+package com.warehouse.deliveryreturn.infrastructure.api.request;
 
 import jakarta.xml.bind.annotation.XmlRootElement;
 

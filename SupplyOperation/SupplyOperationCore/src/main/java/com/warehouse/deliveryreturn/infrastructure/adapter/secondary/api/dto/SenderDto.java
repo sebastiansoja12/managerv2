@@ -1,16 +1,13 @@
-package com.warehouse.tracker.infrastructure.api.dto;
+package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 @Builder
+@Jacksonized
 public class SenderDto {
-
     String firstName;
     String lastName;
     String email;

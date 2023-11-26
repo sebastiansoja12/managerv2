@@ -1,12 +1,12 @@
 package com.warehouse.deliveryreturn.domain.model;
 
+import static com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus.RETURN;
+
 import com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
+
 import lombok.Builder;
 import lombok.Data;
-
-import static com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus.DELIVERY;
-import static com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus.RETURN;
 
 @Data
 @Builder
@@ -19,7 +19,7 @@ public class DeliveryReturnDetails {
 
 
     public void validateDeliveryStatus() {
-        if (!DELIVERY.equals(deliveryStatus)) {
+        if (!RETURN.equals(deliveryStatus)) {
             throw new WrongDeliveryStatusException(7000, "Wrong delivery status");
         }
     }

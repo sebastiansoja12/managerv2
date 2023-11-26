@@ -16,7 +16,10 @@ public interface UpdateStatusParcelRequestMapper {
                 .value(updateStatusParcelRequest.getParcelId())
                 .build();
         final StatusDto status = map(updateStatusParcelRequest.getParcelStatus());
-        final ParcelDto parcel = new ParcelDto(parcelId, status);
+        final ParcelDto parcel = ParcelDto.builder()
+                .parcelId(parcelId)
+                .parcelStatus(status)
+                .build();
         return new UpdateStatusParcelRequestDto(parcel);
     }
 

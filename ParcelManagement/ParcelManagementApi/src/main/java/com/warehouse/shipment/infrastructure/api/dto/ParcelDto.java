@@ -13,7 +13,7 @@ public class ParcelDto {
 
     ParcelSizeDto parcelSize;
 
-    StatusDto status;
+    StatusDto parcelStatus;
 
     ParcelTypeDto parcelType;
 

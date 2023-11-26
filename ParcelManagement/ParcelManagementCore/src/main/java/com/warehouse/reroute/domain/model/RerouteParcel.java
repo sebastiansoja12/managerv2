@@ -22,7 +22,7 @@ public class RerouteParcel {
 
 	Size parcelSize;
 
-	Status status;
+	Status parcelStatus;
 
 	ParcelType parcelType;
 
@@ -35,11 +35,11 @@ public class RerouteParcel {
 	}
 
 	public boolean hasStatusCreated() {
-		return status.equals(Status.CREATED);
+		return parcelStatus.equals(Status.CREATED);
 	}
 
 	public boolean hasStatusReroute() {
-		return status.equals(Status.REROUTE);
+		return parcelStatus.equals(Status.REROUTE);
 	}
 
 	public boolean hasStatusCreatedOrReroute() {

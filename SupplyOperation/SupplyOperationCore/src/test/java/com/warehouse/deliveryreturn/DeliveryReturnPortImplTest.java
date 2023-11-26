@@ -4,6 +4,7 @@ package com.warehouse.deliveryreturn;
 import java.util.List;
 
 import com.warehouse.deliveryreturn.domain.exception.*;
+import com.warehouse.deliveryreturn.domain.port.secondary.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,10 +18,6 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
-import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
-import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 
@@ -42,6 +39,12 @@ public class DeliveryReturnPortImplTest {
     @Mock
     private DeliveryReturnTokenServicePort deliveryReturnTokenServicePort;
 
+    @Mock
+    private ParcelRepositoryServicePort parcelRepositoryServicePort;
+
+    @Mock
+    private MailServicePort mailServicePort;
+
     private DeliveryReturnPortImpl returnPort;
 
     private final DeviceInformation deviceInformation = new DeviceInformation(
@@ -52,7 +55,7 @@ public class DeliveryReturnPortImplTest {
     @BeforeEach
     void setup() {
         final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
-                deliveryReturnTokenServicePort);
+                deliveryReturnTokenServicePort, parcelRepositoryServicePort, mailServicePort);
         returnPort = new DeliveryReturnPortImpl(deliveryReturnService, parcelStatusControlChangeServicePort,
                 routeLogServicePort);
     }
@@ -109,22 +112,6 @@ public class DeliveryReturnPortImplTest {
         final Executable executable = () -> returnPort.deliverReturn(deliveryReturnRequest);
         // then
         final WrongDeliveryStatusException exception = assertThrows(WrongDeliveryStatusException.class, executable);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    void shouldThrowSupplierNotAvailableInRequest() {
-        // given
-        final String message = "Supplier not available";
-        final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L,
-                DeliveryStatus.DELIVERY, "KT1", null, "token");
-        final DeliveryReturnRequest deliveryReturnRequest = buildDeliveryReturnRequest(
-                ProcessType.RETURN, deviceInformation, deliveryReturnDetails);
-        // when
-        final Executable executable = () -> returnPort.deliverReturn(deliveryReturnRequest);
-        // then
-        final SupplierNotAvailableInRequestException exception =
-                assertThrows(SupplierNotAvailableInRequestException.class, executable);
         assertEquals(message, exception.getMessage());
     }
 

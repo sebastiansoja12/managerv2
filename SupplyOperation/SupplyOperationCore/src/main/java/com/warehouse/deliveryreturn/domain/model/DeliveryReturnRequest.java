@@ -2,6 +2,7 @@ package com.warehouse.deliveryreturn.domain.model;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.warehouse.deliveryreturn.domain.enumeration.ProcessType;
 import lombok.AllArgsConstructor;
@@ -28,5 +29,21 @@ public class DeliveryReturnRequest {
 
     public boolean isReturnProcessType() {
         return RETURN.equals(processType);
+    }
+
+    public void rewriteSupplierCodeFromDevice() {
+        deliveryReturnDetails = deliveryReturnDetails
+                .stream()
+				.peek(deliveryReturnDetail -> deliveryReturnDetail
+						.setSupplierCode(zebraDeviceInformation.getUsername()))
+                .collect(Collectors.toList());
+    }
+
+    public void rewriteDepotCodeFromDevice() {
+        deliveryReturnDetails = deliveryReturnDetails
+                .stream()
+                .peek(deliveryReturnDetail -> deliveryReturnDetail
+                        .setDepotCode(zebraDeviceInformation.getDepotCode()))
+                .collect(Collectors.toList());
     }
 }

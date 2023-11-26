@@ -141,7 +141,7 @@ public class RerouteIntegrationTest {
                 .parcelSize(Size.TEST)
                 .sender(createSender())
                 .parcelType(ParcelType.PARENT)
-                .status(Status.SENT)
+                .parcelStatus(Status.SENT)
                 .build();
 
         final RerouteParcelRequest updateParcelRequest = RerouteParcelRequest.builder()
@@ -170,7 +170,7 @@ public class RerouteIntegrationTest {
                 .parcelSize(Size.TEST)
                 .sender(createSender())
                 .parcelType(ParcelType.CHILD)
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .build();
 
         final RerouteParcelRequest updateParcelRequest = RerouteParcelRequest.builder()
@@ -227,7 +227,7 @@ public class RerouteIntegrationTest {
                 .parcelSize(Size.TEST)
                 .sender(createSender())
                 .parcelType(ParcelType.PARENT)
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .build();
     }
 

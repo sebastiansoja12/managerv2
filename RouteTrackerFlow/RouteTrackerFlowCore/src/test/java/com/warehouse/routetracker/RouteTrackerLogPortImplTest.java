@@ -58,7 +58,7 @@ public class RouteTrackerLogPortImplTest {
                 .supplierCode(supplierCode)
                 .parcelId(PARCEL_ID)
                 .depotCode(depotCode)
-                .status(Status.DELIVERY)
+                .parcelStatus(Status.DELIVERY)
                 .build();
 
         // when

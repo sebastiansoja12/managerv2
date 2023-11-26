@@ -16,6 +16,6 @@ public class RouteLogRecord {
 
     String supplierCode;
 
-    Status status;
+    Status parcelStatus;
 
 }

@@ -1,4 +1,4 @@
-package com.warehouse.tracker.infrastructure.api.dto;
+package com.warehouse.routetracker.infrastructure.api.dto;
 
 import lombok.Value;
 

@@ -13,25 +13,28 @@ import lombok.*;
 @Builder
 public class Parcel {
 
-	ParcelId parcelId;
-	Sender sender;
-	Recipient recipient;
-	Size parcelSize;
+	private ParcelId parcelId;
 
-	Status status;
+	private Sender sender;
 
-	ParcelType parcelType;
+	private Recipient recipient;
 
-	Long parcelRelatedId;
+	private Size parcelSize;
 
-	String destination;
+	private Status parcelStatus;
+
+	private ParcelType parcelType;
+
+	private Long parcelRelatedId;
+
+	private String destination;
 
 	public boolean isParent() {
 		return parcelType.equals(ParcelType.PARENT);
 	}
 
 	public boolean hasStatusCreated() {
-		return status.equals(Status.CREATED);
+		return parcelStatus.equals(Status.CREATED);
 	}
 
 	public boolean isRequiredToReroute() {

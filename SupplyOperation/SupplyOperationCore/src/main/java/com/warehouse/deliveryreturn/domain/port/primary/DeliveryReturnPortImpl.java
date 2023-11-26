@@ -44,6 +44,10 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
         deliveryRequest.validateStatuses();
 
+        deliveryRequest.rewriteSupplierCodeFromDevice();
+
+        deliveryRequest.rewriteDepotCodeFromDevice();
+
         final Set<DeliveryReturnDetails> deliveryReturnRequests = deliveryRequest.getDeliveryReturnDetails()
                 .stream()
                 .filter(Objects::nonNull)

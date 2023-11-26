@@ -75,7 +75,7 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
                 .parcelType(parcelUpdate.getParcelType())
                 .recipient(parcelUpdate.getRecipient())
                 .sender(parcelUpdate.getSender())
-                .status(parcelUpdate.getStatus())
+                .status(parcelUpdate.getParcelStatus())
                 .parcelRelatedId(parcelUpdate.getParcelRelatedId())
                 .build();
     }
@@ -85,7 +85,7 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
     }
 
     private void prepareToReroute(RerouteParcel parcel) {
-        parcel.setStatus(Status.REROUTE);
+        parcel.setParcelStatus(Status.REROUTE);
     }
 
     private RerouteParcel extractParcelFromRequest(RerouteParcelRequest request) {

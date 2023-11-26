@@ -1,18 +1,18 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.secondary;
 
+import static org.mapstruct.factory.Mappers.getMapper;
+
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestGatewaySupport;
+
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatusParcelRequest;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.UpdateStatusParcelRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.UpdateStatusParcelRequestMapper;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelStatusProperty;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.support.RestGatewaySupport;
-
-import static org.mapstruct.factory.Mappers.getMapper;
 
 
 public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
@@ -33,16 +33,21 @@ public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
     @Override
     public UpdateStatus updateStatus(UpdateStatusParcelRequest updateStatusParcelRequest) {
         final UpdateStatusParcelRequestDto request = updateStatusParcelRequestMapper.map(updateStatusParcelRequest);
-        final ResponseEntity<Void> updateStatus = restClient.post()
+        return restClient
+                .post()
                 .uri("/v2/api/{url}", parcelStatusProperty.getEndpoint())
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {})
-                .toBodilessEntity();
-        if (updateStatus.getStatusCode().is2xxSuccessful()) {
-            return UpdateStatus.OK;
-        }
-        return UpdateStatus.NOT_OK;
+                .exchange((req, res) -> {
+                    final HttpStatusCode httpStatusCode = HttpStatusCode.valueOf(res.getStatusCode().value());
+                    if (httpStatusCode.is2xxSuccessful()) {
+                        return UpdateStatus.OK;
+                    }
+                    if (httpStatusCode.is5xxServerError()) {
+                        return UpdateStatus.ERROR;
+                    } else {
+                        return UpdateStatus.NOT_OK;
+                    }
+                });
     }
 }

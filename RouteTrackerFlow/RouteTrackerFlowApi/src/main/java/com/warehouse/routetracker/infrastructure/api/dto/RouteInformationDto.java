@@ -1,15 +1,15 @@
 package com.warehouse.routetracker.infrastructure.api.dto;
 
-import com.warehouse.tracker.infrastructure.api.dto.DepotDto;
-import com.warehouse.tracker.infrastructure.api.dto.ParcelDto;
-import com.warehouse.tracker.infrastructure.api.dto.SupplierDto;
-import com.warehouse.tracker.infrastructure.api.dto.UserDto;
-import lombok.Value;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
+
 @Value
+@Builder
+@Jacksonized
 public class RouteInformationDto {
 
     UUID id;

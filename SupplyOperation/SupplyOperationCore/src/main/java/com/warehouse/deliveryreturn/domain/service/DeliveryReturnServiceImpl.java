@@ -9,10 +9,13 @@ import com.warehouse.deliveryreturn.domain.exception.SupplierNotAvailableInReque
 import com.warehouse.deliveryreturn.domain.model.*;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturn;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnInformation;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
 
+import com.warehouse.deliveryreturn.domain.vo.Parcel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,6 +25,10 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
     private final DeliveryReturnRepository deliveryReturnRepository;
 
     private final DeliveryReturnTokenServicePort deliveryReturnTokenServicePort;
+
+    private final ParcelRepositoryServicePort parcelRepositoryServicePort;
+
+    private final MailServicePort mailServicePort;
 
     @Override
     public List<DeliveryReturn> deliverReturn(Set<DeliveryReturnDetails> deliveryReturnRequests) {
@@ -36,6 +43,10 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 deliveryReturnRequests);
 
         return deliveries.stream()
+                .peek(deliveryReturn -> {
+                    final Parcel parcel = parcelRepositoryServicePort.downloadParcel(deliveryReturn.getParcelId());
+                    mailServicePort.sendNotification(parcel);
+                })
                 .map(deliveryReturnRepository::saveDeliveryReturn)
                 .toList();
     }

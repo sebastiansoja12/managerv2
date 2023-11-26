@@ -83,14 +83,14 @@ public interface RouteModelMapper {
     }
 
     default ParcelEntity mapParcelEntity(RouteLogRecord routeLogRecord) {
-        if (Objects.isNull(routeLogRecord.getStatus())) {
+        if (Objects.isNull(routeLogRecord.getParcelStatus())) {
             return ParcelEntity.builder()
                     .id(routeLogRecord.getParcelId())
                     .build();
         }
         return ParcelEntity.builder()
                 .id(routeLogRecord.getParcelId())
-                .status(mapEntityStatus(routeLogRecord.getStatus()))
+                .status(mapEntityStatus(routeLogRecord.getParcelStatus()))
                 .build();
     }
 

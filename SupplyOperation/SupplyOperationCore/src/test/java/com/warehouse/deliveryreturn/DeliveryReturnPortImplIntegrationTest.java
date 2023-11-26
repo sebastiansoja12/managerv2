@@ -3,14 +3,22 @@ package com.warehouse.deliveryreturn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
 
+import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.deliveryreturn.domain.vo.*;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelProperty;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -28,10 +36,6 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponseDetails;
-import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
-import com.warehouse.deliveryreturn.domain.vo.UpdateStatusParcelRequest;
 
 @SpringBootTest(classes = DeliveryReturnPortImplIntegrationTest.DeliveryReturnPortIntegrationTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -49,6 +53,15 @@ public class DeliveryReturnPortImplIntegrationTest {
         @MockBean
         public RouteLogServicePort routeLogServicePort;
 
+        @MockBean
+        public ParcelProperty parcelProperty;
+
+        @MockBean
+        public ParcelRepositoryServicePort parcelRepositoryServicePort;
+
+        @MockBean
+        public MailServicePort mailServicePort;
+
         @Bean
         public RestClient restClient(RestClient.Builder builder) {
             return builder.baseUrl("http://localhost:8080").build();
@@ -62,10 +75,19 @@ public class DeliveryReturnPortImplIntegrationTest {
     private RestClient restClient;
 
     @Autowired
+    private ParcelProperty parcelProperty;
+
+    @Autowired
     private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
     @Autowired
     private RouteLogServicePort routeLogServicePort;
+
+    @Autowired
+    private ParcelRepositoryServicePort parcelRepositoryServicePort;
+
+    @Autowired
+    private MailServicePort mailServicePort;
 
     private final DeviceInformation deviceInformation = new DeviceInformation(
             "1", 1L, "s-soja", "KT1"
@@ -80,7 +102,7 @@ public class DeliveryReturnPortImplIntegrationTest {
     void shouldDeliverReturnAndNotUpdateParcelWhenIsNotAllowed() {
         // given
         final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L,
-                DeliveryStatus.DELIVERY, "KT1", "abc", null);
+                DeliveryStatus.RETURN, "KT1", "abc", null);
         final DeliveryReturnRequest request = buildDeliveryReturnRequest(
                 ProcessType.RETURN, deviceInformation, deliveryReturnDetails);
 
@@ -88,8 +110,21 @@ public class DeliveryReturnPortImplIntegrationTest {
                 .parcelId(1L)
                 .build();
 
+        final Parcel parcel = Parcel.builder()
+                .recipientEmail("recipient")
+                .parcelStatus("RETURN")
+                .id(1L)
+                .senderEmail("sender")
+                .build();
+
         when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest))
                 .thenReturn(UpdateStatus.NOT_OK);
+        when(parcelRepositoryServicePort.downloadParcel(1L)).thenReturn(parcel);
+
+        doNothing()
+                .when(mailServicePort)
+                .sendNotification(parcel);
+
         doNothing()
                 .when(routeLogServicePort)
                 .logDeliverReturn(any());
@@ -110,7 +145,7 @@ public class DeliveryReturnPortImplIntegrationTest {
     void shouldDeliverReturn() {
         // given
         final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L,
-                DeliveryStatus.DELIVERY, "KT1", "abc", null);
+                DeliveryStatus.RETURN, "KT1", "abc", null);
         final DeliveryReturnRequest request = buildDeliveryReturnRequest(
                 ProcessType.RETURN, deviceInformation, deliveryReturnDetails);
 
@@ -118,8 +153,19 @@ public class DeliveryReturnPortImplIntegrationTest {
                 .parcelId(1L)
                 .build();
 
+        final Parcel parcel = Parcel.builder()
+                .recipientEmail("recipient")
+                .parcelStatus("RETURN")
+                .id(1L)
+                .senderEmail("sender")
+                .build();
+
         when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest))
                 .thenReturn(UpdateStatus.OK);
+        when(parcelRepositoryServicePort.downloadParcel(1L)).thenReturn(parcel);
+        doNothing()
+                .when(mailServicePort)
+                .sendNotification(parcel);
         doNothing()
                 .when(routeLogServicePort)
                 .logDeliverReturn(any());
@@ -134,6 +180,54 @@ public class DeliveryReturnPortImplIntegrationTest {
 
         assertEquals("s-soja", response.getSupplierCode());
         assertEquals("KT1", response.getDepotCode());
+    }
+
+    @Test
+    void shouldBreakProcessWhenBusinessExceptionIsThrown() {
+        // given
+        final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L,
+                DeliveryStatus.RETURN, "KT1", "abc", null);
+        final DeliveryReturnRequest request = buildDeliveryReturnRequest(
+                ProcessType.RETURN, deviceInformation, deliveryReturnDetails);
+
+        final UpdateStatusParcelRequest updateStatusParcelRequest = UpdateStatusParcelRequest.builder()
+                .parcelId(1L)
+                .build();
+
+        when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest))
+                .thenReturn(UpdateStatus.NOT_OK);
+        doThrow(new BusinessException(404, "Parcel 1 was not found"))
+                .when(parcelRepositoryServicePort)
+                .downloadParcel(1L);
+        // when
+        final Executable executable = () -> deliveryReturnPort.deliverReturn(request);
+        // then
+        final BusinessException exception = assertThrows(BusinessException.class, executable);
+        assertEquals("Parcel 1 was not found", exception.getMessage());
+    }
+
+    @Test
+    void shouldBreakProcessWhenTechnicalExceptionIsThrown() {
+        // given
+        final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L,
+                DeliveryStatus.RETURN, "KT1", "abc", null);
+        final DeliveryReturnRequest request = buildDeliveryReturnRequest(
+                ProcessType.RETURN, deviceInformation, deliveryReturnDetails);
+
+        final UpdateStatusParcelRequest updateStatusParcelRequest = UpdateStatusParcelRequest.builder()
+                .parcelId(1L)
+                .build();
+
+        when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest))
+                .thenReturn(UpdateStatus.OK);
+        doThrow(new TechnicalException(500, "Could not establish connection"))
+                .when(parcelRepositoryServicePort)
+                .downloadParcel(1L);
+        // when
+        final Executable executable = () -> deliveryReturnPort.deliverReturn(request);
+        // then
+        final TechnicalException exception = assertThrows(TechnicalException.class, executable);
+        assertEquals("Could not establish connection", exception.getMessage());
     }
 
 	private DeliveryReturnRequest buildDeliveryReturnRequest(ProcessType processType,

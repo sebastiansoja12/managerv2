@@ -24,10 +24,10 @@ public interface ParcelMapper {
     @Mapping(source = "rerouteParcel.sender", target = "parcel.sender")
     @Mapping(source = "rerouteParcel.recipient", target = "parcel.recipient")
     @Mapping(source = "rerouteParcel.parcelSize", target = "parcel.parcelSize")
-    @Mapping(source = "rerouteParcel.status", target = "parcel.status")
     @Mapping(source = "rerouteParcel.parcelType", target = "parcel.parcelType")
     @Mapping(source = "rerouteParcel.parcelRelatedId", target = "parcel.parcelRelatedId")
     @Mapping(source = "rerouteParcel.destination", target = "parcel.destination")
+    @Mapping(source = "rerouteParcel.parcelStatus", target = "parcel.parcelStatus")
     UpdateParcelRequestDto map(RerouteParcel rerouteParcel, ParcelId parcelId);
     
     @Mapping(source = "parcel.sender.firstName", target = "sender.firstName")
@@ -47,7 +47,7 @@ public interface ParcelMapper {
     @Mapping(source = "parcel.parcelSize", target = "parcelSize")
     @Mapping(source = "parcel.parcelId.value", target = "parcelId.value")
     @Mapping(source = "parcel.parcelType", target = "parcelType")
-    @Mapping(source = "parcel.status", target = "status")
+    @Mapping(source = "parcel.parcelStatus", target = "parcelStatus")
     @Mapping(source = "parcel.destination", target = "destination")
     @Mapping(source = "parcel.parcelRelatedId", target = "parcelRelatedId")
     Parcel map(UpdateParcelResponseDto updateParcelResponse);

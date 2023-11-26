@@ -11,12 +11,16 @@ import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
 import com.warehouse.routetracker.domain.vo.*;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @AllArgsConstructor
 public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     private final RouteRepository repository;
+
+    private final Logger logger = LoggerFactory.getLogger(RouteTrackerLogPort.class);
 
     @Override
     public void initializeRoute(Long parcelId) {
@@ -33,7 +37,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                     .supplierCode(request.getSupplierCode())
 					.parcelId(request.getParcelId())
                     .depotCode(request.getDepotCode())
-                    .status(request.getDeliveryStatus())
+                    .parcelStatus(request.getDeliveryStatus())
                     .build();
             repository.save(routeLogRecord);
 		});
@@ -41,8 +45,10 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     @Override
     public List<RouteResponse> saveRoutes(List<RouteRequest> routeRequests) {
+        logRouteRequest(routeRequests);
 		return routeRequests.stream()
                 .map(this::mapToRoute)
+                .peek(this::logRouteRecord)
                 .map(repository::save)
 				.collect(Collectors.toList());
     }
@@ -60,6 +66,17 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public List<RouteInformation> findRoutesByUsername(String username) {
         return repository.findByUsername(username);
+    }
+
+    private void logRouteRecord(RouteLogRecord routeLogRecord) {
+        logger.info("Saving route for parcel: {}", routeLogRecord.getParcelId());
+    }
+
+    private void logRouteRequest(List<RouteRequest> routeRequests) {
+        logger.info("Detected request route for parcels: {}", routeRequests
+                .stream()
+                .map(RouteRequest::getParcelId)
+                .collect(Collectors.toList()));
     }
 
     private RouteLogRecord mapToRoute(RouteRequest routeRequest) {

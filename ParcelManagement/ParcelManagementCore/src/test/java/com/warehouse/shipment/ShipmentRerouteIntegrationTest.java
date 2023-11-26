@@ -79,7 +79,7 @@ public class ShipmentRerouteIntegrationTest {
                 .id(100001L)
                 .parcelSize(Size.TEST)
                 .price(99)
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .sender(createSender())
                 .recipient(createRecipient())
                 .build();

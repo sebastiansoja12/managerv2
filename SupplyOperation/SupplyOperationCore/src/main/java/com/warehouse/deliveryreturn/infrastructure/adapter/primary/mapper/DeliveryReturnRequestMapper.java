@@ -10,7 +10,7 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetail;
-import com.warehouse.deliveryreturn.infrastructure.api.dto.request.ZebraDeliveryReturnRequest;
+import com.warehouse.deliveryreturn.infrastructure.api.request.ZebraDeliveryReturnRequest;
 import com.warehouse.deliveryreturn.infrastructure.api.zebradevice.ZebraDeviceInformation;
 
 @Mapper
@@ -29,5 +29,5 @@ public interface DeliveryReturnRequestMapper {
 
     DeviceInformation map(ZebraDeviceInformation zebraDeviceInformation);
 
-    ProcessType map(com.warehouse.deliveryreturn.infrastructure.api.dto.request.ProcessType processType);
+    ProcessType map(com.warehouse.deliveryreturn.infrastructure.api.request.ProcessType processType);
 }
