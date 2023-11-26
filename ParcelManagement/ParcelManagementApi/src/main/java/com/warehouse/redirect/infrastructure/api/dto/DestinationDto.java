@@ -1,8 +1,12 @@
 package com.warehouse.redirect.infrastructure.api.dto;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class DestinationDto {
     String value;
 }
