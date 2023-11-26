@@ -4,8 +4,7 @@ package com.warehouse.deliverytoken;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +29,7 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.deliverytoken.domain.vo.Parcel;
 import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.ParcelServiceAdapter;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 
 @ExtendWith(SpringExtension.class)
@@ -50,7 +50,6 @@ public class ParcelServiceAdapterIntegrationTest {
     private ParcelServiceAdapter parcelServiceAdapter;
 
     private MockRestServiceServer mockRestServiceServer;
-
 
     private final static Long PARCEL_ID = 1L;
 
@@ -88,6 +87,19 @@ public class ParcelServiceAdapterIntegrationTest {
         final Executable executable = () -> parcelServiceAdapter.downloadParcel(parcelId);
         // then
         assertThrows(TechnicalException.class, executable);
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void shouldFailAndThrowBusinessException() {
+        // given
+        final ParcelId parcelId = new ParcelId(PARCEL_ID);
+        mockRestServiceServer.expect(requestTo(String.format(URL, PARCEL_ID)))
+                .andRespond(withResourceNotFound());
+        // when
+        final Executable executable = () -> parcelServiceAdapter.downloadParcel(parcelId);
+        // then
+        assertThrows(CommunicationException.class, executable);
         mockRestServiceServer.verify();
     }
 }
