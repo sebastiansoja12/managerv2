@@ -1,12 +1,12 @@
 package com.warehouse.reroute.infrastructure.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
+@Builder
+@Jacksonized
 public class TokenValidationRequestDto {
 
     Long parcelId;
