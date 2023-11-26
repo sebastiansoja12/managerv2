@@ -2,6 +2,7 @@ package com.warehouse.reroute;
 
 import static org.mockito.Mockito.*;
 
+import com.warehouse.mail.domain.vo.Notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,8 +38,7 @@ public class MailAdapterTest {
                 .token(12345)
                 .build();
 
-        final com.warehouse.mail.domain.vo.Notification mappedNotification =
-                new com.warehouse.mail.domain.vo.Notification();
+        final com.warehouse.mail.domain.vo.Notification mappedNotification = Notification.builder().build();
 
         doReturn(mappedNotification)
                 .when(notificationMapper)

@@ -1,2 +1,6 @@
+parcel:
+  endpoint: parcel-updates
+  url: http://inparcel-dev-v2.herokuapp.com/v2/api/%s
+
 service:
   mock: false

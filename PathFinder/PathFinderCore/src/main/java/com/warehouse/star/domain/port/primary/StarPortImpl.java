@@ -1,13 +1,16 @@
 package com.warehouse.star.domain.port.primary;
 
+import static com.google.common.collect.MoreCollectors.onlyElement;
+
+import java.util.*;
+
 import com.warehouse.star.domain.exception.MissingCoordinatesException;
 import com.warehouse.star.domain.exception.MissingDepotsException;
 import com.warehouse.star.domain.model.Coordinates;
 import com.warehouse.star.domain.model.Depot;
 import com.warehouse.star.domain.service.CalculateDistanceBetweenDepots;
-import lombok.AllArgsConstructor;
 
-import java.util.*;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class StarPortImpl implements StarPort {
@@ -30,19 +33,17 @@ public class StarPortImpl implements StarPort {
 
         final Depot depot = depots.stream()
                 .filter(d -> d.getDepotCode(depotCode))
-                .findFirst()
-                .orElse(null);
+                .collect(onlyElement());
 
         final Depot destDepot = depots.stream()
                 .filter(d -> d.getCoordinates().getLat() == coordinates.getLat()
                         && d.getCoordinates().getLon() == coordinates.getLon())
-                .findFirst()
-                .orElse(null);
+                .collect(onlyElement());
 
         return find(depot, destDepot, depots);
     }
 
-    public static String find(Depot start, Depot goal, List<Depot> depots) {
+    private static String find(Depot start, Depot goal, List<Depot> depots) {
         final Map<Depot, Depot> cameFrom = new HashMap<>();
         final Map<Depot, Double> gScore = new HashMap<>();
         final Map<Depot, Double> fScore = new HashMap<>();

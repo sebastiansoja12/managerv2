@@ -1,6 +1,6 @@
 package com.warehouse.parcelstatuschange.domain.port.primary;
 
-import com.warehouse.parcelstatuschange.domain.model.StatusRequest;
+import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
 import com.warehouse.parcelstatuschange.domain.port.secondary.ParcelStatusRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class ParcelStatusPortImpl implements ParcelStatusPort {
     }
 
     private void logStatusRequest(StatusRequest statusRequest) {
-        log.warn("Update status of parcel {}, setting status {}", statusRequest.getParcel().getId(),
-                statusRequest.getParcel().getStatus());
+        log.warn("Update status of parcel {}, trying to set status {}", statusRequest.getParcel().getId(),
+                statusRequest.getParcel().getParcelStatus());
     }
 }

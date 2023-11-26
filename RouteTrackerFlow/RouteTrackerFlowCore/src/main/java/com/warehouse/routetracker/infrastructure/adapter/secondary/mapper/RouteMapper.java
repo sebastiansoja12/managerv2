@@ -1,6 +1,6 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.routetracker.domain.model.Route;
+import com.warehouse.routetracker.domain.vo.RouteLogRecord;
 import com.warehouse.routetracker.domain.vo.RouteRequest;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.api.dto.RouteRequestDto;
@@ -15,5 +15,5 @@ public interface RouteMapper {
 
     RouteResponse mapToRouteResponse(RouteRequest routeRequest);
 
-    Route mapToRoute(RouteRequest request);
+    RouteLogRecord mapToRoute(RouteRequest request);
 }

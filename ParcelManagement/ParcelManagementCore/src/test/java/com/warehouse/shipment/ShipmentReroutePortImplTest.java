@@ -39,7 +39,7 @@ public class ShipmentReroutePortImplTest {
         updateParcelRequest.setParcel(createParcel());
 
         final Parcel parcel =  createParcel();
-        parcel.setStatus(Status.REROUTE);
+        parcel.setParcelStatus(Status.REROUTE);
 
         final UpdateParcelResponse expectedResponse = new UpdateParcelResponse();
         expectedResponse.setParcel(parcel);
@@ -53,7 +53,7 @@ public class ShipmentReroutePortImplTest {
         assertEquals(expectedResponse, response);
 
         // and status changed to reroute
-        assertThat(response.getParcel().getStatus().name()).isEqualTo("REROUTE");
+        assertThat(response.getParcel().getParcelStatus().name()).isEqualTo("REROUTE");
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ShipmentReroutePortImplTest {
                 .recipient(createRecipient())
                 .parcelSize(Size.TEST)
                 .sender(createSender())
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .destination("KT1")
                 .id(1L)
                 .build();

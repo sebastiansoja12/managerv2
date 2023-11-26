@@ -1,27 +1,28 @@
 package com.warehouse.qrcode.domain.service;
 
-import com.lowagie.text.Font;
+import java.awt.*;
+
+import com.warehouse.qrcode.domain.model.Parcel;
+import com.warehouse.qrcode.domain.port.secondary.ParcelRepository;
+import org.springframework.stereotype.Service;
+
 import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import com.warehouse.qrcode.infrastructure.adapter.primary.mapper.ParcelEntityMapper;
-import com.warehouse.shipment.domain.model.Parcel;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.awt.*;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class ParcelExportServiceImpl implements ParcelExportService {
 
-    private final BarcodeGeneratorService generatorService;
-
-    private final ParcelEntityMapper entityMapper;
+    private final ParcelRepository parcelRepository;
 
     private void writeTableHeader(PdfPTable senderTable, PdfPTable recipientTable) {
         final PdfPCell cell = new PdfPCell();
@@ -48,7 +49,10 @@ public class ParcelExportServiceImpl implements ParcelExportService {
         cell.setPhrase(new Phrase("Numer telefonu", font));
         recipientTable.addCell(cell);
 
-        cell.setPhrase(new Phrase("Destynacja", font));
+        cell.setPhrase(new Phrase("Miasto", font));
+        recipientTable.addCell(cell);
+
+        cell.setPhrase(new Phrase("Ulica", font));
         recipientTable.addCell(cell);
 
         cell.setPhrase(new Phrase("Email odbiorcy", font));
@@ -60,27 +64,27 @@ public class ParcelExportServiceImpl implements ParcelExportService {
     }
 
 
-    private void writeTableData(PdfPTable senderTable, PdfPTable recipientTable, Parcel parcel) throws Exception {
-
+	private void writeTableData(PdfPTable senderTable, PdfPTable recipientTable, Parcel parcel, Image image) {
         //sender
         senderTable.addCell(String.valueOf(parcel.getId()));
-        senderTable.addCell(parcel.getSender().getFirstName() + " " + parcel.getSender().getLastName());
-        senderTable.addCell(String.valueOf(parcel.getSender().getTelephoneNumber()));
+        senderTable.addCell(parcel.getFirstName() + " " + parcel.getLastName());
+        senderTable.addCell(String.valueOf(parcel.getSenderTelephone()));
 
         //recipient
-        recipientTable.addCell(parcel.getRecipient().getFirstName() + " " + parcel.getRecipient().getLastName());
-        recipientTable.addCell(String.valueOf(parcel.getRecipient().getTelephoneNumber()));
-        recipientTable.addCell((parcel.getRecipient().getCity()) + " " + parcel.getRecipient().getStreet());
-        recipientTable.addCell(String.valueOf(parcel.getRecipient().getEmail()));
-        recipientTable.addCell(generatorService.generateQRCodeImage(parcel.getId()));
-
-
+        recipientTable.addCell(parcel.getRecipientFirstName() + " " + parcel.getRecipientLastName());
+        recipientTable.addCell(String.valueOf(parcel.getRecipientTelephone()));
+        recipientTable.addCell((parcel.getRecipientCity()));
+        recipientTable.addCell((parcel.getRecipientStreet()));
+        recipientTable.addCell(String.valueOf(parcel.getRecipientEmail()));
+        recipientTable.addCell(image);
     }
 
-    @Override
-    public void exportToPdf(HttpServletResponse response, com.warehouse.shipment.domain.model.Parcel parcel) throws Exception {
+	@Override
+	public void exportToPdf(HttpServletResponse response, Long id, Image image) throws Exception {
         final Document document = new Document(PageSize.LETTER);
-        PdfWriter.getInstance(document, response.getOutputStream());
+        final PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
+
+        writer.setCloseStream(false);
 
         document.open();
         final Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
@@ -88,7 +92,7 @@ public class ParcelExportServiceImpl implements ParcelExportService {
         font.setColor(Color.BLUE);
 
         final PdfPTable senderTable = new PdfPTable(3);
-        final PdfPTable recipientTable = new PdfPTable(5);
+        final PdfPTable recipientTable = new PdfPTable(6);
 
 
         senderTable.setWidthPercentage(100f);
@@ -100,11 +104,15 @@ public class ParcelExportServiceImpl implements ParcelExportService {
 
         writeTableHeader(senderTable, recipientTable);
 
-        writeTableData(senderTable, recipientTable, parcel);
+        final Parcel parcel = parcelRepository.find(id);
+
+        writeTableData(senderTable, recipientTable, parcel, image);
 
         document.add(senderTable);
         document.add(recipientTable);
         document.close();
+
+        writer.close();
 
     }
 }

@@ -1,0 +1,43 @@
+<ZebraRequest>
+    <ProcessType>RETURN</ProcessType>
+    <ZebraDeviceInformation>
+        <ResponsibleUser>s-soja</ResponsibleUser>
+        <DepotCode>KT1</DepotCode>
+        <Version>1.0</Version>
+        <ZebraID>1</ZebraID>
+    </ZebraDeviceInformation>
+    <ReturnRequestInformations>
+        <ReturnRequestInformation>
+            <Parcel>
+                <ParcelID>1</ParcelID>
+                <ParcelSize>TEST</ParcelSize>
+                <Destination>Destination1</Destination>
+                <ReturnStatus>RETURN</ReturnStatus>
+                <ParcelType>PARENT</ParcelType>
+                <ParcelRelatedId></ParcelRelatedId>
+            </Parcel>
+            <Reason>Recipient not available</Reason>
+            <ReturnStatus>CREATED</ReturnStatus>
+            <ReturnToken>ReturnToken1</ReturnToken>
+            <SupplierCode>
+                <Value>abc</Value>
+            </SupplierCode>
+        </ReturnRequestInformation>
+        <ReturnRequestInformation>
+            <Parcel>
+                <ParcelID>2</ParcelID>
+                <ParcelSize>TEST</ParcelSize>
+                <Destination>Destination1</Destination>
+                <ReturnStatus>RETURN</ReturnStatus>
+                <ParcelType>PARENT</ParcelType>
+                <ParcelRelatedId></ParcelRelatedId>
+            </Parcel>
+            <Reason>Recipient not available</Reason>
+            <ReturnStatus>CREATED</ReturnStatus>
+            <ReturnToken>ReturnToken1</ReturnToken>
+            <SupplierCode>
+                <Value>abc</Value>
+            </SupplierCode>
+        </ReturnRequestInformation>
+    </ReturnRequestInformations>
+</ZebraRequest>

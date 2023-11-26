@@ -1,12 +1,16 @@
 package com.warehouse.parcelstatuschange.infrastructure.adapter.primary.api.dto;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class ParcelDto {
 
     ParcelIdDto parcelId;
 
-    StatusDto status;
+    StatusDto parcelStatus;
 
 }

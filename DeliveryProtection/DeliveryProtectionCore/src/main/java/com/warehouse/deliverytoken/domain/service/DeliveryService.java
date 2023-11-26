@@ -1,7 +1,7 @@
 package com.warehouse.deliverytoken.domain.service;
 
-import com.warehouse.deliverytoken.domain.model.DeliveryTokenResponse;
-import com.warehouse.deliverytoken.domain.model.Parcel;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
 import com.warehouse.deliverytoken.domain.model.DeliveryTokenRequest;
 
 import java.util.List;

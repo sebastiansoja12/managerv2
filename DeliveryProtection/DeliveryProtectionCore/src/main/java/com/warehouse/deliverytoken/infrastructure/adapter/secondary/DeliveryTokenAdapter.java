@@ -1,6 +1,6 @@
 package com.warehouse.deliverytoken.infrastructure.adapter.secondary;
 
-import com.warehouse.deliverytoken.domain.model.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
 import com.warehouse.deliverytoken.domain.model.DeliveryTokenRequest;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.STSProperty;
@@ -21,6 +21,6 @@ public class DeliveryTokenAdapter extends RestGatewaySupport implements Delivery
         // TODO INPL-6151
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Stage", stsProperty.getStage());
-        return new DeliveryTokenResponse(Collections.emptyList());
+        return new DeliveryTokenResponse(Collections.emptyList(), request.extractSupplierCode());
     }
 }

@@ -1,5 +1,9 @@
 package com.warehouse.auth.domain.port.primary;
 
+import com.warehouse.auth.domain.vo.AuthenticationResponse;
+import com.warehouse.auth.domain.vo.LoginRequest;
+import com.warehouse.auth.domain.vo.RegisterResponse;
+import com.warehouse.auth.domain.vo.UserLogout;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,11 +40,10 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final String authenticationToken = jwtService.generateToken(user);
 
-        final LoginResponse loginResponse = authenticationService.login(user);
+        authenticationService.login(user);
 
         return AuthenticationResponse.builder()
                 .authenticationToken(authenticationToken)
-                .refreshToken(loginResponse.getRefreshToken().getValue())
                 .build();
     }
 

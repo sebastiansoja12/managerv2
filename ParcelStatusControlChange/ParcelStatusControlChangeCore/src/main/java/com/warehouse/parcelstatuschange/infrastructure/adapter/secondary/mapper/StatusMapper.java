@@ -5,5 +5,5 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface StatusMapper {
-    Status map(com.warehouse.parcelstatuschange.domain.enumeration.Status status);
+    Status map(com.warehouse.parcelstatuschange.domain.vo.Status status);
 }

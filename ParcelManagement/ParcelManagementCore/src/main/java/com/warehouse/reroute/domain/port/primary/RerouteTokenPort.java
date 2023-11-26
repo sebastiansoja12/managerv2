@@ -2,6 +2,7 @@ package com.warehouse.reroute.domain.port.primary;
 
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
+import com.warehouse.reroute.domain.vo.RerouteResponse;
 
 public interface RerouteTokenPort {
 

@@ -7,7 +7,7 @@
     <!-- Change Set to Create the 'refresh_token' Table -->
     <changeSet author="s-soja" id="createRefreshTokenTable">
         <createTable tableName="refresh_token">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="created_date" type="datetime(6)">
@@ -22,10 +22,7 @@
             <column name="revoked" type="bit(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="token_type" type="enum('BEARER')">
-                <constraints nullable="false"/>
-            </column>
-            <column name="user_id" type="bigint">
+            <column name="token_type" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="expiry_date" type="datetime(6)">

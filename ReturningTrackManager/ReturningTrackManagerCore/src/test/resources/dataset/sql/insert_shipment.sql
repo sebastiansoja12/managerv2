@@ -1,0 +1,1 @@
+INSERT INTO SHIPMENT(id) values (1);

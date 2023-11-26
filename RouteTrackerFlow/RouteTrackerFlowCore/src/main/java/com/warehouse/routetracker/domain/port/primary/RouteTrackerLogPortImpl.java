@@ -4,17 +4,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.warehouse.routetracker.domain.port.secondary.ParcelStatusUpdateRepository;
-import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
-import com.warehouse.routetracker.domain.vo.RouteRequest;
-import com.warehouse.routetracker.domain.vo.RouteResponse;
 import org.apache.commons.lang3.StringUtils;
 
-import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
-import com.warehouse.routetracker.domain.vo.DeliveryInformation;
+import com.warehouse.routetracker.domain.vo.*;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @AllArgsConstructor
@@ -22,37 +20,35 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     private final RouteRepository repository;
 
-    private final ParcelStatusUpdateRepository updateRepository;
+    private final Logger logger = LoggerFactory.getLogger(RouteTrackerLogPort.class);
 
     @Override
     public void initializeRoute(Long parcelId) {
-        final Route route = Route.builder()
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                 .parcelId(parcelId)
                 .build();
-        repository.initializeRoute(route);
+        repository.save(routeLogRecord);
     }
 
     @Override
     public void saveDelivery(List<DeliveryInformation> deliveryInformation) {
 		deliveryInformation.stream().filter(this::existsToken).forEach(request -> {
-			final Route route = Route.builder()
+			final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                     .supplierCode(request.getSupplierCode())
 					.parcelId(request.getParcelId())
                     .depotCode(request.getDepotCode())
+                    .parcelStatus(request.getDeliveryStatus())
                     .build();
-            final SupplyRoute supplyRoute = SupplyRoute.builder()
-                    .route(route)
-                    .status(request.getDeliveryStatus())
-                    .build();
-            updateParcelStatus(supplyRoute);
-            repository.saveSupplyRoute(supplyRoute);
+            repository.save(routeLogRecord);
 		});
     }
 
     @Override
     public List<RouteResponse> saveRoutes(List<RouteRequest> routeRequests) {
+        logRouteRequest(routeRequests);
 		return routeRequests.stream()
                 .map(this::mapToRoute)
+                .peek(this::logRouteRecord)
                 .map(repository::save)
 				.collect(Collectors.toList());
     }
@@ -72,16 +68,23 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         return repository.findByUsername(username);
     }
 
-    private void updateParcelStatus(SupplyRoute supplyRoute) {
-        updateRepository.updateStatus(supplyRoute.getRoute().getParcelId(), supplyRoute.getStatus());
+    private void logRouteRecord(RouteLogRecord routeLogRecord) {
+        logger.info("Saving route for parcel: {}", routeLogRecord.getParcelId());
     }
 
-    private Route mapToRoute(RouteRequest routeRequest) {
-        return Route.builder()
+    private void logRouteRequest(List<RouteRequest> routeRequests) {
+        logger.info("Detected request route for parcels: {}", routeRequests
+                .stream()
+                .map(RouteRequest::getParcelId)
+                .collect(Collectors.toList()));
+    }
+
+    private RouteLogRecord mapToRoute(RouteRequest routeRequest) {
+        return RouteLogRecord.builder()
                 .parcelId(routeRequest.getParcelId())
                 .supplierCode(routeRequest.getSupplierCode())
                 .depotCode(routeRequest.getDepotCode())
-                .userId(routeRequest.getUserId())
+                .username(routeRequest.getUsername())
                 .build();
     }
 

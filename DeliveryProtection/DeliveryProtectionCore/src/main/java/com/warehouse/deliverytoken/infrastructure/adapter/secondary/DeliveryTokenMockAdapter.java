@@ -2,6 +2,10 @@ package com.warehouse.deliverytoken.infrastructure.adapter.secondary;
 
 import com.warehouse.deliverytoken.domain.model.*;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageRequest;
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.ProtectedDelivery;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.model.SupplierToken;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
 import lombok.AllArgsConstructor;
@@ -24,7 +28,7 @@ public class DeliveryTokenMockAdapter implements DeliveryTokenServicePort {
 		validateSupplier(request);
 		final List<DeliveryPackageResponse> deliveryPackageResponses = deliveryPackageRequests(
 				request.getDeliveryPackageRequests());
-		return new DeliveryTokenResponse(deliveryPackageResponses);
+		return new DeliveryTokenResponse(deliveryPackageResponses, request.extractSupplierCode());
 	}
 
 	private void validateSupplier(DeliveryTokenRequest request) {
@@ -37,8 +41,8 @@ public class DeliveryTokenMockAdapter implements DeliveryTokenServicePort {
 
 	private List<DeliveryPackageResponse> deliveryPackageRequests(List<DeliveryPackageRequest> requests) {
 		return requests.stream()
-				.map(deliveryPackageRequest -> new DeliveryPackageResponse(deliveryPackageRequest.getParcel(),
-						deliveryPackageRequest.getSupplier().getSupplierCode(), supplierTokenServiceApplicationId,
+				.map(deliveryPackageRequest -> new DeliveryPackageResponse(
+						deliveryPackageRequest.getParcel(), supplierTokenServiceApplicationId,
 						createProtectedDelivery(deliveryPackageRequest.getDelivery().getId())))
 				.toList();
 	}

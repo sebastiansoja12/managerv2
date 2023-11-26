@@ -5,7 +5,7 @@
     <parent>
         <artifactId>RouteTrackerFlow</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2023.11-SNAPSHOT</version>
+        <version>2023.12-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,6 +16,10 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
     </dependencies>
 

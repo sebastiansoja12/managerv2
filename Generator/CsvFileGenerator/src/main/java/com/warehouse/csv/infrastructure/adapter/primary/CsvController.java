@@ -19,7 +19,8 @@ public class CsvController {
     private final CsvPort csvPort;
 
     @GetMapping("/{parcelId}")
-    public void generateLabel(HttpServletResponse response, @PathVariable Long parcelId) throws DocumentException, IOException {
+	public void generateLabel(HttpServletResponse response, @PathVariable Long parcelId)
+			throws DocumentException, IOException {
         csvPort.exportToCSV(response, parcelId);
     }
 }

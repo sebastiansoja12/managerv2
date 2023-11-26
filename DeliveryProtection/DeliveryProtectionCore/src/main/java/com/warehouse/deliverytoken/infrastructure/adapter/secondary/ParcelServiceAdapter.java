@@ -6,12 +6,13 @@ import java.util.Objects;
 
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.support.RestGatewaySupport;
 
-import com.warehouse.deliverytoken.domain.model.Parcel;
-import com.warehouse.deliverytoken.domain.model.ParcelId;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.api.dto.ParcelDto;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
@@ -35,7 +36,7 @@ public class ParcelServiceAdapter extends RestGatewaySupport implements ParcelSe
         final ShipmentConfiguration shipmentConfiguration = new ShipmentConfiguration(shipmentProperty);
         try {
             return downloadParcel(parcelId, shipmentConfiguration);
-        } catch (ResourceAccessException exception) {
+        } catch (HttpClientErrorException exception) {
             log.info("Connection with {} could not be established", shipmentConfiguration.getName());
             throw new CommunicationException(shipmentConfiguration.getName());
         } catch (HttpServerErrorException exception) {

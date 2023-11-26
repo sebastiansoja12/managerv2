@@ -1,7 +1,7 @@
 package com.warehouse.auth.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.auth.domain.model.AuthenticationResponse;
-import com.warehouse.auth.domain.model.RegisterResponse;
+import com.warehouse.auth.domain.vo.AuthenticationResponse;
+import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.infrastructure.adapter.primary.dto.AuthenticationResponseDto;
 import com.warehouse.auth.infrastructure.adapter.primary.dto.RegisterResponseDto;

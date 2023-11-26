@@ -1,5 +1,7 @@
 package com.warehouse.delivery.configuration;
 
+import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
+import com.warehouse.delivery.infrastructure.adapter.secondary.property.ParcelStatusProperty;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +24,15 @@ import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 public class DeliveryConfiguration {
 
 	@Bean
-	public DeliveryPort deliveryPort(DeliveryService service, RouteLogServicePort logServicePort) {
-		return new DeliveryPortImpl(service, logServicePort);
+	public DeliveryPort deliveryPort(DeliveryService service, RouteLogServicePort logServicePort,
+			ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort) {
+		return new DeliveryPortImpl(service, logServicePort, parcelStatusControlChangeServicePort);
+	}
+    
+	@Bean("delivery.parcelStatusControlChangeServicePort")
+	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
+			ParcelStatusProperty parcelStatusProperty) {
+		return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperty);
 	}
 
 	@Bean

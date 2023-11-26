@@ -11,17 +11,17 @@ import lombok.Data;
 @AllArgsConstructor
 public class RerouteToken {
 
-    Long id;
+    private Long id;
 
-    Integer token;
+    private Integer token;
 
-    Instant createdDate;
+    private Instant createdDate;
 
-    Instant expiryDate;
+    private Instant expiryDate;
 
-    Long parcelId;
+    private Long parcelId;
 
-    String email;
+    private String email;
 
     public boolean isValid() {
         return getExpiryDate().isAfter(Instant.now());

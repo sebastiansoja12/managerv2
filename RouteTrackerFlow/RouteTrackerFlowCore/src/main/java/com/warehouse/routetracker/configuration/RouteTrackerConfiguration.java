@@ -7,9 +7,10 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
-import com.warehouse.routetracker.domain.port.secondary.ParcelStatusUpdateRepository;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.*;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteReadRepository;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteRepositoryImpl;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.RouteModelMapper;
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 
@@ -28,13 +29,7 @@ public class RouteTrackerConfiguration {
     }
 
 	@Bean
-	public RouteTrackerLogPort routeTrackerLogPort(RouteRepository repository,
-			ParcelStatusUpdateRepository updateRepository) {
-		return new RouteTrackerLogPortImpl(repository, updateRepository);
+	public RouteTrackerLogPort routeTrackerLogPort(RouteRepository repository) {
+		return new RouteTrackerLogPortImpl(repository);
 	}
-
-    @Bean
-    public ParcelStatusUpdateRepository parcelStatusUpdateRepository(ParcelReadRepository parcelReadRepository) {
-        return new ParcelStatusUpdateRepositoryImpl(parcelReadRepository);
-    }
 }

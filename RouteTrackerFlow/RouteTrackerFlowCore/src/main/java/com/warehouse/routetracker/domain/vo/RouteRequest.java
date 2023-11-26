@@ -1,17 +1,13 @@
 package com.warehouse.routetracker.domain.vo;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class RouteRequest {
     Long parcelId;
-    Long userId;
+    String username;
     String supplierCode;
     String depotCode;
 }

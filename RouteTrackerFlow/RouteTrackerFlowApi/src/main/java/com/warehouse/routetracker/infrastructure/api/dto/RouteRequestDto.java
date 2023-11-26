@@ -1,16 +1,16 @@
 package com.warehouse.routetracker.infrastructure.api.dto;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+
 @Value
 @Builder
+@Jacksonized
 public class RouteRequestDto {
-
     Long parcelId;
-    Long userId;
+    String username;
     String supplierCode;
-    Long depotId;
+    String depotCode;
 }

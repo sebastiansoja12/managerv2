@@ -26,11 +26,11 @@ import com.warehouse.reroute.domain.exception.RerouteException;
 import com.warehouse.reroute.domain.model.RerouteParcel;
 import com.warehouse.reroute.domain.model.RerouteParcelRequest;
 import com.warehouse.reroute.domain.model.RerouteRequest;
-import com.warehouse.reroute.domain.model.RerouteResponse;
+import com.warehouse.reroute.domain.vo.RerouteResponse;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.model.Recipient;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
-import com.warehouse.reroute.domain.vo.Sender;
+import com.warehouse.reroute.domain.model.Sender;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
 import com.warehouse.shipment.infrastructure.api.dto.*;
 
@@ -141,7 +141,7 @@ public class RerouteIntegrationTest {
                 .parcelSize(Size.TEST)
                 .sender(createSender())
                 .parcelType(ParcelType.PARENT)
-                .status(Status.SENT)
+                .parcelStatus(Status.SENT)
                 .build();
 
         final RerouteParcelRequest updateParcelRequest = RerouteParcelRequest.builder()
@@ -170,7 +170,7 @@ public class RerouteIntegrationTest {
                 .parcelSize(Size.TEST)
                 .sender(createSender())
                 .parcelType(ParcelType.CHILD)
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .build();
 
         final RerouteParcelRequest updateParcelRequest = RerouteParcelRequest.builder()
@@ -227,7 +227,7 @@ public class RerouteIntegrationTest {
                 .parcelSize(Size.TEST)
                 .sender(createSender())
                 .parcelType(ParcelType.PARENT)
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .build();
     }
 

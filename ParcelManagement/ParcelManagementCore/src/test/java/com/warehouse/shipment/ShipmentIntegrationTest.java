@@ -124,7 +124,7 @@ public class ShipmentIntegrationTest {
         return Parcel.builder()
                 .parcelSize(Size.TEST)
                 .price(99)
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .sender(createSender())
                 .recipient(createRecipient())
                 .build();

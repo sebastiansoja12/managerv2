@@ -3,6 +3,7 @@ package com.warehouse.reroute.infrastructure.adapter.primary;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
+import com.warehouse.reroute.domain.vo.RerouteResponse;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapper;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapper;
 import com.warehouse.reroute.infrastructure.api.dto.RerouteParcelRequestDto;

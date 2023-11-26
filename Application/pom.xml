@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2023.11-SNAPSHOT</version>
+        <version>2023.12-SNAPSHOT</version>
     </parent>
     <artifactId>Application</artifactId>
 
@@ -39,6 +39,11 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ZebraIntegrationCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>ParcelManagementCore</artifactId>
@@ -81,7 +86,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>PositionDetermination</artifactId>
+            <artifactId>DestinationDetermination</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -102,6 +107,16 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>ParcelStatusControlChangeCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ReturningTrackManagerCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>Caching</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

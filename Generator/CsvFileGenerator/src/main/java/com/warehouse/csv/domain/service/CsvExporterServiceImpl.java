@@ -1,33 +1,36 @@
 package com.warehouse.csv.domain.service;
 
-import com.warehouse.csv.domain.model.ParcelCsv;
-import com.warehouse.csv.domain.service.mapper.ParcelMapper;
-import com.warehouse.shipment.domain.model.Parcel;
-import lombok.AllArgsConstructor;
+import java.io.IOException;
+
+import com.warehouse.csv.domain.port.secondary.ParcelRepository;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import com.warehouse.csv.domain.vo.ParcelCsv;
+
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class CsvExporterServiceImpl implements CsvExporterService {
 
-    private final ParcelMapper parcelMapper;
+    private final ParcelRepository parcelRepository;
+
     @Override
-    public void exportToCSV(HttpServletResponse response, Parcel parcel) throws IOException {
+    public void exportToCSV(HttpServletResponse response, Long id) throws IOException {
 
         final CsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(),
                 CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
 
-        final ParcelCsv parcelCsv = parcelMapper.map(parcel);
+        final ParcelCsv parcelCsv = parcelRepository.find(id);
 
         final String[] csvHeader = {"Kod paczki", "Imie nadawcy", "Nazwisko nadawcy", "Numer tel nadawcy",
                 "Imie odbiorcy", "Nazwisko odbiorcy", "Numer tel odbiorcy", "Miasto", "Ulica", "Email"};
+
         final String[] nameMapping = {
                 "id",
-                "senderFirstName",
-                "senderLastName",
+                "firstName",
+                "lastName",
                 "senderTelephoneNumber",
                 "recipientFirstName",
                 "recipientLastName",

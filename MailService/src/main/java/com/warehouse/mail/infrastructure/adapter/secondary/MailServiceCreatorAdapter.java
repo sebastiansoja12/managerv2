@@ -13,10 +13,7 @@ import com.warehouse.mail.infrastructure.adapter.secondary.exception.WarehouseMa
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Class for managing email sending.
- * Used for parcels and reroutes.
- */
+
 @Slf4j
 @Service
 public class MailServiceCreatorAdapter implements MailServicePort {
@@ -24,11 +21,6 @@ public class MailServiceCreatorAdapter implements MailServicePort {
     @Autowired
     private JavaMailSender mailSender;
 
-    /**
-     * Sends email message to recipient/sender
-     *
-     * @param notification
-     */
     void sendMail(Notification notification) {
         final MimeMessagePreparator messagePreparator = mimeMessage -> {
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);

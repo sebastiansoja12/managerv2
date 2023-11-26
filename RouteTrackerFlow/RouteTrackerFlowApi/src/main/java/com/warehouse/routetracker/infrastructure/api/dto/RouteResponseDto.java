@@ -1,12 +1,15 @@
 package com.warehouse.routetracker.infrastructure.api.dto;
 
-import lombok.Data;
-import lombok.Value;
-
 import java.util.UUID;
 
-@Data
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
+
 @Value
+@Builder
+@Jacksonized
 public class RouteResponseDto {
     UUID id;
+    Long parcelId;
 }

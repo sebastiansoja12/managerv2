@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ZebraDeliveryReturnResponse>
+    <DeliveryReturnResponses>
+        <DeliveryReturnResponse>
+            <DeliveryID>54f5a99f-3c62-4fc1-a8a2-ec422e2ff9a6</DeliveryID>
+            <ParcelID>1000000002</ParcelID>
+            <DeliveryStatus>RETURN</DeliveryStatus>
+            <ReturnToken>12345</ReturnToken>
+            <UpdateStatus>OK</UpdateStatus>
+        </DeliveryReturnResponse>
+        <DeliveryReturnResponse>
+            <DeliveryID>cc0cf7d2-f61b-4d47-b0ad-94e0f3fd7784</DeliveryID>
+            <ParcelID>1000000003</ParcelID>
+            <DeliveryStatus>RETURN</DeliveryStatus>
+            <ReturnToken>12345</ReturnToken>
+            <UpdateStatus>OK</UpdateStatus>
+        </DeliveryReturnResponse>
+        <DeliveryReturnResponse>
+            <DeliveryID>a09aa699-e674-41a4-b4c4-191cb1d104e6</DeliveryID>
+            <ParcelID>1000000000</ParcelID>
+            <DeliveryStatus>RETURN</DeliveryStatus>
+            <ReturnToken>12345</ReturnToken>
+            <UpdateStatus>OK</UpdateStatus>
+        </DeliveryReturnResponse>
+        <DeliveryReturnResponse>
+            <DeliveryID>8d2c0b3c-0b0e-4c36-8a0a-3f1a243317bb</DeliveryID>
+            <ParcelID>1000000001</ParcelID>
+            <DeliveryStatus>RETURN</DeliveryStatus>
+            <ReturnToken>12345</ReturnToken>
+            <UpdateStatus>OK</UpdateStatus>
+        </DeliveryReturnResponse>
+        <DeliveryReturnResponse>
+            <DeliveryID>2c3e4dd4-6cb1-413b-a491-6fbe11690bcb</DeliveryID>
+            <ParcelID>1000000004</ParcelID>
+            <DeliveryStatus>RETURN</DeliveryStatus>
+            <ReturnToken>12345</ReturnToken>
+            <UpdateStatus>OK</UpdateStatus>
+        </DeliveryReturnResponse>
+    </DeliveryReturnResponses>
+    <SupplierCode>dwvscq</SupplierCode>
+    <DepotCode>KT1</DepotCode>
+</ZebraDeliveryReturnResponse>

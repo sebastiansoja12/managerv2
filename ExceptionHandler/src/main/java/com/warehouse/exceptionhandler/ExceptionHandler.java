@@ -1,5 +1,6 @@
 package com.warehouse.exceptionhandler;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
@@ -16,7 +17,6 @@ public class ExceptionHandler {
         //errors.setTimestamp(LocalDateTime.now());
         errors.setStatus(ex.getCode());
         errors.setError(ex.getMessage());
-        return ResponseEntity.badRequest().body(errors);
-
+        return new ResponseEntity<>(errors, HttpStatusCode.valueOf(errors.getStatus()));
     }
 }

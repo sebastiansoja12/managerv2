@@ -4,8 +4,11 @@ import static com.google.common.collect.MoreCollectors.onlyElement;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import com.warehouse.deliverytoken.domain.vo.DeliveryPackageRequest;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.ParcelId;
+import com.warehouse.deliverytoken.domain.vo.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,14 +17,13 @@ import lombok.Getter;
 @Getter
 public class DeliveryTokenRequest {
 
-    List<DeliveryPackageRequest> deliveryPackageRequests;
+    private List<DeliveryPackageRequest> deliveryPackageRequests;
+
+    private Supplier supplier;
 
 
     public String extractSupplierCode() {
-        return deliveryPackageRequests.stream()
-                .map(DeliveryPackageRequest::getSupplier)
-                .map(Supplier::getSupplierCode)
-                .collect(Collectors.joining());
+        return supplier.getSupplierCode();
     }
 
     public List<ParcelId> extractParcelIds() {
@@ -38,16 +40,14 @@ public class DeliveryTokenRequest {
                 .anyMatch(parcel -> Objects.isNull(parcel.getId()));
     }
     
-    public void assignParcelValuesToDeliveryPackages(List<Parcel> parcels) {
-		deliveryPackageRequests = deliveryPackageRequests.stream()
-                .map(deliveryPackageRequest -> {
+	public void assignParcelValuesToDeliveryPackages(List<Parcel> parcels) {
+		deliveryPackageRequests = deliveryPackageRequests.stream().map(deliveryPackageRequest -> {
 			final Parcel matchingParcel = parcels.stream()
 					.filter(parcel -> parcelExists(deliveryPackageRequest, parcel))
                     .collect(onlyElement());
-			return new DeliveryPackageRequest(matchingParcel, deliveryPackageRequest.getSupplier(),
-					deliveryPackageRequest.getDelivery());
+			return new DeliveryPackageRequest(matchingParcel, deliveryPackageRequest.getDelivery());
 		}).toList();
-    }
+	}
 
     private boolean parcelExists(DeliveryPackageRequest deliveryPackageRequest, Parcel parcel) {
         return parcel.getId().equals(deliveryPackageRequest.getParcel().getId());

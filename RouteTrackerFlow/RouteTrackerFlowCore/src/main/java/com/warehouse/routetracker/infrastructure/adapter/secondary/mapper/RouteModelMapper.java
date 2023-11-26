@@ -4,28 +4,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import com.warehouse.routetracker.domain.vo.RouteLogRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.routetracker.domain.enumeration.Status;
-import com.warehouse.routetracker.domain.model.Route;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.SupplyRoute;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
+@Mapper
 public interface RouteModelMapper {
 
     @Mapping(source = "parcel.id", target = "parcelId")
     @Mapping(source = "depot.depotCode", target = "depotCode")
-    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.username", target = "username")
     @Mapping(source = "supplier.supplierCode", target = "supplierCode")
-    Route map(RouteEntity routeEntity);
+    RouteLogRecord map(RouteEntity routeEntity);
 
-    List<Route> map(List<RouteEntity> routeEntityList);
+    List<RouteLogRecord> map(List<RouteEntity> routeEntityList);
 
     @Mapping(target = "parcel.sender.firstName", source = "parcel.firstName")
     @Mapping(target = "parcel.sender.lastName", source = "parcel.lastName")
@@ -49,44 +48,49 @@ public interface RouteModelMapper {
     List<RouteInformation> mapToRoutes(List<RouteEntity> routeEntityList);
 
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "parcel.id", target = "parcelId")
     RouteResponse mapToRouteResponse(RouteEntity routeEntity);
 
-    default RouteEntity map(Route route) {
+    default RouteEntity map(RouteLogRecord routeLogRecord) {
         return RouteEntity.builder()
                 .created(LocalDateTime.now())
-                .depot(mapDepotEntity(route))
-                .parcel(mapParcelEntity(route))
-                .supplier(mapSupplierEntity(route))
-                .user(mapUserEntity(route))
+                .depot(mapDepotEntity(routeLogRecord))
+                .parcel(mapParcelEntity(routeLogRecord))
+                .supplier(mapSupplierEntity(routeLogRecord))
+                .user(mapUserEntity(routeLogRecord))
                 .build();
     }
 
     default RouteEntity map(SupplyRoute supplyRoute) {
-        final Route route = supplyRoute.getRoute();
-        final Status status = supplyRoute.getStatus();
+        final RouteLogRecord routeLogRecord = supplyRoute.getRouteLogRecord();
         return RouteEntity.builder()
                 .created(LocalDateTime.now())
-                .depot(mapDepotEntity(route))
-                .parcel(mapParcelEntity(route, status))
-                .supplier(mapSupplierEntity(route))
-                .user(mapUserEntity(route))
+                .depot(mapDepotEntity(routeLogRecord))
+                .parcel(mapParcelEntity(routeLogRecord))
+                .supplier(mapSupplierEntity(routeLogRecord))
+                .user(mapUserEntity(routeLogRecord))
                 .build();
     }
 
-    default UserEntity mapUserEntity(Route route) {
-        final Long userId = route.getUserId();
-        if (Objects.nonNull(userId)) {
+    default UserEntity mapUserEntity(RouteLogRecord routeLogRecord) {
+        final String username = routeLogRecord.getUsername();
+        if (StringUtils.isNotEmpty(username)) {
             return UserEntity.builder()
-                    .id(userId)
+                    .username(username)
                     .build();
         }
         return null;
     }
 
-    default ParcelEntity mapParcelEntity(Route route, Status status) {
+    default ParcelEntity mapParcelEntity(RouteLogRecord routeLogRecord) {
+        if (Objects.isNull(routeLogRecord.getParcelStatus())) {
+            return ParcelEntity.builder()
+                    .id(routeLogRecord.getParcelId())
+                    .build();
+        }
         return ParcelEntity.builder()
-                .id(route.getParcelId())
-                .status(mapEntityStatus(status))
+                .id(routeLogRecord.getParcelId())
+                .status(mapEntityStatus(routeLogRecord.getParcelStatus()))
                 .build();
     }
 
@@ -101,14 +105,8 @@ public interface RouteModelMapper {
         };
     }
 
-    default ParcelEntity mapParcelEntity(Route route) {
-        return ParcelEntity.builder()
-                .id(route.getParcelId())
-                .build();
-    }
-
-	default DepotEntity mapDepotEntity(Route route) {
-		final String depotCode = route.getDepotCode();
+	default DepotEntity mapDepotEntity(RouteLogRecord routeLogRecord) {
+		final String depotCode = routeLogRecord.getDepotCode();
 		if (StringUtils.isNotEmpty(depotCode)) {
 			return DepotEntity.builder()
                     .depotCode(depotCode)
@@ -117,8 +115,8 @@ public interface RouteModelMapper {
 		return null;
 	}
 
-    default SupplierEntity mapSupplierEntity(Route route) {
-        final String supplierCode = route.getSupplierCode();
+    default SupplierEntity mapSupplierEntity(RouteLogRecord routeLogRecord) {
+        final String supplierCode = routeLogRecord.getSupplierCode();
         if (StringUtils.isNotEmpty(supplierCode)) {
             return SupplierEntity.builder()
                     .supplierCode(supplierCode)

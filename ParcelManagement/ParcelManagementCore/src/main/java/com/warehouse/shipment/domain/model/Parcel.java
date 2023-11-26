@@ -26,7 +26,7 @@ public class Parcel {
 
     private String destination;
 
-    private Status status;
+    private Status parcelStatus;
 
     private ParcelType parcelType;
 

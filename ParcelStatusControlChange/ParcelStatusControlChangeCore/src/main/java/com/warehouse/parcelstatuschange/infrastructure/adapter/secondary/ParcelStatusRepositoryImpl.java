@@ -1,7 +1,7 @@
 package com.warehouse.parcelstatuschange.infrastructure.adapter.secondary;
 
-import com.warehouse.parcelstatuschange.domain.enumeration.Status;
-import com.warehouse.parcelstatuschange.domain.model.StatusRequest;
+import com.warehouse.parcelstatuschange.domain.vo.Status;
+import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
 import com.warehouse.parcelstatuschange.domain.port.secondary.ParcelStatusRepository;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
@@ -24,8 +24,9 @@ public class ParcelStatusRepositoryImpl implements ParcelStatusRepository {
     @Override
     public void update(StatusRequest statusRequest) {
 		final ParcelEntity parcel = parcelStatusReadRepository.findById(statusRequest.getParcel().getId()).orElseThrow(
-				() -> new ParcelNotFoundException(String.format(exceptionMessage, statusRequest.getParcel().getId())));
-		final Status status = statusRequest.getParcel().getStatus();
+				() -> new ParcelNotFoundException(8070,
+						String.format(exceptionMessage, statusRequest.getParcel().getId())));
+		final Status status = statusRequest.getParcel().getParcelStatus();
 		parcel.setStatus(statusMapper.map(status));
         parcel.setUpdatedAt(LocalDateTime.now());
 		parcelStatusReadRepository.save(parcel);

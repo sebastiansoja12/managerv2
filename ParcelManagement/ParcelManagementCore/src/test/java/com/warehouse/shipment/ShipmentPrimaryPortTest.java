@@ -92,7 +92,7 @@ class ShipmentPrimaryPortTest {
                 .recipient(createRecipient())
                 .parcelSize(Size.TEST)
                 .sender(createSender())
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .destination("KT1")
                 .id(1L)
                 .build();

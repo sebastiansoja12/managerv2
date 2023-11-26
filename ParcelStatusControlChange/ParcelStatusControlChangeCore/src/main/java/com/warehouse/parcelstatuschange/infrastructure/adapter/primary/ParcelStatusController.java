@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.warehouse.parcelstatuschange.domain.model.StatusRequest;
+import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
 import com.warehouse.parcelstatuschange.domain.port.primary.ParcelStatusPort;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.primary.api.dto.StatusRequestDto;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.primary.mapper.ParcelStatusRequestMapper;

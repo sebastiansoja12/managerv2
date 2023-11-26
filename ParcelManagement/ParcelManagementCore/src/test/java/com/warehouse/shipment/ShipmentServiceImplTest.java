@@ -251,7 +251,7 @@ public class ShipmentServiceImplTest {
                 .recipient(createRecipient())
                 .parcelSize(Size.TEST)
                 .sender(createSender())
-                .status(Status.CREATED)
+                .parcelStatus(Status.CREATED)
                 .id(1L)
                 .build();
     }

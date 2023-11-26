@@ -1,7 +1,7 @@
 package com.warehouse.delivery.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.delivery.domain.model.DeliveryResponse;
-import com.warehouse.supplier.dto.DeliveryResponseDto;
+import com.warehouse.delivery.infrastructure.adapter.primary.dto.DeliveryResponseDto;
 import org.mapstruct.Mapper;
 import java.util.List;
 

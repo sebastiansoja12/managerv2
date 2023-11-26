@@ -2,10 +2,10 @@ package com.warehouse.deliverytoken.domain.port.primary;
 
 
 import com.warehouse.deliverytoken.domain.exception.MissingParcelIdException;
-import com.warehouse.deliverytoken.domain.model.Parcel;
-import com.warehouse.deliverytoken.domain.model.ParcelId;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.domain.model.DeliveryTokenRequest;
-import com.warehouse.deliverytoken.domain.model.DeliveryTokenResponse;
+import com.warehouse.deliverytoken.domain.vo.DeliveryTokenResponse;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.domain.service.DeliveryService;
 import lombok.AllArgsConstructor;

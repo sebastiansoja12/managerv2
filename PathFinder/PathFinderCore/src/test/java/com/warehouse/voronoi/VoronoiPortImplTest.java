@@ -8,6 +8,9 @@ import static org.mockito.Mockito.doReturn;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.warehouse.voronoi.domain.model.Coordinates;
+import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
+import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,12 +32,13 @@ public class VoronoiPortImplTest {
     private DepotServicePort depotServicePort;
 
     @Mock
-    private ComputeService computeService;
+    private VoronoiServicePort voronoiServicePort;
 
     private VoronoiPortImpl voronoiPort;
 
     @BeforeEach
     void setup() {
+        final ComputeService computeService = new ComputeServiceImpl(voronoiServicePort);
         voronoiPort = new VoronoiPortImpl(depotServicePort, computeService);
     }
 
@@ -53,9 +57,9 @@ public class VoronoiPortImplTest {
                 .when(depotServicePort)
                 .downloadDepots();
 
-        doReturn("KT1")
-                .when(computeService)
-                .calculate(requestCity, depotsList);
+		doReturn(Coordinates.builder().lon(50.3013283).lat(18.5795769).build())
+                .when(voronoiServicePort)
+				.obtainCoordinates(requestCity);
 
         // when
         final String nearestDepot = voronoiPort.findFastestRoute(requestCity);
@@ -73,9 +77,7 @@ public class VoronoiPortImplTest {
                 .downloadDepots();
 
         // when && then
-        assertThrows(MissingDepotsException.class, () -> {
-            voronoiPort.findFastestRoute("KR1");
-        });
+        assertThrows(MissingDepotsException.class, () -> voronoiPort.findFastestRoute("KR1"));
     }
 
     @Test
@@ -88,8 +90,6 @@ public class VoronoiPortImplTest {
                 .downloadDepots();
 
         // when && then
-        assertThrows(MissingRequestCityException.class, () -> {
-            voronoiPort.findFastestRoute(null);
-        });
+        assertThrows(MissingRequestCityException.class, () -> voronoiPort.findFastestRoute(null));
     }
 }

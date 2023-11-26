@@ -7,8 +7,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.dto.CoordinatesDto;
 import com.warehouse.dto.DepotDto;
@@ -17,13 +18,13 @@ import com.warehouse.star.domain.model.Depot;
 import com.warehouse.star.domain.port.primary.StarPort;
 import com.warehouse.star.infrastructure.adapter.primary.StarServiceAdapter;
 import com.warehouse.star.infrastructure.adapter.primary.mapper.StarRequestMapper;
-import com.warehouse.star.infrastructure.adapter.primary.mapper.StarRequestMapperImpl;
 
 
+@ExtendWith(MockitoExtension.class)
 public class StarServiceAdapterTest {
 
     @Mock
-    StarRequestMapper starRequestMapper = new StarRequestMapperImpl();
+    StarRequestMapper starRequestMapper;
 
     @Mock
     StarPort starPort;
@@ -32,7 +33,6 @@ public class StarServiceAdapterTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         starServiceAdapter = new StarServiceAdapter(starPort, starRequestMapper);
     }
 

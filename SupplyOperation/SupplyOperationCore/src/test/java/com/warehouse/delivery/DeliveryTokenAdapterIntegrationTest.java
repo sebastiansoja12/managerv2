@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import com.warehouse.delivery.domain.vo.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.delivery.configuration.DeliveryTestConfiguration;
 import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
-import com.warehouse.delivery.domain.model.*;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryTokenAdapter;
 import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
-import com.warehouse.deliverytoken.domain.model.Parcel;
-import com.warehouse.deliverytoken.domain.model.ParcelId;
+import com.warehouse.deliverytoken.domain.vo.Parcel;
+import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 
 @ExtendWith(SpringExtension.class)
@@ -41,18 +41,19 @@ public class DeliveryTokenAdapterIntegrationTest {
     private ParcelServicePort parcelServicePort;
 
     private final static String SUPPLIER_CODE = "dwvscq";
+
+    private final static String TOKEN = "abcdefghjklk";
     
     @Test
     void shouldProtectDelivery() {
         // given
-        final DeliveryTokenRequest request = new DeliveryTokenRequest( 
-             List.of(new DeliveryPackageRequest(1L, new Supplier(SUPPLIER_CODE), Delivery.builder()
-                     .deliveryStatus(DeliveryStatus.DELIVERY)
-                     .parcelId(1L)
-                     .supplierCode(SUPPLIER_CODE)
-                     .depotCode("abc")
-                     .build()))
-        );
+		final DeliveryTokenRequest request = DeliveryTokenRequest.builder().supplier(new Supplier(SUPPLIER_CODE))
+				.deliveryPackageRequests(
+						List.of(DeliveryPackageRequest
+								.builder().delivery(DeliveryInformation.builder()
+										.deliveryStatus(DeliveryStatus.DELIVERY).parcelId(1L).depotCode("abc").build())
+								.build()))
+				.build();
         final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenReturn(parcel);
@@ -61,7 +62,8 @@ public class DeliveryTokenAdapterIntegrationTest {
         // then
         assertThat(response.getSupplierSignature())
                 .hasSize(1)
-                .filteredOn(delivery -> delivery.getSupplierCode().equals(SUPPLIER_CODE));
+                .filteredOn(delivery -> delivery.getToken().equals(TOKEN));
+        assertThat(response.getSupplierCode()).isEqualTo(SUPPLIER_CODE);
 
     }
 }

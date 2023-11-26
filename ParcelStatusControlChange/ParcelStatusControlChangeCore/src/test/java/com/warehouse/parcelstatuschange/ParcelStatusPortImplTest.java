@@ -16,9 +16,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.parcelstatuschange.domain.enumeration.Status;
-import com.warehouse.parcelstatuschange.domain.model.Parcel;
-import com.warehouse.parcelstatuschange.domain.model.StatusRequest;
+import com.warehouse.parcelstatuschange.domain.vo.Status;
+import com.warehouse.parcelstatuschange.domain.vo.Parcel;
+import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
 import com.warehouse.parcelstatuschange.domain.port.primary.ParcelStatusPort;
 import com.warehouse.parcelstatuschange.domain.port.secondary.ParcelStatusRepository;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.ParcelStatusReadRepository;

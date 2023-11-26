@@ -26,13 +26,13 @@ import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteE
 @ContextConfiguration(classes = RouteTrackerTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DatabaseSetup("/dataset/db.xml")
 public class RouteReadRepositoryTest {
 
     @Autowired
     private RouteReadRepository repository;
 
     @Test
-    @DatabaseSetup("/dataset/db.xml")
     void shouldFindByParcelId() {
         // given
         final Long parcelId = 100L;
@@ -43,7 +43,6 @@ public class RouteReadRepositoryTest {
     }
 
     @Test
-    @DatabaseSetup("/dataset/db.xml")
     void shouldNotFindByParcelId() {
         // given
         final Long parcelId = 101L;
@@ -54,7 +53,6 @@ public class RouteReadRepositoryTest {
     }
 
     @Test
-    @DatabaseSetup("/dataset/db.xml")
     void shouldFindByUsername() {
         // given
         final String username = "test";
@@ -65,7 +63,6 @@ public class RouteReadRepositoryTest {
     }
 
     @Test
-    @DatabaseSetup("/dataset/db.xml")
     void shouldNotFindByUsername() {
         // given
         final String username = "test2";

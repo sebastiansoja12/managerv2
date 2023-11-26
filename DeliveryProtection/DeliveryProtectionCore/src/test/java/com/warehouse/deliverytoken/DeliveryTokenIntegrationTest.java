@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.warehouse.deliverytoken.domain.vo.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +63,8 @@ public class DeliveryTokenIntegrationTest {
     void shouldProtectDelivery() {
         // given
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
-                createDeliveryRequests(1L, null, null, null, "dwvscq", "1")
+                createDeliveryRequests(1L, null, null, null, "1"),
+                new Supplier("dwvscq")
         );
         final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
@@ -84,7 +86,8 @@ public class DeliveryTokenIntegrationTest {
         final String domainName = "Shipment";
         final int code = 8001;
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
-                createDeliveryRequests(1L, null, null, null, "abc", "1")
+                createDeliveryRequests(1L, null, null, null, "1"),
+                new Supplier("abc")
         );
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenThrow(new CommunicationException(domainName));
@@ -103,7 +106,8 @@ public class DeliveryTokenIntegrationTest {
         final String domainName = "Shipment";
         final int code = 8002;
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
-                createDeliveryRequests(1L, null, null, null, "abc", "1")
+                createDeliveryRequests(1L, null, null, null, "1"),
+                new Supplier("abc")
         );
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenThrow(new TechnicalException(domainName));
@@ -121,7 +125,8 @@ public class DeliveryTokenIntegrationTest {
         final String exceptionMessage = "Supplier %s does not have any access to deliveries";
         final String supplierCode = "abc";
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
-                createDeliveryRequests(1L, null, null, null, supplierCode, "1")
+                createDeliveryRequests(1L, null, null, null, "1"),
+                new Supplier(supplierCode)
         );
         final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
@@ -134,10 +139,10 @@ public class DeliveryTokenIntegrationTest {
     }
 
 	private List<DeliveryPackageRequest> createDeliveryRequests(Long parcelId, Long parcelRelatedId,
-			ParcelType parcelType, String destination, String supplierCode, String deliveryId) {
+                                                                ParcelType parcelType, String destination, String deliveryId) {
 		return Collections.singletonList(
 				new DeliveryPackageRequest(createParcel(parcelId, parcelRelatedId, parcelType, destination),
-						createSupplier(supplierCode), createDelivery(deliveryId)));
+						 createDelivery(deliveryId)));
 	}
 
     private Delivery createDelivery(String id) {

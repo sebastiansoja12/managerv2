@@ -61,7 +61,7 @@ public class ShipmentReroutePortImpl implements ShipmentReroutePort {
 		parcelUpdate.id(updateParcelRequest.getParcel().getId());
 		parcelUpdate.parcelType(updateParcelRequest.getParcel().getParcelType());
 		parcelUpdate.parcelSize(updateParcelRequest.getParcel().getParcelSize());
-		parcelUpdate.status(updateParcelRequest.getParcel().getStatus());
+		parcelUpdate.status(updateParcelRequest.getParcel().getParcelStatus());
 	}
 
 }

@@ -11,11 +11,17 @@ public class ShipmentProperty {
 
     private String name;
 
+    private String endpoint;
+
     public void setUrl(String url) {
         this.url = url;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
     }
 }

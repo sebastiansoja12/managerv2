@@ -48,7 +48,7 @@ public interface ParcelMapper {
     @Mapping(source = "recipient.postalCode", target = "recipientPostalCode")
     @Mapping(source = "recipient.street", target = "recipientStreet")
     @Mapping(source = "parcelSize", target = "parcelSize")
-    @Mapping(source = "status", target = "status")
+    @Mapping(source = "parcelStatus", target = "status")
     ParcelEntity mapForUpdate(Parcel parcel);
 
     @Mapping(source = "senderFirstName", target = "firstName")
@@ -71,6 +71,7 @@ public interface ParcelMapper {
     @Mapping(target = "recipient.street", source = "recipientStreet")
     @Mapping(target = "parcelSize", source = "parcelSize")
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "parcelStatus", source = "status")
     Parcel map(ParcelEntity entity);
 
 
@@ -91,6 +92,6 @@ public interface ParcelMapper {
     @Mapping(target = "parcel.parcelSize", source = "parcelSize")
     @Mapping(target = "parcel.id", source = "id")
     @Mapping(target = "parcel.parcelType", source = "parcelType")
-    @Mapping(target = "parcel.status", source = "status")
+    @Mapping(target = "parcel.parcelStatus", source = "status")
     UpdateParcelResponse mapToUpdateParcelResponse(ParcelEntity entity);
 }

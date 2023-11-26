@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<dataset>
+    <returning_information
+            id = "1"
+            reason = "Recipient not available"
+            return_status = "0"/>
+    <returning
+            id="1"
+            parcel_id="1"
+            return_status="0"
+            return_token="token"
+            username="s-soja"
+            supplier_code="abc"
+            depot_code="KT1"
+            returning_information_id = "1"
+    />
+</dataset>

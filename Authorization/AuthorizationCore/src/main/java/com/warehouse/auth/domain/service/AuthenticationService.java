@@ -1,9 +1,9 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.model.LoginResponse;
-import com.warehouse.auth.domain.model.RegisterResponse;
+import com.warehouse.auth.domain.vo.LoginResponse;
+import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.model.UserLogout;
+import com.warehouse.auth.domain.vo.UserLogout;
 
 public interface AuthenticationService {
 
