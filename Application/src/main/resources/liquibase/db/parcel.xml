@@ -51,7 +51,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="destination" type="varchar(255)"/>
-            <column name="status" type="tinyint">
+            <column name="parcelStatus" type="tinyint">
                 <constraints nullable="false"/>
             </column>
             <column name="parcel_size" type="tinyint">

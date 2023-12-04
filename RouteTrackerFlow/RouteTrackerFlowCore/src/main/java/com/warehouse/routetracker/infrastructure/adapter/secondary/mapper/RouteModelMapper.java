@@ -4,12 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import com.warehouse.routetracker.domain.vo.RouteLogRecord;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.warehouse.routetracker.domain.enumeration.Status;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.SupplyRoute;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
@@ -94,8 +94,8 @@ public interface RouteModelMapper {
                 .build();
     }
 
-    default com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status mapEntityStatus(Status status) {
-        return switch (status.name()) {
+    default com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status mapEntityStatus(ParcelStatus parcelStatus) {
+        return switch (parcelStatus.name()) {
             case "REROUTE" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.REROUTE;
             case "SENT" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.SENT;
             case "DELIVERY" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.DELIVERY;

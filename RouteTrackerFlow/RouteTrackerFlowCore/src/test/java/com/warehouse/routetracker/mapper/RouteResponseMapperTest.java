@@ -1,6 +1,6 @@
 package com.warehouse.routetracker.mapper;
 
-import com.warehouse.routetracker.domain.enumeration.Status;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteResponseMapper;
@@ -46,11 +46,11 @@ public class RouteResponseMapperTest {
     void shouldMapRouteInformationToDto() {
         // given
         final RouteInformation routeInformation = RouteInformation.builder()
-                .status(Status.REROUTE)
+                .parcelStatus(ParcelStatus.REROUTE)
                 .build();
         // when
         final List<RouteInformationDto> response = routeResponseMapper.map(List.of(routeInformation));
         // then
-        assertEquals(routeInformation.getStatus().name(), response.get(0).getStatus().name());
+        assertEquals(routeInformation.getParcelStatus().name(), response.get(0).getStatus().name());
     }
 }

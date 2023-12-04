@@ -19,7 +19,7 @@
             recipient_postal_code="00-000"
             parcel_size="1"
             destination="KT1"
-            status="0"
+            parcelStatus="0"
             type="0"
     />
 
@@ -41,7 +41,7 @@
             recipient_postal_code="00-000"
             parcel_size="1"
             destination="KT1"
-            status="0"
+            parcelStatus="0"
             type="0"
     />
     <parcel
@@ -62,7 +62,7 @@
             recipient_postal_code="00-000"
             parcel_size="1"
             destination="KT1"
-            status="0"
+            parcelStatus="0"
             type="0"
     />
 </dataset>

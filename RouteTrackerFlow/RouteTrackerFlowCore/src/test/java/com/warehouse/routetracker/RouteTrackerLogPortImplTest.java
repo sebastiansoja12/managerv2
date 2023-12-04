@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.routetracker.domain.enumeration.Status;
 import com.warehouse.routetracker.domain.model.Parcel;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
@@ -48,7 +49,7 @@ public class RouteTrackerLogPortImplTest {
         final String supplierCode = "abc";
         final DeliveryInformation deliveryInformation = DeliveryInformation.builder()
                 .depotCode(depotCode)
-                .deliveryStatus(Status.DELIVERY)
+                .deliveryParcelStatus(ParcelStatus.DELIVERY)
                 .parcelId(PARCEL_ID)
                 .supplierCode(supplierCode)
                 .token("token")
@@ -58,7 +59,7 @@ public class RouteTrackerLogPortImplTest {
                 .supplierCode(supplierCode)
                 .parcelId(PARCEL_ID)
                 .depotCode(depotCode)
-                .parcelStatus(Status.DELIVERY)
+                .parcelStatus(ParcelStatus.DELIVERY)
                 .build();
 
         // when
@@ -142,7 +143,7 @@ public class RouteTrackerLogPortImplTest {
         final String username = "s-soja";
         final List<RouteInformation> expectedRouteInformations = Collections.singletonList(
                 RouteInformation.builder()
-                        .status(Status.RETURN)
+                        .parcelStatus(ParcelStatus.RETURN)
                         .build()
         );
         doReturn(expectedRouteInformations)
@@ -152,7 +153,7 @@ public class RouteTrackerLogPortImplTest {
         final List<RouteInformation> routeInformations = routeTrackerLogPort.findRoutesByUsername(username);
         // then
         routeInformations.forEach(
-                routeInformation -> assertEquals(expectedToBe(routeInformation.getStatus()), Status.RETURN)
+                routeInformation -> assertEquals(expectedToBe(routeInformation.getParcelStatus()), ParcelStatus.RETURN)
         );
 
     }
@@ -164,7 +165,7 @@ public class RouteTrackerLogPortImplTest {
         final List<RouteInformation> expectedRouteInformations = Collections.singletonList(
                 RouteInformation.builder()
                         .parcel(Parcel.builder().id(parcelId).build())
-                        .status(Status.RETURN)
+                        .parcelStatus(ParcelStatus.RETURN)
                         .build()
         );
         doReturn(expectedRouteInformations)
@@ -174,7 +175,7 @@ public class RouteTrackerLogPortImplTest {
         final List<RouteInformation> routeInformations = routeTrackerLogPort.getRouteListByParcelId(parcelId);
         // then
         routeInformations.forEach(
-                routeInformation -> assertEquals(expectedToBe(routeInformation.getStatus()), Status.RETURN)
+                routeInformation -> assertEquals(expectedToBe(routeInformation.getParcelStatus()), ParcelStatus.RETURN)
         );
 
     }

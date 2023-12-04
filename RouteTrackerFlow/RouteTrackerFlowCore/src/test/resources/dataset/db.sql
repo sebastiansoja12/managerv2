@@ -8,7 +8,7 @@ VALUES
 -- Insert fake data into PARCEL table
 INSERT INTO PARCEL (id, first_name, last_name, sender_email, sender_city, sender_street, sender_postal_code,
                     recipient_city, recipient_email, recipient_first_name, recipient_last_name, recipient_postal_code,
-                    recipient_street, recipient_telephone, price, parcel_size, status, destination, parcel_related_id, createdAt, updatedAt)
+                    recipient_street, recipient_telephone, price, parcel_size, parcelStatus, destination, parcel_related_id, createdAt, updatedAt)
 VALUES (1001, 'John', 'Doe', 'john@example.com', 'SenderCity1', 'SenderStreet1', '12345', 'RecipientCity1',
         'recipient1@example.com', 'RecipientFirstName1', 'RecipientLastName1', '54321', 'RecipientStreet1',
         '1234567890', 25.00, 0, 1, 'WA1', null, '2023-10-23T17:27:49.254626', '2023-10-23T17:27:49.254626'),

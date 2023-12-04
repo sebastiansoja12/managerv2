@@ -3,11 +3,13 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary;
 import java.util.List;
 
 import com.warehouse.routetracker.domain.model.RouteInformation;
+import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
 import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
-import com.warehouse.routetracker.domain.vo.RouteLogRecord;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.RouteModelMapper;
 
 import lombok.AllArgsConstructor;
@@ -41,6 +43,17 @@ public class RouteRepositoryImpl implements RouteRepository {
     @Override
     public List<RouteInformation> findByUsername(String username) {
         return mapper.mapToRoutes(routeReadRepository.findAllByUserUsername(username));
+    }
+
+    @Override
+    public RouteLogRecordToChange find(Long parcelId) {
+        final RouteLogRecordEntity routeLogRecord = null;
+        return null;
+    }
+
+    @Override
+    public void update(RouteLogRecordToChange routeLogRecord) {
+        // TODO
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.warehouse.routetracker.mapper;
 
-import com.warehouse.routetracker.domain.enumeration.Status;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.StatusMapper;
 import org.junit.jupiter.api.Test;
 
@@ -14,11 +14,11 @@ public class StatusMapperTest {
     @Test
     void shouldMap() {
         // given
-        final Status status = Status.RETURN;
+        final ParcelStatus parcelStatus = ParcelStatus.RETURN;
         // when
 		final com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status secondaryStatus = mapper
-				.map(status);
+				.map(parcelStatus);
         // then
-        assertEquals(status.name(), secondaryStatus.name());
+        assertEquals(parcelStatus.name(), secondaryStatus.name());
     }
 }

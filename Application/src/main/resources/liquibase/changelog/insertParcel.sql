@@ -4,7 +4,7 @@
 INSERT INTO PARCEL (id, first_name, last_name, recipient_city, recipient_email, recipient_first_name,
                     recipient_last_name, recipient_postal_code, recipient_street, recipient_telephone,
                     sender_city, sender_email, sender_postal_code, sender_street, sender_telephone,
-                    destination, status, parcel_size, parent_related_id, type, created_at, updated_at)
+                    destination, parcelStatus, parcel_size, parent_related_id, type, created_at, updated_at)
 VALUES
     (1000000000, 'John', 'Doe', 'RecipientCity1', 'recipient1@email.com', 'RecipientFirstName1', 'RecipientLastName1', '12345', 'RecipientStreet1', '123-456-7890',
      'SenderCity1', 'sender1@email.com', '54321', 'SenderStreet1', '987-654-3210',

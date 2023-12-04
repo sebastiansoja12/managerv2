@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS PARCEL
     recipient_telephone   VARCHAR(255) NOT NULL,
     price                 DOUBLE NOT NULL,
     parcel_size           VARCHAR(255) NOT NULL,
-    status                INT NOT NULL,
+    parcelStatus                INT NOT NULL,
     destination           VARCHAR(255) NOT NULL,
     parcel_related_id     BIGINT  DEFAULT NULL,
     PRIMARY KEY (id)

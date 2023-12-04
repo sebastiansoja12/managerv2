@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.model.Error;
 import org.apache.commons.lang3.StringUtils;
 
-import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
 import com.warehouse.routetracker.domain.vo.*;
 
@@ -37,7 +38,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                     .supplierCode(request.getSupplierCode())
 					.parcelId(request.getParcelId())
                     .depotCode(request.getDepotCode())
-                    .parcelStatus(request.getDeliveryStatus())
+                    .parcelStatus(request.getDeliveryParcelStatus())
                     .build();
             repository.save(routeLogRecord);
 		});
@@ -66,6 +67,41 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public List<RouteInformation> findRoutesByUsername(String username) {
         return repository.findByUsername(username);
+    }
+
+    @Override
+    public void saveZebraIdInformation(ProcessType processType, Long parcelId, Long zebraId) {
+
+    }
+
+    @Override
+    public void saveZebraVersionInformation(ProcessType processType, Long parcelId, String version) {
+        final RouteLogRecordToChange routeLogRecord = repository.find(parcelId);
+        final RouteLogRecordDetail routeLogRecordDetail =
+                routeLogRecord.getRouteLogRecordDetails().getRouteLogRecordDetail(processType, parcelId);
+        routeLogRecordDetail.saveZebraVersionInformation(version);
+        routeLogRecord.update(routeLogRecordDetail);
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveReturnErrorCode(ProcessType processType, Error error) {
+
+    }
+
+    @Override
+    public void saveFaultDescription(ProcessType processType, String faultDescription) {
+
+    }
+
+    @Override
+    public void saveTerminalRequest(TerminalRequest request) {
+
+    }
+
+    @Override
+    public void saveReturnTrackRequest(ReturnTrackRequest request) {
+
     }
 
     private void logRouteRecord(RouteLogRecord routeLogRecord) {
