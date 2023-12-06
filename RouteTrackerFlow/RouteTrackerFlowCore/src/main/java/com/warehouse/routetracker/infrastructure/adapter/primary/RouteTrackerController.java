@@ -1,12 +1,12 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary;
 
-import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
+import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
+import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.domain.model.RouteInformation;
-import com.warehouse.routetracker.domain.vo.RouteRequest;
-import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteRequestMapper;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteResponseMapper;
+import com.warehouse.routetracker.infrastructure.api.dto.ParcelIdDto;
 import com.warehouse.routetracker.infrastructure.api.dto.RouteRequestDto;
 import lombok.AllArgsConstructor;
 import org.mapstruct.factory.Mappers;

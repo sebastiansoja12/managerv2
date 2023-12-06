@@ -1,21 +1,26 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.routetracker.domain.model.RouteInformation;
-import com.warehouse.routetracker.domain.model.SupplyRoute;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.vo.RouteProcess;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
+import org.springframework.util.CollectionUtils;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RouteModelMapper {
 
     @Mapping(source = "parcel.id", target = "parcelId")
@@ -42,7 +47,7 @@ public interface RouteModelMapper {
     @Mapping(target = "parcel.recipient.street", source = "parcel.recipientStreet")
     @Mapping(target = "parcel.parcelSize", source = "parcel.parcelSize")
     @Mapping(target = "parcel.id", source = "parcel.id")
-    @Mapping(target = "status", source = "parcel.status")
+    @Mapping(target = "parcelStatus", source = "parcel.status")
     RouteInformation mapToRoutes(RouteEntity routeEntity);
 
     List<RouteInformation> mapToRoutes(List<RouteEntity> routeEntityList);
@@ -125,4 +130,14 @@ public interface RouteModelMapper {
         return null;
     }
 
+    RouteLogRecordToChange mapToRecord(RouteLogRecordEntity routeLogRecordToChange);
+
+    default RouteLogRecordDetails mapToRouteLogRecordDetails(List<RouteLogRecordDetailEntity> value) {
+        return RouteLogRecordDetails.builder().routeLogRecordDetailSet(mapToLogRecordDetails(value)).build();
+    }
+
+    Set<RouteLogRecordDetail> mapToLogRecordDetails(List<RouteLogRecordDetailEntity> value);
+
+    @Mapping(target = "processId", source = "id")
+    RouteProcess map(RouteLogRecordEntity entity);
 }

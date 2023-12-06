@@ -1,5 +1,5 @@
 package com.warehouse.routetracker.domain.model;
 
 public enum ProcessType {
-    CREATED
+    CREATED, RETURN, ROUTE, REJECT, REROUTE, REDIRECT
 }

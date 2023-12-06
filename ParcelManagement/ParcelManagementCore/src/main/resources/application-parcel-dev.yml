@@ -13,3 +13,7 @@ redirect:
 purge:
   cron:
     expression: "@midnight"
+
+routelog:
+  url: http://localhost:8080
+  endpoint: routes

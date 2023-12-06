@@ -1,10 +1,20 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumeration.ProcessType;
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumeration.ProcessType;
+
+import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ParcelStatus;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Getter
+@Setter
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "route_log_details")
 public class RouteLogRecordDetailEntity {
 
     @Id
@@ -17,25 +27,24 @@ public class RouteLogRecordDetailEntity {
     @Column(name = "version")
     private String version;
 
-    @Column(name = "created", nullable = false)
+    @Column(name = "created")
     private LocalDateTime created;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "process_type", nullable = false)
+    @Column(name = "process_type")
     private ProcessType processType;
 
-    @Column(name = "request", nullable = false)
+    @Column(name = "request")
     private String request;
+
+    @Column(name = "parcel_status")
+    private ParcelStatus parcelStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "username", referencedColumnName = "username")
     private UserEntity user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parcel_id", referencedColumnName = "id")
-    private ParcelEntity parcel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")

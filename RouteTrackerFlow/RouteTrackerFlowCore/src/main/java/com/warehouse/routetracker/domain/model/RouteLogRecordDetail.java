@@ -31,10 +31,24 @@ public class RouteLogRecordDetail {
         this.version = version;
     }
 
-    public void updateRequest(String request, LocalDateTime timestamp) {
+    public void updateRequest(String request) {
         this.request = request;
-        this.timestamp = timestamp;
+        this.timestamp = LocalDateTime.now();
     }
 
+    public void saveSupplierCode(String supplierCode) {
+        this.supplierCode = supplierCode;
+    }
 
+    public void saveDescription(String description) {
+        this.description = description;
+    }
+
+    public void saveUsername(String username) {
+        this.username = username;
+    }
+
+    public void saveDepotCode(String depotCode) {
+        this.depotCode = depotCode;
+    }
 }

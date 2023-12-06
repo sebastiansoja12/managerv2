@@ -22,11 +22,11 @@ public class ZebraPortImpl implements ZebraPort {
 		}
 		return switch (processType) {
 			case RETURN -> returnServicePort.processReturn(request);
-			case REJECT, ROUTE -> Response.builder()
+			case REJECT, ROUTE, REROUTE, REDIRECT, CREATED -> Response.builder()
 					.zebraId(request.getZebraDeviceInformation().getZebraId())
 					.version(request.getZebraDeviceInformation().getVersion())
 					.username(request.getZebraDeviceInformation().getUsername())
 					.build();
-        };
+		};
     }
 }

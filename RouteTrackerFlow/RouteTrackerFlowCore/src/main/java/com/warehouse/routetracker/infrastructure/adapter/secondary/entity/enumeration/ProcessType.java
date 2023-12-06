@@ -1,5 +1,5 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumeration;
 
 public enum ProcessType {
-    CREATED
+    CREATED, RETURN, ROUTE, REJECT, REROUTE, REDIRECT
 }

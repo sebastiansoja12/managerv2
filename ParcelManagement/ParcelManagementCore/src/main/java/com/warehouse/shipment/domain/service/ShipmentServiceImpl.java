@@ -5,14 +5,16 @@ import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExcept
 
 import java.util.Objects;
 
+import com.warehouse.shipment.domain.vo.ParcelId;
+import com.warehouse.shipment.domain.vo.RouteProcess;
+import org.apache.commons.lang3.StringUtils;
+
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentPaymentException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.model.Notification;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 
 @AllArgsConstructor
 public class ShipmentServiceImpl implements ShipmentService {
@@ -30,6 +32,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final MailServicePort mailServicePort;
 
     private final Logger logger;
+
+    private final RouteLogServicePort routeLogServicePort;
 
 	@Override
 	public ShipmentResponse createShipment(ShipmentParcel shipmentParcel) {
@@ -63,7 +67,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logNotification(notification);
 
+        //final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(ParcelId.builder().value(parcel.getId()).build());
+
 		return shipmentServicePort.registerParcel(parcel.getId(), paymentStatus.getLink());
+
+        //return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getParcelId());
 	}
 
 

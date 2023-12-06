@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.warehouse.routetracker.domain.model.Error;
 import com.warehouse.routetracker.domain.model.ProcessType;
+import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 
@@ -22,15 +23,19 @@ public interface RouteTrackerLogPort {
 
     List<RouteInformation> findRoutesByUsername(String username);
 
-    void saveZebraIdInformation(ProcessType processType, Long parcelId, Long zebraId);
+    RouteProcess initializeRouteProcess(ParcelId parcelId);
 
-    void saveZebraVersionInformation(ProcessType processType, Long parcelId, String version);
+    void saveZebraIdInformation(ZebraIdInformation zebraIdInformation);
 
-    void saveReturnErrorCode(ProcessType processType, Error error);
+    void saveZebraVersionInformation(ZebraVersionInformation zebraVersionInformation);
 
-    void saveFaultDescription(ProcessType processType, String faultDescription);
+    void saveReturnErrorCode(Long parcelId, Error error);
+
+    void saveFaultDescription(ProcessType processType, Long parcelId, String faultDescription);
 
     void saveTerminalRequest(TerminalRequest request);
 
     void saveReturnTrackRequest(ReturnTrackRequest request);
+
+    RouteLogRecordToChange find(Long parcelId);
 }

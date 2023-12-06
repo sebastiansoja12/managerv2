@@ -1,13 +1,14 @@
 package com.warehouse.routetracker.domain.model;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+
+import lombok.*;
 
 @Builder
 @Getter
@@ -17,34 +18,59 @@ import java.util.function.Predicate;
 @NoArgsConstructor
 public class RouteLogRecordDetails {
 
-
     private Set<RouteLogRecordDetail> routeLogRecordDetailSet;
 
-    private final String description = "Parcel created. Not yet shipped";
+    private final String description = "Description";
 
 
     public Set<RouteLogRecordDetail> getRouteLogRecordDetailSet() {
         if (routeLogRecordDetailSet == null) {
-            routeLogRecordDetailSet = new HashSet<>();
+            final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
+                    .builder()
+                    .parcelStatus(ParcelStatus.CREATED)
+                    .timestamp(LocalDateTime.now())
+                    .processType(ProcessType.CREATED)
+                    .description(description)
+                    .build();
+            routeLogRecordDetailSet = Set.of(routeLogRecordDetail);
         }
         return routeLogRecordDetailSet;
     }
 
-    public RouteLogRecordDetail getRouteLogRecordDetail(ProcessType processType, Long id) {
+    public RouteLogRecordDetail getRouteLogRecordDetail(ProcessType processType) {
         return getRouteLogRecordDetailSet()
                 .stream()
                 .filter(equalProcessType(processType))
-                .filter(equalRouteLogRecordDetailId(id))
                 .findFirst()
-                .orElseGet(this::addNewRouteLogRecordDetail);
+                .orElseGet(() -> addNewRouteLogRecordDetail(processType, determineParcelStatus(processType),
+                        description));
     }
 
-    private RouteLogRecordDetail addNewRouteLogRecordDetail() {
+    private ParcelStatus determineParcelStatus(ProcessType processType) {
+        return switch (processType) {
+            case ROUTE -> ParcelStatus.DELIVERY;
+            case RETURN, REJECT -> ParcelStatus.RETURN;
+            case REROUTE -> ParcelStatus.REROUTE;
+            case REDIRECT -> ParcelStatus.REDIRECT;
+            default ->  throw new RuntimeException("Wrong process type or parcel is already created");
+        };
+    }
+
+    private RouteLogRecordDetail addNewRouteLogRecordDetail(ProcessType processType, ParcelStatus parcelStatus,
+			String description) {
+		final RouteLogRecordDetail routeLogRecordDetail = createNewRouteLogRecordDetail(processType, parcelStatus,
+				description);
+		getRouteLogRecordDetailSet().add(routeLogRecordDetail);
+		return routeLogRecordDetail;
+	}
+
+	private RouteLogRecordDetail createNewRouteLogRecordDetail(ProcessType processType, ParcelStatus parcelStatus,
+			String description) {
         return RouteLogRecordDetail
                 .builder()
-                .parcelStatus(ParcelStatus.CREATED)
+                .parcelStatus(parcelStatus)
                 .timestamp(LocalDateTime.now())
-                .processType(ProcessType.CREATED)
+                .processType(processType)
                 .description(description)
                 .build();
     }
