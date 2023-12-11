@@ -1,16 +1,12 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
@@ -18,7 +14,6 @@ import com.warehouse.routetracker.domain.model.*;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
-import org.springframework.util.CollectionUtils;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RouteModelMapper {
@@ -88,27 +83,14 @@ public interface RouteModelMapper {
     }
 
     default ParcelEntity mapParcelEntity(RouteLogRecord routeLogRecord) {
-        if (Objects.isNull(routeLogRecord.getParcelStatus())) {
-            return ParcelEntity.builder()
-                    .id(routeLogRecord.getParcelId())
-                    .build();
-        }
         return ParcelEntity.builder()
                 .id(routeLogRecord.getParcelId())
                 .status(mapEntityStatus(routeLogRecord.getParcelStatus()))
                 .build();
     }
 
-    default com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status mapEntityStatus(ParcelStatus parcelStatus) {
-        return switch (parcelStatus.name()) {
-            case "REROUTE" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.REROUTE;
-            case "SENT" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.SENT;
-            case "DELIVERY" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.DELIVERY;
-            case "RETURN" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.RETURN;
-            case "REDIRECT" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.REDIRECT;
-            default -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.CREATED;
-        };
-    }
+	com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status mapEntityStatus(
+			ParcelStatus parcelStatus);
 
 	default DepotEntity mapDepotEntity(RouteLogRecord routeLogRecord) {
 		final String depotCode = routeLogRecord.getDepotCode();

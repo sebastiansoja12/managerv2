@@ -2,6 +2,7 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
@@ -19,7 +20,7 @@ public interface RouteLogToModelMapper {
     default RouteLogRecordToChange map(RouteLogRecordEntity routeLogRecord) {
         return RouteLogRecordToChange
                 .builder()
-                .id(routeLogRecord.getId())
+                .id(UUID.fromString(routeLogRecord.getId()))
                 .returnCode(routeLogRecord.getReturnCode())
                 .parcelId(routeLogRecord.getParcelId())
                 .faultDescription(routeLogRecord.getFaultDescription())

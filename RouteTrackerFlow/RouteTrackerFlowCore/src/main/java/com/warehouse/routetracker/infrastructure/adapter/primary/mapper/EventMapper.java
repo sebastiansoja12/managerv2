@@ -3,6 +3,7 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.mapper;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.routetracker.domain.model.ShipmentRequest;
@@ -17,6 +18,7 @@ import com.warehouse.routetracker.infrastructure.api.dto.ShipmentRequestDto;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface EventMapper {
 
+    @Mapping(target = "deliveryParcelStatus", source = "deliveryStatus")
     DeliveryInformation map(DeliveryInformationDto deliveryInformationDto);
 
     List<DeliveryInformation> map(List<DeliveryInformationDto> deliveryInformationDto);

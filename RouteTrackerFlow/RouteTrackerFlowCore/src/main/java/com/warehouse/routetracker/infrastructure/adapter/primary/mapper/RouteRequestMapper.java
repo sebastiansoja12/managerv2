@@ -2,16 +2,10 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.mapper;
 
 import java.util.List;
 
+import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.domain.vo.ParcelId;
-import com.warehouse.routetracker.domain.vo.ZebraIdInformation;
-import com.warehouse.routetracker.domain.vo.ZebraVersionInformation;
-import com.warehouse.routetracker.infrastructure.api.dto.ParcelIdDto;
-import com.warehouse.routetracker.infrastructure.api.dto.ZebraIdInformationDto;
-import com.warehouse.routetracker.infrastructure.api.dto.ZebraVersionInformationDto;
+import com.warehouse.routetracker.infrastructure.api.dto.*;
 import org.mapstruct.Mapper;
-
-import com.warehouse.routetracker.domain.vo.RouteRequest;
-import com.warehouse.routetracker.infrastructure.api.dto.RouteRequestDto;
 
 @Mapper
 public interface RouteRequestMapper {
@@ -27,4 +21,10 @@ public interface RouteRequestMapper {
     ZebraIdInformation map(ZebraIdInformationDto zebraIdInformation);
 
     ZebraVersionInformation map(ZebraVersionInformationDto versionInformation);
+
+    ErrorInformation map(ErrorInformationDto errorInformation);
+
+    TerminalRequest map(TerminalRequestDto terminalRequest);
+
+    ReturnTrackRequest map(ReturnTrackRequestDto returnTrackRequest);
 }

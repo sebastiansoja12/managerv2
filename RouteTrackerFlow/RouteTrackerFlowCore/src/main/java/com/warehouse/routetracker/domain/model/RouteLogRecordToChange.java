@@ -2,6 +2,7 @@ package com.warehouse.routetracker.domain.model;
 
 // TODO it will be RouteLogRecord
 
+import com.warehouse.routetracker.domain.vo.Error;
 import lombok.*;
 
 import java.util.UUID;

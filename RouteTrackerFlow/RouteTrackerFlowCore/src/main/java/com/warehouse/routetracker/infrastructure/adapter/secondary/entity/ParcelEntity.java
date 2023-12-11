@@ -88,8 +88,4 @@ public class ParcelEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    public void updateStatus(Status status) {
-        this.status = status;
-    }
 }

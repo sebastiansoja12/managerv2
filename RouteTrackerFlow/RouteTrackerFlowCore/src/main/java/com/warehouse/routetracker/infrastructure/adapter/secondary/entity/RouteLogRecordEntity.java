@@ -2,8 +2,6 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +17,7 @@ public class RouteLogRecordEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @Column(name = "parcel_id", nullable = false)
     private Long parcelId;

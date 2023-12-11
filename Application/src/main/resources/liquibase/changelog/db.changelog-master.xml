@@ -22,6 +22,8 @@
     <include file="/liquibase/changelog/insertDepots.xml"/>
     <include file="/liquibase/changelog/insertSuppliers.xml"/>
     <include file="/liquibase/changelog/insertUser.xml"/>
+
+<!--    <include file="/liquibase/changelog/insertMessageSequence.sql"/>-->
 <!--
     <include file="/liquibase/changelog/insertParcel.sql"/>
 -->

@@ -2,11 +2,10 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
-import com.warehouse.routetracker.domain.model.Error;
 import com.warehouse.routetracker.domain.model.ProcessType;
+import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
 import com.warehouse.routetracker.domain.vo.*;
-import com.warehouse.routetracker.domain.model.RouteInformation;
 
 public interface RouteTrackerLogPort {
 
@@ -29,7 +28,7 @@ public interface RouteTrackerLogPort {
 
     void saveZebraVersionInformation(ZebraVersionInformation zebraVersionInformation);
 
-    void saveReturnErrorCode(Long parcelId, Error error);
+    void saveReturnErrorCode(ErrorInformation information);
 
     void saveFaultDescription(ProcessType processType, Long parcelId, String faultDescription);
 

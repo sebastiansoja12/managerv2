@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<dataset>
+
+    <users
+            username="s-soja"
+            password="$2a$10$m0ZdN0WH0B4O7FL9o1p.pejO4VF0yTlTB.aYJMd/GxyDtm05IAk4q"
+            first_name="Sebastian"
+            last_name="Soja"
+            email="sebastian5152@wp.pl"
+            role="2"
+            depot_code="TST"
+    />
+
+    <route_log
+            id='7ecaa82b-eda9-4b5d-ae9f-933f9adaee27'
+            parcel_id="123456"
+            return_code="ReturnCode1"
+            fault_description="FaultDescription1"
+    />
+
+    <route_log
+            id='7ecaa82b-eda9-4b5d-ae9f-933f9adaee28'
+            parcel_id="789012"
+            return_code="ReturnCode2"
+            fault_description="FaultDescription2"
+    />
+    <!-- Add more route_log records as needed -->
+
+    <route_log_details
+            id = "1"
+            route_log_record_id='7ecaa82b-eda9-4b5d-ae9f-933f9adaee27'
+            zebra_id="123"
+            version="v1.0"
+            created="2023-01-01 12:00:00"
+            description="Detail Description 1"
+            process_type="0"
+            request="Request Detail 1"
+            parcel_status="0"
+            username="s-soja"
+    />
+
+    <route_log_details
+            id = "2"
+            route_log_record_id='7ecaa82b-eda9-4b5d-ae9f-933f9adaee28'
+            zebra_id="456"
+            version="v2.0"
+            created="2023-02-01 14:30:00"
+            description="Detail Description 2"
+            process_type="0"
+            request="Request Detail 2"
+            parcel_status="0"
+            username="s-soja"
+    />
+
+    <depot
+            city="Test"
+            street="Test"
+            country="Test"
+            depot_code="TST"
+    />
+
+    <supplier
+            supplier_code="TS_TST"
+            first_name="test"
+            last_name="test"
+            telephone="123"
+            depot_code="TST"
+    />
+
+</dataset>

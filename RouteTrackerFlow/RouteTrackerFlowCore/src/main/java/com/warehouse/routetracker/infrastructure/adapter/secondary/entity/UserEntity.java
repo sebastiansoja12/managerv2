@@ -1,6 +1,6 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.authority.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

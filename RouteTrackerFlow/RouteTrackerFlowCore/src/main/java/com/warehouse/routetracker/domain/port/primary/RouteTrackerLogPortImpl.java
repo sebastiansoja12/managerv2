@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.routetracker.domain.model.*;
-import com.warehouse.routetracker.domain.model.Error;
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
@@ -97,9 +96,9 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public void saveReturnErrorCode(Long parcelId, Error error) {
-        final RouteLogRecordToChange routeLogRecord = repository.find(parcelId);
-        routeLogRecord.saveErrorReturnCode(error);
+    public void saveReturnErrorCode(ErrorInformation information) {
+        final RouteLogRecordToChange routeLogRecord = repository.find(information.getParcelId());
+        routeLogRecord.saveErrorReturnCode(information.getError());
         repository.update(routeLogRecord);
     }
 

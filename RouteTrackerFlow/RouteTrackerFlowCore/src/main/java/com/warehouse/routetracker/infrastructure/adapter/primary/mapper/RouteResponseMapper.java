@@ -10,6 +10,7 @@ import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.api.dto.RouteInformationDto;
 import com.warehouse.routetracker.infrastructure.api.dto.RouteProcessDto;
 import com.warehouse.routetracker.infrastructure.api.dto.RouteResponseDto;
+import org.mapstruct.Mapping;
 
 @Mapper
 public interface RouteResponseMapper {
@@ -20,6 +21,7 @@ public interface RouteResponseMapper {
 
     List<RouteInformationDto> map(List<RouteInformation> routes);
 
+    @Mapping(target = "status", source = "parcelStatus")
     RouteInformationDto map(RouteInformation routeInformation);
 
     RouteProcessDto map(RouteProcess routeProcess);

@@ -1,13 +1,13 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary;
 
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-import java.util.UUID;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 
 @Repository
-public interface RouteLogRecordReadRepository extends JpaRepository<RouteLogRecordEntity, UUID> {
+public interface RouteLogRecordReadRepository extends JpaRepository<RouteLogRecordEntity, String> {
     Optional<RouteLogRecordEntity> findByParcelId(Long parcelId);
 }

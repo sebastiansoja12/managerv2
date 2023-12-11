@@ -25,14 +25,7 @@ public class RouteLogRecordDetails {
 
     public Set<RouteLogRecordDetail> getRouteLogRecordDetailSet() {
         if (routeLogRecordDetailSet == null) {
-            final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
-                    .builder()
-                    .parcelStatus(ParcelStatus.CREATED)
-                    .timestamp(LocalDateTime.now())
-                    .processType(ProcessType.CREATED)
-                    .description(description)
-                    .build();
-            routeLogRecordDetailSet = Set.of(routeLogRecordDetail);
+            routeLogRecordDetailSet = new HashSet<>();
         }
         return routeLogRecordDetailSet;
     }

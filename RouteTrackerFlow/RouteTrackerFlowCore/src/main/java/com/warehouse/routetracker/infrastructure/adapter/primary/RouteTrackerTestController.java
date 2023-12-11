@@ -3,11 +3,10 @@ package com.warehouse.routetracker.infrastructure.adapter.primary;
 import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.vo.*;
+import com.warehouse.routetracker.domain.vo.ParcelId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteRequestMapper;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteResponseMapper;
-import com.warehouse.routetracker.infrastructure.api.dto.ParcelIdDto;
-import com.warehouse.routetracker.infrastructure.api.dto.ZebraIdInformationDto;
-import com.warehouse.routetracker.infrastructure.api.dto.ZebraVersionInformationDto;
+import com.warehouse.routetracker.infrastructure.api.dto.*;
 import lombok.AllArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
@@ -24,8 +23,6 @@ public class RouteTrackerTestController {
     private final RouteRequestMapper requestMapper = Mappers.getMapper(RouteRequestMapper.class);
 
     private final RouteResponseMapper responseMapper = Mappers.getMapper(RouteResponseMapper.class);
-
-    // TODO create DTOs
 
     @PostMapping("/initialize")
     public ResponseEntity<?> initialize(@RequestBody ParcelIdDto id) {
@@ -50,19 +47,22 @@ public class RouteTrackerTestController {
     }
 
     @PostMapping("/error")
-    public ResponseEntity<?> saveError(@RequestBody ErrorInformation errorInformation) {
-        trackerLogPort.saveReturnErrorCode(errorInformation.getParcelId(), errorInformation.getError());
+    public ResponseEntity<?> saveError(@RequestBody ErrorInformationDto errorInformation) {
+        final ErrorInformation information = requestMapper.map(errorInformation);
+        trackerLogPort.saveReturnErrorCode(information);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/terminalrequest")
-    public ResponseEntity<?> saveTerminalRequest(@RequestBody TerminalRequest terminalRequest) {
-        trackerLogPort.saveTerminalRequest(terminalRequest);
+    public ResponseEntity<?> saveTerminalRequest(@RequestBody TerminalRequestDto terminalRequest) {
+        final TerminalRequest request = requestMapper.map(terminalRequest);
+        trackerLogPort.saveTerminalRequest(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/returntrackrequest")
-    public ResponseEntity<?> saveReturnTrackRequest(@RequestBody ReturnTrackRequest request) {
+    public ResponseEntity<?> saveReturnTrackRequest(@RequestBody ReturnTrackRequestDto returnTrackRequest) {
+        final ReturnTrackRequest request = requestMapper.map(returnTrackRequest);
         trackerLogPort.saveReturnTrackRequest(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
