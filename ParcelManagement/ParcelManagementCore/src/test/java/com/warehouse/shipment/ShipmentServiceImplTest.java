@@ -39,12 +39,16 @@ public class ShipmentServiceImplTest {
     private MailServicePort mailServicePort;
     @Mock
     private Logger logger;
+
+    @Mock
+    private RouteLogServicePort routeLogServicePort;
+
     private ShipmentServiceImpl service;
 
 	@BeforeEach
 	void setup() {
 		service = new ShipmentServiceImpl(shipmentServicePort, shipmentRepository, pathFinderServicePort,
-				paypalServicePort, notificationCreatorProvider, mailServicePort, logger);
+				paypalServicePort, notificationCreatorProvider, mailServicePort, logger, routeLogServicePort);
 	}
 
     @Test

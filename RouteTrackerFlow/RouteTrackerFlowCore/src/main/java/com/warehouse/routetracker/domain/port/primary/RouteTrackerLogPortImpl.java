@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.routetracker.domain.model.*;
 import org.apache.commons.lang3.StringUtils;
 
-import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
 import com.warehouse.routetracker.domain.vo.*;
 
@@ -21,6 +23,8 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     private final RouteRepository repository;
 
     private final Logger logger = LoggerFactory.getLogger(RouteTrackerLogPort.class);
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void initializeRoute(Long parcelId) {
@@ -37,7 +41,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                     .supplierCode(request.getSupplierCode())
 					.parcelId(request.getParcelId())
                     .depotCode(request.getDepotCode())
-                    .parcelStatus(request.getDeliveryStatus())
+                    .parcelStatus(request.getDeliveryParcelStatus())
                     .build();
             repository.save(routeLogRecord);
 		});
@@ -59,6 +63,15 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
+    public RouteProcess initializeRouteProcess(ParcelId parcelId) {
+        final RouteLogRecordToChange routeLogRecordToChange = RouteLogRecordToChange
+                .builder()
+                .parcelId(parcelId.getValue())
+                .build();
+        return repository.save(routeLogRecordToChange);
+    }
+
+    @Override
     public List<RouteInformation> getRouteListByParcelId(Long parcelId) {
         return repository.findByParcelId(parcelId);
     }
@@ -66,6 +79,63 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public List<RouteInformation> findRoutesByUsername(String username) {
         return repository.findByUsername(username);
+    }
+
+    @Override
+    public void saveZebraIdInformation(ZebraIdInformation information) {
+        final RouteLogRecordToChange routeLogRecord = repository.find(information.getParcelId());
+        routeLogRecord.saveZebraIdInformation(information.getProcessType(), information.getZebraId());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveZebraVersionInformation(ZebraVersionInformation information) {
+        final RouteLogRecordToChange routeLogRecord = repository.find(information.getParcelId());
+        routeLogRecord.saveZebraVersionInformation(information.getProcessType(), information.getVersion());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveReturnErrorCode(ErrorInformation information) {
+        final RouteLogRecordToChange routeLogRecord = repository.find(information.getParcelId());
+        routeLogRecord.saveErrorReturnCode(information.getError());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveFaultDescription(ProcessType processType, Long parcelId, String faultDescription) {
+        final RouteLogRecordToChange routeLogRecord = repository.find(parcelId);
+        routeLogRecord.saveFaultDescription(faultDescription);
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveTerminalRequest(TerminalRequest request) {
+        final RouteLogRecordToChange routeLogRecord = repository.find(request.getParcelId());
+        try {
+            routeLogRecord.saveTerminalRequest(request.getProcessType(), mapper.writeValueAsString(request));
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage());
+        }
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveReturnTrackRequest(ReturnTrackRequest request) {
+        final RouteLogRecordToChange routeLogRecord = repository.find(request.getParcelId());
+        try {
+            routeLogRecord.saveReturnTrackRequest(request.getProcessType(), mapper.writeValueAsString(request));
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage());
+        }
+        routeLogRecord.saveUsername(request.getProcessType(), request.getUsername());
+        routeLogRecord.saveDepotCode(request.getProcessType(), request.getDepotCode());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public RouteLogRecordToChange find(Long parcelId) {
+        return repository.find(parcelId);
     }
 
     private void logRouteRecord(RouteLogRecord routeLogRecord) {

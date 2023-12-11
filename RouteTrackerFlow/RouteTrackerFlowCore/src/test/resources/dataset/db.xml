@@ -2,7 +2,6 @@
 <dataset>
 
     <users
-            id="1"
             username="test"
             password="$2a$10$m0ZdN0WH0B4O7FL9o1p.pejO4VF0yTlTB.aYJMd/GxyDtm05IAk4q"
             first_name="Sebastian"
@@ -82,5 +81,6 @@
             created="2023-10-23 17:27:49.254626"
             supplier_code="TS_TST"
     />
+
 
 </dataset>

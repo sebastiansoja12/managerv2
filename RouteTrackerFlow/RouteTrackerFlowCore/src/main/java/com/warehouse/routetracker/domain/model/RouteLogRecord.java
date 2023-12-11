@@ -1,6 +1,6 @@
-package com.warehouse.routetracker.domain.vo;
+package com.warehouse.routetracker.domain.model;
 
-import com.warehouse.routetracker.domain.enumeration.Status;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import lombok.Builder;
 import lombok.Value;
 
@@ -16,6 +16,6 @@ public class RouteLogRecord {
 
     String supplierCode;
 
-    Status parcelStatus;
+    ParcelStatus parcelStatus;
 
 }

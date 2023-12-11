@@ -5,9 +5,6 @@
 
     <changeSet id="create-users-table" author="s-soja">
         <createTable tableName="users">
-            <column name="id" type="int" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="email" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
@@ -24,7 +21,7 @@
                 <constraints nullable="true"/>
             </column>
             <column name="username" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
+                <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
             <column name="depot_code" type="varchar(255)">
                 <constraints nullable="false"/>

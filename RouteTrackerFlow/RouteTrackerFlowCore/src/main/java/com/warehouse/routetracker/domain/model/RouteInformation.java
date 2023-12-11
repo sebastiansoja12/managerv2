@@ -3,7 +3,7 @@ package com.warehouse.routetracker.domain.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.warehouse.routetracker.domain.enumeration.Status;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Value;
@@ -25,5 +25,5 @@ public class RouteInformation {
 
     Depot depot;
 
-    Status status;
+    ParcelStatus parcelStatus;
 }

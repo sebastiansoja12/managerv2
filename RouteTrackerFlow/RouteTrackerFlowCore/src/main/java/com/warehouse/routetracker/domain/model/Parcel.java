@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Parcel {
-    Long id;
-    Sender sender;
-    Recipient recipient;
-    ParcelSize parcelSize;
+    private Long id;
+    private Sender sender;
+    private Recipient recipient;
+    private ParcelSize parcelSize;
 }

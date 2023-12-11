@@ -9,6 +9,7 @@ import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
 import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteLogRecordReadRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteReadRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteRepositoryImpl;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.RouteModelMapper;
@@ -18,9 +19,10 @@ import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 public class RouteTrackerConfiguration {
 
 	@Bean
-	public RouteRepository routeRepository(RouteReadRepository routeReadRepository) {
+	public RouteRepository routeRepository(RouteReadRepository routeReadRepository,
+			RouteLogRecordReadRepository routeLogRecordReadRepository) {
 		final RouteModelMapper routeModelMapper = Mappers.getMapper(RouteModelMapper.class);
-		return new RouteRepositoryImpl(routeReadRepository, routeModelMapper);
+		return new RouteRepositoryImpl(routeReadRepository, routeLogRecordReadRepository, routeModelMapper);
 	}
 
     @Bean
