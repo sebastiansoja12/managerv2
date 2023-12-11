@@ -1,5 +1,6 @@
 package com.warehouse.shipment.configuration;
 
+import com.warehouse.shipment.infrastructure.adapter.secondary.property.RouteLogProperty;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -74,10 +75,15 @@ public class ShipmentConfiguration {
 	public ShipmentService shipmentService(ShipmentServicePort shipmentServicePort,
 			PathFinderServicePort pathFinderServicePort, PaypalServicePort paypalServicePort,
 			NotificationCreatorProvider notificationCreatorProvider, MailServicePort mailServicePort,
-			ShipmentRepository shipmentRepository) {
+			ShipmentRepository shipmentRepository, RouteLogServicePort routeLogServicePort) {
 		return new ShipmentServiceImpl(shipmentServicePort, shipmentRepository, pathFinderServicePort,
 				paypalServicePort, notificationCreatorProvider, mailServicePort,
-				LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class));
+				LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class), routeLogServicePort);
+	}
+
+	@Bean
+	public RouteLogServicePort routeLogServicePort(RouteLogProperty routeLogProperty) {
+		return new RouteLogServiceAdapter(routeLogProperty);
 	}
 
 	@Bean
