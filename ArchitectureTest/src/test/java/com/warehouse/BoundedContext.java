@@ -66,6 +66,7 @@ class BoundedContext {
     private ArchRule adapterRepositoryInterfacesRule;
     private ArchRule repositoryClassesAsInterfacesRule;
     private ArchRule enumsInProperPackageRule;
+    private ArchRule valueObjectsInProperPackageRule;
     private ArchRule enumsProperStructureRule;
 
     @Builder
@@ -116,6 +117,11 @@ class BoundedContext {
                 classes().that().areEnums()
                         .and().resideInAPackage(pack(DOMAIN_PACKAGE + ".."))
                         .should().beAssignableTo(pack(DOMAIN_ENUM_PACKAGE) + ".EnumValue");
+
+        valueObjectsInProperPackageRule =
+                classes().that().areAnnotatedWith("lombok.Value")
+                        .and().resideInAPackage(pack(DOMAIN_PACKAGE + ".."))
+                        .should().beAssignableTo(pack(DOMAIN_VO_PACKAGE) + ".vo");
     }
 
     private void setUpClasses() {
@@ -127,10 +133,16 @@ class BoundedContext {
         this.adapterClasses = GenericDynamicTestUtils.importClasses(pack(INFRASTRUCTURE_PERSISTENCE_ADAPTER_PACKAGE));
     }
 
+    @BoundedContextTest
+    private DynamicNode domainObjectsShouldNotHaveGetters() {
+        return dynamicContainer(name + " domain object classes should not have getters",
+                domainModelClasses.stream().filter(JavaClass::isTopLevelClass).map(javaClass ->
+                        GenericDynamicTestUtils.classShouldNotHaveMethodStartsWith(javaClass, "get")));
+    }
 
     @BoundedContextTest
     private DynamicNode domainObjectsShouldNotHaveSetters() {
-        return dynamicContainer(name + " domain object classes sohuld not have setters",
+        return dynamicContainer(name + " domain object classes should not have setters",
                 domainModelClasses.stream().filter(JavaClass::isTopLevelClass).map(javaClass ->
                 GenericDynamicTestUtils.classShouldNotHaveMethodStartsWith(javaClass, "set")));
     }
@@ -150,6 +162,22 @@ class BoundedContext {
                         .map(javaClass -> GenericDynamicTestUtils
 						.classShouldNotHaveDependenciesToPackage(javaClass, "org.springframework")));
     }
+
+    @BoundedContextTest
+    private DynamicNode domainWithoutConfiguration() {
+        return dynamicContainer(name + " domain object classes should not have configuration annotations",
+                domainClasses.stream()
+                        .map(javaClass -> GenericDynamicTestUtils
+                                .classShouldNotHaveDependenciesToPackage(javaClass, "configuration")));
+    }
+
+    @BoundedContextTest
+    private DynamicNode valueObjectWithAnnotation() {
+        return dynamicContainer(name + " value object classes should have configuration annotations",
+                valueObjectClasses.stream()
+                        .map(javaClass -> GenericDynamicTestUtils
+                                .classShouldHaveDependenciesToPackage(javaClass, "lombok.Value")));
+    }
     
 	@BoundedContextTest
 	private DynamicNode portsShouldHaveAdapters() {
@@ -167,6 +195,12 @@ class BoundedContext {
         return dynamicTest(name + " enum classes should reside in proper package",
                 () -> enumsInProperPackageRule.check(allClasses));
     }
+
+    /*@BoundedContextTest
+    private DynamicNode valueObjectsShouldResideInVoDirectory() {
+        return dynamicTest(name + " value object classes should reside in proper package",
+                () -> valueObjectsInProperPackageRule.check(allClasses));
+    }*/
 
     private DynamicTest shouldContainAtLeastOneBuilder(JavaClass javaClass) {
         return GenericDynamicTestUtils.classShouldNotHaveMethodEndsWith(javaClass, "builder");

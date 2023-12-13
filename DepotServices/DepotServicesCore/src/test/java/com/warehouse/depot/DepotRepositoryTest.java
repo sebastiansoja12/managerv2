@@ -13,8 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.depot.domain.model.Depot;
-import com.warehouse.depot.domain.model.DepotCode;
+import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.vo.DepotCode;
 import com.warehouse.depot.infrastructure.adapter.secondary.DepotReadRepository;
 import com.warehouse.depot.infrastructure.adapter.secondary.DepotRepositoryImpl;
 import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;

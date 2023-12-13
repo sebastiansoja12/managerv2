@@ -17,7 +17,7 @@ public class DepotServiceAdapter implements DepotServicePort {
 
     @Override
     public List<Depot> downloadDepots() {
-        final List<com.warehouse.depot.domain.model.Depot> depots = depotPort.findAll();
+        final List<com.warehouse.depot.domain.vo.Depot> depots = depotPort.findAll();
         return depotResponseMapper.map(depots);
     }
 }

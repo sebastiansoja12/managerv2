@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.warehouse.returning.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.returning.domain.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,10 +16,6 @@ import com.warehouse.returning.domain.model.Parcel;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.service.ReturnService;
-import com.warehouse.returning.domain.vo.ProcessReturn;
-import com.warehouse.returning.domain.vo.ReturnId;
-import com.warehouse.returning.domain.vo.ReturnModel;
-import com.warehouse.returning.domain.vo.ReturnResponse;
 
 import lombok.AllArgsConstructor;
 
@@ -26,6 +24,8 @@ import lombok.AllArgsConstructor;
 public class ReturnPortImpl implements ReturnPort {
 
     private final ReturnService returnService;
+
+    private final RouteLogServicePort routeLogServicePort;
 
     private final Logger log = LoggerFactory.getLogger(ReturnPort.class);
 
@@ -51,12 +51,10 @@ public class ReturnPortImpl implements ReturnPort {
         }
 
         if (request.isProcessing()) {
-            request.filterProcessingReturns();
             processProcessingReturns(request, processReturns);
         }
 
         if (request.isCreated()) {
-            request.filterCreatedReturns();
             processCreatedReturn(request, processReturns);
         }
 
@@ -69,8 +67,17 @@ public class ReturnPortImpl implements ReturnPort {
             processCancelledReturn(request);
         }
 
+        logReturnInTracker(new RouteProcessReturn(processReturns, request.getDepotCode(), request.getUsername()));
+
         return new ReturnResponse(processReturns);
     }
+
+	private void logReturnInTracker(RouteProcessReturn routeProcessReturn) {
+		routeProcessReturn
+                .getProcessReturn()
+                .forEach(processReturn -> routeLogServicePort.logReturn(processReturn,
+                        routeProcessReturn.getDepotCode(), routeProcessReturn.getUsername()));
+	}
 
     @Override
     public ReturnModel getReturn(ReturnId returnId) {
@@ -94,12 +101,14 @@ public class ReturnPortImpl implements ReturnPort {
 
     private void processProcessingReturns(ReturnRequest request, List<ProcessReturn> processReturns) {
         logProcessingReturns(request);
+        request.filterProcessingReturns();
         final List<ProcessReturn> updatedReturns = returnService.updateReturn(request);
         processReturns.addAll(updatedReturns);
     }
 
     private void processCreatedReturn(ReturnRequest request, List<ProcessReturn> processReturns) {
         logCreatedReturns(request);
+        request.filterCreatedReturns();
         final List<ProcessReturn> createdReturns = returnService.processReturn(request);
         processReturns.addAll(createdReturns);
     }
