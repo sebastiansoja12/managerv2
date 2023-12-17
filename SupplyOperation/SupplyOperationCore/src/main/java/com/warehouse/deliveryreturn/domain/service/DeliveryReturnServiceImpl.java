@@ -11,11 +11,8 @@ import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnReposito
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturn;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnInformation;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
+import com.warehouse.deliveryreturn.domain.vo.*;
 
-import com.warehouse.deliveryreturn.domain.vo.Parcel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 

@@ -1,9 +1,9 @@
 package com.warehouse.deliveryreturn;
 
-import com.warehouse.deliveryreturn.domain.model.DeliveryPackageRequest;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryPackageRequest;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
-import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenResponse;
-import com.warehouse.deliveryreturn.domain.model.Supplier;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnTokenResponse;
+import com.warehouse.deliveryreturn.domain.vo.Supplier;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnInformation;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.DeliveryReturnServiceMockAdapter;

@@ -1,8 +1,6 @@
-package com.warehouse.deliveryreturn.domain.model;
+package com.warehouse.deliveryreturn.domain.vo;
 
 import java.util.List;
-
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
 
 import lombok.Value;
 
