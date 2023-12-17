@@ -67,11 +67,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logNotification(notification);
 
-        //final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(ParcelId.builder().value(parcel.getId()).build());
+        final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(ParcelId.builder().value(parcel.getId()).build());
 
-		return shipmentServicePort.registerParcel(parcel.getId(), paymentStatus.getLink());
+		//return shipmentServicePort.registerParcel(parcel.getId(), paymentStatus.getLink());
 
-        //return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getParcelId());
+        return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getParcelId());
 	}
 
 

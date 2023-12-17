@@ -8,8 +8,8 @@ import com.warehouse.returning.infrastructure.adapter.secondary.properties.Addre
 import com.warehouse.returning.infrastructure.adapter.secondary.properties.RouteTrackerLogProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.support.RestGatewaySupport;
 
 import static org.mapstruct.factory.Mappers.getMapper;
@@ -38,8 +38,9 @@ public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteL
     public void logReturn(RouteLogServiceConfiguration configuration, ReturnTrackRequestDto request) {
         restClient
                 .post()
-                .uri("/v2/api/routes/test/returntrackrequest")
+                .uri("/v2/api/{endpoint}", configuration.getEndpoint())
                 .body(request)
+                .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is2xxSuccessful,
                         (req, res) -> log.warn("Successfully registered return in tracker module"))
@@ -49,7 +50,7 @@ public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteL
 						(req, res) -> log.warn("Critical error while logging return"))
                 .toBodilessEntity();
     }
-    
+
     public static class RouteLogServiceConfiguration implements Addressing {
 
         private final RouteTrackerLogProperties routeTrackerLogProperties;

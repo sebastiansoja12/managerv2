@@ -48,22 +48,16 @@ public class ReturnServiceAdapter extends RestGatewaySupport implements ReturnSe
     }
 
 
-    private static class ReturnConfiguration implements Properties {
-
-        private final ReturnProperty returnProperty;
-
-        private ReturnConfiguration(ReturnProperty returnProperty) {
-            this.returnProperty = returnProperty;
-        }
+    private record ReturnConfiguration(ReturnProperty returnProperty) implements Properties {
 
         @Override
-        public String getUrl() {
-            return returnProperty.getUrl();
-        }
+            public String getUrl() {
+                return returnProperty.getUrl();
+            }
 
-        @Override
-        public String getEndpoint() {
-            return returnProperty.getEndpoint();
+            @Override
+            public String getEndpoint() {
+                return returnProperty.getEndpoint();
+            }
         }
-    }
 }

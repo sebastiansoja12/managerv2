@@ -7,6 +7,7 @@ import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.ReturnResponseMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import com.warehouse.returning.infrastructure.adapter.primary.mapper.ReturnReque
 @RestController
 @RequestMapping("/returns")
 @RequiredArgsConstructor
+@Slf4j
 public class ReturnController {
 
     private final ReturnPort returnPort;
@@ -33,8 +35,16 @@ public class ReturnController {
 
     @PostMapping
     public ResponseEntity<?> process(@RequestBody ReturningRequestDto returningRequest) {
+        
+		log.info("Detected request for returning from user: {} from depot: {}",
+				returningRequest.getUsername().getValue(), returningRequest.getDepotCode().getValue());
+
         final ReturnRequest request = requestMapper.map(returningRequest);
+        
+        
         final ReturnResponse response = returnPort.process(request);
+        
+        
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
 
