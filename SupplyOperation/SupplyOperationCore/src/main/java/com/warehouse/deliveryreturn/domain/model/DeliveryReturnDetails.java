@@ -20,12 +20,8 @@ public class DeliveryReturnDetails {
 
     public void validateDeliveryStatus() {
         if (!RETURN.equals(deliveryStatus)) {
-            throw new WrongDeliveryStatusException(7000, "Wrong delivery status");
+            throw new WrongDeliveryStatusException(500, "Wrong delivery status");
         }
-    }
-
-    public boolean isNotReturn() {
-        return !RETURN.equals(deliveryStatus);
     }
 
     public DeliveryReturnDetails updateDeliveryStatus() {

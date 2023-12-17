@@ -3,6 +3,8 @@ package com.warehouse.deliveryreturn.domain.model;
 
 import java.util.List;
 
+import com.warehouse.deliveryreturn.domain.vo.DeliveryPackageRequest;
+import com.warehouse.deliveryreturn.domain.vo.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

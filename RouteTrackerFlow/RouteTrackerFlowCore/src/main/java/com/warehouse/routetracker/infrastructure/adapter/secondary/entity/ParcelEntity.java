@@ -88,4 +88,7 @@ public class ParcelEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "locked", nullable = false)
+    private Boolean locked;
 }

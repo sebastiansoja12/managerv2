@@ -1,5 +1,7 @@
 package com.warehouse.auth.configuration;
 
+import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPort;
+import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPortImpl;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
@@ -45,6 +47,11 @@ public class AuthConfiguration  {
 		return new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager, jwtService,
 				LOGGER_FACTORY.getLogger(Authentication.class));
 	}
+
+    @Bean
+    public RefreshTokenPortObserverPort refreshTokenPortObserverPort(RefreshTokenRepository refreshTokenRepository) {
+        return new RefreshTokenPortObserverPortImpl(refreshTokenRepository);
+    }
 
     @Bean
     public JwtService jwtService(JwtProvider jwtProvider) {

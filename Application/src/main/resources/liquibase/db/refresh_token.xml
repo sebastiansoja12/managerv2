@@ -10,7 +10,7 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created_date" type="datetime(6)">
+            <column name="created_date" type="timestamp(6)">
                 <constraints nullable="false"/>
             </column>
             <column name="token" type="varchar(255)">
@@ -25,7 +25,7 @@
             <column name="token_type" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="expiry_date" type="datetime(6)">
+            <column name="expiry_date" type="timestamp(6)">
                 <constraints nullable="false"/>
             </column>
             <column name="username" type="varchar(255)">

@@ -1,15 +1,16 @@
 package com.warehouse.deliveryreturn.domain.model;
 
 
+import static com.warehouse.deliveryreturn.domain.enumeration.ProcessType.RETURN;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.warehouse.deliveryreturn.domain.enumeration.ProcessType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import static com.warehouse.deliveryreturn.domain.enumeration.ProcessType.RETURN;
 
 @Getter
 @Setter
@@ -18,10 +19,6 @@ public class DeliveryReturnRequest {
     private ProcessType processType;
     private DeviceInformation zebraDeviceInformation;
     private List<DeliveryReturnDetails> deliveryReturnDetails;
-
-    public boolean isNotReturn() {
-        return deliveryReturnDetails.stream().anyMatch(DeliveryReturnDetails::isNotReturn);
-    }
 
     public void validateStatuses() {
         deliveryReturnDetails.forEach(DeliveryReturnDetails::validateDeliveryStatus);

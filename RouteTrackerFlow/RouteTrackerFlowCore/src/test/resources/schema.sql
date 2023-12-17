@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS REROUTE_TOKEN
 
 CREATE TABLE IF NOT EXISTS PARCEL
 (
-    id                    BIGINT NOT NULL,
+    id                    BIGINT       NOT NULL,
     first_name            VARCHAR(255) NOT NULL,
     last_name             VARCHAR(255) NOT NULL,
     sender_email          VARCHAR(255) NOT NULL,
@@ -56,11 +56,12 @@ CREATE TABLE IF NOT EXISTS PARCEL
     recipient_postal_code VARCHAR(255) NOT NULL,
     recipient_street      VARCHAR(255) NOT NULL,
     recipient_telephone   VARCHAR(255) NOT NULL,
-    price                 DOUBLE NOT NULL,
+    price                 DOUBLE       NOT NULL,
     parcel_size           VARCHAR(255) NOT NULL,
-    parcelStatus                INT NOT NULL,
+    parcelStatus          INT          NOT NULL,
     destination           VARCHAR(255) NOT NULL,
     parcel_related_id     BIGINT  DEFAULT NULL,
+    locked                BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (id)
 );
 

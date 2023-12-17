@@ -1,8 +1,8 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.secondary;
 
-import com.warehouse.deliveryreturn.domain.model.DeliveryPackageRequest;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryPackageRequest;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
-import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenResponse;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnTokenResponse;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
 import lombok.AllArgsConstructor;
