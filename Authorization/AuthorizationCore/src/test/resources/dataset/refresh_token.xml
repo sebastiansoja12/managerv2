@@ -4,10 +4,41 @@
     <refresh_token
             id = "100001"
             token = "12345"
-            created_date = "2018-05-25 20:23:54"
-            expiry_date = "3018-05-25 20:23:54"
+            created_date = "2023-10-23 17:27:49.254626"
+            expiry_date = "3023-10-23 17:27:49.254626"
             revoked = "0"
             expired = "0"
             username = "s-soja"
+            token_type = "BEARER"
+    />
+    <refresh_token
+            id = "100002"
+            token = "12521"
+            created_date = "2023-10-23 17:27:49.254626"
+            expiry_date = "2023-10-23 17:27:49.254626"
+            revoked = "0"
+            expired = "0"
+            username = "s-soja"
+            token_type = "BEARER"
+    />
+    <refresh_token
+            id = "100003"
+            token = "15215"
+            created_date = "2023-10-23 17:27:49.254626"
+            expiry_date = "2023-10-23 17:27:49.254626"
+            revoked = "0"
+            expired = "0"
+            username = "s-soja"
+            token_type = "BEARER"
+    />
+    <refresh_token
+            id = "100004"
+            token = "12312312"
+            created_date = "2023-10-23 17:27:49.254626"
+            expiry_date = "2023-10-23 17:27:49.254626"
+            revoked = "0"
+            expired = "0"
+            username = "s-soja"
+            token_type = "BEARER"
     />
 </dataset>

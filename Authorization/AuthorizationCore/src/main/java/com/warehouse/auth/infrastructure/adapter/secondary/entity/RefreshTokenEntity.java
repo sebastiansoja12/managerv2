@@ -1,6 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType;
 
@@ -26,10 +26,10 @@ public class RefreshTokenEntity {
     private String token;
 
     @Column(name = "created_date", nullable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "expiry_date", nullable = false)
-    private Instant expiryDate;
+    private LocalDateTime expiryDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "token_type", nullable = false)
