@@ -67,6 +67,7 @@
             <column name="updated_at" type="timestamp(6)">
                 <constraints nullable="false"/>
             </column>
+            <column name="locked" type="bit(1)"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>

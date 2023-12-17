@@ -1,7 +1,12 @@
 package com.warehouse.parcelstatuschange.domain.port.primary;
 
-import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
+import java.util.Objects;
+
+import com.warehouse.parcelstatuschange.domain.exception.ParcelRequestEmptyException;
 import com.warehouse.parcelstatuschange.domain.port.secondary.ParcelStatusRepository;
+import com.warehouse.parcelstatuschange.domain.vo.Parcel;
+import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,12 +18,19 @@ public class ParcelStatusPortImpl implements ParcelStatusPort {
 
     @Override
     public void updateStatus(StatusRequest statusRequest) {
-        logStatusRequest(statusRequest);
-        parcelStatusRepository.update(statusRequest);
+        final Parcel parcel = statusRequest.getParcel();
+        validateParcel(parcel);
+        logStatusRequest(parcel);
+        parcelStatusRepository.update(parcel);
     }
 
-    private void logStatusRequest(StatusRequest statusRequest) {
-        log.warn("Update status of parcel {}, trying to set status {}", statusRequest.getParcel().getId(),
-                statusRequest.getParcel().getParcelStatus());
+    private void validateParcel(Parcel parcel) {
+        if (Objects.isNull(parcel)) {
+            throw new ParcelRequestEmptyException(404, "Parcel is null");
+        }
+    }
+
+    private void logStatusRequest(Parcel parcel) {
+        log.warn("Update status of parcel {}, trying to set status {}", parcel.getId(), parcel.getParcelStatus());
     }
 }

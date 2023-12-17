@@ -30,6 +30,7 @@ public interface ParcelMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "locked", constant = "false")
     ParcelEntity map(ShipmentParcel parcel);
 
     @Mapping(target = "id", source = "id")

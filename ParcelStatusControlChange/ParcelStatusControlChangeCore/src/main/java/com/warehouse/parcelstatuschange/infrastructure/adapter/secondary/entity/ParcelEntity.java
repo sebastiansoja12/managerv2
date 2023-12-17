@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import static com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.enumeration.Status.REDIRECT;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,4 +29,15 @@ public class ParcelEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "locked", nullable = false)
+    private Boolean locked;
+
+    public void shouldBeLocked() {
+        if (REDIRECT.equals(status)) {
+            this.locked = Boolean.TRUE;
+        } else {
+            this.locked = Boolean.FALSE;
+        }
+    }
 }

@@ -21,6 +21,7 @@
             destination="KT1"
             parcelStatus="0"
             type="0"
+            locked = "false"
     />
     <depot
             country="Poland"
