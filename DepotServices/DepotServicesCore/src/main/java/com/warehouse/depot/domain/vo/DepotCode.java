@@ -1,9 +1,8 @@
-package com.warehouse.depot.domain.model;
+package com.warehouse.depot.domain.vo;
 
-import lombok.Data;
 import lombok.Value;
 
-@Data
+
 @Value
 public class DepotCode {
     String value;

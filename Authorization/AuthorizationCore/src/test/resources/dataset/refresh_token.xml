@@ -9,7 +9,6 @@
             revoked = "0"
             expired = "0"
             username = "s-soja"
-            token_type = "BEARER"
     />
     <refresh_token
             id = "100002"
@@ -19,7 +18,6 @@
             revoked = "0"
             expired = "0"
             username = "s-soja"
-            token_type = "BEARER"
     />
     <refresh_token
             id = "100003"
@@ -29,7 +27,6 @@
             revoked = "0"
             expired = "0"
             username = "s-soja"
-            token_type = "BEARER"
     />
     <refresh_token
             id = "100004"
@@ -39,6 +36,5 @@
             revoked = "0"
             expired = "0"
             username = "s-soja"
-            token_type = "BEARER"
     />
 </dataset>

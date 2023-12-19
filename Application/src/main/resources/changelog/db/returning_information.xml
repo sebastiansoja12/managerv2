@@ -11,7 +11,7 @@
             <column name="reason" type="VARCHAR(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="return_status" type="VARCHAR(255)">
+            <column name="return_status" type="tinyint">
                 <constraints nullable="false" />
             </column>
         </createTable>

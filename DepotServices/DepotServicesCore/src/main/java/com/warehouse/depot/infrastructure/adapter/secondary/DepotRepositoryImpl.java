@@ -1,7 +1,7 @@
 package com.warehouse.depot.infrastructure.adapter.secondary;
 
-import com.warehouse.depot.domain.model.Depot;
-import com.warehouse.depot.domain.model.DepotCode;
+import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.vo.DepotCode;
 import com.warehouse.depot.domain.port.secondary.DepotRepository;
 import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;
 import com.warehouse.depot.infrastructure.adapter.secondary.exception.DepotNotFoundException;

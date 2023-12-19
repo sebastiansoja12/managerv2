@@ -7,6 +7,7 @@ import com.warehouse.parcelstatuschange.domain.port.secondary.ParcelStatusReposi
 import com.warehouse.parcelstatuschange.domain.vo.Parcel;
 import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +18,7 @@ public class ParcelStatusPortImpl implements ParcelStatusPort {
     private final ParcelStatusRepository parcelStatusRepository;
 
     @Override
-    public void updateStatus(StatusRequest statusRequest) {
+    public void updateStatus(@NotNull StatusRequest statusRequest) {
         final Parcel parcel = statusRequest.getParcel();
         validateParcel(parcel);
         logStatusRequest(parcel);

@@ -1,6 +1,6 @@
 package com.warehouse.depot.mapper;
 
-import com.warehouse.depot.domain.model.Depot;
+import com.warehouse.depot.domain.vo.Depot;
 import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;
 import com.warehouse.depot.infrastructure.adapter.secondary.mapper.DepotMapper;
 import com.warehouse.depot.infrastructure.adapter.secondary.mapper.DepotMapperImpl;
