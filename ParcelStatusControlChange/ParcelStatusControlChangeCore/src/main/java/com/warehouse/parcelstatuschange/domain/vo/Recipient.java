@@ -1,16 +1,11 @@
-package com.warehouse.parcelstatuschange.domain.model;
+package com.warehouse.parcelstatuschange.domain.vo;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 @Builder
 public class Recipient {
-
     String firstName;
     String lastName;
     String email;
