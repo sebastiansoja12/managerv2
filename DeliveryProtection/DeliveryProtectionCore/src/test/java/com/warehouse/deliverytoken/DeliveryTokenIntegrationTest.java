@@ -84,7 +84,7 @@ public class DeliveryTokenIntegrationTest {
         // given
         final String exceptionMessage = "Connection with %s could not be established";
         final String domainName = "Shipment";
-        final int code = 8001;
+        final int code = 400;
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
                 createDeliveryRequests(1L, null, null, null, "1"),
                 new Supplier("abc")
@@ -104,7 +104,7 @@ public class DeliveryTokenIntegrationTest {
         // given
         final String exceptionMessage = "Http exception while connecting with %s service";
         final String domainName = "Shipment";
-        final int code = 8002;
+        final int code = 500;
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
                 createDeliveryRequests(1L, null, null, null, "1"),
                 new Supplier("abc")

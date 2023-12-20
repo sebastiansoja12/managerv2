@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
-import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
@@ -24,7 +23,6 @@ import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResp
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.PaymentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import com.warehouse.voronoi.VoronoiService;
 
@@ -57,8 +55,7 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentPort shipmentPort(ShipmentService service) {
-		return new ShipmentPortImpl(service,
-				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class));
+		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class));
 	}
 
 	@Bean
@@ -72,26 +69,18 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(ShipmentServicePort shipmentServicePort,
-			PathFinderServicePort pathFinderServicePort, PaypalServicePort paypalServicePort,
+	public ShipmentService shipmentService(PathFinderServicePort pathFinderServicePort,
 			NotificationCreatorProvider notificationCreatorProvider, MailServicePort mailServicePort,
 			ShipmentRepository shipmentRepository, RouteLogServicePort routeLogServicePort) {
-		return new ShipmentServiceImpl(shipmentServicePort, shipmentRepository, pathFinderServicePort,
-				paypalServicePort, notificationCreatorProvider, mailServicePort,
-				LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class), routeLogServicePort);
+		return new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort, notificationCreatorProvider,
+				mailServicePort, LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class), routeLogServicePort);
 	}
 
 	@Bean
 	public RouteLogServicePort routeLogServicePort(RouteLogProperty routeLogProperty) {
 		return new RouteLogServiceAdapter(routeLogProperty);
 	}
-
-	@Bean
-	public PaypalServicePort paypalServicePort(PaypalPort paypalPort) {
-		final PaymentMapper paymentMapper = Mappers.getMapper(PaymentMapper.class);
-		return new PaypalAdapter(paypalPort, paymentMapper);
-	}
-
+	
 	@Bean(name = "shipment.mailServicePort")
 	public MailServicePort mailServicePort(MailPort mailPort) {
 		final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);

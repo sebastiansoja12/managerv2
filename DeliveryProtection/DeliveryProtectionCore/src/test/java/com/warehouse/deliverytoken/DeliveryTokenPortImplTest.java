@@ -92,7 +92,7 @@ public class DeliveryTokenPortImplTest {
     void shouldThrowCommunicationException() {
 		// given
         final String exceptionMessage = "Connection with %s could not be established";
-        final int code = 8001;
+        final int code = 400;
         final String domainName = "Shipment";
 		final DeliveryTokenRequest request = new DeliveryTokenRequest(
 				createDeliveryRequests(1L, null, null, null, "1"),

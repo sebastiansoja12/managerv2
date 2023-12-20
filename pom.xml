@@ -23,7 +23,6 @@
 		<module>DepotServices</module>
 		<module>RouteTrackerFlow</module>
 		<module>SupplyOperation</module>
-		<module>PaymentManagement</module>
 		<module>PathFinder</module>
 		<module>Authorization</module>
 		<module>Utility</module>

@@ -30,11 +30,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>PaymentManagementCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>PathFinderApi</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -5,11 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.paypal.domain.model.LinkInformation;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.Sender;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
-import com.warehouse.shipment.domain.model.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapperImpl;
@@ -38,13 +37,6 @@ public class ShipmentMapperTest {
         assertThat(parcel.getSender().getCity()).isEqualTo("Test");
     }
 
-
-
-    private LinkInformation createLink() {
-        final LinkInformation link = new LinkInformation();
-        link.setPaymentUrl("test.pl");
-        return link;
-    }
 
     private ShipmentParcel createParcel() {
         return ShipmentParcel.builder()

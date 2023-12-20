@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import com.warehouse.shipment.domain.model.UpdateParcelRequest;
-import com.warehouse.shipment.domain.model.UpdateParcelResponse;
+import com.warehouse.shipment.domain.vo.UpdateParcelRequest;
+import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;

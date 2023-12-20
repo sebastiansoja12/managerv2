@@ -5,31 +5,27 @@ import lombok.Data;
 @Data
 public class ConstantBodyMailMessage {
 
-    String message;
+    private String message;
 
-    Long parcelId;
+    private Long parcelId;
 
-    String url;
+    private String url;
 
-    String labelUrl;
+    private String labelUrl;
 
-    String parcelManagementUrl;
+    private String parcelManagementUrl;
 
-    String city;
+    private String city;
 
-    String street;
+    private String street;
 
-    String paymentUrl;
-
-
-    public ConstantBodyMailMessage(Parcel parcel, String paymentUrl) {
+    public ConstantBodyMailMessage(Parcel parcel) {
         this.labelUrl = "http://localhost:8080/api/parcels/ " + parcel.getId() + "/label";
         this.parcelManagementUrl = "http://localhost:4200/shipment/client/management/" + parcel.getId();
         this.message = "Docelowa destynacja paczki to: " +
                 parcel.getRecipient().getCity() + parcel.getRecipient().getStreet() +
                 "\nKod państwa paczki to: " + parcel.getId() +
                 "\nAby pobrać etykietę prosimy wejść w " + getLabelUrl() +
-                "\nAby opłacić przesyłkę prosimy wejść w : " + paymentUrl +
                 "\nAby zarządzać przesyłką prosimy wejść w: " + this.parcelManagementUrl;
 
     }

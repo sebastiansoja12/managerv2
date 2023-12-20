@@ -8,8 +8,6 @@
     <include file="/changelog/db/users.xml"/>
     <include file="/changelog/db/delivery.xml"/>
     <include file="/changelog/db/parcel.xml"/>
-    <include file="/changelog/db/payment.xml"/>
-    <include file="/changelog/db/paypal.xml"/>
     <include file="/changelog/db/redirect_token.xml"/>
     <include file="/changelog/db/refresh_token.sql"/>
     <include file="/changelog/db/reroute_token.xml"/>

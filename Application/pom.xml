@@ -61,11 +61,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>PaymentManagementCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>SupplyOperationCore</artifactId>
             <version>${project.version}</version>
         </dependency>

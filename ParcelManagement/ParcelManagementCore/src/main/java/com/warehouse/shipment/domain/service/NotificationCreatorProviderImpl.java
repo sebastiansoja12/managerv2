@@ -1,8 +1,9 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.ConstantBodyMailMessage;
+import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.Parcel;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -11,8 +12,8 @@ public class NotificationCreatorProviderImpl implements NotificationCreatorProvi
     private final static String SUBJECT = "Została nadana do państwa przesyłka: ";
 
     @Override
-    public Notification createNotification(Parcel parcel, String message) {
-        final ConstantBodyMailMessage constantBodyMailMessage = new ConstantBodyMailMessage(parcel, message);
+    public Notification createNotification(Parcel parcel) {
+        final ConstantBodyMailMessage constantBodyMailMessage = new ConstantBodyMailMessage(parcel);
 
         return Notification.builder()
                 .body(constantBodyMailMessage.getMessage())
@@ -22,13 +23,13 @@ public class NotificationCreatorProviderImpl implements NotificationCreatorProvi
     }
 
     @Override
-    public Notification createRerouteNotification(Parcel parcel, String message) {
-        final ConstantBodyMailMessage constantBodyMailMessage = new ConstantBodyMailMessage(parcel, message);
+    public Notification createRerouteNotification(Parcel parcel) {
+        final ConstantBodyMailMessage constantBodyMailMessage = new ConstantBodyMailMessage(parcel);
 
         return Notification.builder()
                 .body(constantBodyMailMessage.getMessage())
                 .recipient(parcel.getRecipient().getEmail())
-                .subject(message)
+                .subject(SUBJECT)
                 .build();
     }
 }

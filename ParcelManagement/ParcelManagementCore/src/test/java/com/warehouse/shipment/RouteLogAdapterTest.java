@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
-import com.warehouse.shipment.domain.model.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.RouteLogAdapter;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapperImpl;
