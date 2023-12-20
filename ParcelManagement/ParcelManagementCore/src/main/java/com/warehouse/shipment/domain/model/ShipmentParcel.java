@@ -33,4 +33,13 @@ public class ShipmentParcel {
     public double getPrice() {
         return this.price = parcelSize.getPrice();
     }
+
+    public void prepareParcelToCreate() {
+        this.status = Status.CREATED;
+        this.parcelType = ParcelType.PARENT;
+    }
+
+    public void updateDestination(String destination) {
+        this.destination = destination;
+    }
 }

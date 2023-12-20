@@ -40,7 +40,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new DestinationDepotDeterminationException(SHIPMENT_202);
 		}
 
-        updateParcelDestination(shipmentParcel, city);
+        shipmentParcel.updateDestination(city.getValue());
 
         final Parcel parcel = shipmentRepository.save(shipmentParcel);
 
@@ -99,10 +99,6 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .city(parcelUpdate.getRecipientCity())
                 .postalCode(parcelUpdate.getRecipientPostalCode())
                 .build();
-    }
-
-    private void updateParcelDestination(ShipmentParcel shipmentParcel, City city) {
-        shipmentParcel.setDestination(city.getValue());
     }
 
     private void updateParcelDestinationForReroute(ParcelUpdate parcelUpdate, City city) {
