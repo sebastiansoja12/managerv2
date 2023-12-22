@@ -38,7 +38,7 @@ public class ReturningRepositoryImpl implements ReturnRepository {
     @Override
     public ProcessReturn update(ReturnPackageRequest returnPackage) {
 		final ReturnEntity returnEntity = repository.findFirstByParcelId(returnPackage.getParcelId())
-				.orElseThrow(() -> new ReturnEntityNotFoundException(8083,
+				.orElseThrow(() -> new ReturnEntityNotFoundException(404,
 						String.format(exceptionMessage, returnPackage.getParcelId())));
         if (PROCESSING.equals(returnEntity.getReturnStatus())) {
             returnEntity.completeReturn();
