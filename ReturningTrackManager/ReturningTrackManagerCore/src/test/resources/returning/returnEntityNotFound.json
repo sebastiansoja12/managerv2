@@ -1,4 +1,4 @@
 {
-  "status": 404,
+  "parcelStatus": 404,
   "error": "Return Entity for parcel 2137 was not found"
 }

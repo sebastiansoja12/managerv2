@@ -10,10 +10,11 @@ redirect:
       Aby zarządzać przesyłką prosimy wejść w: {}
     subject: Żądanie o przekierowanie przesyłki
 
+
 purge:
   cron:
     expression: "@midnight"
-
-routelog:
-  url: http://localhost:8080
-  endpoint: routes
+shipment:
+  log:
+    endpoint: initialize
+    url: http://localhost:8080

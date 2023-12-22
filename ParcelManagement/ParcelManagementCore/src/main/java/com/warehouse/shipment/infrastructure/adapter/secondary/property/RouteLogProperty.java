@@ -2,9 +2,11 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.property;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 @Getter
-@ConfigurationProperties(prefix = "routelog")
+@Configuration("shipment.routeLogProperty")
+@ConfigurationProperties(prefix = "shipment.log")
 public class RouteLogProperty {
     private String url;
     private String endpoint;

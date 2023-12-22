@@ -33,7 +33,7 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
     public RouteProcess initializeRouteProcess(ParcelId parcelId) {
         final ResponseEntity<RouteProcessDto> process = restClient
                 .post()
-                .uri("/v2/api/{url}", routeLogProperty.getEndpoint())
+                .uri("/v2/api/routes/test/{endpoint}", routeLogProperty.getEndpoint())
                 .body(parcelId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
