@@ -149,10 +149,10 @@ public class ReturnPortImpl implements ReturnPort {
 
     private void validateRequest(ReturnRequest request) {
         if (request.isUserMissing()) {
-            throw new UsernameMissingException(8081, "Username is missing");
+            throw new UsernameMissingException(406, "Username is missing");
         }
         if (request.isDepotCodeMissing()) {
-            throw new DepotCodeMissingException(8082, "Depot code is missing");
+            throw new DepotCodeMissingException(406, "Depot code is missing");
         }
     }
 

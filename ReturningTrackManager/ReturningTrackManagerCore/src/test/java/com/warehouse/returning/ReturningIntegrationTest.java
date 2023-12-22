@@ -144,7 +144,7 @@ public class ReturningIntegrationTest {
                 .toEntity(ErrorResponse.class);
 
         // then
-        assertTrue(returningResponse.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST));
+        assertTrue(returningResponse.getStatusCode().isSameCodeAs(HttpStatus.NOT_ACCEPTABLE));
         assertNotNull(returningResponse.getBody());
         assertEquals(readFileAsString(USERNAME_MISSING_JSON_PATH),
                 returningErrorResponseAsJsonString(returningResponse.getBody()));
@@ -166,7 +166,7 @@ public class ReturningIntegrationTest {
                 .toEntity(ErrorResponse.class);
 
         // then
-        assertTrue(returningResponse.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST));
+        assertTrue(returningResponse.getStatusCode().isSameCodeAs(HttpStatus.NOT_ACCEPTABLE));
         assertNotNull(returningResponse.getBody());
         assertEquals(readFileAsString(DEPOT_CODE_MISSING_JSON_PATH),
                 returningErrorResponseAsJsonString(returningResponse.getBody()));
@@ -188,7 +188,7 @@ public class ReturningIntegrationTest {
                 .toEntity(ErrorResponse.class);
 
         // then
-        assertTrue(returningResponse.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST));
+        assertTrue(returningResponse.getStatusCode().isSameCodeAs(HttpStatus.NOT_FOUND));
         assertNotNull(returningResponse.getBody());
         assertEquals(readFileAsString(RETURN_MISSING_JSON_PATH),
                 returningErrorResponseAsJsonString(returningResponse.getBody()));
