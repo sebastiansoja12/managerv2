@@ -18,7 +18,6 @@ public interface RefreshTokenMapper {
 
     @Mapping(target = "revoked", ignore = true)
     @Mapping(target = "token", source = "token")
-    @Mapping(target = "tokenType", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "expired", ignore = true)
     RefreshTokenEntity map(RefreshToken refreshToken);
