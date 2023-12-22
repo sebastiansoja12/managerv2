@@ -9,17 +9,12 @@
         <version>2023.13-SNAPSHOT</version>
     </parent>
 
-    <artifactId>Properties</artifactId>
+    <artifactId>ManagerTools</artifactId>
 
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-
-
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>Properties</module>
+    </modules>
 
 </project>

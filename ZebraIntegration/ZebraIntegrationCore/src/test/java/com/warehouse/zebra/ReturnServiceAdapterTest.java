@@ -94,7 +94,7 @@ public class ReturnServiceAdapterTest {
 
         final Request request = Request.builder()
                 .processType(ProcessType.RETURN)
-                .requests(List.of(returnRequest))
+                .returnRequests(List.of(returnRequest))
                 .zebraDeviceInformation(deviceInformation).build();
 
         final Resource resource = new ClassPathResource(PROCESS_RETURN_RESPONSE_PATH);
@@ -130,7 +130,7 @@ public class ReturnServiceAdapterTest {
 
         final Request request = Request.builder()
                 .processType(ProcessType.RETURN)
-                .requests(List.of(returnRequest))
+                .returnRequests(List.of(returnRequest))
                 .zebraDeviceInformation(deviceInformation).build();
 
         final Resource resource = new ClassPathResource(UPDATE_PROCESS_RETURN_RESPONSE_PATH);
