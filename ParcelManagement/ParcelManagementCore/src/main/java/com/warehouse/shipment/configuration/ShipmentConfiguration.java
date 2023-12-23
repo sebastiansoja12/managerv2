@@ -21,7 +21,7 @@ import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResp
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.property.RouteLogProperty;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
 
 @Configuration
@@ -68,9 +68,14 @@ public class ShipmentConfiguration {
 				mailServicePort, LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class), routeLogServicePort);
 	}
 
-	@Bean
-	public RouteLogServicePort routeLogServicePort(RouteLogProperty routeLogProperty) {
-		return new RouteLogServiceAdapter(routeLogProperty);
+	@Bean(name = "shipment.routeLogServicePort")
+	public RouteLogServicePort routeLogServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {
+		return new RouteLogServiceAdapter(routeTrackerLogProperties);
+	}
+
+	@Bean("shipment.routeTrackerLogProperties")
+	public RouteTrackerLogProperties routeTrackerLogProperties() {
+		return new RouteTrackerLogProperties();
 	}
 	
 	@Bean(name = "shipment.mailServicePort")

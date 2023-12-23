@@ -5,7 +5,7 @@ import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.infrastructure.adapter.secondary.api.ReturnTrackRequestDto;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.RouteLogRequestMapper;
 import com.warehouse.returning.infrastructure.adapter.secondary.properties.Addressing;
-import com.warehouse.returning.infrastructure.adapter.secondary.properties.RouteTrackerLogProperties;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -38,7 +38,7 @@ public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteL
     public void logReturn(RouteLogServiceConfiguration configuration, ReturnTrackRequestDto request) {
         restClient
                 .post()
-                .uri("/v2/api/{endpoint}", configuration.getEndpoint())
+                .uri("/v2/api/routes/test/{returntrackrequest}", configuration.getReturnTrackRequestFunction())
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -67,6 +67,11 @@ public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteL
         @Override
         public String getEndpoint() {
             return routeTrackerLogProperties.getEndpoint();
+        }
+
+        @Override
+        public String getReturnTrackRequestFunction() {
+            return routeTrackerLogProperties.getReturnTrackRequest();
         }
     }
 }

@@ -16,7 +16,6 @@ import com.warehouse.deliveryreturn.configuration.DeliveryReturnTestConfiguratio
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatusParcelRequest;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelStatusProperty;
 
 @SpringBootTest(classes = DeliveryReturnTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -29,9 +28,6 @@ public class ParcelStatusControlChangeServiceIntegrationAdapterTest {
 
     @Autowired
     private RestClient restClient;
-
-    @Autowired
-    private ParcelStatusProperty parcelStatusProperty;
 
     @Test
     void shouldNotUpdateParcelStatus() {

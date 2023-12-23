@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.warehouse.tools.returning.ReturnProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +24,6 @@ import org.springframework.web.client.RestClient;
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
 import com.warehouse.zebra.domain.vo.ProcessReturn;
 import com.warehouse.zebra.domain.vo.Response;
-import com.warehouse.zebra.infrastructure.adapter.secondary.properties.ReturnProperty;
 import com.warehouse.zebra.infrastructure.api.dto.*;
 import com.warehouse.zebra.infrastructure.api.requestmodel.ProcessType;
 import com.warehouse.zebra.infrastructure.api.requestmodel.ReturnRequestInformation;
@@ -42,7 +42,7 @@ public class ZebraIntegrationTest {
     private RestClient restClient;
 
     @Autowired
-    private ReturnProperty returnProperty;
+    private ReturnProperties returnProperties;
 
     @Autowired
     private ReturnServicePort returnServicePort;
