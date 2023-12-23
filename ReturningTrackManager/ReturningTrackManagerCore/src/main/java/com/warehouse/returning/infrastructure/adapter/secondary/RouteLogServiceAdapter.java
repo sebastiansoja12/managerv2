@@ -31,7 +31,7 @@ public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteL
     @Override
     public void logReturn(ProcessReturn processReturn, String depotCode, String username) {
         final RouteLogServiceConfiguration configuration = new RouteLogServiceConfiguration(routeTrackerLogProperties);
-        final ReturnTrackRequestDto request = requestMapper.map(processReturn);
+        final ReturnTrackRequestDto request = requestMapper.map(processReturn, depotCode, username);
         logReturn(configuration, request);
     }
 

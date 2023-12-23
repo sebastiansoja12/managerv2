@@ -8,11 +8,11 @@ import org.mapstruct.Mapper;
 @Mapper
 public interface RouteLogRequestMapper {
 
-    default ReturnTrackRequestDto map(ProcessReturn processReturn) {
+    default ReturnTrackRequestDto map(ProcessReturn processReturn, String depotCode, String username) {
         return ReturnTrackRequestDto
                 .builder()
-                .username("s-soja")
-                .depotCode("KT1")
+                .username(username)
+                .depotCode(depotCode)
                 .processType(ProcessTypeDto.RETURN)
                 .parcelId(processReturn.parcelId())
                 .build();
