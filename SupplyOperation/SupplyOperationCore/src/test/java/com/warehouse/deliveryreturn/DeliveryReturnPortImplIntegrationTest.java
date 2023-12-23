@@ -14,7 +14,7 @@ import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.deliveryreturn.domain.vo.*;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelProperty;
+import com.warehouse.tools.shipment.ShipmentProperties;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ public class DeliveryReturnPortImplIntegrationTest {
         public RouteLogServicePort routeLogServicePort;
 
         @MockBean
-        public ParcelProperty parcelProperty;
+        public ShipmentProperties shipmentProperties;
 
         @MockBean
         public ParcelRepositoryServicePort parcelRepositoryServicePort;
@@ -75,7 +75,7 @@ public class DeliveryReturnPortImplIntegrationTest {
     private RestClient restClient;
 
     @Autowired
-    private ParcelProperty parcelProperty;
+    private ShipmentProperties shipmentProperties;
 
     @Autowired
     private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;

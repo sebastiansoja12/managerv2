@@ -8,6 +8,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import java.util.List;
 
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
@@ -28,9 +30,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.zebra.domain.vo.*;
 import com.warehouse.zebra.infrastructure.adapter.secondary.ReturnServiceAdapter;
-import com.warehouse.zebra.infrastructure.adapter.secondary.properties.ReturnProperty;
 
 
 @ExtendWith(SpringExtension.class)
@@ -40,12 +42,17 @@ import com.warehouse.zebra.infrastructure.adapter.secondary.properties.ReturnPro
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ReturnServiceAdapterTest {
 
-    @ComponentScan(basePackages = { "com.warehouse.zebra" })
-    @EntityScan(basePackages = { "com.warehouse.zebra" })
-    @EnableJpaRepositories(basePackages = { "com.warehouse.zebra"})
+    @ComponentScan(basePackages = { "com.warehouse.zebra", "com.warehouse.tools.returning",
+            "com.warehouse.tools.routelog" })
+    @EntityScan(basePackages = { "com.warehouse.zebra", "com.warehouse.tools.returning",
+            "com.warehouse.tools.routelog" })
+    @EnableJpaRepositories(basePackages = { "com.warehouse.zebra", "com.warehouse.tools.returning",
+            "com.warehouse.tools.routelog" })
     @PropertySource("classpath:application.properties")
     static class ReturnServiceAdapterTestConfiguration {
 
+        @MockBean
+        public RouteTrackerLogProperties routeTrackerLogProperties;
 
     }
 
@@ -53,7 +60,7 @@ public class ReturnServiceAdapterTest {
     private ReturnServiceAdapter returnServiceAdapter;
 
     @Autowired
-    private ReturnProperty returnProperty;
+    private ReturnProperties returnProperties;
     
     private MockRestServiceServer mockRestServiceServer;
 
@@ -94,7 +101,7 @@ public class ReturnServiceAdapterTest {
 
         final Request request = Request.builder()
                 .processType(ProcessType.RETURN)
-                .requests(List.of(returnRequest))
+                .returnRequests(List.of(returnRequest))
                 .zebraDeviceInformation(deviceInformation).build();
 
         final Resource resource = new ClassPathResource(PROCESS_RETURN_RESPONSE_PATH);
@@ -130,7 +137,7 @@ public class ReturnServiceAdapterTest {
 
         final Request request = Request.builder()
                 .processType(ProcessType.RETURN)
-                .requests(List.of(returnRequest))
+                .returnRequests(List.of(returnRequest))
                 .zebraDeviceInformation(deviceInformation).build();
 
         final Resource resource = new ClassPathResource(UPDATE_PROCESS_RETURN_RESPONSE_PATH);

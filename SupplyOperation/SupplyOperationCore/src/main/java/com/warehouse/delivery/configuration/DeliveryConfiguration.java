@@ -1,8 +1,5 @@
 package com.warehouse.delivery.configuration;
 
-import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
-import com.warehouse.delivery.infrastructure.adapter.secondary.property.ParcelStatusProperty;
-import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,15 +7,18 @@ import org.springframework.context.annotation.Configuration;
 import com.warehouse.delivery.domain.port.primary.DeliveryPort;
 import com.warehouse.delivery.domain.port.primary.DeliveryPortImpl;
 import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
-import com.warehouse.delivery.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
+import com.warehouse.delivery.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.delivery.domain.service.DeliveryService;
 import com.warehouse.delivery.domain.service.DeliveryServiceImpl;
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import com.warehouse.delivery.infrastructure.adapter.secondary.*;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryMapper;
+import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 
 @Configuration
 public class DeliveryConfiguration {
@@ -31,8 +31,8 @@ public class DeliveryConfiguration {
     
 	@Bean("delivery.parcelStatusControlChangeServicePort")
 	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
-			ParcelStatusProperty parcelStatusProperty) {
-		return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperty);
+			ParcelStatusProperties parcelStatusProperties) {
+		return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperties);
 	}
 
 	@Bean

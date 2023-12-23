@@ -28,13 +28,13 @@
 		<module>Utility</module>
         <module>DestinationDetermination</module>
         <module>Generator</module>
-		<module>Properties</module>
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
 		<module>ParcelStatusControlChange</module>
         <module>ZebraIntegration</module>
         <module>ReturningTrackManager</module>
         <module>ArchitectureTest</module>
+        <module>ManagerTools</module>
     </modules>
 
 	<properties>

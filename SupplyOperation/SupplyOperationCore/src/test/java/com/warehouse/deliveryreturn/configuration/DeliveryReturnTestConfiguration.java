@@ -12,7 +12,7 @@ import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
 
-@ComponentScan(basePackages = { "com.warehouse.deliveryreturn" })
+@ComponentScan(basePackages = { "com.warehouse.deliveryreturn",  "com.warehouse.tools.parcelstatus" })
 @EntityScan(basePackages = { "com.warehouse.deliveryreturn" })
 @EnableJpaRepositories(basePackages = { "com.warehouse.deliveryreturn" })
 @EnableAutoConfiguration

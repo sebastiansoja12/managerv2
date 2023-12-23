@@ -14,6 +14,7 @@ public interface ReturnRequestMapper {
 
     @Mapping(target = "depotCode.value", source = "zebraDeviceInformation.depotCode")
     @Mapping(target = "username.value", source = "zebraDeviceInformation.username")
+    @Mapping(target = "requests", source = "returnRequests")
     ReturnRequestDto map(Request zebraRequest);
 
 

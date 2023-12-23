@@ -1,6 +1,5 @@
 package com.warehouse.shipment.configuration;
 
-import com.warehouse.shipment.infrastructure.adapter.secondary.property.RouteLogProperty;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
-import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
@@ -23,19 +21,13 @@ import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResp
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
 
 @Configuration
 public class ShipmentConfiguration {
 
 	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
-
-	@Bean
-	public RouteLogAdapter shipmentAdapter(RouteLogEventPublisher routeLogEventPublisher) {
-		final ShipmentMapper shipmentMapper = Mappers.getMapper(ShipmentMapper.class);
-		return new RouteLogAdapter(shipmentMapper, routeLogEventPublisher);
-	}
 
 	@Bean
 	public ShipmentRepository shipmentRepository(ShipmentReadRepository repository) {
@@ -76,9 +68,14 @@ public class ShipmentConfiguration {
 				mailServicePort, LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class), routeLogServicePort);
 	}
 
-	@Bean
-	public RouteLogServicePort routeLogServicePort(RouteLogProperty routeLogProperty) {
-		return new RouteLogServiceAdapter(routeLogProperty);
+	@Bean(name = "shipment.routeLogServicePort")
+	public RouteLogServicePort routeLogServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {
+		return new RouteLogServiceAdapter(routeTrackerLogProperties);
+	}
+
+	@Bean("shipment.routeTrackerLogProperties")
+	public RouteTrackerLogProperties routeTrackerLogProperties() {
+		return new RouteTrackerLogProperties();
 	}
 	
 	@Bean(name = "shipment.mailServicePort")
