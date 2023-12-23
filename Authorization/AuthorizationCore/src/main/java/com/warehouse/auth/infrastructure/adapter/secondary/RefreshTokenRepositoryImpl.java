@@ -7,7 +7,6 @@ import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.RefreshTokenNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
 
@@ -26,7 +25,6 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
         final RefreshTokenEntity entity = refreshTokenMapper.map(refreshToken);
         entity.setCreatedDate(Instant.now());
         entity.setExpiryDate(Instant.now().plus(ChronoUnit.HALF_DAYS.getDuration()));
-        entity.setTokenType(TokenType.BEARER);
         repository.save(entity);
 
         return refreshTokenMapper.mapToToken(entity);

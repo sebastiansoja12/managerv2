@@ -1,12 +1,12 @@
 package com.warehouse.redirect.infrastructure.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
+@Builder
+@Jacksonized
 public class RedirectResponseDto {
     TokenDto token;
     Long parcelId;

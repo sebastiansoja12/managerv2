@@ -27,9 +27,10 @@ public class RerouteTokenRequestMapperTest {
     @Test
     void shouldMapFromRerouteRequestDtoToRerouteRequest() {
         // given
-        final RerouteRequestDto requestDto = new RerouteRequestDto();
-        requestDto.setParcelId(parcelId());
-        requestDto.setEmail(email());
+        final RerouteRequestDto requestDto = RerouteRequestDto.builder()
+                .parcelId(parcelId())
+                .email(email())
+                .build();
         // when
         final RerouteRequest request = requestMapper.map(requestDto);
         // then
@@ -41,10 +42,11 @@ public class RerouteTokenRequestMapperTest {
     @Test
     void shouldMapFromUpdateParcelRequestDtoToUpdateParcelRequest() {
         // given
-        final RerouteParcelRequestDto requestDto = new RerouteParcelRequestDto();
-        requestDto.setParcelId(parcelIdDto());
-        requestDto.setToken(new TokenDto(TOKEN));
-        requestDto.setParcel(parcelDto());
+        final RerouteParcelRequestDto requestDto = RerouteParcelRequestDto.builder()
+                .parcelId(parcelIdDto())
+                .token(TokenDto.builder().value(TOKEN).build())
+                .parcel(parcelDto())
+                .build();
         // when
         final RerouteParcelRequest updateParcelRequest = requestMapper.map(requestDto);
         // then
@@ -66,7 +68,7 @@ public class RerouteTokenRequestMapperTest {
     @Test
     void shouldMapFromTokenDtoToToken() {
         // given
-        final TokenDto tokenDto = new TokenDto(TOKEN);
+        final TokenDto tokenDto = TokenDto.builder().value(TOKEN).build();
         // when
         final Token token = requestMapper.map(tokenDto);
         // then
@@ -85,25 +87,22 @@ public class RerouteTokenRequestMapperTest {
     }
 
     private com.warehouse.reroute.infrastructure.api.dto.ParcelId parcelId() {
-        return new ParcelId(PARCEL_ID);
+        return ParcelId.builder().value(PARCEL_ID).build();
     }
 
     private EmailDto email() {
-        return new EmailDto(EMAIL);
+        return EmailDto.builder().value(EMAIL).build();
     }
 
     private ParcelIdDto parcelIdDto() {
-        final ParcelIdDto parcelId = new ParcelIdDto();
-        parcelId.setValue(PARCEL_ID);
-        return parcelId;
+        return ParcelIdDto.builder().value(PARCEL_ID).build();
     }
 
     private ParcelDto parcelDto() {
-        final ParcelDto parcel = new ParcelDto();
-        parcel.setParcelSize(ParcelSizeDto.AVERAGE);
-        parcel.setRecipient(new RecipientDto());
-        parcel.setSender(new SenderDto());
-        return parcel;
+        return ParcelDto.builder().parcelSize(ParcelSizeDto.AVERAGE)
+                .recipient(RecipientDto.builder().build())
+                .sender(SenderDto.builder().build())
+                .build();
     }
 
 }

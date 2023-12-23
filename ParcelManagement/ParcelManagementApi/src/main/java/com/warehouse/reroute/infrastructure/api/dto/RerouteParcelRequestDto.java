@@ -1,8 +1,12 @@
 package com.warehouse.reroute.infrastructure.api.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class RerouteParcelRequestDto {
 
     ParcelIdDto parcelId;

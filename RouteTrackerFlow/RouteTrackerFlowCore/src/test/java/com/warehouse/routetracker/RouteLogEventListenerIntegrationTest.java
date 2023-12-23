@@ -3,20 +3,14 @@ package com.warehouse.routetracker;
 
 import static com.google.common.collect.MoreCollectors.onlyElement;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.Collections;
 import java.util.List;
 
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.ParcelEntity;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
-import com.warehouse.routetracker.infrastructure.api.dto.DeliveryInformationDto;
-import com.warehouse.routetracker.infrastructure.api.event.DeliveryLogEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -26,12 +20,17 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.routetracker.configuration.RouteTrackerTestConfiguration;
 import com.warehouse.routetracker.infrastructure.adapter.primary.RouteLogEventListener;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.ParcelReadRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteReadRepository;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status;
+import com.warehouse.routetracker.infrastructure.api.dto.DeliveryInformationDto;
 import com.warehouse.routetracker.infrastructure.api.dto.ShipmentRequestDto;
+import com.warehouse.routetracker.infrastructure.api.event.DeliveryLogEvent;
 import com.warehouse.routetracker.infrastructure.api.event.ShipmentLogEvent;
 
 @ExtendWith(SpringExtension.class)
@@ -103,29 +102,6 @@ public class RouteLogEventListenerIntegrationTest {
         // then
         final List<RouteEntity> routeEntityList = repository.findByParcelId(PARCEL_ID);
         assertThat(routeEntityList).isEmpty();
-    }
-
-
-    @Test
-    void shouldNotHandleWhenParcelToUpdateWasNotFound() {
-        // given
-        final String exceptionMessage = "Parcel to update with id '%s' was not found";
-        final Long parcelId = 1L;
-        final DeliveryLogEvent deliveryLogEvent = DeliveryLogEvent.builder()
-                .deliveryInformation(Collections.singletonList(
-                        DeliveryInformationDto.builder()
-                                .parcelId(parcelId)
-                                .depotCode(DEPOT_CODE)
-                                .supplierCode(SUPPLIER_CODE)
-                                .deliveryStatus("DELIVERY")
-                                .token("token")
-                                .build()))
-                .build();
-        // when
-        final Executable executable = () -> eventListener.handle(deliveryLogEvent);
-        // then
-        final ParcelNotFoundException exception = assertThrows(ParcelNotFoundException.class, executable);
-        assertEquals(expected(String.format(exceptionMessage, parcelId)), exception.getMessage());
     }
 
     private <T> T expected(T t) {

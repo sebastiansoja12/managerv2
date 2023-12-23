@@ -2,7 +2,6 @@ package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.TokenType;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,10 +29,6 @@ public class RefreshTokenEntity {
 
     @Column(name = "expiry_date", nullable = false)
     private Instant expiryDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "token_type", nullable = false)
-    private TokenType tokenType = TokenType.BEARER;
 
     @Column(name = "revoked", nullable = false)
     private boolean revoked;

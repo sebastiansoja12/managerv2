@@ -32,9 +32,10 @@ public class RerouteTokenResponseMapperTest {
     @Test
     void shouldMapFromRerouteResponseDtoToRerouteResponse() {
         // given
-        final RerouteResponseDto rerouteResponseDto = new RerouteResponseDto(
-                TOKEN, PARCEL_ID
-        );
+        final RerouteResponseDto rerouteResponseDto = RerouteResponseDto.builder()
+                .token(TOKEN)
+                .parcelId(PARCEL_ID)
+                .build();
         // when
         final RerouteResponse rerouteResponse = responseMapper.map(rerouteResponseDto);
 
@@ -62,12 +63,12 @@ public class RerouteTokenResponseMapperTest {
     @Test
     void shouldMapFromRerouteTokenResponseDtoToRerouteTokenResponse() {
         // given
-        final RerouteTokenResponseDto rerouteTokenResponseDto = new RerouteTokenResponseDto();
-        rerouteTokenResponseDto.setToken(TOKEN);
-        rerouteTokenResponseDto.setParcelId(PARCEL_ID);
-        rerouteTokenResponseDto.setValid(true);
-        rerouteTokenResponseDto.setCreated("2022-08-10 21:37:00");
-
+        final RerouteTokenResponseDto rerouteTokenResponseDto = RerouteTokenResponseDto.builder()
+                .token(TOKEN)
+                .parcelId(PARCEL_ID)
+                .created("2022-08-10 21:37:00")
+                .isValid(true)
+                .build();
         // when
         final RerouteTokenResponse tokenResponse = responseMapper.map(rerouteTokenResponseDto);
         // then
