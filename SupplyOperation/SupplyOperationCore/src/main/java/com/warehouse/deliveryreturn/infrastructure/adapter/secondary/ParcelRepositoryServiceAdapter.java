@@ -4,6 +4,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.tools.shipment.ShipmentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
@@ -14,22 +15,21 @@ import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServic
 import com.warehouse.deliveryreturn.domain.vo.Parcel;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ParcelDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.ParcelMapper;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelProperty;
 
 
 public class ParcelRepositoryServiceAdapter implements ParcelRepositoryServicePort {
 
     private final RestClient restClient;
     
-    private final ParcelProperty parcelProperty;
+    private final ShipmentProperties shipmentProperties;
 
     private final ParcelMapper parcelMapper = getMapper(ParcelMapper.class);
     
     private final Logger logger = LoggerFactory.getLogger(ParcelRepositoryServicePort.class);
 
-    public ParcelRepositoryServiceAdapter(ParcelProperty parcelProperty) {
-        this.parcelProperty = parcelProperty;
-        this.restClient = RestClient.builder().baseUrl(parcelProperty.getUrl()).build();
+    public ParcelRepositoryServiceAdapter(ShipmentProperties shipmentProperties) {
+        this.shipmentProperties = shipmentProperties;
+        this.restClient = RestClient.builder().baseUrl(shipmentProperties.getUrl()).build();
     }
 
     @Override

@@ -4,8 +4,8 @@ import java.util.List;
 
 import lombok.Builder;
 
-
 @Builder
-public record Response(Long zebraId, String version, String username, List<ProcessReturn> processReturns) {
+public record Response(Long zebraId, String version, String username, List<ProcessReturn> processReturns,
+                       List<RouteProcess> routeProcesses) {
 
 }

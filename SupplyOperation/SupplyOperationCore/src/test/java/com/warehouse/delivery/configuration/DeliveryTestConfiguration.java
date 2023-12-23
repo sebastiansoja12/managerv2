@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
-import com.warehouse.delivery.infrastructure.adapter.secondary.property.ParcelStatusProperty;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 
@@ -22,9 +21,6 @@ public class DeliveryTestConfiguration {
 
     @MockBean
     public ParcelServicePort parcelServicePort;
-
-    @MockBean
-    private ParcelStatusProperty parcelStatusProperty;
 
     @MockBean
     private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;

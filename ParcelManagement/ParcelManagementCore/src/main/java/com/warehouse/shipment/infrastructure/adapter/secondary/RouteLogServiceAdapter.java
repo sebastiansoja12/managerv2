@@ -11,29 +11,29 @@ import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.vo.ParcelId;
 import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.RouteProcessMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.property.RouteLogProperty;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RouteLogServiceAdapter implements RouteLogServicePort {
 
-    private final RouteLogProperty routeLogProperty;
+    private final RouteTrackerLogProperties routeTrackerLogProperties;
 
     private final RestClient restClient;
 
     private final RouteProcessMapper mapper = getMapper(RouteProcessMapper.class);
 
-    public RouteLogServiceAdapter(RouteLogProperty routeLogProperty) {
-        this.routeLogProperty = routeLogProperty;
-        this.restClient = RestClient.builder().baseUrl(routeLogProperty.getUrl()).build();
+    public RouteLogServiceAdapter(RouteTrackerLogProperties routeTrackerLogProperties) {
+        this.routeTrackerLogProperties = routeTrackerLogProperties;
+        this.restClient = RestClient.builder().baseUrl(routeTrackerLogProperties.getUrl()).build();
     }
 
     @Override
     public RouteProcess initializeRouteProcess(ParcelId parcelId) {
         final ResponseEntity<RouteProcessDto> process = restClient
                 .post()
-                .uri("/v2/api/routes/test/{endpoint}", routeLogProperty.getEndpoint())
+				.uri("/v2/api/routes/test/{initialize}", routeTrackerLogProperties.getInitialize())
                 .body(parcelId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()

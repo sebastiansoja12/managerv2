@@ -1,22 +1,23 @@
 package com.warehouse.zebra.infrastructure.adapter.secondary.api;
 
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-import lombok.Data;
-
-
-
-@Data
+@Value
+@Builder
+@Jacksonized
 public class ParcelDto {
 
-    private Long id;
+    Long id;
 
-    private SizeDto parcelSize;
+    SizeDto parcelSize;
 
-    private String destination;
+    String destination;
 
-    private StatusDto status;
+    StatusDto status;
 
-    private ParcelTypeDto parcelType;
+    ParcelTypeDto parcelType;
 
-    private Long parcelRelatedId;
+    Long parcelRelatedId;
 }

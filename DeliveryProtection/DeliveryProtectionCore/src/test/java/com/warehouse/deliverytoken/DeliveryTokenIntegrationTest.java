@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.warehouse.deliverytoken.domain.vo.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.tools.shipment.ShipmentProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,6 @@ import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePor
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -52,7 +52,7 @@ public class DeliveryTokenIntegrationTest {
     private DeliveryTokenServicePort deliveryTokenServicePort;
 
     @Autowired
-    private ShipmentProperty shipmentProperty;
+    private ShipmentProperties shipmentProperties;
 
     @BeforeEach
     void setup() {

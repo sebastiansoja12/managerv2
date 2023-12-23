@@ -4,4 +4,6 @@ public interface Addressing {
     String getUrl();
 
     String getEndpoint();
+
+    String getReturnTrackRequestFunction();
 }

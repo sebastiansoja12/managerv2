@@ -1,25 +1,25 @@
 package com.warehouse.deliverytoken.configuration;
 
 
-import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPort;
-import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPortImpl;
-import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
-import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
-import com.warehouse.deliverytoken.domain.service.DeliveryService;
-import com.warehouse.deliverytoken.domain.service.DeliveryServiceImpl;
-import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.ParcelServiceAdapter;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenAdapter;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenMockAdapter;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.model.SupplierToken;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.STSProperty;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
+import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPort;
+import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPortImpl;
+import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
+import com.warehouse.deliverytoken.domain.service.DeliveryService;
+import com.warehouse.deliverytoken.domain.service.DeliveryServiceImpl;
+import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenAdapter;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenMockAdapter;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.ParcelServiceAdapter;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.model.SupplierToken;
+import com.warehouse.tools.shipment.ShipmentProperties;
 
 @Configuration
 public class DeliveryTokenSignatureConfiguration {
@@ -38,14 +38,9 @@ public class DeliveryTokenSignatureConfiguration {
 	}
 
 	@Bean
-	public ShipmentProperty shipmentProperty() {
-		return new ShipmentProperty();
-	}
-
-	@Bean
 	@ConditionalOnProperty(name = "service.mock", havingValue = "false")
-	public DeliveryTokenAdapter deliveryTokenAdapter(STSProperty stsProperty) {
-		return new DeliveryTokenAdapter(stsProperty);
+	public DeliveryTokenAdapter deliveryTokenAdapter() {
+		return new DeliveryTokenAdapter();
 	}
 
 	@Bean
@@ -55,8 +50,13 @@ public class DeliveryTokenSignatureConfiguration {
 		return new DeliveryTokenMockAdapter(supplierTokenMap);
 	}
 
+	@Bean(name = "delivery.shipmentProperties")
+	public ShipmentProperties shipmentProperties() {
+		return new ShipmentProperties();
+	}
+
 	@Bean
-	public ParcelServiceAdapter parcelServiceAdapter(ShipmentProperty shipmentProperty) {
-		return new ParcelServiceAdapter(shipmentProperty);
+	public ParcelServiceAdapter parcelServiceAdapter(ShipmentProperties shipmentProperties) {
+		return new ParcelServiceAdapter(shipmentProperties);
 	}
 }
