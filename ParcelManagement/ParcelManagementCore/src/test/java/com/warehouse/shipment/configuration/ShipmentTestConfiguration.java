@@ -11,7 +11,6 @@ import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
-import com.warehouse.shipment.infrastructure.adapter.secondary.RouteLogServiceAdapter;
 import com.warehouse.voronoi.VoronoiService;
 
 @ComponentScan(basePackages = { "com.warehouse.shipment"})
@@ -39,8 +38,5 @@ public class ShipmentTestConfiguration {
 
     @MockBean
     public RouteLogServicePort routeLogServicePort;
-
-    @MockBean
-    public RouteLogServiceAdapter routeLogServiceAdapter;
 
 }
