@@ -31,7 +31,7 @@ public class ParcelServiceAdapter extends RestGatewaySupport implements ParcelSe
 
     private final ParcelResponseMapper responseMapper = getMapper(ParcelResponseMapper.class);
     
-    private final String url = "/v2/api/%s/";
+    private final String url = "/v2/api/%s/%s";
 
     @Override
     public Parcel downloadParcel(ParcelId parcelId) {
@@ -51,7 +51,7 @@ public class ParcelServiceAdapter extends RestGatewaySupport implements ParcelSe
             throws ResourceAccessException {
 
 		final ResponseEntity<ParcelDto> responseEntity = getRestTemplate().getForEntity(
-				conf.getUrl() + String.format(url, conf.getName()) + parcelId.value(), ParcelDto.class);
+                String.format(conf.getUrl(), conf.getName()) + parcelId.value(), ParcelDto.class);
 
 		return responseMapper.map(Objects.requireNonNull(responseEntity.getBody()));
 	}
