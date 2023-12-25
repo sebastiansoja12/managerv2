@@ -70,6 +70,6 @@ public class RouteTrackerTestController {
     @GetMapping("/{parcelId}")
     public ResponseEntity<?> getByParcelId(@PathVariable Long parcelId) {
         final RouteLogRecordToChange routeLogRecordToChange = trackerLogPort.find(parcelId);
-        return new ResponseEntity<>(responseMapper.map(routeLogRecordToChange), HttpStatus.FOUND);
+        return new ResponseEntity<>(responseMapper.map(routeLogRecordToChange), HttpStatus.OK);
     }
 }

@@ -42,13 +42,13 @@ public class RouteTrackerController {
     @GetMapping("/by-parcel/{parcelId}")
     public ResponseEntity<?> getRouteListByParcelId(@PathVariable Long parcelId) {
         final List<RouteInformation> routes = trackerLogPort.getRouteListByParcelId(parcelId);
-        return new ResponseEntity<>(responseMapper.map(routes), HttpStatus.FOUND);
+        return new ResponseEntity<>(responseMapper.map(routes), HttpStatus.OK);
     }
 
     @GetMapping("/by-username/{username}")
     public ResponseEntity<?> findAllByUsername(@PathVariable String username) {
         final List<RouteInformation> routes = trackerLogPort.findRoutesByUsername(username);
-        return new ResponseEntity<>(responseMapper.map(routes), HttpStatus.FOUND);
+        return new ResponseEntity<>(responseMapper.map(routes), HttpStatus.OK);
     }
 
     @DeleteMapping

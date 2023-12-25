@@ -42,14 +42,14 @@ public class DepotController {
         final DepotCode depotCode = requestMapper.map(code);
         final Depot depot = depotPort.viewDepotByCode(depotCode);
         return ResponseEntity
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .body(responseMapper.map(depot));
     }
 
     @GetMapping
     public ResponseEntity<?> allDepots() {
         return ResponseEntity
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .body(responseMapper.map(depotPort.findAll()));
     }
 }
