@@ -24,6 +24,11 @@ public class ReturningConfiguration {
         return new ReturnPortImpl(returnService, routeLogServicePort);
     }
 
+    @Bean(name = "returning.routeTrackerLogProperties")
+    public RouteTrackerLogProperties routeTrackerLogProperties() {
+        return new RouteTrackerLogProperties();
+    }
+
 	@Bean("returning.routeLogServicePort")
 	public RouteLogServicePort routeLogServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {
 		return new RouteLogServiceAdapter(routeTrackerLogProperties);
