@@ -13,12 +13,12 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(
         info = @Info(
                 contact = @Contact(
-                        name = "InParcel",
+                        name = "Manager 2.0",
                         email = "sebastian5152@wp.pl",
                         url = "https://gitlab.com/sebastiansoja"
                 ),
                 description = "OpenApi documentation for Spring Security",
-                title = "OpenApi specification - InParcel Spring Boot Project",
+                title = "OpenApi specification - Manager Spring Boot Project",
                 version = "2023.13",
                 license = @License(
                         name = "Licence name",
