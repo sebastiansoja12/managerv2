@@ -1,20 +1,20 @@
 package com.warehouse.supplier.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class DepotDto {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Long id;
+    String city;
 
-    private String city;
+    String street;
 
-    private String street;
+    String country;
 
-    private String country;
-
-    private String depotCode;
+    String depotCode;
 
 }

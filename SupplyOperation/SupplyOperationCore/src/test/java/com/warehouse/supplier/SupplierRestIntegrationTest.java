@@ -21,7 +21,7 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.supplier.configuration.SupplierTestConfiguration;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
-import com.warehouse.supplier.domain.model.SupplierAddResponse;
+import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;

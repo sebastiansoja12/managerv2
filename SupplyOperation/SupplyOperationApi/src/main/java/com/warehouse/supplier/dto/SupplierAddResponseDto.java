@@ -1,17 +1,21 @@
 package com.warehouse.supplier.dto;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class SupplierAddResponseDto {
 
-    private String firstName;
+    String firstName;
 
-    private String lastName;
+    String lastName;
 
-    private String telephone;
+    String telephone;
 
-    private String supplierCode;
+    String supplierCode;
 
-    private String depotCode;
+    String depotCode;
 }

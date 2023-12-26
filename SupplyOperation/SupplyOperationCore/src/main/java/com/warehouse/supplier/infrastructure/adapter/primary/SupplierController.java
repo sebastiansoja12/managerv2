@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
-import com.warehouse.supplier.domain.model.SupplierAddResponse;
+import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
 import com.warehouse.supplier.dto.SupplierAddRequestDto;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierRequestMapper;
