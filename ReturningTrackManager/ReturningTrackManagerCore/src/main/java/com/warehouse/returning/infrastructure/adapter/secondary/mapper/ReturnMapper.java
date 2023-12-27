@@ -13,6 +13,8 @@ import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnEnt
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnInformationEntity;
 import com.warehouse.returning.infrastructure.adapter.secondary.enumeration.ReturnStatus;
 
+import java.util.Objects;
+
 @Mapper
 public interface ReturnMapper {
 
@@ -39,7 +41,10 @@ public interface ReturnMapper {
     ReturnModel mapToReturnModel(ReturnEntity returnEntity);
 
     default Long map(ReturnId returnId) {
-        return returnId.getValue();
+        if (Objects.nonNull(returnId)) {
+            return returnId.getValue();
+        }
+        throw new IllegalStateException("Return Id is null");
     }
 
     com.warehouse.returning.domain.model.ReturnStatus map(ReturnStatus returnStatus);

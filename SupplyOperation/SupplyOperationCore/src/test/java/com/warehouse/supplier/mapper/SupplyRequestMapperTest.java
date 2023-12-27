@@ -27,8 +27,9 @@ public class SupplyRequestMapperTest {
     @Test
     void shouldMapFromRequestToSupplier() {
         // given
-        final SupplierAddRequestDto requestDto = new SupplierAddRequestDto();
-        requestDto.setFirstName("test");
+        final SupplierAddRequestDto requestDto = SupplierAddRequestDto.builder()
+                .firstName("test")
+                .build();
         // when
         final SupplierAddRequest request1 = requestMapper.map(requestDto);
         // then
@@ -38,8 +39,9 @@ public class SupplyRequestMapperTest {
     @Test
     void shouldMapFromRequestListToSupplierList() {
         // given
-        final SupplierAddRequestDto request = new SupplierAddRequestDto();
-        request.setFirstName("test");
+        final SupplierAddRequestDto request = SupplierAddRequestDto.builder()
+                .firstName("test")
+                .build();
         final List<SupplierAddRequestDto> requests = new ArrayList<>();
         requests.add(request);
         // when

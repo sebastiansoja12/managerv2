@@ -5,6 +5,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 import java.util.Objects;
 
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.tools.shipment.ShipmentProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -17,7 +18,6 @@ import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.api.dto.ParcelDto;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.mapper.ParcelResponseMapper;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -27,13 +27,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ParcelServiceAdapter extends RestGatewaySupport implements ParcelServicePort {
 
-    private final ShipmentProperty shipmentProperty;
+    private final ShipmentProperties shipmentProperties;
 
     private final ParcelResponseMapper responseMapper = getMapper(ParcelResponseMapper.class);
+    
+    private final String url = "/v2/api/%s/%s";
 
     @Override
     public Parcel downloadParcel(ParcelId parcelId) {
-        final ShipmentConfiguration shipmentConfiguration = new ShipmentConfiguration(shipmentProperty);
+        final ShipmentConfiguration shipmentConfiguration = new ShipmentConfiguration(shipmentProperties);
         try {
             return downloadParcel(parcelId, shipmentConfiguration);
         } catch (HttpClientErrorException exception) {
@@ -45,11 +47,11 @@ public class ParcelServiceAdapter extends RestGatewaySupport implements ParcelSe
         }
     }
 
-	private Parcel downloadParcel(ParcelId parcelId, ShipmentConfiguration shipmentConfiguration)
+	private Parcel downloadParcel(ParcelId parcelId, ShipmentConfiguration conf)
             throws ResourceAccessException {
 
-		final ResponseEntity<ParcelDto> responseEntity = getRestTemplate()
-				.getForEntity(String.format(shipmentConfiguration.getUrl(), parcelId.value()), ParcelDto.class);
+		final ResponseEntity<ParcelDto> responseEntity = getRestTemplate().getForEntity(
+                String.format(conf.getUrl(), conf.getName()) + parcelId.value(), ParcelDto.class);
 
 		return responseMapper.map(Objects.requireNonNull(responseEntity.getBody()));
 	}
@@ -57,14 +59,14 @@ public class ParcelServiceAdapter extends RestGatewaySupport implements ParcelSe
     @Value
     private static class ShipmentConfiguration {
 
-        ShipmentProperty shipmentProperty;
+        ShipmentProperties shipmentProperties;
 
         public String getUrl() {
-            return shipmentProperty.getUrl();
+            return shipmentProperties.getUrl();
         }
 
         public String getName() {
-            return shipmentProperty.getName();
+            return shipmentProperties.getName();
         }
     }
 }

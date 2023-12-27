@@ -1,22 +1,23 @@
 package com.warehouse.deliveryreturn.configuration;
 
 
-import com.warehouse.deliveryreturn.domain.port.secondary.*;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.MailProperty;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelProperty;
-import com.warehouse.mail.domain.port.primary.MailPort;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
+import com.warehouse.deliveryreturn.domain.port.secondary.*;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelStatusProperty;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.RouteLogProperty;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.MailProperty;
+import com.warehouse.mail.domain.port.primary.MailPort;
+import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
+import com.warehouse.tools.shipment.ShipmentProperties;
+
+import jakarta.validation.constraints.NotNull;
 
 @Configuration
 public class DeliveryReturnConfiguration {
@@ -37,19 +38,19 @@ public class DeliveryReturnConfiguration {
         return new MailAdapter(mailPort, mailProperty);
     }
 
-    @Bean
-    public ParcelRepositoryServicePort parcelRepositoryServicePort(@NotNull ParcelProperty parcelProperty) {
-        return new ParcelRepositoryServiceAdapter(parcelProperty);
+    @Bean(name = "deliveryreturn.shipmentProperties")
+    public ShipmentProperties shipmentProperties() {
+        return new ShipmentProperties();
     }
 
     @Bean
-    public RouteLogProperty routeLogProperty() {
-        return new RouteLogProperty();
+    public ParcelRepositoryServicePort parcelRepositoryServicePort(@NotNull ShipmentProperties shipmentProperties) {
+        return new ParcelRepositoryServiceAdapter(shipmentProperties);
     }
 
     @Bean
-    public RouteLogServicePort logServicePort(RouteLogProperty routeLogProperty) {
-        return new RouteLogServiceAdapter(routeLogProperty);
+    public RouteLogServicePort logServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {
+        return new RouteLogServiceAdapter(routeTrackerLogProperties);
     }
 
     @Bean
@@ -69,15 +70,14 @@ public class DeliveryReturnConfiguration {
         return new DeliveryReturnServiceMockAdapter();
     }
 
+    @Bean("deliveryReturn.parcelStatusProperties")
+    public ParcelStatusProperties parcelStatusProperties() {
+        return new ParcelStatusProperties();
+    }
+
     @Bean("deliveryReturn.parcelStatusControlChangeServicePort")
     public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
-			ParcelStatusProperty parcelStatusProperty) {
-        return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperty);
+			ParcelStatusProperties parcelStatusProperties) {
+        return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperties);
     }
-
-    @Bean
-    public ParcelStatusProperty parcelStatusProperty() {
-        return new ParcelStatusProperty();
-    }
-
 }

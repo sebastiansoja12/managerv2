@@ -2,6 +2,7 @@ package com.warehouse.zebra;
 
 import com.warehouse.zebra.domain.port.primary.ZebraPortImpl;
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
+import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.zebra.domain.vo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,9 @@ public class ZebraPortImplTest {
     @Mock
     private ReturnServicePort returnServicePort;
 
+    @Mock
+    private RouteLogServicePort routeLogServicePort;
+
     private ZebraPortImpl zebraPort;
 
     private final DeviceInformation deviceInformation = DeviceInformation.builder()
@@ -34,7 +38,7 @@ public class ZebraPortImplTest {
 
     @BeforeEach
     void setup() {
-        zebraPort = new ZebraPortImpl(returnServicePort);
+        zebraPort = new ZebraPortImpl(returnServicePort, routeLogServicePort);
     }
 
     @Test
@@ -55,7 +59,7 @@ public class ZebraPortImplTest {
                 .build();
         final Request request = Request.builder()
                 .processType(ProcessType.RETURN)
-                .requests(List.of(returnRequest))
+                .returnRequests(List.of(returnRequest))
                 .zebraDeviceInformation(deviceInformation)
                 .build();
 
@@ -97,7 +101,7 @@ public class ZebraPortImplTest {
                 .build();
         final Request request = Request.builder()
                 .processType(null)
-                .requests(List.of(returnRequest))
+                .returnRequests(List.of(returnRequest))
                 .zebraDeviceInformation(deviceInformation)
                 .build();
 

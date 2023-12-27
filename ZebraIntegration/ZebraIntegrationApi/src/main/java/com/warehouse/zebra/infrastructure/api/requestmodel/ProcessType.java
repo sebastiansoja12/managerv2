@@ -4,5 +4,5 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "ProcessType")
 public enum ProcessType {
-    RETURN, REJECT, ROUTE
+    CREATED, RETURN, ROUTE, REJECT, REROUTE, REDIRECT
 }

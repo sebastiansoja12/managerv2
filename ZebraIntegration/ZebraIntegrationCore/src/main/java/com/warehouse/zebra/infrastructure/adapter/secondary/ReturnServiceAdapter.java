@@ -1,26 +1,28 @@
 package com.warehouse.zebra.infrastructure.adapter.secondary;
 
-import com.warehouse.zebra.domain.vo.Request;
-import com.warehouse.zebra.domain.vo.Response;
-import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
-import com.warehouse.zebra.infrastructure.adapter.secondary.mapper.ReturnResponseMapper;
-import com.warehouse.zebra.infrastructure.adapter.secondary.properties.Properties;
-import com.warehouse.zebra.infrastructure.adapter.secondary.properties.ReturnProperty;
-import com.warehouse.zebra.infrastructure.adapter.secondary.api.ReturnResponseDto;
-import com.warehouse.zebra.infrastructure.adapter.secondary.mapper.ReturnRequestMapper;
-import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.support.RestGatewaySupport;
+import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.Objects;
 
-import static org.mapstruct.factory.Mappers.getMapper;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.support.RestGatewaySupport;
+
+import com.warehouse.tools.returning.ReturnProperties;
+import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
+import com.warehouse.zebra.domain.vo.Request;
+import com.warehouse.zebra.domain.vo.Response;
+import com.warehouse.zebra.infrastructure.adapter.secondary.api.ReturnResponseDto;
+import com.warehouse.zebra.infrastructure.adapter.secondary.mapper.ReturnRequestMapper;
+import com.warehouse.zebra.infrastructure.adapter.secondary.mapper.ReturnResponseMapper;
+import com.warehouse.zebra.infrastructure.adapter.secondary.properties.Properties;
+
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class ReturnServiceAdapter extends RestGatewaySupport implements ReturnServicePort {
 
 
-    private final ReturnProperty returnProperty;
+    private final ReturnProperties returnProperties;
 
     private final ReturnRequestMapper requestMapper = getMapper(ReturnRequestMapper.class);
 
@@ -29,14 +31,14 @@ public class ReturnServiceAdapter extends RestGatewaySupport implements ReturnSe
 
     @Override
     public Response processReturn(Request zebraRequest) {
-        final ReturnConfiguration configuration = new ReturnConfiguration(returnProperty);
+        final ReturnConfiguration configuration = new ReturnConfiguration(returnProperties);
         return processReturn(zebraRequest, configuration);
     }
 
     private Response processReturn(Request request, ReturnConfiguration configuration) {
 
         final ResponseEntity<ReturnResponseDto> responseEntity = getRestTemplate()
-                .postForEntity(String.format(configuration.getUrl(), configuration.getEndpoint()),
+                .postForEntity(configuration.getUrl() + configuration.getEndpoint(),
                         requestMapper.map(request), ReturnResponseDto.class);
 
         return Response.builder()
@@ -48,22 +50,16 @@ public class ReturnServiceAdapter extends RestGatewaySupport implements ReturnSe
     }
 
 
-    private static class ReturnConfiguration implements Properties {
+    private record ReturnConfiguration(ReturnProperties returnProperties) implements Properties {
 
-        private final ReturnProperty returnProperty;
+		@Override
+		public String getUrl() {
+			return returnProperties.getUrl();
+		}
 
-        private ReturnConfiguration(ReturnProperty returnProperty) {
-            this.returnProperty = returnProperty;
-        }
-
-        @Override
-        public String getUrl() {
-            return returnProperty.getUrl();
-        }
-
-        @Override
-        public String getEndpoint() {
-            return returnProperty.getEndpoint();
-        }
-    }
+		@Override
+		public String getEndpoint() {
+			return returnProperties.getEndpoint();
+		}
+	}
 }

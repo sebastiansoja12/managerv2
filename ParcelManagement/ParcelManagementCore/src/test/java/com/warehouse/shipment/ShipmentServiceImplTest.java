@@ -1,8 +1,11 @@
 package com.warehouse.shipment;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +19,10 @@ import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
-import com.warehouse.shipment.domain.model.Notification;
+import com.warehouse.shipment.domain.vo.ParcelId;
+import com.warehouse.shipment.domain.vo.RouteProcess;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
@@ -24,27 +30,27 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelN
 @ExtendWith(MockitoExtension.class)
 public class ShipmentServiceImplTest {
 
-
-    @Mock
-    private ShipmentServicePort shipmentServicePort;
     @Mock
     private ShipmentRepository shipmentRepository;
     @Mock
     private PathFinderServicePort pathFinderServicePort;
-    @Mock
-    private PaypalServicePort paypalServicePort;
+
     @Mock
     private NotificationCreatorProvider notificationCreatorProvider;
     @Mock
     private MailServicePort mailServicePort;
     @Mock
     private Logger logger;
+
+    @Mock
+    private RouteLogServicePort routeLogServicePort;
+
     private ShipmentServiceImpl service;
 
 	@BeforeEach
 	void setup() {
-		service = new ShipmentServiceImpl(shipmentServicePort, shipmentRepository, pathFinderServicePort,
-				paypalServicePort, notificationCreatorProvider, mailServicePort, logger);
+		service = new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort,
+                notificationCreatorProvider, mailServicePort, logger, routeLogServicePort);
 	}
 
     @Test
@@ -56,11 +62,8 @@ public class ShipmentServiceImplTest {
 
         final Parcel parcel = createParcel();
 
-        final ShipmentResponse expectedResponse = new ShipmentResponse("paymentUrl", 1L);
-
-        final PaymentStatus paymentStatus = new PaymentStatus();
-        paymentStatus.setPaymentMethod("paypal");
-        paymentStatus.setLink("paymentUrl");
+        final ParcelId parcelId = ParcelId.builder().value(1L).build();
+        final RouteProcess routeProcess = RouteProcess.builder().parcelId(1L).processId(UUID.randomUUID()).build();
 
         final Notification notification = new Notification("test",
                 "test@test.pl", "test");
@@ -73,20 +76,15 @@ public class ShipmentServiceImplTest {
                 .when(shipmentRepository)
                 .save(shipmentParcel);
 
-        doReturn(paymentStatus)
-                .when(paypalServicePort)
-                .payment(parcel);
-
         doReturn(notification)
                 .when(notificationCreatorProvider)
-                .createNotification(any(), any());
+                .createNotification(any());
 
         doNothing()
                 .when(mailServicePort)
                 .sendShipmentNotification(notification);
 
-        when(shipmentServicePort.registerParcel(1L, "paymentUrl")).thenReturn(
-                expectedResponse);
+        when(routeLogServicePort.initializeRouteProcess(parcelId)).thenReturn(routeProcess);
 
 
         // when
@@ -94,7 +92,7 @@ public class ShipmentServiceImplTest {
         // then
         assertAll(
                 () -> assertEquals(response.getParcelId(), expectedToBe(1L)),
-                () -> assertEquals(response.getPaymentUrl(), expectedToBe("paymentUrl"))
+                () -> assertThat(response.getRouteProcessId()).isInstanceOf(String.class)
         );
     }
 

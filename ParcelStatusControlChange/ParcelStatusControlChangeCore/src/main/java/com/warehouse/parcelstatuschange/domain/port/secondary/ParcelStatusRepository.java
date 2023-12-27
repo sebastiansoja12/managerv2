@@ -1,7 +1,7 @@
 package com.warehouse.parcelstatuschange.domain.port.secondary;
 
-import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
+import com.warehouse.parcelstatuschange.domain.vo.Parcel;
 
 public interface ParcelStatusRepository {
-    void update(StatusRequest statusRequest);
+    void update(Parcel parcel);
 }

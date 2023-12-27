@@ -24,7 +24,7 @@ public class MailServiceCreatorAdapter implements MailServicePort {
     void sendMail(Notification notification) {
         final MimeMessagePreparator messagePreparator = mimeMessage -> {
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
-            messageHelper.setFrom("inparcel@inp.com");
+            messageHelper.setFrom("manager@inp.com");
             messageHelper.setTo(notification.getRecipient());
             messageHelper.setSubject(notification.getSubject());
             messageHelper.setText(notification.getBody());

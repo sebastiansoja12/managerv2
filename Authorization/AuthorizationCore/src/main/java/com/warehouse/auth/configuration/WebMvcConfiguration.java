@@ -31,6 +31,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedHeaders(Collections.singletonList("Authorization"));
+        configuration.addAllowedHeader("Content-Type");
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.addAllowedHeader("Access-Control-Allow-Origin");

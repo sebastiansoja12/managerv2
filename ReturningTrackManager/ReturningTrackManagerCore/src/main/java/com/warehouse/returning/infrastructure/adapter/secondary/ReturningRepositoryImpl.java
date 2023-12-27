@@ -51,14 +51,14 @@ public class ReturningRepositoryImpl implements ReturnRepository {
 	public ReturnModel get(ReturnId returnId) {
 		final Optional<ReturnEntity> returnEntity = repository.findFirstByParcelId(returnId.getValue());
 		return returnEntity.map(returnMapper::mapToReturnModel)
-				.orElseThrow(() -> new ReturnEntityNotFoundException(8084,
+				.orElseThrow(() -> new ReturnEntityNotFoundException(404,
 						String.format(returnEntityExceptionMessage, returnId.getValue())));
 	}
 
     @Override
     public ReturnStatus unlockReturn(Long parcelId, String returnToken) {
         final ReturnEntity returnEntity = repository.findFirstByParcelIdAndReturnToken(parcelId, returnToken)
-                .orElseThrow(() -> new ReturnEntityNotFoundException(8083, String.format(exceptionMessage, parcelId)));
+                .orElseThrow(() -> new ReturnEntityNotFoundException(404, String.format(exceptionMessage, parcelId)));
 
         if (returnEntity.isCancelled()) {
             returnEntity.unlockReturn();

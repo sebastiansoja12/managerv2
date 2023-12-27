@@ -4,8 +4,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
+import com.warehouse.shipment.domain.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,43 +14,67 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentReroutePortImpl;
+import com.warehouse.shipment.domain.port.secondary.*;
+import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentService;
+import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.UpdateParcelRequest;
+import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipmentReroutePortImplTest {
+    
 
     @Mock
-    private ShipmentService service;
+    private ShipmentRepository shipmentRepository;
+    
+    @Mock
+    private PathFinderServicePort pathFinderServicePort;
+    
+    @Mock
+    private NotificationCreatorProvider notificationCreatorProvider;
+    
+    @Mock
+    private MailServicePort mailServicePort;
+    
+    @Mock
+    private Logger logger;
+    
+    @Mock
+    private RouteLogServicePort routeLogServicePort;
 
     private ShipmentReroutePortImpl shipmentReroutePort;
 
-    @BeforeEach
-    void setup() {
-        shipmentReroutePort = new ShipmentReroutePortImpl(service);
+	@BeforeEach
+	void setup() {
+		final ShipmentService service = new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort,
+				notificationCreatorProvider, mailServicePort, logger, routeLogServicePort);
+		shipmentReroutePort = new ShipmentReroutePortImpl(service);
     }
 
     @Test
     void shouldUpdateParcel() {
         // given
-        final UpdateParcelRequest updateParcelRequest = new UpdateParcelRequest();
-        updateParcelRequest.setParcel(createParcel());
+        final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest
+                .builder()
+                .parcel(createParcel())
+                .build();
 
-        final Parcel parcel =  createParcel();
+        final Parcel parcel = createParcel();
         parcel.setParcelStatus(Status.REROUTE);
 
-        final UpdateParcelResponse expectedResponse = new UpdateParcelResponse();
-        expectedResponse.setParcel(parcel);
+        final UpdateParcelResponse expectedResponse = new UpdateParcelResponse(parcel);
 
-        when(service.update(any(ParcelUpdate.class))).thenReturn(expectedResponse);
+        when(pathFinderServicePort.determineDeliveryDepot(any())).thenReturn(new City("KT3"));
+        when(shipmentRepository.update(any())).thenReturn(parcel);
         // when
         final UpdateParcelResponse response = shipmentReroutePort.reroute(updateParcelRequest);
 
         // then
-        verify(service, times(1)).update(any(ParcelUpdate.class));
         assertEquals(expectedResponse, response);
 
         // and status changed to reroute
@@ -59,7 +84,7 @@ public class ShipmentReroutePortImplTest {
     @Test
     void shouldThrowExceptionWhenParcelIsNull() {
         // given
-        final UpdateParcelRequest updateParcelRequest = new UpdateParcelRequest();
+        final UpdateParcelRequest updateParcelRequest = UpdateParcelRequest.builder().build();
         // when, then
         assertThrows(ParcelNotFoundException.class, () -> shipmentReroutePort.reroute(updateParcelRequest));
     }

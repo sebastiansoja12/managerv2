@@ -104,10 +104,6 @@ public class RouteLogEventListenerIntegrationTest {
         assertThat(routeEntityList).isEmpty();
     }
 
-    private <T> T expected(T t) {
-        return t;
-    }
-
     private DeliveryInformationDto createDeliveryInformation(String token) {
         return DeliveryInformationDto.builder()
                 .parcelId(PARCEL_ID)

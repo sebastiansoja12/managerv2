@@ -2,20 +2,20 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
-import com.warehouse.routetracker.domain.vo.RouteLogRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.routetracker.domain.enumeration.Status;
-import com.warehouse.routetracker.domain.model.RouteInformation;
-import com.warehouse.routetracker.domain.model.SupplyRoute;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.vo.RouteProcess;
 import com.warehouse.routetracker.domain.vo.RouteResponse;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RouteModelMapper {
 
     @Mapping(source = "parcel.id", target = "parcelId")
@@ -42,7 +42,7 @@ public interface RouteModelMapper {
     @Mapping(target = "parcel.recipient.street", source = "parcel.recipientStreet")
     @Mapping(target = "parcel.parcelSize", source = "parcel.parcelSize")
     @Mapping(target = "parcel.id", source = "parcel.id")
-    @Mapping(target = "status", source = "parcel.status")
+    @Mapping(target = "parcelStatus", source = "parcel.status")
     RouteInformation mapToRoutes(RouteEntity routeEntity);
 
     List<RouteInformation> mapToRoutes(List<RouteEntity> routeEntityList);
@@ -83,27 +83,14 @@ public interface RouteModelMapper {
     }
 
     default ParcelEntity mapParcelEntity(RouteLogRecord routeLogRecord) {
-        if (Objects.isNull(routeLogRecord.getParcelStatus())) {
-            return ParcelEntity.builder()
-                    .id(routeLogRecord.getParcelId())
-                    .build();
-        }
         return ParcelEntity.builder()
                 .id(routeLogRecord.getParcelId())
                 .status(mapEntityStatus(routeLogRecord.getParcelStatus()))
                 .build();
     }
 
-    default com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status mapEntityStatus(Status status) {
-        return switch (status.name()) {
-            case "REROUTE" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.REROUTE;
-            case "SENT" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.SENT;
-            case "DELIVERY" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.DELIVERY;
-            case "RETURN" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.RETURN;
-            case "REDIRECT" -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.REDIRECT;
-            default -> com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status.CREATED;
-        };
-    }
+	com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status mapEntityStatus(
+			ParcelStatus parcelStatus);
 
 	default DepotEntity mapDepotEntity(RouteLogRecord routeLogRecord) {
 		final String depotCode = routeLogRecord.getDepotCode();
@@ -125,4 +112,14 @@ public interface RouteModelMapper {
         return null;
     }
 
+    RouteLogRecordToChange mapToRecord(RouteLogRecordEntity routeLogRecordToChange);
+
+    default RouteLogRecordDetails mapToRouteLogRecordDetails(List<RouteLogRecordDetailEntity> value) {
+        return RouteLogRecordDetails.builder().routeLogRecordDetailSet(mapToLogRecordDetails(value)).build();
+    }
+
+    Set<RouteLogRecordDetail> mapToLogRecordDetails(List<RouteLogRecordDetailEntity> value);
+
+    @Mapping(target = "processId", source = "id")
+    RouteProcess map(RouteLogRecordEntity entity);
 }

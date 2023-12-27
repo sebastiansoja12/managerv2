@@ -3,47 +3,52 @@ package com.warehouse.shipment.domain.model;
 import com.warehouse.shipment.domain.enumeration.ParcelType;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
-import lombok.Builder;
-import lombok.Data;
 
-@Data
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
 @Builder
 public class ParcelUpdate {
-    Long id;
+    private Long id;
 
-    String senderFirstName;
+    private String senderFirstName;
 
-    String senderLastName;
+    private String senderLastName;
 
-    String senderTelephone;
+    private String senderTelephone;
 
-    String senderEmail;
+    private String senderEmail;
 
-    String senderCity;
+    private String senderCity;
 
-    String senderStreet;
+    private String senderStreet;
 
-    String senderPostalCode;
+    private String senderPostalCode;
 
-    String recipientFirstName;
+    private String recipientFirstName;
 
-    String recipientLastName;
+    private String recipientLastName;
 
-    String recipientTelephone;
+    private String recipientTelephone;
 
-    String recipientEmail;
+    private String recipientEmail;
 
-    String recipientCity;
+    private String recipientCity;
 
-    String recipientStreet;
+    private String recipientStreet;
 
-    String recipientPostalCode;
+    private String recipientPostalCode;
 
-    String destination;
+    private String destination;
 
-    Size parcelSize;
+    private Size parcelSize;
 
-    Status status;
+    private Status status;
 
-    ParcelType parcelType;
+    private ParcelType parcelType;
+
+    public void updateDestination(String destination) {
+        this.destination = destination;
+    }
 }

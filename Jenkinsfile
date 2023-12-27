@@ -58,7 +58,7 @@ pipeline {
             steps {
             gitlabCommitStatus(name: 'Build', connection: gitLabConnection('GitLab'), builds: [[projectId: '21733589',
             revisionHash: "${GIT_BRANCH_NAME}"]]) {
-            configFileProvider([configFile(fileId: 'inparcel-mvn-settings', variable: 'MAVEN_SETTINGS')]) {
+            configFileProvider([configFile(fileId: 'manager-mvn-settings', variable: 'MAVEN_SETTINGS')]) {
             bat "mvn versions:set -DnewVersion=${MAVEN_DEPLOY_NAME}-SNAPSHOT"
             bat 'mvn compiler:compile'
            }
@@ -70,7 +70,7 @@ pipeline {
             steps{
             gitlabCommitStatus(name: 'Tests', connection: gitLabConnection('GitLab'), builds: [[projectId: '21733589',
                         revisionHash: "${GIT_BRANCH_NAME}"]]) {
-              configFileProvider([configFile(fileId: 'inparcel-mvn-settings', variable: 'MAVEN_SETTINGS')]) {
+              configFileProvider([configFile(fileId: 'manager-mvn-settings', variable: 'MAVEN_SETTINGS')]) {
               bat 'mvn clean install'
             }
         }
@@ -80,7 +80,7 @@ pipeline {
             steps {
                 gitlabCommitStatus(name: 'Deploy', connection: gitLabConnection('GitLab'), builds: [[projectId: '21733589',
                                         revisionHash: "${GIT_BRANCH_NAME}"]]) {
-                configFileProvider([configFile(fileId: 'inparcel-mvn-settings', variable: 'MAVEN_SETTINGS')]) {
+                configFileProvider([configFile(fileId: 'manager-mvn-settings', variable: 'MAVEN_SETTINGS')]) {
                 bat 'mvn clean deploy -DskipTests'
             }
         }

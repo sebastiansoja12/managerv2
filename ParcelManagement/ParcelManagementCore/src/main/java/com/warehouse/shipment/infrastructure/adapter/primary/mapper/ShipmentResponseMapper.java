@@ -1,8 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.model.ShipmentResponse;
-import com.warehouse.shipment.domain.model.UpdateParcelResponse;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
 import com.warehouse.shipment.infrastructure.api.dto.ParcelDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentResponseDto;
 import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelResponseDto;

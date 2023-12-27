@@ -14,23 +14,32 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ShipmentParcel {
 
-    Sender sender;
+    private Sender sender;
 
-    Recipient recipient;
+    private Recipient recipient;
 
-    Size parcelSize;
+    private Size parcelSize;
 
-    String destination;
+    private String destination;
 
-    Status status;
+    private Status status;
 
-    ParcelType parcelType;
+    private ParcelType parcelType;
 
-    Long parcelRelatedId;
+    private Long parcelRelatedId;
 
-    double price;
+    private double price;
 
     public double getPrice() {
         return this.price = parcelSize.getPrice();
+    }
+
+    public void prepareParcelToCreate() {
+        this.status = Status.CREATED;
+        this.parcelType = ParcelType.PARENT;
+    }
+
+    public void updateDestination(String destination) {
+        this.destination = destination;
     }
 }

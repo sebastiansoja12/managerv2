@@ -10,6 +10,7 @@ import static org.mockito.Mockito.doReturn;
 
 import java.util.List;
 
+import com.warehouse.returning.domain.port.secondary.RouteLogServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,9 @@ public class ReturnPortImplTest {
     @Mock
     private ReturnRepository returnRepository;
 
+    @Mock
+    private RouteLogServicePort routeLogServicePort;
+
     private ReturnPortImpl returnPort;
 
     private static final String RECIPIENT_NOT_AVAILABLE = "Recipient not available";
@@ -42,7 +46,7 @@ public class ReturnPortImplTest {
     @BeforeEach
     void setup() {
         final ReturnService returnService = new ReturnServiceImpl(returnRepository);
-        returnPort = new ReturnPortImpl(returnService);
+        returnPort = new ReturnPortImpl(returnService, routeLogServicePort);
     }
 
     @Test

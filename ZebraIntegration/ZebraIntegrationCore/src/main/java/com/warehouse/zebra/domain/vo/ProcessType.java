@@ -1,5 +1,5 @@
 package com.warehouse.zebra.domain.vo;
 
 public enum ProcessType {
-    RETURN, REJECT, ROUTE
+    CREATED, RETURN, ROUTE, REJECT, REROUTE, REDIRECT
 }

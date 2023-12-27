@@ -8,8 +8,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.mail.domain.service.MailService;
-import com.warehouse.paypal.domain.port.primary.PaypalPort;
 import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
+import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
 import com.warehouse.voronoi.VoronoiService;
 
@@ -25,9 +25,6 @@ public class ShipmentTestConfiguration {
     public MailService mailService;
 
     @MockBean
-    public PaypalPort paypalPort;
-
-    @MockBean
     public ShipmentController shipmentController;
 
     @MockBean
@@ -38,5 +35,8 @@ public class ShipmentTestConfiguration {
 
     @MockBean
     public RouteLogEventPublisher routeLogEventPublisher;
+
+    @MockBean
+    public RouteLogServicePort routeLogServicePort;
 
 }

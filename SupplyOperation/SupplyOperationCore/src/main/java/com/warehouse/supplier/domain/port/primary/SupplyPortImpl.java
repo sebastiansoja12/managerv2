@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
-import com.warehouse.supplier.domain.model.SupplierAddResponse;
+import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
 

@@ -1,5 +1,7 @@
 package com.warehouse.auth.configuration;
 
+import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPort;
+import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPortImpl;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
@@ -10,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -41,10 +44,14 @@ public class AuthConfiguration  {
 	@Bean
 	public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
 			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService) {
-		final String loggerName = "Authentication";
 		return new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager, jwtService,
-				LOGGER_FACTORY.getLogger(loggerName));
+				LOGGER_FACTORY.getLogger(Authentication.class));
 	}
+
+    @Bean
+    public RefreshTokenPortObserverPort refreshTokenPortObserverPort(RefreshTokenRepository refreshTokenRepository) {
+        return new RefreshTokenPortObserverPortImpl(refreshTokenRepository);
+    }
 
     @Bean
     public JwtService jwtService(JwtProvider jwtProvider) {

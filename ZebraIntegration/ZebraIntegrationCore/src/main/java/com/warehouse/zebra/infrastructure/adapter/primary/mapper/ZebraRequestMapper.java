@@ -10,6 +10,8 @@ import org.mapstruct.Mapping;
 
 @Mapper
 public interface ZebraRequestMapper {
+
+    @Mapping(target = "returnRequests", source = "requests")
     Request map(ZebraRequest zebraRequest);
 
     @Mapping(target = "supplierCode", source = "supplierCode.value")

@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.port.secondary;
 
-import com.warehouse.shipment.domain.model.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
 
 public interface ShipmentServicePort {
 

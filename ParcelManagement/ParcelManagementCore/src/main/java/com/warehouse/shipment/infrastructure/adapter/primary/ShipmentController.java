@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.model.ShipmentRequest;
-import com.warehouse.shipment.domain.model.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;

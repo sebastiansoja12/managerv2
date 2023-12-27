@@ -3,7 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.ParcelUpdate;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
-import com.warehouse.shipment.domain.model.UpdateParcelResponse;
+import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,6 +30,7 @@ public interface ParcelMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "locked", constant = "false")
     ParcelEntity map(ShipmentParcel parcel);
 
     @Mapping(target = "id", source = "id")

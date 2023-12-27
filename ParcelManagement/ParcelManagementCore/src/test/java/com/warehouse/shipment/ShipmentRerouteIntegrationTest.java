@@ -2,6 +2,8 @@ package com.warehouse.shipment;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.warehouse.shipment.domain.vo.UpdateParcelRequest;
+import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;

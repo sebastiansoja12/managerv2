@@ -227,7 +227,7 @@ public class ReturningIntegrationTest {
     private static String returningErrorResponseAsJsonString(ErrorResponse errorResponse) {
 		final String json = """
 				{
-				  "status": %s,
+				  "parcelStatus": %s,
 				  "error": "%s"
 				}""";
 

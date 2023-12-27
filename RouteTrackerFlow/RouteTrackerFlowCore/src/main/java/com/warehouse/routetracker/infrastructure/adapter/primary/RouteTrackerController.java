@@ -1,22 +1,24 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary;
 
-import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
-import com.warehouse.routetracker.domain.model.RouteInformation;
-import com.warehouse.routetracker.domain.vo.RouteRequest;
-import com.warehouse.routetracker.domain.vo.RouteResponse;
-import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
-import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteRequestMapper;
-import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteResponseMapper;
-import com.warehouse.routetracker.infrastructure.api.dto.RouteRequestDto;
-import lombok.AllArgsConstructor;
+import static org.springframework.http.HttpStatus.OK;
+
+import java.util.List;
+
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.warehouse.routetracker.domain.model.RouteInformation;
+import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
+import com.warehouse.routetracker.domain.vo.RouteDeleteRequest;
+import com.warehouse.routetracker.domain.vo.RouteRequest;
+import com.warehouse.routetracker.domain.vo.RouteResponse;
+import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteRequestMapper;
+import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteResponseMapper;
+import com.warehouse.routetracker.infrastructure.api.dto.RouteRequestDto;
 
-import static org.springframework.http.HttpStatus.OK;
+import lombok.AllArgsConstructor;
 
 
 @RestController
@@ -40,13 +42,13 @@ public class RouteTrackerController {
     @GetMapping("/by-parcel/{parcelId}")
     public ResponseEntity<?> getRouteListByParcelId(@PathVariable Long parcelId) {
         final List<RouteInformation> routes = trackerLogPort.getRouteListByParcelId(parcelId);
-        return new ResponseEntity<>(responseMapper.map(routes), HttpStatus.FOUND);
+        return new ResponseEntity<>(responseMapper.map(routes), HttpStatus.OK);
     }
 
     @GetMapping("/by-username/{username}")
     public ResponseEntity<?> findAllByUsername(@PathVariable String username) {
         final List<RouteInformation> routes = trackerLogPort.findRoutesByUsername(username);
-        return new ResponseEntity<>(responseMapper.map(routes), HttpStatus.FOUND);
+        return new ResponseEntity<>(responseMapper.map(routes), HttpStatus.OK);
     }
 
     @DeleteMapping

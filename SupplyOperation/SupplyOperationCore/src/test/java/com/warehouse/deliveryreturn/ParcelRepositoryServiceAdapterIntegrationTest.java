@@ -15,7 +15,7 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.deliveryreturn.configuration.DeliveryReturnTestConfiguration;
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.vo.Parcel;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelStatusProperty;
+import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 
 @SpringBootTest(classes = DeliveryReturnTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -31,7 +31,7 @@ public class ParcelRepositoryServiceAdapterIntegrationTest {
     private RestClient restClient;
 
     @Autowired
-    private ParcelStatusProperty parcelStatusProperty;
+    private ParcelStatusProperties parcelStatusProperties;
 
     @Test
     void shouldNotDownloadParcel() {

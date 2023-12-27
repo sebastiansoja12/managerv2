@@ -1,6 +1,6 @@
 package com.warehouse.routetracker.domain.vo;
 
-import com.warehouse.routetracker.domain.enumeration.Status;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 
 import lombok.Builder;
 import lombok.Value;
@@ -12,5 +12,5 @@ public class DeliveryInformation {
     String depotCode;
     String supplierCode;
     String token;
-    Status deliveryStatus;
+    ParcelStatus deliveryParcelStatus;
 }

@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.0</version>
+		<version>3.2.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.warehouse</groupId>
 	<artifactId>warehouse</artifactId>
-	<version>2023.12-SNAPSHOT</version>
+	<version>2023.13-SNAPSHOT</version>
 	<name>warehouse</name>
 	<description>Pom file for all modules</description>
 	<packaging>pom</packaging>
@@ -23,25 +23,25 @@
 		<module>DepotServices</module>
 		<module>RouteTrackerFlow</module>
 		<module>SupplyOperation</module>
-		<module>PaymentManagement</module>
 		<module>PathFinder</module>
 		<module>Authorization</module>
 		<module>Utility</module>
         <module>DestinationDetermination</module>
         <module>Generator</module>
-		<module>Properties</module>
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
 		<module>ParcelStatusControlChange</module>
         <module>ZebraIntegration</module>
         <module>ReturningTrackManager</module>
+        <module>ArchitectureTest</module>
+        <module>ManagerTools</module>
     </modules>
 
 	<properties>
 		<java.version>17</java.version>
 		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 		<org.projectlombok.version>1.18.30</org.projectlombok.version>
-		<spring-starter.version>3.2.0</spring-starter.version>
+		<spring-starter.version>3.2.1</spring-starter.version>
 		<maven-jaxb2-plugin.version>0.15.1</maven-jaxb2-plugin.version>
 		<maven-jaxb2-basics-plugin.version>1.11.1</maven-jaxb2-basics-plugin.version>
 		<sonar.organization>sebastiansoja</sonar.organization>
@@ -286,7 +286,7 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>4.24.0</version>
+				<version>4.25.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.h2database</groupId>
@@ -305,7 +305,12 @@
 				<version>3.5.1</version>
 				<scope>test</scope>
 			</dependency>
-
+			<dependency>
+				<groupId>com.tngtech.archunit</groupId>
+				<artifactId>archunit</artifactId>
+				<version>0.17.0</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -323,8 +328,10 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 					<version>${spring-starter.version}</version>
+					<configuration>
+						<includeSystemScope>true</includeSystemScope>
+					</configuration>
 				</plugin>
-
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>

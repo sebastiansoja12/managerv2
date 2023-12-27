@@ -1,7 +1,7 @@
 package com.warehouse.depot.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.depot.domain.model.Depot;
-import com.warehouse.depot.domain.model.DepotCode;
+import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.vo.DepotCode;
 import com.warehouse.depot.infrastructure.adapter.primary.api.dto.DepotCodeDto;
 import com.warehouse.depot.infrastructure.adapter.primary.api.dto.DepotDto;
 import org.mapstruct.Mapper;

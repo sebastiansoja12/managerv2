@@ -1,13 +1,13 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.mapper;
 
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
-import com.warehouse.auth.domain.vo.Token;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.warehouse.auth.domain.model.RefreshToken;
+import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
 
 @Mapper
@@ -26,6 +26,6 @@ public interface RefreshTokenMapper {
     Token mapToToken(RefreshTokenEntity entity);
 
     default boolean isTokenExpired(RefreshToken refreshToken) {
-        return refreshToken.getExpiryDate().isAfter(Instant.now());
+        return refreshToken.getExpiryDate().isAfter(LocalDateTime.now());
     }
 }

@@ -1,8 +1,12 @@
 package com.warehouse.zebra.infrastructure.adapter.secondary.api;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Value
+@Builder
+@Jacksonized
 public class DepotCodeDto {
-    private String value;
+    String value;
 }

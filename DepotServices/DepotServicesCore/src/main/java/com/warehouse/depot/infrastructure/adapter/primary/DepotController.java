@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.depot.domain.model.Depot;
-import com.warehouse.depot.domain.model.DepotCode;
+import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.vo.DepotCode;
 import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.depot.infrastructure.adapter.primary.api.dto.DepotDto;
 import com.warehouse.depot.infrastructure.adapter.primary.mapper.DepotRequestMapper;
@@ -42,14 +42,14 @@ public class DepotController {
         final DepotCode depotCode = requestMapper.map(code);
         final Depot depot = depotPort.viewDepotByCode(depotCode);
         return ResponseEntity
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .body(responseMapper.map(depot));
     }
 
     @GetMapping
     public ResponseEntity<?> allDepots() {
         return ResponseEntity
-                .status(HttpStatus.FOUND)
+                .status(HttpStatus.OK)
                 .body(responseMapper.map(depotPort.findAll()));
     }
 }

@@ -1,13 +1,13 @@
 CREATE TABLE IF NOT EXISTS USERS
 (
-    id         BIGINT       NOT NULL,
     email      VARCHAR(255) NOT NULL,
     first_name VARCHAR(255) DEFAULT NULL,
     last_name  VARCHAR(255) DEFAULT NULL,
     password   VARCHAR(255) NOT NULL,
     role       VARCHAR(255) DEFAULT NULL,
     username   VARCHAR(255) NOT NULL,
-    depot_code VARCHAR(255) DEFAULT NULL
+    depot_code VARCHAR(255) DEFAULT NULL,
+    PRIMARY KEY (username)
 );
 
 CREATE TABLE IF NOT EXISTS SUPPLIER
@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS SUPPLIER
     first_name    VARCHAR(255) DEFAULT NULL,
     last_name     VARCHAR(255) DEFAULT NULL,
     username      VARCHAR(255) NOT NULL,
-    depot_code    VARCHAR(255) DEFAULT NULL
+    depot_code    VARCHAR(255) DEFAULT NULL,
+    PRIMARY KEY (supplier_code)
 );
 
 CREATE TABLE IF NOT EXISTS PAYMENT
@@ -41,7 +42,7 @@ CREATE TABLE IF NOT EXISTS REROUTE_TOKEN
 
 CREATE TABLE IF NOT EXISTS PARCEL
 (
-    id                    BIGINT NOT NULL,
+    id                    BIGINT       NOT NULL,
     first_name            VARCHAR(255) NOT NULL,
     last_name             VARCHAR(255) NOT NULL,
     sender_email          VARCHAR(255) NOT NULL,
@@ -55,11 +56,12 @@ CREATE TABLE IF NOT EXISTS PARCEL
     recipient_postal_code VARCHAR(255) NOT NULL,
     recipient_street      VARCHAR(255) NOT NULL,
     recipient_telephone   VARCHAR(255) NOT NULL,
-    price                 DOUBLE NOT NULL,
+    price                 DOUBLE       NOT NULL,
     parcel_size           VARCHAR(255) NOT NULL,
-    status                INT NOT NULL,
+    parcelStatus          INT          NOT NULL,
     destination           VARCHAR(255) NOT NULL,
     parcel_related_id     BIGINT  DEFAULT NULL,
+    locked                BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (id)
 );
 
@@ -80,5 +82,33 @@ CREATE TABLE IF NOT EXISTS ROUTE
     parcel_id     BIGINT       DEFAULT NULL,
     supplier_code VARCHAR(255) DEFAULT NULL,
     user_id       INT          DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+CREATE TABLE route_log_details
+(
+    id            BIGINT PRIMARY KEY,
+    zebra_id      BIGINT,
+    version       VARCHAR(255),
+    created       TIMESTAMP,
+    description   VARCHAR(255),
+    process_type  VARCHAR(255),
+    request       VARCHAR(255),
+    parcel_status VARCHAR(255),
+    username      VARCHAR(255),
+    depot_code    VARCHAR(255),
+    supplier_code VARCHAR(255),
+
+    -- Foreign key relationships
+    FOREIGN KEY (username) REFERENCES USERS (username),
+    FOREIGN KEY (depot_code) REFERENCES DEPOT (depot_code),
+    FOREIGN KEY (supplier_code) REFERENCES SUPPLIER (supplier_code)
+);
+CREATE TABLE route_log
+(
+    id                  UUID,
+    parcel_id           BIGINT NOT NULL,
+    return_code         VARCHAR(255),
+    fault_description   VARCHAR(255),
+    route_log_detail_id BIGINT,
     PRIMARY KEY (id)
 );

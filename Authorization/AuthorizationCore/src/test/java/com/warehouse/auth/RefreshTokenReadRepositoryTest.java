@@ -1,9 +1,11 @@
 package com.warehouse.auth;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -71,5 +74,18 @@ public class RefreshTokenReadRepositoryTest {
         repository.deleteByToken("0");
         // then
         assertFalse(repository.findByToken(token).isEmpty());
+    }
+
+    @Test
+    @DirtiesContext
+    public void testDeleteAllExpiredSince() {
+        // given
+        final LocalDateTime expiredDateTime = LocalDateTime.now().minusDays(1);
+
+        // when
+        repository.deleteAllExpiredSince(expiredDateTime);
+
+        // then
+        assertThat(repository.count()).isEqualTo(1); // Only the first token should remain
     }
 }

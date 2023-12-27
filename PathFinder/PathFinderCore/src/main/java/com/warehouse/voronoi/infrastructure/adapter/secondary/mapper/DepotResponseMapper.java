@@ -8,8 +8,8 @@ import java.util.List;
 
 @Mapper
 public interface DepotResponseMapper {
-    List<Depot> map(List<com.warehouse.depot.domain.model.Depot> depots);
+    List<Depot> map(List<com.warehouse.depot.domain.vo.Depot> depots);
 
     @Mapping(target = "coordinates", ignore = true)
-    Depot map(com.warehouse.depot.domain.model.Depot depot);
+    Depot map(com.warehouse.depot.domain.vo.Depot depot);
 }

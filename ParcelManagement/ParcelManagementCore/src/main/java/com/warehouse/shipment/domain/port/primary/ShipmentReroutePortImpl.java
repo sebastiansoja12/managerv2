@@ -4,8 +4,8 @@ import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExcept
 
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.model.ParcelUpdate;
-import com.warehouse.shipment.domain.model.UpdateParcelRequest;
-import com.warehouse.shipment.domain.model.UpdateParcelResponse;
+import com.warehouse.shipment.domain.vo.UpdateParcelRequest;
+import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
 import com.warehouse.shipment.domain.service.ShipmentService;
 
 import lombok.AllArgsConstructor;

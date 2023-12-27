@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.warehouse.deliverytoken.domain.vo.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.tools.shipment.ShipmentProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,6 @@ import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePor
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.property.ShipmentProperty;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -52,7 +52,7 @@ public class DeliveryTokenIntegrationTest {
     private DeliveryTokenServicePort deliveryTokenServicePort;
 
     @Autowired
-    private ShipmentProperty shipmentProperty;
+    private ShipmentProperties shipmentProperties;
 
     @BeforeEach
     void setup() {
@@ -84,7 +84,7 @@ public class DeliveryTokenIntegrationTest {
         // given
         final String exceptionMessage = "Connection with %s could not be established";
         final String domainName = "Shipment";
-        final int code = 8001;
+        final int code = 400;
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
                 createDeliveryRequests(1L, null, null, null, "1"),
                 new Supplier("abc")
@@ -104,7 +104,7 @@ public class DeliveryTokenIntegrationTest {
         // given
         final String exceptionMessage = "Http exception while connecting with %s service";
         final String domainName = "Shipment";
-        final int code = 8002;
+        final int code = 500;
         final DeliveryTokenRequest request = new DeliveryTokenRequest(
                 createDeliveryRequests(1L, null, null, null, "1"),
                 new Supplier("abc")

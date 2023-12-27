@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
-import com.warehouse.supplier.domain.model.SupplierAddResponse;
+import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 
 public interface SupplyPort {
     List<Supplier> findAllSuppliers();

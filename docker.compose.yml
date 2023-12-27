@@ -17,7 +17,7 @@ services:
   app:
     depends_on:
       - postgresdb
-    build: ./inparcel-app
+    build: ./managerv2-app
     restart: on-failure
     env_file: ./.env
     ports:

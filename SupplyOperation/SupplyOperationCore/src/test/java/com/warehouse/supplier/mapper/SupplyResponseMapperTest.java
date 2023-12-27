@@ -1,7 +1,7 @@
 package com.warehouse.supplier.mapper;
 
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.model.SupplierAddResponse;
+import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 import com.warehouse.supplier.dto.SupplierAddResponseDto;
 import com.warehouse.supplier.dto.SupplierDto;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierResponseMapper;

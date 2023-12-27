@@ -12,7 +12,7 @@ import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatusParcelRequest;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.UpdateStatusParcelRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.UpdateStatusParcelRequestMapper;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.ParcelStatusProperty;
+import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 
 
 public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
@@ -20,14 +20,14 @@ public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
 
     private final RestClient restClient;
 
-    private final ParcelStatusProperty parcelStatusProperty;
+    private final ParcelStatusProperties parcelStatusProperties;
 
     private final UpdateStatusParcelRequestMapper updateStatusParcelRequestMapper =
             getMapper(UpdateStatusParcelRequestMapper.class);
 
-    public ParcelStatusControlChangeServiceAdapter(ParcelStatusProperty parcelStatusProperty) {
-        this.restClient = RestClient.builder().baseUrl(parcelStatusProperty.getUrl()).build();
-        this.parcelStatusProperty = parcelStatusProperty;
+    public ParcelStatusControlChangeServiceAdapter(ParcelStatusProperties parcelStatusProperties) {
+        this.restClient = RestClient.builder().baseUrl(parcelStatusProperties.getUrl()).build();
+        this.parcelStatusProperties = parcelStatusProperties;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
         final UpdateStatusParcelRequestDto request = updateStatusParcelRequestMapper.map(updateStatusParcelRequest);
         return restClient
                 .post()
-                .uri("/v2/api/{url}", parcelStatusProperty.getEndpoint())
+                .uri("/v2/api/{url}", parcelStatusProperties.getEndpoint())
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .exchange((req, res) -> {

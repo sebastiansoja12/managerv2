@@ -16,33 +16,34 @@ import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.Del
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.RouteRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.RouteResponseDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryRouteRequestMapper;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.RouteLogProperty;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RouteLogServiceAdapter implements RouteLogServicePort {
 
-    private final RouteLogProperty routeLogProperty;
+    private final RouteTrackerLogProperties routeTrackerLogProperties;
     
     private final RestClient restClient;
     
     private final DeliveryRouteRequestMapper requestMapper = getMapper(DeliveryRouteRequestMapper.class);
 
-    public RouteLogServiceAdapter(RouteLogProperty routeLogProperty) {
-        this.routeLogProperty = routeLogProperty;
+    public RouteLogServiceAdapter(RouteTrackerLogProperties routeTrackerLogProperties) {
+        this.routeTrackerLogProperties = routeTrackerLogProperties;
         this.restClient = RestClient.builder()
-                .baseUrl(routeLogProperty.getUrl())
+                .baseUrl(routeTrackerLogProperties.getUrl())
                 .build();
     }
 
+    // TODO adjust for new routing process
     @Override
     public void logDeliverReturn(DeliveryReturnRouteRequest deliveryReturnRouteRequest) {
         final DeliveryReturnRouteRequestDto request = requestMapper.map(deliveryReturnRouteRequest);
 
         final List<RouteRequestDto> routeRequest = buildRouteRequest(request);
         final ResponseEntity<List<RouteResponseDto>> logRoute = restClient.post()
-                        .uri("/v2/api/{endpoint}", routeLogProperty.getEndpoint())
+                        .uri("/v2/api/routes")
                         .body(routeRequest)
                         .contentType(MediaType.APPLICATION_JSON)
                         .retrieve()

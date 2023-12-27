@@ -4,8 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.shipment.domain.model.ShipmentRequest;
-import com.warehouse.shipment.domain.model.UpdateParcelRequest;
+import com.warehouse.shipment.domain.vo.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.UpdateParcelRequest;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelRequestDto;
 

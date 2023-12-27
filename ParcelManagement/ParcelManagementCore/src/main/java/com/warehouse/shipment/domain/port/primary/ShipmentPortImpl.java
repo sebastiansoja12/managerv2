@@ -1,17 +1,15 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import com.warehouse.shipment.domain.model.Parcel;
 import org.apache.commons.lang3.ObjectUtils;
 
-import com.warehouse.shipment.domain.enumeration.ParcelType;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
+import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
-import com.warehouse.shipment.domain.model.ShipmentRequest;
-import com.warehouse.shipment.domain.model.ShipmentResponse;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
+import com.warehouse.shipment.domain.vo.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
 
 import lombok.AllArgsConstructor;
 
@@ -32,7 +30,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         logParcelShipment(parcel);
 
-        prepareParcelToCreate(parcel);
+        parcel.prepareParcelToCreate();
 
         return service.createShipment(parcel);
     }
@@ -50,11 +48,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private ShipmentParcel extractParcelFromRequest(ShipmentRequest request) {
         return request.getParcel();
-    }
-
-    private void prepareParcelToCreate(ShipmentParcel parcel) {
-        parcel.setStatus(Status.CREATED);
-        parcel.setParcelType(ParcelType.PARENT);
     }
 
     private void logParcelShipment(ShipmentParcel parcel) {

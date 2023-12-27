@@ -1,7 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
-import java.time.Instant;
-
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,10 +24,10 @@ public class RefreshTokenEntity {
     private String token;
 
     @Column(name = "created_date", nullable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "expiry_date", nullable = false)
-    private Instant expiryDate;
+    private LocalDateTime expiryDate;
 
     @Column(name = "revoked", nullable = false)
     private boolean revoked;

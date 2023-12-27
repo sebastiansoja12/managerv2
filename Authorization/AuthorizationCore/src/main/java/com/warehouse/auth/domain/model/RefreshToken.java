@@ -1,16 +1,16 @@
 package com.warehouse.auth.domain.model;
 
+import java.time.LocalDateTime;
+
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.Instant;
 
 @Data
 @Builder
 public class RefreshToken {
     private String token;
-    private Instant createdDate;
-    private Instant expiryDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime expiryDate;
     private String username;
     private boolean expired;
     private boolean revoked;

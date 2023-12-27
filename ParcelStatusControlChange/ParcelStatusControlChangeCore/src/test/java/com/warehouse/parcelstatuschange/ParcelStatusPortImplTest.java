@@ -3,6 +3,7 @@ package com.warehouse.parcelstatuschange;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
+import com.warehouse.parcelstatuschange.domain.exception.ParcelRequestEmptyException;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,6 +64,15 @@ public class ParcelStatusPortImplTest {
         final StatusRequest request = new StatusRequest(parcel);
         // when && then
         assertThrowsExactly(ParcelNotFoundException.class,
+                () -> parcelStatusPort.updateStatus(request));
+    }
+
+    @Test
+    void shouldNotUpdateStatusWhenParcelInRequestIsNull() {
+        // given
+        final StatusRequest request = new StatusRequest(null);
+        // when && then
+        assertThrowsExactly(ParcelRequestEmptyException.class,
                 () -> parcelStatusPort.updateStatus(request));
     }
 
