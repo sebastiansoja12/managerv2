@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ZebraInitializeResponse>
+    <ZebraID>1</ZebraID>
+    <Version>1.0</Version>
+    <ResponsibleUser>s-soja</ResponsibleUser>
+    <RouteProcesses>
+        <RouteProcess>
+            <ParcelID>123</ParcelID>
+            <ProcessID>null</ProcessID>
+        </RouteProcess>
+    </RouteProcesses>
+</ZebraInitializeResponse>

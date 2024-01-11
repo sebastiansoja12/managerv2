@@ -37,10 +37,10 @@ import com.warehouse.zebra.infrastructure.adapter.secondary.ReturnServiceAdapter
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-@ContextConfiguration(classes = ReturnServiceAdapterTest.ReturnServiceAdapterTestConfiguration.class)
+@ContextConfiguration(classes = ReturnServiceAdapterIntegrationTest.ReturnServiceAdapterTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ReturnServiceAdapterTest {
+public class ReturnServiceAdapterIntegrationTest {
 
     @ComponentScan(basePackages = { "com.warehouse.zebra", "com.warehouse.tools.returning",
             "com.warehouse.tools.routelog" })
