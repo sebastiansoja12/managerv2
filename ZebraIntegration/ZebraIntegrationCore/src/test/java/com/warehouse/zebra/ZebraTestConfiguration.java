@@ -12,11 +12,12 @@ import org.springframework.web.client.RestClient;
 
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
+import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
 
 @ComponentScan(basePackages = { "com.warehouse.zebra", "com.warehouse.returning", "com.warehouse.exceptionhandler",
-		"com.warehouse.tools.returning" })
-@EntityScan(basePackages = { "com.warehouse.zebra", "com.warehouse.returning" })
-@EnableJpaRepositories(basePackages = { "com.warehouse.zebra", "com.warehouse.returning" })
+		"com.warehouse.tools.returning", "com.warehouse.routetracker" })
+@EntityScan(basePackages = { "com.warehouse.zebra", "com.warehouse.returning", "com.warehouse.routetracker" })
+@EnableJpaRepositories(basePackages = { "com.warehouse.zebra", "com.warehouse.returning", "com.warehouse.routetracker" })
 @EnableAutoConfiguration
 public class ZebraTestConfiguration {
 
@@ -25,6 +26,9 @@ public class ZebraTestConfiguration {
 
     @MockBean
     public ReturnProperties returnProperties;
+
+    @MockBean
+    public RouteLogServicePort routeLogServicePort;
 
     @LocalServerPort
     private Integer port;

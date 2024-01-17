@@ -22,13 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
-import com.warehouse.zebra.domain.vo.ProcessReturn;
 import com.warehouse.zebra.domain.vo.Response;
 import com.warehouse.zebra.infrastructure.api.dto.*;
-import com.warehouse.zebra.infrastructure.api.requestmodel.ProcessType;
-import com.warehouse.zebra.infrastructure.api.requestmodel.ReturnRequestInformation;
-import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraDeviceInformation;
-import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraRequest;
 import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 
 import jakarta.xml.bind.JAXBContext;
@@ -59,8 +54,9 @@ public class ZebraIntegrationTest {
         final String requestXmlContent = new String(Files.readAllBytes(request));
         final String responseXmlContent = new String(Files.readAllBytes(response));
 
-        final List<ProcessReturn> processReturns = List.of(new ProcessReturn(1L, "PROCESSING"),
-                new ProcessReturn(2L, "PROCESSING"));
+		final List<com.warehouse.zebra.domain.vo.ProcessReturn> processReturns = List.of(
+				new com.warehouse.zebra.domain.vo.ProcessReturn(1L, "PROCESSING"),
+				new com.warehouse.zebra.domain.vo.ProcessReturn(2L, "PROCESSING"));
 
         final Response expectedResponse = Response.builder()
                 .username("s-soja")
@@ -119,32 +115,11 @@ public class ZebraIntegrationTest {
         return sw.toString();
     }
 
-    private final ZebraDeviceInformation zebraDeviceInformation = new ZebraDeviceInformation("1.0", 1L, "s-soja", "KT1");
-
     private ZebraResponse createZebraResponse() {
-        return new ZebraResponse(1L, "1.0", "s-soja", createProcessReturn());
+        return new ZebraResponse(1L, "1.0", "s-soja", createProcessReturn(), null);
     }
 
-    private List<ProcessReturnDto> createProcessReturn() {
-		return List.of(new ProcessReturnDto(1L, "PROCESSING"), new ProcessReturnDto(2L, "PROCESSING"));
-    }
-
-    private ZebraRequest createZebraRequest() {
-        return new ZebraRequest(ProcessType.RETURN, zebraDeviceInformation, List.of(createReturnRequestInformation()));
-    }
-
-    private ReturnRequestInformation createReturnRequestInformation() {
-        return new ReturnRequestInformation(createParcelDto(), "Not available", ReturnStatusDto.CREATED,
-                "returnToken", createSupplierCode());
-    }
-
-    private SupplierCodeDto createSupplierCode() {
-        final SupplierCodeDto supplierCode = new SupplierCodeDto();
-        supplierCode.setValue("abc");
-        return supplierCode;
-    }
-
-    private ParcelDto createParcelDto() {
-        return new ParcelDto(1L, SizeDto.TEST, "KT1", StatusDto.RETURN, ParcelTypeDto.PARENT, null);
+    private List<ProcessReturn> createProcessReturn() {
+		return List.of(new ProcessReturn(1L, "PROCESSING"), new ProcessReturn(2L, "PROCESSING"));
     }
 }

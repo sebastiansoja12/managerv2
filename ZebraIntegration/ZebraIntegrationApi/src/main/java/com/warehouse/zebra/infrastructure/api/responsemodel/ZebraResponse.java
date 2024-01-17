@@ -1,6 +1,6 @@
 package com.warehouse.zebra.infrastructure.api.responsemodel;
 
-import com.warehouse.zebra.infrastructure.api.dto.ProcessReturnDto;
+import com.warehouse.zebra.infrastructure.api.dto.ProcessReturn;
 import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,5 +26,9 @@ public class ZebraResponse {
 
     @XmlElementWrapper(name = "ProcessReturns")
     @XmlElement(name = "ProcessReturn")
-    private List<ProcessReturnDto> processReturns;
+    private List<ProcessReturn> processReturns;
+
+    @XmlElementWrapper(name = "RouteProcesses")
+    @XmlElement(name = "RouteProcess")
+    private List<RouteProcessType> routeProcesses;
 }

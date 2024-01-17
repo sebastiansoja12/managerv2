@@ -26,5 +26,4 @@ public class ZebraInitializeRequest {
     @XmlElementWrapper(name = "ParcelCreatedRequests")
     @XmlElement(name = "ParcelCreatedRequest")
     private List<ParcelCreatedRequest> parcelCreatedRequests;
-
 }

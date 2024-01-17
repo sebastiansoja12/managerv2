@@ -16,8 +16,8 @@ import com.warehouse.zebra.domain.vo.Response;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraRequestMapper;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraResponseMapper;
 import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraDeviceInformation;
-import com.warehouse.zebrainitialize.model.ZebraInitializeRequest;
-import com.warehouse.zebrainitialize.model.ZebraInitializeResponse;
+import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraRequest;
+import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,9 +25,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/zebra/initialize")
 @RequiredArgsConstructor
 public class ZebraInitializeAdapter {
-    
 
     private final ZebraInitializePort zebraInitializePort;
+
     private final ZebraRequestMapper requestMapper = getMapper(ZebraRequestMapper.class);
 
     private final ZebraResponseMapper responseMapper = getMapper(ZebraResponseMapper.class);
@@ -36,7 +36,7 @@ public class ZebraInitializeAdapter {
 
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
-    public ZebraInitializeResponse processRequest(@RequestBody ZebraInitializeRequest zebraRequest) {
+    public ZebraResponse processRequest(@RequestBody ZebraRequest zebraRequest) {
 
         final ZebraDeviceInformation zebraDeviceInformation = zebraRequest.getZebraDeviceInformation();
 
@@ -48,7 +48,7 @@ public class ZebraInitializeAdapter {
 
         final Response response = zebraInitializePort.processRequest(request);
 
-        return responseMapper.mapToInitializeResponse(response);
+        return responseMapper.map(response);
     }
     
 }

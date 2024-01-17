@@ -7,18 +7,17 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 
 @XmlRootElement(name = "ProcessReturn")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProcessReturnDto {
+public class ProcessReturn {
 
     @XmlElement(name = "ReturnID")
-    Long returnId;
+    private Long returnId;
 
     @XmlElement(name = "ProcessStatus")
-    String processStatus;
+    private String processStatus;
 }

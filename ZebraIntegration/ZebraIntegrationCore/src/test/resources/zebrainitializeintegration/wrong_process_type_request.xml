@@ -1,5 +1,5 @@
 <ZebraRequest>
-    <ProcessType>CREATED</ProcessType>
+    <ProcessType>REDIRECT</ProcessType>
     <ZebraDeviceInformation>
         <ResponsibleUser>s-soja</ResponsibleUser>
         <DepotCode>KT1</DepotCode>
