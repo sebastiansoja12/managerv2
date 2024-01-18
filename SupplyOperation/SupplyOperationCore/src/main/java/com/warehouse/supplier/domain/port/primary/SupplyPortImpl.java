@@ -63,6 +63,7 @@ public class SupplyPortImpl implements SupplyPort {
                 .firstName(supplierRequest.getFirstName())
                 .lastName(supplierRequest.getLastName())
                 .telephone(supplierRequest.getTelephone())
+                .active(Boolean.TRUE)
                 .build();
     }
 

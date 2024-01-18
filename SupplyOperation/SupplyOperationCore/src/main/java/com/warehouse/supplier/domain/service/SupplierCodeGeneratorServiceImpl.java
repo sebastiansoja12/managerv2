@@ -13,8 +13,8 @@ public class SupplierCodeGeneratorServiceImpl implements SupplierCodeGeneratorSe
     public String generate() {
         final StringBuilder builder = new StringBuilder();
         final Random r = new Random();
-        for (int i=0; i<SUPPLIER_CODE_LENGTH; i++) {
-            char c = (char)(r.nextInt(26) + 'a');
+        for (int i = 0; i < SUPPLIER_CODE_LENGTH; i++) {
+            final char c = (char)(r.nextInt(26) + 'a');
             builder.append(c);
         }
         return builder.toString();

@@ -27,6 +27,9 @@ public class SupplierEntity {
     @Column(name = "telephone", nullable = false)
     private String telephone;
 
+    @Column(name = "active", nullable = false)
+    private Boolean active;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
     private DepotEntity depot;

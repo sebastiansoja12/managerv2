@@ -21,4 +21,6 @@ public class Supplier {
 
     private String depotCode;
 
+    private Boolean active;
+
 }

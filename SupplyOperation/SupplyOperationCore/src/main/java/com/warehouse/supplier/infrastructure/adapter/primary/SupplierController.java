@@ -58,6 +58,4 @@ public class SupplierController {
         final List<Supplier> suppliers = supplyPort.findSuppliersByDepotCode(depotCode);
         return new ResponseEntity<>(responseMapper.mapToDto(suppliers), HttpStatus.OK);
     }
-
-
 }

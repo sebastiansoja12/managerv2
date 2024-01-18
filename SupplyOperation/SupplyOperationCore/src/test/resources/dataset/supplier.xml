@@ -13,6 +13,7 @@
             last_name="test"
             telephone="123"
             depot_code="TST"
+            active="1"
     />
 
     <supplier
@@ -21,6 +22,7 @@
             last_name="test"
             telephone="123"
             depot_code="TST"
+            active="1"
     />
 
 </dataset>
