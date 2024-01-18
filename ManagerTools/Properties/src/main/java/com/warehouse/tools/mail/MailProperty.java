@@ -1,8 +1,9 @@
-package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property;
+package com.warehouse.tools.mail;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter

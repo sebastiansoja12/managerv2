@@ -2,8 +2,8 @@ package com.warehouse.deliveryreturn;
 
 import com.warehouse.deliveryreturn.domain.vo.Parcel;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.MailAdapter;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.MailProperty;
 import com.warehouse.mail.domain.port.primary.MailPort;
+import com.warehouse.tools.mail.MailProperty;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

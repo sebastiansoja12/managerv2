@@ -10,9 +10,5 @@ shipment:
   name: shipment
   endpoint: shipments
 
-mail:
-  subject: Państwa zwracana przesyłka została odebrana przez kuriera
-  message: Państwa przesyłka o numerze %s została odebrana przez kuriera \n Trafi do magazynu a następnie zostanie odesłana do nadawcy %s
-
 service:
   mock: true

@@ -7,10 +7,9 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class ParcelDto {
-    ParcelIdDto parcelId;
-    StatusDto parcelStatus;
-    SenderDto sender;
-    RecipientDto recipient;
+public class ParcelReturnTokenRequestDto {
+    Long id;
+    Long parcelRelatedId;
+    String parcelStatus;
     Boolean locked;
 }

@@ -5,9 +5,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
 import com.warehouse.deliveryreturn.domain.vo.Parcel;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.MailMapper;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.MailProperty;
 import com.warehouse.mail.domain.port.primary.MailPort;
 
+import com.warehouse.tools.mail.MailProperty;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

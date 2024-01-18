@@ -38,6 +38,8 @@ public class Parcel {
 
     private LocalDateTime updatedAt;
 
+    private Boolean locked;
+
     public double getPrice() {
         return this.price = parcelSize.getPrice();
     }

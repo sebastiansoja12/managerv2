@@ -1,6 +1,8 @@
 package com.warehouse.deliveryreturn.configuration;
 
 
+import com.warehouse.tools.mail.MailProperty;
+import com.warehouse.tools.returntoken.ReturnTokenProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,13 +13,14 @@ import com.warehouse.deliveryreturn.domain.port.secondary.*;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.MailProperty;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
 
 import jakarta.validation.constraints.NotNull;
+import org.springframework.context.annotation.Primary;
+import org.springframework.web.client.RestClient;
 
 @Configuration
 public class DeliveryReturnConfiguration {
@@ -34,7 +37,7 @@ public class DeliveryReturnConfiguration {
 	}
 
     @Bean("deliveryReturn.mailServicePort")
-    public MailServicePort mailServicePort( MailPort mailPort, MailProperty mailProperty) {
+    public MailServicePort mailServicePort(MailPort mailPort, MailProperty mailProperty) {
         return new MailAdapter(mailPort, mailProperty);
     }
 
@@ -58,10 +61,20 @@ public class DeliveryReturnConfiguration {
         return new DeliveryReturnRepositoryImpl(deliveryReturnReadRepository);
     }
 
+    @Bean("deliveryReturn.returnTokenProperties")
+    @Primary
+    public ReturnTokenProperties returnTokenProperties() {
+        return new ReturnTokenProperties();
+    }
+
     @Bean
     @ConditionalOnProperty(name = "service.mock", havingValue = "false")
-    public DeliveryReturnTokenServicePort deliveryReturnTokenServicePort() {
-        return new DeliveryReturnServiceAdapter();
+    public DeliveryReturnTokenServicePort deliveryReturnTokenServicePort(ReturnTokenProperties returnTokenProperties) {
+        return DeliveryReturnServiceAdapter
+                .builder()
+                .returnTokenProperties(returnTokenProperties)
+                .restClient(RestClient.builder().baseUrl(returnTokenProperties().getUrl()).build())
+                .build();
     }
 
     @Bean
