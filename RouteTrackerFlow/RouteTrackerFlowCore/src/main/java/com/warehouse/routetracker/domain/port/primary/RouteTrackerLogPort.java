@@ -2,7 +2,7 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
-import com.warehouse.routetracker.domain.model.ProcessType;
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
 import com.warehouse.routetracker.domain.vo.*;

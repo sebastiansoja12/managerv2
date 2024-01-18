@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.domain.model;
 
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import lombok.*;
 
 import java.time.LocalDateTime;

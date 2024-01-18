@@ -1,4 +1,4 @@
-package com.warehouse.routetracker.domain.model;
+package com.warehouse.routetracker.domain.enumeration;
 
 public enum ProcessType {
     CREATED, RETURN, ROUTE, REJECT, REROUTE, REDIRECT
