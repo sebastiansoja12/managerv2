@@ -1,8 +1,11 @@
 package com.warehouse.deliveryreturn.configuration;
 
 
+import com.warehouse.deliveryreturn.domain.port.primary.SupplierCodeValidatorPort;
+import com.warehouse.deliveryreturn.domain.port.primary.SupplierCodeValidatorPortImpl;
 import com.warehouse.tools.mail.MailProperty;
 import com.warehouse.tools.returntoken.ReturnTokenProperties;
+import com.warehouse.tools.supplier.SupplierValidatorProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -92,5 +95,25 @@ public class DeliveryReturnConfiguration {
     public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
 			ParcelStatusProperties parcelStatusProperties) {
         return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperties);
+    }
+    
+    @Bean
+	public SupplierCodeValidatorPort supplierCodeValidatorPort(
+			SupplierCodeValidatorServicePort supplierCodeValidatorServicePort) {
+        return new SupplierCodeValidatorPortImpl(supplierCodeValidatorServicePort);
+    }
+    
+
+    @Bean
+	public SupplierCodeValidatorServicePort supplierCodeValidatorServicePort(
+			SupplierValidatorProperties supplierValidatorProperties) {
+		return SupplierCodeValidatorServiceAdapter
+                .builder()
+                .supplierValidatorProperties(supplierValidatorProperties)
+				.restClient(RestClient
+                        .builder()
+                        .baseUrl(supplierValidatorProperties.getUrl())
+                        .build())   
+                .build();
     }
 }

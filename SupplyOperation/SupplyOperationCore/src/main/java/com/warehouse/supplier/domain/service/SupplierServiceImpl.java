@@ -28,17 +28,13 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    public Supplier update(Supplier supplier) {
+        return supplierRepository.update(supplier);
+    }
+
+    @Override
     public List<Supplier> createMultipleSuppliers(List<Supplier> suppliers) {
         final List<SupplierModelRequest> supplierList = supplierRepository.createMultipleSuppliers(suppliers);
-
-
-        /** TODO
-         * final List<SupplierModelResponse> response = servicePort.createSuppliers(supplierList);
-         * return response
-                .stream()
-                .map(this::mapToSupplier)
-                .collect(Collectors.toList());
-         **/
         return supplierList.stream()
                 .map(this::mapToSupplier)
                 .collect(Collectors.toList());
@@ -47,11 +43,6 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public List<Supplier> findSuppliersByDepotCode(String depotCode) {
         return supplierRepository.findByDepotCode(depotCode);
-    }
-
-    @Override
-    public List<Supplier> findSuppliersBySupplierCode(String supplierCode) {
-        return supplierRepository.findBySupplierCode(supplierCode);
     }
 
     @Override

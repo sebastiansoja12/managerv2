@@ -7,9 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
-import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
+import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 
 import lombok.AllArgsConstructor;
 
@@ -40,6 +40,11 @@ public class SupplyPortImpl implements SupplyPort {
     }
 
     @Override
+    public Supplier updateSupplier(Supplier supplierUpdate) {
+        return service.update(supplierUpdate);
+    }
+
+    @Override
     public List<Supplier> findSuppliersByDepotCode(String depotCode) {
         return service.findSuppliersByDepotCode(depotCode);
     }
@@ -47,11 +52,6 @@ public class SupplyPortImpl implements SupplyPort {
     @Override
     public Supplier findSupplierByCode(String supplierCode) {
         return service.findSupplierByCode(supplierCode);
-    }
-
-    @Override
-    public List<Supplier> findSuppliersByCode(String supplierCode) {
-        return service.findSuppliersBySupplierCode(supplierCode);
     }
 
     private Supplier buildSupplierFromRequest(SupplierAddRequest supplierRequest) {

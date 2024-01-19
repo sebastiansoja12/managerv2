@@ -61,7 +61,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .orElseThrow(() -> new SupplierNotAvailableInRequestException("Supplier not available"));
         return DeliveryReturnTokenRequest.builder()
                 .requests(deliveryPackageRequests)
-                .supplier(new Supplier(supplierCode))
+                .supplier(new Supplier(supplierCode, Boolean.TRUE))
                 .build();
     }
 

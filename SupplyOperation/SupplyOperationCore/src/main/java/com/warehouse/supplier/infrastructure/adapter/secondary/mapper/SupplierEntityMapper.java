@@ -18,12 +18,10 @@ public interface SupplierEntityMapper {
     @Mapping(source = "depot.depotCode", target = "depotCode")
     SupplierModelRequest mapToModel(SupplierEntity supplier);
 
-
     @Mapping(source = "depot.depotCode", target = "depotCode")
     Supplier map(SupplierEntity supplier);
 
     List<Supplier> map(List<SupplierEntity> supplier);
 
     List<SupplierEntity> mapToListEntity(List<Supplier> suppliers);
-
 }

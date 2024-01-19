@@ -15,6 +15,7 @@ import com.warehouse.deliveryreturn.domain.vo.*;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
 import com.warehouse.tools.shipment.ShipmentProperties;
+import com.warehouse.tools.supplier.SupplierValidatorProperties;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,9 @@ public class DeliveryReturnPortImplIntegrationTest {
         @MockBean
         public MailServicePort mailServicePort;
 
+        @MockBean
+        public SupplierValidatorProperties supplierValidatorProperties;
+
         @Bean
         public RestClient restClient(RestClient.Builder builder) {
             return builder.baseUrl("http://localhost:8080").build();
@@ -88,6 +92,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 
     @Autowired
     private MailServicePort mailServicePort;
+
+    @Autowired
+    private SupplierValidatorProperties supplierValidatorProperties;
 
     private final DeviceInformation deviceInformation = new DeviceInformation(
             "1", 1L, "s-soja", "KT1"

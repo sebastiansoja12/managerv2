@@ -23,4 +23,7 @@ public class Supplier {
 
     private Boolean active;
 
+    public void updateSupplierCode(String generate) {
+        this.supplierCode = supplierCode;
+    }
 }

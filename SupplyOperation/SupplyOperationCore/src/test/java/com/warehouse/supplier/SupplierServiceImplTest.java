@@ -102,28 +102,6 @@ public class SupplierServiceImplTest {
     }
 
     @Test
-    void shouldFindManyBySupplierCode() {
-        // given
-        final String code = "code";
-        when(supplierRepository.findBySupplierCode(code)).thenReturn(List.of(createSupplier()));
-        // when
-        final List<Supplier> supplier = service.findSuppliersBySupplierCode(code);
-        // then
-        assertThat(supplier).isNotNull();
-    }
-
-    @Test
-    void shouldNotFindManyBySupplierCode() {
-        // given
-        final String code = "code";
-        when(supplierRepository.findBySupplierCode(code)).thenReturn(Collections.emptyList());
-        // when
-        final List<Supplier> supplier = service.findSuppliersBySupplierCode(code);
-        // then
-        assertTrue(supplier.isEmpty());
-    }
-
-    @Test
     void shouldFindManyByDepotCode() {
         // given
         final String code = "code";

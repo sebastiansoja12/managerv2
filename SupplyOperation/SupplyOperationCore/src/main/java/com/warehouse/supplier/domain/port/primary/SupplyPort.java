@@ -11,9 +11,10 @@ public interface SupplyPort {
 
     List<SupplierAddResponse> createMultipleSuppliers(List<SupplierAddRequest> suppliers);
 
+    Supplier updateSupplier(Supplier supplierUpdate);
+
     List<Supplier> findSuppliersByDepotCode(String depotCode);
 
     Supplier findSupplierByCode(String supplierCode);
 
-    List<Supplier> findSuppliersByCode(String supplierCode);
 }

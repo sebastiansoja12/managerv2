@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
+import com.warehouse.tools.supplier.SupplierValidatorProperties;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,12 +32,14 @@ import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.Deliver
 @Disabled
 public class RouteLogServiceAdapterTest {
 
-
     @Mock
     private RestClient restClient;
 
     @Autowired
     private RouteLogServicePort routeLogServicePort;
+
+    @Autowired
+    private SupplierValidatorProperties supplierValidatorProperties;
 
     @Test
     void shouldLogDeliverReturn() {

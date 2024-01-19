@@ -1,5 +1,6 @@
 package com.warehouse.deliveryreturn.configuration;
 
+import com.warehouse.tools.supplier.SupplierValidatorProperties;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,4 +32,7 @@ public class DeliveryReturnTestConfiguration {
 
     @MockBean
     public MailServicePort mailServicePort;
+
+    @MockBean
+    public SupplierValidatorProperties supplierValidatorProperties;
 }

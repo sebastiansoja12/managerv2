@@ -5,17 +5,17 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
 @Value
-@Builder
 @Jacksonized
-public class SupplierDto {
-
-    String supplierCode;
+@Builder
+public class SupplierUpdateRequestDto {
 
     String firstName;
 
     String lastName;
 
     String telephone;
+
+    String supplierCode;
 
     String depotCode;
 

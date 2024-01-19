@@ -22,6 +22,5 @@ public interface SupplierReadRepository extends JpaRepository<SupplierEntity, Lo
     @NotNull
     List<SupplierEntity> findAll();
 
-    List<SupplierEntity> findAllBySupplierCode(String supplierCode);
 }
 

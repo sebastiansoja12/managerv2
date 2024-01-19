@@ -8,5 +8,6 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class SupplierDto {
+    Boolean active;
     String supplierCode;
 }

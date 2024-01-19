@@ -94,6 +94,23 @@ public class SupplierRestIntegrationTest {
     }
 
     @Test
+    void shouldUpdateSupplier() {
+        // given
+        final Supplier supplier = Supplier.builder()
+                .supplierCode("abcdef")
+                .firstName("Anna")
+                .lastName("test")
+                .telephone("123")
+                .depotCode("TST")
+                .active(Boolean.TRUE)
+                .build();
+        // when
+        final Supplier updatedSupplier = supplyPort.updateSupplier(supplier);
+        // then
+        assertEquals("Anna", updatedSupplier.getFirstName());
+    }
+
+    @Test
     void shouldReturnEmptyList() {
         // given
         // when
@@ -122,26 +139,6 @@ public class SupplierRestIntegrationTest {
         final SupplierNotFoundException supplierNotFoundException =
                 assertThrows(SupplierNotFoundException.class, executable);
         assertEquals(expectedToBe("Supplier was not found"), supplierNotFoundException.getMessage());
-    }
-
-    @Test
-    void shouldFindManyBySupplierCode() {
-        // given
-        final String code = "code";
-        // when
-        final List<Supplier> supplier = supplyPort.findSuppliersByCode(code);
-        // then
-        assertThat(supplier).isNotNull();
-    }
-
-    @Test
-    void shouldNotFindManyBySupplierCode() {
-        // given
-        final String code = "fakeCode";
-        // when
-        final List<Supplier> supplier = supplyPort.findSuppliersByCode(code);
-        // then
-        assertTrue(supplier.isEmpty());
     }
 
     @Test

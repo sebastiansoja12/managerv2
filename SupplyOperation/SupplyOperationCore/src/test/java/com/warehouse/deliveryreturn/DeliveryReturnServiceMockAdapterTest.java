@@ -27,7 +27,8 @@ public class DeliveryReturnServiceMockAdapterTest {
                         .parcelId(1L)
                         .build())
                 .build());
-        final DeliveryReturnTokenRequest request = new DeliveryReturnTokenRequest(requests, new Supplier("abc"));
+        final DeliveryReturnTokenRequest request = new DeliveryReturnTokenRequest(requests, new Supplier("abc",
+                Boolean.TRUE));
         // when
         final DeliveryReturnTokenResponse response = adapter.sign(request);
         // then
