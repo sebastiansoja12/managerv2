@@ -28,14 +28,6 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void initializeRoute(Long parcelId) {
-        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
-                .parcelId(parcelId)
-                .build();
-        repository.save(routeLogRecord);
-    }
-
-    @Override
     public void saveDelivery(List<DeliveryInformation> deliveryInformation) {
 		deliveryInformation.stream().filter(this::existsToken).forEach(request -> {
 			final RouteLogRecord routeLogRecord = RouteLogRecord.builder()

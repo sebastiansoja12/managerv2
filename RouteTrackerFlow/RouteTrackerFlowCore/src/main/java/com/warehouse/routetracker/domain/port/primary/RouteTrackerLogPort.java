@@ -10,8 +10,6 @@ import com.warehouse.routetracker.domain.vo.*;
 public interface RouteTrackerLogPort {
 
 
-    void initializeRoute(Long parcelId);
-
     void saveDelivery(List<DeliveryInformation> deliveryInformation);
 
     void deleteRoute(RouteDeleteRequest request);

@@ -3,19 +3,17 @@ package com.warehouse.routetracker.infrastructure.adapter.primary;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.warehouse.routetracker.domain.model.ShipmentRequest;
+import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.vo.DeliveryInformation;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.EventMapper;
 import com.warehouse.routetracker.infrastructure.api.event.DeliveryLogEvent;
 import com.warehouse.routetracker.infrastructure.api.event.RouteLogBaseEvent;
-import com.warehouse.routetracker.infrastructure.api.event.ShipmentLogEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,13 +28,6 @@ public class RouteLogEventListener {
     private final Logger logger = LoggerFactory.getLogger(RouteLogEventListener.class);
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSSS");
-
-    @EventListener
-    public void handle(ShipmentLogEvent event) {
-        logEvent(event);
-        final ShipmentRequest shipmentRequest = eventMapper.map(event.getShipmentRequest());
-        trackerLogPort.initializeRoute(shipmentRequest.getParcelId());
-    }
 
     @EventListener
     public void handle(DeliveryLogEvent event) {
