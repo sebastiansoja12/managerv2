@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/routes/test")
 @AllArgsConstructor
@@ -23,6 +25,12 @@ public class RouteTrackerTestController {
     private final RouteRequestMapper requestMapper = Mappers.getMapper(RouteRequestMapper.class);
 
     private final RouteResponseMapper responseMapper = Mappers.getMapper(RouteResponseMapper.class);
+
+    @GetMapping
+    public ResponseEntity<?> getAll() {
+        final List<RouteLogRecordToChange> routeLogRecordToChange = trackerLogPort.findAll();
+        return new ResponseEntity<>(responseMapper.mapToLogRecord(routeLogRecordToChange), HttpStatus.OK);
+    }
 
     @PostMapping("/initialize")
     public ResponseEntity<?> initialize(@RequestBody ParcelIdDto id) {

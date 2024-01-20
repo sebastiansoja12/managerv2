@@ -30,4 +30,6 @@ public interface RouteResponseMapper {
     @Mapping(target = "returnCode.value", source = "returnCode")
     @Mapping(target = "faultDescription.value", source = "faultDescription")
     RouteLogRecordDto map(RouteLogRecordToChange routeLogRecordToChange);
+
+    List<RouteLogRecordDto> mapToLogRecord(List<RouteLogRecordToChange> routeLogRecordToChanges);
 }

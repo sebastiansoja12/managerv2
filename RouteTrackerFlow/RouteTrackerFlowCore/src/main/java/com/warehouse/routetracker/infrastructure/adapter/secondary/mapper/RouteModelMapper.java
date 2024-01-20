@@ -120,6 +120,12 @@ public interface RouteModelMapper {
 
     Set<RouteLogRecordDetail> mapToLogRecordDetails(List<RouteLogRecordDetailEntity> value);
 
+
+    @Mapping(target = "depotCode", source = "depot.depotCode")
+    @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "supplierCode", source = "supplier.supplierCode")
+    RouteLogRecordDetail map(RouteLogRecordDetailEntity routeLogRecordDetailEntity);
+
     @Mapping(target = "processId", source = "id")
     RouteProcess map(RouteLogRecordEntity entity);
 }

@@ -24,4 +24,6 @@ public interface RouteRepository {
     RouteLogRecordToChange find(Long parcelId);
 
     void update(RouteLogRecordToChange routeLogRecord);
+
+    List<RouteLogRecordToChange> findAll();
 }

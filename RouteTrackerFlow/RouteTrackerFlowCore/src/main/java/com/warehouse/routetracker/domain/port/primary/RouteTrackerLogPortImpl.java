@@ -131,6 +131,11 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         return repository.find(parcelId);
     }
 
+    @Override
+    public List<RouteLogRecordToChange> findAll() {
+        return repository.findAll();
+    }
+
     private void logRouteRecord(RouteLogRecord routeLogRecord) {
         logger.info("Saving route for parcel: {}", routeLogRecord.getParcelId());
     }

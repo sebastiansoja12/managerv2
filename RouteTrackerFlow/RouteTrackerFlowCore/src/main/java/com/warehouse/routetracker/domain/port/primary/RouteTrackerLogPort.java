@@ -35,4 +35,6 @@ public interface RouteTrackerLogPort {
     void saveReturnTrackRequest(ReturnTrackRequest request);
 
     RouteLogRecordToChange find(Long parcelId);
+
+    List<RouteLogRecordToChange> findAll();
 }
