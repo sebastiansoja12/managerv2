@@ -35,6 +35,7 @@
         <module>ReturningTrackManager</module>
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>
+        <module>SoftwareConfiguration</module>
     </modules>
 
 	<properties>
@@ -273,11 +274,11 @@
 				<artifactId>jjwt-api</artifactId>
 				<version>0.11.5</version>
 			</dependency>
-			<!--<dependency>
+			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-data-mongodb</artifactId>
 				<version>${spring-starter.version}</version>
-			</dependency>-->
+			</dependency>
 			<dependency>
 				<groupId>com.braintreepayments.gateway</groupId>
 				<artifactId>braintree-java</artifactId>
