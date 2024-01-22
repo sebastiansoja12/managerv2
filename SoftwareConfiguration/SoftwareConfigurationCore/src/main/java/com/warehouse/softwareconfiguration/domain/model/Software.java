@@ -8,6 +8,8 @@ import lombok.Setter;
 @Getter
 @Builder
 public class Software {
+
+    private String id;
     private String category;
     private String name;
     private String value;

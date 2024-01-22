@@ -8,6 +8,7 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 @Builder
 public class SoftwareDto {
+    String id;
     String name;
     String category;
     String value;
