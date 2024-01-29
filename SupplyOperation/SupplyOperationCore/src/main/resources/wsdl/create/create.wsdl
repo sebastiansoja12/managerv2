@@ -1,0 +1,49 @@
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             targetNamespace="http://example.com/soap-create-service"
+             xmlns:tns="http://example.com/soap-create-service">
+    <message name="TerminalRequest">
+        <message name="TerminalRequest">
+            <part name="processType" type="tns:ProcessType"/>
+            <part name="deviceInformation" type="tns:DeviceInformation"/>
+            <part name="parcelId" type="xsd:long"/>
+        </message>
+    </message>
+    <message name="TerminalResponse">
+        <part name="greeting" type="xsd:string"/>
+    </message>
+
+    <xsd:complexType name="DeviceInformation">
+        <xsd:sequence>
+            <xsd:element name="version" type="xsd:string"/>
+            <xsd:element name="zebraId" type="xsd:long"/>
+            <xsd:element name="username" type="xsd:string"/>
+            <xsd:element name="depotCode" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <portType name="HelloPortType">
+        <operation name="getHello">
+            <input message="tns:GetHelloRequest"/>
+            <output message="tns:GetHelloResponse"/>
+        </operation>
+    </portType>
+    <binding name="HelloBinding" type="tns:HelloPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="getHello">
+            <soap:operation soapAction="http://example.com/soap-web-service/getHello"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="HelloService">
+        <port name="HelloPort" binding="tns:HelloBinding">
+            <soap:address location="http://localhost:8080/soap-api"/>
+        </port>
+    </service>
+</definitions>
