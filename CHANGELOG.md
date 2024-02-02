@@ -1,3 +1,17 @@
+## [2024.2] - 2024-02-05
+
+### Added
+- TBA
+
+### Changed
+- TBA
+
+### Fixed
+- TBA
+
+### Deprecated
+- TBA
+
 ## [2024.1] - 2024-01-01
 
 ### Added
