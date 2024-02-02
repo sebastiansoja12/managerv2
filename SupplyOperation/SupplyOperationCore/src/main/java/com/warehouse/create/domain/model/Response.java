@@ -1,9 +1,6 @@
 package com.warehouse.create.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -11,7 +8,8 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TerminalResponse {
+@Builder
+public class Response {
     private Long terminalId;
     private String version;
     private String username;

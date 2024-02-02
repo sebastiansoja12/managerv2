@@ -1,15 +1,13 @@
 package com.warehouse.create.domain.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class DeliveryCreate {
     private Long terminalId;
     private Long parcelId;

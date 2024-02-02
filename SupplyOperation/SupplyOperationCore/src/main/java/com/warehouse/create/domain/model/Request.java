@@ -2,16 +2,14 @@ package com.warehouse.create.domain.model;
 
 
 import com.warehouse.create.domain.enumeration.ProcessType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TerminalRequest {
+@Builder
+public class Request {
     private ProcessType processType;
     private DeviceInformation deviceInformation;
     private Long parcelId;

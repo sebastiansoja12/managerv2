@@ -18,8 +18,9 @@ public class DeliveryCreateAdapter extends DeliveryCreateAdapterConfig {
 
     private final DeliveryReturnResponseMapper responseMapper = getMapper(DeliveryReturnResponseMapper.class);
 
-    private static final String NAMESPACE_URI = "http://example.org/delivery-create";
+    private static final String NAMESPACE_URI = "delivery-create-service";
 
+    // TODO
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "")
     @ResponsePayload
     public ResponseEntity<?> create() {

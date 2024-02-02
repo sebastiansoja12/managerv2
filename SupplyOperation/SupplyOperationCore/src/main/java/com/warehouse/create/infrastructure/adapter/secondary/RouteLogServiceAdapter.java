@@ -1,7 +1,7 @@
 package com.warehouse.create.infrastructure.adapter.secondary;
 
-import com.warehouse.create.domain.model.TerminalRequest;
-import com.warehouse.create.domain.model.TerminalResponse;
+import com.warehouse.create.domain.model.Request;
+import com.warehouse.create.domain.model.Response;
 import com.warehouse.create.domain.port.secondary.RouteLogServicePort;
 import lombok.AllArgsConstructor;
 
@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class RouteLogServiceAdapter implements RouteLogServicePort {
     @Override
-    public TerminalResponse logRoute(TerminalRequest request) {
+    public Response logRoute(Request request) {
         return null;
     }
 }

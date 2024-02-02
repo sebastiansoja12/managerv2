@@ -1,8 +1,8 @@
 package com.warehouse.create.domain.service;
 
-import com.warehouse.create.domain.model.TerminalRequest;
-import com.warehouse.create.domain.model.TerminalResponse;
+import com.warehouse.create.domain.model.Request;
+import com.warehouse.create.domain.model.Response;
 
 public interface DeliveryCreateService {
-    TerminalResponse createDelivery(TerminalRequest request);
+    Response createDelivery(Request request);
 }

@@ -1,8 +1,8 @@
 package com.warehouse.create.domain.port.secondary;
 
-import com.warehouse.create.domain.model.TerminalRequest;
-import com.warehouse.create.domain.model.TerminalResponse;
+import com.warehouse.create.domain.model.Request;
+import com.warehouse.create.domain.model.Response;
 
 public interface RouteLogServicePort {
-    TerminalResponse logRoute(TerminalRequest request);
+    Response logRoute(Request request);
 }
