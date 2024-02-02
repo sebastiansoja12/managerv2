@@ -1,16 +1,84 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.secondary;
 
-import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnTokenResponse;
-import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
-import lombok.AllArgsConstructor;
-import org.springframework.web.client.support.RestGatewaySupport;
+import static org.mapstruct.factory.Mappers.getMapper;
 
-@AllArgsConstructor
-public class DeliveryReturnServiceAdapter extends RestGatewaySupport implements DeliveryReturnTokenServicePort {
+import java.util.List;
+
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClient;
+
+import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
+import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnTokenResponse;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ParcelReturnTokenRequestDto;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.TokenDto;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryReturnTokenRequestMapper;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryReturnTokenResponseMapper;
+import com.warehouse.tools.returntoken.ReturnTokenProperties;
+
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
+
+@Builder
+public class DeliveryReturnServiceAdapter implements DeliveryReturnTokenServicePort {
+
+
+    private final ReturnTokenProperties returnTokenProperties;
+
+    private final RestClient restClient;
+    
+    private final DeliveryReturnTokenRequestMapper requestMapper = getMapper(DeliveryReturnTokenRequestMapper.class);
+
+    private final DeliveryReturnTokenResponseMapper responseMapper = getMapper(DeliveryReturnTokenResponseMapper.class);
+
+
+	private DeliveryReturnSignature signWithReturnToken(PropertiesConfiguration configuration,
+			ParcelReturnTokenRequestDto request) {
+
+        final ResponseEntity<? extends TokenDto> responseEntity = restClient
+                .post()
+                .uri("/v2/api/return-tokens")
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(TokenDto.class);
+
+        return responseMapper.map(responseEntity.getBody());
+    }
+    
+	private DeliveryReturnSignature sign(PropertiesConfiguration configuration,
+			ParcelReturnTokenRequestDto request) {
+        return signWithReturnToken(configuration, request);
+	}
+    
     @Override
     public DeliveryReturnTokenResponse sign(DeliveryReturnTokenRequest deliveryReturnTokenRequest) {
-        // TODO
-        return null;
+        final PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration(returnTokenProperties);
+        final List<ParcelReturnTokenRequestDto> returnTokenRequests = requestMapper.map(deliveryReturnTokenRequest);
+        
+        final List<DeliveryReturnSignature> signatures = returnTokenRequests.stream()
+                .map(parcelReturnTokenRequest -> sign(propertiesConfiguration, parcelReturnTokenRequest))
+                .toList();
+
+		return new DeliveryReturnTokenResponse(signatures, deliveryReturnTokenRequest.getSupplier().getSupplierCode());
+    }
+    
+    
+    @RequiredArgsConstructor
+    private static class PropertiesConfiguration implements Properties {
+        
+        private final ReturnTokenProperties returnTokenProperties;
+
+        @Override
+        public String getUrl() {
+            return returnTokenProperties.getUrl();
+        }
+
+        @Override
+        public String getEndpoint() {
+            return returnTokenProperties.getEndpoint();
+        }
     }
 }

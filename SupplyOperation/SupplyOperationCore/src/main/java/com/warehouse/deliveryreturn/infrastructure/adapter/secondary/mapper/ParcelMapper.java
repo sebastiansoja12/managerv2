@@ -13,6 +13,7 @@ public interface ParcelMapper {
                 .parcelStatus(parcel.getParcelStatus().name())
                 .recipientEmail(parcel.getRecipient().getEmail())
                 .senderEmail(parcel.getSender().getEmail())
+                .locked(parcel.getLocked())
                 .build();
     }
 }

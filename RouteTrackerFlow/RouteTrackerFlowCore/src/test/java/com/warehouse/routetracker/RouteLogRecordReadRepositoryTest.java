@@ -16,9 +16,11 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
@@ -70,5 +72,13 @@ public class RouteLogRecordReadRepositoryTest {
         final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByParcelId(id);
         // then
         assertTrue(routeLogRecord.isEmpty());
+    }
+
+    @Test
+    void shouldFindAll() {
+        // given && when
+        final List<RouteLogRecordEntity> routeLogRecord = repository.findAll();
+        // then
+        assertFalse(routeLogRecord.isEmpty());
     }
 }

@@ -14,4 +14,6 @@ public class Request {
     DeviceInformation zebraDeviceInformation;
 
     List<ReturnRequest> returnRequests;
+
+    List<ParcelCreatedRequest> parcelCreatedRequests;
 }

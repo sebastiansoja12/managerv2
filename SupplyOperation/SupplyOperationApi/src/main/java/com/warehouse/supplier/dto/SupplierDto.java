@@ -18,4 +18,6 @@ public class SupplierDto {
     String telephone;
 
     String depotCode;
+
+    Boolean active;
 }

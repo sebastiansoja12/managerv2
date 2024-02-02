@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierAddRequest;
-import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
+import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 import com.warehouse.supplier.dto.SupplierAddRequestDto;
+import com.warehouse.supplier.dto.SupplierUpdateRequestDto;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierRequestMapper;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierResponseMapper;
 
@@ -35,6 +36,13 @@ public class SupplierController {
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
 
+    @PutMapping
+    public ResponseEntity<?> updateSupplier(@RequestBody SupplierUpdateRequestDto updateRequest) {
+        final Supplier request = requestMapper.map(updateRequest);
+        final Supplier response = supplyPort.updateSupplier(request);
+        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<?> getSuppliers() {
         final List<Supplier> suppliers = supplyPort.findAllSuppliers();
@@ -47,17 +55,9 @@ public class SupplierController {
         return new ResponseEntity<>(responseMapper.map(supplier), HttpStatus.OK);
     }
 
-    @GetMapping("/all/supplierCode/{supplierCode}")
-    public ResponseEntity<?> getSuppliersByCode(@PathVariable String supplierCode) {
-        final List<Supplier> suppliers = supplyPort.findSuppliersByCode(supplierCode);
-        return new ResponseEntity<>(responseMapper.mapToDto(suppliers), HttpStatus.OK);
-    }
-
     @GetMapping("/depotCode/{depotCode}")
     public ResponseEntity<?> getSuppliersByDepotCode(@PathVariable String depotCode) {
         final List<Supplier> suppliers = supplyPort.findSuppliersByDepotCode(depotCode);
         return new ResponseEntity<>(responseMapper.mapToDto(suppliers), HttpStatus.OK);
     }
-
-
 }

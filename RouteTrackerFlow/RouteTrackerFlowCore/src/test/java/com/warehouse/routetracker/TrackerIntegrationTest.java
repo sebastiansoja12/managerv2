@@ -58,15 +58,6 @@ public class TrackerIntegrationTest {
     private static final Long PARCEL_ID = 100L;
 
     @Test
-    void shouldInitializeRoute() {
-        // when
-        routeTrackerLogPort.initializeRoute(PARCEL_ID);
-        // then
-        final List<RouteEntity> routeEntityList = routeReadRepository.findByParcelId(PARCEL_ID);
-        assertFalse(routeEntityList.isEmpty());
-    }
-
-    @Test
     void shouldSaveDelivery() {
         // given
         final List<DeliveryInformation> deliveryInformations = Collections.singletonList(

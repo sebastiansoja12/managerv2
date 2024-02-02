@@ -1,5 +1,8 @@
 package com.warehouse.zebra.configuration;
 
+import com.warehouse.zebra.domain.port.primary.ZebraInitializePort;
+import com.warehouse.zebra.domain.port.primary.ZebraInitializePortImpl;
+import com.warehouse.zebra.infrastructure.adapter.primary.ZebraInitializeAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,7 +22,7 @@ import jakarta.validation.constraints.NotNull;
 public class ZebraConfiguration {
 
     @Bean
-    public ZebraPort zebraPort(ReturnServicePort returnServicePort,  RouteLogServicePort routeLogServicePort) {
+    public ZebraPort zebraPort(ReturnServicePort returnServicePort, RouteLogServicePort routeLogServicePort) {
         return new ZebraPortImpl(returnServicePort, routeLogServicePort);
     }
     
@@ -46,5 +49,15 @@ public class ZebraConfiguration {
     @Bean
     public ZebraAdapter zebraAdapter(ZebraPort zebraPort) {
         return new ZebraAdapter(zebraPort);
+    }
+
+    @Bean
+    public ZebraInitializePort zebraInitializePort(RouteLogServicePort routeLogServicePort) {
+        return new ZebraInitializePortImpl(routeLogServicePort);
+    }
+
+    @Bean
+    public ZebraInitializeAdapter zebraInitializeAdapter(ZebraInitializePort zebraInitializePort) {
+        return new ZebraInitializeAdapter(zebraInitializePort);
     }
 }

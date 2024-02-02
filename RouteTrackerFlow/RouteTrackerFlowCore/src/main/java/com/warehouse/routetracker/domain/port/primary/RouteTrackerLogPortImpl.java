@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,14 +26,6 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     private final Logger logger = LoggerFactory.getLogger(RouteTrackerLogPort.class);
 
     private final ObjectMapper mapper = new ObjectMapper();
-
-    @Override
-    public void initializeRoute(Long parcelId) {
-        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
-                .parcelId(parcelId)
-                .build();
-        repository.save(routeLogRecord);
-    }
 
     @Override
     public void saveDelivery(List<DeliveryInformation> deliveryInformation) {
@@ -136,6 +129,11 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public RouteLogRecordToChange find(Long parcelId) {
         return repository.find(parcelId);
+    }
+
+    @Override
+    public List<RouteLogRecordToChange> findAll() {
+        return repository.findAll();
     }
 
     private void logRouteRecord(RouteLogRecord routeLogRecord) {

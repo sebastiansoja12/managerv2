@@ -1,0 +1,15 @@
+<ZebraRequest>
+    <ProcessType>CREATED</ProcessType>
+    <ZebraDeviceInformation>
+        <ResponsibleUser>s-soja</ResponsibleUser>
+        <DepotCode>KT1</DepotCode>
+        <Version>1.0</Version>
+        <ZebraID>1</ZebraID>
+    </ZebraDeviceInformation>
+    <ParcelCreatedRequests>
+        <ParcelCreatedRequest>
+            <ParcelID>321</ParcelID>
+            <ParcelRelatedId></ParcelRelatedId>
+        </ParcelCreatedRequest>
+    </ParcelCreatedRequests>
+</ZebraRequest>

@@ -8,13 +8,13 @@ import com.warehouse.supplier.domain.model.SupplierModelRequest;
 public interface SupplierRepository {
     Supplier create(Supplier supplier);
 
+    Supplier update(Supplier supplier);
+
     List<Supplier> findAll();
 
     List<SupplierModelRequest> createMultipleSuppliers(List<Supplier> suppliers);
 
     List<Supplier> findByDepotCode(String depotCode);
-
-    List<Supplier> findBySupplierCode(String supplierCode);
 
     Supplier findByCode(String supplierCode);
 }

@@ -4,7 +4,6 @@ package com.warehouse.routetracker;
 import static com.google.common.collect.MoreCollectors.onlyElement;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +28,7 @@ import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.Parcel
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.routetracker.infrastructure.api.dto.DeliveryInformationDto;
-import com.warehouse.routetracker.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.routetracker.infrastructure.api.event.DeliveryLogEvent;
-import com.warehouse.routetracker.infrastructure.api.event.ShipmentLogEvent;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -56,19 +53,6 @@ public class RouteLogEventListenerIntegrationTest {
 
     private final String SUPPLIER_CODE = "TS_TST";
 
-
-    @Test
-    void shouldHandleShipment() {
-        // given
-        final ShipmentLogEvent shipmentLogEvent = ShipmentLogEvent.builder()
-                .shipmentRequest(ShipmentRequestDto.builder().parcelId(PARCEL_ID).build())
-                .build();
-        // when
-        eventListener.handle(shipmentLogEvent);
-        // then
-        final List<RouteEntity> routeEntityList = repository.findByParcelId(PARCEL_ID);
-        assertFalse(routeEntityList.isEmpty());
-    }
 
     @Test
     void shouldHandleDelivery() {

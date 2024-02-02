@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-import com.warehouse.routetracker.domain.model.ProcessType;
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
 import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;

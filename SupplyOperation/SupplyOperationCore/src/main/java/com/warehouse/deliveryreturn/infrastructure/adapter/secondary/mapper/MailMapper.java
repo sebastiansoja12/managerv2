@@ -2,8 +2,8 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper;
 
 
 import com.warehouse.deliveryreturn.domain.vo.Parcel;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.property.MailProperty;
 import com.warehouse.mail.domain.vo.Notification;
+import com.warehouse.tools.mail.MailProperty;
 import org.mapstruct.Mapper;
 
 @Mapper

@@ -1,6 +1,6 @@
 package com.warehouse.routetracker.domain.vo;
 
-import com.warehouse.routetracker.domain.model.ProcessType;
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
 
 import lombok.Builder;
 import lombok.Value;

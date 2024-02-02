@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ZebraResponse>
+    <ZebraID>1</ZebraID>
+    <Version>1.0</Version>
+    <ResponsibleUser>s-soja</ResponsibleUser>
+    <RouteProcesses>
+        <RouteProcess>
+            <ParcelID>1</ParcelID>
+            <ProcessID>4061acb8-b556-42b1-b274-7aa300eb1112</ProcessID>
+        </RouteProcess>
+    </RouteProcesses>
+</ZebraResponse>

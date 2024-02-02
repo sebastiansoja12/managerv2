@@ -25,4 +25,6 @@ public class ParcelDto {
 
     String updatedAt;
 
+    Boolean locked;
+
 }

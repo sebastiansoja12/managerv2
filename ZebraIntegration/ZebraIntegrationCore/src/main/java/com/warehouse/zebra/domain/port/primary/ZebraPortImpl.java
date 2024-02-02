@@ -1,15 +1,14 @@
 package com.warehouse.zebra.domain.port.primary;
 
-import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.zebra.domain.vo.*;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
+import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.zebra.domain.vo.ProcessType;
+import com.warehouse.zebra.domain.vo.Request;
+import com.warehouse.zebra.domain.vo.Response;
 
 import lombok.AllArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @AllArgsConstructor
 public class ZebraPortImpl implements ZebraPort {
@@ -26,28 +25,12 @@ public class ZebraPortImpl implements ZebraPort {
 		}
 
 		return switch (processType) {
-			case CREATED -> processCreated(request);
 			case RETURN -> returnServicePort.processReturn(request);
-			case REJECT, ROUTE, REROUTE, REDIRECT -> Response.builder()
+			case REJECT, ROUTE, REROUTE, REDIRECT, CREATED -> Response.builder()
 					.zebraId(request.getZebraDeviceInformation().getZebraId())
 					.version(request.getZebraDeviceInformation().getVersion())
 					.username(request.getZebraDeviceInformation().getUsername())
 					.build();
 		};
     }
-
-	private Response processCreated(Request request) {
-		final List<RouteProcess> routeProcesses = new ArrayList<>();
-		request.getReturnRequests().forEach(req -> {
-			final RouteProcess routeProcess = routeLogServicePort.initializeProcess(req.getParcelId());
-			routeProcesses.add(routeProcess);
-		});
-
-		return Response.builder()
-				.zebraId(request.getZebraDeviceInformation().getZebraId())
-				.version(request.getZebraDeviceInformation().getVersion())
-				.username(request.getZebraDeviceInformation().getUsername())
-				.routeProcesses(routeProcesses)
-				.build();
-	}
 }

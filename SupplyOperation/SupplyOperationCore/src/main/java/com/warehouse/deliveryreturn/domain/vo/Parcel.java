@@ -10,4 +10,5 @@ public class Parcel {
     String senderEmail;
     String recipientEmail;
     String parcelStatus;
+    Boolean locked;
 }

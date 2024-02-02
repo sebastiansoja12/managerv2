@@ -4,6 +4,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.warehouse.routetracker.domain.model.RouteInformation;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
@@ -90,6 +91,15 @@ public class RouteRepositoryImpl implements RouteRepository {
     public void update(RouteLogRecordToChange routeLogRecord) {
         final RouteLogRecordEntity routeLogRecordEntity = logToEntityMapper.map(routeLogRecord);
         routeLogRecordReadRepository.save(routeLogRecordEntity);
+    }
+
+    @Override
+    public List<RouteLogRecordToChange> findAll() {
+		return routeLogRecordReadRepository
+                .findAll()
+                .stream()
+                .map(mapper::mapToRecord)
+                .collect(Collectors.toList());
     }
 
     @Override

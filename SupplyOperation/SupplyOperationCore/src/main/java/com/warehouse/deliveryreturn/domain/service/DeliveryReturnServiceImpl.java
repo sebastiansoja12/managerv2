@@ -61,7 +61,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .orElseThrow(() -> new SupplierNotAvailableInRequestException("Supplier not available"));
         return DeliveryReturnTokenRequest.builder()
                 .requests(deliveryPackageRequests)
-                .supplier(new Supplier(supplierCode))
+                .supplier(new Supplier(supplierCode, Boolean.TRUE))
                 .build();
     }
 
@@ -80,6 +80,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .deliveryStatus(String.valueOf(delivery.getDeliveryStatus()))
                 .depotCode(delivery.getDepotCode())
                 .parcelId(delivery.getParcelId())
+                .locked(parcelRepositoryServicePort.downloadParcel(delivery.getParcelId()).getLocked())
                 .build();
     }
 
@@ -87,6 +88,9 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 			Set<DeliveryReturnDetails> deliveryReturnRequests) {
         return deliveryReturnRequests.stream().map(delivery -> {
 			final DeliveryReturnSignature deliveryReturnSignature = signaturesMap.get(delivery.getParcelId());
+            if (deliveryReturnSignature == null) {
+                throw new RuntimeException("Delivery response not found");
+            }
             return DeliveryReturnDetails.builder()
                     .supplierCode(delivery.getSupplierCode())
                     .deliveryStatus(delivery.getDeliveryStatus())

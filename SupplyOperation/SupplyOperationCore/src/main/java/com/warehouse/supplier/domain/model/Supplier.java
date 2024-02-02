@@ -21,4 +21,9 @@ public class Supplier {
 
     private String depotCode;
 
+    private Boolean active;
+
+    public void updateSupplierCode(String generate) {
+        this.supplierCode = supplierCode;
+    }
 }

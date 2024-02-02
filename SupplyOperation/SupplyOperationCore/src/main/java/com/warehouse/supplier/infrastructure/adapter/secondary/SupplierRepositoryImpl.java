@@ -28,6 +28,16 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
+    public Supplier update(Supplier supplierUpdate) {
+		supplierReadRepository
+				.findBySupplierCode(supplierUpdate.getSupplierCode())
+				.orElseThrow(() -> new SupplierNotFoundException("Supplier was not found"));
+        final SupplierEntity supplierEntity = supplierEntityMapper.map(supplierUpdate);
+        supplierReadRepository.save(supplierEntity);
+        return supplierEntityMapper.map(supplierEntity);
+    }
+
+    @Override
     @Cacheable("suppliersCache")
     public List<Supplier> findAll() {
         final List<SupplierEntity> supplierEntities = supplierReadRepository.findAll();
@@ -49,15 +59,6 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     public List<Supplier> findByDepotCode(String depotCode) {
         final List<SupplierEntity> supplierEntities = supplierReadRepository.findByDepot_DepotCode(depotCode);
         return supplierEntityMapper.map(supplierEntities);
-    }
-
-    @Override
-    @Cacheable("suppliersCodeCache")
-    public List<Supplier> findBySupplierCode(String supplierCode) {
-        final List<SupplierEntity> supplierEntities = supplierReadRepository.findAllBySupplierCode(supplierCode);
-        return supplierEntities.stream()
-                .map(supplierEntityMapper::map)
-                .collect(Collectors.toList());
     }
 
     @Override

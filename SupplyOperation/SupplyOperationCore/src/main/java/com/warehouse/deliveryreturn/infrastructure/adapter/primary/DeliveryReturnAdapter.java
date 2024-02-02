@@ -3,6 +3,7 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.primary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.deliveryreturn.domain.port.primary.SupplierCodeValidatorPort;
 import com.warehouse.deliveryreturn.infrastructure.api.zebradevice.ZebraDeviceInformation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,8 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DeliveryReturnAdapter {
 
-
     private final DeliveryReturnPort deliveryReturnPort;
+
+    private final SupplierCodeValidatorPort validatorPort;
 
     private final DeliveryReturnRequestMapper requestMapper = getMapper(DeliveryReturnRequestMapper.class);
 
@@ -43,6 +45,8 @@ public class DeliveryReturnAdapter {
         log.info("Detected request from Zebra device: ID - {}, Version - {}, Responsible User - {}, Depot - {}",
                 zebraDeviceInformation.getZebraId(), zebraDeviceInformation.getVersion(),
                 zebraDeviceInformation.getUsername(), zebraDeviceInformation.getDepotCode());
+
+        validatorPort.validateSupplierCode(zebraDeviceInformation.getUsername());
 
         final DeliveryReturnRequest request = requestMapper.map(zebraDeliveryReturnRequest);
 

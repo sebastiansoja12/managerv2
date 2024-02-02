@@ -9,11 +9,11 @@ public interface SupplierService {
 
     List<Supplier> findAll();
 
+    Supplier update(Supplier supplier);
+
     List<Supplier> createMultipleSuppliers(List<Supplier> suppliers);
 
     List<Supplier> findSuppliersByDepotCode(String depotCode);
-
-    List<Supplier> findSuppliersBySupplierCode(String supplierCode);
 
     Supplier findSupplierByCode(String supplierCode);
 }

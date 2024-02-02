@@ -13,4 +13,5 @@ public class DeliveryReturnInformation {
 	String depotCode;
 	String deliveryStatus;
 	String token;
+	Boolean locked;
 }

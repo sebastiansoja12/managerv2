@@ -34,12 +34,12 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
         final ParcelIdDto parcelIdRequest = ParcelIdDto.builder().value(parcelId).build();
         final ResponseEntity<RouteProcessDto> responseEntity = restClient
                 .post()
-                .uri("/v2/api/routes/test/initialize")
+                .uri("/v2/api/routes/test/{initialize}", routeTrackerLogProperties.getInitialize())
                 .body(parcelIdRequest)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatusCode::is2xxSuccessful,
-                        (req, res) -> log.warn("Successfully registered process in tracker module"))
+                        (req, res) -> log.trace("Successfully registered process in tracker module"))
                 .onStatus(HttpStatusCode::is4xxClientError,
                         (req, res) -> log.warn("Error while logging process"))
                 .onStatus(HttpStatusCode::is5xxServerError,

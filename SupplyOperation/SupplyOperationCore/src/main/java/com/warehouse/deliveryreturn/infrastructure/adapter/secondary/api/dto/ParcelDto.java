@@ -12,4 +12,5 @@ public class ParcelDto {
     StatusDto parcelStatus;
     SenderDto sender;
     RecipientDto recipient;
+    Boolean locked;
 }

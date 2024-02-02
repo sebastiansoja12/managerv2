@@ -1,12 +1,14 @@
 package com.warehouse.zebra.infrastructure.api.requestmodel;
 
 
+import java.util.List;
+
+import com.warehouse.zebrainitialize.model.ParcelCreatedRequest;
+
 import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 
 @XmlRootElement(name = "ZebraRequest")
@@ -26,4 +28,7 @@ public class ZebraRequest {
     @XmlElement(name = "ReturnRequestInformation")
     private List<ReturnRequestInformation> requests;
 
+    @XmlElementWrapper(name = "ParcelCreatedRequests")
+    @XmlElement(name = "ParcelCreatedRequest")
+    private List<ParcelCreatedRequest> parcelCreatedRequests;
 }

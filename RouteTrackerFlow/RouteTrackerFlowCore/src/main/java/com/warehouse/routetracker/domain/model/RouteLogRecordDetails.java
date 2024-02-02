@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import lombok.*;
 
 @Builder
@@ -50,7 +51,7 @@ public class RouteLogRecordDetails {
     }
 
     private RouteLogRecordDetail addNewRouteLogRecordDetail(ProcessType processType, ParcelStatus parcelStatus,
-			String description) {
+                                                            String description) {
 		final RouteLogRecordDetail routeLogRecordDetail = createNewRouteLogRecordDetail(processType, parcelStatus,
 				description);
 		getRouteLogRecordDetailSet().add(routeLogRecordDetail);

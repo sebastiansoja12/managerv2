@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="parcel_created_request"
+           targetNamespace="parcel_created_request"
+           elementFormDefault="qualified">
+
+    <xs:element name="ParcelCreatedRequest" type="tns:ParcelCreatedRequest"/>
+
+    <xs:complexType name="ParcelCreatedRequest">
+        <xs:sequence>
+            <xs:element name="ParcelID" type="xs:long" minOccurs="0"/>
+            <xs:element name="ParcelRelatedID" type="xs:long" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
