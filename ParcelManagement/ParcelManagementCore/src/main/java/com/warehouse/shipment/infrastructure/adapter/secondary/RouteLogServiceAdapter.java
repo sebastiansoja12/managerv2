@@ -2,11 +2,11 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteProcessDto;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
-import com.warehouse.routetracker.infrastructure.api.dto.RouteProcessDto;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.vo.ParcelId;
 import com.warehouse.shipment.domain.vo.RouteProcess;

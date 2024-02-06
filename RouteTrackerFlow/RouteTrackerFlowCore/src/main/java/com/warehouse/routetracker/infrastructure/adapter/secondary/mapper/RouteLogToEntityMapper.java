@@ -11,14 +11,14 @@ import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
-import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
 
 @Mapper
 public interface RouteLogToEntityMapper {
 
     @Mapping(target = "routeLogRecordDetails", source = "routeLogRecordDetails")
-    RouteLogRecordEntity map(RouteLogRecordToChange routeLogRecordToChange);
+    RouteLogRecordEntity map(RouteLogRecord routeLogRecord);
 
 	default List<RouteLogRecordDetailEntity> map(RouteLogRecordDetails routeLogRecordDetails) {
         return routeLogRecordDetails

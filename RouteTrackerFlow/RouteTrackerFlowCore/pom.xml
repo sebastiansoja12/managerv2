@@ -14,11 +14,6 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>RouteTrackerFlowApi</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>ExceptionHandler</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>

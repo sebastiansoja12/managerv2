@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
-import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 
 @ComponentScan(basePackages = { "com.warehouse.delivery", "com.warehouse.deliverytoken" })
 @EntityScan(basePackages = { "com.warehouse.delivery", "com.warehouse.deliverytoken" })
@@ -16,8 +15,6 @@ import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 @AutoConfigureDataJpa
 public class DeliveryTestConfiguration {
 
-    @MockBean
-    public RouteLogEventPublisher routeLogEventPublisher;
 
     @MockBean
     public ParcelServicePort parcelServicePort;

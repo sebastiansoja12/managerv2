@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.*;
+import java.util.Set;
+import java.util.UUID;
 
-import com.warehouse.routetracker.domain.enumeration.ProcessType;
-import org.junit.jupiter.api.Assertions;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -17,10 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
+import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
-import com.warehouse.routetracker.domain.port.secondary.RouteRepository;
+import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.domain.vo.Error;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.RouteLogException;
@@ -29,7 +30,7 @@ import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.Rou
 public class RouteTrackerLogPortImplTest {
 
     @Mock
-    private RouteRepository repository;
+    private RouteLogRepository repository;
 
     @InjectMocks
     private RouteTrackerLogPortImpl routeTrackerLogPort;
@@ -38,150 +39,8 @@ public class RouteTrackerLogPortImplTest {
 
     private final UUID ROUTE_ID = UUID.fromString("1d614a30-910f-486e-8c7b-e3043744088f");
 
-    private final UUID ROUTE_ID_2 = UUID.fromString("f0a45a51-6d0f-45ab-a839-41f161208c65");
-
     public static final Long PARCEL_ID = 100001L;
 
-    public static final Long PARCEL_ID2 = 100002L;
-
-
-    @Test
-    void shouldSaveSupplyRoute() {
-        // given
-        final String depotCode = "KT1";
-        final String supplierCode = "abc";
-        final DeliveryInformation deliveryInformation = DeliveryInformation.builder()
-                .depotCode(depotCode)
-                .deliveryParcelStatus(ParcelStatus.DELIVERY)
-                .parcelId(PARCEL_ID)
-                .supplierCode(supplierCode)
-                .token("token")
-                .build();
-
-        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
-                .supplierCode(supplierCode)
-                .parcelId(PARCEL_ID)
-                .depotCode(depotCode)
-                .parcelStatus(ParcelStatus.DELIVERY)
-                .build();
-
-        // when
-        routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation));
-        // then
-        verify(repository, times(1)).save(routeLogRecord);
-    }
-
-    @Test
-    void shouldNotSaveSupplyRouteWhenTokenDoesNotExist() {
-        // given
-        final DeliveryInformation deliveryInformation = DeliveryInformation.builder().build();
-        final RouteLogRecord routeLogRecord = RouteLogRecord.builder().build();
-        // when
-        routeTrackerLogPort.saveDelivery(Collections.singletonList(deliveryInformation));
-        // then
-        verify(repository, times(0)).save(routeLogRecord);
-    }
-
-    @Test
-    void shouldSaveRoutes() {
-        // given
-        final RouteRequest routeRequest = RouteRequest.builder()
-                .parcelId(100001L)
-                .build();
-
-        final RouteRequest routeRequest2 = RouteRequest.builder()
-                .parcelId(PARCEL_ID2)
-                .build();
-
-        final List<RouteRequest> requests = Arrays.asList(routeRequest, routeRequest2);
-
-        // create expected route response objects with uuid
-        final RouteResponse response = RouteResponse.builder()
-                .id(ROUTE_ID)
-                .build();
-        final RouteResponse response2 = RouteResponse.builder()
-                .id(ROUTE_ID_2)
-                .build();
-        // model route objects sent to liquibase
-        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
-                .parcelId(PARCEL_ID)
-                .build();
-
-        final RouteLogRecord routeLogRecord2 = RouteLogRecord.builder()
-                .parcelId(PARCEL_ID2)
-                .build();
-
-        doReturn(response)
-                .when(repository)
-                .save(routeLogRecord);
-
-        doReturn(response2)
-                .when(repository)
-                .save(routeLogRecord2);
-
-        // when
-        final List<RouteResponse> responses = routeTrackerLogPort.saveRoutes(requests);
-
-        // then
-        Assertions.assertEquals(expectedToBe(response), responses.get(0));
-        Assertions.assertEquals(expectedToBe(response2), responses.get(1));
-    }
-
-    @Test
-    void shouldDeleteRoute() {
-        // given
-        final String username = "s-soja";
-        final RouteDeleteRequest deleteRequest = RouteDeleteRequest.builder()
-                .id("d8d53e7d-9175-4b5b-bf0d-bc209549c3a9")
-                .build();
-        // when
-        routeTrackerLogPort.deleteRoute(deleteRequest);
-        // then
-        verify(repository, times(1)).deleteRoute(deleteRequest);
-    }
-
-    @Test
-    void shouldFindByUsername() {
-        // given
-        final String username = "s-soja";
-        final List<RouteInformation> expectedRouteInformations = Collections.singletonList(
-                RouteInformation.builder()
-                        .parcelStatus(ParcelStatus.RETURN)
-                        .build()
-        );
-        doReturn(expectedRouteInformations)
-                .when(repository)
-                .findByUsername(username);
-        // when
-        final List<RouteInformation> routeInformations = routeTrackerLogPort.findRoutesByUsername(username);
-        // then
-        routeInformations.forEach(
-                routeInformation -> assertEquals(expectedToBe(routeInformation.getParcelStatus()), ParcelStatus.RETURN)
-        );
-
-    }
-
-    @Test
-    void shouldFindByParcelId() {
-        // given
-        final Long parcelId = 1L;
-        final List<RouteInformation> expectedRouteInformations = Collections.singletonList(
-                RouteInformation.builder()
-                        .parcel(Parcel.builder().id(parcelId).build())
-                        .parcelStatus(ParcelStatus.RETURN)
-                        .build()
-        );
-        doReturn(expectedRouteInformations)
-                .when(repository)
-                .findByParcelId(parcelId);
-        // when
-        final List<RouteInformation> routeInformations = routeTrackerLogPort.getRouteListByParcelId(parcelId);
-        // then
-        routeInformations.forEach(
-                routeInformation -> assertEquals(expectedToBe(routeInformation.getParcelStatus()), ParcelStatus.RETURN)
-        );
-
-    }
 
     @Test
     void shouldInitializeRouteProcess() {
@@ -195,7 +54,7 @@ public class RouteTrackerLogPortImplTest {
 
         doReturn(expectedRouteProcess)
                 .when(repository)
-                .save(any(RouteLogRecordToChange.class));
+                .save(any(RouteLogRecord.class));
         // when
         final RouteProcess routeProcess = routeTrackerLogPort.initializeRouteProcess(parcelId);
         // then
@@ -226,20 +85,20 @@ public class RouteTrackerLogPortImplTest {
                 .routeLogRecordDetailSet(Set.of(routeLogRecordDetail))
                 .build();
 
-        final RouteLogRecordToChange routeLogRecordToChange = RouteLogRecordToChange
+        final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
                 .id(ROUTE_ID)
                 .routeLogRecordDetails(routeLogRecordDetails)
                 .parcelId(PARCEL_ID)
                 .build();
 
-        doReturn(routeLogRecordToChange)
+        doReturn(routeLogRecord)
                 .when(repository)
                 .find(PARCEL_ID);
 
         doNothing()
                 .when(repository)
-                .update(routeLogRecordToChange);
+                .update(routeLogRecord);
         // when
         routeTrackerLogPort.saveZebraIdInformation(information);
         // then
@@ -258,13 +117,13 @@ public class RouteTrackerLogPortImplTest {
                 .processType(processType)
                 .build();
 
-        final RouteLogRecordToChange routeLogRecordToChange = mock(RouteLogRecordToChange.class);
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
 
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecordToChange);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveZebraIdInformation(information);
         // then
-        verify(routeLogRecordToChange).saveZebraIdInformation(processType, zebraId);
+        verify(routeLogRecord).saveZebraIdInformation(processType, zebraId);
         verify(repository, times(1)).update(any());
     }
     
@@ -289,25 +148,25 @@ public class RouteTrackerLogPortImplTest {
                 .routeLogRecordDetailSet(Set.of(routeLogRecordDetail))
                 .build();
         
-        final RouteLogRecordToChange routeLogRecordToChange = RouteLogRecordToChange
+        final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
                 .id(ROUTE_ID)
                 .routeLogRecordDetails(routeLogRecordDetails)
                 .parcelId(PARCEL_ID)
                 .build();
 
-        doReturn(routeLogRecordToChange)
+        doReturn(routeLogRecord)
                 .when(repository)
                 .find(PARCEL_ID);
 
         doNothing()
                 .when(repository)
-                .update(routeLogRecordToChange);
+                .update(routeLogRecord);
 
         // when
         routeTrackerLogPort.saveZebraVersionInformation(information);
         // then
-        assertThat(routeLogRecordToChange.getRouteLogRecordDetails()
+        assertThat(routeLogRecord.getRouteLogRecordDetails()
                 .getRouteLogRecordDetailSet())
                 .extracting(RouteLogRecordDetail::getVersion)
                 .containsExactly("1.0");
@@ -325,13 +184,13 @@ public class RouteTrackerLogPortImplTest {
                 .processType(processType)
                 .build();
 
-        final RouteLogRecordToChange routeLogRecordToChange = mock(RouteLogRecordToChange.class);
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
 
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecordToChange);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveZebraVersionInformation(information);
         // then
-        verify(routeLogRecordToChange).saveZebraVersionInformation(processType, version);
+        verify(routeLogRecord).saveZebraVersionInformation(processType, version);
         verify(repository, times(1)).update(any());
     }
 
@@ -355,26 +214,26 @@ public class RouteTrackerLogPortImplTest {
                 .routeLogRecordDetailSet(Set.of(routeLogRecordDetail))
                 .build();
 
-        final RouteLogRecordToChange routeLogRecordToChange = RouteLogRecordToChange
+        final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
                 .id(ROUTE_ID)
                 .routeLogRecordDetails(routeLogRecordDetails)
                 .parcelId(PARCEL_ID)
                 .build();
 
-        doReturn(routeLogRecordToChange)
+        doReturn(routeLogRecord)
                 .when(repository)
                 .find(PARCEL_ID);
 
         doNothing()
                 .when(repository)
-                .update(routeLogRecordToChange);
+                .update(routeLogRecord);
 
         // when
         routeTrackerLogPort.saveReturnErrorCode(information);
         // then
-        verify(repository, times(1)).update(routeLogRecordToChange);
-        assertEquals("1234", routeLogRecordToChange.getReturnCode());
+        verify(repository, times(1)).update(routeLogRecord);
+        assertEquals("1234", routeLogRecord.getReturnCode());
     }
 
     @Test
@@ -392,26 +251,26 @@ public class RouteTrackerLogPortImplTest {
                 .routeLogRecordDetailSet(Set.of(routeLogRecordDetail))
                 .build();
 
-        final RouteLogRecordToChange routeLogRecordToChange = RouteLogRecordToChange
+        final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
                 .id(ROUTE_ID)
                 .routeLogRecordDetails(routeLogRecordDetails)
                 .parcelId(PARCEL_ID)
                 .build();
 
-        doReturn(routeLogRecordToChange)
+        doReturn(routeLogRecord)
                 .when(repository)
                 .find(PARCEL_ID);
 
         doNothing()
                 .when(repository)
-                .update(routeLogRecordToChange);
+                .update(routeLogRecord);
 
         // when
         routeTrackerLogPort.saveFaultDescription(processType, PARCEL_ID, "Error");
         // then
-        verify(repository, times(1)).update(routeLogRecordToChange);
-        assertEquals("Error", routeLogRecordToChange.getFaultDescription());
+        verify(repository, times(1)).update(routeLogRecord);
+        assertEquals("Error", routeLogRecord.getFaultDescription());
     }
 
     @Test
@@ -423,13 +282,13 @@ public class RouteTrackerLogPortImplTest {
                 .parcelId(PARCEL_ID)
                 .processType(processType)
                 .build();
-        final RouteLogRecordToChange routeLogRecordToChange = mock(RouteLogRecordToChange.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecordToChange);
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
         final String requestAsString = objectMapper.writeValueAsString(request);
         // when
         routeTrackerLogPort.saveTerminalRequest(request);
         // then
-        verify(routeLogRecordToChange).saveTerminalRequest(processType, requestAsString);
+        verify(routeLogRecord).saveTerminalRequest(processType, requestAsString);
     }
 
     @Test
@@ -443,13 +302,13 @@ public class RouteTrackerLogPortImplTest {
                 .depotCode("KT1")
                 .processType(processType)
                 .build();
-        final RouteLogRecordToChange routeLogRecordToChange = mock(RouteLogRecordToChange.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecordToChange);
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
         final String requestAsString = objectMapper.writeValueAsString(request);
         // when
         routeTrackerLogPort.saveReturnTrackRequest(request);
         // then
-        verify(routeLogRecordToChange).saveReturnTrackRequest(processType, requestAsString);
+        verify(routeLogRecord).saveReturnTrackRequest(processType, requestAsString);
     }
 
     @Test
@@ -478,12 +337,12 @@ public class RouteTrackerLogPortImplTest {
     void shouldFindRouteLogRecord() {
         // given
         final Long parcelId = 1L;
-        final RouteLogRecordToChange expected = mock(RouteLogRecordToChange.class);
+        final RouteLogRecord expected = mock(RouteLogRecord.class);
         when(repository.find(parcelId)).thenReturn(expected);
         // when
-        final RouteLogRecordToChange routeLogRecordToChange = routeTrackerLogPort.find(parcelId);
+        final RouteLogRecord routeLogRecord = routeTrackerLogPort.find(parcelId);
         // then
-        assertEquals(expected, routeLogRecordToChange);
+        assertEquals(expected, routeLogRecord);
     }
 
     @Test

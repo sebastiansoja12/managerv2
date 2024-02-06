@@ -76,14 +76,5 @@
             active="1"
     />
 
-    <route
-            id="1d614a30-910f-486e-8c7b-e3043744088f"
-            parcel_id="100"
-            username="test"
-            depot_code="TST"
-            created="2023-10-23 17:27:49.254626"
-            supplier_code="TS_TST"
-    />
-
 
 </dataset>

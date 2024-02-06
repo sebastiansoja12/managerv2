@@ -30,7 +30,6 @@ import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.domain.vo.Parcel;
 import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
-import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -41,9 +40,6 @@ public class DeliveryIntegrationTest {
 
     @Autowired
     private DeliveryPort deliveryPort;
-
-    @Autowired
-    private RouteLogEventPublisher routeLogEventPublisher;
 
     @Autowired
     private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;

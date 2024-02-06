@@ -33,12 +33,6 @@
             <artifactId>PathFinderApi</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>RouteTrackerFlowApi</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
 
         <dependency>
             <groupId>com.warehouse</groupId>

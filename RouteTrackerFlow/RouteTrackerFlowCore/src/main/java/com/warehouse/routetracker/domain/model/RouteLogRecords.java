@@ -14,9 +14,9 @@ import java.util.List;
 public class RouteLogRecords {
 
 
-    private List<RouteLogRecordToChange> routeLogRecords;
+    private List<RouteLogRecord> routeLogRecords;
 
-    public List<RouteLogRecordToChange> getRouteLogRecords() {
+    public List<RouteLogRecord> getRouteLogRecords() {
         if (routeLogRecords == null) {
             routeLogRecords = new ArrayList<>();
         }
@@ -24,7 +24,7 @@ public class RouteLogRecords {
     }
 
     void saveRequestParcels(List<Parcel> parcels) {
-        final List<RouteLogRecordToChange> routeLogRecords = parcels
+        final List<RouteLogRecord> routeLogRecords = parcels
                 .stream()
                 .map(this::toRouteLogRecord)
                 .toList();
@@ -32,8 +32,8 @@ public class RouteLogRecords {
         getRouteLogRecords().addAll(routeLogRecords);
     }
 
-    private RouteLogRecordToChange toRouteLogRecord(Parcel e) {
-        return RouteLogRecordToChange
+    private RouteLogRecord toRouteLogRecord(Parcel e) {
+        return RouteLogRecord
                 .builder()
                 .parcelId(e.getId())
                 .returnCode("400")
