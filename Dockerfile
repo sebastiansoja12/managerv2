@@ -2,7 +2,7 @@
 FROM openjdk:21
 
 # Copy the Spring Boot application
-COPY  Application/target/Application-2024.1-SNAPSHOT.jar app.jar
+COPY  Application/target/Application-2024.1.1-SNAPSHOT.jar app.jar
 
 # Expose the default Spring Boot port
 EXPOSE 8080
