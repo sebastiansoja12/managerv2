@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Configuration
+@Configuration("softwareConfiguration.webMvcConfiguration")
 @Slf4j
 public class WebMvcConfiguration implements WebMvcConfigurer {
 

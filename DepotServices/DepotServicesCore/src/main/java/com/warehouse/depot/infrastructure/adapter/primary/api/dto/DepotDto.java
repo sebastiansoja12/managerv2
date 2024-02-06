@@ -12,4 +12,12 @@ public class DepotDto {
     String street;
 
     String country;
+
+    String postalCode;
+
+    String nip;
+
+    String telephoneNumber;
+
+    String openingHours;
 }

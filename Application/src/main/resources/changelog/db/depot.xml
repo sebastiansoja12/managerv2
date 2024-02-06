@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet author="s-soja" id="1">
-        <!-- Create the 'depot' table -->
+
         <createTable tableName="depot">
             <column name="depot_code" type="varchar(255)">
                 <constraints primaryKey="true" unique="true" nullable="false"/>
@@ -16,6 +16,18 @@
                 <constraints nullable="false"/>
             </column>
             <column name="street" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="postalCode" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nip" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="telephoneNumber" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="openingHours" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

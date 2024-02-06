@@ -7,6 +7,7 @@ import lombok.Value;
 @Value
 @Builder
 public class Depot {
+
     String city;
 
     String street;
@@ -14,4 +15,12 @@ public class Depot {
     String country;
 
     String depotCode;
+
+    String postalCode;
+
+    String nip;
+
+    String telephoneNumber;
+
+    String openingHours;
 }

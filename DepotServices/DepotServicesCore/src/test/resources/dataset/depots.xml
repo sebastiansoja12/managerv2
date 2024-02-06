@@ -6,5 +6,9 @@
            street="Polska 11"
            depot_code="PL1"
            country="Polska"
+           postal_code="44-213"
+           nip="123"
+           telephone_number="123"
+           opening_hours="8-22"
     />
 </dataset>
