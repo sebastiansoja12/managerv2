@@ -8,14 +8,12 @@ import org.springframework.ws.config.annotation.EnableWs;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition;
 
-@EnableWs
-@Configuration
 public class DeliveryCreateConfiguration {
 
     @Bean
     public Jaxb2Marshaller marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("com.warehouse");
+        marshaller.setPackagesToScan("com.warehouse.*");
         return marshaller;
     }
 
