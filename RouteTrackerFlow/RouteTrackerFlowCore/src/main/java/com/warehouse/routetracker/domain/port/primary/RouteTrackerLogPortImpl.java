@@ -91,6 +91,17 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
+    public void saveCreateRequest(ZebraInitializeRequest request) {
+        final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
+        try {
+            routeLogRecord.updateRequest(request.getProcessType(), mapper.writeValueAsString(request));
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage());
+        }
+        repository.update(routeLogRecord);
+    }
+
+    @Override
     public void saveTerminalRequest(TerminalRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
         try {
@@ -123,7 +134,6 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         } catch (JsonProcessingException e) {
             logger.error(e.getMessage());
         }
-        routeLogRecord.saveSupplierCode(processType, request.getUsername());
         routeLogRecord.saveDepotCode(processType, request.getDepotCode());
         repository.update(routeLogRecord);
     }

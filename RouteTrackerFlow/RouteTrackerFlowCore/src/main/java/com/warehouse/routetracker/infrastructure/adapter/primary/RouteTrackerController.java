@@ -93,6 +93,13 @@ public class RouteTrackerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/zebra-initialize-request")
+    public ResponseEntity<?> saveZebraInitializeRequest(@RequestBody ZebraInitializeRequestDto initializeRequest) {
+        final ZebraInitializeRequest request = requestMapper.map(initializeRequest);
+        trackerLogPort.saveCreateRequest(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/terminalrequest")
     public ResponseEntity<?> saveTerminalRequest(@RequestBody TerminalRequestDto terminalRequest) {
         final TerminalRequest request = requestMapper.map(terminalRequest);

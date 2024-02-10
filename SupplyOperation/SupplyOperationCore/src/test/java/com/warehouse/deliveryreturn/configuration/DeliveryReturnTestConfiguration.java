@@ -1,5 +1,6 @@
 package com.warehouse.deliveryreturn.configuration;
 
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.supplier.SupplierValidatorProperties;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -35,4 +36,7 @@ public class DeliveryReturnTestConfiguration {
 
     @MockBean
     public SupplierValidatorProperties supplierValidatorProperties;
+
+    @MockBean
+    public RouteTrackerLogProperties routeTrackerLogProperties;
 }

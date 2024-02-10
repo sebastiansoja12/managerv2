@@ -8,8 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @XmlRootElement(name = "RouteProcess")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
@@ -20,6 +18,6 @@ public class RouteProcessType {
     @XmlElement(name = "ParcelID")
     private Long parcelId;
 
-    @XmlElement(name = "ProcessID")
-    private UUID processId;
+    @XmlElement(name = "LogStatus")
+    private LogStatus logStatus;
 }

@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn;
 
 
+import com.warehouse.routetracker.infrastructure.adapter.primary.dto.ProcessTypeDto;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -18,4 +19,5 @@ public class DeliveryReturnRequestDto {
     String updateStatus;
     String username;
     String depotCode;
+    ProcessTypeDto processType;
 }

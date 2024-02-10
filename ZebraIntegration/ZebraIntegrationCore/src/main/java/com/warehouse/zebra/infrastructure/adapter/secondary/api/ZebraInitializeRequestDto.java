@@ -7,6 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class ParcelIdDto {
-    Long value;
+public class ZebraInitializeRequestDto {
+    Long parcelId;
+    ProcessTypeDto processType;
 }

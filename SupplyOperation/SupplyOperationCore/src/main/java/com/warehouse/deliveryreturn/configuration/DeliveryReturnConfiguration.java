@@ -41,8 +41,13 @@ public class DeliveryReturnConfiguration {
 	}
 
     @Bean
-    public SupplierCodeLogServicePort supplierCodeLogServicePort() {
-        return new SupplierCodeLogServiceAdapter();
+    public SupplierCodeLogServicePort supplierCodeLogServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {
+        return SupplierCodeLogServiceAdapter.builder()
+                .routeTrackerLogProperties(routeTrackerLogProperties)
+                .restClient(RestClient.builder()
+                        .baseUrl(routeTrackerLogProperties.getUrl())
+                        .build())
+                .build();
     }
 
     @Bean("deliveryReturn.mailServicePort")

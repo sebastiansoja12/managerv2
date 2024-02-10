@@ -10,7 +10,6 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -22,6 +21,7 @@ import org.springframework.web.client.RestClient;
 
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.zebra.domain.vo.LogStatus;
 import com.warehouse.zebra.domain.vo.RouteProcess;
 import com.warehouse.zebra.infrastructure.adapter.primary.ZebraInitializeAdapter;
 import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
@@ -60,9 +60,7 @@ public class ZebraInitializeIntegrationAdapterTest {
         final String requestXmlContent = new String(Files.readAllBytes(request));
         final Path response = Paths.get(RESPONSE_PATH);
         final String responseXmlContent = new String(Files.readAllBytes(response));
-        when(routeLogServicePort.initializeProcess(any())).thenReturn(new RouteProcess(1L, UUID.fromString(
-                "4061acb8-b556-42b1-b274-7aa300eb1112"
-        )));
+        when(routeLogServicePort.initializeProcess(any())).thenReturn(new RouteProcess(1L, LogStatus.OK));
         // when
         final ResponseEntity<ZebraResponse> responseEntity = restClient
                 .post()

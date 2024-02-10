@@ -31,6 +31,8 @@ public interface RouteTrackerLogPort {
 
     void saveDepotCode(DepotCodeRequest depotCodeRequest);
 
+    void saveCreateRequest(ZebraInitializeRequest request);
+
     void saveTerminalRequest(TerminalRequest request);
 
     void saveReturnTrackRequest(ReturnTrackRequest request);
