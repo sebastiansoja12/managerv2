@@ -34,7 +34,7 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
         final ParcelIdDto parcelIdRequest = ParcelIdDto.builder().value(parcelId).build();
         final ResponseEntity<RouteProcessDto> responseEntity = restClient
                 .post()
-                .uri("/v2/api/routes/test/{initialize}", routeTrackerLogProperties.getInitialize())
+                .uri("/v2/api/routes/{initialize}", routeTrackerLogProperties.getInitialize())
                 .body(parcelIdRequest)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()

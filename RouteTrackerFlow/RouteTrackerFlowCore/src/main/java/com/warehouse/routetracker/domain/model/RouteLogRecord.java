@@ -83,4 +83,11 @@ public class RouteLogRecord {
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveSupplierCode(supplierCode);
     }
+
+    public void updateRequest(ProcessType processType, String request) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+
+        routeLogRecordDetail.updateRequest(request);
+    }
 }

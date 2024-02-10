@@ -1,4 +1,5 @@
-package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto;
+package com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn;
+
 
 import lombok.Builder;
 import lombok.Value;
@@ -9,7 +10,7 @@ import java.util.UUID;
 @Value
 @Jacksonized
 @Builder
-public class DeliveryReturnRouteDetailsDto {
+public class DeliveryReturnRequestDto {
     UUID id;
     Long parcelId;
     String deliveryStatus;

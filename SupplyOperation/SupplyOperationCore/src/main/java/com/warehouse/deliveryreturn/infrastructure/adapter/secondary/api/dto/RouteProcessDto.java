@@ -7,14 +7,9 @@ import lombok.extern.jackson.Jacksonized;
 import java.util.UUID;
 
 @Value
-@Jacksonized
 @Builder
-public class DeliveryReturnRouteDetailsDto {
-    UUID id;
+@Jacksonized
+public class RouteProcessDto {
     Long parcelId;
-    String deliveryStatus;
-    String returnToken;
-    String updateStatus;
-    String username;
-    String depotCode;
+    UUID processId;
 }

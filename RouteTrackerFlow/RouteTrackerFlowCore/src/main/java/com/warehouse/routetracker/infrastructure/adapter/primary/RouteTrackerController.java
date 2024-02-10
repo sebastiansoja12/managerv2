@@ -2,6 +2,8 @@ package com.warehouse.routetracker.infrastructure.adapter.primary;
 
 import java.util.List;
 
+import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
+import com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn.DeliveryReturnRequestDto;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +65,34 @@ public class RouteTrackerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/suppliercode")
+    public ResponseEntity<?> saveSupplierCode(@RequestBody SupplierCodeRequestDto supplierCodeRequest) {
+        final SupplierCodeRequest request = requestMapper.map(supplierCodeRequest);
+        trackerLogPort.saveSupplierCode(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/depotcode")
+    public ResponseEntity<?> saveDepotCode(@RequestBody DepotCodeRequestDto depotCodeRequest) {
+        final DepotCodeRequest request = requestMapper.map(depotCodeRequest);
+        trackerLogPort.saveDepotCode(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/username")
+    public ResponseEntity<?> saveUsername(@RequestBody UsernameRequestDto usernameRequest) {
+        final UsernameRequest request = requestMapper.map(usernameRequest);
+        trackerLogPort.saveUsername(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/description")
+    public ResponseEntity<?> saveDescription(@RequestBody DescriptionRequestDto descriptionRequest) {
+        final DescriptionRequest request = requestMapper.map(descriptionRequest);
+        trackerLogPort.saveDescription(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/terminalrequest")
     public ResponseEntity<?> saveTerminalRequest(@RequestBody TerminalRequestDto terminalRequest) {
         final TerminalRequest request = requestMapper.map(terminalRequest);
@@ -74,6 +104,13 @@ public class RouteTrackerController {
     public ResponseEntity<?> saveReturnTrackRequest(@RequestBody ReturnTrackRequestDto returnTrackRequest) {
         final ReturnTrackRequest request = requestMapper.map(returnTrackRequest);
         trackerLogPort.saveReturnTrackRequest(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/delivery-return-request")
+    public ResponseEntity<?> saveDeliveryReturnRequest(@RequestBody DeliveryReturnRequestDto deliveryReturnRequest) {
+        final DeliveryReturnRequest request = requestMapper.map(deliveryReturnRequest);
+        trackerLogPort.saveDeliveryReturnRequest(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -45,6 +45,9 @@ public class DeliveryReturnPortImplTest {
     @Mock
     private MailServicePort mailServicePort;
 
+    @Mock
+    private SupplierCodeLogServicePort supplierCodeLogServicePort;
+
     private DeliveryReturnPortImpl returnPort;
 
     private final DeviceInformation deviceInformation = new DeviceInformation(
@@ -57,7 +60,7 @@ public class DeliveryReturnPortImplTest {
         final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
                 deliveryReturnTokenServicePort, parcelRepositoryServicePort, mailServicePort);
         returnPort = new DeliveryReturnPortImpl(deliveryReturnService, parcelStatusControlChangeServicePort,
-                routeLogServicePort);
+                routeLogServicePort, supplierCodeLogServicePort);
     }
 
     @Test

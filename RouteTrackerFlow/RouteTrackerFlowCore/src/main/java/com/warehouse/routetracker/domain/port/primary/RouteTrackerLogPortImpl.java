@@ -2,6 +2,7 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
+import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,34 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
+    public void saveDescription(DescriptionRequest request) {
+        final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
+        routeLogRecord.saveDescription(request.getProcessType(), request.getValue());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveSupplierCode(SupplierCodeRequest request) {
+        final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
+        routeLogRecord.saveSupplierCode(request.getProcessType(), request.getSupplierCode());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveUsername(UsernameRequest request) {
+        final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
+        routeLogRecord.saveUsername(request.getProcessType(), request.getUsername());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveDepotCode(DepotCodeRequest request) {
+        final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
+        routeLogRecord.saveDepotCode(request.getProcessType(), request.getDepotCode());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
     public void saveTerminalRequest(TerminalRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
         try {
@@ -76,12 +105,26 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     public void saveReturnTrackRequest(ReturnTrackRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
         try {
-            routeLogRecord.saveReturnTrackRequest(request.getProcessType(), mapper.writeValueAsString(request));
+            routeLogRecord.updateRequest(request.getProcessType(), mapper.writeValueAsString(request));
         } catch (JsonProcessingException e) {
             logger.error(e.getMessage());
         }
         routeLogRecord.saveUsername(request.getProcessType(), request.getUsername());
         routeLogRecord.saveDepotCode(request.getProcessType(), request.getDepotCode());
+        repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveDeliveryReturnRequest(DeliveryReturnRequest request) {
+        final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
+        final ProcessType processType = ProcessType.RETURN;
+        try {
+            routeLogRecord.updateRequest(processType, mapper.writeValueAsString(request));
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage());
+        }
+        routeLogRecord.saveSupplierCode(processType, request.getUsername());
+        routeLogRecord.saveDepotCode(processType, request.getDepotCode());
         repository.update(routeLogRecord);
     }
 

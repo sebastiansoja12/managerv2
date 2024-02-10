@@ -61,7 +61,7 @@ public class RouteTrackerIntegrationTest {
         // when
         final ResponseEntity<RouteProcessDto> responseEntity = restClient
                 .post()
-                .uri("/v2/api/routes/test/initialize")
+                .uri("/v2/api/routes/initialize")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -80,7 +80,7 @@ public class RouteTrackerIntegrationTest {
         // when
         final ResponseEntity<RouteLogRecord> responseEntity = restClient
                 .get()
-                .uri("/v2/api/routes/test/{parcelId}", parcelId)
+                .uri("/v2/api/routes/{parcelId}", parcelId)
                 .retrieve()
                 .toEntity(RouteLogRecord.class);
         // then

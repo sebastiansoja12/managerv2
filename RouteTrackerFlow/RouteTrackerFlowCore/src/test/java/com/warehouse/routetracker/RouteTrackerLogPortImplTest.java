@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.util.Set;
 import java.util.UUID;
 
+import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -308,7 +309,102 @@ public class RouteTrackerLogPortImplTest {
         // when
         routeTrackerLogPort.saveReturnTrackRequest(request);
         // then
-        verify(routeLogRecord).saveReturnTrackRequest(processType, requestAsString);
+        verify(routeLogRecord).updateRequest(processType, requestAsString);
+    }
+
+    @Test
+    void shouldSaveDeliveryReturnRequest() throws JsonProcessingException {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final DeliveryReturnRequest request = DeliveryReturnRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .username("s-soja")
+                .depotCode("KT1")
+                .processType(processType)
+                .deliveryStatus("RETURN")
+                .returnToken("12345")
+                .updateStatus("OK")
+                .build();
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        final String requestAsString = objectMapper.writeValueAsString(request);
+        // when
+        routeTrackerLogPort.saveDeliveryReturnRequest(request);
+        // then
+        verify(routeLogRecord).updateRequest(processType, requestAsString);
+    }
+
+    @Test
+    void shouldSaveUsername() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final UsernameRequest request = UsernameRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .username("s-soja")
+                .processType(processType)
+                .build();
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        // when
+        routeTrackerLogPort.saveUsername(request);
+        // then
+        verify(routeLogRecord).saveUsername(processType, "s-soja");
+    }
+
+    @Test
+    void shouldSaveDepotCode() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final DepotCodeRequest request = DepotCodeRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .depotCode("KT1")
+                .processType(processType)
+                .build();
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        // when
+        routeTrackerLogPort.saveDepotCode(request);
+        // then
+        verify(routeLogRecord).saveDepotCode(processType, "KT1");
+    }
+
+    @Test
+    void shouldSaveSupplierCode() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final SupplierCodeRequest request = SupplierCodeRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .supplierCode("abc")
+                .processType(processType)
+                .build();
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        // when
+        routeTrackerLogPort.saveSupplierCode(request);
+        // then
+        verify(routeLogRecord).saveSupplierCode(processType, "abc");
+    }
+
+    @Test
+    void shouldSaveDescription() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final DescriptionRequest request = DescriptionRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .processType(processType)
+                .value("value")
+                .build();
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        // when
+        routeTrackerLogPort.saveDescription(request);
+        // then
+        verify(routeLogRecord).saveDescription(processType, "value");
     }
 
     @Test
@@ -328,6 +424,112 @@ public class RouteTrackerLogPortImplTest {
 
         // when
         final Executable executable = () -> routeTrackerLogPort.saveReturnTrackRequest(request);
+        // then
+        assertThrows(RouteLogException.class, executable);
+        verify(repository, times(0)).update(any());
+    }
+
+    @Test
+    void shouldNotSaveDeliveryReturnRequestWhenProcessWasNotFound() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final DeliveryReturnRequest request = DeliveryReturnRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .username("s-soja")
+                .depotCode("KT1")
+                .processType(processType)
+                .build();
+        doThrow(new RouteLogException("Route log was not found"))
+                .when(repository)
+                .find(PARCEL_ID);
+
+        // when
+        final Executable executable = () -> routeTrackerLogPort.saveDeliveryReturnRequest(request);
+        // then
+        assertThrows(RouteLogException.class, executable);
+        verify(repository, times(0)).update(any());
+    }
+
+    @Test
+    void shouldNotSaveSupplierCode() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final SupplierCodeRequest request = SupplierCodeRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .supplierCode("abc")
+                .processType(processType)
+                .build();
+        doThrow(new RouteLogException("Route log was not found"))
+                .when(repository)
+                .find(PARCEL_ID);
+
+        // when
+        final Executable executable = () -> routeTrackerLogPort.saveSupplierCode(request);
+        // then
+        assertThrows(RouteLogException.class, executable);
+        verify(repository, times(0)).update(any());
+    }
+
+    @Test
+    void shouldNotSaveUsername() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final UsernameRequest request = UsernameRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .username("s-soja")
+                .processType(processType)
+                .build();
+        doThrow(new RouteLogException("Route log was not found"))
+                .when(repository)
+                .find(PARCEL_ID);
+
+        // when
+        final Executable executable = () -> routeTrackerLogPort.saveUsername(request);
+        // then
+        assertThrows(RouteLogException.class, executable);
+        verify(repository, times(0)).update(any());
+    }
+
+    @Test
+    void shouldNotSaveDepotCode() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final DepotCodeRequest request = DepotCodeRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .depotCode("KT1")
+                .processType(processType)
+                .build();
+        doThrow(new RouteLogException("Route log was not found"))
+                .when(repository)
+                .find(PARCEL_ID);
+
+        // when
+        final Executable executable = () -> routeTrackerLogPort.saveDepotCode(request);
+        // then
+        assertThrows(RouteLogException.class, executable);
+        verify(repository, times(0)).update(any());
+    }
+
+    @Test
+    void shouldNotDescription() {
+        // given
+        final ProcessType processType = ProcessType.RETURN;
+        final DescriptionRequest request = DescriptionRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .value("value")
+                .processType(processType)
+                .build();
+        doThrow(new RouteLogException("Route log was not found"))
+                .when(repository)
+                .find(PARCEL_ID);
+
+        // when
+        final Executable executable = () -> routeTrackerLogPort.saveDescription(request);
         // then
         assertThrows(RouteLogException.class, executable);
         verify(repository, times(0)).update(any());
@@ -453,10 +655,5 @@ public class RouteTrackerLogPortImplTest {
         // then
         assertThrows(RouteLogException.class, executable);
         verify(repository, times(0)).update(any());
-    }
-
-
-    private <T> T expectedToBe(T t) {
-        return t;
     }
 }

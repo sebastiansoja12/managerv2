@@ -32,12 +32,18 @@ public class DeliveryReturnConfiguration {
 	public DeliveryReturnPort deliveryReturnPort(DeliveryReturnRepository deliveryReturnRepository,
 			DeliveryReturnTokenServicePort deliveryReturnTokenServicePort, RouteLogServicePort routeLogServicePort,
 			ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort,
-			ParcelRepositoryServicePort parcelRepositoryServicePort, MailServicePort mailServicePort) {
+			ParcelRepositoryServicePort parcelRepositoryServicePort, MailServicePort mailServicePort,
+			SupplierCodeLogServicePort supplierCodeLogServicePort) {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
 				deliveryReturnTokenServicePort, parcelRepositoryServicePort, mailServicePort);
 		return new DeliveryReturnPortImpl(deliveryReturnService, parcelStatusControlChangeServicePort,
-                routeLogServicePort);
+				routeLogServicePort, supplierCodeLogServicePort);
 	}
+
+    @Bean
+    public SupplierCodeLogServicePort supplierCodeLogServicePort() {
+        return new SupplierCodeLogServiceAdapter();
+    }
 
     @Bean("deliveryReturn.mailServicePort")
     public MailServicePort mailServicePort(MailPort mailPort, MailProperty mailProperty) {

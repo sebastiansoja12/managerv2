@@ -4,17 +4,13 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.List;
 
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteRequest;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.DeliveryReturnRouteRequestDto;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.RouteRequestDto;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.RouteResponseDto;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.routelog.request.DeliveryReturnLogRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryRouteRequestMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 
@@ -36,36 +32,30 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
                 .build();
     }
 
-    // TODO adjust for new routing process
     @Override
     public void logDeliverReturn(DeliveryReturnRouteRequest deliveryReturnRouteRequest) {
-        final DeliveryReturnRouteRequestDto request = requestMapper.map(deliveryReturnRouteRequest);
+        final List<DeliveryReturnLogRequestDto> request = requestMapper.map(deliveryReturnRouteRequest);
 
-        final List<RouteRequestDto> routeRequest = buildRouteRequest(request);
-        final ResponseEntity<List<RouteResponseDto>> logRoute = restClient.post()
-                        .uri("/v2/api/routes")
-                        .body(routeRequest)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .retrieve()
-                        .toEntity(new ParameterizedTypeReference<List<RouteResponseDto>>() {});
-
-        if (logRoute.getStatusCode().is2xxSuccessful()) {
-			if (!CollectionUtils.isEmpty(logRoute.getBody())) {
-				logRoute.getBody().forEach(res -> log.info("Successfully logged route for parcel {} with route id: {}",
-						res.getParcelId(), res.getId()));
-			}
-		}
+        request.stream()
+                .peek(this::logDeliverReturnInformation)
+                .forEach(this::logDeliverReturn);
     }
 
-	private List<RouteRequestDto> buildRouteRequest(DeliveryReturnRouteRequestDto request) {
-		return request.getDeliveryReturnRouteDetails().stream()
-				.map(req -> RouteRequestDto
-                        .builder()
-                        .parcelId(req.getParcelId())
-                        .supplierCode(request.getSupplierCode())
-                        .depotCode(request.getDepotCode())
-                        .build())
-                .toList();
+    private void logDeliverReturnInformation(DeliveryReturnLogRequestDto logRequest) {
+        log.info("Logging delivery return in tracker module for parcel: {}", logRequest.getParcelId());
+    }
 
-	}
+    private void logDeliverReturn(DeliveryReturnLogRequestDto request) {
+        restClient.post()
+                .uri("/v2/api/routes/{endpoint}", routeTrackerLogProperties.getDeliveryReturnRequest())
+                .body(request)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(HttpStatusCode::is2xxSuccessful,
+                        (req, res) -> log.warn("Successfully registered return in tracker module"))
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (req, res) -> log.warn("Error while logging return"))
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        (req, res) -> log.warn("Critical error while logging return"));
+    }
 }
