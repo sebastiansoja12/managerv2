@@ -1,13 +1,16 @@
 ## [2024.2] - 2024-02-05
 
 ### Added
-- TBA
+- FFT-439 Add fields for depot
+- New endpoints for saving information about route record
 
 ### Changed
-- TBA
+- Route process
+- Initialize in zebra module
+- Delete old route controller
 
 ### Fixed
-- TBA
+- Conflict between SoftwareConfig and main Application
 
 ### Deprecated
 - TBA
