@@ -6,7 +6,7 @@
     <RouteProcesses>
         <RouteProcess>
             <ParcelID>1</ParcelID>
-            <ProcessID>4061acb8-b556-42b1-b274-7aa300eb1112</ProcessID>
+            <LogStatus>OK</LogStatus>
         </RouteProcess>
     </RouteProcesses>
 </ZebraResponse>
