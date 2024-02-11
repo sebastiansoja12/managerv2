@@ -1,10 +1,11 @@
-package com.warehouse.returning.domain.model;
+package com.warehouse.returning.domain.vo;
 
 import lombok.Builder;
+import lombok.Value;
 
-
+@Value
 @Builder
-public class Recipient {
+public class Sender {
     String firstName;
     String lastName;
     String email;

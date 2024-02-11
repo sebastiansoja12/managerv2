@@ -21,22 +21,10 @@ public class ReturnRequest {
                 .anyMatch(ReturnPackageRequest::isReturnNotTokenAvailable);
     }
 
-    public List<ReturnPackageRequest> cleanReturnRequest() {
-        return requests.stream()
-                .filter(ReturnPackageRequest::isCancelled)
-                .collect(Collectors.toList());
-    }
-
     public void assignDepotToReturnPackages() {
         requests = requests.stream()
                 .peek(returnPackageRequest -> returnPackageRequest.updateDepot(depotCode))
                 .collect(Collectors.toList());
-    }
-
-    public void updateProcessing() {
-        requests.stream()
-                .filter(ReturnPackageRequest::isCreated)
-                .forEach(returnPackageRequest -> returnPackageRequest.processReturn(returnPackageRequest.getReason()));
     }
 
     public void assignUserToReturnPackages() {

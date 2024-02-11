@@ -33,10 +33,6 @@ public class ReturnPackageRequest {
         this.returnStatus = COMPLETED;
     }
 
-    public void revertStatus(ReturnStatus returnStatus) {
-        this.returnStatus = returnStatus;
-    }
-
     public void updateDepot(String depotCode) {
         this.depotCode = depotCode;
     }
