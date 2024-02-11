@@ -5,7 +5,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.warehouse.routetracker.domain.model.RouteInformation;
+import com.warehouse.routetracker.domain.vo.RouteInformation;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.RouteInformationDto;

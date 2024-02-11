@@ -41,13 +41,6 @@ public class RouteLogRecord {
         routeLogRecordDetail.updateRequest(terminalRequest);
     }
 
-    public void saveReturnTrackRequest(ProcessType processType, String request) {
-        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
-                .getRouteLogRecordDetail(processType);
-
-        routeLogRecordDetail.updateRequest(request);
-    }
-
     public void saveZebraIdInformation(ProcessType processType, Long zebraId) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);

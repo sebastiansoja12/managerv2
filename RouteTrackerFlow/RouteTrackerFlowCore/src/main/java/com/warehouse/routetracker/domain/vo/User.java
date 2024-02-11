@@ -1,9 +1,9 @@
-package com.warehouse.routetracker.domain.model;
+package com.warehouse.routetracker.domain.vo;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class User {
 
