@@ -1,14 +1,12 @@
 package com.warehouse.auth.infrastructure.adapter.primary.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
+@Builder
+@Jacksonized
 public class UserResponseDto {
-    Long id;
     String username;
     String depotCode;
     boolean nonExpired;

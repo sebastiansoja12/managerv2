@@ -6,7 +6,6 @@ import lombok.Value;
 @Value
 @Builder
 public class UserResponse {
-    Long id;
     String username;
     String depotCode;
     boolean nonExpired;

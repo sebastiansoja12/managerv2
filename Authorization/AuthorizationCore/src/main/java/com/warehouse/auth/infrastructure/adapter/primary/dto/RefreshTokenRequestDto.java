@@ -1,15 +1,15 @@
 package com.warehouse.auth.infrastructure.adapter.primary.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
+@Builder
+@Jacksonized
 public class RefreshTokenRequestDto {
     @NotBlank
-    private String refreshToken;
-    private String username;
+    String refreshToken;
+    String username;
 }
