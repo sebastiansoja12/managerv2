@@ -1,11 +1,9 @@
 package com.warehouse.redirect.domain.vo;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
 
-@Data
-@NoArgsConstructor
+@Value
 public class RedirectToken {
 
     String token;
@@ -13,10 +11,4 @@ public class RedirectToken {
     Long parcelId;
 
     String email;
-
-    public RedirectToken(String token, Long parcelId, String email) {
-        this.token = token;
-        this.parcelId = parcelId;
-        this.email = email;
-    }
 }
