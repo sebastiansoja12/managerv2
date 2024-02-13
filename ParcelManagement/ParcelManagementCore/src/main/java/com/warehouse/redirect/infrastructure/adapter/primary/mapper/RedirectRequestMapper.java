@@ -1,6 +1,6 @@
 package com.warehouse.redirect.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.redirect.domain.model.RedirectParcel;
+import com.warehouse.redirect.domain.vo.RedirectParcel;
 import com.warehouse.redirect.infrastructure.api.dto.ParcelDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

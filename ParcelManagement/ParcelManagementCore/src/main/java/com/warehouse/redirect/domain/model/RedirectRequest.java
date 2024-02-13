@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class RedirectRequest {
-    Long parcelId;
-    String email;
+    private Long parcelId;
+    private String email;
 }

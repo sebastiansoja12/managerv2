@@ -8,11 +8,11 @@ import lombok.Data;
 
 @Data
 public class RedirectParcelResponse {
-    Long parcelId;
-    Sender sender;
-    Recipient recipient;
-    Size parcelSize;
-    Status status;
-    ParcelType parcelType;
-    Long parcelRelatedId;
+    private Long parcelId;
+    private Sender sender;
+    private Recipient recipient;
+    private Size parcelSize;
+    private Status status;
+    private ParcelType parcelType;
+    private Long parcelRelatedId;
 }

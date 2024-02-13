@@ -1,5 +1,6 @@
 package com.warehouse.redirect.domain.model;
 
+import com.warehouse.redirect.domain.vo.RedirectParcel;
 import com.warehouse.redirect.domain.vo.Token;
 import lombok.Data;
 

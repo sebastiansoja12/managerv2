@@ -10,12 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Sender {
-
-    String firstName;
-    String lastName;
-    String email;
-    String telephoneNumber;
-    String city;
-    String postalCode;
-    String street;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String telephoneNumber;
+    private String city;
+    private String postalCode;
+    private String street;
 }
