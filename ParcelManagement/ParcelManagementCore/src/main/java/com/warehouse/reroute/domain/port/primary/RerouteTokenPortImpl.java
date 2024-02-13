@@ -1,6 +1,6 @@
 package com.warehouse.reroute.domain.port.primary;
 
-import static com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes.REROUTE_102;
+import static com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes.REROUTE_403;
 
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.RerouteException;
@@ -54,13 +54,13 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
         final RerouteParcel parcel = extractParcelFromRequest(request);
 
         if (!parcel.isRequiredToReroute()) {
-            throw new RerouteException(RerouteExceptionCodes.REROUTE_100);
+            throw new RerouteException(RerouteExceptionCodes.REROUTE_403_EMPTY_PARCEL);
         }
 
         final RerouteToken rerouteToken = extractTokenFromRequest(request);
 
         if (!rerouteToken.isValid()) {
-            throw new RerouteTokenExpiredException(REROUTE_102);
+            throw new RerouteTokenExpiredException(REROUTE_403);
         }
 
         prepareToReroute(parcel);

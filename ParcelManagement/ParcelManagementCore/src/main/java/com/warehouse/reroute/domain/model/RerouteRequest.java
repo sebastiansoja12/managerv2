@@ -1,7 +1,7 @@
 package com.warehouse.reroute.domain.model;
 
 
-import static com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes.REROUTE_101;
+import static com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes.REROUTE_500;
 
 import com.warehouse.reroute.domain.exception.EmailNotFoundException;
 
@@ -21,7 +21,7 @@ public class RerouteRequest {
 
     public String getEmail() {
         if (email == null) {
-            throw new EmailNotFoundException(REROUTE_101);
+            throw new EmailNotFoundException(REROUTE_500);
         }
         return email;
     }
