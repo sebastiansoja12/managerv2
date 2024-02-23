@@ -6,7 +6,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
 import com.warehouse.redirect.domain.exception.*;
-import com.warehouse.redirect.domain.model.RedirectParcelRequest;
+import com.warehouse.redirect.domain.vo.RedirectParcelRequest;
 import com.warehouse.redirect.domain.port.secondary.RedirectServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -155,8 +155,7 @@ public class RedirectTokenPortImplTest {
     @Test
     void shouldNotRedirectWhenTokenIsEmpty() {
         // given
-        final RedirectParcelRequest request = new RedirectParcelRequest();
-        request.setToken(null);
+        final RedirectParcelRequest request = new RedirectParcelRequest(null, null, null);
         // when
         final Executable executable = () -> redirectTokenPort.redirect(request);
         // then
@@ -168,9 +167,7 @@ public class RedirectTokenPortImplTest {
     @Test
     void shouldNotRedirectWhenParcelIdIsNull() {
         // given
-        final RedirectParcelRequest request = new RedirectParcelRequest();
-        request.setParcelId(null);
-        request.setToken(new Token("12345"));
+        final RedirectParcelRequest request = new RedirectParcelRequest(null, null, new Token("12345"));
         // when
         final Executable executable = () -> redirectTokenPort.redirect(request);
         // then

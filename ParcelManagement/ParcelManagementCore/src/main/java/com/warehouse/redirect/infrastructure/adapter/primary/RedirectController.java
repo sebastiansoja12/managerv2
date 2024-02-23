@@ -1,6 +1,6 @@
 package com.warehouse.redirect.infrastructure.adapter.primary;
 
-import com.warehouse.redirect.domain.model.RedirectParcelRequest;
+import com.warehouse.redirect.domain.vo.RedirectParcelRequest;
 import com.warehouse.redirect.domain.model.RedirectParcelResponse;
 import com.warehouse.redirect.domain.model.RedirectRequest;
 import com.warehouse.redirect.domain.model.RedirectResponse;
@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.mapstruct.factory.Mappers.getMapper;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/redirections")
@@ -24,10 +26,9 @@ public class RedirectController {
 
     private final RedirectTokenPort redirectTokenPort;
 
-    private final RedirectRequestMapper requestMapper;
+    private final RedirectRequestMapper requestMapper = getMapper(RedirectRequestMapper.class);
 
-    private final RedirectResponseMapper responseMapper;
-
+    private final RedirectResponseMapper responseMapper = getMapper(RedirectResponseMapper.class);
 
     @PostMapping("/information")
     public ResponseEntity<?> sendInformation(@RequestBody RedirectRequestDto requestDto) {
@@ -42,5 +43,4 @@ public class RedirectController {
         final RedirectParcelResponse response = redirectTokenPort.redirect(request);
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
-
 }

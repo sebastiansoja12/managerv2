@@ -28,7 +28,7 @@ public class RedirectServiceImplTest {
     @Test
     void shouldSaveToken() {
         // given
-        final RedirectToken redirectToken = new RedirectToken();
+        final RedirectToken redirectToken = new RedirectToken("token", 1L, "email");
         // when
         redirectService.saveRedirectToken(redirectToken);
         // then
