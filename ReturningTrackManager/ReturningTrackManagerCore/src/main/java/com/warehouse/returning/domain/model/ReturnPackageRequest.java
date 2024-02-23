@@ -67,4 +67,9 @@ public class ReturnPackageRequest {
         }
         return null;
     }
+
+    public ReturnPackageRequest updateReturnStatus(ReturnStatus returnStatus) {
+        this.returnStatus = returnStatus;
+        return this;
+    }
 }
