@@ -1,16 +1,12 @@
 package com.warehouse.redirect.domain.vo;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 @Builder
 public class RedirectNotification {
-    private String subject;
-    private String recipient;
-    private String body;
+     String subject;
+     String recipient;
+     String body;
 }

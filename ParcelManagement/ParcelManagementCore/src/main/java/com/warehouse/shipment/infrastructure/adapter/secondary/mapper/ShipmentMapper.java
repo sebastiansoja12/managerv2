@@ -4,11 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.routetracker.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.ParcelUpdate;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
-import com.warehouse.shipment.domain.vo.ShipmentResponse;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentMapper {
@@ -31,6 +29,7 @@ public interface ShipmentMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "price", ignore = true)
     Parcel map(ShipmentRequest request);
+
     @Mapping(target = "sender.firstName", source = "senderFirstName")
     @Mapping(target = "sender.lastName", source = "senderLastName")
     @Mapping(target = "sender.email", source = "senderEmail")
@@ -48,6 +47,4 @@ public interface ShipmentMapper {
     @Mapping(target = "parcelSize", source = "parcelSize")
     @Mapping(target = "id", source = "id")
     Parcel map(ParcelUpdate parcelUpdate);
-
-    ShipmentRequestDto mapToRequestDto(ShipmentResponse response);
 }

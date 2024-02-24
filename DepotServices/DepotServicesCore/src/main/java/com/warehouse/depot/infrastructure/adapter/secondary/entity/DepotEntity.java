@@ -29,4 +29,17 @@ public class DepotEntity {
 
     @Column(name = "country", nullable = false)
     private String country;
+
+    @Column(name = "postal_code", nullable = false)
+    private String postalCode;
+
+    @Column(name = "nip", nullable = false)
+    private String nip;
+
+    @Column(name = "telephone_number", nullable = false)
+    private String telephoneNumber;
+
+    @Column(name = "opening_hours", nullable = false)
+    private String openingHours;
+
 }

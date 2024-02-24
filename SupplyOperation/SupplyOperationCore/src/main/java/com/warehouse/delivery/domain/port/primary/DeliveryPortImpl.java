@@ -51,7 +51,7 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .map(this::mapToDeliveryRouteRequest)
                 .collect(Collectors.toSet());
 
-        logServicePort.deliver(deliveryRouteRequests);
+        //logServicePort.deliver(deliveryRouteRequests);
     }
     
     private void updateParcelStatus(List<DeliveryResponse> deliveryResponses) {

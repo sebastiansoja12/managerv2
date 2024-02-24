@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 public class ConstantBodyMailMessage {
 
-    String body;
+    private String body;
 
-    String token;
+    private String token;
 
-    Long parcelId;
+    private Long parcelId;
 
     public ConstantBodyMailMessage(String token) {
         this.body = "Dla Państwa paczki została wysłana prośba o przekierowanie" +

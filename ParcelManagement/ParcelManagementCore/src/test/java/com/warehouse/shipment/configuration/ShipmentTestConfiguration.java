@@ -8,7 +8,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.mail.domain.service.MailService;
-import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
 import com.warehouse.voronoi.VoronoiService;
@@ -32,9 +31,6 @@ public class ShipmentTestConfiguration {
 
     @MockBean
     public VoronoiService voronoiService;
-
-    @MockBean
-    public RouteLogEventPublisher routeLogEventPublisher;
 
     @MockBean
     public RouteLogServicePort routeLogServicePort;

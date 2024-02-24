@@ -38,9 +38,4 @@ public class RouteLogRecordEntity {
         }
         return routeLogRecordDetails;
     }
-
-    public void updateRouteLogRecordDetails(List<RouteLogRecordDetailEntity> routeLogRecordEntities) {
-        this.routeLogRecordDetails = routeLogRecordEntities;
-    }
-
 }

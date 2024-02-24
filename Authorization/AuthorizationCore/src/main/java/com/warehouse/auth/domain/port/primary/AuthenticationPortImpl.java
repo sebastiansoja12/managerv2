@@ -88,6 +88,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         return switch (role) {
             case "ADMIN" -> Role.ADMIN;
             case "MANAGER" -> Role.MANAGER;
+            case "SUPPLIER" -> Role.SUPPLIER;
             default -> Role.USER;
         };
     }

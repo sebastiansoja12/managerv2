@@ -1,5 +1,9 @@
 package com.warehouse.redirect.configuration;
 
+import org.mapstruct.factory.Mappers;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPort;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPortImpl;
@@ -10,10 +14,6 @@ import com.warehouse.redirect.domain.service.RedirectService;
 import com.warehouse.redirect.domain.service.RedirectServiceImpl;
 import com.warehouse.redirect.domain.service.RedirectTokenGenerator;
 import com.warehouse.redirect.domain.service.RedirectTokenGeneratorImpl;
-import com.warehouse.redirect.infrastructure.adapter.primary.mapper.RedirectRequestMapper;
-import com.warehouse.redirect.infrastructure.adapter.primary.mapper.RedirectRequestMapperImpl;
-import com.warehouse.redirect.infrastructure.adapter.primary.mapper.RedirectResponseMapper;
-import com.warehouse.redirect.infrastructure.adapter.primary.mapper.RedirectResponseMapperImpl;
 import com.warehouse.redirect.infrastructure.adapter.secondary.MailAdapter;
 import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectParcelAdapter;
 import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenReadRepository;
@@ -22,9 +22,6 @@ import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.Notificati
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.RedirectTokenMapper;
 import com.warehouse.redirect.infrastructure.adapter.secondary.properties.RedirectTokenProperties;
 import com.warehouse.shipment.infrastructure.api.ShipmentService;
-import org.mapstruct.factory.Mappers;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RedirectConfiguration {
@@ -62,17 +59,4 @@ public class RedirectConfiguration {
     public RedirectServicePort redirectServicePort(ShipmentService service) {
         return new RedirectParcelAdapter(service);
     }
-
-    // Request mapper
-    @Bean(name = "redirect.requestMapper")
-    public RedirectRequestMapper requestMapper() {
-        return new RedirectRequestMapperImpl();
-    }
-
-    // Response mapper
-    @Bean(name = "redirect.responseMapper")
-    public RedirectResponseMapper responseMapper() {
-        return new RedirectResponseMapperImpl();
-    }
-
 }

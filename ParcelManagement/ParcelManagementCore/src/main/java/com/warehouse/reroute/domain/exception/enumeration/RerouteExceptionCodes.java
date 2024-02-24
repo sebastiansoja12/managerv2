@@ -5,11 +5,11 @@ import lombok.Getter;
 @Getter
 public enum RerouteExceptionCodes {
 
-    REROUTE_100(100, "Parcel cannot be rerouted"),
+    REROUTE_403_EMPTY_PARCEL(403, "Parcel cannot be rerouted"),
 
-    REROUTE_101(101, "E-mail cannot be null"),
+    REROUTE_500(500, "E-mail cannot be null"),
 
-    REROUTE_102(102, "Reroute token expired");
+    REROUTE_403(403, "Reroute token expired");
 
 
     private final int code;

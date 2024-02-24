@@ -7,7 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
+import com.warehouse.routetracker.infrastructure.adapter.primary.dto.RouteProcessDto;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.web.client.RestClient;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.warehouse.routetracker.infrastructure.api.dto.RouteProcessDto;
 
 // TODO to be fixed
 
@@ -61,7 +61,7 @@ public class RouteTrackerIntegrationTest {
         // when
         final ResponseEntity<RouteProcessDto> responseEntity = restClient
                 .post()
-                .uri("/v2/api/routes/test/initialize")
+                .uri("/v2/api/routes/initialize")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -78,11 +78,11 @@ public class RouteTrackerIntegrationTest {
         // given
         final Long parcelId = 1L;
         // when
-        final ResponseEntity<RouteLogRecordToChange> responseEntity = restClient
+        final ResponseEntity<RouteLogRecord> responseEntity = restClient
                 .get()
-                .uri("/v2/api/routes/test/{parcelId}", parcelId)
+                .uri("/v2/api/routes/{parcelId}", parcelId)
                 .retrieve()
-                .toEntity(RouteLogRecordToChange.class);
+                .toEntity(RouteLogRecord.class);
         // then
         assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
     }

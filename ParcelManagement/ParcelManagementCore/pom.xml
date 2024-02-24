@@ -6,7 +6,7 @@
     <parent>
         <artifactId>ParcelManagement</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2024.1-SNAPSHOT</version>
+        <version>2024.2-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
 
@@ -32,12 +32,6 @@
             <groupId>com.warehouse</groupId>
             <artifactId>PathFinderApi</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>RouteTrackerFlowApi</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>

@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 @Builder
 public class RedirectResponse {
-    Token token;
-    Long parcelId;
+    private Token token;
+    private Long parcelId;
 }

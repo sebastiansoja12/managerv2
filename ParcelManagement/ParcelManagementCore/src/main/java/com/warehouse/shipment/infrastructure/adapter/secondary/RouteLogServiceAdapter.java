@@ -2,11 +2,11 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteProcessDto;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
-import com.warehouse.routetracker.infrastructure.api.dto.RouteProcessDto;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.vo.ParcelId;
 import com.warehouse.shipment.domain.vo.RouteProcess;
@@ -33,7 +33,7 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
     public RouteProcess initializeRouteProcess(ParcelId parcelId) {
         final ResponseEntity<RouteProcessDto> process = restClient
                 .post()
-				.uri("/v2/api/routes/test/{initialize}", routeTrackerLogProperties.getInitialize())
+				.uri("/v2/api/routes/{initialize}", routeTrackerLogProperties.getInitialize())
                 .body(parcelId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()

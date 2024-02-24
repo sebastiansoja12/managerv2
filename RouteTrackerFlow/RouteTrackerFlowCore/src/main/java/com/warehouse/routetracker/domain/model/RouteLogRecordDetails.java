@@ -42,6 +42,7 @@ public class RouteLogRecordDetails {
 
     private ParcelStatus determineParcelStatus(ProcessType processType) {
         return switch (processType) {
+            case CREATED -> ParcelStatus.CREATED;
             case ROUTE -> ParcelStatus.DELIVERY;
             case RETURN, REJECT -> ParcelStatus.RETURN;
             case REROUTE -> ParcelStatus.REROUTE;

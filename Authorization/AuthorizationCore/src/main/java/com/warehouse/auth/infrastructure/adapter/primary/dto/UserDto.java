@@ -1,10 +1,12 @@
 package com.warehouse.auth.infrastructure.adapter.primary.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
+@Builder
+@Jacksonized
 public class UserDto {
 
     String username;

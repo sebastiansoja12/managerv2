@@ -38,7 +38,7 @@ public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteL
     private void logReturn(RouteLogServiceConfiguration configuration, ReturnTrackRequestDto request) {
         restClient
                 .post()
-                .uri("/v2/api/routes/test/returntrackrequest")
+                .uri("/v2/api/routes/{endpoint}", configuration.getEndpoint())
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()

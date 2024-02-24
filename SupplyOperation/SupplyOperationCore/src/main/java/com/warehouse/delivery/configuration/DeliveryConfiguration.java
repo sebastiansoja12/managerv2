@@ -17,7 +17,6 @@ import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResp
 import com.warehouse.delivery.infrastructure.adapter.secondary.*;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryMapper;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
-import com.warehouse.routetracker.infrastructure.api.RouteLogEventPublisher;
 import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 
 @Configuration
@@ -47,9 +46,9 @@ public class DeliveryConfiguration {
     }
 
     @Bean
-    public RouteLogServicePort deliveryServicePort(RouteLogEventPublisher routeLogEventPublisher) {
+    public RouteLogServicePort deliveryServicePort() {
         final DeliveryMapper deliveryMapper = Mappers.getMapper(DeliveryMapper.class);
-        return new RouteLogAdapter(routeLogEventPublisher, deliveryMapper);
+        return new RouteLogAdapter(deliveryMapper);
     }
 
     @Bean(name = "delivery.supplierTokenServicePort")

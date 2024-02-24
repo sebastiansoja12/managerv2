@@ -11,14 +11,14 @@ import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
-import com.warehouse.routetracker.domain.model.RouteLogRecordToChange;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 
 @Mapper
 public interface RouteLogToModelMapper {
-    default RouteLogRecordToChange map(RouteLogRecordEntity routeLogRecord) {
-        return RouteLogRecordToChange
+    default RouteLogRecord map(RouteLogRecordEntity routeLogRecord) {
+        return RouteLogRecord
                 .builder()
                 .id(UUID.fromString(routeLogRecord.getId()))
                 .returnCode(routeLogRecord.getReturnCode())

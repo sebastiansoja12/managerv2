@@ -75,7 +75,6 @@ public class AuthenticationPortImplTest {
         final RegisterRequest request = buildRegisterRequest();
         // build user response after signing
         final UserResponse userResponse = UserResponse.builder()
-                .id(1L)
                 .depotCode("TST")
                 .username("s-soja")
                 .nonLocked(true)
@@ -88,8 +87,7 @@ public class AuthenticationPortImplTest {
         final RegisterResponse registerResponse = authenticationPort.signup(request);
         // then
         assertAll(
-                () -> assertThat(registerResponse.getUserRegisterResponse()).isNotNull(),
-                () -> assertThat(registerResponse.getUserRegisterResponse().getId()).isNotNull()
+                () -> assertThat(registerResponse.getUserRegisterResponse()).isNotNull()
         );
     }
 

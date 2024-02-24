@@ -5,7 +5,6 @@ import java.util.List;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
-import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.ProcessReturn;
 import com.warehouse.returning.domain.vo.ReturnId;
@@ -36,21 +35,11 @@ public class ReturnServiceImpl implements ReturnService {
                 .toList();
     }
 
-    @Override
-    public ReturnPackageRequest unlockReturn(ReturnPackageRequest request) {
-        final ReturnStatus returnStatus = returnRepository.unlockReturn(request.getParcel().getId(),
-                request.getReturnToken());
-
-        return ReturnPackageRequest.builder()
-                .supplierCode(request.getSupplierCode())
-                .returnStatus(returnStatus)
-                .returnToken(request.getReturnToken())
-                .parcel(request.getParcel())
-                .reason(request.getReason())
-                .depotCode(request.getDepotCode())
-                .username(request.getUsername())
-                .build();
-    }
+	@Override
+	public ReturnPackageRequest unlockReturn(ReturnPackageRequest request) {
+		return request.updateReturnStatus(
+				returnRepository.unlockReturn(request.getParcel().getId(), request.getReturnToken()));
+	}
 
     @Override
     public ReturnModel getReturn(ReturnId returnId) {

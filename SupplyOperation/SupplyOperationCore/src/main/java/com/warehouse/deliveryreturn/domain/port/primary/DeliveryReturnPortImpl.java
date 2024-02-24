@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.warehouse.deliveryreturn.domain.enumeration.ProcessType;
+import com.warehouse.deliveryreturn.domain.port.secondary.SupplierCodeLogServicePort;
 import org.springframework.util.CollectionUtils;
 
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
@@ -31,6 +33,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
     private final ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
     private final RouteLogServicePort logServicePort;
+    
+    private final SupplierCodeLogServicePort supplierCodeLogServicePort;
 
     @Override
     public DeliveryReturnResponse deliverReturn(DeliveryReturnRequest deliveryRequest) {
@@ -56,6 +60,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
         final List<DeliveryReturn> deliveryReturnResponses =
                 deliveryReturnService.deliverReturn(deliveryReturnRequests);
+
+        saveSupplierCode(deliveryReturnResponses);
 
 		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturnResponses.stream()
                 .map(deliveryReturn -> {
@@ -117,9 +123,22 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
                 .returnToken(response.getReturnToken())
                 .build();
     }
+    
+	private void saveSupplierCode(List<DeliveryReturn> deliveryReturns) {
+		deliveryReturns.forEach(deliveryReturn -> {
+			logSupplierCodeSave(deliveryReturn.getSupplierCode());
+			final SupplierCodeRequest request = new SupplierCodeRequest(deliveryReturn.getSupplierCode(),
+					deliveryReturn.getParcelId(), ProcessType.RETURN);
+			supplierCodeLogServicePort.saveSupplierCode(request);
+		});
+	}
 
     private void logWrongProcessTypeInformation() {
         log.warn("Process type is different than RETURN");
+    }
+    
+    private void logSupplierCodeSave(String supplierCode) {
+        log.warn("Saving supplier code {} in process", supplierCode);
     }
 }
 

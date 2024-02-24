@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.routetracker.infrastructure.api.dto.RouteProcessDto;
 import com.warehouse.shipment.domain.vo.RouteProcess;
+import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteProcessDto;
 import org.mapstruct.Mapper;
 
 @Mapper

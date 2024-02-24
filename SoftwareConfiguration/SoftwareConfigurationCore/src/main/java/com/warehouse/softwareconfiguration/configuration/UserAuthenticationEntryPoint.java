@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Component
+@Component("softwareConfiguration.userAuthenticationEntryPoint")
 public class UserAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

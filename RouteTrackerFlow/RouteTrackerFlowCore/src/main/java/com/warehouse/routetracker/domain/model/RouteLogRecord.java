@@ -1,21 +1,86 @@
 package com.warehouse.routetracker.domain.model;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-import lombok.Builder;
-import lombok.Value;
 
-@Value
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.routetracker.domain.vo.Error;
+import lombok.*;
+
+import java.util.UUID;
+
 @Builder
+@EqualsAndHashCode
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RouteLogRecord {
+    private UUID id;
+    private Long parcelId;
+    private RouteLogRecordDetails routeLogRecordDetails;
+    private String returnCode;
+    private String faultDescription;
 
-    String username;
+    public RouteLogRecordDetails getRouteLogRecordDetails() {
+        if (routeLogRecordDetails == null) {
+            routeLogRecordDetails = new RouteLogRecordDetails();
+        }
+        return routeLogRecordDetails;
+    }
 
-    Long parcelId;
+    public void saveErrorReturnCode(Error error) {
+        this.returnCode = error.getValue();
+    }
 
-    String depotCode;
+    public void saveFaultDescription(String faultDescription) {
+        this.faultDescription = faultDescription;
+    }
 
-    String supplierCode;
+    public void saveTerminalRequest(ProcessType processType, String terminalRequest) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
 
-    ParcelStatus parcelStatus;
+        routeLogRecordDetail.updateRequest(terminalRequest);
+    }
 
+    public void saveZebraIdInformation(ProcessType processType, Long zebraId) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+        routeLogRecordDetail.saveZebraIdInformation(zebraId);
+    }
+
+    public void saveZebraVersionInformation(ProcessType processType, String version) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+        routeLogRecordDetail.saveZebraVersionInformation(version);
+    }
+
+    public void saveUsername(ProcessType processType, String username) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+        routeLogRecordDetail.saveUsername(username);
+    }
+
+    public void saveDepotCode(ProcessType processType, String depotCode) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+        routeLogRecordDetail.saveDepotCode(depotCode);
+    }
+
+    public void saveDescription(ProcessType processType, String description) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+        routeLogRecordDetail.saveDescription(description);
+    }
+
+    public void saveSupplierCode(ProcessType processType, String supplierCode) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+        routeLogRecordDetail.saveSupplierCode(supplierCode);
+    }
+
+    public void updateRequest(ProcessType processType, String request) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+
+        routeLogRecordDetail.updateRequest(request);
+    }
 }

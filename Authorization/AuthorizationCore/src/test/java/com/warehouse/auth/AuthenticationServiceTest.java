@@ -58,7 +58,6 @@ public class AuthenticationServiceTest {
 
         final UserResponse userResponse = UserResponse.builder()
                 .nonLocked(false)
-                .id(1L)
                 .enabled(true)
                 .nonExpired(false)
                 .username("s-soja")
@@ -71,7 +70,7 @@ public class AuthenticationServiceTest {
         // when
         final RegisterResponse registerResponse = authenticationService.register(user);
         // then
-        assertThat(registerResponse.getUserRegisterResponse().getId()).isNotNull();
+        assertThat(registerResponse.getUserRegisterResponse().getUsername()).isNotNull();
     }
 
     @Test

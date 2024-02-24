@@ -57,14 +57,14 @@ public class ZebraInitializePortImplTest {
                 .zebraDeviceInformation(deviceInformation)
                 .parcelCreatedRequests(parcelCreatedRequests)
                 .build();
-        final RouteProcess routeProcess = new RouteProcess(1L, ROUTE_PROCESS_ID);
+        final RouteProcess routeProcess = new RouteProcess(1L, LogStatus.OK);
         when(routeLogServicePort.initializeProcess(1L)).thenReturn(routeProcess);
         // when
         final Response response = zebraInitializePort.processRequest(request);
         // then
         assertThat(response.routeProcesses())
-                .extracting(RouteProcess::getProcessId, RouteProcess::getParcelId)
-                .containsExactly(tuple(ROUTE_PROCESS_ID, 1L));
+                .extracting(RouteProcess::getLogStatus, RouteProcess::getParcelId)
+                .containsExactly(tuple(LogStatus.OK, 1L));
     }
 
     @Test

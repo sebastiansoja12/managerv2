@@ -8,12 +8,11 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
-import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.*;
 import com.warehouse.deliveryreturn.domain.vo.*;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
 import com.warehouse.tools.supplier.SupplierValidatorProperties;
 import org.assertj.core.groups.Tuple;
@@ -36,7 +35,6 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
 
 @SpringBootTest(classes = DeliveryReturnPortImplIntegrationTest.DeliveryReturnPortIntegrationTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -65,6 +63,12 @@ public class DeliveryReturnPortImplIntegrationTest {
 
         @MockBean
         public SupplierValidatorProperties supplierValidatorProperties;
+
+        @MockBean
+        public RouteTrackerLogProperties routeTrackerLogProperties;
+
+        @MockBean
+        public SupplierCodeLogServicePort supplierCodeLogServicePort;
 
         @Bean
         public RestClient restClient(RestClient.Builder builder) {
@@ -95,6 +99,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 
     @Autowired
     private SupplierValidatorProperties supplierValidatorProperties;
+
+    @Autowired
+    private SupplierCodeLogServicePort supplierCodeLogServicePort;
 
     private final DeviceInformation deviceInformation = new DeviceInformation(
             "1", 1L, "s-soja", "KT1"
@@ -135,6 +142,10 @@ public class DeliveryReturnPortImplIntegrationTest {
         doNothing()
                 .when(routeLogServicePort)
                 .logDeliverReturn(any());
+
+        doNothing()
+                .when(supplierCodeLogServicePort)
+                .saveSupplierCode(any());
         // when
         final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
         // then
