@@ -11,7 +11,13 @@ import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.enumera
 public interface StatusMapper {
     Status map(com.warehouse.parcelstatuschange.domain.vo.Status status);
 
+    com.warehouse.parcelstatuschange.domain.vo.Status map(Status status);
+
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "status", source = "parcelStatus")
     ParcelEntity map(Parcel parcel);
+
+    default com.warehouse.parcelstatuschange.domain.vo.Status mapToStatus(ParcelEntity parcel) {
+        return map(parcel.getStatus());
+    }
 }

@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.warehouse.parcelstatuschange.domain.exception.ParcelRequestEmptyException;
 import com.warehouse.parcelstatuschange.domain.port.secondary.ParcelStatusRepository;
 import com.warehouse.parcelstatuschange.domain.vo.Parcel;
+import com.warehouse.parcelstatuschange.domain.vo.Status;
 import com.warehouse.parcelstatuschange.domain.vo.StatusRequest;
 
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +24,11 @@ public class ParcelStatusPortImpl implements ParcelStatusPort {
         validateParcel(parcel);
         logStatusRequest(parcel);
         parcelStatusRepository.update(parcel);
+    }
+
+    @Override
+    public Status getStatus(Long parcelId) {
+        return parcelStatusRepository.get(parcelId);
     }
 
     private void validateParcel(Parcel parcel) {
