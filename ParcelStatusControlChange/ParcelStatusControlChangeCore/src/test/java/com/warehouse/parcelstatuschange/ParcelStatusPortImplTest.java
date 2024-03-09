@@ -1,5 +1,6 @@
 package com.warehouse.parcelstatuschange;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
@@ -74,6 +75,25 @@ public class ParcelStatusPortImplTest {
         // when && then
         assertThrowsExactly(ParcelRequestEmptyException.class,
                 () -> parcelStatusPort.updateStatus(request));
+    }
+
+    @Test
+    void shouldGetParcelsStatusById() {
+        // given
+        final Long parcelId = 1L;
+        // when
+        final Status status = parcelStatusPort.getStatus(parcelId);
+        // then
+        assertThat(status).isEqualTo(Status.CREATED);
+    }
+
+    @Test
+    void shouldNotGetParcelsStatusById() {
+        // given
+        final Long parcelId = 10L;
+        // when && then
+        assertThrowsExactly(ParcelNotFoundException.class,
+                () -> parcelStatusPort.getStatus(parcelId));
     }
 
 }
