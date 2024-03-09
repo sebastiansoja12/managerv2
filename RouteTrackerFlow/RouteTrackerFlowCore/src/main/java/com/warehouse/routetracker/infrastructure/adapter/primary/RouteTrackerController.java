@@ -130,8 +130,6 @@ public class RouteTrackerController {
         return new ResponseEntity<>(responseMapper.map(routeLogRecord), HttpStatus.OK);
     }
 
-
-
     @ExceptionHandler(RestException.class)
     public ResponseEntity<?> handleException(RestException ex) {
         final ErrorResponseDto error = ErrorResponseDto.builder()
