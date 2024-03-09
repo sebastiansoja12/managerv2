@@ -4,6 +4,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import com.warehouse.parcelstatuschange.domain.port.secondary.ParcelStatusRepository;
 import com.warehouse.parcelstatuschange.domain.vo.Parcel;
+import com.warehouse.parcelstatuschange.domain.vo.Status;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import com.warehouse.parcelstatuschange.infrastructure.adapter.secondary.mapper.StatusMapper;
@@ -26,5 +27,12 @@ public class ParcelStatusRepositoryImpl implements ParcelStatusRepository {
 		final ParcelEntity parcelEntity = statusMapper.map(parcel);
 		parcelEntity.shouldBeLocked();
 		parcelStatusReadRepository.save(parcelEntity);
+    }
+
+    @Override
+    public Status get(Long parcelId) {
+        return parcelStatusReadRepository.findStatusById(parcelId)
+                .map(statusMapper::mapToStatus)
+                .orElseThrow(() -> new ParcelNotFoundException(404, String.format(exceptionMessage, parcelId)));
     }
 }
