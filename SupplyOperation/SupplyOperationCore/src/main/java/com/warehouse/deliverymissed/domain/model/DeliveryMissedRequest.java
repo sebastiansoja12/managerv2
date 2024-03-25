@@ -1,6 +1,6 @@
 package com.warehouse.deliverymissed.domain.model;
 
-import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
+import com.warehouse.deliverymissed.domain.enumeration.DeliveryStatus;
 import lombok.Data;
 
 @Data

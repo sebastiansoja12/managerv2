@@ -7,5 +7,6 @@ import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.Deli
 
 @Mapper
 public interface DeliveryMissedToEntityMapper {
+
     DeliveryMissedEntity map(DeliveryMissedRequest deliveryMissedRequest);
 }

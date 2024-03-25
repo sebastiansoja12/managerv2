@@ -1,6 +1,6 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.enumeration.Status;
+import com.warehouse.deliverymissed.infrastructure.adapter.secondary.enumeration.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

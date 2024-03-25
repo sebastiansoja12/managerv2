@@ -1,7 +1,7 @@
 package com.warehouse.deliverymissed.domain.vo;
 
-import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 
+import com.warehouse.deliverymissed.domain.enumeration.DeliveryStatus;
 import lombok.Value;
 
 @Value
@@ -10,5 +10,5 @@ public class DeliveryMissed {
     Long parcelId;
     String depotCode;
     String supplierCode;
-    DeliveryStatus deliveryStatus = DeliveryStatus.UNAVAILABLE;
+    DeliveryStatus deliveryStatus;
 }
