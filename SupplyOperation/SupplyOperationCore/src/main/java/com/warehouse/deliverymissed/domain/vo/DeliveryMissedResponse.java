@@ -1,12 +1,17 @@
 package com.warehouse.deliverymissed.domain.vo;
 
+
 import lombok.Builder;
 import lombok.Value;
 
+import java.time.LocalDateTime;
+
 @Value
 @Builder
-public class RouteLogMissedRequest {
+public class DeliveryMissedResponse {
+    Long deliveryId;
     Long parcelId;
-    String supplierCode;
     String depotCode;
+    String supplierCode;
+    LocalDateTime timestamp;
 }
