@@ -160,8 +160,8 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         final ProcessType processType = request.getProcessType();
         return switch (processType) {
             case CREATED -> ParcelStatus.CREATED;
-            case ROUTE -> ParcelStatus.DELIVERY;
-            case RETURN, MISS -> ParcelStatus.RETURN;
+            case ROUTE, MISS -> ParcelStatus.DELIVERY;
+            case RETURN -> ParcelStatus.RETURN;
             case REROUTE -> ParcelStatus.REROUTE;
             case REDIRECT, REJECT -> ParcelStatus.REDIRECT;
         };
