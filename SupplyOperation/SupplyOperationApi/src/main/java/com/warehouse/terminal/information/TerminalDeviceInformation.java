@@ -19,7 +19,7 @@ public class TerminalDeviceInformation {
     @XmlElement(name = "Version")
     private String version;
 
-    @XmlElement(name = "ZebraID")
+    @XmlElement(name = "TerminalID")
     private Long terminalId;
 
     @XmlElement(name = "ResponsibleUser")

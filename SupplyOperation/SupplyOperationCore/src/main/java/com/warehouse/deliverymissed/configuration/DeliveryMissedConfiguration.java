@@ -11,6 +11,7 @@ import com.warehouse.deliverymissed.domain.service.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedServiceImpl;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.*;
 import com.warehouse.routelogger.RouteLogEventPublisher;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,7 +46,8 @@ public class DeliveryMissedConfiguration {
     }
 
     @Bean("deliveryMissed.supplierRepository")
-    public SupplierRepository supplierRepository(SupplierReadRepository repository) {
+	public SupplierRepository supplierRepository(
+			@Qualifier("deliveryMissed.supplierReadRepository") SupplierReadRepository repository) {
         return new SupplierRepositoryImpl(repository);
     }
 }

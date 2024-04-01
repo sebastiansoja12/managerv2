@@ -52,6 +52,6 @@ public class DeliveryMissedAdapter {
 
         final DeliveryMissedResponse response = deliveryMissedPort.logMissedDelivery(request);
 
-        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.CREATED);
     }
 }

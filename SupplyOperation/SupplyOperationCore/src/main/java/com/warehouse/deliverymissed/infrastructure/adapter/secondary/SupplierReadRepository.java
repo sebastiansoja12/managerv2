@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+@Repository("deliveryMissed.supplierReadRepository")
 public interface SupplierReadRepository extends JpaRepository<SupplierEntity, String> {
     Optional<SupplierEntity> findBySupplierCode(String supplierCode);
 }

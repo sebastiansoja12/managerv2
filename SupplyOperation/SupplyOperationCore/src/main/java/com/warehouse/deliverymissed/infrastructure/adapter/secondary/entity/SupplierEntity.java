@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "deliveryMissed.SupplierEntity")
 @Builder
 @Table(name = "supplier")
-@NamedEntityGraph(name = "SupplierEntity.full", attributeNodes = {
+@NamedEntityGraph(name = "deliveryMissed.SupplierEntity.full", attributeNodes = {
         @NamedAttributeNode("depot")
 })
 public class SupplierEntity {
