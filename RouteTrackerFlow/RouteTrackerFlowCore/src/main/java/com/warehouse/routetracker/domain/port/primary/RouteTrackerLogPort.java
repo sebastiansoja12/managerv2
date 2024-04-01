@@ -38,4 +38,6 @@ public interface RouteTrackerLogPort {
     void saveReturnTrackRequest(ReturnTrackRequest request);
 
     void saveDeliveryReturnRequest(DeliveryReturnRequest request);
+
+    void saveDeliveryStatus(DeliveryStatusRequest request);
 }

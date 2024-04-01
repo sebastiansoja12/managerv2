@@ -2,6 +2,7 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,6 +140,13 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
+    public void saveDeliveryStatus(DeliveryStatusRequest request) {
+        final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
+        routeLogRecord.saveParcelStatus(request.getProcessType(), determineParcelStatus(request));
+        repository.update(routeLogRecord);
+    }
+
+    @Override
     public RouteLogRecord find(Long parcelId) {
         return repository.find(parcelId);
     }
@@ -146,5 +154,16 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public List<RouteLogRecord> findAll() {
         return repository.findAll();
+    }
+
+    private ParcelStatus determineParcelStatus(DeliveryStatusRequest request) {
+        final ProcessType processType = request.getProcessType();
+        return switch (processType) {
+            case CREATED -> ParcelStatus.CREATED;
+            case ROUTE -> ParcelStatus.DELIVERY;
+            case RETURN, MISS -> ParcelStatus.RETURN;
+            case REROUTE -> ParcelStatus.REROUTE;
+            case REDIRECT, REJECT -> ParcelStatus.REDIRECT;
+        };
     }
 }

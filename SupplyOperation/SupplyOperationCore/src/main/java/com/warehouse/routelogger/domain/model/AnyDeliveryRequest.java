@@ -6,7 +6,7 @@ import com.warehouse.routelogger.domain.enumeration.ProcessType;
 import lombok.Data;
 
 @Data
-public class DeliveryMissedRequest {
+public class AnyDeliveryRequest {
     private String depotCode;
     private String supplierCode;
     private Long parcelId;

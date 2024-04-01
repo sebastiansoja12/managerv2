@@ -1,6 +1,6 @@
 package com.warehouse.routelogger.infrastructure.adapter.primary;
 
-import com.warehouse.routelogger.domain.model.DeliveryMissedRequest;
+import com.warehouse.routelogger.domain.model.AnyDeliveryRequest;
 import com.warehouse.routelogger.domain.port.primary.RouteLoggerPort;
 import com.warehouse.routelogger.event.DeliveryMissedLogEvent;
 import com.warehouse.routelogger.event.RouteLogBaseEvent;
@@ -27,12 +27,11 @@ public class RouteLoggerListener {
         this.routeLoggerPort = routeLoggerPort;
     }
 
-
     @EventListener
     void handleEvent(DeliveryMissedLogEvent event) {
         logEvent(event);
-        final DeliveryMissedRequest request = eventMapper.map(event.getDeliveryMissedRequest());
-        routeLoggerPort.logDeliveryMissed(request);
+        final AnyDeliveryRequest request = eventMapper.map(event.getDeliveryMissedRequest());
+        routeLoggerPort.logAnyDelivery(request);
     }
 
     private void logEvent(RouteLogBaseEvent event) {

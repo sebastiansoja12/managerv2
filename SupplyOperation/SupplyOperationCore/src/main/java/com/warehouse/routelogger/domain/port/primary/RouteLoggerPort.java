@@ -1,8 +1,8 @@
 package com.warehouse.routelogger.domain.port.primary;
 
-import com.warehouse.routelogger.domain.model.DeliveryMissedRequest;
+import com.warehouse.routelogger.domain.model.AnyDeliveryRequest;
 
 public interface RouteLoggerPort {
 
-    void logDeliveryMissed(DeliveryMissedRequest request);
+    void logAnyDelivery(AnyDeliveryRequest request);
 }

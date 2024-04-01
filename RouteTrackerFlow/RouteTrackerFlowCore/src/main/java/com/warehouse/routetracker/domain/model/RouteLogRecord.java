@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.domain.model;
 
 
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
 import lombok.*;
@@ -75,6 +76,12 @@ public class RouteLogRecord {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveSupplierCode(supplierCode);
+    }
+
+    public void saveParcelStatus(ProcessType processType, ParcelStatus parcelStatus) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(processType);
+        routeLogRecordDetail.saveParcelStatus(parcelStatus);
     }
 
     public void updateRequest(ProcessType processType, String request) {

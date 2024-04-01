@@ -34,4 +34,6 @@ public interface RouteRequestMapper {
     DescriptionRequest map(DescriptionRequestDto descriptionRequest);
 
     ZebraInitializeRequest map(ZebraInitializeRequestDto initializeRequest);
+
+    DeliveryStatusRequest map(DeliveryStatusRequestDto deliveryStatusRequest);
 }

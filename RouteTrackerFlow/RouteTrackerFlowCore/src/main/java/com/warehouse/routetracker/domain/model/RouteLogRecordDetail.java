@@ -52,4 +52,8 @@ public class RouteLogRecordDetail {
     public void saveDepotCode(String depotCode) {
         this.depotCode = depotCode;
     }
+
+    public void saveParcelStatus(ParcelStatus parcelStatus) {
+        this.parcelStatus = parcelStatus;
+    }
 }
