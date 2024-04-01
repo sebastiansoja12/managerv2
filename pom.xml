@@ -36,6 +36,7 @@
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>
         <module>SoftwareConfiguration</module>
+        <module>E2E</module>
     </modules>
 
 	<properties>
