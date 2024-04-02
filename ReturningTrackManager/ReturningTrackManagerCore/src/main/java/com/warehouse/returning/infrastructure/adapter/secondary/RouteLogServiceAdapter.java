@@ -14,6 +14,7 @@ import org.springframework.web.client.support.RestGatewaySupport;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+// TODO - to be moved to ZebraIntegration module
 @Slf4j
 public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteLogServicePort {
 
