@@ -9,21 +9,21 @@ import com.warehouse.delivery.domain.port.primary.DeliveryPortImpl;
 import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
-import com.warehouse.delivery.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.delivery.domain.port.secondary.RouteLogDeliveryStatusServicePort;
 import com.warehouse.delivery.domain.service.DeliveryService;
 import com.warehouse.delivery.domain.service.DeliveryServiceImpl;
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import com.warehouse.delivery.infrastructure.adapter.secondary.*;
-import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryMapper;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
+import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 
 @Configuration
 public class DeliveryConfiguration {
 
 	@Bean
-	public DeliveryPort deliveryPort(DeliveryService service, RouteLogServicePort logServicePort,
+	public DeliveryPort deliveryPort(DeliveryService service, RouteLogDeliveryStatusServicePort logServicePort,
 			ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort) {
 		return new DeliveryPortImpl(service, logServicePort, parcelStatusControlChangeServicePort);
 	}
@@ -46,9 +46,8 @@ public class DeliveryConfiguration {
     }
 
     @Bean
-    public RouteLogServicePort deliveryServicePort() {
-        final DeliveryMapper deliveryMapper = Mappers.getMapper(DeliveryMapper.class);
-        return new RouteLogAdapter(deliveryMapper);
+    public RouteLogDeliveryStatusServicePort deliveryServicePort(RouteLogEventPublisher routeLogEventPublisher) {
+        return new RouteLogDeliveryStatusAdapter(routeLogEventPublisher);
     }
 
     @Bean(name = "delivery.supplierTokenServicePort")

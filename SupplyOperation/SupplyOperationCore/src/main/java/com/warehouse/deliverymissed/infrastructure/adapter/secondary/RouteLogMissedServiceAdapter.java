@@ -4,7 +4,7 @@ import com.warehouse.deliverymissed.domain.port.secondary.RouteLogMissedServiceP
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.mapper.DeliveryMissedEventMapper;
 import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.routelogger.event.DeliveryMissedLogEvent;
+import com.warehouse.routelogger.event.DeliveryLogEvent;
 import lombok.AllArgsConstructor;
 
 import static org.mapstruct.factory.Mappers.getMapper;
@@ -24,13 +24,13 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
         sendEvent(buildEvent(deliveryMissed));
     }
 
-    private DeliveryMissedLogEvent buildEvent(DeliveryMissed deliveryMissed) {
-        return DeliveryMissedLogEvent.builder()
-                .deliveryMissedRequest(eventMapper.map(deliveryMissed))
+    private DeliveryLogEvent buildEvent(DeliveryMissed deliveryMissed) {
+        return DeliveryLogEvent.builder()
+                .deliveryRequest(eventMapper.map(deliveryMissed))
                 .build();
     }
 
-    private void sendEvent(DeliveryMissedLogEvent event) {
+    private void sendEvent(DeliveryLogEvent event) {
         routeLogEventPublisher.send(event);
     }
 }

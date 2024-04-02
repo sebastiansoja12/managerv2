@@ -2,7 +2,7 @@ package com.warehouse.routelogger.infrastructure.adapter.primary;
 
 import com.warehouse.routelogger.domain.model.AnyDeliveryRequest;
 import com.warehouse.routelogger.domain.port.primary.RouteLoggerPort;
-import com.warehouse.routelogger.event.DeliveryMissedLogEvent;
+import com.warehouse.routelogger.event.DeliveryLogEvent;
 import com.warehouse.routelogger.event.RouteLogBaseEvent;
 import com.warehouse.routelogger.infrastructure.adapter.primary.mapper.EventMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +28,9 @@ public class RouteLoggerListener {
     }
 
     @EventListener
-    void handleEvent(DeliveryMissedLogEvent event) {
+    void handleEvent(DeliveryLogEvent event) {
         logEvent(event);
-        final AnyDeliveryRequest request = eventMapper.map(event.getDeliveryMissedRequest());
+        final AnyDeliveryRequest request = eventMapper.map(event.getDeliveryRequest());
         routeLoggerPort.logAnyDelivery(request);
     }
 
