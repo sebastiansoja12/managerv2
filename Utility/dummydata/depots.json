@@ -3,210 +3,350 @@
     "city": "Katowice",
     "street": "Medziana 11",
     "country": "Polska",
-    "depotCode": "KT3"
+    "depotCode": "KT3",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Gliwice",
     "street": "Bojowska 21",
     "country": "Polska",
-    "depotCode": "KT1"
+    "depotCode": "KT1",
+    "postalCode": "50-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Wrocław",
     "street": "Wroclawska 1",
     "country": "Polska",
-    "depotCode": "WRO"
+    "depotCode": "WRO",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Gdańsk",
     "street": "Pomorska 33",
     "country": "Polska",
-    "depotCode": "GD1"
+    "depotCode": "GD1",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Warszawa",
     "street": "Koktajlowa 21",
     "country": "Polska",
-    "depotCode": "WA1"
+    "depotCode": "WA1",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Warszawa",
     "street": "Wolności 112",
     "country": "Polska",
-    "depotCode": "WA2"
+    "depotCode": "WA2",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Poznań",
     "street": "Kaponiera 94",
     "country": "Polska",
-    "depotCode": "POZ"
+    "depotCode": "POZ",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Rzeszów",
     "street": "Kolorowa 64",
     "country": "Polska",
-    "depotCode": "RZE"
+    "depotCode": "RZE",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Berlin",
     "street": "Hochstrasse 3",
     "country": "Niemcy",
-    "depotCode": "BR1"
+    "depotCode": "BR1",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Lwów",
     "street": "Baczewskich 44",
     "country": "Ukraina",
-    "depotCode": "LW1"
+    "depotCode": "LW1",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Łódź",
     "street": "Wodna 38A",
     "country": "Polska",
-    "depotCode": "NCS"
+    "depotCode": "NCS",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Białystok",
     "street": "Ognista 31A",
     "country": "Polska",
-    "depotCode": "BIA"
+    "depotCode": "BIA",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Ruda Śląska",
     "street": "Śląska 2",
     "country": "Polska",
-    "depotCode": "SRS"
+    "depotCode": "SRS",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Kraków",
     "street": "Stanisława Dąbka 22A",
     "country": "Polska",
-    "depotCode": "KR1"
+    "depotCode": "KR1",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Gorzów Wielkopolski",
     "street": "Lubuska 101",
     "country": "Polska",
-    "depotCode": "GW1"
+    "depotCode": "GW1",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Zielona Góra",
     "street": "Ostrowska 9",
     "country": "Polska",
-    "depotCode": "ZGR"
+    "depotCode": "ZGR",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Szczecin",
     "street": "Zachodniopomorska 12B",
     "country": "Polska",
-    "depotCode": "SZ1"
+    "depotCode": "SZ1",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Opole",
     "street": "Oławska 11",
     "country": "Polska",
-    "depotCode": "OPO"
+    "depotCode": "OPO",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Kielce",
     "street": "Świętokrzyska 2",
     "country": "Polska",
-    "depotCode": "KIE"
+    "depotCode": "KIE",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Bydgoszcz",
     "street": "Bydoska 87",
     "country": "Polska",
-    "depotCode": "BYD"
+    "depotCode": "BYD",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Toruń",
     "street": "Opatowska 64",
     "country": "Polska",
-    "depotCode": "TOR"
+    "depotCode": "TOR",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Częstochowa",
     "street": "Jasna 97",
     "country": "Polska",
-    "depotCode": "CZW"
+    "depotCode": "CZW",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Zamość",
     "street": "Lubelska 28",
     "country": "Polska",
-    "depotCode": "ZAM"
+    "depotCode": "ZAM",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Słupsk",
     "street": "Gdańska 36",
     "country": "Polska",
-    "depotCode": "SLP"
+    "depotCode": "SLP",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Kalisz",
     "street": "Wielkopolska 103",
     "country": "Polska",
-    "depotCode": "KAL"
+    "depotCode": "KAL",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Koszalin",
     "street": "Morska 32",
     "country": "Polska",
-    "depotCode": "KSZ"
+    "depotCode": "KSZ",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Bielsko-Biała",
     "street": "Bielska 87",
     "country": "Polska",
-    "depotCode": "BBA"
+    "depotCode": "BBA",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Kłodzko",
     "street": "Wrocławska 71",
     "country": "Polska",
-    "depotCode": "KLD"
+    "depotCode": "KLD",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Mława",
     "street": "Morawska 79",
     "country": "Polska",
-    "depotCode": "MLW"
+    "depotCode": "MLW",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Gdynia",
     "street": "Stoczniowa 80",
     "country": "Polska",
-    "depotCode": "GD2"
+    "depotCode": "GD2",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Sosnowiec",
     "street": "Zagłębska 65",
     "country": "Polska",
-    "depotCode": "KT2"
+    "depotCode": "KT2",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Mińsk Mazowiecki",
     "street": "Warszawska 15",
     "country": "Polska",
-    "depotCode": "WA3"
+    "depotCode": "WA3",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Wilno",
     "street": "Liepkalno 180",
     "country": "Litwa",
-    "depotCode": "WL1"
+    "depotCode": "WL1",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Praga",
     "street": "Chodovská 228/3",
     "country": "Czechy",
-    "depotCode": "PRG"
+    "depotCode": "PRG",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   },
   {
     "city": "Zagrzeb",
     "street": "Franje Lučića 23",
     "country": "Chorwacja",
-    "depotCode": "ZAG"
+    "depotCode": "ZAG",
+    "postalCode": "40-000",
+    "nip": "1234567890",
+    "telephoneNumber": "+48 12 345 67 89",
+    "openingHours": "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 1:00 PM, Sun: Closed"
   }
 ]
