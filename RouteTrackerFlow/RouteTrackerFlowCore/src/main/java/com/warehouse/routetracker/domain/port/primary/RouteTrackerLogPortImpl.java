@@ -2,10 +2,6 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
@@ -21,13 +17,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
-    private final RouteLogRepository repository;
-
-    private final Logger logger = LoggerFactory.getLogger(RouteTrackerLogPort.class);
-
-    private final ObjectMapper mapper = new ObjectMapper();
-
     private final JsonToStringService jsonToStringService = new JsonToStringServiceImpl();
+
+    private final RouteLogRepository repository;
 
     @Override
     public RouteProcess initializeRouteProcess(ParcelId parcelId) {
@@ -112,17 +104,13 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     public void saveReturnTrackRequest(ReturnTrackRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
         routeLogRecord.updateRequest(request.getProcessType(), jsonToStringService.convertToString(request));
-        routeLogRecord.saveUsername(request.getProcessType(), request.getUsername());
-        routeLogRecord.saveDepotCode(request.getProcessType(), request.getDepotCode());
         repository.update(routeLogRecord);
     }
 
     @Override
     public void saveDeliveryReturnRequest(DeliveryReturnRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
-        final ProcessType processType = ProcessType.RETURN;
-        routeLogRecord.updateRequest(processType, jsonToStringService.convertToString(request));
-        routeLogRecord.saveDepotCode(processType, request.getDepotCode());
+        routeLogRecord.updateRequest(request.getProcessType(), jsonToStringService.convertToString(request));
         repository.update(routeLogRecord);
     }
 
