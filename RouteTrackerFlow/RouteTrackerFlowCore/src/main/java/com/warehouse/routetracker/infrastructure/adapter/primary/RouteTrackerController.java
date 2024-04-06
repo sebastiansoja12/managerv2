@@ -124,6 +124,13 @@ public class RouteTrackerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/delivery")
+    public ResponseEntity<?> saveDeliveryStatus(@RequestBody DeliveryStatusRequestDto deliveryStatusRequest) {
+        final DeliveryStatusRequest request = requestMapper.map(deliveryStatusRequest);
+        trackerLogPort.saveDeliveryStatus(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/{parcelId}")
     public ResponseEntity<?> getByParcelId(@PathVariable Long parcelId) {
         final RouteLogRecord routeLogRecord = trackerLogPort.find(parcelId);

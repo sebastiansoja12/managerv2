@@ -43,7 +43,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
         
         if (!deliveryRequest.isReturnProcessType()) {
             logWrongProcessTypeInformation();
-            throw new WrongProcessTypeException(7001, "Wrong process type");
+            throw new WrongProcessTypeException(403, "Wrong process type");
         }
 
         deliveryRequest.validateStatuses();

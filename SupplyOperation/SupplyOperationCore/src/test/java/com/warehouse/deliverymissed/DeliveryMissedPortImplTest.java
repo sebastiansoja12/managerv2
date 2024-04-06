@@ -1,0 +1,104 @@
+package com.warehouse.deliverymissed;
+
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
+import com.warehouse.deliverymissed.domain.exception.EmptyDepotCodeException;
+import com.warehouse.deliverymissed.domain.exception.WrongDeliveryStatusException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.warehouse.deliverymissed.domain.enumeration.DeliveryStatus;
+import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
+import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPortImpl;
+import com.warehouse.deliverymissed.domain.port.secondary.DeliveryMissedRepository;
+import com.warehouse.deliverymissed.domain.port.secondary.RouteLogMissedServicePort;
+import com.warehouse.deliverymissed.domain.service.DeliveryMissedService;
+import com.warehouse.deliverymissed.domain.service.DeliveryMissedServiceImpl;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissedResponse;
+
+@ExtendWith(MockitoExtension.class)
+public class DeliveryMissedPortImplTest {
+
+
+    @Mock
+    private RouteLogMissedServicePort routeLogMissedServicePort;
+
+    @Mock
+    private DeliveryMissedRepository deliveryMissedRepository;
+
+    private DeliveryMissedService deliveryMissedService;
+
+    private DeliveryMissedPortImpl deliveryMissedPort;
+
+
+    @BeforeEach
+    void setup() {
+        deliveryMissedService = new DeliveryMissedServiceImpl(deliveryMissedRepository);
+        deliveryMissedPort = new DeliveryMissedPortImpl(deliveryMissedService, routeLogMissedServicePort);
+    }
+
+    @Test
+    void shouldLogMissedDelivery() {
+        // given
+        final DeliveryMissedRequest request = createDeliveryMissedRequest(DeliveryStatus.UNAVAILABLE,
+                "KT1", 1L, "abc");
+        final DeliveryMissed deliveryMissed = new DeliveryMissed("deliveryId", 1L, "KT1", "abc", DeliveryStatus.UNAVAILABLE);
+        when(deliveryMissedRepository
+                .saveDeliveryMissed(request))
+                .thenReturn(deliveryMissed);
+        doNothing()
+                .when(routeLogMissedServicePort)
+                .logRouteLogMissedDelivery(deliveryMissed);
+        doNothing()
+                .when(routeLogMissedServicePort)
+                .logDepotCodeMissedDelivery(deliveryMissed);
+        // when
+        final DeliveryMissedResponse response = deliveryMissedPort.logMissedDelivery(request);
+        // then
+        assertEquals(response.getDeliveryId(), deliveryMissed.getDeliveryId());
+    }
+
+    @Test
+    void shouldNotLogMissedDeliveryWhenDepotCodeIsEmpty() {
+        // given
+        final DeliveryMissedRequest request = createDeliveryMissedRequest(DeliveryStatus.UNAVAILABLE,
+                "", 1L, "abc");
+        // when
+        final Executable executable = () -> deliveryMissedPort.logMissedDelivery(request);
+        // then
+        final EmptyDepotCodeException runtimeException = assertThrows(EmptyDepotCodeException.class, executable);
+        assertEquals("Depot code cannot be empty", runtimeException.getMessage());
+    }
+
+    @Test
+    void shouldNotLogMissedDeliveryWhenProcessTypeIsDifferent() {
+        // given
+        final DeliveryMissedRequest request = createDeliveryMissedRequest(DeliveryStatus.TEST,
+                "KT1", 1L, "abc");
+        // when
+        final Executable executable = () -> deliveryMissedPort.logMissedDelivery(request);
+        // then
+		final WrongDeliveryStatusException runtimeException = assertThrows(WrongDeliveryStatusException.class,
+				executable);
+        assertEquals("Wrong delivery status", runtimeException.getMessage());
+    }
+
+	private DeliveryMissedRequest createDeliveryMissedRequest(final DeliveryStatus deliveryStatus,
+			final String depotCode, final Long parcelId, final String supplierCode) {
+		final DeliveryMissedRequest request = new DeliveryMissedRequest();
+		request.setDeliveryStatus(deliveryStatus);
+		request.setDepotCode(depotCode);
+		request.setParcelId(parcelId);
+		request.setSupplierCode(supplierCode);
+		return request;
+	}
+}

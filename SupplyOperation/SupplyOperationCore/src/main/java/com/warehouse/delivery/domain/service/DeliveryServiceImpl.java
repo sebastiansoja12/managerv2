@@ -20,29 +20,28 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     public List<Delivery> save(Set<DeliveryRequest> deliveryRequest) {
-        final List<Delivery> deliveries = deliveryRequest.stream()
-                .map(deliveryRepository::saveDelivery)
-                .toList();
-
-        final DeliveryTokenRequest deliveryTokenRequest = buildTokenRequest(deliveries);
+        final DeliveryTokenRequest deliveryTokenRequest = buildTokenRequest(deliveryRequest);
 
         final DeliveryTokenResponse deliveryTokenResponse = secureDelivery(deliveryTokenRequest);
 
-        final Map<UUID, SupplierSignature> signaturesMap = assignToHashMap(deliveryTokenResponse);
+        final Map<Long, SupplierSignature> signaturesMap = assignToHashMap(deliveryTokenResponse);
 
-        assignTokenToDelivery(signaturesMap, deliveries);
+        assignTokenToDelivery(signaturesMap, deliveryRequest);
 
-		return deliveries;
+		return deliveryRequest
+                .stream()
+                .map(deliveryRepository::saveDelivery)
+                .toList();
     }
 
-    private DeliveryTokenRequest buildTokenRequest(List<Delivery> deliveries) {
+    private DeliveryTokenRequest buildTokenRequest(Set<DeliveryRequest> deliveries) {
         final List<DeliveryPackageRequest> deliveryPackageRequests = deliveries
                 .stream()
                 .map(this::createDeliveryPackageRequests)
                 .flatMap(Collection::stream)
                 .toList();
         final Supplier supplier = deliveries.stream()
-                .map(Delivery::getSupplierCode)
+                .map(DeliveryRequest::getSupplierCode)
                 .map(Supplier::new)
                 .findAny()
                 .orElse(null);
@@ -52,42 +51,40 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .build();
     }
 
-    private List<DeliveryPackageRequest> createDeliveryPackageRequests(Delivery delivery) {
+    private List<DeliveryPackageRequest> createDeliveryPackageRequests(DeliveryRequest delivery) {
         return List.of(createDeliveryPackageRequest(delivery));
     }
 
-    private DeliveryPackageRequest createDeliveryPackageRequest(Delivery delivery) {
+    private DeliveryPackageRequest createDeliveryPackageRequest(DeliveryRequest delivery) {
         return DeliveryPackageRequest.builder()
                 .delivery(buildDeliveryInformation(delivery))
                 .build();
     }
 
-    private DeliveryInformation buildDeliveryInformation(Delivery delivery) {
+    private DeliveryInformation buildDeliveryInformation(DeliveryRequest delivery) {
         return DeliveryInformation.builder()
                 .deliveryStatus(delivery.getDeliveryStatus())
-                .id(delivery.getId())
-                .token(delivery.getToken())
                 .depotCode(delivery.getDepotCode())
                 .parcelId(delivery.getParcelId())
                 .build();
     }
 
-    private void assignTokenToDelivery(Map<UUID, SupplierSignature> supplierTokenResponseMap,
-			List<Delivery> deliveries) {
+    private void assignTokenToDelivery(Map<Long, SupplierSignature> supplierTokenResponseMap,
+			Set<DeliveryRequest> deliveries) {
 		deliveries.forEach(delivery -> {
-			final SupplierSignature supplierSignature = supplierTokenResponseMap.get(delivery.getId());
-			delivery.setToken(supplierSignature.getToken());
+			final SupplierSignature supplierSignature = supplierTokenResponseMap.get(delivery.getParcelId());
+			delivery.assignTokenToDelivery(supplierSignature.getToken());
 		});
 	}
 
-    private Map<UUID, SupplierSignature> assignToHashMap(DeliveryTokenResponse responses) {
+    private Map<Long, SupplierSignature> assignToHashMap(DeliveryTokenResponse responses) {
         return responses.getSupplierSignature().stream()
                 .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
     }
 
-    private UUID generateKeyFromResponse(SupplierSignature supplierSignature) {
+    private Long generateKeyFromResponse(SupplierSignature supplierSignature) {
 		if (supplierSignature != null) {
-			return supplierSignature.getDeliveryId();
+			return supplierSignature.getParcelId();
 		}
 		return null;
 	}

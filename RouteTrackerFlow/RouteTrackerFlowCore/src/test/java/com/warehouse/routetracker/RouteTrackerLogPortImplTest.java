@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.util.Set;
 import java.util.UUID;
 
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import org.junit.jupiter.api.Test;
@@ -405,6 +406,46 @@ public class RouteTrackerLogPortImplTest {
         routeTrackerLogPort.saveDescription(request);
         // then
         verify(routeLogRecord).saveDescription(processType, "value");
+    }
+
+    @Test
+    void shouldSaveDeliveryStatus() {
+        // given
+        final ProcessType processType = ProcessType.MISS;
+        final DeliveryStatusRequest request = DeliveryStatusRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .processType(processType)
+                .depotCode("KT1")
+                .supplierCode("ABC")
+                .build();
+        final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
+        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        // when
+        routeTrackerLogPort.saveDeliveryStatus(request);
+        // then
+        verify(routeLogRecord).saveParcelStatus(processType, ParcelStatus.DELIVERY);
+    }
+
+    @Test
+    void shouldNotSaveDeliveryStatus() {
+        // given
+        final ProcessType processType = ProcessType.MISS;
+        final DeliveryStatusRequest request = DeliveryStatusRequest
+                .builder()
+                .parcelId(PARCEL_ID)
+                .processType(processType)
+                .depotCode("KT1")
+                .supplierCode("ABC")
+                .build();
+        doThrow(new RouteLogException("Route log was not found"))
+                .when(repository)
+                .find(PARCEL_ID);
+        // when
+        final Executable executable = () -> routeTrackerLogPort.saveDeliveryStatus(request);
+        // then
+        assertThrows(RouteLogException.class, executable);
+        verify(repository, times(0)).update(any());
     }
 
     @Test

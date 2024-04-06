@@ -1,5 +1,6 @@
 package com.warehouse.delivery.configuration;
 
+import com.warehouse.routelogger.RouteLogEventPublisher;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,4 +22,7 @@ public class DeliveryTestConfiguration {
 
     @MockBean
     private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
+
+    @MockBean
+    private RouteLogEventPublisher routeLogEventPublisher;
 }

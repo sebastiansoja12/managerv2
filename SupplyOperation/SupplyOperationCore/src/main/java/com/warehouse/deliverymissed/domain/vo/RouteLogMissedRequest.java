@@ -6,4 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class RouteLogMissedRequest {
+    Long parcelId;
+    String supplierCode;
+    String depotCode;
 }

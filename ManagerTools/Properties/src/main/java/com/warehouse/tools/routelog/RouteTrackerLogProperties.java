@@ -21,4 +21,5 @@ public class RouteTrackerLogProperties {
     private String depotCode;
     private String username;
     private String zebraInitialize;
+    private String delivery;
 }

@@ -17,9 +17,13 @@ public class DeliveryRequest {
     private String depotCode;
     private String supplierCode;
     private DeliveryStatus deliveryStatus;
-    private final String token = "abcdefghjklk";
+    private String token;
 
     public void updateDeliveryStatus() {
         this.deliveryStatus = DeliveryStatus.DELIVERY;
+    }
+
+    public void assignTokenToDelivery(String token) {
+        this.token = token;
     }
 }
