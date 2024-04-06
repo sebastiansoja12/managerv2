@@ -1,3 +1,26 @@
+## [2024.3] - 2024-04-06
+
+### Added
+- Delivery missed domain
+- Route logger for logging informations via events
+- Secondary adapters for route logging
+- New process type
+- Determination for parcel status
+- Module for E2E tests
+
+### Changed
+- Route process
+- Delivery domain
+- Depot model extended
+- Dummy data for depots
+
+### Fixed
+- -------
+
+### Deprecated
+- -------
+
+
 ## [2024.2] - 2024-02-05
 
 ### Added
@@ -13,7 +36,7 @@
 - Conflict between SoftwareConfig and main Application
 
 ### Deprecated
-- TBA
+- -------
 
 ## [2024.1] - 2024-01-01
 
