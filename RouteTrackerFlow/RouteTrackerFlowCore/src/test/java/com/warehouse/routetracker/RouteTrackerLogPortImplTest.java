@@ -290,7 +290,7 @@ public class RouteTrackerLogPortImplTest {
         // when
         routeTrackerLogPort.saveTerminalRequest(request);
         // then
-        verify(routeLogRecord).saveTerminalRequest(processType, requestAsString);
+        verify(routeLogRecord).updateRequest(processType, requestAsString);
     }
 
     @Test

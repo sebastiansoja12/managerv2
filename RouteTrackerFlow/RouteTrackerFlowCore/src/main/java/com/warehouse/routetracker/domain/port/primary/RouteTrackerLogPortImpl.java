@@ -2,16 +2,17 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
+import com.warehouse.routetracker.domain.service.JsonToStringService;
+import com.warehouse.routetracker.domain.service.JsonToStringServiceImpl;
 import com.warehouse.routetracker.domain.vo.*;
 
 import lombok.AllArgsConstructor;
@@ -25,6 +26,8 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     private final Logger logger = LoggerFactory.getLogger(RouteTrackerLogPort.class);
 
     private final ObjectMapper mapper = new ObjectMapper();
+
+    private final JsonToStringService jsonToStringService = new JsonToStringServiceImpl();
 
     @Override
     public RouteProcess initializeRouteProcess(ParcelId parcelId) {
@@ -94,33 +97,21 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public void saveCreateRequest(ZebraInitializeRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
-        try {
-            routeLogRecord.updateRequest(request.getProcessType(), mapper.writeValueAsString(request));
-        } catch (JsonProcessingException e) {
-            logger.error(e.getMessage());
-        }
+        routeLogRecord.updateRequest(request.getProcessType(), jsonToStringService.convertToString(request));
         repository.update(routeLogRecord);
     }
 
     @Override
     public void saveTerminalRequest(TerminalRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
-        try {
-            routeLogRecord.saveTerminalRequest(request.getProcessType(), mapper.writeValueAsString(request));
-        } catch (JsonProcessingException e) {
-            logger.error(e.getMessage());
-        }
+        routeLogRecord.updateRequest(request.getProcessType(), jsonToStringService.convertToString(request));
         repository.update(routeLogRecord);
     }
 
     @Override
     public void saveReturnTrackRequest(ReturnTrackRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
-        try {
-            routeLogRecord.updateRequest(request.getProcessType(), mapper.writeValueAsString(request));
-        } catch (JsonProcessingException e) {
-            logger.error(e.getMessage());
-        }
+        routeLogRecord.updateRequest(request.getProcessType(), jsonToStringService.convertToString(request));
         routeLogRecord.saveUsername(request.getProcessType(), request.getUsername());
         routeLogRecord.saveDepotCode(request.getProcessType(), request.getDepotCode());
         repository.update(routeLogRecord);
@@ -130,11 +121,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     public void saveDeliveryReturnRequest(DeliveryReturnRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
         final ProcessType processType = ProcessType.RETURN;
-        try {
-            routeLogRecord.updateRequest(processType, mapper.writeValueAsString(request));
-        } catch (JsonProcessingException e) {
-            logger.error(e.getMessage());
-        }
+        routeLogRecord.updateRequest(processType, jsonToStringService.convertToString(request));
         routeLogRecord.saveDepotCode(processType, request.getDepotCode());
         repository.update(routeLogRecord);
     }
