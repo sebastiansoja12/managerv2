@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 public class DeliveryMissed {
-    Long deliveryId;
+    String deliveryId;
     Long parcelId;
     String depotCode;
     String supplierCode;

@@ -27,5 +27,6 @@ public interface SupplierTokenResponseMapper {
 
     @Mapping(target = "deliveryId", source = "protectedDelivery.deliveryId")
     @Mapping(target = "token", source = "protectedDelivery.protectionToken")
+    @Mapping(target = "parcelId", source = "parcel.id")
     SupplierSignatureDto map(DeliveryPackageResponse deliveryPackageResponse);
 }

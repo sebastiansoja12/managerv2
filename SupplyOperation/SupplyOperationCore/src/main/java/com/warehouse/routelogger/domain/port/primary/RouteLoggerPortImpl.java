@@ -14,4 +14,9 @@ public class RouteLoggerPortImpl implements RouteLoggerPort {
     public void logAnyDelivery(AnyDeliveryRequest request) {
         routeLoggerDeliveryServicePort.logAnyDelivery(request);
     }
+
+    @Override
+    public void logDepotCode(AnyDeliveryRequest request) {
+        routeLoggerDeliveryServicePort.logDepotCode(request);
+    }
 }

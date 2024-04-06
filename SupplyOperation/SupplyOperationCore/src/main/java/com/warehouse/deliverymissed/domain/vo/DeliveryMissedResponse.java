@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Value
 @Builder
 public class DeliveryMissedResponse {
-    Long deliveryId;
+    String deliveryId;
     Long parcelId;
     String depotCode;
     String supplierCode;

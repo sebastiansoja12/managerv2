@@ -7,5 +7,6 @@ import java.util.UUID;
 @Value
 public class SupplierSignatureDto {
     UUID deliveryId;
+    Long parcelId;
     String token;
 }

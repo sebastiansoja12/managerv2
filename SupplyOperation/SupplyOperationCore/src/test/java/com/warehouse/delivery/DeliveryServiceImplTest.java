@@ -46,7 +46,6 @@ public class DeliveryServiceImplTest {
         // given
         final DeliveryPackageRequest deliveryPackageRequest = createDeliveryPackageRequest(
                  DeliveryInformation.builder()
-                        .id(DELIVERY_ID)
                         .deliveryStatus(DeliveryStatus.DELIVERY)
                         .parcelId(1L)
                         .depotCode("depotCode")
@@ -85,7 +84,6 @@ public class DeliveryServiceImplTest {
                 .supplier(new Supplier("code"))
                 .deliveryPackageRequests(List.of(createDeliveryPackageRequest(
                         DeliveryInformation.builder()
-                                .id(DELIVERY_ID)
                                 .deliveryStatus(DeliveryStatus.DELIVERY)
                                 .parcelId(1L)
                                 .depotCode("depotCode")

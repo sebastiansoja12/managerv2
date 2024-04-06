@@ -9,13 +9,12 @@ import java.util.stream.Collectors;
 import com.warehouse.delivery.domain.model.Delivery;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
-import com.warehouse.delivery.domain.model.DeliveryRouteRequest;
 import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.delivery.domain.port.secondary.RouteLogDeliveryStatusServicePort;
 import com.warehouse.delivery.domain.service.DeliveryService;
-
 import com.warehouse.delivery.domain.vo.UpdateStatusParcelRequest;
 import com.warehouse.delivery.infrastructure.adapter.secondary.api.UpdateStatus;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -35,31 +34,30 @@ public class DeliveryPortImpl implements DeliveryPort {
                 .collect(Collectors.toSet());
 
         final List<Delivery> signedDeliveries = deliveryService.save(deliveryRequests);
-
-        final List<DeliveryResponse> deliveryResponses = signedDeliveries.stream()
-                .map(this::mapToResponse)
-                .toList();
         
-        updateParcelStatus(deliveryResponses);
+        updateParcelStatus(signedDeliveries);
 
         registerDeliveryRoute(signedDeliveries);
         
-        return deliveryResponses;
+        return signedDeliveries
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     private void registerDeliveryRoute(List<Delivery> signedDeliveries) {
         logServicePort.deliver(new HashSet<>(signedDeliveries));
     }
     
-    private void updateParcelStatus(List<DeliveryResponse> deliveryResponses) {
-        deliveryResponses.forEach(this::updateParcelStatus);
+    private void updateParcelStatus(List<Delivery> signedDeliveries) {
+        signedDeliveries.forEach(this::updateParcelStatus);
     }
     
-    private void updateParcelStatus(DeliveryResponse deliveryResponse) {
+    private void updateParcelStatus(Delivery delivery) {
 		final UpdateStatus updateStatus = parcelStatusControlChangeServicePort
-				.updateParcelStatus(new UpdateStatusParcelRequest(deliveryResponse.getParcelId()));
-        
-        deliveryResponse.updateStatus(updateStatus);
+				.updateParcelStatus(new UpdateStatusParcelRequest(delivery.getParcelId()));
+
+        delivery.updateStatus(updateStatus);
 
     }
 

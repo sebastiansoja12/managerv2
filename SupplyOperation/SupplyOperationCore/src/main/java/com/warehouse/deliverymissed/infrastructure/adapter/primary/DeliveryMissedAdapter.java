@@ -3,13 +3,13 @@ package com.warehouse.deliverymissed.infrastructure.adapter.primary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.ErrorResponseDto;
+import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.exception.RestException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPort;
@@ -22,6 +22,8 @@ import com.warehouse.terminal.request.TerminalRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/delivery-missings")
@@ -53,5 +55,16 @@ public class DeliveryMissedAdapter {
         final DeliveryMissedResponse response = deliveryMissedPort.logMissedDelivery(request);
 
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.CREATED);
+    }
+
+
+    @ExceptionHandler(RestException.class)
+    public ResponseEntity<?> handleException(RestException ex) {
+        final ErrorResponseDto error = ErrorResponseDto.builder()
+                .error(ex.getMessage())
+                .status(ex.getCode())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(error, HttpStatusCode.valueOf(error.getStatus()));
     }
 }

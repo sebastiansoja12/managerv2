@@ -131,7 +131,6 @@ public class RouteTrackerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
     @GetMapping("/{parcelId}")
     public ResponseEntity<?> getByParcelId(@PathVariable Long parcelId) {
         final RouteLogRecord routeLogRecord = trackerLogPort.find(parcelId);
