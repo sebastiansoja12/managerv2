@@ -37,6 +37,7 @@
         <module>ManagerTools</module>
         <module>SoftwareConfiguration</module>
         <module>E2E</module>
+        <module>Common</module>
     </modules>
 
 	<properties>
