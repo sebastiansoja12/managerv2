@@ -20,6 +20,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>Common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>ExceptionHandler</artifactId>
             <version>${project.version}</version>
         </dependency>
