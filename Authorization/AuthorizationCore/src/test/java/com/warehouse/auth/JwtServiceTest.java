@@ -3,6 +3,7 @@ package com.warehouse.auth;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 
+import com.warehouse.commonassets.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,6 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.JwtServiceImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.common.util.StringUtils;

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.warehouse.auth.domain.vo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,16 +16,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.domain.model.*;
+import com.warehouse.auth.domain.model.RefreshTokenRequest;
+import com.warehouse.auth.domain.model.RegisterRequest;
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
+import com.warehouse.auth.domain.vo.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
+import com.warehouse.commonassets.Role;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationPortImplTest {
@@ -94,9 +96,7 @@ public class AuthenticationPortImplTest {
     @Test
     void shouldLogin() {
         // given
-        final String authenticationToken = "authenticationToken";
         final LoginRequest loginRequest = new LoginRequest("s-soja", "test");
-        final LoginResponse loginResponse = new LoginResponse(new Token(authenticationToken));
 
         final User userDetails = User.builder()
                 .username("s-soja")
@@ -124,7 +124,7 @@ public class AuthenticationPortImplTest {
         final AuthenticationResponse response = authenticationPort.login(loginRequest);
 
         // then
-		assertTrue(response.getAuthenticationToken().startsWith("eyJhbGciOiJIUzM4NCJ9"));
+		assertTrue(response.authenticationToken().startsWith("eyJhbGciOiJIUzM4NCJ9"));
     }
 
     @Test

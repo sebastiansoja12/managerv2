@@ -2,6 +2,7 @@ package com.warehouse.auth;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.warehouse.commonassets.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -24,7 +25,6 @@ import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 
@@ -59,8 +59,8 @@ public class AuthenticationIntegrationTest {
         // when
         final AuthenticationResponse response = authenticationPort.login(loginRequest);
         // then
-        assertTrue(response.getAuthenticationToken().startsWith("eyJhbGciOiJIUzM4NCJ9"));
-        assertThatJwtUsernameTokenIsCorrect(response.getAuthenticationToken());
+        assertTrue(response.authenticationToken().startsWith("eyJhbGciOiJIUzM4NCJ9"));
+        assertThatJwtUsernameTokenIsCorrect(response.authenticationToken());
     }
 
     @Test
