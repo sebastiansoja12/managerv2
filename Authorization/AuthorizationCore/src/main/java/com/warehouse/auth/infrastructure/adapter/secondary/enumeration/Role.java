@@ -1,5 +1,7 @@
-package com.warehouse.commonassets;
+package com.warehouse.auth.infrastructure.adapter.secondary.enumeration;
 
+
+import static com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Permission.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,8 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import static com.warehouse.commonassets.Permission.*;
 
 @RequiredArgsConstructor
 public enum Role {

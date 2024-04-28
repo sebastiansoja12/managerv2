@@ -28,7 +28,7 @@ import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.domain.vo.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
-import com.warehouse.commonassets.Role;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationPortImplTest {

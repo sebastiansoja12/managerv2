@@ -2,7 +2,7 @@ package com.warehouse.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.warehouse.commonassets.Role;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

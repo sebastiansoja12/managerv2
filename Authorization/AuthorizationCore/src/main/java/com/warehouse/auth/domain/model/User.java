@@ -1,6 +1,6 @@
 package com.warehouse.auth.domain.model;
 
-import com.warehouse.commonassets.Role;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

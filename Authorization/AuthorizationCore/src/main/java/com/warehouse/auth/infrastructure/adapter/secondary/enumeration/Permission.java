@@ -1,4 +1,4 @@
-package com.warehouse.commonassets;
+package com.warehouse.auth.infrastructure.adapter.secondary.enumeration;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

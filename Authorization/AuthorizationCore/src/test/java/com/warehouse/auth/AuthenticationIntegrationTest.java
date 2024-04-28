@@ -2,7 +2,7 @@ package com.warehouse.auth;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.warehouse.commonassets.Role;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;

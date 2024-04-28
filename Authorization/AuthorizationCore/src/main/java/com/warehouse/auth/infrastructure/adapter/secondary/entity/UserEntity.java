@@ -2,7 +2,7 @@ package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import java.util.Collection;
 
-import com.warehouse.commonassets.Role;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
