@@ -1,8 +1,8 @@
 package com.warehouse.returntoken;
 
 
+import com.warehouse.commonassets.ParcelStatus;
 import com.warehouse.returntoken.configuration.ReturnTokenTestConfiguration;
-import com.warehouse.returntoken.domain.enumeration.ParcelStatus;
 import com.warehouse.returntoken.domain.model.Parcel;
 import com.warehouse.returntoken.domain.vo.Token;
 import org.junit.jupiter.api.Test;
