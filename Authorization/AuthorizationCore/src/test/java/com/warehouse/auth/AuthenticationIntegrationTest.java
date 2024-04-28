@@ -2,7 +2,6 @@ package com.warehouse.auth;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -17,15 +16,15 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.auth.configuration.AuthTestConfiguration;
-import com.warehouse.auth.domain.vo.AuthenticationResponse;
-import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.domain.model.RefreshTokenRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.vo.AuthenticationResponse;
+import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
-import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 
 @ExtendWith(SpringExtension.class)
@@ -129,18 +128,6 @@ public class AuthenticationIntegrationTest {
     private void assertThatJwtUsernameTokenIsCorrect(String authenticationToken) {
         final String username = jwtService.extractUsername(authenticationToken);
         assertEquals(expectedToBe(USERNAME), username);
-    }
-
-    private UserEntity createUser() {
-        return UserEntity.builder()
-                .username(USERNAME)
-                .password(PASSWORD)
-                .role(Role.ADMIN)
-                .email("sebastian5152@wp.pl")
-                .depotCode("TST")
-                .firstName("Sebastian")
-                .lastName("Soja")
-                .build();
     }
 
     private <T> T expectedToBe(T value) {
