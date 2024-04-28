@@ -2,7 +2,6 @@ package com.warehouse.returning.domain.service;
 
 import java.util.List;
 
-import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
@@ -51,15 +50,4 @@ public class ReturnServiceImpl implements ReturnService {
         returnRepository.delete(returnId);
     }
 
-    private ReturnPackage buildReturnPackage(ReturnPackageRequest returnPackageRequest) {
-        return ReturnPackage.builder()
-                .returnToken(returnPackageRequest.getReturnToken())
-                .returnStatus(returnPackageRequest.getReturnStatus())
-                .parcelId(returnPackageRequest.getParcel().getId())
-                .reason(returnPackageRequest.getReason())
-                .supplierCode(returnPackageRequest.getSupplierCode())
-                .depotCode(returnPackageRequest.getDepotCode())
-                .username(returnPackageRequest.getUsername())
-                .build();
-    }
 }
