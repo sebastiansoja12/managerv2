@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.warehouse.commonassets.ParcelType;
 import com.warehouse.deliverytoken.domain.vo.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 import com.warehouse.tools.shipment.ShipmentProperties;
@@ -27,7 +28,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.deliverytoken.configuration.DeliveryTokenTestConfiguration;
-import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
 import com.warehouse.deliverytoken.domain.model.*;
 import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPort;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
@@ -147,10 +147,6 @@ public class DeliveryTokenIntegrationTest {
 
     private Delivery createDelivery(String id) {
         return new Delivery(id);
-    }
-
-    private Supplier createSupplier(String supplierCode) {
-        return new Supplier(supplierCode);
     }
 
     private Parcel createParcel(Long id, Long parcelRelatedId, ParcelType parcelType, String destination) {
