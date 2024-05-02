@@ -4,4 +4,6 @@ public interface RouteLoggerDeliveryServicePort<T> {
     void logAnyDelivery(T t);
 
     void logDepotCode(T t);
+
+    void logRequest(T t);
 }

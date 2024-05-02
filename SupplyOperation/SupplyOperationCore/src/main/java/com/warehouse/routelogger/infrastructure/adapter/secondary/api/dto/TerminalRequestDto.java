@@ -1,4 +1,4 @@
-package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
+package com.warehouse.routelogger.infrastructure.adapter.secondary.api.dto;
 
 import lombok.Builder;
 import lombok.Value;
@@ -8,7 +8,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class TerminalRequestDto {
-    ProcessTypeDto processType;
-    Long parcelId;
     String request;
+    Long parcelId;
+    String processType;
 }

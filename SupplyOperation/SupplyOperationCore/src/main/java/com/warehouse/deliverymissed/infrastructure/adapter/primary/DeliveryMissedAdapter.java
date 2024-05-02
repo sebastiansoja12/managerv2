@@ -3,8 +3,10 @@ package com.warehouse.deliverymissed.infrastructure.adapter.primary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.deliverymissed.domain.port.primary.TerminalRequestLoggerPort;
 import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.ErrorResponseDto;
 import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.exception.RestException;
+import com.warehouse.routelogger.domain.port.secondary.RouteLoggerDeliveryServicePort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -37,10 +39,12 @@ public class DeliveryMissedAdapter {
 
     private final DeliveryMissedPort deliveryMissedPort;
 
+    private final TerminalRequestLoggerPort terminalRequestLoggerPort;
+
     private final SupplierValidatorPort validatorPort;
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<?> deliveryReturn(@RequestBody TerminalRequest terminalRequest) {
+    public ResponseEntity<?> deliveryReturn(@RequestBody final TerminalRequest terminalRequest) {
 
         final TerminalDeviceInformation terminalDeviceInformation = terminalRequest.getTerminalDeviceInformation();
 
@@ -50,6 +54,8 @@ public class DeliveryMissedAdapter {
 
         validatorPort.validateSupplierCode(terminalDeviceInformation.getUsername());
 
+        logTerminalRequest(terminalRequest);
+
         final DeliveryMissedRequest request = requestMapper.map(terminalRequest);
 
         final DeliveryMissedResponse response = deliveryMissedPort.logMissedDelivery(request);
@@ -57,9 +63,13 @@ public class DeliveryMissedAdapter {
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.CREATED);
     }
 
+    private void logTerminalRequest(final TerminalRequest terminalRequest) {
+        log.info("Logging request in tracker");
+        terminalRequestLoggerPort.logDeliveryMissedTerminalRequest(terminalRequest);
+    }
 
     @ExceptionHandler(RestException.class)
-    public ResponseEntity<?> handleException(RestException ex) {
+    public ResponseEntity<?> handleException(final RestException ex) {
         final ErrorResponseDto error = ErrorResponseDto.builder()
                 .error(ex.getMessage())
                 .status(ex.getCode())

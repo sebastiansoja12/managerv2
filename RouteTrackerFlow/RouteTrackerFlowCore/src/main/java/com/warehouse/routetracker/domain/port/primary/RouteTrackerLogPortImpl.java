@@ -96,7 +96,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     @Override
     public void saveTerminalRequest(TerminalRequest request) {
         final RouteLogRecord routeLogRecord = repository.find(request.getParcelId());
-        routeLogRecord.updateRequest(request.getProcessType(), jsonToStringService.convertToString(request));
+        routeLogRecord.updateRequest(request.getProcessType(), request.getRequest());
         repository.update(routeLogRecord);
     }
 

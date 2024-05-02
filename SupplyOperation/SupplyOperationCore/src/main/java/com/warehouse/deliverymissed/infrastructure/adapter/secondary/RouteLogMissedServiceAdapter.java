@@ -7,6 +7,8 @@ import com.warehouse.routelogger.RouteLogEvent;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.event.DeliveryLogEvent;
 import com.warehouse.routelogger.event.DepotCodeLogEvent;
+import com.warehouse.routelogger.event.RequestLogEvent;
+import com.warehouse.terminal.request.TerminalRequest;
 import lombok.AllArgsConstructor;
 
 import static org.mapstruct.factory.Mappers.getMapper;
@@ -22,28 +24,39 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
 
 
     @Override
-    public void logRouteLogMissedDelivery(DeliveryMissed deliveryMissed) {
+    public void logRouteLogMissedDelivery(final DeliveryMissed deliveryMissed) {
         sendEvent(buildDeliveryLogEvent(deliveryMissed));
     }
 
     @Override
-    public void logDepotCodeMissedDelivery(DeliveryMissed deliveryMissed) {
+    public void logDepotCodeMissedDelivery(final DeliveryMissed deliveryMissed) {
         sendEvent(buildDepotCodeLogEvent(deliveryMissed));
     }
 
-    private DepotCodeLogEvent buildDepotCodeLogEvent(DeliveryMissed deliveryMissed) {
+    @Override
+    public void logRequest(final TerminalRequest terminalRequest, final String requestAsJson) {
+        sendEvent(buildRequestLogEvent(terminalRequest, requestAsJson));
+    }
+
+    private DepotCodeLogEvent buildDepotCodeLogEvent(final DeliveryMissed deliveryMissed) {
         return DepotCodeLogEvent.builder()
                 .depotCodeRequest(eventMapper.mapToDepotCodeRequest(deliveryMissed))
                 .build();
     }
 
-    private DeliveryLogEvent buildDeliveryLogEvent(DeliveryMissed deliveryMissed) {
+    private DeliveryLogEvent buildDeliveryLogEvent(final DeliveryMissed deliveryMissed) {
         return DeliveryLogEvent.builder()
                 .deliveryRequest(eventMapper.map(deliveryMissed))
                 .build();
     }
 
-    private void sendEvent(RouteLogEvent event) {
+	private RequestLogEvent buildRequestLogEvent(final TerminalRequest terminalRequest, final String requestAsJson) {
+        return RequestLogEvent.builder()
+                .request(eventMapper.map(terminalRequest, requestAsJson))
+                .build();
+    }
+
+    private void sendEvent(final RouteLogEvent event) {
         routeLogEventPublisher.send(event);
     }
 }
