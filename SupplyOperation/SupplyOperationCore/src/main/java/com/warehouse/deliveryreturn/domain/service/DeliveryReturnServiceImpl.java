@@ -104,10 +104,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
     }
 
     private Long generateKeyFromResponse(DeliveryReturnSignature deliveryReturnSignature) {
-        if (deliveryReturnSignature != null) {
-            return deliveryReturnSignature.getParcelId();
-        }
-        return null;
+        return !Objects.isNull(deliveryReturnSignature) ? deliveryReturnSignature.getParcelId() : null;
     }
 
     private DeliveryReturnTokenResponse secureDeliveryReturn(DeliveryReturnTokenRequest request) {
