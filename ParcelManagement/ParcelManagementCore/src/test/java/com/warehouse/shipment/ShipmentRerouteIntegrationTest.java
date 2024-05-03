@@ -69,7 +69,7 @@ public class ShipmentRerouteIntegrationTest {
         // then
         final ParcelNotFoundException exception = assertThrows(ParcelNotFoundException.class, executable);
         assertEquals(expected("Parcel not found in request"), exception.getMessage());
-        assertEquals(expected(204), exception.getCode());
+        assertEquals(expected(404), exception.getCode());
     }
 
     private <T> T expected(T value) {
