@@ -38,6 +38,7 @@
         <module>SoftwareConfiguration</module>
         <module>E2E</module>
         <module>Common</module>
+        <module>RouteLogger</module>
     </modules>
 
 	<properties>
