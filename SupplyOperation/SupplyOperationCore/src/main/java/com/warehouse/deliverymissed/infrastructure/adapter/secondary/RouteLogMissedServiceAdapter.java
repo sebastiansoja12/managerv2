@@ -8,6 +8,7 @@ import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.event.DeliveryLogEvent;
 import com.warehouse.routelogger.event.DepotCodeLogEvent;
 import com.warehouse.routelogger.event.RequestLogEvent;
+import com.warehouse.routelogger.event.SupplierCodeLogEvent;
 import com.warehouse.terminal.request.TerminalRequest;
 import lombok.AllArgsConstructor;
 
@@ -38,6 +39,11 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
         sendEvent(buildRequestLogEvent(terminalRequest, requestAsJson));
     }
 
+    @Override
+    public void logSupplierCode(DeliveryMissed deliveryMissed) {
+        sendEvent(buildSupplierCodeLogEvent(deliveryMissed));
+    }
+
     private DepotCodeLogEvent buildDepotCodeLogEvent(final DeliveryMissed deliveryMissed) {
         return DepotCodeLogEvent.builder()
                 .depotCodeRequest(eventMapper.mapToDepotCodeRequest(deliveryMissed))
@@ -47,6 +53,12 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
     private DeliveryLogEvent buildDeliveryLogEvent(final DeliveryMissed deliveryMissed) {
         return DeliveryLogEvent.builder()
                 .deliveryRequest(eventMapper.map(deliveryMissed))
+                .build();
+    }
+
+    private SupplierCodeLogEvent buildSupplierCodeLogEvent(final DeliveryMissed deliveryMissed) {
+        return SupplierCodeLogEvent.builder()
+                .supplierCodeRequest(eventMapper.mapToSupplierCodeRequest(deliveryMissed))
                 .build();
     }
 

@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>RouteLoggerApi</artifactId>
+            <artifactId>RouteLoggerCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
