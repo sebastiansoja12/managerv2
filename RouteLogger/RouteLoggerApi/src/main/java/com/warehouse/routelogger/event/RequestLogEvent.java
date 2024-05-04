@@ -10,7 +10,7 @@ import lombok.NonNull;
 @Getter
 public class RequestLogEvent extends RouteLogBaseEvent implements RouteLogEvent {
 
-    private RequestDto request;
+    private final RequestDto request;
 
     @Builder
     public RequestLogEvent(@NonNull RequestDto request) {

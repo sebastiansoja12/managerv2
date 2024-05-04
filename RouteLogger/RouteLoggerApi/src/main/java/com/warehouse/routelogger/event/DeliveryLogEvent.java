@@ -10,7 +10,7 @@ import lombok.NonNull;
 @Getter
 public class DeliveryLogEvent extends RouteLogBaseEvent implements RouteLogEvent {
 
-    private DeliveryRequestDto deliveryRequest;
+    private final DeliveryRequestDto deliveryRequest;
 
     @Builder
     public DeliveryLogEvent(@NonNull DeliveryRequestDto deliveryRequest) {
