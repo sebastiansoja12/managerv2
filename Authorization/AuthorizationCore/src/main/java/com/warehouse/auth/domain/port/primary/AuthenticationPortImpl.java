@@ -4,6 +4,7 @@ import com.warehouse.auth.domain.vo.AuthenticationResponse;
 import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserLogout;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +14,6 @@ import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,6 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final Logger logger;
 
-
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
 
@@ -42,9 +41,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         authenticationService.login(user);
 
-        return AuthenticationResponse.builder()
-                .authenticationToken(authenticationToken)
-                .build();
+        return new AuthenticationResponse(authenticationToken);
     }
 
     @Override

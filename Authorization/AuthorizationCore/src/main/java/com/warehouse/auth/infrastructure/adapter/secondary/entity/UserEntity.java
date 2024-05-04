@@ -2,10 +2,10 @@ package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import java.util.Collection;
 
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

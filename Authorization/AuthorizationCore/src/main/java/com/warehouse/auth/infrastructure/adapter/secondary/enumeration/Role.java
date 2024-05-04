@@ -1,15 +1,17 @@
-package com.warehouse.auth.infrastructure.adapter.secondary.authority;
+package com.warehouse.auth.infrastructure.adapter.secondary.enumeration;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import static com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Permission.*;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.warehouse.auth.infrastructure.adapter.secondary.authority.Permission.*;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum Role {

@@ -88,13 +88,10 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 			Set<DeliveryReturnDetails> deliveryReturnRequests) {
         return deliveryReturnRequests.stream().map(delivery -> {
 			final DeliveryReturnSignature deliveryReturnSignature = signaturesMap.get(delivery.getParcelId());
-            if (deliveryReturnSignature == null) {
-                throw new RuntimeException("Delivery response not found");
-            }
             return DeliveryReturnDetails.builder()
                     .supplierCode(delivery.getSupplierCode())
                     .deliveryStatus(delivery.getDeliveryStatus())
-                    .token(deliveryReturnSignature.getToken())
+                    .token(deliveryReturnSignature != null ? deliveryReturnSignature.getToken() : null)
                     .depotCode(delivery.getDepotCode())
                     .parcelId(delivery.getParcelId())
                     .build();
@@ -107,10 +104,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
     }
 
     private Long generateKeyFromResponse(DeliveryReturnSignature deliveryReturnSignature) {
-        if (deliveryReturnSignature != null) {
-            return deliveryReturnSignature.getParcelId();
-        }
-        return null;
+        return !Objects.isNull(deliveryReturnSignature) ? deliveryReturnSignature.getParcelId() : null;
     }
 
     private DeliveryReturnTokenResponse secureDeliveryReturn(DeliveryReturnTokenRequest request) {

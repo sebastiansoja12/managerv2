@@ -36,7 +36,7 @@ public class RouteLogRecordDetailEntity {
     @Column(name = "process_type")
     private ProcessType processType;
 
-    @Column(name = "request")
+    @Column(name = "request", length = 1000)
     private String request;
 
     @Column(name = "parcel_status")

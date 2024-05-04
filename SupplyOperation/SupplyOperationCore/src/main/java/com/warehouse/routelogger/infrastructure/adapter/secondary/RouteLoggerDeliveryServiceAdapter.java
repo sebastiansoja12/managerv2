@@ -2,6 +2,8 @@ package com.warehouse.routelogger.infrastructure.adapter.secondary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.routelogger.domain.model.Request;
+import com.warehouse.routelogger.infrastructure.adapter.secondary.api.dto.TerminalRequestDto;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
@@ -51,6 +53,23 @@ public class RouteLoggerDeliveryServiceAdapter implements RouteLoggerDeliverySer
         restClient
                 .post()
                 .uri("/v2/api/routes/{endpoint}", routeTrackerLogProperties.getDepotCode())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .onStatus(HttpStatusCode::is2xxSuccessful,
+                        (req, res) -> log.warn("Successfully registered delivery in tracker module"))
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        (req, res) -> log.warn("Error while logging delivery"))
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        (req, res) -> log.warn("Critical error while logging delivery"));
+    }
+
+    @Override
+    public void logRequest(Object o) {
+        final TerminalRequestDto request = requestMapper.map((Request) o);
+        restClient
+                .post()
+                .uri("/v2/api/routes/{endpoint}", routeTrackerLogProperties.getTerminalRequest())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()

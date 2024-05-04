@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>ParcelStatusControlChange</artifactId>
-        <version>2024.3-SNAPSHOT</version>
+        <version>2024.4-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
     <artifactId>ParcelStatusControlChangeCore</artifactId>
@@ -15,6 +15,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>ExceptionHandler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>Common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

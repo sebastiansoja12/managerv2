@@ -2,13 +2,13 @@ package com.warehouse.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.RefreshTokenGeneratorImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.authority.Role;
 
 public class RefreshTokenGeneratorImplTest {
 

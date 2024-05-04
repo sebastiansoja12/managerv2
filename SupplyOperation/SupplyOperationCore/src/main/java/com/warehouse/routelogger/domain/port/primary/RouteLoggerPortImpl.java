@@ -2,6 +2,7 @@ package com.warehouse.routelogger.domain.port.primary;
 
 
 import com.warehouse.routelogger.domain.model.AnyDeliveryRequest;
+import com.warehouse.routelogger.domain.model.Request;
 import com.warehouse.routelogger.domain.port.secondary.RouteLoggerDeliveryServicePort;
 import lombok.AllArgsConstructor;
 
@@ -18,5 +19,10 @@ public class RouteLoggerPortImpl implements RouteLoggerPort {
     @Override
     public void logDepotCode(AnyDeliveryRequest request) {
         routeLoggerDeliveryServicePort.logDepotCode(request);
+    }
+
+    @Override
+    public void logRequest(Request request) {
+        routeLoggerDeliveryServicePort.logRequest(request);
     }
 }

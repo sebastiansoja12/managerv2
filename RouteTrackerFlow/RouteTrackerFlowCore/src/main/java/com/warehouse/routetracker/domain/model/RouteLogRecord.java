@@ -35,13 +35,6 @@ public class RouteLogRecord {
         this.faultDescription = faultDescription;
     }
 
-    public void saveTerminalRequest(ProcessType processType, String terminalRequest) {
-        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
-                .getRouteLogRecordDetail(processType);
-
-        routeLogRecordDetail.updateRequest(terminalRequest);
-    }
-
     public void saveZebraIdInformation(ProcessType processType, Long zebraId) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);

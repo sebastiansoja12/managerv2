@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 
+import com.warehouse.commonassets.ParcelType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,6 @@ import com.warehouse.delivery.domain.port.primary.DeliveryPort;
 import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.delivery.domain.vo.UpdateStatusParcelRequest;
 import com.warehouse.delivery.infrastructure.adapter.secondary.api.UpdateStatus;
-import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.domain.vo.Parcel;
 import com.warehouse.deliverytoken.domain.vo.ParcelId;

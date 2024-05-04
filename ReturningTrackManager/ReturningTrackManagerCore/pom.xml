@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>ReturningTrackManager</artifactId>
-        <version>2024.3-SNAPSHOT</version>
+        <version>2024.4-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
 
@@ -18,6 +18,11 @@
             <artifactId>Properties</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>Common</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>

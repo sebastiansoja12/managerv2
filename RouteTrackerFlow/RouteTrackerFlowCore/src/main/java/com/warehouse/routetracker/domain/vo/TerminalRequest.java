@@ -10,4 +10,5 @@ import lombok.Value;
 public class TerminalRequest {
     ProcessType processType;
     Long parcelId;
+    String request;
 }

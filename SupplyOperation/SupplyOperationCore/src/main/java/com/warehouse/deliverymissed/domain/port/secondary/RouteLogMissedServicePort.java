@@ -1,9 +1,12 @@
 package com.warehouse.deliverymissed.domain.port.secondary;
 
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
+import com.warehouse.terminal.request.TerminalRequest;
 
 public interface RouteLogMissedServicePort {
-    void logRouteLogMissedDelivery(DeliveryMissed deliveryMissed);
+    void logRouteLogMissedDelivery(final DeliveryMissed deliveryMissed);
 
-    void logDepotCodeMissedDelivery(DeliveryMissed deliveryMissed);
+    void logDepotCodeMissedDelivery(final DeliveryMissed deliveryMissed);
+
+    void logRequest(final TerminalRequest terminalRequest, final String requestAsJson);
 }

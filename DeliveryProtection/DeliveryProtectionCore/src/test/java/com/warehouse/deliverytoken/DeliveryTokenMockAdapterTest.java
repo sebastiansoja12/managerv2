@@ -7,10 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.warehouse.commonassets.ParcelType;
 import com.warehouse.deliverytoken.domain.vo.*;
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
 import com.warehouse.deliverytoken.domain.model.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.DeliveryTokenMockAdapter;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
@@ -55,10 +55,6 @@ public class DeliveryTokenMockAdapterTest {
 
     private Delivery createDelivery(String id) {
         return new Delivery(id);
-    }
-
-    private Supplier createSupplier(String supplierCode) {
-        return new Supplier(supplierCode);
     }
 
     private Parcel createParcel(Long id, Long parcelRelatedId, ParcelType parcelType, String destination) {

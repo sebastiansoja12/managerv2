@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import com.warehouse.commonassets.ParcelType;
 import com.warehouse.delivery.domain.vo.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,6 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.delivery.configuration.DeliveryTestConfiguration;
 import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryTokenAdapter;
-import com.warehouse.deliverytoken.domain.enumeration.ParcelType;
 import com.warehouse.deliverytoken.domain.vo.Parcel;
 import com.warehouse.deliverytoken.domain.vo.ParcelId;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;

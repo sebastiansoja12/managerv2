@@ -39,7 +39,7 @@ public class DeliveryReturnServiceAdapter implements DeliveryReturnTokenServiceP
 
         final ResponseEntity<? extends TokenDto> responseEntity = restClient
                 .post()
-                .uri("/v2/api/return-tokens")
+				.uri("/v2/api/{endpoint}", configuration.getEndpoint())
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()

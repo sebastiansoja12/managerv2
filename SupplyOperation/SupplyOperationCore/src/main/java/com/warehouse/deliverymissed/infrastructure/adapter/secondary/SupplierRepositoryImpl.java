@@ -15,7 +15,9 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     @Override
     public boolean validBySupplierCode(String supplierCode) {
         final Optional<SupplierEntity> supplierEntity = repository.findBySupplierCode(supplierCode);
-        return supplierEntity.map(this::validateSupplier).orElseThrow();
+        return supplierEntity.map(this::validateSupplier).orElseThrow(
+                () -> new RuntimeException("Supplier not valid")
+        );
     }
 
     private boolean validateSupplier(SupplierEntity supplierEntity) {

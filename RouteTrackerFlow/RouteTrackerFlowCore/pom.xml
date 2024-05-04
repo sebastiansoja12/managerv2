@@ -6,12 +6,17 @@
     <parent>
         <artifactId>RouteTrackerFlow</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2024.3-SNAPSHOT</version>
+        <version>2024.4-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
     <artifactId>RouteTrackerFlowCore</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>Common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>

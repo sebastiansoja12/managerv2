@@ -1,9 +1,6 @@
 package com.warehouse.deliverymissed.configuration;
 
-import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPort;
-import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPortImpl;
-import com.warehouse.deliverymissed.domain.port.primary.SupplierValidatorPort;
-import com.warehouse.deliverymissed.domain.port.primary.SupplierValidatorPortImpl;
+import com.warehouse.deliverymissed.domain.port.primary.*;
 import com.warehouse.deliverymissed.domain.port.secondary.DeliveryMissedRepository;
 import com.warehouse.deliverymissed.domain.port.secondary.RouteLogMissedServicePort;
 import com.warehouse.deliverymissed.domain.port.secondary.SupplierRepository;
@@ -23,6 +20,11 @@ public class DeliveryMissedConfiguration {
 			RouteLogMissedServicePort logMissedServicePort) {
 		return new DeliveryMissedPortImpl(deliveryMissedService, logMissedServicePort);
 	}
+
+    @Bean
+    public TerminalRequestLoggerPort terminalRequestLoggerPort(RouteLogMissedServicePort routeLogMissedServicePort) {
+        return new TerminalRequestLoggerPortImpl(routeLogMissedServicePort);
+    }
 
     @Bean
     public RouteLogMissedServicePort routeLogMissedServicePort(RouteLogEventPublisher routeLogEventPublisher) {

@@ -10,4 +10,5 @@ import lombok.extern.jackson.Jacksonized;
 public class TerminalRequestDto {
     ProcessTypeDto processType;
     Long parcelId;
+    String request;
 }

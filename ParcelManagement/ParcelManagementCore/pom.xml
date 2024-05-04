@@ -6,7 +6,7 @@
     <parent>
         <artifactId>ParcelManagement</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2024.3-SNAPSHOT</version>
+        <version>2024.4-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
 
@@ -15,12 +15,17 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>ParcelManagementApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>DepotServicesCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ParcelManagementApi</artifactId>
+            <artifactId>Common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

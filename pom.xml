@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.warehouse</groupId>
 	<artifactId>warehouse</artifactId>
-	<version>2024.3-SNAPSHOT</version>
+	<version>2024.4-SNAPSHOT</version>
 	<name>warehouse</name>
 	<description>Pom file for all modules</description>
 	<packaging>pom</packaging>
@@ -37,6 +37,8 @@
         <module>ManagerTools</module>
         <module>SoftwareConfiguration</module>
         <module>E2E</module>
+        <module>Common</module>
+        <module>RouteLogger</module>
     </modules>
 
 	<properties>
@@ -329,6 +331,11 @@
 				<artifactId>de.flapdoodle.embed.mongo</artifactId>
 				<version>4.12.2</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlbeans</groupId>
+				<artifactId>xmlbeans</artifactId>
+				<version>5.0.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

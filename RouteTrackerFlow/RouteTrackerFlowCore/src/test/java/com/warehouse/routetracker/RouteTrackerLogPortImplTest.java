@@ -276,21 +276,21 @@ public class RouteTrackerLogPortImplTest {
     }
 
     @Test
-    void shouldSaveTerminalRequest() throws JsonProcessingException {
+    void shouldSaveTerminalRequest() {
         // given
         final ProcessType processType = ProcessType.REDIRECT;
         final TerminalRequest request = TerminalRequest
                 .builder()
                 .parcelId(PARCEL_ID)
                 .processType(processType)
+                .request("request")
                 .build();
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
         when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
-        final String requestAsString = objectMapper.writeValueAsString(request);
         // when
         routeTrackerLogPort.saveTerminalRequest(request);
         // then
-        verify(routeLogRecord).saveTerminalRequest(processType, requestAsString);
+        verify(routeLogRecord).updateRequest(processType, "request");
     }
 
     @Test

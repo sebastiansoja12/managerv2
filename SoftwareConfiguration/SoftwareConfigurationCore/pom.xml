@@ -6,13 +6,18 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>SoftwareConfiguration</artifactId>
-        <version>2024.3-SNAPSHOT</version>
+        <version>2024.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>SoftwareConfigurationCore</artifactId>
 
 
     <dependencies>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>Common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
