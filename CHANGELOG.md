@@ -1,3 +1,19 @@
+## [2024.4] - 2024-05-04
+
+### Added
+- Extend delivery missed domain
+- Route logger for logging informations via events
+- Secondary adapters for route logging
+- Module for Route logging
+
+### Changed
+- Route process
+- Delivery missed domain
+
+### Fixed
+- Terminal requests not logging
+
+
 ## [2024.3] - 2024-04-06
 
 ### Added
