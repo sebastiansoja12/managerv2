@@ -7,5 +7,4 @@ public interface RouteLoggerDeliveryServicePort<T> {
 
     void logRequest(T t);
 
-    void logSupplierCode(T t);
 }

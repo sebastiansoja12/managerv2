@@ -19,4 +19,9 @@ public class TerminalRequestLoggerPortImpl implements TerminalRequestLoggerPort 
         final String requestAsString = xmlToStringService.convertToString(terminalRequest);
         routeLogMissedServicePort.logRequest(terminalRequest, requestAsString);
     }
+
+    @Override
+    public void logTerminalId(TerminalRequest terminalRequest) {
+        routeLogMissedServicePort.logTerminalId(terminalRequest);
+    }
 }

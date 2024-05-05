@@ -5,10 +5,7 @@ import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.mapper.DeliveryMissedEventMapper;
 import com.warehouse.routelogger.RouteLogEvent;
 import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.routelogger.event.DeliveryLogEvent;
-import com.warehouse.routelogger.event.DepotCodeLogEvent;
-import com.warehouse.routelogger.event.RequestLogEvent;
-import com.warehouse.routelogger.event.SupplierCodeLogEvent;
+import com.warehouse.routelogger.event.*;
 import com.warehouse.terminal.request.TerminalRequest;
 import lombok.AllArgsConstructor;
 
@@ -44,6 +41,11 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
         sendEvent(buildSupplierCodeLogEvent(deliveryMissed));
     }
 
+    @Override
+    public void logTerminalId(TerminalRequest terminalRequest) {
+        sendEvent(buildTerminalLogEvent(terminalRequest));
+    }
+
     private DepotCodeLogEvent buildDepotCodeLogEvent(final DeliveryMissed deliveryMissed) {
         return DepotCodeLogEvent.builder()
                 .depotCodeRequest(eventMapper.mapToDepotCodeRequest(deliveryMissed))
@@ -65,6 +67,12 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
 	private RequestLogEvent buildRequestLogEvent(final TerminalRequest terminalRequest, final String requestAsJson) {
         return RequestLogEvent.builder()
                 .request(eventMapper.map(terminalRequest, requestAsJson))
+                .build();
+    }
+
+    private TerminalLogEvent buildTerminalLogEvent(final TerminalRequest terminalRequest) {
+        return TerminalLogEvent.builder()
+                .terminalLogRequest(eventMapper.mapToTerminalLogRequest(terminalRequest))
                 .build();
     }
 

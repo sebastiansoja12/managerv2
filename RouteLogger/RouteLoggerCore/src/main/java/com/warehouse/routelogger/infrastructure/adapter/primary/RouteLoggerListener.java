@@ -3,6 +3,7 @@ package com.warehouse.routelogger.infrastructure.adapter.primary;
 import com.warehouse.routelogger.domain.model.AnyDeliveryRequest;
 import com.warehouse.routelogger.domain.model.Request;
 import com.warehouse.routelogger.domain.model.SupplierCodeRequest;
+import com.warehouse.routelogger.domain.model.TerminalLogRequest;
 import com.warehouse.routelogger.domain.port.primary.RouteLoggerPort;
 import com.warehouse.routelogger.event.*;
 import com.warehouse.routelogger.infrastructure.adapter.primary.mapper.EventMapper;
@@ -54,6 +55,13 @@ public class RouteLoggerListener {
         logEvent(event);
         final SupplierCodeRequest request = eventMapper.mapToSupplierCodeRequest(event.getSupplierCodeRequest());
         routeLoggerPort.logSupplierCode(request);
+    }
+
+    @EventListener
+    void handleEvent(TerminalLogEvent event) {
+        logEvent(event);
+        final TerminalLogRequest request = eventMapper.mapToTerminalLogRequest(event.getTerminalLogRequest());
+        routeLoggerPort.logTerminalId(request);
     }
 
     private void logEvent(RouteLogBaseEvent event) {
