@@ -3,6 +3,7 @@ package com.warehouse.deliverymissed;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
+import com.warehouse.deliverymissed.domain.port.secondary.ParcelStatusServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,11 +22,14 @@ public class DeliveryMissedServiceImplTest {
     @Mock
     private DeliveryMissedRepository deliveryMissedRepository;
 
+    @Mock
+    private ParcelStatusServicePort parcelStatusServicePort;
+
 	private DeliveryMissedServiceImpl deliveryMissedService;
 
     @BeforeEach
     void setup() {
-        deliveryMissedService = new DeliveryMissedServiceImpl(deliveryMissedRepository);
+        deliveryMissedService = new DeliveryMissedServiceImpl(deliveryMissedRepository, parcelStatusServicePort);
     }
 
     @Test
