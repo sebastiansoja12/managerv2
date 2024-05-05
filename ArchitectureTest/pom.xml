@@ -134,6 +134,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>RouteLoggerCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>SoftwareConfigurationCore</artifactId>
             <version>${project.version}</version>
         </dependency>
