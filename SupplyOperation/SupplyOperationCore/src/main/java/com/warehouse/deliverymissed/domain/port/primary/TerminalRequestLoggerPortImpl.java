@@ -21,7 +21,12 @@ public class TerminalRequestLoggerPortImpl implements TerminalRequestLoggerPort 
     }
 
     @Override
-    public void logTerminalId(TerminalRequest terminalRequest) {
+    public void logTerminalId(final TerminalRequest terminalRequest) {
         routeLogMissedServicePort.logTerminalId(terminalRequest);
+    }
+
+    @Override
+    public void logVersion(final TerminalRequest terminalRequest) {
+        routeLogMissedServicePort.logVersion(terminalRequest);
     }
 }

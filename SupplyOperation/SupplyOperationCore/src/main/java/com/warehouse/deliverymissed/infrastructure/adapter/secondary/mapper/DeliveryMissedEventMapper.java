@@ -24,4 +24,7 @@ public interface DeliveryMissedEventMapper {
 
     @Mapping(target = "terminalId", source = "terminalDeviceInformation.terminalId")
     TerminalLogRequestDto mapToTerminalLogRequest(TerminalRequest terminalRequest);
+
+    @Mapping(target = "version", source = "terminalDeviceInformation.version")
+    VersionLogRequestDto mapToVersionLogRequest(TerminalRequest terminalRequest);
 }

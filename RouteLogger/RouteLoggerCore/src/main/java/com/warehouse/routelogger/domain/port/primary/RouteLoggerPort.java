@@ -1,9 +1,6 @@
 package com.warehouse.routelogger.domain.port.primary;
 
-import com.warehouse.routelogger.domain.model.AnyDeliveryRequest;
-import com.warehouse.routelogger.domain.model.Request;
-import com.warehouse.routelogger.domain.model.SupplierCodeRequest;
-import com.warehouse.routelogger.domain.model.TerminalLogRequest;
+import com.warehouse.routelogger.domain.model.*;
 
 public interface RouteLoggerPort {
 
@@ -16,4 +13,6 @@ public interface RouteLoggerPort {
     void logSupplierCode(SupplierCodeRequest request);
 
     void logTerminalId(TerminalLogRequest request);
+
+    void logVersion(VersionLogRequest request);
 }

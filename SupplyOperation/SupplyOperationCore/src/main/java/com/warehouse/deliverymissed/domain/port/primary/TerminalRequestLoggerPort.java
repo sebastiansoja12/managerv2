@@ -6,4 +6,6 @@ public interface TerminalRequestLoggerPort {
     void logDeliveryMissedTerminalRequest(final TerminalRequest terminalRequest);
 
     void logTerminalId(final TerminalRequest terminalRequest);
+
+    void logVersion(final TerminalRequest terminalRequest);
 }

@@ -1,9 +1,6 @@
 package com.warehouse.routelogger.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.routelogger.domain.model.AnyDeliveryRequest;
-import com.warehouse.routelogger.domain.model.Request;
-import com.warehouse.routelogger.domain.model.SupplierCodeRequest;
-import com.warehouse.routelogger.domain.model.TerminalLogRequest;
+import com.warehouse.routelogger.domain.model.*;
 import com.warehouse.routelogger.dto.*;
 import org.mapstruct.Mapper;
 
@@ -19,4 +16,6 @@ public interface EventMapper {
     SupplierCodeRequest mapToSupplierCodeRequest(SupplierCodeRequestDto supplierCodeRequest);
 
     TerminalLogRequest mapToTerminalLogRequest(TerminalLogRequestDto terminalLogRequest);
+
+    VersionLogRequest mapToVersionLogRequest(VersionLogRequestDto versionLogRequest);
 }

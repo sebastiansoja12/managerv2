@@ -2,7 +2,9 @@ package com.warehouse.routelogger.configuration;
 
 
 import com.warehouse.routelogger.domain.port.secondary.RouteLoggerTerminalServicePort;
+import com.warehouse.routelogger.domain.port.secondary.RouteLoggerVersionServicePort;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLoggerTerminalIdServiceAdapter;
+import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLoggerVersionServiceAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,9 +22,15 @@ public class RouteLoggerConfiguration {
 	@Bean
 	public RouteLoggerPort routeLoggerPort(RouteLoggerDeliveryServicePort routeLoggerDeliveryServicePort,
 			RouteLoggerSupplierCodeServicePort routeLoggerSupplierCodeServicePort,
-			RouteLoggerTerminalServicePort routeLoggerTerminalServicePort) {
+			RouteLoggerTerminalServicePort routeLoggerTerminalServicePort,
+			RouteLoggerVersionServicePort routeLoggerVersionServicePort) {
 		return new RouteLoggerPortImpl(routeLoggerDeliveryServicePort, routeLoggerSupplierCodeServicePort,
-				routeLoggerTerminalServicePort);
+				routeLoggerTerminalServicePort, routeLoggerVersionServicePort);
+	}
+
+	@Bean
+	public RouteLoggerVersionServicePort routeLoggerVersionServicePort() {
+		return new RouteLoggerVersionServiceAdapter(routeTrackerLogProperties());
 	}
 
 	@Bean

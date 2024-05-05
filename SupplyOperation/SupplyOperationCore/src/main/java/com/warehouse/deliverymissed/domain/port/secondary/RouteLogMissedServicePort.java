@@ -13,4 +13,6 @@ public interface RouteLogMissedServicePort {
     void logSupplierCode(final DeliveryMissed deliveryMissed);
 
     void logTerminalId(final TerminalRequest terminalRequest);
+
+    void logVersion(final TerminalRequest terminalRequest);
 }

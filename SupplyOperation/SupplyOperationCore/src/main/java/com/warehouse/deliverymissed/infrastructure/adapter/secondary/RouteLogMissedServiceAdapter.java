@@ -46,6 +46,11 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
         sendEvent(buildTerminalLogEvent(terminalRequest));
     }
 
+    @Override
+    public void logVersion(TerminalRequest terminalRequest) {
+        sendEvent(buildVersionLogEvent(terminalRequest));
+    }
+
     private DepotCodeLogEvent buildDepotCodeLogEvent(final DeliveryMissed deliveryMissed) {
         return DepotCodeLogEvent.builder()
                 .depotCodeRequest(eventMapper.mapToDepotCodeRequest(deliveryMissed))
@@ -73,6 +78,12 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
     private TerminalLogEvent buildTerminalLogEvent(final TerminalRequest terminalRequest) {
         return TerminalLogEvent.builder()
                 .terminalLogRequest(eventMapper.mapToTerminalLogRequest(terminalRequest))
+                .build();
+    }
+
+    private VersionLogEvent buildVersionLogEvent(final TerminalRequest terminalRequest) {
+        return VersionLogEvent.builder()
+                .versionLogRequest(eventMapper.mapToVersionLogRequest(terminalRequest))
                 .build();
     }
 
