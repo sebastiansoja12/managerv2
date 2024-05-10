@@ -13,11 +13,11 @@ import com.warehouse.auth.domain.service.RefreshTokenGeneratorImpl;
 public class RefreshTokenGeneratorImplTest {
 
     private final RefreshTokenProvider refreshTokenProvider = new RefreshTokenProvider();
-    private RefreshTokenGeneratorImpl rerouteTokenGenerator;
+    private RefreshTokenGeneratorImpl refreshTokenGenerator;
 
     @BeforeEach
     void setup() {
-        rerouteTokenGenerator = new RefreshTokenGeneratorImpl(refreshTokenProvider);
+        refreshTokenGenerator = new RefreshTokenGeneratorImpl(refreshTokenProvider);
     }
 
     @Test
@@ -33,7 +33,7 @@ public class RefreshTokenGeneratorImplTest {
                 .role(Role.USER)
                 .build();
         // when
-        final String token = rerouteTokenGenerator.generateToken(user);
+        final String token = refreshTokenGenerator.generateToken(user);
         // then
         assertThat(token).isNotEmpty();
     }
