@@ -68,6 +68,13 @@ public class RouteLoggerListener {
         routeLoggerPort.logVersion(request);
     }
 
+    @EventListener
+    void handleEvent(UsernameLogEvent event) {
+        logEvent(event);
+        final UsernameLogRequest request = eventMapper.mapToUsernameLogRequest(event.getUsernameLogRequest());
+        routeLoggerPort.logUsername(request);
+    }
+
     private void logEvent(RouteLogBaseEvent event) {
         log.info("Detected event {} at {}", event.getClass().getSimpleName(),
                 event.getLocalDateTime().format(FORMATTER));

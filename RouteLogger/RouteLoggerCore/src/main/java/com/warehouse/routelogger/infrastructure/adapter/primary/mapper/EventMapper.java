@@ -18,4 +18,6 @@ public interface EventMapper {
     TerminalLogRequest mapToTerminalLogRequest(TerminalLogRequestDto terminalLogRequest);
 
     VersionLogRequest mapToVersionLogRequest(VersionLogRequestDto versionLogRequest);
+
+    UsernameLogRequest mapToUsernameLogRequest(UsernameLogRequestDto usernameLogRequest);
 }

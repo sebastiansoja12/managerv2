@@ -15,4 +15,6 @@ public interface RouteLoggerPort {
     void logTerminalId(TerminalLogRequest request);
 
     void logVersion(VersionLogRequest request);
+
+    void logUsername(UsernameLogRequest request);
 }

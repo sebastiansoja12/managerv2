@@ -1,31 +1,31 @@
 package com.warehouse.routelogger.configuration;
 
 
-import com.warehouse.routelogger.domain.port.secondary.RouteLoggerTerminalServicePort;
-import com.warehouse.routelogger.domain.port.secondary.RouteLoggerVersionServicePort;
-import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLoggerTerminalIdServiceAdapter;
-import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLoggerVersionServiceAdapter;
+import com.warehouse.routelogger.domain.port.secondary.*;
+import com.warehouse.routelogger.infrastructure.adapter.secondary.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.routelogger.domain.port.primary.RouteLoggerPort;
 import com.warehouse.routelogger.domain.port.primary.RouteLoggerPortImpl;
-import com.warehouse.routelogger.domain.port.secondary.RouteLoggerDeliveryServicePort;
-import com.warehouse.routelogger.domain.port.secondary.RouteLoggerSupplierCodeServicePort;
-import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLoggerDeliveryServiceAdapter;
-import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLoggerSupplierCodeServiceAdapter;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 
 @Configuration
 public class RouteLoggerConfiguration {
 
 	@Bean
-	public RouteLoggerPort routeLoggerPort(RouteLoggerDeliveryServicePort routeLoggerDeliveryServicePort,
-			RouteLoggerSupplierCodeServicePort routeLoggerSupplierCodeServicePort,
-			RouteLoggerTerminalServicePort routeLoggerTerminalServicePort,
-			RouteLoggerVersionServicePort routeLoggerVersionServicePort) {
+	public RouteLoggerPort routeLoggerPort(final RouteLoggerDeliveryServicePort routeLoggerDeliveryServicePort,
+										   final RouteLoggerSupplierCodeServicePort routeLoggerSupplierCodeServicePort,
+										   final RouteLoggerTerminalServicePort routeLoggerTerminalServicePort,
+										   final RouteLoggerVersionServicePort routeLoggerVersionServicePort,
+										   final RouteLoggerUsernameServicePort routeLoggerUsernameServicePort) {
 		return new RouteLoggerPortImpl(routeLoggerDeliveryServicePort, routeLoggerSupplierCodeServicePort,
-				routeLoggerTerminalServicePort, routeLoggerVersionServicePort);
+				routeLoggerTerminalServicePort, routeLoggerVersionServicePort, routeLoggerUsernameServicePort);
+	}
+
+	@Bean
+	public RouteLoggerUsernameServicePort routeLoggerUsernameServicePort() {
+		return new RouteLoggerUsernameServiceAdapter(routeTrackerLogProperties());
 	}
 
 	@Bean

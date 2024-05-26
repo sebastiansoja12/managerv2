@@ -20,4 +20,6 @@ public interface RouteLogRequestMapper {
     TerminalLogRequestDto map(TerminalLogRequest terminalLogRequest);
 
     VersionLogRequestDto map(VersionLogRequest versionLogRequest);
+
+    UsernameLogRequestDto map(UsernameLogRequest request);
 }
