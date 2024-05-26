@@ -15,12 +15,25 @@ public class RouteLoggerConfiguration {
 
 	@Bean
 	public RouteLoggerPort routeLoggerPort(final RouteLoggerDeliveryServicePort routeLoggerDeliveryServicePort,
-										   final RouteLoggerSupplierCodeServicePort routeLoggerSupplierCodeServicePort,
-										   final RouteLoggerTerminalServicePort routeLoggerTerminalServicePort,
-										   final RouteLoggerVersionServicePort routeLoggerVersionServicePort,
-										   final RouteLoggerUsernameServicePort routeLoggerUsernameServicePort) {
+			final RouteLoggerSupplierCodeServicePort routeLoggerSupplierCodeServicePort,
+			final RouteLoggerTerminalServicePort routeLoggerTerminalServicePort,
+			final RouteLoggerVersionServicePort routeLoggerVersionServicePort,
+			final RouteLoggerUsernameServicePort routeLoggerUsernameServicePort,
+			final RouteLoggerDepotCodeServicePort routeLoggerDepotCodeServicePort,
+			final RouteLoggerRequestServicePort routeLoggerRequestServicePort) {
 		return new RouteLoggerPortImpl(routeLoggerDeliveryServicePort, routeLoggerSupplierCodeServicePort,
-				routeLoggerTerminalServicePort, routeLoggerVersionServicePort, routeLoggerUsernameServicePort);
+				routeLoggerTerminalServicePort, routeLoggerVersionServicePort, routeLoggerUsernameServicePort,
+				routeLoggerDepotCodeServicePort, routeLoggerRequestServicePort);
+	}
+	
+	@Bean
+	public RouteLoggerRequestServicePort routeLoggerRequestServicePort() {
+		return new RouteLoggerRequestServiceAdapter(routeTrackerLogProperties());
+	}
+
+	@Bean
+	public RouteLoggerDepotCodeServicePort routeLoggerDepotCodeServicePort() {
+		return new RouteLoggerDepotCodeServiceAdapter(routeTrackerLogProperties());
 	}
 
 	@Bean

@@ -22,4 +22,6 @@ public interface RouteLogRequestMapper {
     VersionLogRequestDto map(VersionLogRequest versionLogRequest);
 
     UsernameLogRequestDto map(UsernameLogRequest request);
+
+    DeliveryRequestDto mapToDepotCodeRequest(DepotCodeRequest depotCodeRequest);
 }

@@ -9,7 +9,7 @@ public interface EventMapper {
 
     AnyDeliveryRequest map(DeliveryRequestDto request);
 
-    AnyDeliveryRequest mapFromDepotCodeRequest(DepotCodeRequestDto depotCodeRequest);
+    DepotCodeRequest mapFromDepotCodeRequest(DepotCodeRequestDto depotCodeRequest);
 
     Request mapToRequest(RequestDto request);
 

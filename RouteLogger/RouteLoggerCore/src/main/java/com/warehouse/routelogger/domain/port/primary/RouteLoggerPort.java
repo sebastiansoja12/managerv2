@@ -6,7 +6,7 @@ public interface RouteLoggerPort {
 
     void logAnyDelivery(AnyDeliveryRequest request);
 
-    void logDepotCode(AnyDeliveryRequest request);
+    void logDepotCode(DepotCodeRequest request);
 
     void logRequest(Request request);
 

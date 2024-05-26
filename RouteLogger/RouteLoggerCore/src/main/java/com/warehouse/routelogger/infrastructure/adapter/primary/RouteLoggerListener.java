@@ -36,7 +36,7 @@ public class RouteLoggerListener {
     @EventListener
     void handleEvent(DepotCodeLogEvent event) {
         logEvent(event);
-        final AnyDeliveryRequest request = eventMapper.mapFromDepotCodeRequest(event.getDepotCodeRequest());
+        final DepotCodeRequest request = eventMapper.mapFromDepotCodeRequest(event.getDepotCodeRequest());
         routeLoggerPort.logDepotCode(request);
     }
 
