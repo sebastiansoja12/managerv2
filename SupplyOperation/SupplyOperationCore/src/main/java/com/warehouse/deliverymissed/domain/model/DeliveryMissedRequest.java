@@ -8,5 +8,5 @@ public class DeliveryMissedRequest {
     private Long parcelId;
     private String depotCode;
     private String supplierCode;
-    private DeliveryStatus deliveryStatus = DeliveryStatus.UNAVAILABLE;
+    private final DeliveryStatus deliveryStatus = DeliveryStatus.UNAVAILABLE;
 }
