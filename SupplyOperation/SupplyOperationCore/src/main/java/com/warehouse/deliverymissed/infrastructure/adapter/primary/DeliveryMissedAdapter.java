@@ -55,6 +55,10 @@ public class DeliveryMissedAdapter {
 
         logTerminalRequest(terminalRequest);
 
+        logTerminalId(terminalRequest);
+
+        logVersion(terminalRequest);
+
         final DeliveryMissedRequest request = requestMapper.map(terminalRequest);
 
         final DeliveryMissedResponse response = deliveryMissedPort.logMissedDelivery(request);
@@ -62,9 +66,19 @@ public class DeliveryMissedAdapter {
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.CREATED);
     }
 
+    private void logTerminalId(TerminalRequest terminalRequest) {
+        log.info("Logging terminal id in tracker");
+        terminalRequestLoggerPort.logTerminalId(terminalRequest);
+    }
+
     private void logTerminalRequest(final TerminalRequest terminalRequest) {
         log.info("Logging request in tracker");
         terminalRequestLoggerPort.logDeliveryMissedTerminalRequest(terminalRequest);
+    }
+
+    private void logVersion(final TerminalRequest terminalRequest) {
+        log.info("Logging device version in tracker");
+        terminalRequestLoggerPort.logVersion(terminalRequest);
     }
 
     @ExceptionHandler(RestException.class)

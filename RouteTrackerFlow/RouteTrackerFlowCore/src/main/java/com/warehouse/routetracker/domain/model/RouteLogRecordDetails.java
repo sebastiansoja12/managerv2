@@ -7,8 +7,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
+
 import lombok.*;
 
 @Builder
@@ -20,9 +20,6 @@ import lombok.*;
 public class RouteLogRecordDetails {
 
     private Set<RouteLogRecordDetail> routeLogRecordDetailSet;
-
-    private final String description = "Description";
-
 
     public Set<RouteLogRecordDetail> getRouteLogRecordDetailSet() {
         if (routeLogRecordDetailSet == null) {
@@ -36,8 +33,7 @@ public class RouteLogRecordDetails {
                 .stream()
                 .filter(equalProcessType(processType))
                 .findFirst()
-                .orElseGet(() -> addNewRouteLogRecordDetail(processType, determineParcelStatus(processType),
-                        description));
+                .orElseGet(() -> addNewRouteLogRecordDetail(processType, determineParcelStatus(processType)));
     }
 
     private ParcelStatus determineParcelStatus(ProcessType processType) {
@@ -51,22 +47,18 @@ public class RouteLogRecordDetails {
         };
     }
 
-    private RouteLogRecordDetail addNewRouteLogRecordDetail(ProcessType processType, ParcelStatus parcelStatus,
-                                                            String description) {
-		final RouteLogRecordDetail routeLogRecordDetail = createNewRouteLogRecordDetail(processType, parcelStatus,
-				description);
+    private RouteLogRecordDetail addNewRouteLogRecordDetail(ProcessType processType, ParcelStatus parcelStatus) {
+		final RouteLogRecordDetail routeLogRecordDetail = createNewRouteLogRecordDetail(processType, parcelStatus);
 		getRouteLogRecordDetailSet().add(routeLogRecordDetail);
 		return routeLogRecordDetail;
 	}
 
-	private RouteLogRecordDetail createNewRouteLogRecordDetail(ProcessType processType, ParcelStatus parcelStatus,
-			String description) {
+	private RouteLogRecordDetail createNewRouteLogRecordDetail(ProcessType processType, ParcelStatus parcelStatus) {
         return RouteLogRecordDetail
                 .builder()
                 .parcelStatus(parcelStatus)
                 .timestamp(LocalDateTime.now())
                 .processType(processType)
-                .description(description)
                 .build();
     }
 

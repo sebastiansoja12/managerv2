@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2024.4-SNAPSHOT</version>
+        <version>2024.5-SNAPSHOT</version>
     </parent>
 
     <packaging>jar</packaging>

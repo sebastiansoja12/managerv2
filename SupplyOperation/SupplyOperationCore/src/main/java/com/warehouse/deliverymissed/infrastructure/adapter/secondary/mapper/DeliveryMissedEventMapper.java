@@ -1,8 +1,6 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.routelogger.dto.DeliveryRequestDto;
-import com.warehouse.routelogger.dto.DepotCodeRequestDto;
-import com.warehouse.routelogger.dto.RequestDto;
+import com.warehouse.routelogger.dto.*;
 import com.warehouse.terminal.request.TerminalRequest;
 import org.mapstruct.Mapper;
 
@@ -20,4 +18,13 @@ public interface DeliveryMissedEventMapper {
 
     @Mapping(target = "request", source = "requestAsJson")
     RequestDto map(TerminalRequest terminalRequest, String requestAsJson);
+
+    @Mapping(target = "processType", constant = "MISS")
+    SupplierCodeRequestDto mapToSupplierCodeRequest(DeliveryMissed deliveryMissed);
+
+    @Mapping(target = "terminalId", source = "terminalDeviceInformation.terminalId")
+    TerminalLogRequestDto mapToTerminalLogRequest(TerminalRequest terminalRequest);
+
+    @Mapping(target = "version", source = "terminalDeviceInformation.version")
+    VersionLogRequestDto mapToVersionLogRequest(TerminalRequest terminalRequest);
 }

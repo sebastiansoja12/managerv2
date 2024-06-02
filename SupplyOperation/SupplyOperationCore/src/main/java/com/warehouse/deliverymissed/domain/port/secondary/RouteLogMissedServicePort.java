@@ -9,4 +9,10 @@ public interface RouteLogMissedServicePort {
     void logDepotCodeMissedDelivery(final DeliveryMissed deliveryMissed);
 
     void logRequest(final TerminalRequest terminalRequest, final String requestAsJson);
+
+    void logSupplierCode(final DeliveryMissed deliveryMissed);
+
+    void logTerminalId(final TerminalRequest terminalRequest);
+
+    void logVersion(final TerminalRequest terminalRequest);
 }

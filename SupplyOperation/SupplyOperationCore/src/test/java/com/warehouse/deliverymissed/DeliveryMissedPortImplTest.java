@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.warehouse.deliverymissed.domain.exception.EmptyDepotCodeException;
 import com.warehouse.deliverymissed.domain.exception.WrongDeliveryStatusException;
+import com.warehouse.deliverymissed.domain.port.secondary.ParcelStatusServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +36,9 @@ public class DeliveryMissedPortImplTest {
     @Mock
     private DeliveryMissedRepository deliveryMissedRepository;
 
+    @Mock
+    private ParcelStatusServicePort parcelStatusServicePort;
+
     private DeliveryMissedService deliveryMissedService;
 
     private DeliveryMissedPortImpl deliveryMissedPort;
@@ -42,7 +46,7 @@ public class DeliveryMissedPortImplTest {
 
     @BeforeEach
     void setup() {
-        deliveryMissedService = new DeliveryMissedServiceImpl(deliveryMissedRepository);
+        deliveryMissedService = new DeliveryMissedServiceImpl(deliveryMissedRepository, parcelStatusServicePort);
         deliveryMissedPort = new DeliveryMissedPortImpl(deliveryMissedService, routeLogMissedServicePort);
     }
 

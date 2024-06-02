@@ -5,9 +5,7 @@ import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.mapper.DeliveryMissedEventMapper;
 import com.warehouse.routelogger.RouteLogEvent;
 import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.routelogger.event.DeliveryLogEvent;
-import com.warehouse.routelogger.event.DepotCodeLogEvent;
-import com.warehouse.routelogger.event.RequestLogEvent;
+import com.warehouse.routelogger.event.*;
 import com.warehouse.terminal.request.TerminalRequest;
 import lombok.AllArgsConstructor;
 
@@ -38,6 +36,21 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
         sendEvent(buildRequestLogEvent(terminalRequest, requestAsJson));
     }
 
+    @Override
+    public void logSupplierCode(DeliveryMissed deliveryMissed) {
+        sendEvent(buildSupplierCodeLogEvent(deliveryMissed));
+    }
+
+    @Override
+    public void logTerminalId(TerminalRequest terminalRequest) {
+        sendEvent(buildTerminalLogEvent(terminalRequest));
+    }
+
+    @Override
+    public void logVersion(TerminalRequest terminalRequest) {
+        sendEvent(buildVersionLogEvent(terminalRequest));
+    }
+
     private DepotCodeLogEvent buildDepotCodeLogEvent(final DeliveryMissed deliveryMissed) {
         return DepotCodeLogEvent.builder()
                 .depotCodeRequest(eventMapper.mapToDepotCodeRequest(deliveryMissed))
@@ -50,9 +63,27 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
                 .build();
     }
 
+    private SupplierCodeLogEvent buildSupplierCodeLogEvent(final DeliveryMissed deliveryMissed) {
+        return SupplierCodeLogEvent.builder()
+                .supplierCodeRequest(eventMapper.mapToSupplierCodeRequest(deliveryMissed))
+                .build();
+    }
+
 	private RequestLogEvent buildRequestLogEvent(final TerminalRequest terminalRequest, final String requestAsJson) {
         return RequestLogEvent.builder()
                 .request(eventMapper.map(terminalRequest, requestAsJson))
+                .build();
+    }
+
+    private TerminalLogEvent buildTerminalLogEvent(final TerminalRequest terminalRequest) {
+        return TerminalLogEvent.builder()
+                .terminalLogRequest(eventMapper.mapToTerminalLogRequest(terminalRequest))
+                .build();
+    }
+
+    private VersionLogEvent buildVersionLogEvent(final TerminalRequest terminalRequest) {
+        return VersionLogEvent.builder()
+                .versionLogRequest(eventMapper.mapToVersionLogRequest(terminalRequest))
                 .build();
     }
 

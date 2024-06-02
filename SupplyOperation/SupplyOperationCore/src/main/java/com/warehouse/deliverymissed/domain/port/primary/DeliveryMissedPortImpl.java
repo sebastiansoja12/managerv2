@@ -28,6 +28,7 @@ public class DeliveryMissedPortImpl implements DeliveryMissedPort {
         final DeliveryMissed deliveryMissed = deliveryMissedService.saveDelivery(request);
         logMissedDelivery(deliveryMissed);
         logDepotCode(deliveryMissed);
+        logSupplierCode(deliveryMissed);
         return DeliveryMissedResponse
                 .builder()
                 .deliveryId(deliveryMissed.getDeliveryId())
@@ -44,6 +45,10 @@ public class DeliveryMissedPortImpl implements DeliveryMissedPort {
 
     private void logDepotCode(DeliveryMissed deliveryMissed) {
         logMissedServicePort.logDepotCodeMissedDelivery(deliveryMissed);
+    }
+
+    private void logSupplierCode(DeliveryMissed deliveryMissed) {
+        logMissedServicePort.logSupplierCode(deliveryMissed);
     }
 
     private void validateDeliveryMissedRequest(DeliveryMissedRequest request) {

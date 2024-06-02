@@ -1,22 +1,24 @@
 package com.warehouse.redirect.domain.vo;
 
 
-import com.warehouse.redirect.domain.enumeration.ParcelType;
-import com.warehouse.redirect.domain.enumeration.Size;
-import com.warehouse.redirect.domain.enumeration.Status;
+import com.warehouse.commonassets.ParcelStatus;
+import com.warehouse.commonassets.ParcelType;
+import com.warehouse.commonassets.Size;
 import com.warehouse.redirect.domain.model.Recipient;
 import com.warehouse.redirect.domain.model.Sender;
+
 import lombok.Value;
 
 @Value
 public class RedirectParcel {
+
     Sender sender;
 
     Recipient recipient;
 
     Size parcelSize;
 
-    Status status;
+    ParcelStatus status;
 
     ParcelType parcelType;
 
@@ -29,7 +31,7 @@ public class RedirectParcel {
     }
 
     public boolean hasStatusCreated() {
-        return status.equals(Status.CREATED);
+        return status.equals(ParcelStatus.CREATED);
     }
 
     public boolean isRequiredToRedirect() {
