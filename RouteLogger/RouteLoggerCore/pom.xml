@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>RouteLogger</artifactId>
-        <version>2024.5-SNAPSHOT</version>
+        <version>2024.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>RouteLoggerCore</artifactId>
