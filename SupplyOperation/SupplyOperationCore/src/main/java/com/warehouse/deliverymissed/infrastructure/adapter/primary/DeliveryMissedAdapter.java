@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPort;
 import com.warehouse.deliverymissed.domain.port.primary.SupplierValidatorPort;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissedResponse;

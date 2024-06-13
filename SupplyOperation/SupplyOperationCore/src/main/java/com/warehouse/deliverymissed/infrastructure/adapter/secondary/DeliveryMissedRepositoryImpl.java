@@ -1,6 +1,6 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary;
 
-import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.port.secondary.DeliveryMissedRepository;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.DeliveryMissedEntity;

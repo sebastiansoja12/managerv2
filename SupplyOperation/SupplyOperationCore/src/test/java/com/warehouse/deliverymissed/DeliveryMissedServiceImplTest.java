@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.deliverymissed.domain.enumeration.DeliveryStatus;
-import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.port.secondary.DeliveryMissedRepository;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedServiceImpl;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
@@ -50,10 +50,6 @@ public class DeliveryMissedServiceImplTest {
 
 	private DeliveryMissedRequest createDeliveryMissedRequest(final String depotCode, final Long parcelId,
 			final String supplierCode) {
-		final DeliveryMissedRequest request = new DeliveryMissedRequest();
-		request.setDepotCode(depotCode);
-		request.setParcelId(parcelId);
-		request.setSupplierCode(supplierCode);
-		return request;
+        return new DeliveryMissedRequest(parcelId, depotCode, supplierCode);
 	}
 }
