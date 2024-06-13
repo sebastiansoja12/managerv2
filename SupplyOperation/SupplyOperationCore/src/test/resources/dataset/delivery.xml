@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dataset>
     <delivery
-        id="fde44928-44e5-11ee-be56-0242ac120002"
-        parcel_id="1"
-        created ="2023-08-10"
-        depot_code="KT1"
-        supplier_code="abc_def"
-        delivery_status="2"
-        token="token"
+        ID="fde44928-44e5-11ee-be56-0242ac120002"
+        PARCEL_ID="1"
+        CREATED ="2023-08-10"
+        DEPOT_CODE="KT1"
+        SUPPLIER_CODE="abc_def"
+        DELIVERY_STATUS="2"
+        TOKEN="token"
     />
 
 </dataset>

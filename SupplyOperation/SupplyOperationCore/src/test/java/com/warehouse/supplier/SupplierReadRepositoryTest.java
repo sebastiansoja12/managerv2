@@ -26,7 +26,7 @@ import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEn
 @DataJpaTest
 @ContextConfiguration(classes = SupplierTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DatabaseSetup("/dataset/supplier.xml")
 public class SupplierReadRepositoryTest {
 

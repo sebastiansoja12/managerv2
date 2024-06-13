@@ -35,7 +35,7 @@ public class DeliveryMissedServiceImplTest {
     @Test
     void shouldSaveDelivery() {
         // given
-        final DeliveryMissedRequest request = createDeliveryMissedRequest(DeliveryStatus.UNAVAILABLE,
+        final DeliveryMissedRequest request = createDeliveryMissedRequest(
                 "KT1", 1L, "abc");
 		final DeliveryMissed expectedDeliveryMissed = new DeliveryMissed("deliveryId", 1L, "KT1", "abc",
                 DeliveryStatus.UNAVAILABLE);
@@ -48,10 +48,9 @@ public class DeliveryMissedServiceImplTest {
         assertEquals(expectedDeliveryMissed, deliveryMissed);
     }
 
-	private DeliveryMissedRequest createDeliveryMissedRequest(final DeliveryStatus deliveryStatus,
-			final String depotCode, final Long parcelId, final String supplierCode) {
+	private DeliveryMissedRequest createDeliveryMissedRequest(final String depotCode, final Long parcelId,
+			final String supplierCode) {
 		final DeliveryMissedRequest request = new DeliveryMissedRequest();
-		request.setDeliveryStatus(deliveryStatus);
 		request.setDepotCode(depotCode);
 		request.setParcelId(parcelId);
 		request.setSupplierCode(supplierCode);

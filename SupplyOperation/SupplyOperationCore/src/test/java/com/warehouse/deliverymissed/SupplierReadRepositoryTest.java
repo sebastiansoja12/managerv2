@@ -25,7 +25,7 @@ import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.Supp
 @DataJpaTest
 @ContextConfiguration(classes = DeliveryMissedTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DatabaseSetup("/dataset/supplier.xml")
 public class SupplierReadRepositoryTest {
 
