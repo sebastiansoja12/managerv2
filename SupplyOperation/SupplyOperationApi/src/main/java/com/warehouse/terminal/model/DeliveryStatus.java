@@ -1,9 +1,9 @@
-package com.warehouse.deliveryreturn.infrastructure.api.dto;
+package com.warehouse.terminal.model;
 
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "DeliveryStatus")
-public enum DeliveryStatusDto {
+public enum DeliveryStatus {
     DEPOT,
     CLIENT,
     DELIVERY,

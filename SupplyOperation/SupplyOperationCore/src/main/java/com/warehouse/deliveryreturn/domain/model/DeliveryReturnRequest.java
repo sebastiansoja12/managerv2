@@ -1,23 +1,26 @@
 package com.warehouse.deliveryreturn.domain.model;
 
 
-import static com.warehouse.deliveryreturn.domain.enumeration.ProcessType.RETURN;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.warehouse.deliveryreturn.domain.enumeration.ProcessType;
 
+import com.warehouse.commonassets.ProcessType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+
+import static com.warehouse.commonassets.ProcessType.RETURN;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class DeliveryReturnRequest {
     private ProcessType processType;
-    private DeviceInformation zebraDeviceInformation;
+    private DeviceInformation deviceInformation;
     private List<DeliveryReturnDetails> deliveryReturnDetails;
 
     public void validateStatuses() {
@@ -32,7 +35,7 @@ public class DeliveryReturnRequest {
         deliveryReturnDetails = deliveryReturnDetails
                 .stream()
 				.peek(deliveryReturnDetail -> deliveryReturnDetail
-						.setSupplierCode(zebraDeviceInformation.getUsername()))
+						.setSupplierCode(deviceInformation.getUsername()))
                 .collect(Collectors.toList());
     }
 
@@ -40,7 +43,11 @@ public class DeliveryReturnRequest {
         deliveryReturnDetails = deliveryReturnDetails
                 .stream()
                 .peek(deliveryReturnDetail -> deliveryReturnDetail
-                        .setDepotCode(zebraDeviceInformation.getDepotCode()))
+                        .setDepotCode(deviceInformation.getDepotCode()))
                 .collect(Collectors.toList());
+    }
+
+    public String getDepotCode() {
+        return deviceInformation != null ? deviceInformation.getDepotCode() : StringUtils.EMPTY;
     }
 }

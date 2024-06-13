@@ -3,7 +3,7 @@ package com.warehouse.deliveryreturn.infrastructure.api.request;
 
 import java.util.List;
 
-import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetail;
+import com.warehouse.terminal.model.DeliveryReturnDetail;
 import com.warehouse.deliveryreturn.infrastructure.api.zebradevice.ZebraDeviceInformation;
 
 import jakarta.xml.bind.annotation.*;

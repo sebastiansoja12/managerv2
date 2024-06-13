@@ -1,8 +1,8 @@
 package com.warehouse.deliveryreturn.configuration;
 
 
-import com.warehouse.deliveryreturn.domain.port.primary.SupplierCodeValidatorPort;
-import com.warehouse.deliveryreturn.domain.port.primary.SupplierCodeValidatorPortImpl;
+import com.warehouse.deliveryreturn.domain.port.primary.*;
+import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.tools.mail.MailProperty;
 import com.warehouse.tools.returntoken.ReturnTokenProperties;
 import com.warehouse.tools.supplier.SupplierValidatorProperties;
@@ -10,8 +10,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
-import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
 import com.warehouse.deliveryreturn.domain.port.secondary.*;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
@@ -29,16 +27,26 @@ import org.springframework.web.client.RestClient;
 public class DeliveryReturnConfiguration {
 
 	@Bean
-	public DeliveryReturnPort deliveryReturnPort(DeliveryReturnRepository deliveryReturnRepository,
-			DeliveryReturnTokenServicePort deliveryReturnTokenServicePort, RouteLogServicePort routeLogServicePort,
-			ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort,
-			ParcelRepositoryServicePort parcelRepositoryServicePort, MailServicePort mailServicePort,
-			SupplierCodeLogServicePort supplierCodeLogServicePort) {
+	public DeliveryReturnPort deliveryReturnPort(final DeliveryReturnRepository deliveryReturnRepository,
+			final DeliveryReturnTokenServicePort deliveryReturnTokenServicePort,
+			final ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort,
+			final ParcelRepositoryServicePort parcelRepositoryServicePort, MailServicePort mailServicePort,
+			final RouteLogReturnServicePort routeLogReturnServicePort) {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
 				deliveryReturnTokenServicePort, parcelRepositoryServicePort, mailServicePort);
 		return new DeliveryReturnPortImpl(deliveryReturnService, parcelStatusControlChangeServicePort,
-				routeLogServicePort, supplierCodeLogServicePort);
+				routeLogReturnServicePort);
 	}
+    
+    @Bean
+    public RouteLogReturnServicePort routeLogReturnServicePort(final RouteLogEventPublisher routeLogEventPublisher) {
+        return new RouteLogReturnServiceAdapter(routeLogEventPublisher);
+    }
+
+    @Bean("deliveryReturn.terminalRequestLoggerPort")
+    public TerminalRequestLoggerPort terminalRequestLoggerPort(RouteLogReturnServicePort routeLogReturnServicePort) {
+        return new TerminalRequestLoggerPortImpl(routeLogReturnServicePort);
+    }
 
     @Bean
     public SupplierCodeLogServicePort supplierCodeLogServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {

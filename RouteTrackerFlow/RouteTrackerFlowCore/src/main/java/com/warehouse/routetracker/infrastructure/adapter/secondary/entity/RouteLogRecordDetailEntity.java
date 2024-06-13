@@ -6,6 +6,7 @@ import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumer
 
 import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ParcelStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -36,7 +37,8 @@ public class RouteLogRecordDetailEntity {
     @Column(name = "process_type")
     private ProcessType processType;
 
-    @Column(name = "request", length = 1000)
+    @Column(name = "request")
+    @Size(min = 5, max = 65555)
     private String request;
 
     @Column(name = "parcel_status")

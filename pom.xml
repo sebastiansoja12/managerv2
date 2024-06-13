@@ -39,6 +39,7 @@
         <module>E2E</module>
         <module>Common</module>
         <module>RouteLogger</module>
+        <module>AssetConverter</module>
     </modules>
 
 	<properties>

@@ -11,7 +11,7 @@ public class DeviceInformation {
 
      private String version;
 
-     private Long zebraId;
+     private Long terminalId;
 
      private String username;
 

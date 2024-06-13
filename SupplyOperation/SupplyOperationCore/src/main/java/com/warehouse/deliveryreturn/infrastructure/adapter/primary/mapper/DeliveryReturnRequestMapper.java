@@ -2,23 +2,23 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper;
 
 import java.util.List;
 
+import com.warehouse.commonassets.ProcessType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.warehouse.deliveryreturn.domain.enumeration.ProcessType;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
-import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetail;
-import com.warehouse.deliveryreturn.infrastructure.api.request.ZebraDeliveryReturnRequest;
-import com.warehouse.deliveryreturn.infrastructure.api.zebradevice.ZebraDeviceInformation;
+import com.warehouse.terminal.model.DeliveryReturnDetail;
+import com.warehouse.terminal.information.TerminalDeviceInformation;
+import com.warehouse.terminal.request.TerminalRequest;
 
 @Mapper
 public interface DeliveryReturnRequestMapper {
 
 
-    default DeliveryReturnRequest map(ZebraDeliveryReturnRequest request) {
-        return new DeliveryReturnRequest(map(request.getProcessType()), map(request.getZebraDeviceInformation()),
+    default DeliveryReturnRequest map(TerminalRequest request) {
+        return new DeliveryReturnRequest(map(request.getProcessType()), map(request.getTerminalDeviceInformation()),
                 map(request.getDeliveryReturnDetails()));
     }
 
@@ -27,7 +27,7 @@ public interface DeliveryReturnRequestMapper {
     @Mapping(target = "token", ignore = true)
     DeliveryReturnDetails map(DeliveryReturnDetail deliveryReturnDetail);
 
-    DeviceInformation map(ZebraDeviceInformation zebraDeviceInformation);
+    DeviceInformation map(TerminalDeviceInformation terminalDeviceInformation);
 
-    ProcessType map(com.warehouse.deliveryreturn.infrastructure.api.request.ProcessType processType);
+    ProcessType map(com.warehouse.terminal.enumeration.ProcessType processType);
 }

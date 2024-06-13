@@ -1,4 +1,4 @@
-package com.warehouse.deliveryreturn.infrastructure.api.dto;
+package com.warehouse.terminal.model;
 
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -22,7 +22,7 @@ public class DeliveryReturnDetail {
     private Long parcelId;
 
     @XmlElement(name = "DeliveryStatus")
-    private DeliveryStatusDto deliveryStatus;
+    private DeliveryStatus deliveryStatus;
 
     @XmlElement(name = "DepotCode")
     private String depotCode;

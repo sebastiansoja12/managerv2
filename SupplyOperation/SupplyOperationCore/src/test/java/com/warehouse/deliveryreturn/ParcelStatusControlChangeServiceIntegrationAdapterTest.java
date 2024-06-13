@@ -32,9 +32,7 @@ public class ParcelStatusControlChangeServiceIntegrationAdapterTest {
     @Test
     void shouldNotUpdateParcelStatus() {
         // given
-        final UpdateStatusParcelRequest parcelRequest = UpdateStatusParcelRequest.builder()
-                .parcelId(1L)
-                .build();
+        final UpdateStatusParcelRequest parcelRequest = new UpdateStatusParcelRequest(1L);
         // when
         final UpdateStatus updateStatus = parcelStatusControlChangeServicePort.updateStatus(parcelRequest);
         // then

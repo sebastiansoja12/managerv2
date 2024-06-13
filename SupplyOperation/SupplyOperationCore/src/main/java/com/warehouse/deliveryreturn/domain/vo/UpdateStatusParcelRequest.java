@@ -1,11 +1,19 @@
 package com.warehouse.deliveryreturn.domain.vo;
 
-import lombok.Builder;
-import lombok.Value;
-
-@Value
-@Builder
 public class UpdateStatusParcelRequest {
-    Long parcelId;
-    ParcelStatus parcelStatus = ParcelStatus.RETURN;
+
+    private final Long parcelId;
+    private final ParcelStatus parcelStatus = ParcelStatus.RETURN;
+
+    public UpdateStatusParcelRequest(Long parcelId) {
+        this.parcelId = parcelId;
+    }
+
+    public Long getParcelId() {
+        return parcelId;
+    }
+
+    public ParcelStatus getParcelStatus() {
+        return parcelStatus;
+    }
 }

@@ -1,4 +1,4 @@
-package com.warehouse.deliveryreturn.infrastructure.api.dto;
+package com.warehouse.terminal.model;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;

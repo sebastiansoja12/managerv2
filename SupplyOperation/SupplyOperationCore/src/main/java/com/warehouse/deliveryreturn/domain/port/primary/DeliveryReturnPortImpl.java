@@ -5,8 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.warehouse.deliveryreturn.domain.enumeration.ProcessType;
-import com.warehouse.deliveryreturn.domain.port.secondary.SupplierCodeLogServicePort;
 import org.springframework.util.CollectionUtils;
 
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
@@ -15,7 +13,7 @@ import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogReturnServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.vo.*;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteDetails;
@@ -32,9 +30,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private final ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
-    private final RouteLogServicePort logServicePort;
-    
-    private final SupplierCodeLogServicePort supplierCodeLogServicePort;
+    private final RouteLogReturnServicePort routeLogReturnServicePort;
 
     @Override
     public DeliveryReturnResponse deliverReturn(DeliveryReturnRequest deliveryRequest) {
@@ -52,6 +48,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
         deliveryRequest.rewriteDepotCodeFromDevice();
 
+        logDepotCode(deliveryRequest);
+
         final Set<DeliveryReturnDetails> deliveryReturnRequests = deliveryRequest.getDeliveryReturnDetails()
                 .stream()
                 .filter(Objects::nonNull)
@@ -65,10 +63,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
 		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturnResponses.stream()
                 .map(deliveryReturn -> {
-					final UpdateStatusParcelRequest updateStatusParcelRequest = UpdateStatusParcelRequest
-                            .builder()
-							.parcelId(deliveryReturn.getParcelId())
-                            .build();
+					final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(
+							deliveryReturn.getParcelId());
 					final UpdateStatus updateStatus = parcelStatusControlChangeServicePort
 							.updateStatus(updateStatusParcelRequest);
                     return new DeliveryReturnResponseDetails(deliveryReturn.getId(), deliveryReturn.getParcelId(),
@@ -78,13 +74,18 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 		final DeliveryReturnResponse deliveryReturnResponse = DeliveryReturnResponse
                 .builder()
 				.deliveryReturnResponses(deliveryReturnResponseDetails)
-                .supplierCode(deliveryRequest.getZebraDeviceInformation().getUsername())
-                .depotCode(deliveryRequest.getZebraDeviceInformation().getDepotCode())
+                .supplierCode(deliveryRequest.getDeviceInformation().getUsername())
+                .depotCode(deliveryRequest.getDeviceInformation().getDepotCode())
                 .build();
 
         logRouteFlow(deliveryReturnResponse);
         
         return deliveryReturnResponse;
+    }
+
+    private void logDepotCode(DeliveryReturnRequest deliveryRequest) {
+        log.warn("Logging depot code {} in tracker", deliveryRequest.getDepotCode());
+        routeLogReturnServicePort.logDepotCodeReturnDelivery(deliveryRequest);
     }
 
     private void validateRequest(DeliveryReturnRequest deliveryRequest) {
@@ -104,7 +105,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 						deliveryReturnRouteDetails(deliveryReturnResponse.getDeliveryReturnResponses()))
                 .supplierCode(deliveryReturnResponse.getSupplierCode())
                 .build();
-        logServicePort.logDeliverReturn(request);
+        routeLogReturnServicePort.logRouteLogReturnDelivery(request);
     }
     
 	private List<DeliveryReturnRouteDetails> deliveryReturnRouteDetails(
@@ -127,9 +128,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 	private void saveSupplierCode(List<DeliveryReturn> deliveryReturns) {
 		deliveryReturns.forEach(deliveryReturn -> {
 			logSupplierCodeSave(deliveryReturn.getSupplierCode());
-			final SupplierCodeRequest request = new SupplierCodeRequest(deliveryReturn.getSupplierCode(),
-					deliveryReturn.getParcelId(), ProcessType.RETURN);
-			supplierCodeLogServicePort.saveSupplierCode(request);
+			routeLogReturnServicePort.logSupplierCode(deliveryReturn);
 		});
 	}
 

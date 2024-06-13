@@ -1,11 +1,9 @@
-package com.warehouse.deliverymissed;
+package com.warehouse.xmlconverter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.deliverymissed.domain.service.XmlToStringService;
-import com.warehouse.deliverymissed.domain.service.XmlToStringServiceImpl;
 import com.warehouse.terminal.enumeration.ProcessType;
 import com.warehouse.terminal.request.TerminalRequest;
 
@@ -16,8 +14,8 @@ public class XmlToStringServiceImplTest {
     @Test
     void shouldParseXmlToString() {
         // given
-        final TerminalRequest terminalRequest = new TerminalRequest(ProcessType.CREATED, null, 1L);
-        String expectedXml = """
+        final TerminalRequest terminalRequest = new TerminalRequest(ProcessType.CREATED, null, 1L, null);
+        final String expectedXml = """
                 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
                 <TerminalRequest>
                     <ProcessType>CREATED</ProcessType>
