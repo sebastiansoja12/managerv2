@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.domain.vo.DepotCode;
 import com.warehouse.depot.infrastructure.adapter.secondary.DepotReadRepository;
 import com.warehouse.depot.infrastructure.adapter.secondary.DepotRepositoryImpl;
@@ -37,12 +37,8 @@ public class DepotRepositoryTest {
 
     @Test
     public void shouldViewByDepotCode() {
-        final Depot depot = Depot.builder()
-                .depotCode(KT1)
-                .city("Gliwice")
-                .street("Mrągowska 11")
-                .country("Poland")
-                .build();
+        final Depot depot = new Depot();
+        depot.setDepotCode(KT1);
         final DepotCode code = new DepotCode(KT1);
 
         final DepotEntity entity = new DepotEntity();
@@ -52,7 +48,7 @@ public class DepotRepositoryTest {
         when(mapper.map(entity)).thenReturn(depot);
 
         // when
-        final Depot result = depotRepository.viewByCode(code);
+        final Depot result = depotRepository.findByCode(code);
 
         // then
         assertNotNull(result);
@@ -69,7 +65,7 @@ public class DepotRepositoryTest {
         when(repository.findByDepotCode(KT1)).thenReturn(Optional.empty());
 
         // when
-        final Executable executable = () -> depotRepository.viewByCode(code);
+        final Executable executable = () -> depotRepository.findByCode(code);
 
         // then
         final DepotNotFoundException exception = Assertions.assertThrows(DepotNotFoundException.class, executable);

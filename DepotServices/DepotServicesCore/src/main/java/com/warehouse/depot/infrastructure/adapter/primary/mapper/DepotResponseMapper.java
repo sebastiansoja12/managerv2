@@ -1,7 +1,9 @@
 package com.warehouse.depot.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.model.Depot;
+import com.warehouse.depot.domain.vo.UpdateStreetResponse;
 import com.warehouse.depot.infrastructure.adapter.primary.api.dto.DepotDto;
+import com.warehouse.depot.infrastructure.adapter.primary.api.dto.UpdateStreetResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -14,4 +16,6 @@ public interface DepotResponseMapper {
     DepotDto map(Depot depot);
 
     List<DepotDto> map(List<Depot> depotList);
+
+    UpdateStreetResponseDto map(UpdateStreetResponse response);
 }

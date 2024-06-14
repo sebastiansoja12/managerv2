@@ -5,7 +5,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)

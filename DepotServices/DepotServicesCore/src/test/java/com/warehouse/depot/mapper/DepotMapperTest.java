@@ -1,6 +1,6 @@
 package com.warehouse.depot.mapper;
 
-import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;
 import com.warehouse.depot.infrastructure.adapter.secondary.mapper.DepotMapper;
 import com.warehouse.depot.infrastructure.adapter.secondary.mapper.DepotMapperImpl;
@@ -19,9 +19,9 @@ public class DepotMapperTest {
     @Test
     public void shouldMapDepotToDepotEntity() {
         // Given
-        final Depot depot = Depot.builder()
-                .city(KATOWICE)
-                .build();
+        final Depot depot = new Depot();
+        depot.setCity(KATOWICE);
+        depot.setDepotCode("KT3");
 
         final DepotEntity expectedEntity = new DepotEntity();
         expectedEntity.setDepotCode("KT3");
@@ -38,13 +38,12 @@ public class DepotMapperTest {
     public void shouldMapDepotEntityToDepot() {
         // Given
         final DepotEntity depotEntity = new DepotEntity();
-        depotEntity.setCity("Katowice");
+        depotEntity.setCity(KATOWICE);
         depotEntity.setDepotCode("KT3");
 
 
-        final Depot expectedDepot = Depot.builder()
-                .city(KATOWICE)
-                .build();
+        final Depot expectedDepot = new Depot();
+        expectedDepot.setCity(KATOWICE);
 
         // When
         final Depot result = mapper.map(depotEntity);
@@ -68,19 +67,9 @@ public class DepotMapperTest {
     @Test
     public void shouldMapListDepotToListDepotEntity() {
         // Given
-        final Depot depot1 = Depot.builder()
-                .depotCode("KT1")
-                .city("Gliwice")
-                .street("Mrągowska 11")
-                .country("Poland")
-                .build();
+        final Depot depot1 = new Depot();
 
-        final Depot depot2 = Depot.builder()
-                .depotCode("POZ")
-                .city("Poznań")
-                .street("Wielkopolska 11")
-                .country("Poland")
-                .build();
+        final Depot depot2 = new Depot();
 
         final List<Depot> depots = Arrays.asList(depot1, depot2);
 
