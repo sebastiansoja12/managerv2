@@ -1,7 +1,6 @@
 package com.warehouse.deliveryreturn.configuration;
 
-import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import com.warehouse.tools.supplier.SupplierValidatorProperties;
+import com.warehouse.routelogger.RouteLogEventPublisher;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -12,7 +11,8 @@ import org.springframework.web.client.RestClient;
 
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
+import com.warehouse.tools.supplier.SupplierValidatorProperties;
 
 @ComponentScan(basePackages = { "com.warehouse.deliveryreturn",  "com.warehouse.tools.parcelstatus" })
 @EntityScan(basePackages = { "com.warehouse.deliveryreturn" })
@@ -26,9 +26,6 @@ public class DeliveryReturnTestConfiguration {
     }
 
     @MockBean
-    public RouteLogServicePort routeLogServicePort;
-
-    @MockBean
     public ParcelRepositoryServicePort parcelRepositoryServicePort;
 
     @MockBean
@@ -39,4 +36,7 @@ public class DeliveryReturnTestConfiguration {
 
     @MockBean
     public RouteTrackerLogProperties routeTrackerLogProperties;
+
+    @MockBean
+    public RouteLogEventPublisher routeLogEventPublisher;
 }

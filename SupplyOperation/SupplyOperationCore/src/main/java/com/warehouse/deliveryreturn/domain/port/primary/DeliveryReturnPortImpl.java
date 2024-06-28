@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
@@ -33,7 +34,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
     private final RouteLogReturnServicePort routeLogReturnServicePort;
 
     @Override
-    public DeliveryReturnResponse deliverReturn(DeliveryReturnRequest deliveryRequest) {
+    public DeliveryReturnResponse deliverReturn(final DeliveryReturnRequest deliveryRequest) {
 
         validateRequest(deliveryRequest);
         
@@ -59,7 +60,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
         final List<DeliveryReturn> deliveryReturnResponses =
                 deliveryReturnService.deliverReturn(deliveryReturnRequests);
 
-        saveSupplierCode(deliveryReturnResponses);
+        logSupplierCode(deliveryReturnResponses);
 
 		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturnResponses.stream()
                 .map(deliveryReturn -> {
@@ -120,12 +121,13 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
                 .deliveryStatus(response.getDeliveryStatus())
                 .id(response.getId())
                 .parcelId(response.getParcelId())
-                .updateStatus(response.getUpdateStatus().name())
+				.updateStatus(
+						response.getUpdateStatus() != null ? response.getUpdateStatus().name() : StringUtils.EMPTY)
                 .returnToken(response.getReturnToken())
                 .build();
     }
     
-	private void saveSupplierCode(List<DeliveryReturn> deliveryReturns) {
+	private void logSupplierCode(List<DeliveryReturn> deliveryReturns) {
 		deliveryReturns.forEach(deliveryReturn -> {
 			logSupplierCodeSave(deliveryReturn.getSupplierCode());
 			routeLogReturnServicePort.logSupplierCode(deliveryReturn);

@@ -7,14 +7,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
-import com.warehouse.commonassets.ProcessType;
-import com.warehouse.deliveryreturn.domain.port.secondary.*;
-import com.warehouse.deliveryreturn.domain.vo.*;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
-import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import com.warehouse.tools.shipment.ShipmentProperties;
-import com.warehouse.tools.supplier.SupplierValidatorProperties;
+import com.warehouse.routelogger.RouteLogEventPublisher;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,11 +22,21 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.client.RestClient;
 
+import com.warehouse.commonassets.ProcessType;
 import com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
+import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
+import com.warehouse.deliveryreturn.domain.vo.*;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
+import com.warehouse.tools.shipment.ShipmentProperties;
+import com.warehouse.tools.supplier.SupplierValidatorProperties;
 
 @SpringBootTest(classes = DeliveryReturnPortImplIntegrationTest.DeliveryReturnPortIntegrationTestConfiguration.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DeliveryReturnPortImplIntegrationTest {
@@ -46,9 +49,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		@MockBean
 		public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
-
-		@MockBean
-		public RouteLogServicePort routeLogServicePort;
 
 		@MockBean
 		public ShipmentProperties shipmentProperties;
@@ -66,7 +66,7 @@ public class DeliveryReturnPortImplIntegrationTest {
 		public RouteTrackerLogProperties routeTrackerLogProperties;
 
 		@MockBean
-		public SupplierCodeLogServicePort supplierCodeLogServicePort;
+		public RouteLogEventPublisher routeLogEventPublisher;
 
 		@Bean
 		public RestClient restClient(RestClient.Builder builder) {
@@ -87,9 +87,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 	private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
 	@Autowired
-	private RouteLogServicePort routeLogServicePort;
-
-	@Autowired
 	private ParcelRepositoryServicePort parcelRepositoryServicePort;
 
 	@Autowired
@@ -97,9 +94,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 	@Autowired
 	private SupplierValidatorProperties supplierValidatorProperties;
-
-	@Autowired
-	private SupplierCodeLogServicePort supplierCodeLogServicePort;
 
 	private final DeviceInformation deviceInformation = new DeviceInformation("1", 1L, "s-soja", "KT1");
 
@@ -126,16 +120,12 @@ public class DeliveryReturnPortImplIntegrationTest {
 		when(parcelRepositoryServicePort.downloadParcel(1L)).thenReturn(parcel);
 
 		doNothing().when(mailServicePort).sendNotification(parcel);
-
-		doNothing().when(routeLogServicePort).logDeliverReturn(any());
-
-		doNothing().when(supplierCodeLogServicePort).saveSupplierCode(any());
 		// when
 		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
 		// then
 		assertThat(response.getDeliveryReturnResponses()).extracting(DeliveryReturnResponseDetails::getReturnToken,
 				DeliveryReturnResponseDetails::getDeliveryStatus, DeliveryReturnResponseDetails::getUpdateStatus)
-				.containsExactly(Tuple.tuple("12345", "RETURN", UpdateStatus.NOT_OK));
+				.containsExactly(Tuple.tuple("12345", "RETURN", null));
 
 		assertEquals("s-soja", response.getSupplierCode());
 		assertEquals("KT1", response.getDepotCode());
@@ -157,13 +147,12 @@ public class DeliveryReturnPortImplIntegrationTest {
 		when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest)).thenReturn(UpdateStatus.OK);
 		when(parcelRepositoryServicePort.downloadParcel(1L)).thenReturn(parcel);
 		doNothing().when(mailServicePort).sendNotification(parcel);
-		doNothing().when(routeLogServicePort).logDeliverReturn(any());
 		// when
 		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
 		// then
 		assertThat(response.getDeliveryReturnResponses()).extracting(DeliveryReturnResponseDetails::getReturnToken,
 				DeliveryReturnResponseDetails::getDeliveryStatus, DeliveryReturnResponseDetails::getUpdateStatus)
-				.containsExactly(Tuple.tuple("12345", "RETURN", UpdateStatus.OK));
+				.containsExactly(Tuple.tuple("12345", "RETURN", null));
 
 		assertEquals("s-soja", response.getSupplierCode());
 		assertEquals("KT1", response.getDepotCode());
