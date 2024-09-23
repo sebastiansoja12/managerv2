@@ -1,4 +1,4 @@
-package com.warehouse.commonassets;
+package com.warehouse.commonassets.enumeration;
 
 
 public enum DeliveryStatus {
