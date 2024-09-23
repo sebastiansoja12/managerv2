@@ -1,7 +1,7 @@
 package com.warehouse.returntoken;
 
 
-import com.warehouse.commonassets.ParcelStatus;
+import com.warehouse.commonassets.enumeration.ParcelStatus;
 import com.warehouse.returntoken.configuration.ReturnTokenTestConfiguration;
 import com.warehouse.returntoken.domain.model.Parcel;
 import com.warehouse.returntoken.domain.vo.Token;
