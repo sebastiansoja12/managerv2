@@ -1,7 +1,7 @@
 package com.warehouse.deliverytoken;
 
 
-import com.warehouse.commonassets.ParcelType;
+import com.warehouse.commonassets.enumeration.ParcelType;
 import com.warehouse.deliverytoken.domain.exception.MissingParcelIdException;
 import com.warehouse.deliverytoken.domain.model.*;
 import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPortImpl;
