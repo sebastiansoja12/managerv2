@@ -5,7 +5,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.List;
 
-import com.warehouse.commonassets.ParcelType;
+import com.warehouse.commonassets.enumeration.ParcelType;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.deliverytoken.domain.vo.DeliveryPackageResponse;
