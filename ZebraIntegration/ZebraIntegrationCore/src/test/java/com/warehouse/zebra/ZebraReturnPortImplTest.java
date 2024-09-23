@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-public class ZebraPortImplTest {
+public class ZebraReturnPortImplTest {
 
     @Mock
     private ReturnServicePort returnServicePort;
