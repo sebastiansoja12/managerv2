@@ -1,7 +1,7 @@
 package com.warehouse.deliverymissed.domain.vo;
 
 
-import com.warehouse.commonassets.ParcelStatus;
+import com.warehouse.commonassets.enumeration.ParcelStatus;
 import lombok.Builder;
 import lombok.Value;
 
