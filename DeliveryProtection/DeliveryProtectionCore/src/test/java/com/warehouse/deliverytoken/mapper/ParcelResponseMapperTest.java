@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mapstruct.factory.Mappers.getMapper;
 
-import com.warehouse.commonassets.ParcelType;
+import com.warehouse.commonassets.enumeration.ParcelType;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.deliverytoken.domain.vo.Parcel;

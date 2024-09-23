@@ -1,6 +1,6 @@
 package com.warehouse.deliverytoken.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.commonassets.ParcelType;
+import com.warehouse.commonassets.enumeration.ParcelType;
 import org.mapstruct.Mapper;
 
 import com.warehouse.deliverytoken.domain.vo.Parcel;
