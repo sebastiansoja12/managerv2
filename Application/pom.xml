@@ -51,11 +51,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>WarehouseWeb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>BarcodeGenerator</artifactId>
             <version>${project.version}</version>
         </dependency>
