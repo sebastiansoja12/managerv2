@@ -2,9 +2,9 @@ package com.warehouse.redirect.domain.model;
 
 
 
-import com.warehouse.commonassets.ParcelStatus;
-import com.warehouse.commonassets.ParcelType;
-import com.warehouse.commonassets.Size;
+import com.warehouse.commonassets.enumeration.ParcelStatus;
+import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.Size;
 import lombok.Data;
 
 @Data
