@@ -1,9 +1,12 @@
 package com.warehouse.zebra.mapper.primary;
 
-import com.warehouse.zebra.domain.vo.Response;
+import com.warehouse.commonassets.response.Response;
+import com.warehouse.commonassets.vo.DeviceInformation;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraResponseMapper;
 import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mapstruct.factory.Mappers.getMapper;
@@ -12,10 +15,13 @@ public class ZebraResponseMapperTest {
 
     private final ZebraResponseMapper mapper = getMapper(ZebraResponseMapper.class);
 
+    private final DeviceInformation deviceInformation = new DeviceInformation("1.0", 1L,
+            "s-soja", "KT1");
+
     @Test
     void shouldMapToResponse() {
         // given
-        final Response response = Response.builder().zebraId(1L).build();
+        final Response response = new Response(deviceInformation, Collections.emptyList(), Collections.emptyList());
         // when
         final ZebraResponse zebraResponse = mapper.map(response);
         // then
