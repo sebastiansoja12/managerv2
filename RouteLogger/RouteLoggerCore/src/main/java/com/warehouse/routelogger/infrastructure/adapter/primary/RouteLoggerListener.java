@@ -22,60 +22,60 @@ public class RouteLoggerListener {
 
     private final RouteLoggerPort routeLoggerPort;
 
-    public RouteLoggerListener(RouteLoggerPort routeLoggerPort) {
+    public RouteLoggerListener(final RouteLoggerPort routeLoggerPort) {
         this.routeLoggerPort = routeLoggerPort;
     }
 
     @EventListener
-    void handleEvent(DeliveryLogEvent event) {
+    void handleEvent(final DeliveryLogEvent event) {
         logEvent(event);
         final AnyDeliveryRequest request = eventMapper.map(event.getDeliveryRequest());
         routeLoggerPort.logAnyDelivery(request);
     }
 
     @EventListener
-    void handleEvent(DepotCodeLogEvent event) {
+    void handleEvent(final DepotCodeLogEvent event) {
         logEvent(event);
         final DepotCodeRequest request = eventMapper.mapFromDepotCodeRequest(event.getDepotCodeRequest());
         routeLoggerPort.logDepotCode(request);
     }
 
     @EventListener
-    void handleEvent(RequestLogEvent event) {
+    void handleEvent(final RequestLogEvent event) {
         logEvent(event);
         final Request request = eventMapper.mapToRequest(event.getRequest());
         routeLoggerPort.logRequest(request);
     }
 
     @EventListener
-    void handleEvent(SupplierCodeLogEvent event) {
+    void handleEvent(final SupplierCodeLogEvent event) {
         logEvent(event);
         final SupplierCodeRequest request = eventMapper.mapToSupplierCodeRequest(event.getSupplierCodeRequest());
         routeLoggerPort.logSupplierCode(request);
     }
 
     @EventListener
-    void handleEvent(TerminalLogEvent event) {
+    void handleEvent(final TerminalLogEvent event) {
         logEvent(event);
         final TerminalLogRequest request = eventMapper.mapToTerminalLogRequest(event.getTerminalLogRequest());
         routeLoggerPort.logTerminalId(request);
     }
 
     @EventListener
-    void handleEvent(VersionLogEvent event) {
+    void handleEvent(final VersionLogEvent event) {
         logEvent(event);
         final VersionLogRequest request = eventMapper.mapToVersionLogRequest(event.getVersionLogRequest());
         routeLoggerPort.logVersion(request);
     }
 
     @EventListener
-    void handleEvent(UsernameLogEvent event) {
+    void handleEvent(final UsernameLogEvent event) {
         logEvent(event);
         final UsernameLogRequest request = eventMapper.mapToUsernameLogRequest(event.getUsernameLogRequest());
         routeLoggerPort.logUsername(request);
     }
 
-    private void logEvent(RouteLogBaseEvent event) {
+    private void logEvent(final RouteLogBaseEvent event) {
         log.info("Detected event {} at {}", event.getClass().getSimpleName(),
                 event.getLocalDateTime().format(FORMATTER));
     }
