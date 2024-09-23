@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-import com.warehouse.commonassets.ProcessType;
+import com.warehouse.commonassets.enumeration.ProcessType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-import static com.warehouse.commonassets.ProcessType.RETURN;
+import static com.warehouse.commonassets.enumeration.ProcessType.RETURN;
 
 @Getter
 @Setter

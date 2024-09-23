@@ -2,7 +2,7 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper;
 
 import java.util.List;
 
-import com.warehouse.commonassets.ProcessType;
+import com.warehouse.commonassets.enumeration.ProcessType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

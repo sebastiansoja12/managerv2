@@ -12,7 +12,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.commonassets.ProcessType;
+import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;

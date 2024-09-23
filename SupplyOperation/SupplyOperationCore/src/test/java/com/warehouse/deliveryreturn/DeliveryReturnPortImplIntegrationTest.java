@@ -22,7 +22,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.client.RestClient;
 
-import com.warehouse.commonassets.ProcessType;
+import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
@@ -136,7 +136,7 @@ public class DeliveryReturnPortImplIntegrationTest {
 		// given
 		final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L, DeliveryStatus.RETURN, "KT1",
 				"abc", null);
-		final DeliveryReturnRequest request = buildDeliveryReturnRequest(com.warehouse.commonassets.ProcessType.RETURN,
+		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN,
 				deviceInformation, deliveryReturnDetails);
 
 		final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(1L);
