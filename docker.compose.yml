@@ -40,14 +40,6 @@ services:
     networks:
       - my_network
 
-  WarehouseWeb:
-    image: your-8090-app-image:latest
-    container_name: spring-boot-app-8090-container
-    ports:
-      - "8090:8090"
-    networks:
-      - my_network
-
 networks:
   my_network:
     driver: bridge
