@@ -1,6 +1,6 @@
 package com.warehouse.routelogger.domain.model;
 
-import com.warehouse.commonassets.ProcessType;
+import com.warehouse.commonassets.enumeration.ProcessType;
 import lombok.Builder;
 import lombok.Data;
 
