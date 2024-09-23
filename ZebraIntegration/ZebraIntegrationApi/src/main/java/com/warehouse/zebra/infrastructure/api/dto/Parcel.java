@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ParcelDto {
+public class Parcel {
 
     @XmlElement(name = "ParcelID")
     private Long id;

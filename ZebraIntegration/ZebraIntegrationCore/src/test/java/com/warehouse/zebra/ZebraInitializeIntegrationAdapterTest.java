@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.warehouse.commonassets.response.LogStatus;
+import com.warehouse.commonassets.vo.RouteProcess;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,6 @@ import org.springframework.web.client.RestClient;
 
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.zebra.domain.vo.LogStatus;
-import com.warehouse.zebra.domain.vo.RouteProcess;
 import com.warehouse.zebra.infrastructure.adapter.primary.ZebraInitializeAdapter;
 import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 

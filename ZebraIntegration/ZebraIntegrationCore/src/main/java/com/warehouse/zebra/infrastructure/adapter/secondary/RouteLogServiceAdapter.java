@@ -1,9 +1,9 @@
 package com.warehouse.zebra.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.response.LogStatus;
+import com.warehouse.commonassets.vo.RouteProcess;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.zebra.domain.vo.LogStatus;
-import com.warehouse.zebra.domain.vo.RouteProcess;
 import com.warehouse.zebra.infrastructure.adapter.secondary.api.ZebraInitializeRequestDto;
 import com.warehouse.zebra.infrastructure.adapter.secondary.api.ProcessTypeDto;
 import com.warehouse.zebra.infrastructure.adapter.secondary.mapper.RouteLogResponseMapper;

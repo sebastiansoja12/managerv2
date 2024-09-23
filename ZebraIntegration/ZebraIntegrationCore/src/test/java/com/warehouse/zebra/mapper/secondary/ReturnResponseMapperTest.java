@@ -5,15 +5,15 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.List;
 
+import com.warehouse.commonassets.vo.ProcessReturn;
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.zebra.domain.vo.ProcessReturn;
 import com.warehouse.zebra.infrastructure.adapter.secondary.api.ProcessReturnDto;
 import com.warehouse.zebra.infrastructure.adapter.secondary.mapper.ReturnResponseMapper;
 
 public class ReturnResponseMapperTest {
 
-    private ReturnResponseMapper mapper = getMapper(ReturnResponseMapper.class);
+    private final ReturnResponseMapper mapper = getMapper(ReturnResponseMapper.class);
 
     @Test
     void shouldMapToProcessReturn() {

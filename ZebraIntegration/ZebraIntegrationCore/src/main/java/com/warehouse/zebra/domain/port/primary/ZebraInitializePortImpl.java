@@ -1,18 +1,20 @@
 package com.warehouse.zebra.domain.port.primary;
 
 
-import static com.warehouse.zebra.domain.vo.ProcessType.CREATED;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.request.Request;
+import com.warehouse.commonassets.response.Response;
+import com.warehouse.commonassets.vo.RouteProcess;
 import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.zebra.domain.vo.ProcessType;
-import com.warehouse.zebra.domain.vo.Request;
-import com.warehouse.zebra.domain.vo.Response;
-import com.warehouse.zebra.domain.vo.RouteProcess;
 
 import lombok.AllArgsConstructor;
+
+import static com.warehouse.commonassets.enumeration.ProcessType.CREATED;
 
 @AllArgsConstructor
 public class ZebraInitializePortImpl implements ZebraInitializePort {
@@ -20,7 +22,7 @@ public class ZebraInitializePortImpl implements ZebraInitializePort {
     private final RouteLogServicePort routeLogServicePort;
 
     @Override
-    public Response processRequest(Request request) {
+    public Response processRequest(final Request request) {
         final ProcessType processType = request.getProcessType();
         if (!CREATED.equals(processType)) {
             throw new RuntimeException("Invalid Process Type");
@@ -31,11 +33,6 @@ public class ZebraInitializePortImpl implements ZebraInitializePort {
                 .map(parcelCreatedRequest -> routeLogServicePort.initializeProcess(parcelCreatedRequest.getParcelId()))
                 .collect(Collectors.toList());
 
-        return Response.builder()
-                .zebraId(request.getZebraDeviceInformation().getZebraId())
-                .version(request.getZebraDeviceInformation().getVersion())
-                .username(request.getZebraDeviceInformation().getUsername())
-                .routeProcesses(routeProcesses)
-                .build();
+        return new Response(request.getZebraDeviceInformation(), Collections.emptyList(), routeProcesses);
     }
 }

@@ -1,9 +1,11 @@
 package com.warehouse.zebra.domain.vo;
 
+import java.util.List;
+
+import com.warehouse.commonassets.vo.DeviceInformation;
+
 import lombok.Builder;
 import lombok.Value;
-
-import java.util.List;
 
 @Value
 @Builder

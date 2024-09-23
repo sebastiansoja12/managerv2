@@ -1,8 +1,8 @@
 package com.warehouse.zebra.domain.port.primary;
 
-import com.warehouse.zebra.domain.vo.Request;
-import com.warehouse.zebra.domain.vo.Response;
+import com.warehouse.commonassets.request.Request;
+import com.warehouse.commonassets.response.Response;
 
 public interface ZebraInitializePort {
-    Response processRequest(Request request);
+    Response processRequest(final Request request);
 }

@@ -2,6 +2,8 @@ package com.warehouse.zebra.infrastructure.adapter.primary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.commonassets.request.Request;
+import com.warehouse.commonassets.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -11,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.warehouse.zebra.domain.port.primary.ZebraInitializePort;
-import com.warehouse.zebra.domain.vo.Request;
-import com.warehouse.zebra.domain.vo.Response;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraRequestMapper;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraResponseMapper;
 import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraDeviceInformation;

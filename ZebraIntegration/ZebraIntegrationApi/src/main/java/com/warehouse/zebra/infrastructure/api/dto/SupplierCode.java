@@ -10,7 +10,7 @@ import lombok.Data;
 @XmlRootElement(name = "SupplierCode")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
-public class SupplierCodeDto {
+public class SupplierCode {
 
     @XmlElement(name = "Value")
     private String value;

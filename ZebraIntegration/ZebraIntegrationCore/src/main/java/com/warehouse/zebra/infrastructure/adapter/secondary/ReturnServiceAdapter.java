@@ -2,15 +2,16 @@ package com.warehouse.zebra.infrastructure.adapter.secondary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import java.util.Collections;
 import java.util.Objects;
 
+import com.warehouse.commonassets.request.Request;
+import com.warehouse.commonassets.response.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.support.RestGatewaySupport;
 
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
-import com.warehouse.zebra.domain.vo.Request;
-import com.warehouse.zebra.domain.vo.Response;
 import com.warehouse.zebra.infrastructure.adapter.secondary.api.ReturnResponseDto;
 import com.warehouse.zebra.infrastructure.adapter.secondary.mapper.ReturnRequestMapper;
 import com.warehouse.zebra.infrastructure.adapter.secondary.mapper.ReturnResponseMapper;
@@ -30,23 +31,22 @@ public class ReturnServiceAdapter extends RestGatewaySupport implements ReturnSe
 
 
     @Override
-    public Response processReturn(Request zebraRequest) {
+    public Response processReturn(final Request zebraRequest) {
         final ReturnConfiguration configuration = new ReturnConfiguration(returnProperties);
         return processReturn(zebraRequest, configuration);
     }
 
-    private Response processReturn(Request request, ReturnConfiguration configuration) {
+    private Response processReturn(final Request request, final ReturnConfiguration configuration) {
 
         final ResponseEntity<ReturnResponseDto> responseEntity = getRestTemplate()
                 .postForEntity(configuration.getUrl() + configuration.getEndpoint(),
                         requestMapper.map(request), ReturnResponseDto.class);
 
-        return Response.builder()
-                .processReturns(responseMapper.map(Objects.requireNonNull(responseEntity.getBody()).processReturn()))
-                .zebraId(request.getZebraDeviceInformation().getZebraId())
-                .username(request.getZebraDeviceInformation().getUsername())
-                .version(request.getZebraDeviceInformation().getVersion())
-                .build();
+        return new Response(
+                request.getZebraDeviceInformation(),
+                responseMapper.map(Objects.requireNonNull(responseEntity.getBody()).processReturn()),
+                Collections.emptyList()
+        );
     }
 
 
