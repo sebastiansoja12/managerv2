@@ -1,7 +1,7 @@
 package com.warehouse.deliverytoken.domain.vo;
 
 
-import com.warehouse.commonassets.ParcelType;
+import com.warehouse.commonassets.enumeration.ParcelType;
 
 import lombok.Value;
 
