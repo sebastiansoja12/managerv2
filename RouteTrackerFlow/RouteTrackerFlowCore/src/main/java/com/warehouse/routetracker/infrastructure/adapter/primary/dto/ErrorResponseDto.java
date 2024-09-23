@@ -1,16 +1,28 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
-
 import java.time.LocalDateTime;
 
-@Value
-@Builder
-@Jacksonized
+
 public class ErrorResponseDto {
-    LocalDateTime timestamp;
-    int status;
-    String error;
+    private final LocalDateTime timestamp;
+    private final int status;
+    private final String error;
+
+    public ErrorResponseDto(LocalDateTime timestamp, int status, String error) {
+        this.timestamp = timestamp;
+        this.status = status;
+        this.error = error;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getError() {
+        return error;
+    }
 }
