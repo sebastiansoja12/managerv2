@@ -1,9 +1,9 @@
 package com.warehouse.zebra.infrastructure.api.requestmodel;
 
 
-import com.warehouse.zebra.infrastructure.api.dto.ParcelDto;
-import com.warehouse.zebra.infrastructure.api.dto.ReturnStatusDto;
-import com.warehouse.zebra.infrastructure.api.dto.SupplierCodeDto;
+import com.warehouse.zebra.infrastructure.api.dto.Parcel;
+import com.warehouse.zebra.infrastructure.api.dto.ReturnStatus;
+import com.warehouse.zebra.infrastructure.api.dto.SupplierCode;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -20,17 +20,17 @@ import lombok.NoArgsConstructor;
 public class ReturnRequestInformation {
 
     @XmlElement(name = "Parcel")
-    private ParcelDto parcel;
+    private Parcel parcel;
 
     @XmlElement(name = "Reason")
     private String reason;
 
     @XmlElement(name = "ReturnStatus")
-    private ReturnStatusDto returnStatus;
+    private ReturnStatus returnStatus;
 
     @XmlElement(name = "ReturnToken")
     private String returnToken;
 
     @XmlElement(name = "SupplierCode")
-    private SupplierCodeDto supplierCode;
+    private SupplierCode supplierCode;
 }

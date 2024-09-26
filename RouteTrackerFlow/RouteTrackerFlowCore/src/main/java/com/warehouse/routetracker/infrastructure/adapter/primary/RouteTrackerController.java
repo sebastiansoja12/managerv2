@@ -139,11 +139,7 @@ public class RouteTrackerController {
 
     @ExceptionHandler(RestException.class)
     public ResponseEntity<?> handleException(RestException ex) {
-        final ErrorResponseDto error = ErrorResponseDto.builder()
-                .error(ex.getMessage())
-                .status(ex.getCode())
-                .timestamp(LocalDateTime.now())
-                .build();
+        final ErrorResponseDto error = new ErrorResponseDto(LocalDateTime.now(), ex.getCode(), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatusCode.valueOf(error.getStatus()));
     }
 }

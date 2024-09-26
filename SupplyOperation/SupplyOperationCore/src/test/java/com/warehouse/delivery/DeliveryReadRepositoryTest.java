@@ -34,7 +34,6 @@ public class DeliveryReadRepositoryTest {
     @Autowired
     private DeliveryReadRepository repository;
 
-
     @Test
     void shouldFindBySupplierCode() {
         // given

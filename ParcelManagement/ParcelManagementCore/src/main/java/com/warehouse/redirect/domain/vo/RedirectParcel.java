@@ -1,9 +1,9 @@
 package com.warehouse.redirect.domain.vo;
 
 
-import com.warehouse.commonassets.ParcelStatus;
-import com.warehouse.commonassets.ParcelType;
-import com.warehouse.commonassets.Size;
+import com.warehouse.commonassets.enumeration.ParcelStatus;
+import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.Size;
 import com.warehouse.redirect.domain.model.Recipient;
 import com.warehouse.redirect.domain.model.Sender;
 

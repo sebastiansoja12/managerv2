@@ -1,10 +1,11 @@
 package com.warehouse.zebra.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.zebra.domain.vo.ProcessReturn;
-import com.warehouse.zebra.infrastructure.adapter.secondary.api.ProcessReturnDto;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 
-import java.util.List;
+import com.warehouse.commonassets.vo.ProcessReturn;
+import com.warehouse.zebra.infrastructure.adapter.secondary.api.ProcessReturnDto;
 
 @Mapper
 public interface ReturnResponseMapper {

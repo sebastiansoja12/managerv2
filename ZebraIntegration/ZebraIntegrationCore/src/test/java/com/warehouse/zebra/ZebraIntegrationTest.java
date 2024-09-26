@@ -9,8 +9,11 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
+import com.warehouse.commonassets.response.Response;
+import com.warehouse.commonassets.vo.DeviceInformation;
 import com.warehouse.tools.returning.ReturnProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
-import com.warehouse.zebra.domain.vo.Response;
 import com.warehouse.zebra.infrastructure.api.dto.*;
 import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 
@@ -46,6 +48,8 @@ public class ZebraIntegrationTest {
     private final String ERROR_REQUEST_PATH = "src/test/resources/zebraintegration/returntype/errorTypeRequest.xml";
     private final String RESPONSE_PATH = "src/test/resources/zebraintegration/returntype/response.xml";
 
+    private final DeviceInformation deviceInformation = new DeviceInformation("1.0", 1L, "s-soja", "KT1");
+
     @Test
     void shouldProcessRequestWithReturnProcessType() throws IOException, JAXBException {
         // given
@@ -54,16 +58,11 @@ public class ZebraIntegrationTest {
         final String requestXmlContent = new String(Files.readAllBytes(request));
         final String responseXmlContent = new String(Files.readAllBytes(response));
 
-		final List<com.warehouse.zebra.domain.vo.ProcessReturn> processReturns = List.of(
-				new com.warehouse.zebra.domain.vo.ProcessReturn(1L, "PROCESSING"),
-				new com.warehouse.zebra.domain.vo.ProcessReturn(2L, "PROCESSING"));
+		final List<com.warehouse.commonassets.vo.ProcessReturn> processReturns = List.of(
+				new com.warehouse.commonassets.vo.ProcessReturn(1L, "PROCESSING"),
+				new com.warehouse.commonassets.vo.ProcessReturn(2L, "PROCESSING"));
 
-        final Response expectedResponse = Response.builder()
-                .username("s-soja")
-                .zebraId(1L)
-                .version("1.0")
-                .processReturns(processReturns)
-                .build();
+        final Response expectedResponse = new Response(deviceInformation, processReturns, Collections.emptyList());
 
         final ZebraResponse expectedZebraResponse = createZebraResponse();
 

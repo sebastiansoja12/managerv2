@@ -1,15 +1,16 @@
 package com.warehouse.zebra.mapper.primary;
 
 
+import static com.warehouse.commonassets.enumeration.ProcessType.CREATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mapstruct.factory.Mappers.getMapper;
 
-import org.junit.jupiter.api.Test;
-
-import com.warehouse.zebra.domain.vo.Request;
+import com.warehouse.commonassets.request.Request;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraRequestMapper;
 import com.warehouse.zebra.infrastructure.api.requestmodel.ProcessType;
 import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraRequest;
+import org.junit.jupiter.api.Test;
+
 
 public class ZebraRequestMapperTest {
 
@@ -22,6 +23,6 @@ public class ZebraRequestMapperTest {
         // when
         final Request request = mapper.map(zebraRequest);
         // then
-        assertEquals(com.warehouse.zebra.domain.vo.ProcessType.CREATED, request.getProcessType());
+        assertEquals(CREATED, request.getProcessType());
     }
 }

@@ -1,6 +1,6 @@
 package com.warehouse.returntoken.domain.model;
 
-import com.warehouse.commonassets.ParcelStatus;
+import com.warehouse.commonassets.enumeration.ParcelStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

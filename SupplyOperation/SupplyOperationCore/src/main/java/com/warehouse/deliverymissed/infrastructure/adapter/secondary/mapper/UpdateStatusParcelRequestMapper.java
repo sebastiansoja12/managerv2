@@ -1,6 +1,6 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.commonassets.ParcelStatus;
+import com.warehouse.commonassets.enumeration.ParcelStatus;
 import com.warehouse.deliverymissed.domain.vo.UpdateStatusParcelRequest;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.ParcelDto;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.ParcelIdDto;

@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.warehouse.commonassets.ParcelType;
+import com.warehouse.commonassets.enumeration.ParcelType;
 import com.warehouse.deliverytoken.domain.vo.*;
 import org.junit.jupiter.api.Test;
 

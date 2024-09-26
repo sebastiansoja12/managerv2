@@ -1,3 +1,14 @@
+## [2024.5] - 2024-06-02
+
+### Added
+- Route logger module
+- Route Tracker separate application
+- Logging routes
+
+### Changed
+- Route process
+- Delivery missed domain
+
 ## [2024.4] - 2024-05-04
 
 ### Added

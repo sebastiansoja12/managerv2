@@ -1,10 +1,10 @@
 package com.warehouse.deliverymissed.domain.port.primary;
 
 import com.warehouse.deliverymissed.domain.port.secondary.RouteLogMissedServicePort;
-import com.warehouse.deliverymissed.domain.service.XmlToStringService;
-import com.warehouse.deliverymissed.domain.service.XmlToStringServiceImpl;
 import com.warehouse.terminal.request.TerminalRequest;
 
+import com.warehouse.xmlconverter.XmlToStringService;
+import com.warehouse.xmlconverter.XmlToStringServiceImpl;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

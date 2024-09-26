@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.warehouse.commonassets.ParcelType;
+import com.warehouse.commonassets.enumeration.ParcelType;
 import com.warehouse.deliverytoken.domain.vo.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
 import com.warehouse.tools.shipment.ShipmentProperties;

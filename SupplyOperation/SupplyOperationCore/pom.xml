@@ -5,7 +5,7 @@
     <parent>
         <artifactId>SupplyOperation</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2024.5-SNAPSHOT</version>
+        <version>2024.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -55,6 +55,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>Properties</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>AssetConverter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

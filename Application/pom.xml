@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2024.5-SNAPSHOT</version>
+        <version>2024.6-SNAPSHOT</version>
     </parent>
     <artifactId>Application</artifactId>
 
@@ -47,11 +47,6 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>ParcelManagementCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>WarehouseWeb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -4,15 +4,17 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.List;
 
-import com.warehouse.depot.infrastructure.adapter.primary.api.dto.DepotCodeDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.depot.domain.vo.Depot;
-import com.warehouse.depot.domain.vo.DepotCode;
+import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.domain.port.primary.DepotPort;
+import com.warehouse.depot.domain.vo.DepotCode;
+import com.warehouse.depot.domain.vo.UpdateStreetRequest;
+import com.warehouse.depot.infrastructure.adapter.primary.api.dto.DepotCodeDto;
 import com.warehouse.depot.infrastructure.adapter.primary.api.dto.DepotDto;
+import com.warehouse.depot.infrastructure.adapter.primary.api.dto.UpdateStreetRequestDto;
 import com.warehouse.depot.infrastructure.adapter.primary.mapper.DepotRequestMapper;
 import com.warehouse.depot.infrastructure.adapter.primary.mapper.DepotResponseMapper;
 
@@ -35,6 +37,13 @@ public class DepotController {
         final List<Depot> depots = requestMapper.map(depotList);
         depotPort.addMultipleDepots(depots);
         return ResponseEntity.ok().body(HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updateStreet(@RequestBody UpdateStreetRequestDto updateStreetRequest) {
+        final UpdateStreetRequest request = requestMapper.map(updateStreetRequest);
+        depotPort.updateStreet(request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/depotCode/{value}")

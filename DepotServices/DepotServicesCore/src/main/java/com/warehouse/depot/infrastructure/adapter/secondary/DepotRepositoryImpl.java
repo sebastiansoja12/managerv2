@@ -1,6 +1,6 @@
 package com.warehouse.depot.infrastructure.adapter.secondary;
 
-import com.warehouse.depot.domain.vo.Depot;
+import com.warehouse.depot.domain.model.Depot;
 import com.warehouse.depot.domain.vo.DepotCode;
 import com.warehouse.depot.domain.port.secondary.DepotRepository;
 import com.warehouse.depot.infrastructure.adapter.secondary.entity.DepotEntity;
@@ -21,7 +21,7 @@ public class DepotRepositoryImpl implements DepotRepository {
 
     @Override
     @Cacheable("depotCodeCache")
-    public Depot viewByCode(DepotCode depotCode) {
+    public Depot findByCode(DepotCode depotCode) {
         final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode.getValue());
         return depot.map(depotMapper::map).orElseThrow(() -> new DepotNotFoundException("Depot was not found"));
     }
@@ -34,7 +34,13 @@ public class DepotRepositoryImpl implements DepotRepository {
     }
 
     @Override
-    public void saveAll(List<Depot> depots) {
+    public void save(final Depot depot) {
+        final DepotEntity depotEntity = depotMapper.map(depot);
+        repository.save(depotEntity);
+    }
+
+    @Override
+    public void saveAll(final List<Depot> depots) {
         final List<DepotEntity> depotEntities = depotMapper.mapToDepotEntityList(depots);
         repository.saveAll(depotEntities);
     }

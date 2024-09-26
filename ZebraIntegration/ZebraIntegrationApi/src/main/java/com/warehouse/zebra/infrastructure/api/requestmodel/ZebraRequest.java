@@ -26,7 +26,7 @@ public class ZebraRequest {
 
     @XmlElementWrapper(name = "ReturnRequestInformations")
     @XmlElement(name = "ReturnRequestInformation")
-    private List<ReturnRequestInformation> requests;
+    private List<ReturnRequestInformation> returnRequests;
 
     @XmlElementWrapper(name = "ParcelCreatedRequests")
     @XmlElement(name = "ParcelCreatedRequest")

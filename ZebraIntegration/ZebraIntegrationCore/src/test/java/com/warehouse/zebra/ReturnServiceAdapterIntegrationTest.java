@@ -6,9 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import java.util.List;
+import java.util.Collections;
 
-import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,8 +29,15 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.model.Parcel;
+import com.warehouse.commonassets.request.Request;
+import com.warehouse.commonassets.request.ReturnRequest;
+import com.warehouse.commonassets.response.Response;
+import com.warehouse.commonassets.vo.DeviceInformation;
+import com.warehouse.commonassets.vo.ProcessReturn;
 import com.warehouse.tools.returning.ReturnProperties;
-import com.warehouse.zebra.domain.vo.*;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.zebra.infrastructure.adapter.secondary.ReturnServiceAdapter;
 
 
@@ -64,11 +70,7 @@ public class ReturnServiceAdapterIntegrationTest {
     
     private MockRestServiceServer mockRestServiceServer;
 
-    private final DeviceInformation deviceInformation = DeviceInformation.builder()
-            .depotCode("KT1")
-            .username("s-soja")
-            .version("1.0")
-            .zebraId(1L).build();
+    private final DeviceInformation deviceInformation = new DeviceInformation("1.0", 1L, "s-soja", "KT1");
 
     private final String URL = "http://localhost:8080/v2/api/%s";
 
@@ -85,24 +87,15 @@ public class ReturnServiceAdapterIntegrationTest {
     @Test
     void shouldProcessTheReturnRequest() {
         // given
-        final ReturnRequest returnRequest = ReturnRequest.builder()
-                .returnStatus(ReturnStatus.CREATED)
-                .returnToken("returnToken")
-                .parcel(Parcel.builder()
-                        .destination("KT1")
-                        .id(1L)
-                        .parcelRelatedId(null)
-                        .parcelSize(Size.TEST)
-                        .parcelType(ParcelType.PARENT)
-                        .build())
-                .reason("reason")
-                .supplierCode("abc")
-                .build();
+        final Parcel parcel = new Parcel(1L, Size.TEST, "KT1", ParcelStatus.RETURN, ParcelType.PARENT,
+                null);
+        final ReturnRequest returnRequest =  new ReturnRequest(parcel, null, ReturnStatus.PROCESSING, "123",
+                "s-soja");
 
-        final Request request = Request.builder()
-                .processType(ProcessType.RETURN)
-                .returnRequests(List.of(returnRequest))
-                .zebraDeviceInformation(deviceInformation).build();
+        final Request request = new Request(ProcessType.RETURN,
+                deviceInformation,
+                Collections.singletonList(returnRequest),
+                Collections.emptyList());
 
         final Resource resource = new ClassPathResource(PROCESS_RETURN_RESPONSE_PATH);
         mockRestServiceServer.expect(requestTo(String.format(URL, ENDPOINT)))
@@ -110,8 +103,8 @@ public class ReturnServiceAdapterIntegrationTest {
         // when
         final Response response = returnServiceAdapter.processReturn(request);
         // then
-        assertNotNull(response.processReturns());
-        assertThat(response.processReturns())
+        assertNotNull(response.getProcessReturns());
+        assertThat(response.getProcessReturns())
                 .extracting(ProcessReturn::processStatus, ProcessReturn::returnId)
                 .containsExactly(tuple("PROCESSING", 1L), tuple( "PROCESSING", 2L));
 
@@ -121,24 +114,21 @@ public class ReturnServiceAdapterIntegrationTest {
     @Test
     void shouldUpdateTheReturnRequestProcess() {
         // given
-        final ReturnRequest returnRequest = ReturnRequest.builder()
-                .returnStatus(ReturnStatus.PROCESSING)
-                .returnToken("returnToken")
-                .parcel(Parcel.builder()
-                        .destination("KT1")
-                        .id(1L)
-                        .parcelRelatedId(null)
-                        .parcelSize(Size.TEST)
-                        .parcelType(ParcelType.PARENT)
-                        .build())
-                .reason("reason")
-                .supplierCode("abc")
-                .build();
+        final Parcel parcel = new Parcel(1L, Size.TEST,
+                "KT1",
+                ParcelStatus.RETURN,
+                ParcelType.PARENT,
+                null);
+        final ReturnRequest returnRequest =  new ReturnRequest(parcel,
+                null,
+                ReturnStatus.PROCESSING,
+                "123",
+                "s-soja");
 
-        final Request request = Request.builder()
-                .processType(ProcessType.RETURN)
-                .returnRequests(List.of(returnRequest))
-                .zebraDeviceInformation(deviceInformation).build();
+        final Request request = new Request(ProcessType.RETURN,
+                deviceInformation,
+                Collections.singletonList(returnRequest),
+                Collections.emptyList());
 
         final Resource resource = new ClassPathResource(UPDATE_PROCESS_RETURN_RESPONSE_PATH);
         mockRestServiceServer.expect(requestTo(String.format(URL, ENDPOINT)))
@@ -146,8 +136,8 @@ public class ReturnServiceAdapterIntegrationTest {
         // when
         final Response response = returnServiceAdapter.processReturn(request);
         // then
-        assertNotNull(response.processReturns());
-        assertThat(response.processReturns())
+        assertNotNull(response.getProcessReturns());
+        assertThat(response.getProcessReturns())
                 .extracting(ProcessReturn::processStatus, ProcessReturn::returnId)
                 .containsExactly(tuple("COMPLETED", 1L), tuple( "COMPLETED", 2L));
 

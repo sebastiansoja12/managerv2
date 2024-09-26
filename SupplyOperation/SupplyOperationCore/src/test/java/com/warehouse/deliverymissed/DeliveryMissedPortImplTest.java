@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import com.warehouse.deliverymissed.domain.exception.EmptyDepotCodeException;
-import com.warehouse.deliverymissed.domain.exception.WrongDeliveryStatusException;
-import com.warehouse.deliverymissed.domain.port.secondary.ParcelStatusServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +14,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.deliverymissed.domain.enumeration.DeliveryStatus;
-import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
+import com.warehouse.deliverymissed.domain.exception.EmptyDepotCodeException;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPortImpl;
 import com.warehouse.deliverymissed.domain.port.secondary.DeliveryMissedRepository;
+import com.warehouse.deliverymissed.domain.port.secondary.ParcelStatusServicePort;
 import com.warehouse.deliverymissed.domain.port.secondary.RouteLogMissedServicePort;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedServiceImpl;
@@ -53,7 +52,7 @@ public class DeliveryMissedPortImplTest {
     @Test
     void shouldLogMissedDelivery() {
         // given
-        final DeliveryMissedRequest request = createDeliveryMissedRequest(DeliveryStatus.UNAVAILABLE,
+        final DeliveryMissedRequest request = createDeliveryMissedRequest(
                 "KT1", 1L, "abc");
         final DeliveryMissed deliveryMissed = new DeliveryMissed("deliveryId", 1L, "KT1", "abc", DeliveryStatus.UNAVAILABLE);
         when(deliveryMissedRepository
@@ -74,7 +73,7 @@ public class DeliveryMissedPortImplTest {
     @Test
     void shouldNotLogMissedDeliveryWhenDepotCodeIsEmpty() {
         // given
-        final DeliveryMissedRequest request = createDeliveryMissedRequest(DeliveryStatus.UNAVAILABLE,
+        final DeliveryMissedRequest request = createDeliveryMissedRequest(
                 "", 1L, "abc");
         // when
         final Executable executable = () -> deliveryMissedPort.logMissedDelivery(request);
@@ -83,26 +82,8 @@ public class DeliveryMissedPortImplTest {
         assertEquals("Depot code cannot be empty", runtimeException.getMessage());
     }
 
-    @Test
-    void shouldNotLogMissedDeliveryWhenProcessTypeIsDifferent() {
-        // given
-        final DeliveryMissedRequest request = createDeliveryMissedRequest(DeliveryStatus.TEST,
-                "KT1", 1L, "abc");
-        // when
-        final Executable executable = () -> deliveryMissedPort.logMissedDelivery(request);
-        // then
-		final WrongDeliveryStatusException runtimeException = assertThrows(WrongDeliveryStatusException.class,
-				executable);
-        assertEquals("Wrong delivery status", runtimeException.getMessage());
-    }
-
-	private DeliveryMissedRequest createDeliveryMissedRequest(final DeliveryStatus deliveryStatus,
-			final String depotCode, final Long parcelId, final String supplierCode) {
-		final DeliveryMissedRequest request = new DeliveryMissedRequest();
-		request.setDeliveryStatus(deliveryStatus);
-		request.setDepotCode(depotCode);
-		request.setParcelId(parcelId);
-		request.setSupplierCode(supplierCode);
-		return request;
+	private DeliveryMissedRequest createDeliveryMissedRequest(final String depotCode, final Long parcelId,
+			final String supplierCode) {
+        return new DeliveryMissedRequest(parcelId, depotCode, supplierCode);
 	}
 }

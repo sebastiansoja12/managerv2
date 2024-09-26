@@ -3,6 +3,7 @@
     <ZebraID>1</ZebraID>
     <Version>1.0</Version>
     <ResponsibleUser>s-soja</ResponsibleUser>
+    <ProcessReturns/>
     <RouteProcesses>
         <RouteProcess>
             <ParcelID>1</ParcelID>

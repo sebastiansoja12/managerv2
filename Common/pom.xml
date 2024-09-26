@@ -6,15 +6,11 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2024.5-SNAPSHOT</version>
+        <version>2024.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>Common</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
     </dependencies>
 </project>
