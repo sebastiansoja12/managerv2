@@ -1,5 +1,8 @@
 package com.warehouse.shipment.domain.vo;
 
+import lombok.Builder;
+
+@Builder
 public class Recipient implements Person {
 
     private final String firstName;
