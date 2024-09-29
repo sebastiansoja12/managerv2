@@ -1,8 +1,8 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.shipment.domain.model.ConstantBodyMailMessage;
+import com.warehouse.shipment.domain.vo.ConstantBodyMailMessage;
 import com.warehouse.shipment.domain.model.Notification;
-import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.vo.Parcel;
 
 import lombok.AllArgsConstructor;
 
@@ -17,7 +17,7 @@ public class NotificationCreatorProviderImpl implements NotificationCreatorProvi
 
         return Notification.builder()
                 .body(constantBodyMailMessage.getMessage())
-                .recipient(parcel.getRecipient().getEmail())
+                .recipient(parcel.getRecipient().email())
                 .subject(SUBJECT)
                 .build();
     }
@@ -28,7 +28,7 @@ public class NotificationCreatorProviderImpl implements NotificationCreatorProvi
 
         return Notification.builder()
                 .body(constantBodyMailMessage.getMessage())
-                .recipient(parcel.getRecipient().getEmail())
+                .recipient(parcel.getRecipient().email())
                 .subject(SUBJECT)
                 .build();
     }
