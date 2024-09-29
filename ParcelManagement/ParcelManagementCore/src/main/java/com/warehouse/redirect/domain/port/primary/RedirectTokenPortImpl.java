@@ -1,22 +1,25 @@
 package com.warehouse.redirect.domain.port.primary;
 
-import com.warehouse.redirect.domain.exception.*;
-import com.warehouse.redirect.domain.vo.RedirectParcelRequest;
-import com.warehouse.redirect.domain.model.RedirectParcelResponse;
-import com.warehouse.redirect.domain.model.RedirectRequest;
-import com.warehouse.redirect.domain.model.RedirectResponse;
-import com.warehouse.redirect.domain.port.secondary.MailServicePort;
-import com.warehouse.redirect.domain.port.secondary.RedirectServicePort;
-import com.warehouse.redirect.domain.service.RedirectService;
-import com.warehouse.redirect.domain.service.RedirectTokenGenerator;
-import com.warehouse.redirect.domain.vo.RedirectToken;
-import com.warehouse.redirect.domain.vo.Token;
-
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.warehouse.redirect.domain.exception.EmptyEmailException;
+import com.warehouse.redirect.domain.exception.NullParcelIdException;
+import com.warehouse.redirect.domain.exception.RedirectRequestNotFoundException;
+import com.warehouse.redirect.domain.exception.TokenNotFoundException;
+import com.warehouse.redirect.domain.model.RedirectParcelResponse;
+import com.warehouse.redirect.domain.model.RedirectRequest;
+import com.warehouse.redirect.domain.model.RedirectResponse;
+import com.warehouse.redirect.domain.port.secondary.MailServicePort;
+import com.warehouse.redirect.domain.service.RedirectService;
+import com.warehouse.redirect.domain.service.RedirectTokenGenerator;
+import com.warehouse.redirect.domain.vo.RedirectParcelRequest;
+import com.warehouse.redirect.domain.vo.RedirectToken;
+import com.warehouse.redirect.domain.vo.Token;
+
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class RedirectTokenPortImpl implements RedirectTokenPort {
@@ -27,8 +30,6 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
 
 	private final MailServicePort mailServicePort;
 
-	private final RedirectServicePort redirectServicePort;
-
 	private final Logger logger = LoggerFactory.getLogger(RedirectTokenPort.class);
 
 
@@ -38,12 +39,6 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
 		final RedirectToken redirectToken = buildRedirectTokenFromRequest(request);
 
 		logRedirectToken(redirectToken);
-
-		final boolean exists = redirectServicePort.exists(request.getParcelId());
-
-		if (!exists) {
-			throw new ParcelRedirectException(501, "Parcel to redirect does not exist");
-		}
 
 		final Token token = redirectService.saveRedirectToken(redirectToken);
 

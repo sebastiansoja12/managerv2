@@ -8,29 +8,25 @@ import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPort;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPortImpl;
 import com.warehouse.redirect.domain.port.secondary.MailServicePort;
-import com.warehouse.redirect.domain.port.secondary.RedirectServicePort;
 import com.warehouse.redirect.domain.port.secondary.RedirectTokenRepository;
 import com.warehouse.redirect.domain.service.RedirectService;
 import com.warehouse.redirect.domain.service.RedirectServiceImpl;
 import com.warehouse.redirect.domain.service.RedirectTokenGenerator;
 import com.warehouse.redirect.domain.service.RedirectTokenGeneratorImpl;
 import com.warehouse.redirect.infrastructure.adapter.secondary.MailAdapter;
-import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectParcelAdapter;
 import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenReadRepository;
 import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTokenRepositoryImpl;
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.redirect.infrastructure.adapter.secondary.mapper.RedirectTokenMapper;
 import com.warehouse.redirect.infrastructure.adapter.secondary.properties.RedirectTokenProperties;
-import com.warehouse.shipment.infrastructure.api.ShipmentService;
 
 @Configuration
 public class RedirectConfiguration {
     
 	@Bean
-	public RedirectTokenPort redirectTokenPort(RedirectService redirectService, MailServicePort mailServicePort,
-			RedirectServicePort redirectServicePort) {
+	public RedirectTokenPort redirectTokenPort(RedirectService redirectService, MailServicePort mailServicePort) {
 		final RedirectTokenGenerator redirectTokenGenerator = new RedirectTokenGeneratorImpl();
-		return new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort, redirectServicePort);
+		return new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort);
 	}
 
     @Bean(name = "redirect.mailServicePort")
@@ -53,10 +49,5 @@ public class RedirectConfiguration {
     public RedirectTokenRepository redirectTokenRepository(RedirectTokenReadRepository redirectTokenReadRepository) {
         final RedirectTokenMapper mapper = Mappers.getMapper(RedirectTokenMapper.class);
         return new RedirectTokenRepositoryImpl(redirectTokenReadRepository, mapper);
-    }
-
-    @Bean
-    public RedirectServicePort redirectServicePort(ShipmentService service) {
-        return new RedirectParcelAdapter(service);
     }
 }
