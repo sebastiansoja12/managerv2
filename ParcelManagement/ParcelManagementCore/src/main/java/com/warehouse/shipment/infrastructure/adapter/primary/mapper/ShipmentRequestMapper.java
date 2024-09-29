@@ -1,11 +1,14 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.shipment.domain.vo.ShipmentUpdateRequest;
+import com.warehouse.shipment.infrastructure.api.dto.ParcelIdDto;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
-import com.warehouse.shipment.domain.vo.UpdateParcelRequest;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelRequestDto;
 
@@ -18,4 +21,8 @@ public interface ShipmentRequestMapper {
 
     @Mapping(source = "parcel.parcelId.value", target = "parcel.id")
     UpdateParcelRequest map(UpdateParcelRequestDto updateParcelRequestDto);
+
+    ParcelId map(ParcelIdDto parcelId);
+
+    ShipmentUpdateRequest map(final ShipmentUpdateRequestDto request);
 }

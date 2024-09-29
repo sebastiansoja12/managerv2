@@ -1,10 +1,11 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.shipment.domain.model.Parcel;
+import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.ShipmentResponse;
-import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
+import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
 import com.warehouse.shipment.infrastructure.api.dto.ParcelDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentResponseDto;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateResponseDto;
 import com.warehouse.shipment.infrastructure.api.dto.UpdateParcelResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,4 +23,6 @@ public interface ShipmentResponseMapper {
 
     @Mapping(source = "id", target = "parcelId.value")
     ParcelDto map(Parcel parcel);
+
+    ShipmentUpdateResponseDto map(final ShipmentUpdateResponse response);
 }

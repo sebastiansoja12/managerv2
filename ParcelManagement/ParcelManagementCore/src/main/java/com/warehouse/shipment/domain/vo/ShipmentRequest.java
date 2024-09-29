@@ -2,12 +2,16 @@ package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.shipment.domain.model.ShipmentParcel;
 
-import lombok.Builder;
-import lombok.Value;
 
-@Value
-@Builder
 public class ShipmentRequest {
 
-    ShipmentParcel parcel;
+	private final ShipmentParcel parcel;
+
+	public ShipmentRequest(final ShipmentParcel parcel) {
+		this.parcel = parcel;
+	}
+
+	public ShipmentParcel getParcel() {
+		return parcel;
+	}
 }
