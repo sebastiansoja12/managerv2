@@ -1,15 +1,15 @@
 package com.warehouse.shipment.domain.port.primary;
 
+import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.shipment.domain.model.ShipmentUpdate;
+import com.warehouse.shipment.domain.vo.*;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
-import com.warehouse.shipment.domain.model.Parcel;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.domain.vo.ShipmentRequest;
-import com.warehouse.shipment.domain.vo.ShipmentResponse;
 
 import lombok.AllArgsConstructor;
 
@@ -21,7 +21,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     private final Logger logger;
 
     @Override
-    public ShipmentResponse ship(ShipmentRequest request) {
+    public ShipmentResponse ship(final ShipmentRequest request) {
         final ShipmentParcel parcel = extractParcelFromRequest(request);
 
         if (ObjectUtils.isEmpty(parcel)) {
@@ -36,7 +36,14 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public Parcel loadParcel(Long parcelId) {
+    public ShipmentUpdateResponse update(final ShipmentUpdateRequest request) {
+        final ShipmentUpdate shipmentUpdate = ShipmentUpdate.from(request);
+
+        return service.update(shipmentUpdate);
+    }
+
+    @Override
+    public Parcel loadParcel(final ParcelId parcelId) {
         return service.loadParcel(parcelId);
     }
 
@@ -46,7 +53,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
 
-    private ShipmentParcel extractParcelFromRequest(ShipmentRequest request) {
+    private ShipmentParcel extractParcelFromRequest(final ShipmentRequest request) {
         return request.getParcel();
     }
 

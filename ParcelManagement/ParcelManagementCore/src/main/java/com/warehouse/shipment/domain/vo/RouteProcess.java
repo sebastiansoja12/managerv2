@@ -1,13 +1,28 @@
 package com.warehouse.shipment.domain.vo;
 
-import lombok.Builder;
-import lombok.Value;
+import com.warehouse.commonassets.identificator.ParcelId;
 
 import java.util.UUID;
 
-@Value
-@Builder
+
 public class RouteProcess {
-    Long parcelId;
-    UUID processId;
+    private final ParcelId parcelId;
+    private final UUID processId;
+
+    public RouteProcess(final ParcelId parcelId, final UUID processId) {
+        this.parcelId = parcelId;
+        this.processId = processId;
+    }
+
+    public ParcelId getParcelId() {
+        return parcelId;
+    }
+
+    public UUID getProcessId() {
+        return processId;
+    }
+
+    public static RouteProcess from(final ParcelId parcelId, final UUID processId) {
+        return new RouteProcess(parcelId, processId);
+    }
 }

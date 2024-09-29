@@ -1,6 +1,7 @@
-package com.warehouse.shipment.infrastructure.api.dto;
+package com.warehouse.shipment.domain.vo;
 
-public class SenderDto {
+public class Sender implements Person {
+
     private final String firstName;
     private final String lastName;
     private final String email;
@@ -9,7 +10,7 @@ public class SenderDto {
     private final String postalCode;
     private final String street;
 
-	public SenderDto(final String firstName, final String lastName, final String email, final String telephoneNumber,
+	public Sender(final String firstName, final String lastName, final String email, final String telephoneNumber,
 			final String city, final String postalCode, final String street) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -20,31 +21,38 @@ public class SenderDto {
 		this.street = street;
 	}
 
-    public String getFirstName() {
+    @Override
+    public String firstName() {
         return firstName;
     }
 
-    public String getLastName() {
+    @Override
+    public String lastName() {
         return lastName;
     }
 
-    public String getEmail() {
+    @Override
+    public String email() {
         return email;
     }
 
-    public String getTelephoneNumber() {
+    @Override
+    public String telephoneNumber() {
         return telephoneNumber;
     }
 
-    public String getCity() {
+    @Override
+    public String city() {
         return city;
     }
 
-    public String getPostalCode() {
+    @Override
+    public String postalCode() {
         return postalCode;
     }
 
-    public String getStreet() {
+    @Override
+    public String street() {
         return street;
     }
 }

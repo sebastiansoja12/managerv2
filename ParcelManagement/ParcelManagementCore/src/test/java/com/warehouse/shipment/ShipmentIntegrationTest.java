@@ -1,11 +1,13 @@
 package com.warehouse.shipment;
 
 
+import static com.warehouse.shipment.DataTestCreator.createShipmentParcel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+import com.warehouse.commonassets.identificator.ParcelId;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,9 +24,6 @@ import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.shipment.domain.vo.ParcelId;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.voronoi.VoronoiService;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
@@ -61,10 +60,8 @@ public class ShipmentIntegrationTest {
     void shouldNotShipParcelWhenRouteLogIsNotAvailable() {
         // given
         final ShipmentParcel shipmentParcel = createShipmentParcel();
-        final ShipmentRequest request = ShipmentRequest.builder()
-                .parcel(shipmentParcel)
-                .build();
-        final ParcelId parcelId = ParcelId.builder().value(1000000000L).build();
+        final ShipmentRequest request = new ShipmentRequest(shipmentParcel);
+        final ParcelId parcelId = DataTestCreator.parcelId();
         when(voronoiService.findFastestRoute(shipmentParcel.getDestination())).thenReturn("KT3");
         doThrow(new RuntimeException("Error while registering route for parcel"))
                 .when(routeLogServicePort)
@@ -74,50 +71,6 @@ public class ShipmentIntegrationTest {
         // then
         final RuntimeException exception = assertThrows(RuntimeException.class, executable);
         assertEquals(expectedToBe("Error while registering route for parcel"), exception.getMessage());
-    }
-
-    private ShipmentParcel createShipmentParcel() {
-        return ShipmentParcel.builder()
-                .parcelSize(Size.TEST)
-                .price(99)
-                .status(Status.CREATED)
-                .sender(createSender())
-                .recipient(createRecipient())
-                .build();
-    }
-
-    private Parcel createParcel() {
-        return Parcel.builder()
-                .parcelSize(Size.TEST)
-                .price(99)
-                .parcelStatus(Status.CREATED)
-                .sender(createSender())
-                .recipient(createRecipient())
-                .build();
-    }
-
-    private Recipient createRecipient() {
-        return Recipient.builder()
-                .firstName("test")
-                .lastName("test")
-                .city("Katowice")
-                .street("test")
-                .postalCode("00-000")
-                .telephoneNumber("123")
-                .email("test@test.pl")
-                .build();
-    }
-
-    private Sender createSender() {
-        return Sender.builder()
-                .firstName("updatedTest")
-                .lastName("test")
-                .city("test")
-                .street("test")
-                .postalCode("00-000")
-                .telephoneNumber("123")
-                .email("test@test.pl")
-                .build();
     }
 
     private <T> T expectedToBe(T value) {

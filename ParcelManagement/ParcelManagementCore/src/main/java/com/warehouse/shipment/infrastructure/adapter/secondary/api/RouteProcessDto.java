@@ -1,15 +1,24 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.api;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
+import com.warehouse.shipment.infrastructure.api.dto.ParcelIdDto;
 
 import java.util.UUID;
 
-@Value
-@Builder
-@Jacksonized
+
 public class RouteProcessDto {
-    Long parcelId;
-    UUID processId;
+	private final ParcelIdDto parcelId;
+	private final UUID processId;
+
+	public RouteProcessDto(final ParcelIdDto parcelId, final UUID processId) {
+		this.parcelId = parcelId;
+		this.processId = processId;
+	}
+
+	public ParcelIdDto getParcelId() {
+		return parcelId;
+	}
+
+	public UUID getProcessId() {
+		return processId;
+	}
 }

@@ -1,5 +1,7 @@
 package com.warehouse.shipment.configuration;
 
+import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
+import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -9,8 +11,6 @@ import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
-import com.warehouse.shipment.domain.port.primary.ShipmentReroutePort;
-import com.warehouse.shipment.domain.port.primary.ShipmentReroutePortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.NotificationCreatorProviderImpl;
@@ -60,6 +60,11 @@ public class ShipmentConfiguration {
 		return Mappers.getMapper(ShipmentResponseMapper.class);
 	}
 
+	@Bean
+	public ShipmentRequestValidator shipmentRequestValidator() {
+		return new ShipmentRequestValidatorImpl();
+	}
+
 	@Bean(name = "shipment.shipmentService")
 	public ShipmentService shipmentService(PathFinderServicePort pathFinderServicePort,
 			NotificationCreatorProvider notificationCreatorProvider, MailServicePort mailServicePort,
@@ -82,11 +87,6 @@ public class ShipmentConfiguration {
 	public MailServicePort mailServicePort(MailPort mailPort) {
 		final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
 		return new MailAdapter(mailPort, notificationMapper);
-	}
-
-	@Bean
-	public ShipmentReroutePort shipmentReroutePort(ShipmentService service) {
-		return new ShipmentReroutePortImpl(service);
 	}
 
 	@Bean

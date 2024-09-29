@@ -4,8 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.model.ParcelUpdate;
+import com.warehouse.shipment.domain.vo.Parcel;
+import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
@@ -46,5 +46,5 @@ public interface ShipmentMapper {
     @Mapping(target = "recipient.street", source = "recipientStreet")
     @Mapping(target = "parcelSize", source = "parcelSize")
     @Mapping(target = "id", source = "id")
-    Parcel map(ParcelUpdate parcelUpdate);
+    Parcel map(ShipmentUpdate shipmentUpdate);
 }

@@ -1,29 +1,65 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class ShipmentParcelDto {
 
-    SenderDto sender;
+    private final SenderDto sender;
 
-    RecipientDto recipient;
+    private final RecipientDto recipient;
 
-    ParcelSizeDto parcelSize;
+    private final ParcelSizeDto parcelSize;
 
-    String destination;
+    private final String destination;
 
-    StatusDto status;
+    private final StatusDto status;
 
-    ParcelTypeDto parcelType;
+    private final ParcelTypeDto parcelType;
 
-    Long parcelRelatedId;
+    private final ParcelIdDto parcelRelatedId;
 
-    double price;
+    private final double price;
+
+	public ShipmentParcelDto(final SenderDto sender, final RecipientDto recipient, final ParcelSizeDto parcelSize,
+			final String destination, final StatusDto status, final ParcelTypeDto parcelType,
+			final ParcelIdDto parcelRelatedId, final double price) {
+		this.sender = sender;
+		this.recipient = recipient;
+		this.parcelSize = parcelSize;
+		this.destination = destination;
+		this.status = status;
+		this.parcelType = parcelType;
+		this.parcelRelatedId = parcelRelatedId;
+		this.price = price;
+	}
+
+    public SenderDto getSender() {
+        return sender;
+    }
+
+    public RecipientDto getRecipient() {
+        return recipient;
+    }
+
+    public ParcelSizeDto getParcelSize() {
+        return parcelSize;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public StatusDto getStatus() {
+        return status;
+    }
+
+    public ParcelTypeDto getParcelType() {
+        return parcelType;
+    }
+
+    public ParcelIdDto getParcelRelatedId() {
+        return parcelRelatedId;
+    }
+
+    public double getPrice() {
+        return price;
+    }
 }

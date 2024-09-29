@@ -1,10 +1,13 @@
 package com.warehouse.shipment;
 
+import static com.warehouse.shipment.DataTestCreator.createParcel;
+import static com.warehouse.shipment.DataTestCreator.parcelId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import com.warehouse.shipment.domain.vo.ShipmentResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,12 +17,9 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,11 +60,11 @@ class ShipmentPrimaryPortTest {
         // given
         final Long parcelId = 100001L;
 
-        doReturn(new Parcel())
+        doReturn(createParcel())
                 .when(shipmentService)
-                .loadParcel(parcelId);
+                .loadParcel(parcelId());
         // when
-        final Parcel parcel = shipmentPort.loadParcel(parcelId);
+        final Parcel parcel = shipmentPort.loadParcel(parcelId());
         // then
         assertThat(parcel).isNotNull();
     }
@@ -87,51 +87,6 @@ class ShipmentPrimaryPortTest {
 
     private <T> T expectedToBe(T value) {
         return value;
-    }
-
-    private Parcel createParcel() {
-        return Parcel.builder()
-                .recipient(createRecipient())
-                .parcelSize(Size.TEST)
-                .sender(createSender())
-                .parcelStatus(Status.CREATED)
-                .destination("KT1")
-                .id(1L)
-                .build();
-    }
-
-    private ShipmentParcel createShipmentParcel() {
-        return ShipmentParcel.builder()
-                .recipient(createRecipient())
-                .parcelSize(Size.TEST)
-                .sender(createSender())
-                .status(Status.CREATED)
-                .destination("KT1")
-                .build();
-    }
-
-    private Recipient createRecipient() {
-        return Recipient.builder()
-                .firstName("test")
-                .lastName("test")
-                .city("test")
-                .street("test")
-                .postalCode("00-000")
-                .telephoneNumber("123")
-                .email("test@test.pl")
-                .build();
-    }
-
-    private Sender createSender() {
-        return Sender.builder()
-                .firstName("updatedTest")
-                .lastName("test")
-                .city("test")
-                .street("test")
-                .postalCode("00-000")
-                .telephoneNumber("123")
-                .email("test@test.pl")
-                .build();
     }
 
     private <T> T expectedToBeEqualTo(T value) {

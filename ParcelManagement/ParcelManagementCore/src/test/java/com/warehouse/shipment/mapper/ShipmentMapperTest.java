@@ -5,11 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.model.Sender;
+import com.warehouse.shipment.domain.vo.Parcel;
+import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentSize;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentMapperImpl;
 
@@ -40,7 +40,7 @@ public class ShipmentMapperTest {
 
     private ShipmentParcel createParcel() {
         return ShipmentParcel.builder()
-                .parcelSize(Size.TEST)
+                .parcelSize(ShipmentSize.TEST)
                 .price(20)
                 .sender(createSender())
                 .recipient(null)
