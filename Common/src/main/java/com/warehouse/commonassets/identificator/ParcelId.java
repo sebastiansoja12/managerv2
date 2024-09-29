@@ -6,7 +6,7 @@ public class ParcelId {
 
 	private final Long id;
 
-	public ParcelId(Long id) {
+	public ParcelId(final Long id) {
 		this.id = id;
 	}
 
@@ -15,7 +15,7 @@ public class ParcelId {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o)
 			return true;
 		if (o == null || getClass() != o.getClass())
