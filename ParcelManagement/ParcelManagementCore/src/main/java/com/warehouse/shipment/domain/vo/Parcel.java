@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import com.warehouse.commonassets.enumeration.ParcelType;
 import com.warehouse.commonassets.identificator.ParcelId;
-import com.warehouse.shipment.domain.model.Recipient;
-import com.warehouse.shipment.domain.model.Sender;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentSize;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
 import lombok.Builder;
@@ -38,9 +36,10 @@ public class Parcel {
 
     private final Boolean locked;
 
-    public Parcel(ParcelId id, Sender sender, Recipient recipient, ShipmentSize parcelShipmentSize, String destination,
-                  ShipmentStatus parcelShipmentStatus, ParcelType parcelType, ParcelId parcelRelatedId, double price, LocalDateTime createdAt,
-                  LocalDateTime updatedAt, Boolean locked) {
+	public Parcel(final ParcelId id, final Sender sender, final Recipient recipient,
+			final ShipmentSize parcelShipmentSize, final String destination, final ShipmentStatus parcelShipmentStatus,
+			final ParcelType parcelType, final ParcelId parcelRelatedId, final double price,
+			final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
         this.id = id;
         this.sender = sender;
         this.recipient = recipient;
