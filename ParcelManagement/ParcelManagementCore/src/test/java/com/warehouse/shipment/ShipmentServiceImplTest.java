@@ -1,5 +1,6 @@
 package com.warehouse.shipment;
 
+import static com.warehouse.shipment.DataTestCreator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,6 +8,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.UUID;
 
+import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.shipment.domain.vo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,12 +22,6 @@ import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
-import com.warehouse.shipment.domain.vo.ParcelId;
-import com.warehouse.shipment.domain.vo.RouteProcess;
-import com.warehouse.shipment.domain.vo.ShipmentResponse;
-import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,8 +59,8 @@ public class ShipmentServiceImplTest {
 
         final Parcel parcel = createParcel();
 
-        final ParcelId parcelId = ParcelId.builder().value(1L).build();
-        final RouteProcess routeProcess = RouteProcess.builder().parcelId(1L).processId(UUID.randomUUID()).build();
+        final ParcelId parcelId = parcelId();
+        final RouteProcess routeProcess = RouteProcess.from(parcelId, UUID.randomUUID());
 
         final Notification notification = new Notification("test",
                 "test@test.pl", "test");
@@ -118,38 +115,36 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldLoadParcel() {
         // given
-        final Long parcelId = 1L;
+        final ParcelId parcelId = parcelId();
 
         // parcel with id 1L
-        final Parcel expectedParcel = new Parcel();
-        expectedParcel.setId(1L);
+        final Parcel expectedParcel = createParcel();
 
         doReturn(expectedParcel)
                 .when(shipmentRepository)
-                .loadParcelById(parcelId);
+                .findParcelById(parcelId);
         // when
         final Parcel parcel = service.loadParcel(parcelId);
 
         // then
         assertEquals(parcel.getId(), expectedToBe(1L));
-        verify(shipmentRepository, times(1)).loadParcelById(parcelId);
+        verify(shipmentRepository, times(1)).findParcelById(parcelId);
     }
 
     @Test
     void shouldNotLoadParcelAndThrowException() {
         // given
-        final Long parcelId = 1L;
+        final ParcelId parcelId = parcelId();
 
         // parcel with id 1L
-        final Parcel expectedParcel = new Parcel();
-        expectedParcel.setId(1L);
+        final Parcel expectedParcel = createParcel();
 
         // build exception to throw
         final ParcelNotFoundException expectedException = new ParcelNotFoundException("Parcel was not found");
 
         doThrow(expectedException)
                 .when(shipmentRepository)
-                .loadParcelById(parcelId);
+                .findParcelById(parcelId);
         // when
         final Executable executable = () -> service.loadParcel(parcelId);
 
@@ -161,12 +156,11 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldUpdateParcelWithUpdatingDeliveryDepotWhenItsChanged() {
         // given
-        final ParcelUpdate parcelUpdate = ParcelUpdate.builder()
+        final ShipmentUpdate shipmentUpdate = ShipmentUpdate.builder()
                 .destination("KR1")
                 .build();
 
         final Parcel parcel = createParcel();
-        parcel.setDestination("KT1");
 
         final City city = new City("KT1");
 
@@ -176,10 +170,10 @@ public class ShipmentServiceImplTest {
 
         doReturn(parcel)
                 .when(shipmentRepository)
-                .update(parcelUpdate);
+                .update(shipmentUpdate);
 
         // when
-        final UpdateParcelResponse response = service.update(parcelUpdate);
+        final UpdateParcelResponse response = service.update(shipmentUpdate);
         // then
         assertEquals(expectedToBe("KT1"), response.getParcel().getDestination());
     }
@@ -187,12 +181,11 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldUpdateParcelAndDontUpdateDeliveryDepotWhenItWasNotChanged() {
         // given
-        final ParcelUpdate parcelUpdate = ParcelUpdate.builder()
+        final ShipmentUpdate shipmentUpdate = ShipmentUpdate.builder()
                 .destination("KT1")
                 .build();
 
         final Parcel parcel = createParcel();
-        parcel.setDestination("KT1");
 
         final City city = new City("KT1");
 
@@ -202,10 +195,10 @@ public class ShipmentServiceImplTest {
 
         doReturn(parcel)
                 .when(shipmentRepository)
-                .update(parcelUpdate);
+                .update(shipmentUpdate);
 
         // when
-        final UpdateParcelResponse response = service.update(parcelUpdate);
+        final UpdateParcelResponse response = service.update(shipmentUpdate);
         // then
         assertEquals(expectedToBe("KT1"), response.getParcel().getDestination());
     }
@@ -242,49 +235,6 @@ public class ShipmentServiceImplTest {
 
     private <T> T expectedToBe(T value) {
         return value;
-    }
-
-    private Parcel createParcel() {
-        return Parcel.builder()
-                .recipient(createRecipient())
-                .parcelSize(Size.TEST)
-                .sender(createSender())
-                .parcelStatus(Status.CREATED)
-                .id(1L)
-                .build();
-    }
-
-    private ShipmentParcel createShipmentParcel() {
-        return ShipmentParcel.builder()
-                .recipient(createRecipient())
-                .parcelSize(Size.TEST)
-                .sender(createSender())
-                .status(Status.CREATED)
-                .build();
-    }
-
-    private Recipient createRecipient() {
-        return Recipient.builder()
-                .firstName("test")
-                .lastName("test")
-                .city("test")
-                .street("test")
-                .postalCode("00-000")
-                .telephoneNumber("123")
-                .email("test@test.pl")
-                .build();
-    }
-
-    private Sender createSender() {
-        return Sender.builder()
-                .firstName("updatedTest")
-                .lastName("test")
-                .city("test")
-                .street("test")
-                .postalCode("00-000")
-                .telephoneNumber("123")
-                .email("test@test.pl")
-                .build();
     }
 
 }
