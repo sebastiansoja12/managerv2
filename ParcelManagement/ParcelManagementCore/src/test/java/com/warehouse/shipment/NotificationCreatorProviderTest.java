@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.shipment.domain.model.Notification;
-import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.model.Recipient;
+import com.warehouse.shipment.domain.vo.Parcel;
+import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.NotificationCreatorProviderImpl;
 

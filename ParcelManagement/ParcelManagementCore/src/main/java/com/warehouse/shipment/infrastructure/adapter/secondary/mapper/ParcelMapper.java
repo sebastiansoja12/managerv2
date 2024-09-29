@@ -1,9 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.shipment.domain.model.Parcel;
-import com.warehouse.shipment.domain.model.ParcelUpdate;
+import com.warehouse.shipment.domain.vo.Parcel;
+import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
-import com.warehouse.shipment.domain.vo.UpdateParcelResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -54,7 +53,7 @@ public interface ParcelMapper {
 
     @Mapping(source = "senderFirstName", target = "firstName")
     @Mapping(source = "senderLastName", target = "lastName")
-    ParcelEntity map(ParcelUpdate parcel);
+    ParcelEntity map(ShipmentUpdate parcel);
 
     @Mapping(target = "sender.firstName", source = "firstName")
     @Mapping(target = "sender.lastName", source = "lastName")
@@ -74,25 +73,4 @@ public interface ParcelMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "parcelStatus", source = "status")
     Parcel map(ParcelEntity entity);
-
-
-    @Mapping(target = "parcel.sender.firstName", source = "firstName")
-    @Mapping(target = "parcel.sender.lastName", source = "lastName")
-    @Mapping(target = "parcel.sender.email", source = "senderEmail")
-    @Mapping(target = "parcel.sender.telephoneNumber", source = "senderTelephone")
-    @Mapping(target = "parcel.sender.city", source = "senderCity")
-    @Mapping(target = "parcel.sender.postalCode", source = "senderPostalCode")
-    @Mapping(target = "parcel.sender.street", source = "senderStreet")
-    @Mapping(target = "parcel.recipient.firstName", source = "recipientFirstName")
-    @Mapping(target = "parcel.recipient.lastName", source = "recipientLastName")
-    @Mapping(target = "parcel.recipient.email", source = "recipientEmail")
-    @Mapping(target = "parcel.recipient.telephoneNumber", source = "recipientTelephone")
-    @Mapping(target = "parcel.recipient.city", source = "recipientCity")
-    @Mapping(target = "parcel.recipient.postalCode", source = "recipientPostalCode")
-    @Mapping(target = "parcel.recipient.street", source = "recipientStreet")
-    @Mapping(target = "parcel.parcelSize", source = "parcelSize")
-    @Mapping(target = "parcel.id", source = "id")
-    @Mapping(target = "parcel.parcelType", source = "parcelType")
-    @Mapping(target = "parcel.parcelStatus", source = "status")
-    UpdateParcelResponse mapToUpdateParcelResponse(ParcelEntity entity);
 }

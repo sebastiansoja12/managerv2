@@ -9,7 +9,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import com.warehouse.depot.domain.port.primary.DepotPort;
 import com.warehouse.reroute.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import com.warehouse.shipment.infrastructure.api.ShipmentService;
 import com.warehouse.voronoi.VoronoiService;
 
 @ComponentScan(basePackages = { "com.warehouse.reroute", "com.warehouse.mail" })
@@ -22,9 +21,6 @@ public class RerouteTokenTestConfiguration {
 
     @MockBean
     public ShipmentPort shipmentPort;
-
-    @MockBean
-    public ShipmentService shipmentService;
 
     @MockBean
     public VoronoiService voronoiService;

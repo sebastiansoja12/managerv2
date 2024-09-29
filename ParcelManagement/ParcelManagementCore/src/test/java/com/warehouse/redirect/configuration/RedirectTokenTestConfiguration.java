@@ -8,7 +8,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.redirect.domain.port.secondary.MailServicePort;
-import com.warehouse.shipment.infrastructure.api.ShipmentService;
 
 @ComponentScan(basePackages = { "com.warehouse.redirect", "com.warehouse.mail" })
 @EntityScan(basePackages = { "com.warehouse.redirect", "com.warehouse.mail", "com.warehouse.shipment" })
@@ -17,9 +16,6 @@ public class RedirectTokenTestConfiguration {
 
     @MockBean
     public JavaMailSender javaMailSender;
-
-    @MockBean
-    public ShipmentService service;
 
     @MockBean
     public MailPort mailPort;
