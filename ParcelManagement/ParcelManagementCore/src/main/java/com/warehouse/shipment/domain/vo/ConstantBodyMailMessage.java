@@ -1,33 +1,34 @@
-package com.warehouse.shipment.domain.model;
+package com.warehouse.shipment.domain.vo;
 
-import lombok.Data;
 
-@Data
 public class ConstantBodyMailMessage {
 
-    private String message;
+    private final String message;
 
-    private Long parcelId;
+    private final String labelUrl;
 
-    private String url;
+    private final String parcelManagementUrl;
 
-    private String labelUrl;
-
-    private String parcelManagementUrl;
-
-    private String city;
-
-    private String street;
-
-    public ConstantBodyMailMessage(Parcel parcel) {
+    public ConstantBodyMailMessage(final Parcel parcel) {
         this.labelUrl = "http://localhost:8080/api/parcels/ " + parcel.getId() + "/label";
         this.parcelManagementUrl = "http://localhost:4200/shipment/client/management/" + parcel.getId();
         this.message = "Docelowa destynacja paczki to: " +
-                parcel.getRecipient().getCity() + parcel.getRecipient().getStreet() +
+                parcel.getRecipient().city() + parcel.getRecipient().street() +
                 "\nKod państwa paczki to: " + parcel.getId() +
                 "\nAby pobrać etykietę prosimy wejść w " + getLabelUrl() +
                 "\nAby zarządzać przesyłką prosimy wejść w: " + this.parcelManagementUrl;
 
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public String getLabelUrl() {
+        return labelUrl;
+    }
+
+    public String getParcelManagementUrl() {
+        return parcelManagementUrl;
+    }
 }
