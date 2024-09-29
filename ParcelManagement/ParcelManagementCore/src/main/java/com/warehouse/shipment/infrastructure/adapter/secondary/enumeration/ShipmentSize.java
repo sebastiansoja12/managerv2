@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.enumeration;
 
-public enum Size {
+public enum ShipmentSize {
 
     TINY("5cmx5cmx5cm", 10),
     SMALL("10cmx10cmx10cm", 15),
@@ -13,7 +13,7 @@ public enum Size {
     private final String parcelSize;
     public final double price;
 
-    Size(String size, double price) {
+    ShipmentSize(String size, double price) {
         this.parcelSize = size;
         this.price = price;
     }

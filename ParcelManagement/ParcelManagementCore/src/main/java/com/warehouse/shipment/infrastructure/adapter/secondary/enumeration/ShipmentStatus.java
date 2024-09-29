@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.enumeration;
 
-public enum Status {
+public enum ShipmentStatus {
     CREATED,
 
     REROUTE,
