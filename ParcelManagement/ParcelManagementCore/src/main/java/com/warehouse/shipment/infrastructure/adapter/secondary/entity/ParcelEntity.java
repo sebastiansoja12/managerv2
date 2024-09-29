@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Size;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.Status;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentSize;
+import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ParcelType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -91,13 +91,13 @@ public class ParcelEntity {
     private String recipientPostalCode;
 
     @Column(name = "parcel_size", nullable = false)
-    private Size parcelSize;
+    private ShipmentSize parcelShipmentSize;
 
     @Column(name = "destination", nullable = false)
     private String destination;
 
     @Column(name = "status", nullable = false)
-    private Status status;
+    private ShipmentStatus shipmentStatus;
 
     @Column(name = "type", nullable = false)
     private ParcelType parcelType;
