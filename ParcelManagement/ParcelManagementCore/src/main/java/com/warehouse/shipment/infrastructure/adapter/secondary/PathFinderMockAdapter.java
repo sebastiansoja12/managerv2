@@ -1,8 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
-import com.warehouse.shipment.domain.model.Address;
-import com.warehouse.shipment.domain.model.City;
+import com.warehouse.shipment.domain.vo.Address;
+import com.warehouse.shipment.domain.vo.City;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import org.apache.commons.lang3.StringUtils;
 

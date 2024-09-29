@@ -1,7 +1,7 @@
 package com.warehouse.shipment;
 
-import com.warehouse.shipment.domain.model.Address;
-import com.warehouse.shipment.domain.model.City;
+import com.warehouse.shipment.domain.vo.Address;
+import com.warehouse.shipment.domain.vo.City;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockAdapter;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockService;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,11 +26,7 @@ public class PathFinderMockAdapterTest {
     @Test
     void shouldDetermineDeliveryDepot() {
         // given
-        final Address address = Address.builder()
-                .city("Katowice")
-                .postalCode("00-000")
-                .street("Katowicka 1")
-                .build();
+        final Address address = new Address("Katowice", "00-000", "Katowicka 1");
         // when
         final City city = mockAdapter.determineDeliveryDepot(address);
         // then

@@ -9,8 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.shipment.domain.model.Address;
-import com.warehouse.shipment.domain.model.City;
+import com.warehouse.shipment.domain.vo.Address;
+import com.warehouse.shipment.domain.vo.City;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderAdapter;
 import com.warehouse.voronoi.VoronoiService;
 
@@ -31,10 +31,7 @@ public class PathFinderAdapterTest {
     @Test
     void shouldDetermineNewDeliveryDepot() {
         // given
-        final Address address = Address.builder()
-                .street("Krakowska 11")
-                .postalCode("00-000")
-                .city("Kraków").build();
+        final Address address = new Address("Kraków", "Krakowska", "00-000");
 
         doReturn("KR1")
                 .when(voronoiService)
