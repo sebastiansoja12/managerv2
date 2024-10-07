@@ -41,7 +41,7 @@ public class ShipmentController {
         shipmentRequestValidator.validateBody(shipmentRequest);
         final ShipmentRequest request = requestMapper.map(shipmentRequest);
         final ShipmentResponse shipmentResponse = shipmentPort.ship(request);
-        return new ResponseEntity<>(responseMapper.map(shipmentResponse), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.map(shipmentResponse));
     }
 
     @GetMapping("/{parcelId}")
@@ -50,7 +50,7 @@ public class ShipmentController {
         final ParcelId id = requestMapper.map(parcelId);
         final Parcel parcel = shipmentPort.loadParcel(id);
         final ParcelDto parcelResponse = responseMapper.map(parcel);
-        return new ResponseEntity<>(parcelResponse, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(parcelResponse);
     }
 
     @PutMapping
@@ -58,7 +58,7 @@ public class ShipmentController {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
         final ShipmentUpdateResponse response = shipmentPort.update(request);
-        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(response));
     }
 
     @ExceptionHandler
