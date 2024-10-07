@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.validator;
 
+import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.api.dto.ParcelIdDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
@@ -25,7 +26,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
     private void validateRequest(final Object obj) {
         if (Objects.isNull(obj)) {
-            throw new RuntimeException("Request cannot be null");
+            throw new EmptyRequestException("Request cannot be null");
         }
     }
 }

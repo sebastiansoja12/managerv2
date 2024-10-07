@@ -1,12 +1,13 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import com.warehouse.shipment.domain.vo.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.identificator.ParcelId;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
@@ -58,5 +59,10 @@ public class ShipmentController {
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
         final ShipmentUpdateResponse response = shipmentPort.update(request);
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<?> handleException(final EmptyRequestException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 }
