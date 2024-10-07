@@ -1,8 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.commonassets.enumeration.ParcelType;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentSize;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ParcelType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -91,7 +91,7 @@ public class ParcelEntity {
     private String recipientPostalCode;
 
     @Column(name = "parcel_size", nullable = false)
-    private ShipmentSize parcelShipmentSize;
+    private ShipmentSize shipmentSize;
 
     @Column(name = "destination", nullable = false)
     private String destination;

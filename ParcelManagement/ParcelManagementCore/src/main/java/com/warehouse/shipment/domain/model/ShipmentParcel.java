@@ -2,8 +2,8 @@ package com.warehouse.shipment.domain.model;
 
 import java.time.LocalDateTime;
 
+import com.warehouse.commonassets.enumeration.ParcelType;
 import com.warehouse.commonassets.identificator.ParcelId;
-import com.warehouse.shipment.domain.enumeration.ParcelType;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentSize;
@@ -34,20 +34,20 @@ public class ShipmentParcel {
 
     private Boolean locked;
 
-	public ShipmentParcel(final Sender sender, final Recipient recipient, final ShipmentSize parcelShipmentSize, final ShipmentStatus shipmentStatus,
-                          final ParcelId parcelRelatedId, final double price, final LocalDateTime createdAt,
-                          final LocalDateTime updatedAt, final Boolean locked) {
-        this.sender = sender;
-        this.recipient = recipient;
-        this.parcelShipmentSize = parcelShipmentSize;
-        this.shipmentStatus = shipmentStatus;
-        this.parcelRelatedId = parcelRelatedId;
-        this.parcelType = parcelRelatedId != null ? ParcelType.CHILD : ParcelType.PARENT;
-        this.price = price;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.locked = locked;
-    }
+	public ShipmentParcel(final Sender sender, final Recipient recipient, final ShipmentSize parcelShipmentSize,
+			final ShipmentStatus shipmentStatus, final ParcelId parcelRelatedId, final double price,
+			final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
+		this.sender = sender;
+		this.recipient = recipient;
+		this.parcelShipmentSize = parcelShipmentSize;
+		this.shipmentStatus = shipmentStatus;
+		this.parcelRelatedId = parcelRelatedId;
+		this.parcelType = parcelRelatedId != null ? ParcelType.CHILD : ParcelType.PARENT;
+		this.price = price;
+		this.createdAt = createdAt;
+		this.updatedAt = updatedAt;
+		this.locked = locked;
+	}
 
     public Sender getSender() {
         return sender;
@@ -57,7 +57,7 @@ public class ShipmentParcel {
         return recipient;
     }
 
-    public ShipmentSize getParcelSize() {
+    public ShipmentSize getShipmentSize() {
         return parcelShipmentSize;
     }
 

@@ -20,7 +20,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     private final ParcelMapper parcelMapper;
 
     @Override
-    public Parcel save(ShipmentParcel parcel) {
+    public Parcel save(final ShipmentParcel parcel) {
 
         final ParcelEntity entity = parcelMapper.map(parcel);
 

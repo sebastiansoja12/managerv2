@@ -75,7 +75,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public UpdateParcelResponse update(final ShipmentUpdate shipmentUpdate) {
+    public ShipmentUpdateResponse update(final ShipmentUpdate shipmentUpdate) {
 
         final Address address = Address.from(shipmentUpdate);
 
@@ -87,7 +87,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         final Parcel parcel = shipmentRepository.update(shipmentUpdate);
 
-        return new UpdateParcelResponse(parcel);
+        return new ShipmentUpdateResponse(parcel);
     }
 
     @Override

@@ -10,7 +10,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
     @Override
     public void validateBody(final ShipmentRequestDto shipmentRequest) {
-
+        validateRequest(shipmentRequest);
     }
 
     @Override
@@ -20,12 +20,12 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
     @Override
     public void validateBody(final ParcelIdDto parcelId) {
-
+        validateRequest(parcelId);
     }
 
-    private void validateRequest(final ShipmentUpdateRequestDto shipmentRequest) {
-        if (Objects.isNull(shipmentRequest)) {
-            throw new RuntimeException("Shipment request cannot be null");
+    private void validateRequest(final Object obj) {
+        if (Objects.isNull(obj)) {
+            throw new RuntimeException("Request cannot be null");
         }
     }
 }
