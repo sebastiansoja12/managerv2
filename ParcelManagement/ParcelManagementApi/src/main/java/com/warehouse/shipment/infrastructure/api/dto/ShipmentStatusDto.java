@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
-public enum StatusDto {
+public enum ShipmentStatusDto {
     CREATED,
 
     REROUTE,

@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentParcelDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +12,6 @@ import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequ
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
-import com.warehouse.shipment.infrastructure.api.dto.ParcelDto;
 import com.warehouse.shipment.infrastructure.api.dto.ParcelIdDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
@@ -49,7 +49,7 @@ public class ShipmentController {
         shipmentRequestValidator.validateBody(parcelId);
         final ParcelId id = requestMapper.map(parcelId);
         final Parcel parcel = shipmentPort.loadParcel(id);
-        final ParcelDto parcelResponse = responseMapper.map(parcel);
+        final ShipmentParcelDto parcelResponse = responseMapper.map(parcel);
         return ResponseEntity.status(HttpStatus.OK).body(parcelResponse);
     }
 

@@ -23,16 +23,11 @@ import com.warehouse.reroute.domain.enumeration.Size;
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.EmailNotFoundException;
 import com.warehouse.reroute.domain.exception.RerouteException;
-import com.warehouse.reroute.domain.model.RerouteParcel;
-import com.warehouse.reroute.domain.model.RerouteParcelRequest;
-import com.warehouse.reroute.domain.model.RerouteRequest;
-import com.warehouse.reroute.domain.vo.RerouteResponse;
+import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
-import com.warehouse.reroute.domain.model.Recipient;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
-import com.warehouse.reroute.domain.model.Sender;
+import com.warehouse.reroute.domain.vo.RerouteResponse;
 import com.warehouse.reroute.infrastructure.adapter.secondary.exception.RerouteTokenNotFoundException;
-import com.warehouse.shipment.infrastructure.api.dto.*;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -231,18 +226,6 @@ public class RerouteIntegrationTest {
                 .build();
     }
 
-    private ParcelDto createParcelDto() {
-        final ParcelIdDto parcelId = new ParcelIdDto();
-        parcelId.setValue(PARCEL_ID);
-
-        final ParcelDto parcel = new ParcelDto();
-        parcel.setRecipient(createShipmentApiRecipient());
-        parcel.setSender(createShipmentApiSender());
-        parcel.setParcelSize(ParcelSizeDto.TEST);
-        parcel.setParcelId(parcelId);
-        return parcel;
-    }
-
     private Recipient createRecipient() {
         return Recipient.builder()
                 .firstName("test")
@@ -266,29 +249,4 @@ public class RerouteIntegrationTest {
                 .email("test@test.pl")
                 .build();
     }
-
-    private SenderDto createShipmentApiSender() {
-        return SenderDto.builder()
-                .firstName("updatedTest")
-                .lastName("test")
-                .city("test")
-                .street("test")
-                .postalCode("00-000")
-                .telephoneNumber("123")
-                .email("test@test.pl")
-                .build();
-    }
-
-    private RecipientDto createShipmentApiRecipient() {
-        return RecipientDto.builder()
-                .firstName("test")
-                .lastName("test")
-                .city("test")
-                .street("test")
-                .postalCode("00-000")
-                .telephoneNumber("123")
-                .email("test@test.pl")
-                .build();
-    }
-
 }

@@ -2,57 +2,54 @@ package com.warehouse.shipment.infrastructure.api.dto;
 
 public class ShipmentParcelDto {
 
-    private final SenderDto sender;
+    private final PersonDto sender;
 
-    private final RecipientDto recipient;
+    private final PersonDto recipient;
 
-    private final ParcelSizeDto parcelSize;
+    private final ShipmentSizeDto shipmentSize;
 
     private final String destination;
 
-    private final StatusDto status;
-
-    private final ParcelTypeDto parcelType;
-
+    private final ShipmentStatusDto shipmentStatus;
+    
     private final ParcelIdDto parcelRelatedId;
 
     private final double price;
 
-	public ShipmentParcelDto(final SenderDto sender, final RecipientDto recipient, final ParcelSizeDto parcelSize,
-			final String destination, final StatusDto status, final ParcelTypeDto parcelType,
-			final ParcelIdDto parcelRelatedId, final double price) {
+	public ShipmentParcelDto(final PersonDto sender, final PersonDto recipient, final ShipmentSizeDto shipmentSize,
+			final String destination, final ShipmentStatusDto shipmentStatus, final ParcelIdDto parcelRelatedId,
+			final double price) {
 		this.sender = sender;
 		this.recipient = recipient;
-		this.parcelSize = parcelSize;
+		this.shipmentSize = shipmentSize;
 		this.destination = destination;
-		this.status = status;
-		this.parcelType = parcelType;
+		this.shipmentStatus = shipmentStatus;
 		this.parcelRelatedId = parcelRelatedId;
 		this.price = price;
 	}
 
-    public SenderDto getSender() {
+    public PersonDto getSender() {
         return sender;
     }
 
-    public RecipientDto getRecipient() {
+    public PersonDto getRecipient() {
         return recipient;
     }
 
-    public ParcelSizeDto getParcelSize() {
-        return parcelSize;
+    public ShipmentSizeDto getShipmentSize() {
+        return shipmentSize;
     }
 
     public String getDestination() {
         return destination;
     }
 
-    public StatusDto getStatus() {
-        return status;
+    public ShipmentStatusDto getShipmentStatus() {
+        return shipmentStatus;
     }
 
     public ParcelTypeDto getParcelType() {
-        return parcelType;
+        return parcelRelatedId != null && parcelRelatedId.getId() != null ? ParcelTypeDto.CHILD : ParcelTypeDto.PARENT;
     }
 
     public ParcelIdDto getParcelRelatedId() {

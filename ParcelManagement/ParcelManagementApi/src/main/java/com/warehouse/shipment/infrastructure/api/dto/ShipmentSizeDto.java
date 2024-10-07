@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
-public enum ParcelSizeDto {
+public enum ShipmentSizeDto {
     TINY("5cmx5cmx5cm", 10),
     SMALL("10cmx10cmx10cm", 15),
     MEDIUM("30cmx30cmx30cm", 20),
@@ -12,7 +12,7 @@ public enum ParcelSizeDto {
     private final String parcelSize;
     public final double price;
 
-    ParcelSizeDto(String size, double price) {
+    ShipmentSizeDto(String size, double price) {
         this.parcelSize = size;
         this.price = price;
     }

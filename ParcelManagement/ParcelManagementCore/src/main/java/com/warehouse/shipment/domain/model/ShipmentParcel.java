@@ -16,7 +16,7 @@ public class ShipmentParcel {
 
     private Recipient recipient;
 
-    private ShipmentSize parcelShipmentSize;
+    private ShipmentSize shipmentSize;
 
     private String destination;
 
@@ -34,12 +34,12 @@ public class ShipmentParcel {
 
     private Boolean locked;
 
-	public ShipmentParcel(final Sender sender, final Recipient recipient, final ShipmentSize parcelShipmentSize,
+	public ShipmentParcel(final Sender sender, final Recipient recipient, final ShipmentSize shipmentSize,
 			final ShipmentStatus shipmentStatus, final ParcelId parcelRelatedId, final double price,
 			final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
 		this.sender = sender;
 		this.recipient = recipient;
-		this.parcelShipmentSize = parcelShipmentSize;
+		this.shipmentSize = shipmentSize;
 		this.shipmentStatus = shipmentStatus;
 		this.parcelRelatedId = parcelRelatedId;
 		this.parcelType = parcelRelatedId != null ? ParcelType.CHILD : ParcelType.PARENT;
@@ -58,7 +58,7 @@ public class ShipmentParcel {
     }
 
     public ShipmentSize getShipmentSize() {
-        return parcelShipmentSize;
+        return shipmentSize;
     }
 
     public String getDestination() {
@@ -98,7 +98,7 @@ public class ShipmentParcel {
     }
 
     public void setParcelSize(final ShipmentSize parcelShipmentSize) {
-        this.parcelShipmentSize = parcelShipmentSize;
+        this.shipmentSize = parcelShipmentSize;
     }
 
     public void setDestination(final String destination) {

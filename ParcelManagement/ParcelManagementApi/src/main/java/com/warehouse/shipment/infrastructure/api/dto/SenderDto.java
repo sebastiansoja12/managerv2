@@ -1,5 +1,8 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
+import lombok.Builder;
+
+@Builder
 public class SenderDto {
     private final String firstName;
     private final String lastName;
