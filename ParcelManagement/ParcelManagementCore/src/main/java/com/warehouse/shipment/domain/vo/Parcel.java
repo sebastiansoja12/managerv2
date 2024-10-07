@@ -3,9 +3,9 @@ package com.warehouse.shipment.domain.vo;
 import java.time.LocalDateTime;
 
 import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentSize;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ParcelId;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentSize;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
 import lombok.Builder;
 
 

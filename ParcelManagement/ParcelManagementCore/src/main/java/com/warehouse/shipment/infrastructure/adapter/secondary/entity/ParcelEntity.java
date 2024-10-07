@@ -1,8 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.enumeration.ParcelType;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentSize;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentSize;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
