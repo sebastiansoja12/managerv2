@@ -89,52 +89,52 @@ public class ShipmentParcel {
         return locked;
     }
 
-    public void setSender(Sender sender) {
+    public void setSender(final Sender sender) {
         this.sender = sender;
     }
 
-    public void setRecipient(Recipient recipient) {
+    public void setRecipient(final Recipient recipient) {
         this.recipient = recipient;
     }
 
-    public void setParcelSize(ShipmentSize parcelShipmentSize) {
+    public void setParcelSize(final ShipmentSize parcelShipmentSize) {
         this.parcelShipmentSize = parcelShipmentSize;
     }
 
-    public void setDestination(String destination) {
+    public void setDestination(final String destination) {
         this.destination = destination;
     }
 
-    public void setStatus(ShipmentStatus shipmentStatus) {
+    public void setStatus(final ShipmentStatus shipmentStatus) {
         this.shipmentStatus = shipmentStatus;
     }
 
-    public void setParcelType(ParcelType parcelType) {
+    public void setParcelType(final ParcelType parcelType) {
         this.parcelType = parcelType;
     }
 
-    public void setParcelRelatedId(ParcelId parcelRelatedId) {
+    public void setParcelRelatedId(final ParcelId parcelRelatedId) {
         this.parcelRelatedId = parcelRelatedId;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(final double price) {
         this.price = price;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(final LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(final LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public void setLocked(Boolean locked) {
+    public void setLocked(final Boolean locked) {
         this.locked = locked;
     }
 
     public double getPrice() {
-        return this.price = parcelShipmentSize.getPrice();
+        return price;
     }
 
     public void prepareParcelToCreate() {

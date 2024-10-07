@@ -10,16 +10,16 @@ public enum ShipmentSize {
     CUSTOM("XcmXcmXcm", 70),
     TEST("test", 99);
 
-    private final String parcelSize;
+    private final String shipmentSize;
     public final double price;
 
-    ShipmentSize(String size, double price) {
-        this.parcelSize = size;
+    ShipmentSize(final String shipmentSize, final double price) {
+        this.shipmentSize = shipmentSize;
         this.price = price;
     }
 
-    public String getSize() {
-        return parcelSize;
+    public String getShipmentSize() {
+        return shipmentSize;
     }
 
     public double getPrice() { return price; }
