@@ -1,6 +1,6 @@
 package com.warehouse.deliverytoken.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import org.mapstruct.Mapper;
 
 import com.warehouse.deliverytoken.domain.vo.Parcel;
@@ -21,10 +21,10 @@ public interface ParcelResponseMapper {
         );
     }
 
-    default ParcelType mapToParcelType(ParcelTypeDto parcelType) {
+    default ShipmentType mapToParcelType(ParcelTypeDto parcelType) {
         return switch (parcelType) {
-            case PARENT -> ParcelType.PARENT;
-            case CHILD -> ParcelType.CHILD;
+            case PARENT -> ShipmentType.PARENT;
+            case CHILD -> ShipmentType.CHILD;
         };
     }
 }

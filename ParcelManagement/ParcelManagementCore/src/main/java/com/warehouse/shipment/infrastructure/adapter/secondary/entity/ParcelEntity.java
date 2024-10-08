@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import jakarta.persistence.*;
@@ -100,7 +100,7 @@ public class ParcelEntity {
     private ShipmentStatus shipmentStatus;
 
     @Column(name = "type", nullable = false)
-    private ParcelType parcelType;
+    private ShipmentType shipmentType;
 
     @Column(name = "parent_related_id")
     private Long parcelRelatedId;

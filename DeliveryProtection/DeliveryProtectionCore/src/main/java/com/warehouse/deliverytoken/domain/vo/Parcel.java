@@ -1,7 +1,7 @@
 package com.warehouse.deliverytoken.domain.vo;
 
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 
 import lombok.Value;
 
@@ -11,7 +11,7 @@ public class Parcel {
 
     Long parcelRelatedId;
 
-    ParcelType parcelType;
+    ShipmentType shipmentType;
 
     String destination;
 }

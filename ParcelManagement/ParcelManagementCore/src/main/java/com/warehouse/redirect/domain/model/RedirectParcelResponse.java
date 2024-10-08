@@ -3,7 +3,7 @@ package com.warehouse.redirect.domain.model;
 
 
 import com.warehouse.commonassets.enumeration.ParcelStatus;
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.enumeration.Size;
 import lombok.Data;
 
@@ -14,6 +14,6 @@ public class RedirectParcelResponse {
     private Recipient recipient;
     private Size parcelSize;
     private ParcelStatus status;
-    private ParcelType parcelType;
+    private ShipmentType shipmentType;
     private Long parcelRelatedId;
 }

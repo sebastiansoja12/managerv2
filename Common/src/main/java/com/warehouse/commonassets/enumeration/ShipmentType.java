@@ -1,5 +1,5 @@
 package com.warehouse.commonassets.enumeration;
 
-public enum ParcelType {
+public enum ShipmentType {
     PARENT, CHILD
 }

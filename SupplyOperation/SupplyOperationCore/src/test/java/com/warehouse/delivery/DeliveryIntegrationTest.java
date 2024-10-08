@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class DeliveryIntegrationTest {
     void shouldDeliver() {
         // given
         final List<DeliveryRequest> deliveryRequestList = Collections.singletonList(createDeliveryRequest());
-        final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
+        final Parcel parcel = new Parcel(1L, null, ShipmentType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenReturn(parcel);
         when(parcelStatusControlChangeServicePort.updateParcelStatus(new UpdateStatusParcelRequest(1L)))
@@ -84,7 +84,7 @@ public class DeliveryIntegrationTest {
                 .supplierCode("abc")
                 .parcelId(1L)
                 .build());
-        final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
+        final Parcel parcel = new Parcel(1L, null, ShipmentType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenReturn(parcel);
         // when && then

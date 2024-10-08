@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
-public class ShipmentParcelDto {
+public class ShipmentDto {
 
     private final PersonDto sender;
 
@@ -16,7 +16,7 @@ public class ShipmentParcelDto {
 
     private final double price;
 
-	public ShipmentParcelDto(final PersonDto sender, final PersonDto recipient, final ShipmentSizeDto shipmentSize,
+	public ShipmentDto(final PersonDto sender, final PersonDto recipient, final ShipmentSizeDto shipmentSize,
 			final String destination, final ShipmentStatusDto shipmentStatus, final ShipmentIdDto shipmentRelatedId,
 			final double price) {
 		this.sender = sender;
@@ -48,8 +48,8 @@ public class ShipmentParcelDto {
         return shipmentStatus;
     }
 
-    public ParcelTypeDto getParcelType() {
-        return shipmentRelatedId != null && shipmentRelatedId.getId() != null ? ParcelTypeDto.CHILD : ParcelTypeDto.PARENT;
+    public ShipmentTypeDto getShipmentType() {
+        return shipmentRelatedId != null && shipmentRelatedId.getId() != null ? ShipmentTypeDto.CHILD : ShipmentTypeDto.PARENT;
     }
 
     public ShipmentIdDto getShipmentRelatedId() {

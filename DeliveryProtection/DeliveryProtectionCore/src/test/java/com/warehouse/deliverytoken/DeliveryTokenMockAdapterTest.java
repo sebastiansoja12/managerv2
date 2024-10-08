@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.deliverytoken.domain.vo.*;
 import org.junit.jupiter.api.Test;
 
@@ -47,9 +47,9 @@ public class DeliveryTokenMockAdapterTest {
     }
 
 	private List<DeliveryPackageRequest> createDeliveryRequests(Long parcelId, Long parcelRelatedId,
-                                                                ParcelType parcelType, String destination, String deliveryId) {
+                                                                ShipmentType shipmentType, String destination, String deliveryId) {
 		return Collections.singletonList(
-				new DeliveryPackageRequest(createParcel(parcelId, parcelRelatedId, parcelType, destination),
+				new DeliveryPackageRequest(createParcel(parcelId, parcelRelatedId, shipmentType, destination),
 						 createDelivery(deliveryId)));
 	}
 
@@ -57,7 +57,7 @@ public class DeliveryTokenMockAdapterTest {
         return new Delivery(id);
     }
 
-    private Parcel createParcel(Long id, Long parcelRelatedId, ParcelType parcelType, String destination) {
-        return new Parcel(id, parcelRelatedId, parcelType, destination);
+    private Parcel createParcel(Long id, Long parcelRelatedId, ShipmentType shipmentType, String destination) {
+        return new Parcel(id, parcelRelatedId, shipmentType, destination);
     }
 }

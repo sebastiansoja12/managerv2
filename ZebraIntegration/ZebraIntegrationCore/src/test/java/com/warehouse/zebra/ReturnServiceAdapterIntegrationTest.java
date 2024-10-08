@@ -87,7 +87,7 @@ public class ReturnServiceAdapterIntegrationTest {
     @Test
     void shouldProcessTheReturnRequest() {
         // given
-        final Parcel parcel = new Parcel(1L, Size.TEST, "KT1", ParcelStatus.RETURN, ParcelType.PARENT,
+        final Parcel parcel = new Parcel(1L, Size.TEST, "KT1", ParcelStatus.RETURN, ShipmentType.PARENT,
                 null);
         final ReturnRequest returnRequest =  new ReturnRequest(parcel, null, ReturnStatus.PROCESSING, "123",
                 "s-soja");
@@ -117,7 +117,7 @@ public class ReturnServiceAdapterIntegrationTest {
         final Parcel parcel = new Parcel(1L, Size.TEST,
                 "KT1",
                 ParcelStatus.RETURN,
-                ParcelType.PARENT,
+                ShipmentType.PARENT,
                 null);
         final ReturnRequest returnRequest =  new ReturnRequest(parcel,
                 null,

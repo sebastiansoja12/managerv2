@@ -16,7 +16,7 @@ public interface ParcelMapper {
     default ParcelEntity map(final Shipment shipment) {
         return ParcelEntity.builder()
                 .parcelRelatedId(shipment.getShipmentRelatedId() != null ? shipment.getShipmentRelatedId().getId() : null)
-                .parcelType(shipment.getParcelType())
+                .shipmentType(shipment.getShipmentType())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .destination(shipment.getDestination())

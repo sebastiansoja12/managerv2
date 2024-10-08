@@ -1,7 +1,7 @@
 package com.warehouse.commonassets.model;
 
 import com.warehouse.commonassets.enumeration.ParcelStatus;
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.enumeration.Size;
 
 public class Parcel {
@@ -14,16 +14,16 @@ public class Parcel {
 
 	private ParcelStatus status;
 
-	private ParcelType parcelType;
+	private ShipmentType shipmentType;
 
 	private Long parcelRelatedId;
 
-	public Parcel(Long id, Size parcelSize, String destination, ParcelStatus status, ParcelType parcelType, Long parcelRelatedId) {
+	public Parcel(Long id, Size parcelSize, String destination, ParcelStatus status, ShipmentType shipmentType, Long parcelRelatedId) {
 		this.id = id;
 		this.parcelSize = parcelSize;
 		this.destination = destination;
 		this.status = status;
-		this.parcelType = parcelType;
+		this.shipmentType = shipmentType;
 		this.parcelRelatedId = parcelRelatedId;
 	}
 
@@ -59,12 +59,12 @@ public class Parcel {
 		this.status = status;
 	}
 
-	public ParcelType getParcelType() {
-		return parcelType;
+	public ShipmentType getParcelType() {
+		return shipmentType;
 	}
 
-	public void setParcelType(ParcelType parcelType) {
-		this.parcelType = parcelType;
+	public void setParcelType(ShipmentType shipmentType) {
+		this.shipmentType = shipmentType;
 	}
 
 	public Long getParcelRelatedId() {

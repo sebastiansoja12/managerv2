@@ -2,7 +2,7 @@ package com.warehouse.shipment.domain.model;
 
 import java.time.LocalDateTime;
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -22,7 +22,7 @@ public class Shipment {
 
     private ShipmentStatus shipmentStatus;
 
-    private ParcelType parcelType;
+    private ShipmentType shipmentType;
 
     private ShipmentId shipmentRelatedId;
 
@@ -42,7 +42,7 @@ public class Shipment {
 		this.shipmentSize = shipmentSize;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
-		this.parcelType = shipmentRelatedId != null ? ParcelType.CHILD : ParcelType.PARENT;
+		this.shipmentType = shipmentRelatedId != null ? ShipmentType.CHILD : ShipmentType.PARENT;
 		this.price = price;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
@@ -69,8 +69,8 @@ public class Shipment {
         return shipmentStatus;
     }
 
-    public ParcelType getParcelType() {
-        return parcelType;
+    public ShipmentType getShipmentType() {
+        return shipmentType;
     }
 
     public ShipmentId getShipmentRelatedId() {
@@ -109,8 +109,8 @@ public class Shipment {
         this.shipmentStatus = shipmentStatus;
     }
 
-    public void setParcelType(final ParcelType parcelType) {
-        this.parcelType = parcelType;
+    public void setShipmentType(final ShipmentType shipmentType) {
+        this.shipmentType = shipmentType;
     }
 
     public void setShipmentRelatedId(final ShipmentId shipmentRelatedId) {
@@ -139,7 +139,7 @@ public class Shipment {
 
     public void prepareParcelToCreate() {
         this.shipmentStatus = ShipmentStatus.CREATED;
-        this.parcelType = ParcelType.PARENT;
+        this.shipmentType = ShipmentType.PARENT;
     }
 
     public void updateDestination(final String destination) {

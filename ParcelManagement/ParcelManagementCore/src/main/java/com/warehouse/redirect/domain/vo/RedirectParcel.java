@@ -2,7 +2,7 @@ package com.warehouse.redirect.domain.vo;
 
 
 import com.warehouse.commonassets.enumeration.ParcelStatus;
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.enumeration.Size;
 import com.warehouse.redirect.domain.model.Recipient;
 import com.warehouse.redirect.domain.model.Sender;
@@ -20,14 +20,14 @@ public class RedirectParcel {
 
     ParcelStatus status;
 
-    ParcelType parcelType;
+    ShipmentType shipmentType;
 
     Long parcelRelatedId;
 
     String destination;
 
     public boolean isParent() {
-        return parcelType.equals(ParcelType.PARENT);
+        return shipmentType.equals(ShipmentType.PARENT);
     }
 
     public boolean hasStatusCreated() {

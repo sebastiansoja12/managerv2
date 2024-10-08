@@ -2,7 +2,7 @@ package com.warehouse.shipment.domain.vo;
 
 import java.time.LocalDateTime;
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -24,7 +24,7 @@ public class Parcel {
 
     private final ShipmentStatus parcelShipmentStatus;
 
-    private final ParcelType parcelType;
+    private final ShipmentType shipmentType;
 
     private final ShipmentId shipmentRelatedId;
 
@@ -38,7 +38,7 @@ public class Parcel {
 
 	public Parcel(final ShipmentId id, final Sender sender, final Recipient recipient,
                   final ShipmentSize parcelShipmentSize, final String destination, final ShipmentStatus parcelShipmentStatus,
-                  final ParcelType parcelType, final ShipmentId shipmentRelatedId, final double price,
+                  final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final double price,
                   final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
         this.id = id;
         this.sender = sender;
@@ -46,7 +46,7 @@ public class Parcel {
         this.parcelShipmentSize = parcelShipmentSize;
         this.destination = destination;
         this.parcelShipmentStatus = parcelShipmentStatus;
-        this.parcelType = parcelType;
+        this.shipmentType = shipmentType;
         this.shipmentRelatedId = shipmentRelatedId;
         this.price = price;
         this.createdAt = createdAt;
@@ -78,8 +78,8 @@ public class Parcel {
         return parcelShipmentStatus;
     }
 
-    public ParcelType getParcelType() {
-        return parcelType;
+    public ShipmentType getShipmentType() {
+        return shipmentType;
     }
 
     public ShipmentId getShipmentRelatedId() {

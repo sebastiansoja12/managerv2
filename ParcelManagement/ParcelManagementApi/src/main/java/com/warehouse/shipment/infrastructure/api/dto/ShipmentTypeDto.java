@@ -1,5 +1,5 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
-public enum ParcelTypeDto {
+public enum ShipmentTypeDto {
     PARENT, CHILD
 }

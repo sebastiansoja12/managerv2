@@ -1,8 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentParcelDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +49,7 @@ public class ShipmentController {
         shipmentRequestValidator.validateBody(parcelId);
         final ShipmentId id = requestMapper.map(parcelId);
         final Parcel parcel = shipmentPort.loadParcel(id);
-        final ShipmentParcelDto parcelResponse = responseMapper.map(parcel);
+        final ShipmentDto parcelResponse = responseMapper.map(parcel);
         return ResponseEntity.status(HttpStatus.OK).body(parcelResponse);
     }
 

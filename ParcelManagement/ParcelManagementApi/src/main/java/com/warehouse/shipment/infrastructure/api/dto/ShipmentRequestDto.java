@@ -4,13 +4,13 @@ import java.util.Objects;
 
 public class ShipmentRequestDto {
 
-    private final ShipmentParcelDto parcel;
+    private final ShipmentDto parcel;
 
-    public ShipmentRequestDto(final ShipmentParcelDto parcel) {
+    public ShipmentRequestDto(final ShipmentDto parcel) {
         this.parcel = parcel;
     }
 
-    public ShipmentParcelDto getParcel() {
+    public ShipmentDto getParcel() {
         return parcel;
     }
 
