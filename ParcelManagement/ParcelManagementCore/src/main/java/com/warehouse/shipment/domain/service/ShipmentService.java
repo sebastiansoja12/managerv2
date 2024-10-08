@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.vo.Parcel;
@@ -9,9 +9,9 @@ import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
 
 public interface ShipmentService {
 
-    ShipmentResponse createShipment(ShipmentParcel parcel);
+    ShipmentResponse createShipment(Shipment parcel);
 
-    Parcel loadParcel(final ParcelId parcelId);
+    Parcel loadParcel(final ShipmentId shipmentId);
 
     ShipmentUpdateResponse update(ShipmentUpdate shipmentUpdate);
 

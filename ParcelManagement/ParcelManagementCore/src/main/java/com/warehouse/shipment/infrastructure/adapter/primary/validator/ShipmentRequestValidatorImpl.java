@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.validator;
 
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
-import com.warehouse.shipment.infrastructure.api.dto.ParcelIdDto;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
 
@@ -21,7 +21,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     }
 
     @Override
-    public void validateBody(final ParcelIdDto parcelId) {
+    public void validateBody(final ShipmentIdDto parcelId) {
         validateRequest(parcelId);
     }
 

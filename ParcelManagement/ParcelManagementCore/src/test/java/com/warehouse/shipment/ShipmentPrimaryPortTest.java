@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import com.warehouse.shipment.domain.vo.ShipmentResponse;
@@ -70,13 +70,13 @@ class ShipmentPrimaryPortTest {
     @Test
     void shouldNotLoadParcel() {
         // given
-        final ParcelId parcelId = new ParcelId(0L);
+        final ShipmentId shipmentId = new ShipmentId(0L);
         final ParcelNotFoundException parcelNotFoundException = new ParcelNotFoundException("Parcel was not found");
         doThrow(parcelNotFoundException)
                 .when(shipmentService)
-                .loadParcel(parcelId);
+                .loadParcel(shipmentId);
         // when
-        final Executable executable = () -> shipmentPort.loadParcel(parcelId);
+        final Executable executable = () -> shipmentPort.loadParcel(shipmentId);
         // then
         final ParcelNotFoundException exception =
                 assertThrows(ParcelNotFoundException.class, executable);

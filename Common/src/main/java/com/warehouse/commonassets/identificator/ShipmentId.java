@@ -2,11 +2,11 @@ package com.warehouse.commonassets.identificator;
 
 import java.util.Objects;
 
-public class ParcelId {
+public class ShipmentId {
 
 	private final Long id;
 
-	public ParcelId(final Long id) {
+	public ShipmentId(final Long id) {
 		this.id = id;
 	}
 
@@ -20,8 +20,8 @@ public class ParcelId {
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		ParcelId parcelId = (ParcelId) o;
-		return Objects.equals(id, parcelId.id);
+		final ShipmentId shipmentId = (ShipmentId) o;
+		return Objects.equals(id, shipmentId.id);
 	}
 
 	@Override

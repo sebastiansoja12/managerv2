@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.*;
 
 public interface ShipmentPort {
@@ -9,7 +9,7 @@ public interface ShipmentPort {
 
     ShipmentUpdateResponse update(final ShipmentUpdateRequest request);
 
-    Parcel loadParcel(final ParcelId parcelId);
+    Parcel loadParcel(final ShipmentId shipmentId);
 
     boolean exists(final Long parcelId);
 }

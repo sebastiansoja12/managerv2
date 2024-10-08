@@ -1,20 +1,20 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.api;
 
-import com.warehouse.shipment.infrastructure.api.dto.ParcelIdDto;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 
 import java.util.UUID;
 
 
 public class RouteProcessDto {
-	private final ParcelIdDto parcelId;
+	private final ShipmentIdDto parcelId;
 	private final UUID processId;
 
-	public RouteProcessDto(final ParcelIdDto parcelId, final UUID processId) {
+	public RouteProcessDto(final ShipmentIdDto parcelId, final UUID processId) {
 		this.parcelId = parcelId;
 		this.processId = processId;
 	}
 
-	public ParcelIdDto getParcelId() {
+	public ShipmentIdDto getParcelId() {
 		return parcelId;
 	}
 

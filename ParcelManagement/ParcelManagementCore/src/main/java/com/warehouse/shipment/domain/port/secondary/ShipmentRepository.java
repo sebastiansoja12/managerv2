@@ -1,17 +1,17 @@
 package com.warehouse.shipment.domain.port.secondary;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
 
 public interface ShipmentRepository {
 
-    Parcel save(ShipmentParcel parcel);
+    Parcel save(Shipment parcel);
 
     Parcel update(ShipmentUpdate parcel);
 
-    Parcel findParcelById(final ParcelId parcelId);
+    Parcel findParcelById(final ShipmentId shipmentId);
 
     boolean exists(Long parcelId);
 }

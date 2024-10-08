@@ -8,7 +8,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.UUID;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,14 +53,14 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldCreateShip() {
         // given
-        final ShipmentParcel shipmentParcel = createShipmentParcel();
+        final Shipment shipment = createShipmentParcel();
 
         final City city = new City("Katowice");
 
         final Parcel parcel = createParcel();
 
-        final ParcelId parcelId = parcelId();
-        final RouteProcess routeProcess = RouteProcess.from(parcelId, UUID.randomUUID());
+        final ShipmentId shipmentId = parcelId();
+        final RouteProcess routeProcess = RouteProcess.from(shipmentId, UUID.randomUUID());
 
         final Notification notification = new Notification("test",
                 "test@test.pl", "test");
@@ -71,7 +71,7 @@ public class ShipmentServiceImplTest {
 
         doReturn(parcel)
                 .when(shipmentRepository)
-                .save(shipmentParcel);
+                .save(shipment);
 
         doReturn(notification)
                 .when(notificationCreatorProvider)
@@ -81,11 +81,11 @@ public class ShipmentServiceImplTest {
                 .when(mailServicePort)
                 .sendShipmentNotification(notification);
 
-        when(routeLogServicePort.initializeRouteProcess(parcelId)).thenReturn(routeProcess);
+        when(routeLogServicePort.initializeRouteProcess(shipmentId)).thenReturn(routeProcess);
 
 
         // when
-        final ShipmentResponse response = service.createShipment(shipmentParcel);
+        final ShipmentResponse response = service.createShipment(shipment);
         // then
         assertAll(
                 () -> assertEquals(response.parcelId(), expectedToBe(1L)),
@@ -97,13 +97,13 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldNotCreateShipmentWhenDestinationDepotIsNotDetermined() {
         // given
-        final ShipmentParcel shipmentParcel = createShipmentParcel();
+        final Shipment shipment = createShipmentParcel();
 
         doReturn(new City(null))
                 .when(pathFinderServicePort)
                 .determineDeliveryDepot(any(Address.class));
         // when
-        final Executable executable = () -> service.createShipment(shipmentParcel);
+        final Executable executable = () -> service.createShipment(shipment);
         // then
         final DestinationDepotDeterminationException exception =
                 assertThrows(DestinationDepotDeterminationException.class, executable);
@@ -115,26 +115,26 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldLoadParcel() {
         // given
-        final ParcelId parcelId = parcelId();
+        final ShipmentId shipmentId = parcelId();
 
         // parcel with id 1L
         final Parcel expectedParcel = createParcel();
 
         doReturn(expectedParcel)
                 .when(shipmentRepository)
-                .findParcelById(parcelId);
+                .findParcelById(shipmentId);
         // when
-        final Parcel parcel = service.loadParcel(parcelId);
+        final Parcel parcel = service.loadParcel(shipmentId);
 
         // then
         assertEquals(parcel.getId(), expectedToBe(1L));
-        verify(shipmentRepository, times(1)).findParcelById(parcelId);
+        verify(shipmentRepository, times(1)).findParcelById(shipmentId);
     }
 
     @Test
     void shouldNotLoadParcelAndThrowException() {
         // given
-        final ParcelId parcelId = parcelId();
+        final ShipmentId shipmentId = parcelId();
 
         // parcel with id 1L
         final Parcel expectedParcel = createParcel();
@@ -144,9 +144,9 @@ public class ShipmentServiceImplTest {
 
         doThrow(expectedException)
                 .when(shipmentRepository)
-                .findParcelById(parcelId);
+                .findParcelById(shipmentId);
         // when
-        final Executable executable = () -> service.loadParcel(parcelId);
+        final Executable executable = () -> service.loadParcel(shipmentId);
 
         // then
         final ParcelNotFoundException exception = assertThrows(ParcelNotFoundException.class, executable);

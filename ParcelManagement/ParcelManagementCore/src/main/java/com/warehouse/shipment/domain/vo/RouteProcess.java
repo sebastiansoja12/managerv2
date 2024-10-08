@@ -1,28 +1,28 @@
 package com.warehouse.shipment.domain.vo;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 
 import java.util.UUID;
 
 
 public class RouteProcess {
-    private final ParcelId parcelId;
+    private final ShipmentId shipmentId;
     private final UUID processId;
 
-    public RouteProcess(final ParcelId parcelId, final UUID processId) {
-        this.parcelId = parcelId;
+    public RouteProcess(final ShipmentId shipmentId, final UUID processId) {
+        this.shipmentId = shipmentId;
         this.processId = processId;
     }
 
-    public ParcelId getParcelId() {
-        return parcelId;
+    public ShipmentId getParcelId() {
+        return shipmentId;
     }
 
     public UUID getProcessId() {
         return processId;
     }
 
-    public static RouteProcess from(final ParcelId parcelId, final UUID processId) {
-        return new RouteProcess(parcelId, processId);
+    public static RouteProcess from(final ShipmentId shipmentId, final UUID processId) {
+        return new RouteProcess(shipmentId, processId);
     }
 }

@@ -238,7 +238,7 @@ public class ReturningIntegrationTest {
         return """
                 {
                   "processReturn" : [ {
-                    "parcelId" : 2,
+                    "shipmentId" : 2,
                     "returnId" : 6,
                     "processStatus" : "PROCESSING"
                   } ]
@@ -249,11 +249,11 @@ public class ReturningIntegrationTest {
         return """
                 {
                   "processReturn" : [ {
-                    "parcelId" : 3,
+                    "shipmentId" : 3,
                     "returnId" : 4,
                     "processStatus" : "COMPLETED"
                   }, {
-                    "parcelId" : 4,
+                    "shipmentId" : 4,
                     "returnId" : 5,
                     "processStatus" : "COMPLETED"
                   } ]

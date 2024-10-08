@@ -2,17 +2,17 @@ package com.warehouse.shipment;
 
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
+import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Parcel;
 import java.time.LocalDateTime;
 
 public class DataTestCreator {
 
-    static ParcelId parcelId() {
-        return new ParcelId(1L);
+    static ShipmentId parcelId() {
+        return new ShipmentId(1L);
     }
 
     static Recipient recipient() {
@@ -49,8 +49,8 @@ public class DataTestCreator {
                 .build();
     }
 
-    static ShipmentParcel createShipmentParcel() {
-		return new ShipmentParcel(sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, 30.0, LocalDateTime.now(),
+    static Shipment createShipmentParcel() {
+		return new Shipment(sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, 30.0, LocalDateTime.now(),
 				LocalDateTime.now(), false);
     }
 }

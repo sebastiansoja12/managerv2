@@ -1,13 +1,13 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.vo.*;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.service.ShipmentService;
 
@@ -22,7 +22,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public ShipmentResponse ship(final ShipmentRequest request) {
-        final ShipmentParcel parcel = extractParcelFromRequest(request);
+        final Shipment parcel = extractParcelFromRequest(request);
 
         if (ObjectUtils.isEmpty(parcel)) {
             throw new ParcelNotFoundException(ShipmentExceptionCodes.SHIPMENT_204);
@@ -43,8 +43,8 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public Parcel loadParcel(final ParcelId parcelId) {
-        return service.loadParcel(parcelId);
+    public Parcel loadParcel(final ShipmentId shipmentId) {
+        return service.loadParcel(shipmentId);
     }
 
     @Override
@@ -53,11 +53,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
 
-    private ShipmentParcel extractParcelFromRequest(final ShipmentRequest request) {
+    private Shipment extractParcelFromRequest(final ShipmentRequest request) {
         return request.getParcel();
     }
 
-    private void logParcelShipment(ShipmentParcel parcel) {
+    private void logParcelShipment(Shipment parcel) {
 		logger.info("Detected service to create shipment for parcel with telephone number {}",
 				parcel.getSender().telephoneNumber());
     }

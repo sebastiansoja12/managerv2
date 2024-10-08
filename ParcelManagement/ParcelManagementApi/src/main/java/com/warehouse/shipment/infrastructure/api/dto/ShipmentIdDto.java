@@ -2,10 +2,10 @@ package com.warehouse.shipment.infrastructure.api.dto;
 
 import java.util.Objects;
 
-public class ParcelIdDto {
+public class ShipmentIdDto {
 	private final Long id;
 
-	public ParcelIdDto(final Long id) {
+	public ShipmentIdDto(final Long id) {
 		this.id = id;
 	}
 
@@ -17,7 +17,7 @@ public class ParcelIdDto {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		final ParcelIdDto that = (ParcelIdDto) o;
+		final ShipmentIdDto that = (ShipmentIdDto) o;
 		return Objects.equals(id, that.id);
 	}
 

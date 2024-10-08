@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
+import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,28 +13,28 @@ import java.time.LocalDateTime;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ParcelMapper {
 
-    default ParcelEntity map(final ShipmentParcel parcel) {
+    default ParcelEntity map(final Shipment shipment) {
         return ParcelEntity.builder()
-                .parcelRelatedId(parcel.getParcelRelatedId() != null ? parcel.getParcelRelatedId().getId() : null)
-                .parcelType(parcel.getParcelType())
+                .parcelRelatedId(shipment.getShipmentRelatedId() != null ? shipment.getShipmentRelatedId().getId() : null)
+                .parcelType(shipment.getParcelType())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .destination(parcel.getDestination())
-                .firstName(parcel.getSender().firstName())
-                .lastName(parcel.getSender().lastName())
-                .senderPostalCode(parcel.getSender().postalCode())
-                .senderTelephone(parcel.getSender().telephoneNumber())
-                .senderCity(parcel.getSender().city())
-                .senderStreet(parcel.getSender().street())
-                .senderEmail(parcel.getSender().email())
-                .recipientFirstName(parcel.getRecipient().firstName())
-                .recipientLastName(parcel.getRecipient().lastName())
-                .recipientEmail(parcel.getRecipient().email())
-                .recipientTelephone(parcel.getRecipient().telephoneNumber())
-                .recipientCity(parcel.getRecipient().city())
-                .recipientPostalCode(parcel.getRecipient().postalCode())
-                .recipientStreet(parcel.getRecipient().street())
-                .shipmentSize(parcel.getShipmentSize())
+                .destination(shipment.getDestination())
+                .firstName(shipment.getSender().firstName())
+                .lastName(shipment.getSender().lastName())
+                .senderPostalCode(shipment.getSender().postalCode())
+                .senderTelephone(shipment.getSender().telephoneNumber())
+                .senderCity(shipment.getSender().city())
+                .senderStreet(shipment.getSender().street())
+                .senderEmail(shipment.getSender().email())
+                .recipientFirstName(shipment.getRecipient().firstName())
+                .recipientLastName(shipment.getRecipient().lastName())
+                .recipientEmail(shipment.getRecipient().email())
+                .recipientTelephone(shipment.getRecipient().telephoneNumber())
+                .recipientCity(shipment.getRecipient().city())
+                .recipientPostalCode(shipment.getRecipient().postalCode())
+                .recipientStreet(shipment.getRecipient().street())
+                .shipmentSize(shipment.getShipmentSize())
                 .build();
     }
 
@@ -57,6 +57,6 @@ public interface ParcelMapper {
     @Mapping(target = "recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "recipient.street", source = "recipientStreet")
     @Mapping(target = "id.id", source = "id")
-    @Mapping(target = "parcelRelatedId.id", source = "parcelRelatedId")
+    @Mapping(target = "shipmentRelatedId.id", source = "parcelRelatedId")
     Parcel map(final ParcelEntity entity);
 }

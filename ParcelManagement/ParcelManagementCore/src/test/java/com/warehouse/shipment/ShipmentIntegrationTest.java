@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,13 +57,13 @@ public class ShipmentIntegrationTest {
     @Test
     void shouldNotShipParcelWhenRouteLogIsNotAvailable() {
         // given
-        final ShipmentParcel shipmentParcel = createShipmentParcel();
-        final ShipmentRequest request = new ShipmentRequest(shipmentParcel);
-        final ParcelId parcelId = DataTestCreator.parcelId();
-        when(voronoiService.findFastestRoute(shipmentParcel.getDestination())).thenReturn("KT3");
+        final Shipment shipment = createShipmentParcel();
+        final ShipmentRequest request = new ShipmentRequest(shipment);
+        final ShipmentId shipmentId = DataTestCreator.parcelId();
+        when(voronoiService.findFastestRoute(shipment.getDestination())).thenReturn("KT3");
         doThrow(new RuntimeException("Error while registering route for parcel"))
                 .when(routeLogServicePort)
-                .initializeRouteProcess(parcelId);
+                .initializeRouteProcess(shipmentId);
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then

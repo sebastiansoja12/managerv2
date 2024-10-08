@@ -1,18 +1,18 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentParcelDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.commonassets.identificator.ParcelId;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
-import com.warehouse.shipment.infrastructure.api.dto.ParcelIdDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
 
@@ -45,9 +45,9 @@ public class ShipmentController {
     }
 
     @GetMapping("/{parcelId}")
-    public ResponseEntity<?> get(@PathVariable final ParcelIdDto parcelId) {
+    public ResponseEntity<?> get(@PathVariable final ShipmentIdDto parcelId) {
         shipmentRequestValidator.validateBody(parcelId);
-        final ParcelId id = requestMapper.map(parcelId);
+        final ShipmentId id = requestMapper.map(parcelId);
         final Parcel parcel = shipmentPort.loadParcel(id);
         final ShipmentParcelDto parcelResponse = responseMapper.map(parcel);
         return ResponseEntity.status(HttpStatus.OK).body(parcelResponse);

@@ -5,14 +5,14 @@ import java.time.LocalDateTime;
 import com.warehouse.commonassets.enumeration.ParcelType;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import lombok.Builder;
 
 
 @Builder
 public class Parcel {
 
-    private final ParcelId id;
+    private final ShipmentId id;
 
     private final Sender sender;
 
@@ -26,7 +26,7 @@ public class Parcel {
 
     private final ParcelType parcelType;
 
-    private final ParcelId parcelRelatedId;
+    private final ShipmentId shipmentRelatedId;
 
     private final double price;
 
@@ -36,10 +36,10 @@ public class Parcel {
 
     private final Boolean locked;
 
-	public Parcel(final ParcelId id, final Sender sender, final Recipient recipient,
-			final ShipmentSize parcelShipmentSize, final String destination, final ShipmentStatus parcelShipmentStatus,
-			final ParcelType parcelType, final ParcelId parcelRelatedId, final double price,
-			final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
+	public Parcel(final ShipmentId id, final Sender sender, final Recipient recipient,
+                  final ShipmentSize parcelShipmentSize, final String destination, final ShipmentStatus parcelShipmentStatus,
+                  final ParcelType parcelType, final ShipmentId shipmentRelatedId, final double price,
+                  final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
         this.id = id;
         this.sender = sender;
         this.recipient = recipient;
@@ -47,14 +47,14 @@ public class Parcel {
         this.destination = destination;
         this.parcelShipmentStatus = parcelShipmentStatus;
         this.parcelType = parcelType;
-        this.parcelRelatedId = parcelRelatedId;
+        this.shipmentRelatedId = shipmentRelatedId;
         this.price = price;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.locked = locked;
     }
 
-    public ParcelId getId() {
+    public ShipmentId getId() {
         return id;
     }
 
@@ -82,8 +82,8 @@ public class Parcel {
         return parcelType;
     }
 
-    public ParcelId getParcelRelatedId() {
-        return parcelRelatedId;
+    public ShipmentId getShipmentRelatedId() {
+        return shipmentRelatedId;
     }
 
     public double getPrice() {

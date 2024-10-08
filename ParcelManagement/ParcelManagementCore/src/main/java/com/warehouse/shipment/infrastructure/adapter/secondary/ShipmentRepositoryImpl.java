@@ -1,8 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
@@ -20,7 +20,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     private final ParcelMapper parcelMapper;
 
     @Override
-    public Parcel save(final ShipmentParcel parcel) {
+    public Parcel save(final Shipment parcel) {
 
         final ParcelEntity entity = parcelMapper.map(parcel);
 
@@ -40,11 +40,11 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     }
 
     @Override
-    public Parcel findParcelById(final ParcelId parcelId) {
-        if (parcelId == null) {
+    public Parcel findParcelById(final ShipmentId shipmentId) {
+        if (shipmentId == null) {
             return null;
         }
-        return repository.findParcelEntityById(parcelId.getId()).map(parcelMapper::map).orElseThrow(
+        return repository.findParcelEntityById(shipmentId.getId()).map(parcelMapper::map).orElseThrow(
                 () -> new ParcelNotFoundException("Parcel was not found"));
     }
 

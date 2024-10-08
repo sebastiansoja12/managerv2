@@ -1,17 +1,17 @@
 package com.warehouse.shipment.domain.vo;
 
-import com.warehouse.shipment.domain.model.ShipmentParcel;
+import com.warehouse.shipment.domain.model.Shipment;
 
 
 public class ShipmentRequest {
 
-	private final ShipmentParcel parcel;
+	private final Shipment parcel;
 
-	public ShipmentRequest(final ShipmentParcel parcel) {
+	public ShipmentRequest(final Shipment parcel) {
 		this.parcel = parcel;
 	}
 
-	public ShipmentParcel getParcel() {
+	public Shipment getParcel() {
 		return parcel;
 	}
 }

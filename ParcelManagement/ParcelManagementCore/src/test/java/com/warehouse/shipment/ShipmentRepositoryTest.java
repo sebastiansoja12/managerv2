@@ -6,7 +6,8 @@ import static org.mockito.Mockito.*;
 import java.util.Optional;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Shipment;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentRepositoryImpl;
@@ -44,7 +44,7 @@ public class ShipmentRepositoryTest {
     @Test
     void shouldSaveParcel() {
         // given
-        final ShipmentParcel parcel = mock(ShipmentParcel.class);
+        final Shipment parcel = mock(Shipment.class);
         when(parcel.getStatus()).thenReturn(ShipmentStatus.CREATED);
 
         final ParcelEntity entity = new ParcelEntity();
@@ -60,13 +60,13 @@ public class ShipmentRepositoryTest {
     @Test
     void shouldReturnParcelById() {
         // given
-        final ParcelId parcelId = new ParcelId(1L);
+        final ShipmentId shipmentId = new ShipmentId(1L);
         final ParcelEntity entity = new ParcelEntity();
         final Parcel parcel = mock(Parcel.class);
-        when(readRepository.findParcelEntityById(parcelId.getId())).thenReturn(Optional.of(entity));
+        when(readRepository.findParcelEntityById(shipmentId.getId())).thenReturn(Optional.of(entity));
         when(parcelMapper.map(entity)).thenReturn(parcel);
         // when
-        final Parcel result = shipmentRepository.findParcelById(parcelId);
+        final Parcel result = shipmentRepository.findParcelById(shipmentId);
 
         // then
         assertEquals(parcel, result);
@@ -75,12 +75,12 @@ public class ShipmentRepositoryTest {
     @Test
     void shouldNotFindParcelAndThrowException() {
         // given
-        final ParcelId parcelId = new ParcelId(1L);
-        when(readRepository.findParcelEntityById(parcelId.getId())).thenReturn(Optional.empty());
+        final ShipmentId shipmentId = new ShipmentId(1L);
+        when(readRepository.findParcelEntityById(shipmentId.getId())).thenReturn(Optional.empty());
 
         // when && then
         Assertions.assertThrows(ParcelNotFoundException.class, () -> {
-            shipmentRepository.findParcelById(parcelId);
+            shipmentRepository.findParcelById(shipmentId);
         });
     }
 

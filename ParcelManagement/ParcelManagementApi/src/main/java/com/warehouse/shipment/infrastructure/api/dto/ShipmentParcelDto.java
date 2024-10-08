@@ -12,19 +12,19 @@ public class ShipmentParcelDto {
 
     private final ShipmentStatusDto shipmentStatus;
     
-    private final ParcelIdDto parcelRelatedId;
+    private final ShipmentIdDto shipmentRelatedId;
 
     private final double price;
 
 	public ShipmentParcelDto(final PersonDto sender, final PersonDto recipient, final ShipmentSizeDto shipmentSize,
-			final String destination, final ShipmentStatusDto shipmentStatus, final ParcelIdDto parcelRelatedId,
+			final String destination, final ShipmentStatusDto shipmentStatus, final ShipmentIdDto shipmentRelatedId,
 			final double price) {
 		this.sender = sender;
 		this.recipient = recipient;
 		this.shipmentSize = shipmentSize;
 		this.destination = destination;
 		this.shipmentStatus = shipmentStatus;
-		this.parcelRelatedId = parcelRelatedId;
+		this.shipmentRelatedId = shipmentRelatedId;
 		this.price = price;
 	}
 
@@ -49,11 +49,11 @@ public class ShipmentParcelDto {
     }
 
     public ParcelTypeDto getParcelType() {
-        return parcelRelatedId != null && parcelRelatedId.getId() != null ? ParcelTypeDto.CHILD : ParcelTypeDto.PARENT;
+        return shipmentRelatedId != null && shipmentRelatedId.getId() != null ? ParcelTypeDto.CHILD : ParcelTypeDto.PARENT;
     }
 
-    public ParcelIdDto getParcelRelatedId() {
-        return parcelRelatedId;
+    public ShipmentIdDto getShipmentRelatedId() {
+        return shipmentRelatedId;
     }
 
     public double getPrice() {

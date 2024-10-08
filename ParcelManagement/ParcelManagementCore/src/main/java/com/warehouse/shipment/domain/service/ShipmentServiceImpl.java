@@ -4,14 +4,14 @@ import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExcept
 
 import java.util.Objects;
 
+import com.warehouse.shipment.domain.model.Shipment;
 import org.apache.commons.lang3.ObjectUtils;
 
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.vo.*;
 
@@ -42,9 +42,9 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-	public ShipmentResponse createShipment(final ShipmentParcel shipmentParcel) {
+	public ShipmentResponse createShipment(final Shipment shipment) {
 
-        final Address address = Address.from(shipmentParcel.getRecipient());
+        final Address address = Address.from(shipment.getRecipient());
 
 		final City city = pathFinderServicePort.determineDeliveryDepot(address);
 
@@ -52,9 +52,9 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new DestinationDepotDeterminationException(SHIPMENT_202);
 		}
 
-        shipmentParcel.updateDestination(city.getValue());
+        shipment.updateDestination(city.getValue());
 
-        final Parcel parcel = shipmentRepository.save(shipmentParcel);
+        final Parcel parcel = shipmentRepository.save(shipment);
 
         logParcel(parcel);
 
@@ -70,8 +70,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 	}
 
     @Override
-    public Parcel loadParcel(final ParcelId parcelId) {
-        return shipmentRepository.findParcelById(parcelId);
+    public Parcel loadParcel(final ShipmentId shipmentId) {
+        return shipmentRepository.findParcelById(shipmentId);
     }
 
     @Override

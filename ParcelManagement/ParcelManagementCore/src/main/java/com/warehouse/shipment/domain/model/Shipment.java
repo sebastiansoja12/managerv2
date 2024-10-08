@@ -5,12 +5,12 @@ import java.time.LocalDateTime;
 import com.warehouse.commonassets.enumeration.ParcelType;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.identificator.ParcelId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 
 
-public class ShipmentParcel {
+public class Shipment {
 
     private Sender sender;
 
@@ -24,7 +24,7 @@ public class ShipmentParcel {
 
     private ParcelType parcelType;
 
-    private ParcelId parcelRelatedId;
+    private ShipmentId shipmentRelatedId;
 
     private double price;
 
@@ -34,15 +34,15 @@ public class ShipmentParcel {
 
     private Boolean locked;
 
-	public ShipmentParcel(final Sender sender, final Recipient recipient, final ShipmentSize shipmentSize,
-			final ShipmentStatus shipmentStatus, final ParcelId parcelRelatedId, final double price,
+	public Shipment(final Sender sender, final Recipient recipient, final ShipmentSize shipmentSize,
+			final ShipmentStatus shipmentStatus, final ShipmentId shipmentRelatedId, final double price,
 			final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
 		this.sender = sender;
 		this.recipient = recipient;
 		this.shipmentSize = shipmentSize;
 		this.shipmentStatus = shipmentStatus;
-		this.parcelRelatedId = parcelRelatedId;
-		this.parcelType = parcelRelatedId != null ? ParcelType.CHILD : ParcelType.PARENT;
+		this.shipmentRelatedId = shipmentRelatedId;
+		this.parcelType = shipmentRelatedId != null ? ParcelType.CHILD : ParcelType.PARENT;
 		this.price = price;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
@@ -73,8 +73,8 @@ public class ShipmentParcel {
         return parcelType;
     }
 
-    public ParcelId getParcelRelatedId() {
-        return parcelRelatedId;
+    public ShipmentId getShipmentRelatedId() {
+        return shipmentRelatedId;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -113,8 +113,8 @@ public class ShipmentParcel {
         this.parcelType = parcelType;
     }
 
-    public void setParcelRelatedId(final ParcelId parcelRelatedId) {
-        this.parcelRelatedId = parcelRelatedId;
+    public void setShipmentRelatedId(final ShipmentId shipmentRelatedId) {
+        this.shipmentRelatedId = shipmentRelatedId;
     }
 
     public void setPrice(final double price) {
