@@ -1,13 +1,12 @@
 package com.warehouse.shipment;
 
+import com.warehouse.commonassets.enumeration.ShipmentSize;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ParcelId;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.model.ShipmentParcel;
 import com.warehouse.shipment.domain.vo.Parcel;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentSize;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
-
 import java.time.LocalDateTime;
 
 public class DataTestCreator {

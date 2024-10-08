@@ -1,12 +1,12 @@
 package com.warehouse.shipment;
 
-import static com.warehouse.shipment.DataTestCreator.createParcel;
-import static com.warehouse.shipment.DataTestCreator.parcelId;
+import static com.warehouse.shipment.DataTestCreator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.warehouse.commonassets.identificator.ParcelId;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import com.warehouse.shipment.domain.vo.ShipmentResponse;
@@ -41,9 +41,7 @@ class ShipmentPrimaryPortTest {
     @Test
     void shouldShip() {
         // given
-        final ShipmentRequest request = ShipmentRequest.builder()
-                .parcel(createShipmentParcel())
-                .build();
+        final ShipmentRequest request = new ShipmentRequest(createShipmentParcel());
 
         // create expected response from service
         final ShipmentResponse expectedResponse = new ShipmentResponse("paymentUrl", 1L);
@@ -72,7 +70,7 @@ class ShipmentPrimaryPortTest {
     @Test
     void shouldNotLoadParcel() {
         // given
-        final Long parcelId = 0L;
+        final ParcelId parcelId = new ParcelId(0L);
         final ParcelNotFoundException parcelNotFoundException = new ParcelNotFoundException("Parcel was not found");
         doThrow(parcelNotFoundException)
                 .when(shipmentService)

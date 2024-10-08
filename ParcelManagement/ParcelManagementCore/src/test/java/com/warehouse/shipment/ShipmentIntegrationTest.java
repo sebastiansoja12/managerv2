@@ -46,9 +46,7 @@ public class ShipmentIntegrationTest {
     @Test
     void shouldNotShipWhenThereIsNoParcelInRequest() {
         // given
-        final ShipmentRequest request = ShipmentRequest.builder()
-                .parcel(null)
-                .build();
+        final ShipmentRequest request = new ShipmentRequest(null);
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then

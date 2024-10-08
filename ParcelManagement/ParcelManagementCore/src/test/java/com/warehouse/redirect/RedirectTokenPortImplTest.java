@@ -43,8 +43,7 @@ public class RedirectTokenPortImplTest {
 
     @BeforeEach
     void setup() {
-        redirectTokenPort = new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort,
-                redirectServicePort);
+        redirectTokenPort = new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort);
     }
 
     @Test

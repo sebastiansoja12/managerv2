@@ -40,7 +40,7 @@ public interface ParcelMapper {
 
     @Mapping(source = "senderFirstName", target = "firstName")
     @Mapping(source = "senderLastName", target = "lastName")
-    ParcelEntity map(ShipmentUpdate parcel);
+    ParcelEntity map(final ShipmentUpdate parcel);
 
     @Mapping(target = "sender.firstName", source = "firstName")
     @Mapping(target = "sender.lastName", source = "lastName")
@@ -56,8 +56,7 @@ public interface ParcelMapper {
     @Mapping(target = "recipient.city", source = "recipientCity")
     @Mapping(target = "recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "recipient.street", source = "recipientStreet")
-    @Mapping(target = "parcelSize", source = "parcelSize")
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "parcelStatus", source = "status")
-    Parcel map(ParcelEntity entity);
+    @Mapping(target = "id.id", source = "id")
+    @Mapping(target = "parcelRelatedId.id", source = "parcelRelatedId")
+    Parcel map(final ParcelEntity entity);
 }

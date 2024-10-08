@@ -5,8 +5,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ParcelId;
-import com.warehouse.shipment.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,7 @@ public class ShipmentRepositoryTest {
     @Test
     void shouldUpdate() {
         // given
-        final ShipmentUpdate shipmentUpdate = ShipmentUpdate.builder().build();
+        final ShipmentUpdate shipmentUpdate = mock(ShipmentUpdate.class);
         final ParcelEntity entity = new ParcelEntity();
 
         when(parcelMapper.map(shipmentUpdate)).thenReturn(entity);
