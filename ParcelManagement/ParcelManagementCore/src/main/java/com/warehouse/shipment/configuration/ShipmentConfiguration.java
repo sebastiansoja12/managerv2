@@ -1,7 +1,5 @@
 package com.warehouse.shipment.configuration;
 
-import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
-import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +16,8 @@ import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
+import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
+import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
@@ -46,8 +46,11 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentPort shipmentPort(ShipmentService service) {
-		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class));
+	public ShipmentPort shipmentPort(final ShipmentService service, final PathFinderServicePort pathFinderServicePort,
+			final NotificationCreatorProvider notificationCreatorProvider, final MailServicePort mailServicePort,
+			final RouteLogServicePort routeLogServicePort) {
+		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
+				notificationCreatorProvider, mailServicePort, routeLogServicePort);
 	}
 
 	@Bean
@@ -67,10 +70,9 @@ public class ShipmentConfiguration {
 
 	@Bean(name = "shipment.shipmentService")
 	public ShipmentService shipmentService(PathFinderServicePort pathFinderServicePort,
-			NotificationCreatorProvider notificationCreatorProvider, MailServicePort mailServicePort,
-			ShipmentRepository shipmentRepository, RouteLogServicePort routeLogServicePort) {
-		return new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort, notificationCreatorProvider,
-				mailServicePort, LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class), routeLogServicePort);
+			ShipmentRepository shipmentRepository) {
+		return new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort,
+				LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class));
 	}
 
 	@Bean(name = "shipment.routeLogServicePort")

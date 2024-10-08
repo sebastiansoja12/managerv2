@@ -1,7 +1,6 @@
 package com.warehouse.shipment;
 
 import static com.warehouse.shipment.DataTestCreator.*;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -23,7 +22,10 @@ import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.Address;
+import com.warehouse.shipment.domain.vo.City;
+import com.warehouse.shipment.domain.vo.Parcel;
+import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,8 +50,7 @@ public class ShipmentServiceImplTest {
 
 	@BeforeEach
 	void setup() {
-		service = new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort,
-                notificationCreatorProvider, mailServicePort, logger, routeLogServicePort);
+		service = new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort, logger);
 	}
 
     @Test
@@ -87,11 +88,10 @@ public class ShipmentServiceImplTest {
 
 
         // when
-        final ShipmentResponse response = service.createShipment(shipment);
+        final Parcel createdParcel = service.createShipment(shipment);
         // then
         assertAll(
-                () -> assertEquals(response.parcelId(), expectedToBe(1L)),
-                () -> assertThat(response.routeProcessId()).isInstanceOf(String.class)
+                () -> assertEquals(createdParcel.getShipmentId().getValue(), expectedToBe(1L))
         );
     }
 
