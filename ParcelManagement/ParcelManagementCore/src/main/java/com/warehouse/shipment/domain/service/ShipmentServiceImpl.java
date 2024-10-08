@@ -58,16 +58,20 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         logParcel(parcel);
 
-		final Notification notification = notificationCreatorProvider.createNotification(parcel);
+        // sendNotification(parcel);
 
-		mailServicePort.sendShipmentNotification(notification);
-
-        logNotification(notification);
-
-		final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(parcel.getId());
+        final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(parcel.getId());
 
         return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getParcelId().getId());
 	}
+
+    private void sendNotification(Parcel parcel) {
+        final Notification notification = notificationCreatorProvider.createNotification(parcel);
+
+        mailServicePort.sendShipmentNotification(notification);
+
+        logNotification(notification);
+    }
 
     @Override
     public Parcel loadParcel(final ShipmentId shipmentId) {

@@ -7,6 +7,7 @@ import com.warehouse.shipment.domain.vo.Parcel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
+// TODO
 public class NotificationCreatorProviderImpl implements NotificationCreatorProvider {
 
     private final static String SUBJECT = "Została nadana do państwa przesyłka: ";
