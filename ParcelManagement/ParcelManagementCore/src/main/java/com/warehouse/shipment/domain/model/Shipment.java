@@ -97,7 +97,7 @@ public class Shipment {
         this.recipient = recipient;
     }
 
-    public void setParcelSize(final ShipmentSize parcelShipmentSize) {
+    public void setShipmentSize(final ShipmentSize parcelShipmentSize) {
         this.shipmentSize = parcelShipmentSize;
     }
 
