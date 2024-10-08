@@ -7,11 +7,11 @@ import com.warehouse.shipment.domain.model.ShipmentUpdate;
 
 public interface ShipmentRepository {
 
-    Parcel save(Shipment parcel);
+    Parcel save(final Shipment parcel);
 
-    Parcel update(ShipmentUpdate parcel);
+    Parcel update(final ShipmentUpdate parcel);
 
     Parcel findParcelById(final ShipmentId shipmentId);
 
-    boolean exists(Long parcelId);
+    boolean exists(final ShipmentId shipmentId);
 }

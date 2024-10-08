@@ -8,8 +8,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.UUID;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.vo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,11 +15,15 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
-import com.warehouse.shipment.domain.model.*;
+import com.warehouse.shipment.domain.model.Notification;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
+import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -197,14 +199,14 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldExist() {
         // given
-        final Long parcelId = 1L;
+        final ShipmentId shipmentId = new ShipmentId(1L);
 
         doReturn(true)
                 .when(shipmentRepository)
-                .exists(parcelId);
+                .exists(shipmentId);
 
         // when
-        final boolean doesExist = service.exists(parcelId);
+        final boolean doesExist = service.exists(shipmentId);
         // then
         assertEquals(expectedToBe(true), doesExist);
     }
@@ -212,14 +214,14 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldNotExist() {
         // given
-        final Long parcelId = 1L;
+        final ShipmentId shipmentId = new ShipmentId(1L);
 
         doReturn(false)
                 .when(shipmentRepository)
-                .exists(parcelId);
+                .exists(shipmentId);
 
         // when
-        final boolean doesExist = service.exists(parcelId);
+        final boolean doesExist = service.exists(shipmentId);
         // then
         assertEquals(expectedToBe(false), doesExist);
     }

@@ -5,13 +5,13 @@ import com.warehouse.shipment.domain.model.Shipment;
 
 public class ShipmentRequest {
 
-	private final Shipment parcel;
+	private final Shipment shipment;
 
-	public ShipmentRequest(final Shipment parcel) {
-		this.parcel = parcel;
+	public ShipmentRequest(final Shipment shipment) {
+		this.shipment = shipment;
 	}
 
-	public Shipment getParcel() {
-		return parcel;
+	public Shipment getShipment() {
+		return shipment;
 	}
 }

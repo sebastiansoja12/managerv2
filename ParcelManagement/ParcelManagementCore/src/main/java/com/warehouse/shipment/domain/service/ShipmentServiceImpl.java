@@ -91,8 +91,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public boolean exists(Long parcelId) {
-        return shipmentRepository.exists(parcelId);
+    public boolean exists(final ShipmentId shipmentId) {
+        return shipmentRepository.exists(shipmentId);
     }
 
     private void updateParcelDestinationForReroute(ShipmentUpdate shipmentUpdate, City city) {

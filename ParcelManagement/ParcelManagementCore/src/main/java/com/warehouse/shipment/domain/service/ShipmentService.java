@@ -9,11 +9,11 @@ import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
 
 public interface ShipmentService {
 
-    ShipmentResponse createShipment(Shipment parcel);
+    ShipmentResponse createShipment(final Shipment parcel);
 
     Parcel loadParcel(final ShipmentId shipmentId);
 
-    ShipmentUpdateResponse update(ShipmentUpdate shipmentUpdate);
+    ShipmentUpdateResponse update(final ShipmentUpdate shipmentUpdate);
 
-    boolean exists(Long parcelId);
+    boolean exists(final ShipmentId shipmentId);
 }

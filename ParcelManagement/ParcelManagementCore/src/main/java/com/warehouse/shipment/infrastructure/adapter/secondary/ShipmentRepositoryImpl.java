@@ -49,7 +49,10 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     }
 
     @Override
-    public boolean exists(Long parcelId) {
-        return repository.existsById(parcelId);
+    public boolean exists(final ShipmentId shipmentId) {
+        if (shipmentId == null) {
+            return false;
+        }
+        return repository.existsById(shipmentId.getId());
     }
 }

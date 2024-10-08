@@ -11,5 +11,5 @@ public interface ShipmentPort {
 
     Parcel loadParcel(final ShipmentId shipmentId);
 
-    boolean exists(final Long parcelId);
+    boolean exists(final ShipmentId shipmentId);
 }

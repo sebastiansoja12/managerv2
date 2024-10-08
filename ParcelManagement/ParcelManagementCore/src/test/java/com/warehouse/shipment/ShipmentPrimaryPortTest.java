@@ -46,7 +46,7 @@ class ShipmentPrimaryPortTest {
         // create expected response from service
         final ShipmentResponse expectedResponse = new ShipmentResponse("paymentUrl", 1L);
 
-        when(shipmentService.createShipment(request.getParcel())).thenReturn(expectedResponse);
+        when(shipmentService.createShipment(request.getShipment())).thenReturn(expectedResponse);
         // when
         final ShipmentResponse response = shipmentPort.ship(request);
         // then

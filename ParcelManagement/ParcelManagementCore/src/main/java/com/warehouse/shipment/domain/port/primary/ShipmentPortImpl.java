@@ -22,17 +22,17 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public ShipmentResponse ship(final ShipmentRequest request) {
-        final Shipment parcel = extractParcelFromRequest(request);
+        final Shipment shipment = extractShipmentFromRequest(request);
 
-        if (ObjectUtils.isEmpty(parcel)) {
+        if (ObjectUtils.isEmpty(shipment)) {
             throw new ParcelNotFoundException(ShipmentExceptionCodes.SHIPMENT_204);
         }
 
-        logParcelShipment(parcel);
+        logShipment(shipment);
 
-        parcel.prepareParcelToCreate();
+        shipment.prepareShipmentToCreate();
 
-        return service.createShipment(parcel);
+        return service.createShipment(shipment);
     }
 
     @Override
@@ -48,17 +48,17 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public boolean exists(Long parcelId) {
-        return service.exists(parcelId);
+    public boolean exists(final ShipmentId shipmentId) {
+        return service.exists(shipmentId);
     }
 
 
-    private Shipment extractParcelFromRequest(final ShipmentRequest request) {
-        return request.getParcel();
+    private Shipment extractShipmentFromRequest(final ShipmentRequest request) {
+        return request.getShipment();
     }
 
-    private void logParcelShipment(Shipment parcel) {
-		logger.info("Detected service to create shipment for parcel with telephone number {}",
+    private void logShipment(Shipment parcel) {
+		logger.info("Detected service to create shipment with telephone number {}",
 				parcel.getSender().telephoneNumber());
     }
 

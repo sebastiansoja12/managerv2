@@ -137,9 +137,10 @@ public class Shipment {
         return price;
     }
 
-    public void prepareParcelToCreate() {
+    public void prepareShipmentToCreate() {
         this.shipmentStatus = ShipmentStatus.CREATED;
-        this.shipmentType = ShipmentType.PARENT;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void updateDestination(final String destination) {
