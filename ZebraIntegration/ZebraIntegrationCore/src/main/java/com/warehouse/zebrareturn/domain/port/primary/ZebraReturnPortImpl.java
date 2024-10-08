@@ -1,12 +1,11 @@
 package com.warehouse.zebrareturn.domain.port.primary;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.request.Request;
 import com.warehouse.commonassets.response.Response;
-import org.apache.commons.lang3.ObjectUtils;
-
 import com.warehouse.zebrareturn.domain.port.secondary.ReturnServicePort;
-import com.warehouse.zebrareturn.domain.port.secondary.RouteLogServicePort;
 
 import lombok.AllArgsConstructor;
 
@@ -14,8 +13,6 @@ import lombok.AllArgsConstructor;
 public class ZebraReturnPortImpl implements ZebraReturnPort {
 
     private final ReturnServicePort returnServicePort;
-
-	private final RouteLogServicePort routeLogServicePort;
 
 	@Override
 	public Response processRequest(final Request request) {

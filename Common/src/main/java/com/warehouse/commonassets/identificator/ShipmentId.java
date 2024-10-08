@@ -4,14 +4,14 @@ import java.util.Objects;
 
 public class ShipmentId {
 
-	private final Long id;
+	private final Long value;
 
-	public ShipmentId(final Long id) {
-		this.id = id;
+	public ShipmentId(final Long value) {
+		this.value = value;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getValue() {
+		return value;
 	}
 
 	@Override
@@ -21,11 +21,11 @@ public class ShipmentId {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final ShipmentId shipmentId = (ShipmentId) o;
-		return Objects.equals(id, shipmentId.id);
+		return Objects.equals(value, shipmentId.value);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id);
+		return Objects.hashCode(value);
 	}
 }

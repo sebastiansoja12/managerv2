@@ -12,7 +12,7 @@ import lombok.Builder;
 @Builder
 public class Parcel {
 
-    private final ShipmentId id;
+    private final ShipmentId shipmentId;
 
     private final Sender sender;
 
@@ -22,7 +22,7 @@ public class Parcel {
 
     private final String destination;
 
-    private final ShipmentStatus parcelShipmentStatus;
+    private final ShipmentStatus shipmentStatus;
 
     private final ShipmentType shipmentType;
 
@@ -36,16 +36,16 @@ public class Parcel {
 
     private final Boolean locked;
 
-	public Parcel(final ShipmentId id, final Sender sender, final Recipient recipient,
-                  final ShipmentSize parcelShipmentSize, final String destination, final ShipmentStatus parcelShipmentStatus,
+	public Parcel(final ShipmentId shipmentId, final Sender sender, final Recipient recipient,
+                  final ShipmentSize parcelShipmentSize, final String destination, final ShipmentStatus shipmentStatus,
                   final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final double price,
                   final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
-        this.id = id;
+        this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
         this.parcelShipmentSize = parcelShipmentSize;
         this.destination = destination;
-        this.parcelShipmentStatus = parcelShipmentStatus;
+        this.shipmentStatus = shipmentStatus;
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = shipmentRelatedId;
         this.price = price;
@@ -54,8 +54,8 @@ public class Parcel {
         this.locked = locked;
     }
 
-    public ShipmentId getId() {
-        return id;
+    public ShipmentId getShipmentId() {
+        return shipmentId;
     }
 
     public Sender getSender() {
@@ -74,8 +74,8 @@ public class Parcel {
         return destination;
     }
 
-    public ShipmentStatus getParcelShipmentStatus() {
-        return parcelShipmentStatus;
+    public ShipmentStatus getShipmentStatus() {
+        return shipmentStatus;
     }
 
     public ShipmentType getShipmentType() {

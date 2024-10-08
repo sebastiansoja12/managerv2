@@ -56,7 +56,7 @@ public class RerouteTokenPortImplTest {
     void setup() {
         final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
         final RerouteService rerouteService = new RerouteServiceImpl(mailServicePort, rerouteTokenRepository);
-        port = new RerouteTokenPortImpl(rerouteService, parcelReroutePort, rerouteTokenGeneratorService, logger);
+        port = new RerouteTokenPortImpl(rerouteService, rerouteTokenGeneratorService, logger);
     }
 
     @Test

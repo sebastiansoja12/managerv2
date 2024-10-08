@@ -8,22 +8,18 @@ import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
 import com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.Logger;
-import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
 import com.warehouse.reroute.domain.service.RerouteService;
 import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
 import com.warehouse.reroute.domain.vo.GeneratedToken;
-import com.warehouse.reroute.domain.vo.ParcelId;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
-
 import com.warehouse.reroute.domain.vo.RerouteResponse;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class RerouteTokenPortImpl implements RerouteTokenPort {
 
     private final RerouteService rerouteService;
-
-    private final ParcelReroutePort parcelReroutePort;
 
     private final RerouteTokenGeneratorService tokenGeneratorService;
 
@@ -65,19 +61,9 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
 
         prepareToReroute(parcel);
 
-        final Parcel parcelUpdate = parcelReroutePort.reroute(parcel, new ParcelId(request.getId()));
-
         rerouteService.deleteToken(rerouteToken);
 
-        return RerouteParcelResponse.builder()
-                .parcelId(parcelUpdate.getParcelId())
-                .parcelSize(parcelUpdate.getParcelSize())
-                .parcelType(parcelUpdate.getParcelType())
-                .recipient(parcelUpdate.getRecipient())
-                .sender(parcelUpdate.getSender())
-                .status(parcelUpdate.getParcelStatus())
-                .parcelRelatedId(parcelUpdate.getParcelRelatedId())
-                .build();
+        return RerouteParcelResponse.builder().build();
     }
 
     private void logReroute(RerouteParcelRequest request) {

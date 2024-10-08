@@ -63,7 +63,7 @@ public class ShipmentRepositoryTest {
         final ShipmentId shipmentId = new ShipmentId(1L);
         final ParcelEntity entity = new ParcelEntity();
         final Parcel parcel = mock(Parcel.class);
-        when(readRepository.findParcelEntityById(shipmentId.getId())).thenReturn(Optional.of(entity));
+        when(readRepository.findParcelEntityById(shipmentId.getValue())).thenReturn(Optional.of(entity));
         when(parcelMapper.map(entity)).thenReturn(parcel);
         // when
         final Parcel result = shipmentRepository.findParcelById(shipmentId);
@@ -76,7 +76,7 @@ public class ShipmentRepositoryTest {
     void shouldNotFindParcelAndThrowException() {
         // given
         final ShipmentId shipmentId = new ShipmentId(1L);
-        when(readRepository.findParcelEntityById(shipmentId.getId())).thenReturn(Optional.empty());
+        when(readRepository.findParcelEntityById(shipmentId.getValue())).thenReturn(Optional.empty());
 
         // when && then
         Assertions.assertThrows(ParcelNotFoundException.class, () -> {

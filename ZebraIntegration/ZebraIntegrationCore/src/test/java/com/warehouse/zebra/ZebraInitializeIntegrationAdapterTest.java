@@ -23,7 +23,6 @@ import org.springframework.web.client.RestClient;
 
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.zebra.infrastructure.adapter.primary.ZebraInitializeAdapter;
 import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 
 import jakarta.xml.bind.JAXBContext;
@@ -40,9 +39,6 @@ public class ZebraInitializeIntegrationAdapterTest {
 
     @Autowired
     private RouteTrackerLogProperties routeTrackerLogProperties;
-
-    @Autowired
-    private ZebraInitializeAdapter zebraInitializeAdapter;
 
     @Autowired
     private RouteLogServicePort routeLogServicePort;

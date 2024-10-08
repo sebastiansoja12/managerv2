@@ -9,6 +9,12 @@ public final class Notification {
     private final String recipient;
     private final String body;
 
+    public Notification(final String subject, final String recipient, final String body) {
+        this.subject = subject;
+        this.recipient = recipient;
+        this.body = body;
+    }
+
     public String getSubject() {
         return subject;
     }

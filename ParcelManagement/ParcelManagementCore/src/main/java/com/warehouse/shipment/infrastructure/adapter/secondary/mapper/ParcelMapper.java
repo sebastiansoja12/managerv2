@@ -15,7 +15,7 @@ public interface ParcelMapper {
 
     default ParcelEntity map(final Shipment shipment) {
         return ParcelEntity.builder()
-                .parcelRelatedId(shipment.getShipmentRelatedId() != null ? shipment.getShipmentRelatedId().getId() : null)
+                .parcelRelatedId(shipment.getShipmentRelatedId() != null ? shipment.getShipmentRelatedId().getValue() : null)
                 .shipmentType(shipment.getShipmentType())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -35,6 +35,8 @@ public interface ParcelMapper {
                 .recipientPostalCode(shipment.getRecipient().postalCode())
                 .recipientStreet(shipment.getRecipient().street())
                 .shipmentSize(shipment.getShipmentSize())
+                .shipmentStatus(shipment.getStatus())
+                .locked(false)
                 .build();
     }
 
@@ -56,7 +58,7 @@ public interface ParcelMapper {
     @Mapping(target = "recipient.city", source = "recipientCity")
     @Mapping(target = "recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "recipient.street", source = "recipientStreet")
-    @Mapping(target = "id.id", source = "id")
-    @Mapping(target = "shipmentRelatedId.id", source = "parcelRelatedId")
+    @Mapping(target = "shipmentId.value", source = "id")
+    @Mapping(target = "shipmentRelatedId.value", source = "parcelRelatedId")
     Parcel map(final ParcelEntity entity);
 }

@@ -60,9 +60,9 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         // sendNotification(parcel);
 
-        final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(parcel.getId());
+        final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(parcel.getShipmentId());
 
-        return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getParcelId().getId());
+        return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getParcelId().getValue());
 	}
 
     private void sendNotification(Parcel parcel) {
@@ -99,17 +99,17 @@ public class ShipmentServiceImpl implements ShipmentService {
         return shipmentRepository.exists(shipmentId);
     }
 
-    private void updateParcelDestinationForReroute(ShipmentUpdate shipmentUpdate, City city) {
+    private void updateParcelDestinationForReroute(final ShipmentUpdate shipmentUpdate, final City city) {
         if (ObjectUtils.isNotEmpty(city) && city.getValue() != null) {
             shipmentUpdate.updateDestination(city.getValue());
         }
     }
 
-    private void logNotification(Notification notification) {
+    private void logNotification(final Notification notification) {
         logger.info("Email notification to {} has been sent", notification.getRecipient());
     }
 
-    private void logParcel(Parcel parcel) {
-        logger.info("Parcel {} has been created at {}", parcel.getId(), parcel.getCreatedAt());
+    private void logParcel(final Parcel parcel) {
+        logger.info("Shipment {} has been created at {}", parcel.getShipmentId(), parcel.getCreatedAt());
     }
 }

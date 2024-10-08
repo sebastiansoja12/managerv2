@@ -6,16 +6,16 @@ import java.util.UUID;
 
 
 public class RouteProcessDto {
-	private final ShipmentIdDto parcelId;
+	private final ShipmentIdDto shipmentId;
 	private final UUID processId;
 
-	public RouteProcessDto(final ShipmentIdDto parcelId, final UUID processId) {
-		this.parcelId = parcelId;
+	public RouteProcessDto(final ShipmentIdDto shipmentId, final UUID processId) {
+		this.shipmentId = shipmentId;
 		this.processId = processId;
 	}
 
-	public ShipmentIdDto getParcelId() {
-		return parcelId;
+	public ShipmentIdDto getShipmentId() {
+		return shipmentId;
 	}
 
 	public UUID getProcessId() {

@@ -40,7 +40,7 @@ public class RouteTrackerController {
     }
 
     @PostMapping("/initialize")
-    public ResponseEntity<?> initialize(@RequestBody ParcelIdDto id) {
+    public ResponseEntity<?> initialize(@RequestBody ShipmentIdDto id) {
         final ParcelId parcelId = requestMapper.map(id);
         final RouteProcess routeProcess = trackerLogPort.initializeRouteProcess(parcelId);
         return new ResponseEntity<>(responseMapper.map(routeProcess), HttpStatus.OK);

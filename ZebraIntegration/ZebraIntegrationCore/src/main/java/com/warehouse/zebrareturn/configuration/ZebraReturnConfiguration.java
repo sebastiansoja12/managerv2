@@ -8,28 +8,27 @@ import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.zebrareturn.domain.port.primary.ZebraReturnPort;
 import com.warehouse.zebrareturn.domain.port.primary.ZebraReturnPortImpl;
 import com.warehouse.zebrareturn.domain.port.secondary.ReturnServicePort;
-import com.warehouse.zebrareturn.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.zebrareturn.infrastructure.adapter.secondary.ReturnServiceAdapter;
 
 @Configuration
-public class ZebraConfiguration {
+public class ZebraReturnConfiguration {
 
-    @Bean
-    public ZebraReturnPort zebraPort(ReturnServicePort returnServicePort, RouteLogServicePort routeLogServicePort) {
-        return new ZebraReturnPortImpl(returnServicePort, routeLogServicePort);
+    @Bean("zebraReturn.zebraPort")
+    public ZebraReturnPort zebraPort(ReturnServicePort returnServicePort) {
+        return new ZebraReturnPortImpl(returnServicePort);
     }
 
-    @Bean("zebra.returnProperties")
+    @Bean("zebraReturn.returnProperties")
     public ReturnProperties returnProperties() {
         return new ReturnProperties();
     }
 
-    @Bean("zebra.routeTrackerLogProperties")
+    @Bean("zebraReturn.routeTrackerLogProperties")
     public RouteTrackerLogProperties routeTrackerLogProperties() {
         return new RouteTrackerLogProperties();
     }
 
-    @Bean
+    @Bean("zebraReturn.returnServicePort")
     public ReturnServicePort returnServicePort(ReturnProperties returnProperties) {
         return new ReturnServiceAdapter(returnProperties);
     }

@@ -37,10 +37,10 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
         if (process.getStatusCode().is2xxSuccessful()) {
             if (process.getBody() != null) {
                 log.info("Successfully registered route {} for shipment {}", process.getBody().getProcessId(),
-                        shipmentId.getId());
+                        shipmentId.getValue());
             }
         } else {
-            log.error("Error while registering route for shipment {}", shipmentId.getId());
+            log.error("Error while registering route for shipment {}", shipmentId.getValue());
             throw new RuntimeException("Error while registering route for shipment");
         }
         return RouteProcess.from(shipmentId, process.getBody() != null ? process.getBody().getProcessId() : null);

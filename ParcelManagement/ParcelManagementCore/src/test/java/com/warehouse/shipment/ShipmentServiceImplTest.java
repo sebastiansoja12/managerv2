@@ -129,7 +129,7 @@ public class ShipmentServiceImplTest {
         final Parcel parcel = service.loadParcel(shipmentId);
 
         // then
-        assertEquals(parcel.getId(), expectedToBe(1L));
+        assertEquals(parcel.getShipmentId(), expectedToBe(1L));
         verify(shipmentRepository, times(1)).findParcelById(shipmentId);
     }
 

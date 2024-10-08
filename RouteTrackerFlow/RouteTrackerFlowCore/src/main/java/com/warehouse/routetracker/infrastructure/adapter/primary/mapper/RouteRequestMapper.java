@@ -11,7 +11,7 @@ import com.warehouse.routetracker.domain.vo.ParcelId;
 @Mapper
 public interface RouteRequestMapper {
 
-    ParcelId map(ParcelIdDto id);
+    ParcelId map(ShipmentIdDto id);
 
     ZebraIdInformation map(ZebraIdInformationDto zebraIdInformation);
 

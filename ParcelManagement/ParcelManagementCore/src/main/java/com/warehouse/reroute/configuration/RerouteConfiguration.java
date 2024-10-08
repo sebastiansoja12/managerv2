@@ -9,7 +9,6 @@ import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
 import com.warehouse.reroute.domain.port.secondary.LoggerFactory;
 import com.warehouse.reroute.domain.port.secondary.MailServicePort;
-import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.service.*;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapper;
@@ -36,11 +35,11 @@ public class RerouteConfiguration {
 
 	@Bean
 	public RerouteTokenPort rerouteTokenPort(MailServicePort mailServicePort,
-			RerouteTokenRepository rerouteTokenRepository, ParcelReroutePort parcelReroutePort) {
+			RerouteTokenRepository rerouteTokenRepository) {
 		final com.warehouse.reroute.domain.service.RerouteService rerouteService = new RerouteServiceImpl(
 				mailServicePort, rerouteTokenRepository);
 		final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
-		return new RerouteTokenPortImpl(rerouteService, parcelReroutePort, rerouteTokenGeneratorService,
+		return new RerouteTokenPortImpl(rerouteService, rerouteTokenGeneratorService,
 				LOGGER_FACTORY.getLogger(RerouteTokenPort.class));
 	}
 

@@ -44,7 +44,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         if (shipmentId == null) {
             return null;
         }
-        return repository.findParcelEntityById(shipmentId.getId()).map(parcelMapper::map).orElseThrow(
+        return repository.findParcelEntityById(shipmentId.getValue()).map(parcelMapper::map).orElseThrow(
                 () -> new ParcelNotFoundException("Parcel was not found"));
     }
 
@@ -53,6 +53,6 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         if (shipmentId == null) {
             return false;
         }
-        return repository.existsById(shipmentId.getId());
+        return repository.existsById(shipmentId.getValue());
     }
 }

@@ -1,13 +1,12 @@
 package com.warehouse.zebra.configuration;
 
-import com.warehouse.zebra.domain.port.primary.ZebraInitializePort;
-import com.warehouse.zebra.domain.port.primary.ZebraInitializePortImpl;
-import com.warehouse.zebra.infrastructure.adapter.primary.ZebraInitializeAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
+import com.warehouse.zebra.domain.port.primary.ZebraInitializePort;
+import com.warehouse.zebra.domain.port.primary.ZebraInitializePortImpl;
 import com.warehouse.zebra.domain.port.primary.ZebraPort;
 import com.warehouse.zebra.domain.port.primary.ZebraPortImpl;
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
@@ -54,10 +53,5 @@ public class ZebraConfiguration {
     @Bean
     public ZebraInitializePort zebraInitializePort(RouteLogServicePort routeLogServicePort) {
         return new ZebraInitializePortImpl(routeLogServicePort);
-    }
-
-    @Bean
-    public ZebraInitializeAdapter zebraInitializeAdapter(ZebraInitializePort zebraInitializePort) {
-        return new ZebraInitializeAdapter(zebraInitializePort);
     }
 }

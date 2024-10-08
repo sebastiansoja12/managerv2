@@ -9,7 +9,7 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class RouteLogRecordDto {
     ProcessIdDto processId;
-    ParcelIdDto parcelId;
+    ShipmentIdDto parcelId;
     RouteLogRecordDetailsDto routeLogRecordDetails;
     ReturnCodeDto returnCode;
     FaultDescriptionDto faultDescription;

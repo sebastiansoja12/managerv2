@@ -44,8 +44,8 @@ public class DataTestCreator {
                 .recipient(recipient())
                 .parcelShipmentSize(ShipmentSize.TEST)
                 .sender(sender())
-                .parcelShipmentStatus(ShipmentStatus.CREATED)
-                .id(parcelId())
+                .shipmentStatus(ShipmentStatus.CREATED)
+                .shipmentId(parcelId())
                 .build();
     }
 

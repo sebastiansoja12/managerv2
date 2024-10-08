@@ -1,17 +1,21 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class ShipmentRequestDto {
+public class ShipmentRequestDto implements Serializable {
 
-    private final ShipmentDto parcel;
+    private ShipmentDto shipment;
 
-    public ShipmentRequestDto(final ShipmentDto parcel) {
-        this.parcel = parcel;
+    public ShipmentRequestDto(final ShipmentDto shipment) {
+        this.shipment = shipment;
     }
 
-    public ShipmentDto getParcel() {
-        return parcel;
+    public ShipmentRequestDto() {
+    }
+
+    public ShipmentDto getShipment() {
+        return shipment;
     }
 
     @Override
@@ -19,11 +23,11 @@ public class ShipmentRequestDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final ShipmentRequestDto that = (ShipmentRequestDto) o;
-        return Objects.equals(parcel, that.parcel);
+        return Objects.equals(shipment, that.shipment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(parcel);
+        return Objects.hashCode(shipment);
     }
 }
