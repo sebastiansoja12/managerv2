@@ -2,16 +2,16 @@ package com.warehouse.shipment.domain.port.secondary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.vo.Parcel;
-import com.warehouse.shipment.domain.model.ShipmentUpdate;
 
 public interface ShipmentRepository {
 
-    Parcel save(final Shipment parcel);
+    void save(final Shipment parcel);
 
-    Parcel update(final ShipmentUpdate parcel);
+    void update(final Shipment shipment);
 
-    Parcel findParcelById(final ShipmentId shipmentId);
+    Shipment findById(final ShipmentId shipmentId);
 
     boolean exists(final ShipmentId shipmentId);
+
+    ShipmentId nextShipmentId();
 }

@@ -1,15 +1,18 @@
 package com.warehouse.shipment.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.ShipmentUpdateRequest;
 
 public interface ShipmentPort {
 
     ShipmentResponse ship(final ShipmentRequest request);
 
-    ShipmentUpdateResponse update(final ShipmentUpdateRequest request);
+    void update(final ShipmentUpdateRequest request);
 
-    Parcel loadParcel(final ShipmentId shipmentId);
+    Shipment loadParcel(final ShipmentId shipmentId);
 
-    boolean exists(final ShipmentId shipmentId);
+    boolean existsShipment(final ShipmentId shipmentId);
 }

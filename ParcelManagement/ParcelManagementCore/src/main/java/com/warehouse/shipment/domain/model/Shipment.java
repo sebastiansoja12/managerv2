@@ -6,11 +6,15 @@ import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.vo.City;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
+import org.apache.commons.lang3.ObjectUtils;
 
 
 public class Shipment {
+
+    private ShipmentId shipmentId;
 
     private Sender sender;
 
@@ -34,9 +38,17 @@ public class Shipment {
 
     private Boolean locked;
 
-	public Shipment(final Sender sender, final Recipient recipient, final ShipmentSize shipmentSize,
-			final ShipmentStatus shipmentStatus, final ShipmentId shipmentRelatedId, final double price,
-			final LocalDateTime createdAt, final LocalDateTime updatedAt, final Boolean locked) {
+	public Shipment(final ShipmentId shipmentId,
+                    final Sender sender,
+                    final Recipient recipient,
+                    final ShipmentSize shipmentSize,
+			        final ShipmentStatus shipmentStatus,
+                    final ShipmentId shipmentRelatedId,
+                    final double price,
+                    final LocalDateTime createdAt,
+                    final LocalDateTime updatedAt,
+                    final Boolean locked) {
+        this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
 		this.shipmentSize = shipmentSize;
@@ -65,7 +77,7 @@ public class Shipment {
         return destination;
     }
 
-    public ShipmentStatus getStatus() {
+    public ShipmentStatus getShipmentStatus() {
         return shipmentStatus;
     }
 
@@ -85,7 +97,7 @@ public class Shipment {
         return updatedAt;
     }
 
-    public Boolean getLocked() {
+    public Boolean isLocked() {
         return locked;
     }
 
@@ -137,13 +149,24 @@ public class Shipment {
         return price;
     }
 
+    public ShipmentId getShipmentId() {
+        return shipmentId;
+    }
+
+    public void setShipmentId(ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
+    }
+
     public void prepareShipmentToCreate() {
         this.shipmentStatus = ShipmentStatus.CREATED;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateDestination(final String destination) {
-        this.destination = destination;
+    public void updateDestination(final City city) {
+        if (ObjectUtils.isNotEmpty(city) && city.getValue() != null) {
+            this.destination = city.getValue();
+            this.updatedAt = LocalDateTime.now();
+        }
     }
 }

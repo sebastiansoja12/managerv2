@@ -1,14 +1,17 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
-import com.warehouse.shipment.domain.model.Notification;
+import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_202;
+
+import java.util.Objects;
+
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
 import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
+import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
@@ -17,14 +20,10 @@ import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.*;
 
-import java.util.Objects;
-
-import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_202;
-
 
 public class ShipmentPortImpl implements ShipmentPort {
 
-    private final ShipmentService service;
+    private final ShipmentService shipmentService;
 
     private final Logger logger;
 
@@ -36,11 +35,11 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final RouteLogServicePort routeLogServicePort;
 
-	public ShipmentPortImpl(final ShipmentService service, final Logger logger,
-			final PathFinderServicePort pathFinderServicePort,
-			final NotificationCreatorProvider notificationCreatorProvider, final MailServicePort mailServicePort,
-			final RouteLogServicePort routeLogServicePort) {
-		this.service = service;
+	public ShipmentPortImpl(final ShipmentService shipmentService, final Logger logger,
+                            final PathFinderServicePort pathFinderServicePort,
+                            final NotificationCreatorProvider notificationCreatorProvider, final MailServicePort mailServicePort,
+                            final RouteLogServicePort routeLogServicePort) {
+		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
@@ -50,6 +49,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public ShipmentResponse ship(final ShipmentRequest request) {
+
         final Shipment shipment = extractShipmentFromRequest(request);
 
         if (ObjectUtils.isEmpty(shipment)) {
@@ -68,32 +68,34 @@ public class ShipmentPortImpl implements ShipmentPort {
             throw new DestinationDepotDeterminationException(SHIPMENT_202);
         }
 
-        shipment.updateDestination(city.getValue());
+        shipment.updateDestination(city);
 
-        final Parcel parcel = service.createShipment(shipment);
+        final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
-        logParcel(parcel);
+        shipment.setShipmentId(shipmentId);
 
-        final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(parcel.getShipmentId());
+        this.shipmentService.createShipment(shipment);
+
+        logCreatedShipment(shipment);
+
+        final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(shipmentId);
 
         return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getParcelId().getValue());
     }
 
     @Override
-    public ShipmentUpdateResponse update(final ShipmentUpdateRequest request) {
-        final ShipmentUpdate shipmentUpdate = ShipmentUpdate.from(request);
-
-        return service.update(shipmentUpdate);
+    public void update(final ShipmentUpdateRequest request) {
+        shipmentService.update(request.getShipmentUpdate(), request.getShipmentId());
     }
 
     @Override
-    public Parcel loadParcel(final ShipmentId shipmentId) {
-        return service.loadParcel(shipmentId);
+    public Shipment loadParcel(final ShipmentId shipmentId) {
+        return shipmentService.loadShipment(shipmentId);
     }
 
     @Override
-    public boolean exists(final ShipmentId shipmentId) {
-        return service.exists(shipmentId);
+    public boolean existsShipment(final ShipmentId shipmentId) {
+        return shipmentService.existsShipment(shipmentId);
     }
 
 
@@ -110,8 +112,8 @@ public class ShipmentPortImpl implements ShipmentPort {
         logger.info("Email notification to {} has been sent", notification.getRecipient());
     }
 
-    private void logParcel(final Parcel parcel) {
-        logger.info("Shipment {} has been created at {}", parcel.getShipmentId(), parcel.getCreatedAt());
+    private void logCreatedShipment(final Shipment shipment) {
+        logger.info("Shipment {} has been created at {}", shipment.getShipmentId(), shipment.getCreatedAt());
     }
 
 }

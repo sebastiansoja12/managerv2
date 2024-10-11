@@ -3,16 +3,16 @@ package com.warehouse.shipment.domain.service;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.domain.vo.Parcel;
-import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
 
 public interface ShipmentService {
 
-    Parcel createShipment(final Shipment parcel);
+    void createShipment(final Shipment shipment);
 
-    Parcel loadParcel(final ShipmentId shipmentId);
+    Shipment loadShipment(final ShipmentId shipmentId);
 
-    ShipmentUpdateResponse update(final ShipmentUpdate shipmentUpdate);
+    void update(final ShipmentUpdate shipmentUpdate, final ShipmentId shipmentId);
 
-    boolean exists(final ShipmentId shipmentId);
+    boolean existsShipment(final ShipmentId shipmentId);
+
+    ShipmentId nextShipmentId();
 }

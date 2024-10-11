@@ -1,8 +1,9 @@
 package com.warehouse.commonassets.identificator;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class ShipmentId {
+public class ShipmentId implements Serializable {
 
 	private final Long value;
 

@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.MailServicePort;
@@ -21,7 +22,6 @@ import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import com.warehouse.shipment.domain.vo.ShipmentResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
@@ -61,7 +61,6 @@ class ShipmentPrimaryPortTest {
         // given
         final ShipmentRequest request = new ShipmentRequest(createShipmentParcel());
 
-        when(shipmentService.createShipment(request.getShipment())).thenReturn(mock(Parcel.class));
         // when
         final ShipmentResponse response = shipmentPort.ship(request);
         // then
@@ -75,11 +74,11 @@ class ShipmentPrimaryPortTest {
 
         doReturn(createParcel())
                 .when(shipmentService)
-                .loadParcel(parcelId());
+                .loadShipment(parcelId());
         // when
-        final Parcel parcel = shipmentPort.loadParcel(parcelId());
+        final Shipment shipment = shipmentPort.loadParcel(parcelId());
         // then
-        assertThat(parcel).isNotNull();
+        assertThat(shipment).isNotNull();
     }
 
     @Test
@@ -89,7 +88,7 @@ class ShipmentPrimaryPortTest {
         final ParcelNotFoundException parcelNotFoundException = new ParcelNotFoundException("Parcel was not found");
         doThrow(parcelNotFoundException)
                 .when(shipmentService)
-                .loadParcel(shipmentId);
+                .loadShipment(shipmentId);
         // when
         final Executable executable = () -> shipmentPort.loadParcel(shipmentId);
         // then

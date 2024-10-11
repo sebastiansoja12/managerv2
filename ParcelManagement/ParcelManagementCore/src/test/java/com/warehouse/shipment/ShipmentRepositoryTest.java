@@ -45,7 +45,7 @@ public class ShipmentRepositoryTest {
     void shouldSaveParcel() {
         // given
         final Shipment parcel = mock(Shipment.class);
-        when(parcel.getStatus()).thenReturn(ShipmentStatus.CREATED);
+        when(parcel.getShipmentStatus()).thenReturn(ShipmentStatus.CREATED);
 
         final ParcelEntity entity = new ParcelEntity();
 
@@ -66,7 +66,7 @@ public class ShipmentRepositoryTest {
         when(readRepository.findParcelEntityById(shipmentId.getValue())).thenReturn(Optional.of(entity));
         when(parcelMapper.map(entity)).thenReturn(parcel);
         // when
-        final Parcel result = shipmentRepository.findParcelById(shipmentId);
+        final Parcel result = shipmentRepository.findShipmentById(shipmentId);
 
         // then
         assertEquals(parcel, result);
@@ -80,7 +80,7 @@ public class ShipmentRepositoryTest {
 
         // when && then
         Assertions.assertThrows(ParcelNotFoundException.class, () -> {
-            shipmentRepository.findParcelById(shipmentId);
+            shipmentRepository.findShipmentById(shipmentId);
         });
     }
 

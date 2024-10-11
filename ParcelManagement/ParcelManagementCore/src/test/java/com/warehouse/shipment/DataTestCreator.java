@@ -42,7 +42,7 @@ public class DataTestCreator {
     static Parcel createParcel() {
         return Parcel.builder()
                 .recipient(recipient())
-                .parcelShipmentSize(ShipmentSize.TEST)
+                .shipmentSize(ShipmentSize.TEST)
                 .sender(sender())
                 .shipmentStatus(ShipmentStatus.CREATED)
                 .shipmentId(parcelId())

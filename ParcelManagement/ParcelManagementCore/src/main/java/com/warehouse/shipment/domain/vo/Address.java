@@ -1,7 +1,5 @@
 package com.warehouse.shipment.domain.vo;
 
-import com.warehouse.shipment.domain.model.ShipmentUpdate;
-
 public class Address {
     private final String city;
     private final String street;
@@ -23,11 +21,6 @@ public class Address {
 
     public String getPostalCode() {
         return postalCode;
-    }
-    
-    public static Address from(final ShipmentUpdate shipmentUpdate) {
-		return new Address(shipmentUpdate.getRecipientCity(), shipmentUpdate.getRecipientStreet(),
-				shipmentUpdate.getRecipientPostalCode());
     }
 
     public static Address from(final Person person) {
