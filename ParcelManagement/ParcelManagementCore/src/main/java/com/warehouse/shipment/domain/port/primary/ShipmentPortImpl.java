@@ -62,7 +62,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         shipment.prepareShipmentToCreate();
 
-        final City city = pathFinderServicePort.determineDeliveryDepot(address);
+        final City city = this.pathFinderServicePort.determineDeliveryDepot(address);
 
         if (Objects.isNull(city) || city.getValue() == null) {
             throw new DestinationDepotDeterminationException(SHIPMENT_202);
@@ -78,7 +78,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         logCreatedShipment(shipment);
 
-        final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(shipmentId);
+        final RouteProcess routeProcess = this.routeLogServicePort.initializeRouteProcess(shipmentId);
 
         return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getShipmentId());
     }
@@ -88,7 +88,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final Address address = Address.from(request.getRecipient());
 
-        final City city = pathFinderServicePort.determineDeliveryDepot(address);
+        final City city = this.pathFinderServicePort.determineDeliveryDepot(address);
 
         request.updateDestination(city);
 
@@ -97,12 +97,12 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public Shipment loadParcel(final ShipmentId shipmentId) {
-        return shipmentService.loadShipment(shipmentId);
+        return this.shipmentService.loadShipment(shipmentId);
     }
 
     @Override
     public boolean existsShipment(final ShipmentId shipmentId) {
-        return shipmentService.existsShipment(shipmentId);
+        return this.shipmentService.existsShipment(shipmentId);
     }
 
 
