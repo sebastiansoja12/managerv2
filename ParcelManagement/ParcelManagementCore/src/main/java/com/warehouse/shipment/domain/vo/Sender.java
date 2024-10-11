@@ -25,37 +25,37 @@ public class Sender implements Person {
 	}
 
     @Override
-    public String firstName() {
+    public String getFirstName() {
         return firstName;
     }
 
     @Override
-    public String lastName() {
+    public String getLastName() {
         return lastName;
     }
 
     @Override
-    public String email() {
+    public String getEmail() {
         return email;
     }
 
     @Override
-    public String telephoneNumber() {
+    public String getTelephoneNumber() {
         return telephoneNumber;
     }
 
     @Override
-    public String city() {
+    public String getCity() {
         return city;
     }
 
     @Override
-    public String postalCode() {
+    public String getPostalCode() {
         return postalCode;
     }
 
     @Override
-    public String street() {
+    public String getStreet() {
         return street;
     }
 }

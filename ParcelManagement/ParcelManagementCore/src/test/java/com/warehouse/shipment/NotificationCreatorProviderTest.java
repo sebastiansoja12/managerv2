@@ -31,7 +31,7 @@ public class NotificationCreatorProviderTest {
         // then
         assertAll(
                 () -> assertEquals(subject, notification.getSubject()),
-                () -> assertEquals(recipient.email(), notification.getRecipient())
+                () -> assertEquals(recipient.getEmail(), notification.getRecipient())
         );
     }
 }

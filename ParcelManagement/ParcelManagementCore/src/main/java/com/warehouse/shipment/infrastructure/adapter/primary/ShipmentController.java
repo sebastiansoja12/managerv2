@@ -49,8 +49,8 @@ public class ShipmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.map(shipmentResponse));
     }
 
-    @GetMapping("/shipmentId/{shipmentId}")
-    public ResponseEntity<?> get(@PathVariable final ShipmentIdDto shipmentId) {
+    @GetMapping("/{value}")
+    public ResponseEntity<?> get(final ShipmentIdDto shipmentId) {
         shipmentRequestValidator.validateBody(shipmentId);
         final ShipmentId id = requestMapper.map(shipmentId);
         final Shipment shipment = shipmentPort.loadParcel(id);

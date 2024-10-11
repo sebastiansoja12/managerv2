@@ -112,7 +112,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private void logShipment(final Shipment parcel) {
 		logger.info("Detected service to create shipment with telephone number {}",
-				parcel.getSender().telephoneNumber());
+				parcel.getSender().getTelephoneNumber());
     }
 
     private void logNotification(final Notification notification) {

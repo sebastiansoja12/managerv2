@@ -24,6 +24,6 @@ public class Address {
     }
 
     public static Address from(final Person person) {
-        return new Address(person.city(), person.street(), person.postalCode());
+        return new Address(person.getCity(), person.getStreet(), person.getPostalCode());
     }
 }

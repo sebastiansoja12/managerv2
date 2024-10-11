@@ -13,7 +13,7 @@ public class ConstantBodyMailMessage {
         this.labelUrl = "http://localhost:8080/api/parcels/ " + "id" + "/label";
         this.parcelManagementUrl = "http://localhost:4200/shipment/client/management/" + "id";
         this.message = "Docelowa destynacja paczki to: " +
-                parcel.getRecipient().city() + parcel.getRecipient().street() +
+                parcel.getRecipient().getCity() + parcel.getRecipient().getStreet() +
                 "\nKod państwa paczki to: " + "id" +
                 "\nAby pobrać etykietę prosimy wejść w " + getLabelUrl() +
                 "\nAby zarządzać przesyłką prosimy wejść w: " + this.parcelManagementUrl;

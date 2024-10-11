@@ -18,7 +18,7 @@ public class NotificationCreatorProviderImpl implements NotificationCreatorProvi
 
         return Notification.builder()
                 .body(constantBodyMailMessage.getMessage())
-                .recipient(parcel.getRecipient().email())
+                .recipient(parcel.getRecipient().getEmail())
                 .subject(SUBJECT)
                 .build();
     }
@@ -29,7 +29,7 @@ public class NotificationCreatorProviderImpl implements NotificationCreatorProvi
 
         return Notification.builder()
                 .body(constantBodyMailMessage.getMessage())
-                .recipient(parcel.getRecipient().email())
+                .recipient(parcel.getRecipient().getEmail())
                 .subject(SUBJECT)
                 .build();
     }
