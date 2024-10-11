@@ -1,6 +1,9 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.infrastructure.adapter.primary.response.Status;
+import com.warehouse.shipment.infrastructure.adapter.primary.response.ShipmentResponseInformation;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 import org.springframework.http.HttpStatus;
@@ -28,8 +31,10 @@ public class ShipmentController {
 
     private final ShipmentResponseMapper responseMapper;
 
-	public ShipmentController(final ShipmentPort shipmentPort, final ShipmentRequestValidator shipmentRequestValidator,
-			final ShipmentRequestMapper requestMapper, final ShipmentResponseMapper responseMapper) {
+	public ShipmentController(final ShipmentPort shipmentPort,
+                              final ShipmentRequestValidator shipmentRequestValidator,
+			                  final ShipmentRequestMapper requestMapper,
+                              final ShipmentResponseMapper responseMapper) {
         this.shipmentPort = shipmentPort;
         this.shipmentRequestValidator = shipmentRequestValidator;
         this.requestMapper = requestMapper;
@@ -44,21 +49,21 @@ public class ShipmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.map(shipmentResponse));
     }
 
-    @GetMapping("/{parcelId}")
-    public ResponseEntity<?> get(@PathVariable final ShipmentIdDto parcelId) {
-        shipmentRequestValidator.validateBody(parcelId);
-        final ShipmentId id = requestMapper.map(parcelId);
-        final Parcel parcel = shipmentPort.loadParcel(id);
-        final ShipmentDto parcelResponse = responseMapper.map(parcel);
-        return ResponseEntity.status(HttpStatus.OK).body(parcelResponse);
+    @GetMapping("/shipmentId/{shipmentId}")
+    public ResponseEntity<?> get(@PathVariable final ShipmentIdDto shipmentId) {
+        shipmentRequestValidator.validateBody(shipmentId);
+        final ShipmentId id = requestMapper.map(shipmentId);
+        final Shipment shipment = shipmentPort.loadParcel(id);
+        final ShipmentDto shipmentResponse = responseMapper.map(shipment);
+        return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
 
     @PutMapping
     public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestDto shipmentUpdateRequest) {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
-        final ShipmentUpdateResponse response = shipmentPort.update(request);
-        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(response));
+        shipmentPort.update(request);
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 
     @ExceptionHandler

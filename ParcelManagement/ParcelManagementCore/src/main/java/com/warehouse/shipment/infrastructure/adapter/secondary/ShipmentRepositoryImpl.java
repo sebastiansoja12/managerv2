@@ -45,9 +45,4 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         }
         return repository.existsById(shipmentId.getValue());
     }
-
-    @Override
-    public ShipmentId nextShipmentId() {
-        return new ShipmentId(repository.nextShipmentId());
-    }
 }

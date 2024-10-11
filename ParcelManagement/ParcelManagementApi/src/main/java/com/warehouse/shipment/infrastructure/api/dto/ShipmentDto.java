@@ -49,7 +49,7 @@ public class ShipmentDto {
     }
 
     public ShipmentTypeDto getShipmentType() {
-        return shipmentRelatedId != null && shipmentRelatedId.getId() != null ? ShipmentTypeDto.CHILD : ShipmentTypeDto.PARENT;
+        return shipmentRelatedId != null && shipmentRelatedId.getValue() != null ? ShipmentTypeDto.CHILD : ShipmentTypeDto.PARENT;
     }
 
     public ShipmentIdDto getShipmentRelatedId() {

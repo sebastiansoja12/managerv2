@@ -1,18 +1,20 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
+import java.time.LocalDateTime;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
-import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import com.warehouse.commonassets.enumeration.ShipmentSize;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentType;
+
+import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
@@ -24,16 +26,6 @@ import java.time.LocalDateTime;
 public class ParcelEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceParcelIdGenerator")
-    @GenericGenerator(
-            name = "sequenceParcelIdGenerator",
-            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
-            parameters = {
-                    @Parameter(name = "sequence_name", value = "message_sequence"),
-                    @Parameter(name = "initial_value", value = "1000000000"),
-                    @Parameter(name = "increment_size", value = "100")
-            }
-    )
     private Long id;
 
     @Column(name = "first_name", nullable = false)

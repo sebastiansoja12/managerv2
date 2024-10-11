@@ -2,14 +2,15 @@ package com.warehouse.shipment.domain.model;
 
 import java.time.LocalDateTime;
 
-import com.warehouse.commonassets.enumeration.ShipmentType;
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.City;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
-import org.apache.commons.lang3.ObjectUtils;
 
 
 public class Shipment {
@@ -166,7 +167,16 @@ public class Shipment {
     public void updateDestination(final City city) {
         if (ObjectUtils.isNotEmpty(city) && city.getValue() != null) {
             this.destination = city.getValue();
-            this.updatedAt = LocalDateTime.now();
         }
+    }
+
+    public void update(final ShipmentUpdate shipmentUpdate) {
+        this.recipient = shipmentUpdate.getRecipient();
+        this.sender = shipmentUpdate.getSender();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateShipmentStatus(final ShipmentStatus shipmentStatus) {
+        this.shipmentStatus = shipmentStatus;
     }
 }

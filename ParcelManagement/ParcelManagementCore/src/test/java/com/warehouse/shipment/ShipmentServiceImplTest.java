@@ -1,7 +1,8 @@
 package com.warehouse.shipment;
 
 import static com.warehouse.shipment.DataTestCreator.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -50,7 +51,7 @@ public class ShipmentServiceImplTest {
 
 	@BeforeEach
 	void setup() {
-		service = new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort, logger);
+		service = new ShipmentServiceImpl(shipmentRepository);
 	}
 
     @Test
@@ -62,7 +63,7 @@ public class ShipmentServiceImplTest {
 
         final Parcel parcel = createParcel();
 
-        final ShipmentId shipmentId = parcelId();
+        final ShipmentId shipmentId = shipmentId();
         final RouteProcess routeProcess = RouteProcess.from(shipmentId, UUID.randomUUID());
 
         final Notification notification = new Notification("test",
@@ -115,7 +116,7 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldLoadShipment() {
         // given
-        final ShipmentId shipmentId = parcelId();
+        final ShipmentId shipmentId = shipmentId();
 
         // parcel with id 1L
         final Parcel expectedParcel = createParcel();
@@ -130,7 +131,7 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldNotLoadShipmentAndThrowException() {
         // given
-        final ShipmentId shipmentId = parcelId();
+        final ShipmentId shipmentId = shipmentId();
 
         // parcel with id 1L
         final Parcel expectedParcel = createParcel();
@@ -148,7 +149,7 @@ public class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldUpdateParcelWithUpdatingDeliveryDepotWhenItsChanged() {
+    void shouldUpdateShipmentParcelWithUpdatingDeliveryDepotWhenItsChanged() {
         // given
         final ShipmentUpdate shipmentUpdate = mock(ShipmentUpdate.class);
 
@@ -166,7 +167,7 @@ public class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldUpdateParcelAndDontUpdateDeliveryDepotWhenItWasNotChanged() {
+    void shouldUpdateParcelAndDontUpdateShipmentDeliveryDepotWhenItWasNotChanged() {
         // given
 
         final Parcel parcel = createParcel();

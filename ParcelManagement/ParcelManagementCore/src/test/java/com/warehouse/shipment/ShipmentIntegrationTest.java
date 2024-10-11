@@ -59,7 +59,7 @@ public class ShipmentIntegrationTest {
         // given
         final Shipment shipment = createShipmentParcel();
         final ShipmentRequest request = new ShipmentRequest(shipment);
-        final ShipmentId shipmentId = DataTestCreator.parcelId();
+        final ShipmentId shipmentId = DataTestCreator.shipmentId();
         when(voronoiService.findFastestRoute(shipment.getDestination())).thenReturn("KT3");
         doThrow(new RuntimeException("Error while registering route for parcel"))
                 .when(routeLogServicePort)

@@ -12,6 +12,4 @@ public interface ShipmentRepository {
     Shipment findById(final ShipmentId shipmentId);
 
     boolean exists(final ShipmentId shipmentId);
-
-    ShipmentId nextShipmentId();
 }

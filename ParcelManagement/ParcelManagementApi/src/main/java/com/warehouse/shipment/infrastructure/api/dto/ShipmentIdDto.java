@@ -3,14 +3,14 @@ package com.warehouse.shipment.infrastructure.api.dto;
 import java.util.Objects;
 
 public class ShipmentIdDto {
-	private final Long id;
+	private final Long value;
 
-	public ShipmentIdDto(final Long id) {
-		this.id = id;
+	public ShipmentIdDto(final Long value) {
+		this.value = value;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getValue() {
+		return value;
 	}
 
 	@Override
@@ -18,11 +18,11 @@ public class ShipmentIdDto {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		final ShipmentIdDto that = (ShipmentIdDto) o;
-		return Objects.equals(id, that.id);
+		return Objects.equals(value, that.value);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id);
+		return Objects.hashCode(value);
 	}
 }

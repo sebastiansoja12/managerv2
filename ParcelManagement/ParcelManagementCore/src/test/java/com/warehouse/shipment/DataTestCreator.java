@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 public class DataTestCreator {
 
-    static ShipmentId parcelId() {
+    static ShipmentId shipmentId() {
         return new ShipmentId(1L);
     }
 
@@ -45,12 +45,11 @@ public class DataTestCreator {
                 .shipmentSize(ShipmentSize.TEST)
                 .sender(sender())
                 .shipmentStatus(ShipmentStatus.CREATED)
-                .shipmentId(parcelId())
                 .build();
     }
 
     static Shipment createShipmentParcel() {
-		return new Shipment(sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, 30.0, LocalDateTime.now(),
+		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, 30.0, LocalDateTime.now(),
 				LocalDateTime.now(), false);
     }
 }

@@ -69,10 +69,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(PathFinderServicePort pathFinderServicePort,
-			ShipmentRepository shipmentRepository) {
-		return new ShipmentServiceImpl(shipmentRepository, pathFinderServicePort,
-				LOGGER_FACTORY.getLogger(ShipmentServiceImpl.class));
+	public ShipmentService shipmentService(ShipmentRepository shipmentRepository) {
+		return new ShipmentServiceImpl(shipmentRepository);
 	}
 
 	@Bean(name = "shipment.routeLogServicePort")

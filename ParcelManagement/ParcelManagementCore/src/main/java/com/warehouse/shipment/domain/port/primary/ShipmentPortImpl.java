@@ -80,12 +80,19 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final RouteProcess routeProcess = routeLogServicePort.initializeRouteProcess(shipmentId);
 
-        return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getParcelId().getValue());
+        return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getShipmentId());
     }
 
     @Override
     public void update(final ShipmentUpdateRequest request) {
-        shipmentService.update(request.getShipmentUpdate(), request.getShipmentId());
+
+        final Address address = Address.from(request.getRecipient());
+
+        final City city = pathFinderServicePort.determineDeliveryDepot(address);
+
+        request.updateDestination(city);
+
+        shipmentService.updateShipment(request.getShipmentUpdate(), request.getShipmentId());
     }
 
     @Override

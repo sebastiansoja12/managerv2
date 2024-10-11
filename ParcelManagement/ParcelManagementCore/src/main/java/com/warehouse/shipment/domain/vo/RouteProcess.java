@@ -14,7 +14,7 @@ public class RouteProcess {
         this.processId = processId;
     }
 
-    public ShipmentId getParcelId() {
+    public ShipmentId getShipmentId() {
         return shipmentId;
     }
 

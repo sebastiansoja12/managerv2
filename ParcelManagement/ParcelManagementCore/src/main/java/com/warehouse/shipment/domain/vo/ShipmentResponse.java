@@ -1,5 +1,7 @@
 package com.warehouse.shipment.domain.vo;
 
 
-public record ShipmentResponse(String routeProcessId, Long parcelId) {
+import com.warehouse.commonassets.identificator.ShipmentId;
+
+public record ShipmentResponse(String routeProcessId, ShipmentId shipmentId) {
 }

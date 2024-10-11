@@ -74,9 +74,9 @@ class ShipmentPrimaryPortTest {
 
         doReturn(createParcel())
                 .when(shipmentService)
-                .loadShipment(parcelId());
+                .loadShipment(shipmentId());
         // when
-        final Shipment shipment = shipmentPort.loadParcel(parcelId());
+        final Shipment shipment = shipmentPort.loadParcel(shipmentId());
         // then
         assertThat(shipment).isNotNull();
     }

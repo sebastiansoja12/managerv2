@@ -10,7 +10,7 @@ public interface ShipmentService {
 
     Shipment loadShipment(final ShipmentId shipmentId);
 
-    void update(final ShipmentUpdate shipmentUpdate, final ShipmentId shipmentId);
+    void updateShipment(final ShipmentUpdate shipmentUpdate, final ShipmentId shipmentId);
 
     boolean existsShipment(final ShipmentId shipmentId);
 

@@ -5,9 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.model.Shipment;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,13 +13,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
-import com.warehouse.shipment.domain.vo.Parcel;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
+import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentRepositoryImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,7 +66,7 @@ public class ShipmentRepositoryTest {
         when(readRepository.findParcelEntityById(shipmentId.getValue())).thenReturn(Optional.of(entity));
         when(parcelMapper.map(entity)).thenReturn(parcel);
         // when
-        final Parcel result = shipmentRepository.findShipmentById(shipmentId);
+        final Shipment result = shipmentRepository.findById(shipmentId);
 
         // then
         assertEquals(parcel, result);
@@ -80,7 +80,7 @@ public class ShipmentRepositoryTest {
 
         // when && then
         Assertions.assertThrows(ParcelNotFoundException.class, () -> {
-            shipmentRepository.findShipmentById(shipmentId);
+            shipmentRepository.findById(shipmentId);
         });
     }
 
@@ -93,7 +93,7 @@ public class ShipmentRepositoryTest {
         when(parcelMapper.map(shipmentUpdate)).thenReturn(entity);
         when(readRepository.save(entity)).thenReturn(entity);
         // when
-        final Parcel result = shipmentRepository.update(shipmentUpdate);
+        shipmentRepository.update(mock(Shipment.class));
 
         // then
         verify(readRepository, times(1)).save(entity);
