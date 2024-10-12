@@ -3,10 +3,13 @@ package com.warehouse.shipment.infrastructure.api.dto;
 import java.util.Objects;
 
 public class ShipmentIdDto {
-	private final Long value;
+	private Long value;
 
 	public ShipmentIdDto(final Long value) {
 		this.value = value;
+	}
+
+	public ShipmentIdDto() {
 	}
 
 	public Long getValue() {

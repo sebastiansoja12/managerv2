@@ -66,6 +66,13 @@ public class ShipmentController {
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 
+    @GetMapping("/exists/{value}")
+    public ResponseEntity<?> existsShipment(final ShipmentIdDto shipmentId) {
+        shipmentRequestValidator.validateBody(shipmentId);
+        final ShipmentId id = requestMapper.map(shipmentId);
+        return ResponseEntity.status(HttpStatus.OK).body(shipmentPort.existsShipment(id));
+    }
+
     @ExceptionHandler
     public ResponseEntity<?> handleException(final EmptyRequestException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());

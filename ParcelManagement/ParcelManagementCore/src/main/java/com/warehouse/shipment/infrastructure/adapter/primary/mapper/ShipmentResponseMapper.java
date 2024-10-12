@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 import org.mapstruct.Mapper;
 
 import com.warehouse.shipment.domain.model.Shipment;
@@ -19,4 +21,8 @@ public interface ShipmentResponseMapper {
     ShipmentDto map(final Shipment shipment);
 
     ShipmentUpdateResponseDto map(final ShipmentUpdateResponse response);
+
+    default ShipmentIdDto map(final ShipmentId shipmentId) {
+        return new ShipmentIdDto(shipmentId.getValue());
+    }
 }

@@ -21,13 +21,20 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     }
 
     @Override
-    public void validateBody(final ShipmentIdDto parcelId) {
-        validateRequest(parcelId);
+    public void validateBody(final ShipmentIdDto shipmentId) {
+        validateRequest(shipmentId);
+        validateValue(shipmentId);
     }
 
     private void validateRequest(final Object obj) {
         if (Objects.isNull(obj)) {
             throw new EmptyRequestException("Request cannot be null");
+        }
+    }
+
+    private void validateValue(final ShipmentIdDto shipmentId) {
+        if (Objects.isNull(shipmentId.getValue())) {
+            throw new EmptyRequestException("Value cannot be null");
         }
     }
 }
