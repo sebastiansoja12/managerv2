@@ -12,6 +12,12 @@ public interface ShipmentPort {
 
     void update(final ShipmentUpdateRequest request);
 
+    void changeSender(final ShipmentRequest request);
+
+    void changeRecipient(final ShipmentRequest request);
+
+    void changeShipmentType(final ShipmentRequest request);
+
     Shipment loadParcel(final ShipmentId shipmentId);
 
     boolean existsShipment(final ShipmentId shipmentId);

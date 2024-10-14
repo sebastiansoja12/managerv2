@@ -4,6 +4,7 @@ import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExcept
 
 import java.util.Objects;
 
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -96,6 +97,30 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public void changeSender(final ShipmentRequest request) {
+        final Shipment shipment = Shipment.from(request);
+        final Sender sender = Sender.from(shipment);
+        final ShipmentId shipmentId = shipment.getShipmentId();
+        this.shipmentService.changeSender(shipmentId, sender);
+    }
+
+    @Override
+    public void changeRecipient(final ShipmentRequest request) {
+        final Shipment shipment = Shipment.from(request);
+        final Recipient recipient = Recipient.from(shipment);
+        final ShipmentId shipmentId = shipment.getShipmentId();
+        this.shipmentService.changeRecipient(shipmentId, recipient);
+    }
+
+    @Override
+    public void changeShipmentType(final ShipmentRequest request) {
+        final Shipment shipment = Shipment.from(request);
+        final ShipmentType shipmentType = shipment.getShipmentType();
+        final ShipmentId shipmentId = shipment.getShipmentId();
+        this.shipmentService.changeShipmentType(shipmentId, shipmentType);
+    }
+
+    @Override
     public Shipment loadParcel(final ShipmentId shipmentId) {
         return this.shipmentService.find(shipmentId);
     }
@@ -107,6 +132,9 @@ public class ShipmentPortImpl implements ShipmentPort {
 
 
     private Shipment extractShipmentFromRequest(final ShipmentRequest request) {
+        if (Objects.isNull(request)) {
+            throw new RuntimeException();
+        }
         return request.getShipment();
     }
 

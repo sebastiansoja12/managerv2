@@ -1,6 +1,7 @@
 package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.shipment.domain.enumeration.PersonType;
+import com.warehouse.shipment.domain.model.Shipment;
 import lombok.Builder;
 
 import static com.warehouse.shipment.domain.enumeration.PersonType.RECIPIENT;
@@ -25,6 +26,10 @@ public class Recipient implements Person {
         this.city = city;
         this.postalCode = postalCode;
         this.street = street;
+    }
+
+    public static Recipient from(final Shipment shipment) {
+        return shipment.getRecipient();
     }
 
     @Override

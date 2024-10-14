@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.model;
 
 import java.time.LocalDateTime;
 
+import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.ShipmentSize;
@@ -61,6 +62,10 @@ public class Shipment {
 		this.updatedAt = updatedAt;
 		this.locked = locked;
 	}
+
+    public static Shipment from(final ShipmentRequest request) {
+        return request.getShipment();
+    }
 
     public Sender getSender() {
         return sender;
