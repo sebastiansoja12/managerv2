@@ -193,10 +193,12 @@ public class Shipment {
 
     public void changeSender(final Sender sender) {
         this.sender = sender;
+        markAsModified();
     }
 
     public void changeRecipient(final Recipient recipient) {
         this.recipient = recipient;
+        markAsModified();
     }
 
     public void changeShipmentSize(final ShipmentSize shipmentSize) {
