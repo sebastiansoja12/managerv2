@@ -154,7 +154,7 @@ public class Shipment {
         return shipmentId;
     }
 
-    public void setShipmentId(ShipmentId shipmentId) {
+    public void setShipmentId(final ShipmentId shipmentId) {
         this.shipmentId = shipmentId;
     }
 
