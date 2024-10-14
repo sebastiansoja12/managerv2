@@ -3,12 +3,11 @@ package com.warehouse.shipment.domain.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.shipment.domain.enumeration.ShipmentPriority;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import org.apache.commons.lang3.ObjectUtils;
 
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.City;
 import com.warehouse.shipment.domain.vo.Recipient;
@@ -35,11 +34,23 @@ public class Shipment {
 
     private double price;
 
+    private Currency currency;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
     private Boolean locked;
+
+    private DangerousGood dangerousGood;
+
+    private Boolean signatureRequired;
+
+    private ShipmentPriority shipmentPriority;
+
+    private Country originCountry;
+
+    private Country destinationCountry;
 
 	public Shipment(final ShipmentId shipmentId,
                     final Sender sender,
