@@ -126,6 +126,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public void changeShipmentSignature(ShipmentRequest request) {
+        //
+    }
+
+    @Override
     public Shipment loadParcel(final ShipmentId shipmentId) {
         return this.shipmentService.find(shipmentId);
     }

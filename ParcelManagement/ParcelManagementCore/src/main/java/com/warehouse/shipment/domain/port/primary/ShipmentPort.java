@@ -21,6 +21,8 @@ public interface ShipmentPort {
 
     void changeShipmentStatus(final ShipmentStatusRequest request);
 
+    void changeShipmentSignature(final ShipmentRequest request);
+
     Shipment loadParcel(final ShipmentId shipmentId);
 
     boolean existsShipment(final ShipmentId shipmentId);
