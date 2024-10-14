@@ -1,4 +1,4 @@
-package com.warehouse.shipment.infrastructure.adapter.primary.response;
+package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
 public class ShipmentResponseInformation {
     private final Status status;

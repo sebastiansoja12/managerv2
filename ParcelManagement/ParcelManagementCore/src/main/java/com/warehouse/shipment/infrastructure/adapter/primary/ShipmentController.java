@@ -2,8 +2,8 @@ package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.infrastructure.adapter.primary.response.Status;
-import com.warehouse.shipment.infrastructure.adapter.primary.response.ShipmentResponseInformation;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.Status;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentResponseInformation;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 import org.springframework.http.HttpStatus;
