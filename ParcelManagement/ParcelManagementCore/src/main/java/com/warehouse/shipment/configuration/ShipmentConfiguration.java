@@ -30,13 +30,13 @@ public class ShipmentConfiguration {
 	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
 
 	@Bean
-	public ShipmentRepository shipmentRepository(ShipmentReadRepository repository) {
+	public ShipmentRepository shipmentRepository(final ShipmentReadRepository repository) {
 		final ParcelMapper parcelMapper = Mappers.getMapper(ParcelMapper.class);
 		return new ShipmentRepositoryImpl(repository, parcelMapper);
 	}
 
 	@Bean(name = "shipment.mailPort")
-	public MailPort mailPort(com.warehouse.mail.domain.service.MailService mailService) {
+	public MailPort mailPort(final com.warehouse.mail.domain.service.MailService mailService) {
 		return new MailPortImpl(mailService);
 	}
 
@@ -69,12 +69,12 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(ShipmentRepository shipmentRepository) {
+	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository) {
 		return new ShipmentServiceImpl(shipmentRepository);
 	}
 
 	@Bean(name = "shipment.routeLogServicePort")
-	public RouteLogServicePort routeLogServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {
+	public RouteLogServicePort routeLogServicePort(final RouteTrackerLogProperties routeTrackerLogProperties) {
 		return new RouteLogServiceAdapter(routeTrackerLogProperties);
 	}
 
@@ -91,14 +91,14 @@ public class ShipmentConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name="service.mock", havingValue="false")
-	public PathFinderServicePort pathFinderServicePort(VoronoiService voronoiService) {
+	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService) {
 		return new PathFinderAdapter(voronoiService);
 	}
 
 	//MOCK
 	@Bean
 	@ConditionalOnProperty(name="service.mock", havingValue="true")
-	public PathFinderServicePort pathFinderMockServicePort(PathFinderMockService pathFinderMockService) {
+	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
 		return new PathFinderMockAdapter(pathFinderMockService);
 	}
 }
