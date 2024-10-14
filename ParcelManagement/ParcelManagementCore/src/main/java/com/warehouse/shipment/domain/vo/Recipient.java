@@ -1,6 +1,9 @@
 package com.warehouse.shipment.domain.vo;
 
+import com.warehouse.shipment.domain.enumeration.PersonType;
 import lombok.Builder;
+
+import static com.warehouse.shipment.domain.enumeration.PersonType.RECIPIENT;
 
 @Builder
 public class Recipient implements Person {
@@ -57,5 +60,10 @@ public class Recipient implements Person {
     @Override
     public String getStreet() {
         return street;
+    }
+
+    @Override
+    public PersonType getType() {
+        return RECIPIENT;
     }
 }
