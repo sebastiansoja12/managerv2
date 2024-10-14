@@ -20,7 +20,6 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ParcelMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
 
@@ -31,8 +30,7 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentRepository shipmentRepository(final ShipmentReadRepository repository) {
-		final ParcelMapper parcelMapper = Mappers.getMapper(ParcelMapper.class);
-		return new ShipmentRepositoryImpl(repository, parcelMapper);
+		return new ShipmentRepositoryImpl(repository);
 	}
 
 	@Bean(name = "shipment.mailPort")
@@ -46,9 +44,11 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentPort shipmentPort(final ShipmentService service, final PathFinderServicePort pathFinderServicePort,
-			final NotificationCreatorProvider notificationCreatorProvider, final MailServicePort mailServicePort,
-			final RouteLogServicePort routeLogServicePort) {
+	public ShipmentPort shipmentPort(final ShipmentService service,
+									 final PathFinderServicePort pathFinderServicePort,
+									 final NotificationCreatorProvider notificationCreatorProvider,
+									 final MailServicePort mailServicePort,
+									 final RouteLogServicePort routeLogServicePort) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, mailServicePort, routeLogServicePort);
 	}
@@ -84,7 +84,7 @@ public class ShipmentConfiguration {
 	}
 	
 	@Bean(name = "shipment.mailServicePort")
-	public MailServicePort mailServicePort(MailPort mailPort) {
+	public MailServicePort mailServicePort(final MailPort mailPort) {
 		final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
 		return new MailAdapter(mailPort, notificationMapper);
 	}

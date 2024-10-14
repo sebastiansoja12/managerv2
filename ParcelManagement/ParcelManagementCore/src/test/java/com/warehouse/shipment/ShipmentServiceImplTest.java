@@ -27,7 +27,7 @@ import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.City;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.RouteProcess;
-import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipmentServiceImplTest {
@@ -114,7 +114,7 @@ public class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldLoadShipment() {
+    void shouldFind() {
         // given
         final ShipmentId shipmentId = shipmentId();
 
@@ -129,7 +129,7 @@ public class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldNotLoadShipmentAndThrowException() {
+    void shouldNotFindAndThrowException() {
         // given
         final ShipmentId shipmentId = shipmentId();
 
@@ -137,14 +137,14 @@ public class ShipmentServiceImplTest {
         final Parcel expectedParcel = createParcel();
 
         // build exception to throw
-        final ParcelNotFoundException expectedException = new ParcelNotFoundException("Parcel was not found");
+        final ShipmentNotFoundException expectedException = new ShipmentNotFoundException("Parcel was not found");
 
 
         // when
-        final Executable executable = () -> service.loadShipment(shipmentId);
+        final Executable executable = () -> service.find(shipmentId);
 
         // then
-        final ParcelNotFoundException exception = assertThrows(ParcelNotFoundException.class, executable);
+        final ShipmentNotFoundException exception = assertThrows(ShipmentNotFoundException.class, executable);
         assertEquals(exception.getMessage(), expectedToBe("Parcel was not found"));
     }
 

@@ -11,7 +11,7 @@ import org.mapstruct.ReportingPolicy;
 import java.time.LocalDateTime;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
-public interface ParcelMapper {
+public interface ShipmentEntityMapper {
 
     default ParcelEntity map(final Shipment shipment) {
         return ParcelEntity.builder()

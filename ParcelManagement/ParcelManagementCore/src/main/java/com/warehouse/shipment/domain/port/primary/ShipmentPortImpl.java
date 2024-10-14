@@ -97,7 +97,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public Shipment loadParcel(final ShipmentId shipmentId) {
-        return this.shipmentService.loadShipment(shipmentId);
+        return this.shipmentService.find(shipmentId);
     }
 
     @Override

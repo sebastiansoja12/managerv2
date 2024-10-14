@@ -161,22 +161,72 @@ public class Shipment {
     public void prepareShipmentToCreate() {
         this.shipmentStatus = ShipmentStatus.CREATED;
         this.createdAt = LocalDateTime.now();
+        markAsModified();
+    }
+
+    public void prepareShipmentToReroute() {
+        this.shipmentStatus = ShipmentStatus.REROUTE;
+        markAsModified();
+    }
+
+    public void prepareShipmentToRedirect(final ShipmentId newShipmentId) {
+        this.shipmentStatus = ShipmentStatus.REDIRECT;
+        this.shipmentType = ShipmentType.CHILD;
+        this.shipmentRelatedId = newShipmentId;
+        markAsModified();
+        lockShipment();
+    }
+
+    public void lockShipment() {
+        this.locked = true;
+    }
+
+    public void prepareShipmentToSend() {
+        this.shipmentStatus = ShipmentStatus.SENT;
+        markAsModified();
+    }
+
+    public void prepareShipmentToDeliver() {
+        this.shipmentStatus = ShipmentStatus.DELIVERY;
+        markAsModified();
+    }
+
+    public void changeSender(final Sender sender) {
+        this.sender = sender;
+    }
+
+    public void changeRecipient(final Recipient recipient) {
+        this.recipient = recipient;
+    }
+
+    public void changeShipmentSize(final ShipmentSize shipmentSize) {
+        this.shipmentSize = shipmentSize;
+        markAsModified();
+    }
+
+    public void changePrice(final double price) {
+        this.price = price;
+        markAsModified();
+    }
+
+    public void markAsModified() {
         this.updatedAt = LocalDateTime.now();
     }
 
     public void updateDestination(final City city) {
         if (ObjectUtils.isNotEmpty(city) && city.getValue() != null) {
             this.destination = city.getValue();
+            markAsModified();
         }
     }
 
     public void update(final ShipmentUpdate shipmentUpdate) {
         this.recipient = shipmentUpdate.getRecipient();
         this.sender = shipmentUpdate.getSender();
-        this.updatedAt = LocalDateTime.now();
+        markAsModified();
     }
 
-    public void updateShipmentStatus(final ShipmentStatus shipmentStatus) {
-        this.shipmentStatus = shipmentStatus;
+    public void changeShipmentType(final ShipmentType shipmentType) {
+        this.shipmentType = shipmentType;
     }
 }

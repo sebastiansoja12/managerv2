@@ -13,8 +13,13 @@ public class Sender implements Person {
     private final String postalCode;
     private final String street;
 
-	public Sender(final String firstName, final String lastName, final String email, final String telephoneNumber,
-			final String city, final String postalCode, final String street) {
+	public Sender(final String firstName,
+                  final String lastName,
+                  final String email,
+                  final String telephoneNumber,
+                  final String city,
+                  final String postalCode,
+                  final String street) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;

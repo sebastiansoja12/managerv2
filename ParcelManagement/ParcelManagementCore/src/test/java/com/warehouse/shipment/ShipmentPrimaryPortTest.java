@@ -24,7 +24,7 @@ import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import com.warehouse.shipment.domain.vo.ShipmentResponse;
-import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentPrimaryPortTest {
@@ -74,7 +74,7 @@ class ShipmentPrimaryPortTest {
 
         doReturn(createParcel())
                 .when(shipmentService)
-                .loadShipment(shipmentId());
+                .find(shipmentId());
         // when
         final Shipment shipment = shipmentPort.loadParcel(shipmentId());
         // then
@@ -85,15 +85,15 @@ class ShipmentPrimaryPortTest {
     void shouldNotLoadParcel() {
         // given
         final ShipmentId shipmentId = new ShipmentId(0L);
-        final ParcelNotFoundException parcelNotFoundException = new ParcelNotFoundException("Parcel was not found");
-        doThrow(parcelNotFoundException)
+        final ShipmentNotFoundException shipmentNotFoundException = new ShipmentNotFoundException("Parcel was not found");
+        doThrow(shipmentNotFoundException)
                 .when(shipmentService)
-                .loadShipment(shipmentId);
+                .find(shipmentId);
         // when
         final Executable executable = () -> shipmentPort.loadParcel(shipmentId);
         // then
-        final ParcelNotFoundException exception =
-                assertThrows(ParcelNotFoundException.class, executable);
+        final ShipmentNotFoundException exception =
+                assertThrows(ShipmentNotFoundException.class, executable);
         assertEquals(expectedToBe("Parcel was not found"), exception.getMessage());
     }
 
