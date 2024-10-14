@@ -1,6 +1,7 @@
 package com.warehouse.shipment.domain.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import org.apache.commons.lang3.ObjectUtils;
@@ -234,6 +235,9 @@ public class Shipment {
     }
 
     public void changeShipmentType(final ShipmentType shipmentType) {
+        if (Objects.isNull(this.shipmentRelatedId)) {
+            throw new RuntimeException("Shipment type cannot be changed");
+        }
         this.shipmentType = shipmentType;
         markAsModified();
     }
