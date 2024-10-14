@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.service;
 
 import java.util.UUID;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -58,6 +59,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void changeShipmentType(final ShipmentId shipmentId, final ShipmentType shipmentType) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeShipmentType(shipmentType);
+        shipmentRepository.update(shipment);
+    }
+
+    @Override
+    public void changeShipmentStatus(final ShipmentId shipmentId, final ShipmentStatus shipmentStatus) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.changeShipmentStatus(shipmentStatus);
         shipmentRepository.update(shipment);
     }
 

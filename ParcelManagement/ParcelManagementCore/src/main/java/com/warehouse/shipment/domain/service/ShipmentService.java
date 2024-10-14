@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.service;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -22,6 +23,8 @@ public interface ShipmentService {
     void changeRecipient(final ShipmentId shipmentId, final Recipient recipient);
 
     void changeShipmentType(final ShipmentId shipmentId, final ShipmentType shipmentType);
+
+    void changeShipmentStatus(final ShipmentId shipmentId, final ShipmentStatus shipmentStatus);
 
     ShipmentId nextShipmentId();
 }

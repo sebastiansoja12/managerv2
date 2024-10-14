@@ -235,5 +235,11 @@ public class Shipment {
 
     public void changeShipmentType(final ShipmentType shipmentType) {
         this.shipmentType = shipmentType;
+        markAsModified();
+    }
+
+    public void changeShipmentStatus(final ShipmentStatus shipmentStatus) {
+        this.shipmentStatus = shipmentStatus;
+        markAsModified();
     }
 }

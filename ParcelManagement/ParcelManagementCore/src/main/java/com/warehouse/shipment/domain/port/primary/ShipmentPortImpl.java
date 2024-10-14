@@ -121,6 +121,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public void changeShipmentStatus(final ShipmentStatusRequest request) {
+        this.shipmentService.changeShipmentStatus(request.getShipmentId(), request.getShipmentStatus());
+    }
+
+    @Override
     public Shipment loadParcel(final ShipmentId shipmentId) {
         return this.shipmentService.find(shipmentId);
     }
@@ -129,7 +134,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     public boolean existsShipment(final ShipmentId shipmentId) {
         return this.shipmentService.existsShipment(shipmentId);
     }
-
 
     private Shipment extractShipmentFromRequest(final ShipmentRequest request) {
         if (Objects.isNull(request)) {
