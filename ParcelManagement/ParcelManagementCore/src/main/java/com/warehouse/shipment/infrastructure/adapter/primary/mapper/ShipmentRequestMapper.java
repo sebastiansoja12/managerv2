@@ -47,9 +47,9 @@ public interface ShipmentRequestMapper {
         }
 
         return switch (token.length()) {
-            case 4 -> ProcessType.REDIRECT;
-            case 5 -> ProcessType.REROUTE;
-            case 6 -> ProcessType.RETURN;
+            case 8 -> ProcessType.REDIRECT;
+            case 6 -> ProcessType.REROUTE;
+            case 4 -> ProcessType.ROUTE;
             default -> throw new IllegalStateException("Unexpected value: " + token.length());
         };
     }
