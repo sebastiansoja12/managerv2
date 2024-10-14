@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import io.micrometer.common.util.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -40,10 +41,16 @@ public interface ShipmentRequestMapper {
     Recipient mapToRecipient(final PersonDto person);
 
     default ProcessType processDeterminer(final String token) {
-        if (token.length() == 5) {
-            return ProcessType.REROUTE;
-        } else {
+
+        if (StringUtils.isEmpty(token)) {
             return ProcessType.CREATED;
         }
+
+        return switch (token.length()) {
+            case 4 -> ProcessType.REDIRECT;
+            case 5 -> ProcessType.REROUTE;
+            case 6 -> ProcessType.RETURN;
+            default -> throw new IllegalStateException("Unexpected value: " + token.length());
+        };
     }
 }
