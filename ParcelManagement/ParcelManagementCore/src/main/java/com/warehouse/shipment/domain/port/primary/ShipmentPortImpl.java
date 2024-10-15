@@ -127,7 +127,13 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public void changeShipmentSignatureTo(final ShipmentRequest request) {
-        //
+        final Shipment shipment = Shipment.from(request);
+        // change signature in service
+    }
+
+    @Override
+    public void updateShipmentStatus(final ShipmentStatusRequest request) {
+        this.shipmentService.changeShipmentStatusTo(request.getShipmentId(), request.getShipmentStatus());
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusRequestDto;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.Status;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentResponseInformation;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
@@ -63,6 +64,14 @@ public class ShipmentController {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
         shipmentPort.update(request);
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
+    }
+
+    @PutMapping("/status")
+    public ResponseEntity<?> updateStatus(@RequestBody final ShipmentStatusRequestDto shipmentStatusRequest) {
+        shipmentRequestValidator.validateBody(shipmentStatusRequest);
+        final ShipmentStatusRequest request = requestMapper.map(shipmentStatusRequest);
+        shipmentPort.updateShipmentStatus(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 

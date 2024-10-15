@@ -23,7 +23,10 @@ public interface ShipmentPort {
 
     void changeShipmentSignatureTo(final ShipmentRequest request);
 
+    void updateShipmentStatus(ShipmentStatusRequest request);
+
     Shipment loadParcel(final ShipmentId shipmentId);
 
     boolean existsShipment(final ShipmentId shipmentId);
+
 }
