@@ -16,6 +16,8 @@ public interface ShipmentService {
 
     void createShipment(final Shipment shipment);
 
+    ShipmentId createCopy(final ShipmentId shipmentId);
+
     void updateShipment(final ShipmentUpdate shipmentUpdate, final ShipmentId shipmentId);
 
     void changeSenderTo(final ShipmentId shipmentId, final Sender sender);
