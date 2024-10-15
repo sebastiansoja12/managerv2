@@ -25,7 +25,7 @@ public interface ShipmentPort {
 
     void updateShipmentStatus(ShipmentStatusRequest request);
 
-    Shipment loadParcel(final ShipmentId shipmentId);
+    Shipment loadShipment(final ShipmentId shipmentId);
 
     boolean existsShipment(final ShipmentId shipmentId);
 

@@ -76,7 +76,7 @@ class ShipmentPrimaryPortTest {
                 .when(shipmentService)
                 .find(shipmentId());
         // when
-        final Shipment shipment = shipmentPort.loadParcel(shipmentId());
+        final Shipment shipment = shipmentPort.loadShipment(shipmentId());
         // then
         assertThat(shipment).isNotNull();
     }
@@ -90,7 +90,7 @@ class ShipmentPrimaryPortTest {
                 .when(shipmentService)
                 .find(shipmentId);
         // when
-        final Executable executable = () -> shipmentPort.loadParcel(shipmentId);
+        final Executable executable = () -> shipmentPort.loadShipment(shipmentId);
         // then
         final ShipmentNotFoundException exception =
                 assertThrows(ShipmentNotFoundException.class, executable);

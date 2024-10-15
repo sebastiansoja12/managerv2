@@ -54,7 +54,7 @@ public class ShipmentController {
     public ResponseEntity<?> get(final ShipmentIdDto shipmentId) {
         shipmentRequestValidator.validateBody(shipmentId);
         final ShipmentId id = requestMapper.map(shipmentId);
-        final Shipment shipment = shipmentPort.loadParcel(id);
+        final Shipment shipment = shipmentPort.loadShipment(id);
         final ShipmentDto shipmentResponse = responseMapper.map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
