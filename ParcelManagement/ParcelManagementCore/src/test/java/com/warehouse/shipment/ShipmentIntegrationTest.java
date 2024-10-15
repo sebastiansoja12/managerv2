@@ -19,7 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.warehouse.shipment.configuration.ShipmentTestConfiguration;
-import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
@@ -50,7 +50,7 @@ public class ShipmentIntegrationTest {
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then
-        final ParcelNotFoundException exception = assertThrows(ParcelNotFoundException.class, executable);
+        final ShipmentEmptyRequestException exception = assertThrows(ShipmentEmptyRequestException.class, executable);
         assertEquals(expectedToBe("Parcel not found in request"), exception.getMessage());
     }
 

@@ -4,12 +4,12 @@ import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExcept
 
 import java.util.Objects;
 
-import com.warehouse.commonassets.enumeration.ShipmentType;
 import org.apache.commons.lang3.ObjectUtils;
 
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
-import com.warehouse.shipment.domain.exception.ParcelNotFoundException;
+import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -51,10 +51,10 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public ShipmentResponse ship(final ShipmentRequest request) {
 
-        final Shipment shipment = extractShipmentFromRequest(request);
+        final Shipment shipment = Shipment.from(request);
 
         if (ObjectUtils.isEmpty(shipment)) {
-            throw new ParcelNotFoundException(ShipmentExceptionCodes.SHIPMENT_204);
+            throw new ShipmentEmptyRequestException(ShipmentExceptionCodes.SHIPMENT_204);
         }
 
         logShipment(shipment);
@@ -97,36 +97,36 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeSender(final ShipmentRequest request) {
+    public void changeSenderTo(final ShipmentRequest request) {
         final Shipment shipment = Shipment.from(request);
         final Sender sender = Sender.from(shipment);
         final ShipmentId shipmentId = shipment.getShipmentId();
-        this.shipmentService.changeSender(shipmentId, sender);
+        this.shipmentService.changeSenderTo(shipmentId, sender);
     }
 
     @Override
-    public void changeRecipient(final ShipmentRequest request) {
+    public void changeRecipientTo(final ShipmentRequest request) {
         final Shipment shipment = Shipment.from(request);
         final Recipient recipient = Recipient.from(shipment);
         final ShipmentId shipmentId = shipment.getShipmentId();
-        this.shipmentService.changeRecipient(shipmentId, recipient);
+        this.shipmentService.changeRecipientTo(shipmentId, recipient);
     }
 
     @Override
-    public void changeShipmentType(final ShipmentRequest request) {
+    public void changeShipmentTypeTo(final ShipmentRequest request) {
         final Shipment shipment = Shipment.from(request);
         final ShipmentType shipmentType = shipment.getShipmentType();
         final ShipmentId shipmentId = shipment.getShipmentId();
-        this.shipmentService.changeShipmentType(shipmentId, shipmentType);
+        this.shipmentService.changeShipmentTypeTo(shipmentId, shipmentType);
     }
 
     @Override
-    public void changeShipmentStatus(final ShipmentStatusRequest request) {
-        this.shipmentService.changeShipmentStatus(request.getShipmentId(), request.getShipmentStatus());
+    public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
+        this.shipmentService.changeShipmentStatusTo(request.getShipmentId(), request.getShipmentStatus());
     }
 
     @Override
-    public void changeShipmentSignature(ShipmentRequest request) {
+    public void changeShipmentSignatureTo(final ShipmentRequest request) {
         //
     }
 
@@ -140,16 +140,9 @@ public class ShipmentPortImpl implements ShipmentPort {
         return this.shipmentService.existsShipment(shipmentId);
     }
 
-    private Shipment extractShipmentFromRequest(final ShipmentRequest request) {
-        if (Objects.isNull(request)) {
-            throw new RuntimeException();
-        }
-        return request.getShipment();
-    }
-
-    private void logShipment(final Shipment parcel) {
+    private void logShipment(final Shipment shipment) {
 		logger.info("Detected service to create shipment with telephone number {}",
-				parcel.getSender().getTelephoneNumber());
+				shipment.getSender().getTelephoneNumber());
     }
 
     private void logNotification(final Notification notification) {

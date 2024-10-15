@@ -186,10 +186,10 @@ public class Shipment {
         markAsModified();
     }
 
-    public void prepareShipmentToRedirect(final ShipmentId newShipmentId) {
+    public void prepareShipmentToRedirect(final ShipmentId newRelatedShipmentId) {
         this.shipmentStatus = ShipmentStatus.REDIRECT;
         this.shipmentType = ShipmentType.CHILD;
-        this.shipmentRelatedId = newShipmentId;
+        this.shipmentRelatedId = newRelatedShipmentId;
         markAsModified();
         lockShipment();
     }
@@ -256,5 +256,74 @@ public class Shipment {
     public void changeShipmentStatus(final ShipmentStatus shipmentStatus) {
         this.shipmentStatus = shipmentStatus;
         markAsModified();
+    }
+
+    public void notifyRelatedShipmentRedirected(final ShipmentId relatedShipmentId) {
+        this.shipmentRelatedId = relatedShipmentId;
+        this.shipmentType = ShipmentType.CHILD;
+        lockShipment();
+        markAsModified();
+    }
+
+    public void changeCurrency(final Currency currency) {
+        this.currency = currency;
+        markAsModified();
+    }
+
+    public void changeShipmentOrigin(final Country originCountry) {
+        this.originCountry = originCountry;
+        markAsModified();
+    }
+
+    public void changeShipmentDestinationCountry(final Country destinationCountry) {
+        this.destinationCountry = destinationCountry;
+        markAsModified();
+    }
+
+    public void changeSignatureRequired(final boolean signatureRequired) {
+        this.signatureRequired = signatureRequired;
+        markAsModified();
+    }
+
+    public void changeDangerousGood(final DangerousGood dangerousGood) {
+        this.dangerousGood = dangerousGood;
+        markAsModified();
+    }
+
+    public void changeShipmentPriority(final ShipmentPriority shipmentPriority) {
+        this.shipmentPriority = shipmentPriority;
+        markAsModified();
+    }
+
+    public void changeShipmentRelatedId(final ShipmentId relatedShipmentId) {
+        this.shipmentRelatedId = relatedShipmentId;
+        markAsModified();
+    }
+
+    public void notifyRelatedShipmentLocked() {
+        this.shipmentStatus = ShipmentStatus.SENT;
+        this.shipmentType = ShipmentType.PARENT;
+        this.shipmentRelatedId = null;
+        unlockShipment();
+        markAsModified();
+    }
+
+    private void unlockShipment() {
+        this.locked = false;
+    }
+
+    public Shipment snapshot() {
+        return new Shipment(
+                this.shipmentId,
+                this.sender,
+                this.recipient,
+                this.shipmentSize,
+                this.shipmentStatus,
+                this.shipmentRelatedId,
+                this.price,
+                this.createdAt,
+                this.updatedAt,
+                this.locked
+        );
     }
 }

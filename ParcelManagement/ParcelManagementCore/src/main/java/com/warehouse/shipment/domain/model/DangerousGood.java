@@ -1,9 +1,12 @@
 package com.warehouse.shipment.domain.model;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+
 import java.util.List;
 
 public class DangerousGood {
 
+    private ShipmentId shipmentId;
     private String name;
     private String description;
     private String classificationCode;
@@ -19,12 +22,13 @@ public class DangerousGood {
     private String countryOfOrigin;
     private String safetyDataSheet;
 
-    public DangerousGood(final String name, final String description, final String classificationCode,
-                         final List<String> hazardSymbols, final String storageRequirements,
-                         final String handlingInstructions, final double weight, final String packaging,
-                         final boolean flammable, final boolean isCorrosive,
+    public DangerousGood(final ShipmentId shipmentId, final String name, final String description,
+                         final String classificationCode, final List<String> hazardSymbols,
+                         final String storageRequirements, final String handlingInstructions, final double weight,
+                         final String packaging, final boolean flammable, final boolean isCorrosive,
                          final boolean toxic, final String emergencyContact,
                          final String countryOfOrigin, final String safetyDataSheet) {
+        this.shipmentId = shipmentId;
         this.name = name;
         this.description = description;
         this.classificationCode = classificationCode;
@@ -39,6 +43,14 @@ public class DangerousGood {
         this.emergencyContact = emergencyContact;
         this.countryOfOrigin = countryOfOrigin;
         this.safetyDataSheet = safetyDataSheet;
+    }
+
+    public ShipmentId getShipmentId() {
+        return shipmentId;
+    }
+
+    public void setShipmentId(final ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
     }
 
     public void setName(final String name) {

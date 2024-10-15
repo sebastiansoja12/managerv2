@@ -13,15 +13,15 @@ public interface ShipmentPort {
 
     void update(final ShipmentUpdateRequest request);
 
-    void changeSender(final ShipmentRequest request);
+    void changeSenderTo(final ShipmentRequest request);
 
-    void changeRecipient(final ShipmentRequest request);
+    void changeRecipientTo(final ShipmentRequest request);
 
-    void changeShipmentType(final ShipmentRequest request);
+    void changeShipmentTypeTo(final ShipmentRequest request);
 
-    void changeShipmentStatus(final ShipmentStatusRequest request);
+    void changeShipmentStatusTo(final ShipmentStatusRequest request);
 
-    void changeShipmentSignature(final ShipmentRequest request);
+    void changeShipmentSignatureTo(final ShipmentRequest request);
 
     Shipment loadParcel(final ShipmentId shipmentId);
 
