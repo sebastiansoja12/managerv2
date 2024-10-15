@@ -1,6 +1,6 @@
 package com.warehouse.deliveryreturn;
 
-import com.warehouse.deliveryreturn.domain.vo.Parcel;
+import com.warehouse.deliveryreturn.domain.vo.Shipment;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.MailAdapter;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.tools.mail.MailProperty;
@@ -29,10 +29,10 @@ public class MailAdapterTest {
     @Test
     void shouldSendNotification() {
         // given
-        final Parcel parcel = Parcel.builder()
+        final Shipment shipment = Shipment.builder()
                 .senderEmail("email")
                 .id(1L)
-                .parcelStatus("RETURN")
+                .shipmentStatus("RETURN")
                 .recipientEmail("email")
                 .build();
         doReturn("Test message")
@@ -42,7 +42,7 @@ public class MailAdapterTest {
                 .when(mailProperty)
                 .getSubject();
         // when
-        mailAdapter.sendNotification(parcel);
+        mailAdapter.sendNotification(shipment);
         // then
         verify(mailPort).sendNotification(any());
     }

@@ -3,7 +3,7 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.secondary;
 import static org.mapstruct.factory.Mappers.getMapper;
 
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
-import com.warehouse.deliveryreturn.domain.vo.Parcel;
+import com.warehouse.deliveryreturn.domain.vo.Shipment;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.MailMapper;
 import com.warehouse.mail.domain.port.primary.MailPort;
 
@@ -20,8 +20,8 @@ public class MailAdapter implements MailServicePort {
     private final MailMapper mapper = getMapper(MailMapper.class);
 
     @Override
-    public void sendNotification(Parcel parcel) {
-        final com.warehouse.mail.domain.vo.Notification mailNotification = mapper.map(parcel, mailProperty);
+    public void sendNotification(Shipment shipment) {
+        final com.warehouse.mail.domain.vo.Notification mailNotification = mapper.map(shipment, mailProperty);
         mailPort.sendNotification(mailNotification);
     }
 }
