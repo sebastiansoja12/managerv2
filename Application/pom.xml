@@ -96,11 +96,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ParcelStatusControlChangeCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>ReturningTrackManagerCore</artifactId>
             <version>${project.version}</version>
         </dependency>
