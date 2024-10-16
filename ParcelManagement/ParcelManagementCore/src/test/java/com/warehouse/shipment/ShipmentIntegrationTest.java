@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -63,7 +64,7 @@ public class ShipmentIntegrationTest {
         when(voronoiService.findFastestRoute(shipment.getDestination())).thenReturn("KT3");
         doThrow(new RuntimeException("Error while registering route for parcel"))
                 .when(routeLogServicePort)
-                .initializeRouteProcess(shipmentId);
+                .initializeRouteProcess(shipmentId, new SoftwareConfiguration("", ""));
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then

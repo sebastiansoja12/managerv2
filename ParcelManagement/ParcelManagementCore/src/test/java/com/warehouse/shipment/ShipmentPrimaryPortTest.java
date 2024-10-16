@@ -53,7 +53,7 @@ class ShipmentPrimaryPortTest {
     void setUp() {
         logger = mock(Logger.class);
         shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
-                mailServicePort, routeLogServicePort);
+                mailServicePort);
     }
 
     @Test

@@ -10,6 +10,7 @@ import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.vo.Recipient;
+import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.domain.vo.Sender;
 
 public interface ShipmentService {
@@ -49,6 +50,8 @@ public interface ShipmentService {
     Shipment find(final ShipmentId shipmentId);
 
     boolean existsShipment(final ShipmentId shipmentId);
+
+    RouteProcess initializeRouteProcess(final ShipmentId shipmentId);
 
     ShipmentId nextShipmentId();
 }

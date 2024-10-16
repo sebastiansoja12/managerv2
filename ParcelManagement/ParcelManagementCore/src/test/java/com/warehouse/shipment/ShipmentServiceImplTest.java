@@ -47,11 +47,14 @@ public class ShipmentServiceImplTest {
     @Mock
     private RouteLogServicePort routeLogServicePort;
 
+    @Mock
+    SoftwareConfigurationServicePort softwareConfigurationServicePort;
+
     private ShipmentServiceImpl service;
 
 	@BeforeEach
 	void setup() {
-		service = new ShipmentServiceImpl(shipmentRepository);
+		service = new ShipmentServiceImpl(shipmentRepository, routeLogServicePort, softwareConfigurationServicePort);
 	}
 
     @Test
@@ -85,7 +88,7 @@ public class ShipmentServiceImplTest {
                 .when(mailServicePort)
                 .sendShipmentNotification(notification);
 
-        when(routeLogServicePort.initializeRouteProcess(shipmentId)).thenReturn(routeProcess);
+        when(routeLogServicePort.initializeRouteProcess(shipmentId, null)).thenReturn(routeProcess);
 
 
         // when

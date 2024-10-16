@@ -11,16 +11,29 @@ import com.warehouse.shipment.domain.enumeration.ShipmentPriority;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
+import com.warehouse.shipment.domain.model.SoftwareConfigurationProperties;
+import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
+import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.domain.vo.Recipient;
+import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
 
 public class ShipmentServiceImpl implements ShipmentService {
 
     private final ShipmentRepository shipmentRepository;
 
-	public ShipmentServiceImpl(final ShipmentRepository shipmentRepository) {
+    private final RouteLogServicePort routeLogServicePort;
+
+    private final SoftwareConfigurationServicePort softwareConfigurationServicePort;
+
+	public ShipmentServiceImpl(final ShipmentRepository shipmentRepository,
+                               final RouteLogServicePort routeLogServicePort,
+                               final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
         this.shipmentRepository = shipmentRepository;
+        this.routeLogServicePort = routeLogServicePort;
+        this.softwareConfigurationServicePort = softwareConfigurationServicePort;
     }
 
     @Override
@@ -53,6 +66,14 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public boolean existsShipment(final ShipmentId shipmentId) {
         return this.shipmentRepository.exists(shipmentId);
+    }
+
+    @Override
+    public RouteProcess initializeRouteProcess(final ShipmentId shipmentId) {
+        final SoftwareConfigurationProperties softwareConfigurationProperties = new SoftwareConfigurationProperties();
+		final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort
+				.getSoftwareConfiguration(softwareConfigurationProperties);
+        return this.routeLogServicePort.initializeRouteProcess(shipmentId, softwareConfiguration);
     }
 
     @Override

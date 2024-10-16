@@ -1,5 +1,7 @@
 package com.warehouse.shipment.configuration;
 
+import java.time.Duration;
+
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +24,8 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
+
+import io.github.resilience4j.retry.RetryConfig;
 
 @Configuration
 public class ShipmentConfiguration {
@@ -47,10 +51,20 @@ public class ShipmentConfiguration {
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
-									 final MailServicePort mailServicePort,
-									 final RouteLogServicePort routeLogServicePort) {
+									 final MailServicePort mailServicePort) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, mailServicePort, routeLogServicePort);
+				notificationCreatorProvider, mailServicePort);
+	}
+
+	@Bean
+	public SoftwareConfigurationServicePort softwareConfigurationServicePort() {
+		final RetryConfig config = RetryConfig.custom()
+				.maxAttempts(4)
+				.waitDuration(Duration.ofSeconds(2))
+				.retryExceptions(RuntimeException.class)
+				.writableStackTraceEnabled(true)
+				.build();
+		return new SoftwareConfigurationServiceAdapter(config);
 	}
 
 	@Bean
@@ -69,13 +83,21 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository) {
-		return new ShipmentServiceImpl(shipmentRepository);
+	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository,
+										   final RouteLogServicePort routeLogServicePort,
+										   final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
+		return new ShipmentServiceImpl(shipmentRepository, routeLogServicePort, softwareConfigurationServicePort);
 	}
 
 	@Bean(name = "shipment.routeLogServicePort")
-	public RouteLogServicePort routeLogServicePort(final RouteTrackerLogProperties routeTrackerLogProperties) {
-		return new RouteLogServiceAdapter(routeTrackerLogProperties);
+	public RouteLogServicePort routeLogServicePort() {
+		final RetryConfig config = RetryConfig.custom()
+				.maxAttempts(3)
+				.waitDuration(Duration.ofSeconds(2))
+				.retryExceptions(RuntimeException.class)
+				.writableStackTraceEnabled(true)
+				.build();
+		return new RouteLogServiceAdapter(config);
 	}
 
 	@Bean("shipment.routeTrackerLogProperties")

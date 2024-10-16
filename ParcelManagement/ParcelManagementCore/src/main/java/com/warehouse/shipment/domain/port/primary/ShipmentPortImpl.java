@@ -16,7 +16,6 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.*;
@@ -34,18 +33,15 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final MailServicePort mailServicePort;
 
-    private final RouteLogServicePort routeLogServicePort;
-
 	public ShipmentPortImpl(final ShipmentService shipmentService, final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
-                            final NotificationCreatorProvider notificationCreatorProvider, final MailServicePort mailServicePort,
-                            final RouteLogServicePort routeLogServicePort) {
+                            final NotificationCreatorProvider notificationCreatorProvider,
+                            final MailServicePort mailServicePort) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
 		this.mailServicePort = mailServicePort;
-		this.routeLogServicePort = routeLogServicePort;
 	}
 
     @Override
@@ -79,7 +75,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         logCreatedShipment(shipment);
 
-        final RouteProcess routeProcess = this.routeLogServicePort.initializeRouteProcess(shipmentId);
+        final RouteProcess routeProcess = this.shipmentService.initializeRouteProcess(shipmentId);
 
         return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getShipmentId());
     }
