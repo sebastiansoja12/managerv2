@@ -1,5 +1,7 @@
 package com.warehouse.tracking.infrastructure.adapter.primary;
 
+import com.warehouse.redirect.RedirectService;
+import com.warehouse.reroute.RerouteService;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentStatusDto;
 import com.warehouse.tracking.ShipmentStatusChanged;
@@ -18,7 +20,16 @@ public class TrackingEventListener {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSSS");
 
+    private final RerouteService rerouteService;
+
+    private final RedirectService redirectService;
+
     private final ShipmentEventMapper eventMapper = getMapper(ShipmentEventMapper.class);
+
+    public TrackingEventListener(final RerouteService rerouteService, final RedirectService redirectService) {
+        this.rerouteService = rerouteService;
+        this.redirectService = redirectService;
+    }
 
     @EventListener
     public void handle(final ShipmentStatusChanged event) {
@@ -26,8 +37,8 @@ public class TrackingEventListener {
         final ShipmentDto shipment = event.getShipment();
         final ShipmentStatusDto shipmentStatus = shipment.getShipmentStatus();
         switch (shipmentStatus) {
-            case REROUTE -> System.out.println("Reroute adapter");
-            case REDIRECT -> System.out.println("Redirect adapter");
+            case REROUTE -> rerouteService.rerouteShipment(shipment);
+            case REDIRECT -> redirectService.redirectShipment(shipment);
         }
     }
 
