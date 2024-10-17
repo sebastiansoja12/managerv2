@@ -39,6 +39,7 @@ public class TrackingEventListener {
         switch (shipmentStatus) {
             case REROUTE -> rerouteService.rerouteShipment(shipment);
             case REDIRECT -> redirectService.redirectShipment(shipment);
+            default -> log.info("Shipment not eligible for status change");
         }
     }
 
