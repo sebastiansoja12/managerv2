@@ -9,13 +9,13 @@
         <version>2024.7-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ParcelManagement</artifactId>
+    <artifactId>ShipmentManagement</artifactId>
 
     <packaging>pom</packaging>
 
     <modules>
-        <module>ParcelManagementApi</module>
-        <module>ParcelManagementCore</module>
+        <module>ShipmentManagementApi</module>
+        <module>ShipmentManagementCore</module>
     </modules>
 
 </project>

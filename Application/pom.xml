@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ParcelManagementCore</artifactId>
+            <artifactId>ShipmentManagementCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

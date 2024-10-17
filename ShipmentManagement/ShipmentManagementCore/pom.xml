@@ -4,18 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>ParcelManagement</artifactId>
+        <artifactId>ShipmentManagement</artifactId>
         <groupId>com.warehouse</groupId>
         <version>2024.7-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
 
-    <artifactId>ParcelManagementCore</artifactId>
+    <artifactId>ShipmentManagementCore</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ParcelManagementApi</artifactId>
+            <artifactId>ShipmentManagementApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
