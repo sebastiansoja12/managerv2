@@ -41,7 +41,7 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ZebraIntegrationCore</artifactId>
+            <artifactId>TerminalCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

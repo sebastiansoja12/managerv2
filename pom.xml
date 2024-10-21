@@ -29,7 +29,7 @@
         <module>Generator</module>
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
-        <module>ZebraIntegration</module>
+        <module>Terminal</module>
         <module>ReturningTrackManager</module>
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>

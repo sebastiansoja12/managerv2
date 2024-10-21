@@ -9,11 +9,12 @@
         <version>2024.7-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ZebraIntegration</artifactId>
+    <artifactId>Terminal</artifactId>
     <packaging>pom</packaging>
+
     <modules>
-        <module>ZebraIntegrationApi</module>
-        <module>ZebraIntegrationCore</module>
+        <module>TerminalApi</module>
+        <module>TerminalCore</module>
     </modules>
 
 </project>

@@ -5,12 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>ZebraIntegration</artifactId>
+        <artifactId>Terminal</artifactId>
         <version>2024.7-SNAPSHOT</version>
     </parent>
 
     <packaging>jar</packaging>
-    <artifactId>ZebraIntegrationApi</artifactId>
+
+    <artifactId>TerminalApi</artifactId>
 
     <dependencies>
         <dependency>

@@ -114,12 +114,12 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ZebraIntegrationApi</artifactId>
+            <artifactId>TerminalApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ZebraIntegrationCore</artifactId>
+            <artifactId>TerminalCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
