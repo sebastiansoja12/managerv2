@@ -13,4 +13,6 @@ public interface MessageRepository {
     List<Message> findByLanguage(final String language);
 
     List<Message> findByShipmentStatus(final ShipmentStatus shipmentStatus);
+
+    void update(Message message);
 }

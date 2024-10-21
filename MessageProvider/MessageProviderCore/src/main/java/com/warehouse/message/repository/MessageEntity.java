@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 
+import com.warehouse.message.domain.model.Message;
 import jakarta.persistence.*;
 
 @Entity
@@ -41,11 +42,14 @@ public class MessageEntity {
         this.createdAt = LocalDateTime.now();
     }
 
-	public MessageEntity(final String title,
+	public MessageEntity(
+                         final Long id,
+                         final String title,
                          final ShipmentStatus shipmentStatus,
                          final String language,
                          final String messageContent,
                          final String sender) {
+        this.id = id;
         this.title = title;
         this.shipmentStatus = shipmentStatus;
         this.language = language;
@@ -53,6 +57,11 @@ public class MessageEntity {
         this.sender = sender;
         this.createdAt = LocalDateTime.now();
     }
+
+	public static MessageEntity from(final Message message) {
+		return new MessageEntity(message.getMessageId().getValue(), message.getTitle(), message.getShipmentStatus(),
+				message.getLanguage(), message.getMessageContent(), message.getSender());
+	}
 
     @PreUpdate
     public void preUpdate() {

@@ -51,4 +51,10 @@ public class MessageRepositoryImpl implements MessageRepository {
                 .map(Message::from)
                 .toList();
     }
+
+    @Override
+    public void update(final Message message) {
+        final MessageEntity messageEntity = MessageEntity.from(message);
+        this.repository.save(messageEntity);
+    }
 }

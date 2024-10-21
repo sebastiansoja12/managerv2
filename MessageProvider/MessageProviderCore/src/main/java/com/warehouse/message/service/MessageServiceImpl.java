@@ -5,6 +5,8 @@ import java.util.List;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.MessageId;
 import com.warehouse.message.domain.model.Message;
+import com.warehouse.message.domain.vo.SenderUpdateRequest;
+import com.warehouse.message.domain.vo.TitleUpdateRequest;
 import com.warehouse.message.repository.MessageRepository;
 
 public class MessageServiceImpl implements MessageService {
@@ -28,6 +30,20 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<Message> findByShipmentStatus(final ShipmentStatus shipmentStatus) {
         return messageRepository.findByShipmentStatus(shipmentStatus);
+    }
+
+    @Override
+    public void updateMessageTitle(final TitleUpdateRequest request) {
+        final Message message = this.messageRepository.findByMessageId(request.getMessageId());
+        message.updateTitle(request.getTitle());
+        this.messageRepository.update(message);
+    }
+
+    @Override
+    public void updateMessageSender(final SenderUpdateRequest request) {
+        final Message message = this.messageRepository.findByMessageId(request.messageId());
+        message.updateSender(request.sender());
+        this.messageRepository.update(message);
     }
 
     @Override

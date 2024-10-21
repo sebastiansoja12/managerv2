@@ -6,11 +6,12 @@ import static com.warehouse.commonassets.enumeration.ShipmentStatus.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.warehouse.message.api.SenderUpdateRequestDto;
+import com.warehouse.message.api.TitleUpdateRequestDto;
+import com.warehouse.message.domain.vo.SenderUpdateRequest;
+import com.warehouse.message.domain.vo.TitleUpdateRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.MessageId;
@@ -68,6 +69,20 @@ public class MessageController {
                 .stream()
                 .map(MessageDto::from)
                 .collect(Collectors.toList()));
+    }
+
+    @PutMapping("/title")
+    public ResponseEntity<?> updateMessageTitle(@RequestBody final TitleUpdateRequestDto titleUpdateRequest) {
+        final TitleUpdateRequest request = TitleUpdateRequest.from(titleUpdateRequest);
+        messageService.updateMessageTitle(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/sender")
+    public ResponseEntity<?> updateMessageSender(@RequestBody final SenderUpdateRequestDto senderUpdateRequest) {
+        final SenderUpdateRequest request = SenderUpdateRequest.from(senderUpdateRequest);
+        messageService.updateMessageSender(request);
+        return ResponseEntity.ok().build();
     }
 
 	private ShipmentStatus determineShipmentStatus(final ShipmentStatusDto shipmentStatus) {
