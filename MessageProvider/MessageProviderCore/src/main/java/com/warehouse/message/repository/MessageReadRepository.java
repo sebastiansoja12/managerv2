@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+
 @Repository
 public interface MessageReadRepository extends JpaRepository<MessageEntity, Long> {
 
@@ -14,4 +16,6 @@ public interface MessageReadRepository extends JpaRepository<MessageEntity, Long
     List<MessageEntity> findBySender(final String sender);
 
     List<MessageEntity> findByLanguage(final String language);
+
+    List<MessageEntity> findByShipmentStatus(final ShipmentStatus shipmentStatus);
 }

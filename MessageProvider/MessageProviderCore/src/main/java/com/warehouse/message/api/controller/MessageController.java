@@ -1,15 +1,23 @@
 package com.warehouse.message.api.controller;
 
 
-import com.warehouse.commonassets.identificator.MessageId;
-import com.warehouse.message.api.MessageDto;
-import com.warehouse.message.domain.model.Message;
-import com.warehouse.message.service.MessageService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import static com.warehouse.commonassets.enumeration.ShipmentStatus.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.MessageId;
+import com.warehouse.message.api.MessageDto;
+import com.warehouse.message.api.ShipmentStatusDto;
+import com.warehouse.message.domain.model.Message;
+import com.warehouse.message.service.MessageService;
 
 @RestController
 @RequestMapping("/messages")
@@ -51,4 +59,25 @@ public class MessageController {
                 .map(MessageDto::from)
                 .collect(Collectors.toList()));
     }
+
+    @GetMapping("/shipmentstatus/{shipmentStatus}")
+    public ResponseEntity<?> messageByShipmentStatus(@PathVariable final ShipmentStatusDto shipmentStatus) {
+        final ShipmentStatus status = determineShipmentStatus(shipmentStatus);
+        final List<Message> messages = messageService.findByShipmentStatus(status);
+        return ResponseEntity.ok(messages
+                .stream()
+                .map(MessageDto::from)
+                .collect(Collectors.toList()));
+    }
+
+	private ShipmentStatus determineShipmentStatus(final ShipmentStatusDto shipmentStatus) {
+		return switch (shipmentStatus) {
+            case CREATED -> CREATED;
+            case REROUTE -> REROUTE;
+            case SENT -> SENT;
+            case DELIVERY -> DELIVERY;
+            case RETURN -> RETURN;
+            case REDIRECT -> REDIRECT;
+		};
+	}
 }

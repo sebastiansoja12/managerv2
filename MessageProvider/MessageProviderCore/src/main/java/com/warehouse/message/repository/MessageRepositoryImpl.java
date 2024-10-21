@@ -2,6 +2,7 @@ package com.warehouse.message.repository;
 
 import java.util.List;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.MessageId;
 import com.warehouse.message.domain.model.Message;
 
@@ -38,6 +39,14 @@ public class MessageRepositoryImpl implements MessageRepository {
     @Override
     public List<Message> findByLanguage(final String language) {
         return repository.findByLanguage(language)
+                .stream()
+                .map(Message::from)
+                .toList();
+    }
+
+    @Override
+    public List<Message> findByShipmentStatus(final ShipmentStatus shipmentStatus) {
+        return repository.findByShipmentStatus(shipmentStatus)
                 .stream()
                 .map(Message::from)
                 .toList();

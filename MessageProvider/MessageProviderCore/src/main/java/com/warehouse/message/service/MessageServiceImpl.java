@@ -2,6 +2,7 @@ package com.warehouse.message.service;
 
 import java.util.List;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.MessageId;
 import com.warehouse.message.domain.model.Message;
 import com.warehouse.message.repository.MessageRepository;
@@ -22,6 +23,11 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<Message> findBySender(final String sender) {
         return messageRepository.findBySender(sender);
+    }
+
+    @Override
+    public List<Message> findByShipmentStatus(final ShipmentStatus shipmentStatus) {
+        return messageRepository.findByShipmentStatus(shipmentStatus);
     }
 
     @Override
