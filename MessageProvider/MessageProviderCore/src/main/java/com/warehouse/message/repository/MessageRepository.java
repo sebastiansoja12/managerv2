@@ -9,4 +9,5 @@ public interface MessageRepository {
     Message findByTitle(final String title);
     List<Message> findBySender(final String sender);
     Message findByMessageId(final MessageId messageId);
+    List<Message> findByLanguage(String language);
 }

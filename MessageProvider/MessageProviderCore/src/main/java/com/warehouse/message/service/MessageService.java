@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface MessageService {
     Message findByTitle(final String title);
-    List<Message> findBySender(final String sender);
     Message findByMessageId(final MessageId messageId);
+    List<Message> findByLanguage(final String language);
+    List<Message> findBySender(final String sender);
 }

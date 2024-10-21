@@ -28,4 +28,9 @@ public class MessageServiceImpl implements MessageService {
     public Message findByMessageId(final MessageId messageId) {
         return messageRepository.findByMessageId(messageId);
     }
+
+    @Override
+    public List<Message> findByLanguage(final String language) {
+        return messageRepository.findByLanguage(language);
+    }
 }

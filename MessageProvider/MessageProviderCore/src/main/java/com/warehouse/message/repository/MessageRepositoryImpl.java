@@ -1,10 +1,9 @@
 package com.warehouse.message.repository;
 
+import java.util.List;
+
 import com.warehouse.commonassets.identificator.MessageId;
 import com.warehouse.message.domain.model.Message;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class MessageRepositoryImpl implements MessageRepository {
 
@@ -26,7 +25,7 @@ public class MessageRepositoryImpl implements MessageRepository {
         return repository.findBySender(sender)
                 .stream()
                 .map(Message::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -34,5 +33,13 @@ public class MessageRepositoryImpl implements MessageRepository {
         return repository.findById(messageId.getValue())
                 .map(Message::from)
                 .orElse(Message.empty());
+    }
+
+    @Override
+    public List<Message> findByLanguage(final String language) {
+        return repository.findByLanguage(language)
+                .stream()
+                .map(Message::from)
+                .toList();
     }
 }

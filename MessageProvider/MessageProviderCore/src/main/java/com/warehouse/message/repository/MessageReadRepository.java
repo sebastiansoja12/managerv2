@@ -11,5 +11,7 @@ public interface MessageReadRepository extends JpaRepository<MessageEntity, Long
 
     Optional<MessageEntity> findByTitle(final String title);
 
-    List<MessageEntity> findBySender(String sender);
+    List<MessageEntity> findBySender(final String sender);
+
+    List<MessageEntity> findByLanguage(final String language);
 }

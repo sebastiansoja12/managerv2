@@ -1,17 +1,10 @@
 package com.warehouse.message.api;
 
-public final class TitleDto {
+import com.warehouse.message.domain.model.Message;
 
-    private String value;
+public record TitleDto(String value) {
 
-    public TitleDto() {
-    }
-
-    public TitleDto(final String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
+    public static TitleDto from(final Message message) {
+        return new TitleDto(message.getTitle());
     }
 }

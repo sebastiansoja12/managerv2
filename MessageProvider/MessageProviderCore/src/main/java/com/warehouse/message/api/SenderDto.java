@@ -1,17 +1,10 @@
 package com.warehouse.message.api;
 
-public final class SenderDto {
+import com.warehouse.message.domain.model.Message;
 
-	private String value;
+public record SenderDto(String value) {
 
-	public SenderDto() {
-	}
-
-	public SenderDto(final String value) {
-		this.value = value;
-	}
-
-	public String getValue() {
-		return value;
+	public static SenderDto from(final Message message) {
+		return new SenderDto(message.getSender());
 	}
 }

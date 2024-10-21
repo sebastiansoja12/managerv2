@@ -1,5 +1,7 @@
 package com.warehouse.message.api;
 
+import com.warehouse.message.domain.model.Message;
+
 import java.util.Objects;
 
 public final class MessageContentDto {
@@ -16,6 +18,10 @@ public final class MessageContentDto {
 
     public String getValue() {
         return value;
+    }
+
+    public static MessageContentDto from(final Message message) {
+        return new MessageContentDto(message.getMessageContent());
     }
 
     @Override
