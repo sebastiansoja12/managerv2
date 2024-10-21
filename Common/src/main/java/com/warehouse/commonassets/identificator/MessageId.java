@@ -1,4 +1,4 @@
-package com.warehouse.message.domain.model;
+package com.warehouse.commonassets.identificator;
 
 import java.util.Objects;
 

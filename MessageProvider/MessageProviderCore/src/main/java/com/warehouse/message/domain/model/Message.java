@@ -3,6 +3,7 @@ package com.warehouse.message.domain.model;
 import java.time.LocalDateTime;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.MessageId;
 
 public class Message {
     
