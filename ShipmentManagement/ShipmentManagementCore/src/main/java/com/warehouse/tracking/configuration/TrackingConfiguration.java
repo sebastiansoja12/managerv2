@@ -10,12 +10,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TrackingConfiguration {
 
-    @Bean
+    @Bean("tracking.rerouteService")
     public RerouteService rerouteService() {
         return new RerouteServiceAdapter();
     }
 
-    @Bean
+    @Bean("tracking.redirectService")
     public RedirectService redirectService() {
         return new RedirectServiceAdapter();
     }

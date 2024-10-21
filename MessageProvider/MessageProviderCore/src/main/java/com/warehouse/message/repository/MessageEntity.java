@@ -14,36 +14,38 @@ public class MessageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(name = "shipment_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private ShipmentStatus shipmentStatus;
 
-    @Column(nullable = false)
+    @Column(name = "language", nullable = false)
     private String language;
 
     @Lob
-    @Column(nullable = false)
+    @Column(name = "message_content", nullable = false)
     private String messageContent;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column
+    @Column(name = "sender")
     private String sender;
-
 
     public MessageEntity() {
         this.createdAt = LocalDateTime.now();
     }
 
-	public MessageEntity(final String title, final ShipmentStatus shipmentStatus, final String language,
-			final String messageContent, final String sender) {
+	public MessageEntity(final String title,
+                         final ShipmentStatus shipmentStatus,
+                         final String language,
+                         final String messageContent,
+                         final String sender) {
         this.title = title;
         this.shipmentStatus = shipmentStatus;
         this.language = language;

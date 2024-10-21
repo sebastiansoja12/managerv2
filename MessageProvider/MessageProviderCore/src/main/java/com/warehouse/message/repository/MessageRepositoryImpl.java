@@ -1,8 +1,10 @@
 package com.warehouse.message.repository;
 
+import com.warehouse.commonassets.identificator.MessageId;
 import com.warehouse.message.domain.model.Message;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MessageRepositoryImpl implements MessageRepository {
 
@@ -14,16 +16,23 @@ public class MessageRepositoryImpl implements MessageRepository {
 
     @Override
     public Message findByTitle(final String title) {
-        return null;
+        return repository.findByTitle(title)
+                .map(Message::from)
+                .orElse(Message.empty());
     }
 
     @Override
     public List<Message> findBySender(final String sender) {
-        return List.of();
+        return repository.findBySender(sender)
+                .stream()
+                .map(Message::from)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Message findByMessageId(final String messageId) {
-        return null;
+    public Message findByMessageId(final MessageId messageId) {
+        return repository.findById(messageId.getValue())
+                .map(Message::from)
+                .orElse(Message.empty());
     }
 }

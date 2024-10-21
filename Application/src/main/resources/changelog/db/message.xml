@@ -39,6 +39,10 @@
                 <constraints nullable="true"/>
             </column>
         </createTable>
+
+        <!-- Add ENUM type for shipment_status -->
+        <addNotNullConstraint columnName="shipment_status" tableName="messages" />
+
     </changeSet>
 
 </databaseChangeLog>

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.MessageId;
+import com.warehouse.message.repository.MessageEntity;
 
 public class Message {
     
@@ -23,6 +24,10 @@ public class Message {
     
     private String sender;
 
+    public Message() {
+
+    }
+
 	public Message(final MessageId messageId, final String title, final ShipmentStatus shipmentStatus,
 			final String language, final String messageContent, final LocalDateTime createdAt,
 			final LocalDateTime updatedAt, final String sender) {
@@ -35,6 +40,10 @@ public class Message {
 		this.updatedAt = updatedAt;
 		this.sender = sender;
 	}
+
+    public static Message empty() {
+        return new Message();
+    }
 
     public MessageId getMessageId() {
         return messageId;
@@ -96,4 +105,10 @@ public class Message {
         this.sender = sender;
         markAsModified();
     }
+    
+	public static Message from(final MessageEntity entity) {
+		final MessageId id = new MessageId(entity.getId());
+		return new Message(id, entity.getTitle(), entity.getShipmentStatus(), entity.getLanguage(),
+				entity.getMessageContent(), entity.getCreatedAt(), entity.getUpdatedAt(), entity.getSender());
+	}
 }

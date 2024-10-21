@@ -16,7 +16,7 @@
     <include file="/changelog/db/returning.xml"/>
     <include file="/changelog/db/message_sequence.xml"/>
     <include file="/changelog/db/returning_information_seq.xml"/>
-    <include file="/changelog/db/returning_information_seq.xml"/>
+    <include file="/changelog/db/message.xml"/>
 
     <!--Insert default start data-->
     <include file="/changelog/insertDepots.xml"/>
