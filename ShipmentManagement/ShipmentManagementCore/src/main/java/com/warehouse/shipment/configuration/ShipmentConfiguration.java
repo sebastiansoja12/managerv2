@@ -2,6 +2,7 @@ package com.warehouse.shipment.configuration;
 
 import java.time.Duration;
 
+import com.warehouse.shipment.domain.model.SoftwareConfigurationProperties;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -64,7 +65,12 @@ public class ShipmentConfiguration {
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new SoftwareConfigurationServiceAdapter(config);
+		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties());
+	}
+
+	@Bean
+	public SoftwareConfigurationProperties softwareConfigurationProperties() {
+		return new SoftwareConfigurationProperties();
 	}
 
 	@Bean

@@ -19,9 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 public class SoftwareConfigurationServiceAdapter implements SoftwareConfigurationServicePort {
 
     private final Retry retry;
+    
+    private final SoftwareConfigurationProperties softwareConfigurationProperties;
 
-    public SoftwareConfigurationServiceAdapter(final RetryConfig retryConfig) {
+	public SoftwareConfigurationServiceAdapter(final RetryConfig retryConfig,
+			final SoftwareConfigurationProperties softwareConfigurationProperties) {
         this.retry = Retry.of("softwareConfiguration", retryConfig);
+        this.softwareConfigurationProperties = softwareConfigurationProperties;
     }
     
 	private ResponseEntity<SoftwareConfigurationDto> getSoftwareConfiguration(final RestClient restClient,
@@ -34,15 +38,15 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
 	}
 
     @Override
-    public SoftwareConfiguration getSoftwareConfiguration(final SoftwareConfigurationProperties properties) {
+    public SoftwareConfiguration getSoftwareConfiguration() {
 
         final RestClient restClient = RestClient
                 .builder()
-                .baseUrl(properties.getUrl())
+                .baseUrl(softwareConfigurationProperties.getUrl())
                 .build();
 
-        final SoftwareProperty softwareProperty = new SoftwareProperty(properties.getEndpoint(), "route-tracker-initialize-url",
-                "");
+		final SoftwareProperty softwareProperty = new SoftwareProperty(softwareConfigurationProperties.getEndpoint(),
+				"route-tracker-initialize-url","");
 
         final Supplier<ResponseEntity<SoftwareConfigurationDto>> retryableSupplier = Retry
                 .decorateSupplier(retry, () -> getSoftwareConfiguration(restClient, softwareProperty));

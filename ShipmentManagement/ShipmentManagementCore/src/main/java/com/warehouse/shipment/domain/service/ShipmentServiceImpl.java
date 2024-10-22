@@ -11,7 +11,6 @@ import com.warehouse.shipment.domain.enumeration.ShipmentPriority;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.domain.model.SoftwareConfigurationProperties;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
@@ -70,9 +69,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public RouteProcess initializeRouteProcess(final ShipmentId shipmentId) {
-        final SoftwareConfigurationProperties softwareConfigurationProperties = new SoftwareConfigurationProperties();
-		final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort
-				.getSoftwareConfiguration(softwareConfigurationProperties);
+		final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
         return this.routeLogServicePort.initializeRouteProcess(shipmentId, softwareConfiguration);
     }
 
