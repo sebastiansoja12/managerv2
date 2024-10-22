@@ -6,8 +6,8 @@ import static com.warehouse.commonassets.enumeration.ShipmentStatus.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.warehouse.message.api.SenderUpdateRequestDto;
-import com.warehouse.message.api.TitleUpdateRequestDto;
+import com.warehouse.message.api.*;
+import com.warehouse.message.domain.vo.MessageContentUpdateRequest;
 import com.warehouse.message.domain.vo.SenderUpdateRequest;
 import com.warehouse.message.domain.vo.TitleUpdateRequest;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.MessageId;
-import com.warehouse.message.api.MessageDto;
-import com.warehouse.message.api.ShipmentStatusDto;
 import com.warehouse.message.domain.model.Message;
 import com.warehouse.message.domain.service.MessageService;
 
@@ -82,6 +80,13 @@ public class MessageController {
     public ResponseEntity<?> updateMessageSender(@RequestBody final SenderUpdateRequestDto senderUpdateRequest) {
         final SenderUpdateRequest request = SenderUpdateRequest.from(senderUpdateRequest);
         messageService.updateMessageSender(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/content")
+    public ResponseEntity<?> updateMessageContent(@RequestBody final MessageContentUpdateRequestDto messageContentUpdateRequest) {
+        final MessageContentUpdateRequest request = MessageContentUpdateRequest.from(messageContentUpdateRequest);
+        messageService.updateMessageContent(request);
         return ResponseEntity.ok().build();
     }
 

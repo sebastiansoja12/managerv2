@@ -5,6 +5,7 @@ import java.util.List;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.MessageId;
 import com.warehouse.message.domain.model.Message;
+import com.warehouse.message.domain.vo.MessageContentUpdateRequest;
 import com.warehouse.message.domain.vo.SenderUpdateRequest;
 import com.warehouse.message.domain.vo.TitleUpdateRequest;
 import com.warehouse.message.repository.MessageRepository;
@@ -43,6 +44,13 @@ public class MessageServiceImpl implements MessageService {
     public void updateMessageSender(final SenderUpdateRequest request) {
         final Message message = this.messageRepository.findByMessageId(request.messageId());
         message.updateSender(request.sender());
+        this.messageRepository.update(message);
+    }
+
+    @Override
+    public void updateMessageContent(final MessageContentUpdateRequest request) {
+        final Message message = this.messageRepository.findByMessageId(request.messageId());
+        message.updateMessageContent(request.messageContent());
         this.messageRepository.update(message);
     }
 

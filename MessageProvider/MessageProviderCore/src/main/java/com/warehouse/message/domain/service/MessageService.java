@@ -5,6 +5,7 @@ import java.util.List;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.MessageId;
 import com.warehouse.message.domain.model.Message;
+import com.warehouse.message.domain.vo.MessageContentUpdateRequest;
 import com.warehouse.message.domain.vo.SenderUpdateRequest;
 import com.warehouse.message.domain.vo.TitleUpdateRequest;
 
@@ -14,6 +15,7 @@ public interface MessageService {
     List<Message> findByLanguage(final String language);
     List<Message> findBySender(final String sender);
     List<Message> findByShipmentStatus(final ShipmentStatus shipmentStatus);
-    void updateMessageTitle(TitleUpdateRequest request);
-    void updateMessageSender(SenderUpdateRequest request);
+    void updateMessageTitle(final TitleUpdateRequest request);
+    void updateMessageSender(final SenderUpdateRequest request);
+    void updateMessageContent(final MessageContentUpdateRequest request);
 }
