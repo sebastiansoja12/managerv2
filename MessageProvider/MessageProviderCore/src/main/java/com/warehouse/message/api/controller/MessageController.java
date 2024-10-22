@@ -18,7 +18,7 @@ import com.warehouse.commonassets.identificator.MessageId;
 import com.warehouse.message.api.MessageDto;
 import com.warehouse.message.api.ShipmentStatusDto;
 import com.warehouse.message.domain.model.Message;
-import com.warehouse.message.service.MessageService;
+import com.warehouse.message.domain.service.MessageService;
 
 @RestController
 @RequestMapping("/messages")

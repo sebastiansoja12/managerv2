@@ -4,8 +4,8 @@ package com.warehouse.message.configuration;
 import com.warehouse.message.repository.MessageReadRepository;
 import com.warehouse.message.repository.MessageRepository;
 import com.warehouse.message.repository.MessageRepositoryImpl;
-import com.warehouse.message.service.MessageService;
-import com.warehouse.message.service.MessageServiceImpl;
+import com.warehouse.message.domain.service.MessageService;
+import com.warehouse.message.domain.service.MessageServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

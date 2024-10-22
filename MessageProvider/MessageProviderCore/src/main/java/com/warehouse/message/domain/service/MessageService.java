@@ -1,4 +1,4 @@
-package com.warehouse.message.service;
+package com.warehouse.message.domain.service;
 
 import java.util.List;
 
