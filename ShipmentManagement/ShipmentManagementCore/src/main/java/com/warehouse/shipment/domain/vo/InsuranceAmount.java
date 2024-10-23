@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.vo;
 
-import com.warehouse.shipment.domain.enumeration.InsuranceType;
+import com.warehouse.commonassets.enumeration.InsuranceType;
 
 public final class InsuranceAmount {
 

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.shipment.domain.enumeration.ShipmentPriority;
+import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import org.apache.commons.lang3.ObjectUtils;
 

@@ -1,4 +1,4 @@
-package com.warehouse.shipment.domain.enumeration;
+package com.warehouse.commonassets.enumeration;
 
 public enum InsuranceType {
     BASIC, EXTENDED, PREMIUM
