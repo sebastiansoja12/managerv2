@@ -8,7 +8,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class ProcessReturnDto {
-     Long parcelId;
+     Long shipmentId;
      Long returnId;
      String processStatus;
 }

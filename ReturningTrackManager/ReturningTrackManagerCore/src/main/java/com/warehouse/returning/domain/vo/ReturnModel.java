@@ -6,7 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class ReturnModel {
-	Long parcelId;
+	Long shipmentId;
 	String reason;
 	String returnStatus;
 	String returnToken;

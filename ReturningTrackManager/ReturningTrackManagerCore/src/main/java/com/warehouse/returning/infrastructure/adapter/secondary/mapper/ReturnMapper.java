@@ -34,10 +34,12 @@ public interface ReturnMapper {
 
     @Mapping(target = "returnId", source = "id")
     @Mapping(target = "processStatus", source = "returnStatus")
+    @Mapping(target = "shipmentId", source = "parcelId")
     ProcessReturn map(ReturnEntity returning);
 
 
     @Mapping(target = "reason", source = "returnInformationEntity.reason")
+    @Mapping(target = "shipmentId", source = "parcelId")
     ReturnModel mapToReturnModel(ReturnEntity returnEntity);
 
     default Long map(ReturnId returnId) {
