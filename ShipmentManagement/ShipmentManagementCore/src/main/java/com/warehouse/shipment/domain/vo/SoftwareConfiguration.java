@@ -12,9 +12,6 @@ public final class SoftwareConfiguration {
     }
 
     public static SoftwareConfiguration from(final SoftwareConfigurationDto body) {
-        if (body == null) {
-            return null;
-        }
         return new SoftwareConfiguration(body.getValue(), body.getUrl());
     }
 

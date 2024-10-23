@@ -1,18 +1,20 @@
 package com.warehouse.tracking.infrastructure.adapter.primary;
 
-import com.warehouse.redirect.RedirectService;
-import com.warehouse.reroute.RerouteService;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentStatusDto;
-import com.warehouse.tracking.ShipmentStatusChanged;
-import com.warehouse.tracking.infrastructure.adapter.primary.mapper.ShipmentEventMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
+import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.time.format.DateTimeFormatter;
 
-import static org.mapstruct.factory.Mappers.getMapper;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+import com.warehouse.redirect.RedirectService;
+import com.warehouse.reroute.RerouteService;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentStatusDto;
+import com.warehouse.tracking.ShipmentStatusChanged;
+import com.warehouse.tracking.infrastructure.adapter.primary.mapper.ShipmentEventMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -34,11 +36,11 @@ public class TrackingEventListener {
     @EventListener
     public void handle(final ShipmentStatusChanged event) {
         logEvent(event);
-        final ShipmentDto shipment = event.getShipment();
-        final ShipmentStatusDto shipmentStatus = shipment.getShipmentStatus();
+        final ShipmentIdDto shipmentId = event.getShipmentId();
+        final ShipmentStatusDto shipmentStatus = event.getShipmentStatus();
         switch (shipmentStatus) {
-            case REROUTE -> rerouteService.rerouteShipment(shipment);
-            case REDIRECT -> redirectService.redirectShipment(shipment);
+            case REROUTE -> rerouteService.rerouteShipment(shipmentId);
+            case REDIRECT -> redirectService.redirectShipment(shipmentId);
             default -> log.info("Shipment not eligible for status change");
         }
     }

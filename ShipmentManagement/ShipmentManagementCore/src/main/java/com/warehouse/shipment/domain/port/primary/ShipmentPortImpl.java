@@ -4,6 +4,7 @@ import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExcept
 
 import java.util.Objects;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.ShipmentType;
@@ -116,10 +117,25 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentService.changeShipmentTypeTo(shipmentId, shipmentType);
     }
 
-    @Override
-    public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
-        this.shipmentService.changeShipmentStatusTo(request.getShipmentId(), request.getShipmentStatus());
-    }
+	@Override
+	public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
+		final ShipmentStatus status = request.getShipmentStatus();
+		final ShipmentId shipmentId = request.getShipmentId();
+		switch (status) {
+		case REDIRECT -> {
+			final Shipment shipment = this.shipmentService.find(shipmentId);
+			this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, shipment.getShipmentRelatedId());
+		}
+		case REROUTE -> this.shipmentService.notifyShipmentRerouted(shipmentId);
+		case SENT -> this.shipmentService.notifyShipmentSent(shipmentId);
+		case RETURN -> this.shipmentService.notifyShipmentReturned(shipmentId);
+        case DELIVERY -> this.shipmentService.notifyShipmentDelivered(shipmentId);
+        case CREATED -> {
+            logger.warn("Shipment {} already created, status {} cannot be changed", shipmentId, status);
+            throw new RuntimeException("Shipment already created, status cannot be changed");
+        }
+		}
+	}
 
     @Override
     public void changeShipmentSignatureTo(final ShipmentRequest request) {

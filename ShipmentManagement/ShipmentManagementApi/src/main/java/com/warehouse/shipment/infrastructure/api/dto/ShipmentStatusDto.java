@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+
 public enum ShipmentStatusDto {
     CREATED,
 
@@ -11,5 +13,9 @@ public enum ShipmentStatusDto {
 
     RETURN,
 
-    REDIRECT
+    REDIRECT;
+
+    public static ShipmentStatusDto from(final ShipmentStatus shipmentStatus) {
+        return ShipmentStatusDto.valueOf(shipmentStatus.name());
+    }
 }

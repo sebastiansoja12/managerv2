@@ -2,6 +2,7 @@ package com.warehouse.reroute.domain.port.primary;
 
 import static com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes.REROUTE_403;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.RerouteException;
 import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
@@ -64,6 +65,11 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
         rerouteService.deleteToken(rerouteToken);
 
         return RerouteParcelResponse.builder().build();
+    }
+
+    @Override
+    public void rerouteShipment(final ShipmentId shipmentId) {
+        //
     }
 
     private void logReroute(RerouteParcelRequest request) {

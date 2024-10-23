@@ -45,7 +45,15 @@ public interface ShipmentService {
 
     void notifyRelatedShipmentRedirected(final ShipmentId shipmentId, final ShipmentId relatedShipmentId);
 
+    void notifyShipmentRerouted(final ShipmentId shipmentId);
+
     void notifyRelatedShipmentLocked(final ShipmentId shipmentId);
+
+    void notifyShipmentSent(final ShipmentId shipmentId);
+
+    void notifyShipmentReturned(final ShipmentId shipmentId);
+
+    void notifyShipmentDelivered(final ShipmentId shipmentId);
 
     Shipment find(final ShipmentId shipmentId);
 
@@ -54,4 +62,5 @@ public interface ShipmentService {
     RouteProcess initializeRouteProcess(final ShipmentId shipmentId);
 
     ShipmentId nextShipmentId();
+
 }

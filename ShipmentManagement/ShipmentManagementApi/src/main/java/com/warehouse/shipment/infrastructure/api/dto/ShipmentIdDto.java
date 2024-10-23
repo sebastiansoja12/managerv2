@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.api.dto;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+
 import java.util.Objects;
 
 public class ShipmentIdDto {
@@ -12,7 +14,11 @@ public class ShipmentIdDto {
 	public ShipmentIdDto() {
 	}
 
-	public Long getValue() {
+    public static ShipmentIdDto from(final ShipmentId shipmentId) {
+		return new ShipmentIdDto(shipmentId.getValue());
+    }
+
+    public Long getValue() {
 		return value;
 	}
 

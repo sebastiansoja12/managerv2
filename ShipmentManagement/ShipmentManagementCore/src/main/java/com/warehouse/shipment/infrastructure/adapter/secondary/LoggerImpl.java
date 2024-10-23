@@ -11,7 +11,12 @@ public class LoggerImpl implements Logger {
     private final org.slf4j.Logger logger;
 
     @Override
-    public void info(String format, Object... args) {
+    public void info(final String format, final Object... args) {
         logger.info(format, args);
+    }
+
+    @Override
+    public void warn(final String format, final Object... args) {
+        logger.warn(format, args);
     }
 }

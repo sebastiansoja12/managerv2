@@ -158,9 +158,37 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
+    public void notifyShipmentRerouted(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.notifyShipmentRerouted();
+        this.shipmentRepository.update(shipment);
+    }
+
+    @Override
     public void notifyRelatedShipmentLocked(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyRelatedShipmentLocked();
+        this.shipmentRepository.update(shipment);
+    }
+
+    @Override
+    public void notifyShipmentSent(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.notifyShipmentSent();
+        this.shipmentRepository.update(shipment);
+    }
+
+    @Override
+    public void notifyShipmentReturned(ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.notifyShipmentReturned();
+        this.shipmentRepository.update(shipment);
+    }
+
+    @Override
+    public void notifyShipmentDelivered(ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.notifyShipmentDelivered();
         this.shipmentRepository.update(shipment);
     }
 

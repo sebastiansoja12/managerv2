@@ -308,6 +308,26 @@ public class Shipment {
         markAsModified();
     }
 
+    public void notifyShipmentRerouted() {
+        this.shipmentStatus = ShipmentStatus.REROUTE;
+        markAsModified();
+    }
+
+    public void notifyShipmentSent() {
+        this.shipmentStatus = ShipmentStatus.SENT;
+        markAsModified();
+    }
+
+    public void notifyShipmentReturned() {
+        this.shipmentStatus = ShipmentStatus.RETURN;
+        markAsModified();
+    }
+
+    public void notifyShipmentDelivered() {
+        this.shipmentStatus = ShipmentStatus.DELIVERY;
+        markAsModified();
+    }
+
     private void unlockShipment() {
         this.locked = false;
     }
@@ -326,4 +346,5 @@ public class Shipment {
                 this.locked
         );
     }
+
 }

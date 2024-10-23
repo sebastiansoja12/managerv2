@@ -54,8 +54,8 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
         final ResponseEntity<SoftwareConfigurationDto> process = retryableSupplier.get();
 
         if (!process.getStatusCode().is2xxSuccessful() || process.getBody() == null) {
-            log.error("Error while retrieving configuration");
-            return null;
+            log.error("Error while retrieving configuration, cause: {}", process.getStatusCode());
+            throw new RuntimeException("Error while retrieving configuration");
         }
 
         return SoftwareConfiguration.from(process.getBody());

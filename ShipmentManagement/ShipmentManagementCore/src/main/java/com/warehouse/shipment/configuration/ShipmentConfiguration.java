@@ -3,6 +3,7 @@ package com.warehouse.shipment.configuration;
 import java.time.Duration;
 
 import com.warehouse.shipment.domain.model.SoftwareConfigurationProperties;
+import com.warehouse.tracking.TrackingStatusEventPublisher;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -66,6 +67,12 @@ public class ShipmentConfiguration {
 				.writableStackTraceEnabled(true)
 				.build();
 		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties());
+	}
+	
+	@Bean("shipment.rerouteTokenServicePort")
+	public RerouteTokenServicePort rerouteTokenServicePort(
+			final TrackingStatusEventPublisher trackingStatusEventPublisher) {
+		return new RerouteTokenServiceAdapter(trackingStatusEventPublisher);
 	}
 
 	@Bean

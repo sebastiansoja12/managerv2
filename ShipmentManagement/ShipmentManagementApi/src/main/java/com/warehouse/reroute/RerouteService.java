@@ -1,7 +1,7 @@
 package com.warehouse.reroute;
 
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
+import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 
 public interface RerouteService {
-    void rerouteShipment(final ShipmentDto shipmentDto);
+    void rerouteShipment(final ShipmentIdDto shipmentId);
 }
