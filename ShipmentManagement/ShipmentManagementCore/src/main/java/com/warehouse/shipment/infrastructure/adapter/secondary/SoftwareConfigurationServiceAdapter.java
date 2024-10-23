@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.commonassets.model.SoftwareProperty;
-import com.warehouse.shipment.domain.model.SoftwareConfigurationProperties;
+import com.warehouse.shipment.configuration.SoftwareConfigurationProperties;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.SoftwareConfigurationDto;

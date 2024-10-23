@@ -1,4 +1,4 @@
-package com.warehouse.shipment.domain.model;
+package com.warehouse.shipment.configuration;
 
 import lombok.Getter;
 import lombok.Setter;

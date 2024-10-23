@@ -2,7 +2,6 @@ package com.warehouse.shipment.configuration;
 
 import java.time.Duration;
 
-import com.warehouse.shipment.domain.model.SoftwareConfigurationProperties;
 import com.warehouse.tracking.TrackingStatusEventPublisher;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
