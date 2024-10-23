@@ -1,15 +1,13 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
+import com.warehouse.shipment.domain.model.Money;
+import com.warehouse.shipment.infrastructure.api.dto.*;
 import org.mapstruct.Mapper;
 
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.ShipmentResponse;
 import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentResponseDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateResponseDto;
 
 @Mapper
 public interface ShipmentResponseMapper {
@@ -19,6 +17,10 @@ public interface ShipmentResponseMapper {
     ShipmentResponseDto map(final ShipmentResponse response);
 
     ShipmentDto map(final Shipment shipment);
+
+	default MoneyDto map(final Money amount) {
+		return new MoneyDto(amount.getAmount(), amount.getCurrency().name());
+	}
 
     ShipmentUpdateResponseDto map(final ShipmentUpdateResponse response);
 

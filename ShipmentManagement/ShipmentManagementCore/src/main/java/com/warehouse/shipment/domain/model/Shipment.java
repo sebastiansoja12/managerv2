@@ -3,15 +3,14 @@ package com.warehouse.shipment.domain.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import org.apache.commons.lang3.ObjectUtils;
 
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.City;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.ShipmentRequest;
 
 
 public class Shipment {
@@ -32,9 +31,7 @@ public class Shipment {
 
     private ShipmentId shipmentRelatedId;
 
-    private double price;
-
-    private Currency currency;
+    private Money price;
 
     private LocalDateTime createdAt;
 
@@ -58,7 +55,7 @@ public class Shipment {
                     final ShipmentSize shipmentSize,
 			        final ShipmentStatus shipmentStatus,
                     final ShipmentId shipmentRelatedId,
-                    final double price,
+                    final Money price,
                     final LocalDateTime createdAt,
                     final LocalDateTime updatedAt,
                     final Boolean locked) {
@@ -147,7 +144,7 @@ public class Shipment {
         this.shipmentRelatedId = shipmentRelatedId;
     }
 
-    public void setPrice(final double price) {
+    public void setPrice(final Money price) {
         this.price = price;
     }
 
@@ -163,7 +160,7 @@ public class Shipment {
         this.locked = locked;
     }
 
-    public double getPrice() {
+    public Money getPrice() {
         return price;
     }
 
@@ -223,7 +220,7 @@ public class Shipment {
         markAsModified();
     }
 
-    public void changePrice(final double price) {
+    public void changePrice(final Money price) {
         this.price = price;
         markAsModified();
     }
@@ -266,7 +263,7 @@ public class Shipment {
     }
 
     public void changeCurrency(final Currency currency) {
-        this.currency = currency;
+        this.price.changeCurrency(currency);
         markAsModified();
     }
 

@@ -1,12 +1,16 @@
 package com.warehouse.shipment;
 
+import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Money;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Parcel;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class DataTestCreator {
@@ -48,8 +52,12 @@ public class DataTestCreator {
                 .build();
     }
 
+    static Money money() {
+        return new Money(new BigDecimal(10L), Currency.PLN);
+    }
+
     static Shipment createShipmentParcel() {
-		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, 30.0, LocalDateTime.now(),
+		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, money(), LocalDateTime.now(),
 				LocalDateTime.now(), false);
     }
 }

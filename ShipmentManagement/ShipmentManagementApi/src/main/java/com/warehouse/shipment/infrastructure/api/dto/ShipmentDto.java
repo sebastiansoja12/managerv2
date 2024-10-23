@@ -16,13 +16,13 @@ public class ShipmentDto {
     
     private final ShipmentIdDto shipmentRelatedId;
 
-    private final double price;
+    private final MoneyDto price;
 
     private final Boolean locked;
 
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonDto sender, final PersonDto recipient,
                        final ShipmentSizeDto shipmentSize, final String destination, final ShipmentStatusDto shipmentStatus,
-                       final ShipmentIdDto shipmentRelatedId, final double price, final Boolean locked) {
+                       final ShipmentIdDto shipmentRelatedId, final MoneyDto price, final Boolean locked) {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -70,7 +70,7 @@ public class ShipmentDto {
         return shipmentRelatedId;
     }
 
-    public double getPrice() {
+    public MoneyDto getPrice() {
         return price;
     }
 }
