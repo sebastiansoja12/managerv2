@@ -1,5 +1,7 @@
 package com.warehouse.redirect.configuration;
 
+import com.warehouse.redirect.domain.port.secondary.RedirectTrackerServicePort;
+import com.warehouse.redirect.infrastructure.adapter.secondary.RedirectTrackerServiceAdapter;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,10 +26,17 @@ import com.warehouse.redirect.infrastructure.adapter.secondary.properties.Redire
 public class RedirectConfiguration {
     
 	@Bean
-	public RedirectTokenPort redirectTokenPort(RedirectService redirectService, MailServicePort mailServicePort) {
+	public RedirectTokenPort redirectTokenPort(RedirectService redirectService, MailServicePort mailServicePort,
+                                               final RedirectTrackerServicePort redirectTrackerServicePort) {
 		final RedirectTokenGenerator redirectTokenGenerator = new RedirectTokenGeneratorImpl();
-		return new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort);
+		return new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort,
+                redirectTrackerServicePort);
 	}
+
+    @Bean
+    public RedirectTrackerServicePort redirectTrackerServicePort() {
+        return new RedirectTrackerServiceAdapter();
+    }
 
     @Bean(name = "redirect.mailServicePort")
     public MailServicePort mailServicePort(MailPort mailPort, RedirectTokenProperties properties) {

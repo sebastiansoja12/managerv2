@@ -1,5 +1,7 @@
 package com.warehouse.redirect.domain.port.primary;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.redirect.domain.port.secondary.RedirectTrackerServicePort;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,6 +23,8 @@ import com.warehouse.redirect.domain.vo.Token;
 
 import lombok.AllArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 public class RedirectTokenPortImpl implements RedirectTokenPort {
 
@@ -31,6 +35,8 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
 	private final MailServicePort mailServicePort;
 
 	private final Logger logger = LoggerFactory.getLogger(RedirectTokenPort.class);
+
+	private final RedirectTrackerServicePort redirectTrackerServicePort;
 
 
     @Override
@@ -60,9 +66,18 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
 		return new RedirectParcelResponse();
 	}
 
-	private RedirectToken buildRedirectTokenFromRequest(RedirectRequest request) {
+	@Override
+	public void invalidateToken(final ShipmentId shipmentId) {
+		this.redirectService.invalidateToken(shipmentId);
+		this.redirectTrackerServicePort.sendRedirectRequest();
+	}
+
+	private RedirectToken buildRedirectTokenFromRequest(final RedirectRequest request) {
 		final String token = redirectTokenGenerator.generateToken(request.getParcelId(), request.getEmail());
-		return new RedirectToken(token, request.getParcelId(), request.getEmail());
+		final ShipmentId shipmentId = new ShipmentId(request.getParcelId());
+		final String email = request.getEmail();
+		return new RedirectToken(null, token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(10L), shipmentId,
+				email);
 	}
 
 	private void logRedirectParcelRequest(RedirectParcelRequest request) {
@@ -70,7 +85,7 @@ public class RedirectTokenPortImpl implements RedirectTokenPort {
 	}
 
 	private void logRedirectToken(RedirectToken redirectToken) {
-		logger.info("Request for redirecting parcel {} has been recorded", redirectToken.getParcelId());
+		logger.info("Request for redirecting parcel {} has been recorded", redirectToken.getShipmentId());
 	}
 
 	private void handleRequest(RedirectRequest request) { 

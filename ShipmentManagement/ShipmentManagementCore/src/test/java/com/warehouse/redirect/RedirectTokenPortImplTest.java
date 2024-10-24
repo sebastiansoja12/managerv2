@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.redirect.domain.exception.*;
+import com.warehouse.redirect.domain.port.secondary.RedirectTrackerServicePort;
 import com.warehouse.redirect.domain.vo.RedirectParcelRequest;
 import com.warehouse.redirect.domain.port.secondary.RedirectServicePort;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,8 @@ import com.warehouse.redirect.domain.service.RedirectTokenGenerator;
 import com.warehouse.redirect.domain.vo.RedirectToken;
 import com.warehouse.redirect.domain.vo.Token;
 
+import java.time.LocalDateTime;
+
 @ExtendWith(MockitoExtension.class)
 public class RedirectTokenPortImplTest {
 
@@ -39,11 +43,15 @@ public class RedirectTokenPortImplTest {
     @Mock
     private RedirectServicePort redirectServicePort;
 
+    @Mock
+    private RedirectTrackerServicePort redirectTrackerServicePort;
+
     private RedirectTokenPortImpl redirectTokenPort;
 
     @BeforeEach
     void setup() {
-        redirectTokenPort = new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort);
+        redirectTokenPort = new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort,
+                redirectTrackerServicePort);
     }
 
     @Test
@@ -53,7 +61,8 @@ public class RedirectTokenPortImplTest {
         request.setEmail("sebastian5152@wp.pl");
         request.setParcelId(1L);
 
-        final RedirectToken redirectToken = new RedirectToken("12345", 1L, "sebastian5152@wp.pl");
+        final RedirectToken redirectToken = new RedirectToken( 1L, "12345",
+                LocalDateTime.now(), LocalDateTime.now(), new ShipmentId(1L), "sebastian5152@wp.pl");
         final Token token = new Token("12345");
 
         doReturn(true)
@@ -62,7 +71,7 @@ public class RedirectTokenPortImplTest {
 
         doReturn("12345")
                 .when(redirectTokenGenerator)
-                        .generateToken(redirectToken.getParcelId(), redirectToken.getEmail());
+                        .generateToken(redirectToken.getShipmentId().getValue(), redirectToken.getEmail());
 
         doReturn(token)
                 .when(redirectService)
@@ -84,7 +93,8 @@ public class RedirectTokenPortImplTest {
         request.setEmail("sebastian5152@wp.pl");
         request.setParcelId(1L);
 
-        final RedirectToken redirectToken = new RedirectToken("12345", 1L, "sebastian5152@wp.pl");
+        final RedirectToken redirectToken = new RedirectToken( 1L, "12345",
+                LocalDateTime.now(), LocalDateTime.now(), new ShipmentId(1L), "sebastian5152@wp.pl");
 
         doReturn(false)
                 .when(redirectServicePort)
@@ -92,7 +102,7 @@ public class RedirectTokenPortImplTest {
 
         doReturn("12345")
                 .when(redirectTokenGenerator)
-                .generateToken(redirectToken.getParcelId(), redirectToken.getEmail());
+                .generateToken(redirectToken.getShipmentId().getValue(), redirectToken.getEmail());
 
         // when
         final Executable executable = () -> redirectTokenPort.sendRedirectInformation(request);

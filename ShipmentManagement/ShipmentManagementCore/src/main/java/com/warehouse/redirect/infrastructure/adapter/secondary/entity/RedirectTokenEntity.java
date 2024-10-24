@@ -21,18 +21,18 @@ public class RedirectTokenEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token", nullable = false, updatable = false)
+    @Column(name = "token", nullable = false)
     private String token;
 
     @Column(name = "created", updatable = false)
     private LocalDateTime createdDate;
 
-    @Column(name = "timeout", updatable = false)
+    @Column(name = "timeout")
     private LocalDateTime expiryDate;
 
     @Column(name = "parcel_id", nullable = false, updatable = false)
     private Long parcelId;
 
-    @Column(name = "email", nullable = false, updatable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 }

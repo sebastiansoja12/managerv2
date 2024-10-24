@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +40,8 @@ class RedirectTokenRepositoryImplTest {
     @Test
     void shouldSaveToken() {
         // given
-        final RedirectToken redirectToken = new RedirectToken("12345", 1L, "test@test.pl");
+        final RedirectToken redirectToken = new RedirectToken( 1L, "12345",
+                LocalDateTime.now(), LocalDateTime.now(), new ShipmentId(1L), "sebastian5152@wp.pl");
 
         final RedirectTokenEntity entity = new RedirectTokenEntity();
         entity.setExpiryDate(LocalDateTime.now().plusSeconds(86400L));

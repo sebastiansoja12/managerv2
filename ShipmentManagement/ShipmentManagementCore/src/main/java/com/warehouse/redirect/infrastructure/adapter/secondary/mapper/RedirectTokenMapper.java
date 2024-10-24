@@ -1,14 +1,11 @@
 package com.warehouse.redirect.infrastructure.adapter.secondary.mapper;
 
+import org.mapstruct.Mapper;
+
 import com.warehouse.redirect.domain.vo.RedirectToken;
 import com.warehouse.redirect.infrastructure.adapter.secondary.entity.RedirectTokenEntity;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper
 public interface RedirectTokenMapper {
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "expiryDate", ignore = true)
-    RedirectTokenEntity map(RedirectToken redirectToken);
+    RedirectTokenEntity map(final RedirectToken redirectToken);
 }

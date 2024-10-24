@@ -9,8 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RedirectServiceImplTest {
@@ -28,7 +27,7 @@ public class RedirectServiceImplTest {
     @Test
     void shouldSaveToken() {
         // given
-        final RedirectToken redirectToken = new RedirectToken("token", 1L, "email");
+        final RedirectToken redirectToken = mock(RedirectToken.class);
         // when
         redirectService.saveRedirectToken(redirectToken);
         // then

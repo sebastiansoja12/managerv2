@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -31,6 +32,8 @@ import com.warehouse.redirect.domain.port.secondary.MailServicePort;
 import com.warehouse.redirect.domain.port.secondary.RedirectServicePort;
 import com.warehouse.redirect.domain.vo.RedirectToken;
 
+import java.time.LocalDateTime;
+
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ContextConfiguration(classes = RedirectTokenTestConfiguration.class)
@@ -54,15 +57,16 @@ public class RedirectIntegrationTest {
     @Test
     void shouldSendRedirectInformation() {
         // given
-        final Long parcelId = 100001L;
+        final ShipmentId shipmentId = new ShipmentId(100L);
         final String email = "recipient@test.pl";
         final RedirectRequest request = new RedirectRequest();
         request.setEmail(email);
-        request.setParcelId(parcelId);
+        request.setParcelId(shipmentId.getValue());
 
-        final RedirectToken redirectToken = new RedirectToken(TOKEN, parcelId, email);
+        final RedirectToken redirectToken = new RedirectToken(1L, TOKEN, LocalDateTime.now(),
+                LocalDateTime.now(), shipmentId, email);
 
-        when(redirectServicePort.exists(parcelId)).thenReturn(true);
+        when(redirectServicePort.exists(shipmentId.getValue())).thenReturn(true);
 
         doNothing()
                 .when(mailServicePort)
@@ -71,7 +75,7 @@ public class RedirectIntegrationTest {
         // when
         final RedirectResponse response = redirectTokenPort.sendRedirectInformation(request);
         // then
-        assertEquals(expected(parcelId), response.getParcelId());
+        assertEquals(expected(shipmentId.getValue()), response.getParcelId());
         assertEquals(expected(8), response.getToken().getValue().length());
     }
 

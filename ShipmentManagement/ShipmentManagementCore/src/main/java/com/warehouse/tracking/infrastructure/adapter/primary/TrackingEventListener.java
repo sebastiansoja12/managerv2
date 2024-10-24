@@ -34,8 +34,8 @@ public class TrackingEventListener {
         final ShipmentIdDto shipmentId = event.getShipmentId();
         final ShipmentStatusDto shipmentStatus = event.getShipmentStatus();
         switch (shipmentStatus) {
-            case REROUTE -> rerouteService.rerouteShipment(shipmentId);
-            case REDIRECT -> redirectService.redirectShipment(shipmentId);
+            case REROUTE -> rerouteService.processRerouting(shipmentId);
+            case REDIRECT -> redirectService.processRedirecting(shipmentId);
             default -> log.info("Shipment not eligible for status change");
         }
     }

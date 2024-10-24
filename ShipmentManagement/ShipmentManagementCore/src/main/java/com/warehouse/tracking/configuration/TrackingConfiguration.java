@@ -1,6 +1,7 @@
 package com.warehouse.tracking.configuration;
 
 import com.warehouse.redirect.RedirectService;
+import com.warehouse.redirect.domain.port.primary.RedirectTokenPort;
 import com.warehouse.reroute.RerouteService;
 import com.warehouse.redirect.infrastructure.adapter.primary.RedirectServiceAdapter;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
@@ -20,8 +21,8 @@ public class TrackingConfiguration {
     }
 
     @Bean("tracking.redirectService")
-    public RedirectService redirectService() {
-        return new RedirectServiceAdapter();
+    public RedirectService redirectService(final RedirectTokenPort redirectTokenPort) {
+        return new RedirectServiceAdapter(redirectTokenPort);
     }
 
     @Bean

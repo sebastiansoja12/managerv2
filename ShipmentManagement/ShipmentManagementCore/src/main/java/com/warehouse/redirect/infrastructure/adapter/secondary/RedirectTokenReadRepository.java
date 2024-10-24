@@ -19,4 +19,6 @@ public interface RedirectTokenReadRepository extends JpaRepository<RedirectToken
     @Query("delete from redirect.RedirectTokenEntity t where t.expiryDate <= ?1")
     @Transactional
     void deleteAllExpiredSince(Instant now);
+
+    Optional<RedirectTokenEntity> findByParcelId(Long parcelId);
 }

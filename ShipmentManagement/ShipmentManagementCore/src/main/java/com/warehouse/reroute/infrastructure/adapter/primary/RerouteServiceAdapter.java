@@ -14,7 +14,7 @@ public class RerouteServiceAdapter implements RerouteService {
     }
 
     @Override
-    public void rerouteShipment(final ShipmentIdDto id) {
+    public void processRerouting(final ShipmentIdDto id) {
         final ShipmentId shipmentId = new ShipmentId(id.getValue());
         this.rerouteTokenPort.invalidateToken(shipmentId);
     }

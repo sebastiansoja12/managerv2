@@ -39,7 +39,7 @@ public class MailAdapterTest {
     @Test
     void shouldSendRedirectNotification() {
         // given
-        final RedirectToken redirectToken = new RedirectToken("token", 1L, "email");
+        final RedirectToken redirectToken = mock(RedirectToken.class);
 
         final com.warehouse.mail.domain.vo.Notification mappedNotification = Notification.builder().build();
 
