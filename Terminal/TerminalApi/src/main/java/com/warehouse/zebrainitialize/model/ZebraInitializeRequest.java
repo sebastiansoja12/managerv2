@@ -3,7 +3,7 @@ package com.warehouse.zebrainitialize.model;
 import java.util.List;
 
 import com.warehouse.zebra.infrastructure.api.requestmodel.ProcessType;
-import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraDeviceInformation;
+import com.warehouse.zebra.infrastructure.api.requestmodel.TerminalDeviceInformation;
 
 import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
@@ -21,9 +21,9 @@ public class ZebraInitializeRequest {
     private ProcessType processType;
 
     @XmlElement(name = "ZebraDeviceInformation")
-    private ZebraDeviceInformation zebraDeviceInformation;
+    private TerminalDeviceInformation terminalDeviceInformation;
 
     @XmlElementWrapper(name = "ParcelCreatedRequests")
     @XmlElement(name = "ParcelCreatedRequest")
-    private List<ParcelCreatedRequest> parcelCreatedRequests;
+    private List<ShipmentRequest> shipmentRequests;
 }

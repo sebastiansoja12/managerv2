@@ -3,7 +3,7 @@ package com.warehouse.zebra.mapper.primary;
 import com.warehouse.commonassets.response.Response;
 import com.warehouse.commonassets.vo.DeviceInformation;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraResponseMapper;
-import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
+import com.warehouse.zebra.infrastructure.api.responsemodel.TerminalResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -11,7 +11,7 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mapstruct.factory.Mappers.getMapper;
 
-public class ZebraResponseMapperTest {
+public class TerminalResponseMapperTest {
 
     private final ZebraResponseMapper mapper = getMapper(ZebraResponseMapper.class);
 
@@ -23,8 +23,8 @@ public class ZebraResponseMapperTest {
         // given
         final Response response = new Response(deviceInformation, Collections.emptyList(), Collections.emptyList());
         // when
-        final ZebraResponse zebraResponse = mapper.map(response);
+        final TerminalResponse terminalResponse = mapper.map(response);
         // then
-        assertEquals(1L, zebraResponse.getZebraId());
+        assertEquals(1L, terminalResponse.getTerminalId());
     }
 }

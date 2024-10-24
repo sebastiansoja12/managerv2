@@ -9,18 +9,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@XmlRootElement(name = "ZebraDeviceInformation")
+@XmlRootElement(name = "TerminalDeviceInformation")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ZebraDeviceInformation {
+public class TerminalDeviceInformation {
 
     @XmlElement(name = "Version")
     private String version;
 
-    @XmlElement(name = "ZebraID")
-    private Long zebraId;
+    @XmlElement(name = "TerminalId")
+    private Long terminalId;
 
     @XmlElement(name = "ResponsibleUser")
     private String username;

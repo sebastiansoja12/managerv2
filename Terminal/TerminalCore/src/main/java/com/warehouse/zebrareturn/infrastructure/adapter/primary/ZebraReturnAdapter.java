@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraDeviceInformation;
-import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraRequest;
-import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
+import com.warehouse.zebra.infrastructure.api.requestmodel.TerminalDeviceInformation;
+import com.warehouse.zebra.infrastructure.api.requestmodel.TerminalRequest;
+import com.warehouse.zebra.infrastructure.api.responsemodel.TerminalResponse;
 import com.warehouse.zebrareturn.infrastructure.adapter.primary.mapper.ZebraRequestMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -36,15 +36,15 @@ public class ZebraReturnAdapter {
 
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
-    public ZebraResponse processRequest(@RequestBody ZebraRequest zebraRequest) {
+    public TerminalResponse processRequest(@RequestBody TerminalRequest terminalRequest) {
 
-        final ZebraDeviceInformation zebraDeviceInformation = zebraRequest.getZebraDeviceInformation();
+        final TerminalDeviceInformation terminalDeviceInformation = terminalRequest.getTerminalDeviceInformation();
 
 		logger.info("Initializing process from Zebra device: ID - {}, Version - {}, Responsible User - {}, Depot - {}",
-				zebraDeviceInformation.getZebraId(), zebraDeviceInformation.getVersion(),
-				zebraDeviceInformation.getUsername(), zebraDeviceInformation.getDepotCode());
+				terminalDeviceInformation.getTerminalId(), terminalDeviceInformation.getVersion(),
+				terminalDeviceInformation.getUsername(), terminalDeviceInformation.getDepotCode());
 
-        final Request request = requestMapper.map(zebraRequest);
+        final Request request = requestMapper.map(terminalRequest);
 
         final Response response = zebraReturnPort.processRequest(request);
 

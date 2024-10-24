@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 
 import com.warehouse.commonassets.response.LogStatus;
 import com.warehouse.commonassets.vo.RouteProcess;
+import com.warehouse.zebra.infrastructure.api.responsemodel.TerminalResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import org.springframework.web.client.RestClient;
 
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.zebra.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -58,13 +58,13 @@ public class ZebraInitializeIntegrationAdapterTest {
         final String responseXmlContent = new String(Files.readAllBytes(response));
         when(routeLogServicePort.initializeProcess(any())).thenReturn(new RouteProcess(1L, LogStatus.OK));
         // when
-        final ResponseEntity<ZebraResponse> responseEntity = restClient
+        final ResponseEntity<TerminalResponse> responseEntity = restClient
                 .post()
-                .uri("/v2/api/zebra/initialize")
+                .uri("/v2/api/zebra")
                 .body(requestXmlContent)
                 .contentType(MediaType.APPLICATION_XML)
                 .retrieve()
-                .toEntity(ZebraResponse.class);
+                .toEntity(TerminalResponse.class);
         // then
         assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
         assertEquals(responseXmlContent, convertObjectToXmlString(responseEntity.getBody()));
@@ -82,15 +82,15 @@ public class ZebraInitializeIntegrationAdapterTest {
                 .body(requestXmlContent)
                 .contentType(MediaType.APPLICATION_XML)
                 .retrieve()
-                .toEntity(ZebraResponse.class);
+                .toEntity(TerminalResponse.class);
         // then
         assertThrows(RuntimeException.class, executable);
     }
 
 
-    private String convertObjectToXmlString(ZebraResponse zebraResponse) throws JAXBException {
+    private String convertObjectToXmlString(TerminalResponse terminalResponse) throws JAXBException {
 
-        final JAXBContext jaxbContext = JAXBContext.newInstance(ZebraResponse.class);
+        final JAXBContext jaxbContext = JAXBContext.newInstance(TerminalResponse.class);
 
         final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
@@ -98,7 +98,7 @@ public class ZebraInitializeIntegrationAdapterTest {
 
         final StringWriter sw = new StringWriter();
 
-        jaxbMarshaller.marshal(zebraResponse, sw);
+        jaxbMarshaller.marshal(terminalResponse, sw);
 
         return sw.toString();
     }

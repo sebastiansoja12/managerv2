@@ -1,5 +1,7 @@
 package com.warehouse.zebra.configuration;
 
+import com.warehouse.zebra.infrastructure.adapter.primary.strategy.ProcessStrategy;
+import com.warehouse.zebra.infrastructure.adapter.primary.strategy.ProcessStrategyFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,6 +18,9 @@ import com.warehouse.zebra.infrastructure.adapter.secondary.ReturnServiceAdapter
 import com.warehouse.zebra.infrastructure.adapter.secondary.RouteLogServiceAdapter;
 
 import jakarta.validation.constraints.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class ZebraConfiguration {
@@ -53,5 +58,11 @@ public class ZebraConfiguration {
     @Bean
     public ZebraInitializePort zebraInitializePort(RouteLogServicePort routeLogServicePort) {
         return new ZebraInitializePortImpl(routeLogServicePort);
+    }
+
+    @Bean
+    public ProcessStrategyFactory processStrategyFactory() {
+        final Map<String, ProcessStrategy> strategies = new HashMap<>();
+        return new ProcessStrategyFactory(strategies);
     }
 }

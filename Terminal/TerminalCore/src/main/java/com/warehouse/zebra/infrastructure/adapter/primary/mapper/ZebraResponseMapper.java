@@ -1,11 +1,11 @@
 package com.warehouse.zebra.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.zebra.infrastructure.api.responsemodel.TerminalResponse;
 import org.mapstruct.Mapper;
 
 import com.warehouse.commonassets.response.Response;
-import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 
 @Mapper
 public interface ZebraResponseMapper {
-    ZebraResponse map(final Response response);
+    TerminalResponse map(final Response response);
 }

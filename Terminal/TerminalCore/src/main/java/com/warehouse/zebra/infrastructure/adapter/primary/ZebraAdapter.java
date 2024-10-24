@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.warehouse.zebra.domain.port.primary.ZebraPort;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraRequestMapper;
 import com.warehouse.zebra.infrastructure.adapter.primary.mapper.ZebraResponseMapper;
-import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraDeviceInformation;
-import com.warehouse.zebra.infrastructure.api.requestmodel.ZebraRequest;
-import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
+import com.warehouse.zebra.infrastructure.api.requestmodel.TerminalDeviceInformation;
+import com.warehouse.zebra.infrastructure.api.requestmodel.TerminalRequest;
+import com.warehouse.zebra.infrastructure.api.responsemodel.TerminalResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,15 +35,15 @@ public class ZebraAdapter {
     private final Logger logger = LoggerFactory.getLogger(ZebraAdapter.class);
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
-    public ZebraResponse processRequest(@RequestBody final ZebraRequest zebraRequest) {
+    public TerminalResponse processRequest(@RequestBody final TerminalRequest terminalRequest) {
 
-        final ZebraDeviceInformation zebraDeviceInformation = zebraRequest.getZebraDeviceInformation();
+        final TerminalDeviceInformation terminalDeviceInformation = terminalRequest.getTerminalDeviceInformation();
 
 		logger.info("Detected request from Zebra device: ID - {}, Version - {}, Responsible User - {}, Depot - {}",
-				zebraDeviceInformation.getZebraId(), zebraDeviceInformation.getVersion(),
-				zebraDeviceInformation.getUsername(), zebraDeviceInformation.getDepotCode());
+				terminalDeviceInformation.getTerminalId(), terminalDeviceInformation.getVersion(),
+				terminalDeviceInformation.getUsername(), terminalDeviceInformation.getDepotCode());
 
-        final Request request = requestMapper.map(zebraRequest);
+        final Request request = requestMapper.map(terminalRequest);
 
         final Response response = zebraPort.processRequest(request);
 

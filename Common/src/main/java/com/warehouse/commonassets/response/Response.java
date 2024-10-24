@@ -9,7 +9,7 @@ import com.warehouse.commonassets.vo.RouteProcess;
 
 
 public class Response {
-    private final Long zebraId;
+    private final Long terminalId;
     private final String version;
     private final String username;
     private final List<ProcessReturn> processReturns;
@@ -19,15 +19,15 @@ public class Response {
                     final List<ProcessReturn> processReturns,
                     final List<RouteProcess> routeProcesses) {
         Objects.requireNonNull(deviceInformation);
-        this.zebraId = deviceInformation.getZebraId();
+        this.terminalId = deviceInformation.getTerminalId();
         this.version = deviceInformation.getVersion();
         this.username = deviceInformation.getUsername();
         this.processReturns = processReturns;
         this.routeProcesses = routeProcesses;
     }
 
-    public Long getZebraId() {
-        return zebraId;
+    public Long getTerminalId() {
+        return terminalId;
     }
 
     public String getVersion() {

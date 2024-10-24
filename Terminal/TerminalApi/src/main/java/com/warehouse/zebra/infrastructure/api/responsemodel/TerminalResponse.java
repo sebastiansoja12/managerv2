@@ -8,15 +8,15 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@XmlRootElement(name = "ZebraResponse")
+@XmlRootElement(name = "TerminalResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ZebraResponse {
+public class TerminalResponse {
 
-    @XmlElement(name = "ZebraID")
-    private Long zebraId;
+    @XmlElement(name = "TerminalID")
+    private Long terminalId;
 
     @XmlElement(name = "Version")
     private String version;

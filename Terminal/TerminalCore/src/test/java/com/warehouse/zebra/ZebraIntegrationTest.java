@@ -15,6 +15,7 @@ import java.util.List;
 import com.warehouse.commonassets.response.Response;
 import com.warehouse.commonassets.vo.DeviceInformation;
 import com.warehouse.tools.returning.ReturnProperties;
+import com.warehouse.zebra.infrastructure.api.responsemodel.TerminalResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +27,6 @@ import org.springframework.web.client.RestClient;
 
 import com.warehouse.zebra.domain.port.secondary.ReturnServicePort;
 import com.warehouse.zebra.infrastructure.api.dto.*;
-import com.warehouse.zebra.infrastructure.api.responsemodel.ZebraResponse;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -64,20 +64,20 @@ public class ZebraIntegrationTest {
 
         final Response expectedResponse = new Response(deviceInformation, processReturns, Collections.emptyList());
 
-        final ZebraResponse expectedZebraResponse = createZebraResponse();
+        final TerminalResponse expectedTerminalResponse = createZebraResponse();
 
         when(returnServicePort.processReturn(any())).thenReturn(expectedResponse);
         // when
-        final ResponseEntity<ZebraResponse> zebraProcess = restClient.post()
+        final ResponseEntity<TerminalResponse> zebraProcess = restClient.post()
                 .uri("/v2/api/zebra")
                 .body(requestXmlContent)
                 .contentType(MediaType.APPLICATION_XML)
                 .retrieve()
-                .toEntity(ZebraResponse.class);
+                .toEntity(TerminalResponse.class);
         // then
         assertTrue(zebraProcess.getStatusCode().isSameCodeAs(HttpStatus.OK));
         assertNotNull(zebraProcess.getBody());
-        assertEquals(expectedZebraResponse.getProcessReturns(), zebraProcess.getBody().getProcessReturns());
+        assertEquals(expectedTerminalResponse.getProcessReturns(), zebraProcess.getBody().getProcessReturns());
         assertEquals(responseXmlContent, convertObjectToXmlString(zebraProcess.getBody()));
     }
 
@@ -99,9 +99,9 @@ public class ZebraIntegrationTest {
         assertNull(zebraProcess.getBody());
     }
 
-    private String convertObjectToXmlString(ZebraResponse zebraResponse) throws JAXBException {
+    private String convertObjectToXmlString(TerminalResponse terminalResponse) throws JAXBException {
 
-        final JAXBContext jaxbContext = JAXBContext.newInstance(ZebraResponse.class);
+        final JAXBContext jaxbContext = JAXBContext.newInstance(TerminalResponse.class);
 
         final Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
@@ -109,13 +109,13 @@ public class ZebraIntegrationTest {
 
         final StringWriter sw = new StringWriter();
 
-        jaxbMarshaller.marshal(zebraResponse, sw);
+        jaxbMarshaller.marshal(terminalResponse, sw);
 
         return sw.toString();
     }
 
-    private ZebraResponse createZebraResponse() {
-        return new ZebraResponse(1L, "1.0", "s-soja", createProcessReturn(), null);
+    private TerminalResponse createZebraResponse() {
+        return new TerminalResponse(1L, "1.0", "s-soja", createProcessReturn(), null);
     }
 
     private List<ProcessReturn> createProcessReturn() {
