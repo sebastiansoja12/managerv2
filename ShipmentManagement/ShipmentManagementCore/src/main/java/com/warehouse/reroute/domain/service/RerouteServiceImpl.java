@@ -1,5 +1,6 @@
 package com.warehouse.reroute.domain.service;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.vo.RerouteResponse;
 import com.warehouse.reroute.domain.model.RerouteToken;
@@ -42,5 +43,12 @@ public class RerouteServiceImpl implements RerouteService {
     @Override
     public RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId) {
         return rerouteTokenRepository.loadByTokenAndParcelId(token, parcelId);
+    }
+
+    @Override
+    public void invalidateToken(final ShipmentId shipmentId) {
+        final RerouteToken rerouteToken = this.rerouteTokenRepository.findByShipmentId(shipmentId);
+        rerouteToken.invalidate();
+        this.rerouteTokenRepository.update(rerouteToken);
     }
 }

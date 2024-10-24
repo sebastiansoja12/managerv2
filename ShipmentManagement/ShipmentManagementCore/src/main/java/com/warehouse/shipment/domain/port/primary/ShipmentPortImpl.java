@@ -1,10 +1,13 @@
 package com.warehouse.shipment.domain.port.primary;
 
+import static com.warehouse.shipment.domain.enumeration.ShipmentUpdateType.REDIRECT;
+import static com.warehouse.shipment.domain.enumeration.ShipmentUpdateType.REROUTE;
 import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_202;
 
 import java.util.Objects;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.ShipmentType;
@@ -34,16 +37,20 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final MailServicePort mailServicePort;
 
+    private final TrackingStatusServicePort trackingStatusServicePort;
+
 	public ShipmentPortImpl(final ShipmentService shipmentService, final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
                             final NotificationCreatorProvider notificationCreatorProvider,
-                            final MailServicePort mailServicePort) {
+                            final MailServicePort mailServicePort,
+                            final TrackingStatusServicePort trackingStatusServicePort) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
 		this.mailServicePort = mailServicePort;
-	}
+        this.trackingStatusServicePort = trackingStatusServicePort;
+    }
 
     @Override
     public ShipmentResponse ship(final ShipmentRequest request) {
@@ -90,7 +97,19 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         request.updateDestination(city);
 
-        shipmentService.updateShipment(request.getShipmentUpdate(), request.getShipmentId());
+        final ShipmentId shipmentId = request.getShipmentId();
+        final Sender sender = request.getSender();
+        final Recipient recipient = request.getRecipient();
+
+        if (REDIRECT.equals(request.getShipmentUpdateType())) {
+            this.shipmentService.changeRecipientTo(shipmentId, recipient);
+            this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, this.shipmentService.nextShipmentId());
+            this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REDIRECT);
+        } else if (REROUTE.equals(request.getShipmentUpdateType())) {
+            this.shipmentService.changeRecipientTo(shipmentId, recipient);
+            this.shipmentService.changeSenderTo(shipmentId, sender);
+            this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REROUTE);
+        }
     }
 
     @Override

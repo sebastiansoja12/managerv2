@@ -52,9 +52,10 @@ public class ShipmentConfiguration {
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
-									 final MailServicePort mailServicePort) {
+									 final MailServicePort mailServicePort,
+									 final TrackingStatusServicePort trackingStatusServicePort) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, mailServicePort);
+				notificationCreatorProvider, mailServicePort, trackingStatusServicePort);
 	}
 
 	@Bean
@@ -69,9 +70,9 @@ public class ShipmentConfiguration {
 	}
 	
 	@Bean("shipment.rerouteTokenServicePort")
-	public RerouteTokenServicePort rerouteTokenServicePort(
+	public TrackingStatusServicePort rerouteTokenServicePort(
 			final TrackingStatusEventPublisher trackingStatusEventPublisher) {
-		return new RerouteTokenServiceAdapter(trackingStatusEventPublisher);
+		return new TrackingStatusServiceAdapter(trackingStatusEventPublisher);
 	}
 
 	@Bean

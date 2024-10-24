@@ -9,6 +9,7 @@ import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
 import com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.Logger;
+import com.warehouse.reroute.domain.port.secondary.RerouteTrackerServicePort;
 import com.warehouse.reroute.domain.service.RerouteService;
 import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
 import com.warehouse.reroute.domain.vo.GeneratedToken;
@@ -25,6 +26,8 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
     private final RerouteTokenGeneratorService tokenGeneratorService;
 
     private final Logger logger;
+
+    private final RerouteTrackerServicePort rerouteTrackerServicePort;
 
 
     @Override
@@ -68,8 +71,9 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
     }
 
     @Override
-    public void rerouteShipment(final ShipmentId shipmentId) {
-        //
+    public void invalidateToken(final ShipmentId shipmentId) {
+        this.rerouteService.invalidateToken(shipmentId);
+        this.rerouteTrackerServicePort.sendRerouteRequest();
     }
 
     private void logReroute(RerouteParcelRequest request) {

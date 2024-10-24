@@ -1,5 +1,6 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
@@ -39,5 +40,18 @@ public class RerouteTokenRepositoryImpl implements RerouteTokenRepository {
     @Override
     public void deleteByToken(RerouteToken token) {
         repository.deleteByToken(token.getToken());
+    }
+
+    @Override
+    public RerouteToken findByShipmentId(final ShipmentId shipmentId) {
+        return this.repository.findByParcelId(shipmentId.getValue())
+                .map(rerouteTokenMapper::map)
+                .orElseThrow(() -> new RerouteTokenNotFoundException("Reroute token was not found"));
+    }
+
+    @Override
+    public void update(final RerouteToken rerouteToken) {
+        final RerouteTokenEntity entity = rerouteTokenMapper.map(rerouteToken);
+        this.repository.save(entity);
     }
 }

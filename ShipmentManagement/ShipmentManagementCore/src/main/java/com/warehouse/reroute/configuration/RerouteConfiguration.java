@@ -1,5 +1,6 @@
 package com.warehouse.reroute.configuration;
 
+import com.warehouse.reroute.domain.port.secondary.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,9 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
-import com.warehouse.reroute.domain.port.secondary.LoggerFactory;
-import com.warehouse.reroute.domain.port.secondary.MailServicePort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.service.*;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapper;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapperImpl;
@@ -35,12 +33,17 @@ public class RerouteConfiguration {
 
 	@Bean
 	public RerouteTokenPort rerouteTokenPort(MailServicePort mailServicePort,
-			RerouteTokenRepository rerouteTokenRepository) {
+			RerouteTokenRepository rerouteTokenRepository, final RerouteTrackerServicePort rerouteTrackerServicePort) {
 		final com.warehouse.reroute.domain.service.RerouteService rerouteService = new RerouteServiceImpl(
 				mailServicePort, rerouteTokenRepository);
 		final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
 		return new RerouteTokenPortImpl(rerouteService, rerouteTokenGeneratorService,
-				LOGGER_FACTORY.getLogger(RerouteTokenPort.class));
+				LOGGER_FACTORY.getLogger(RerouteTokenPort.class), rerouteTrackerServicePort);
+	}
+
+	@Bean
+	public RerouteTrackerServicePort rerouteTrackerServicePort() {
+		return new RerouteTrackerServiceAdapter();
 	}
 
 	@Bean(name = "reroute.mailServicePort")

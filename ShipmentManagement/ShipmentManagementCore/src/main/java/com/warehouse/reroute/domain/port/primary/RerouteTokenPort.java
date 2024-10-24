@@ -15,5 +15,5 @@ public interface RerouteTokenPort {
 
     RerouteParcelResponse update(final RerouteParcelRequest request);
 
-    void rerouteShipment(final ShipmentId shipmentId);
+    void invalidateToken(final ShipmentId shipmentId);
 }

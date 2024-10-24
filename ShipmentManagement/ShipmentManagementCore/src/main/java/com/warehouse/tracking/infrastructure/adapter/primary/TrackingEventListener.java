@@ -1,7 +1,5 @@
 package com.warehouse.tracking.infrastructure.adapter.primary;
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.context.event.EventListener;
@@ -12,7 +10,6 @@ import com.warehouse.reroute.RerouteService;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentStatusDto;
 import com.warehouse.tracking.ShipmentStatusChanged;
-import com.warehouse.tracking.infrastructure.adapter.primary.mapper.ShipmentEventMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,8 +22,6 @@ public class TrackingEventListener {
     private final RerouteService rerouteService;
 
     private final RedirectService redirectService;
-
-    private final ShipmentEventMapper eventMapper = getMapper(ShipmentEventMapper.class);
 
     public TrackingEventListener(final RerouteService rerouteService, final RedirectService redirectService) {
         this.rerouteService = rerouteService;

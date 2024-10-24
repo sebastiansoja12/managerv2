@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.warehouse.shipment.domain.port.secondary.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,10 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
-import com.warehouse.shipment.domain.port.secondary.Logger;
-import com.warehouse.shipment.domain.port.secondary.MailServicePort;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
@@ -47,13 +44,16 @@ class ShipmentPrimaryPortTest {
     @Mock
     private Logger logger;
 
+    @Mock
+    private TrackingStatusServicePort trackingStatusServicePort;
+
     private ShipmentPortImpl shipmentPort;
 
     @BeforeEach
     void setUp() {
         logger = mock(Logger.class);
         shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
-                mailServicePort);
+                mailServicePort, trackingStatusServicePort);
     }
 
     @Test

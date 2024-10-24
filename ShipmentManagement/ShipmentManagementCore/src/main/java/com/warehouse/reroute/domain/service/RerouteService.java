@@ -1,5 +1,6 @@
 package com.warehouse.reroute.domain.service;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.vo.RerouteResponse;
 import com.warehouse.reroute.domain.model.RerouteToken;
@@ -15,4 +16,6 @@ public interface RerouteService {
     RerouteToken findByToken(Token token);
 
     RerouteToken loadByTokenAndParcelId(Integer token, Long parcelId);
+
+    void invalidateToken(final ShipmentId shipmentId);
 }

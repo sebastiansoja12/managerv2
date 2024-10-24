@@ -26,4 +26,8 @@ public class RerouteToken {
     public boolean isValid() {
         return getExpiryDate().isAfter(Instant.now());
     }
+
+    public void invalidate() {
+        this.expiryDate = Instant.now();
+    }
 }

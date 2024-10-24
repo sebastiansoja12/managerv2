@@ -1,6 +1,8 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
-import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
+import java.time.Instant;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,8 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.Optional;
+import com.warehouse.reroute.infrastructure.adapter.secondary.entity.RerouteTokenEntity;
 
 
 
@@ -32,4 +33,6 @@ public interface RerouteTokenReadRepository extends JpaRepository<RerouteTokenEn
     @Query("delete from reroute.RerouteTokenEntity t where t.expiryDate <= ?1")
     @Transactional
     void deleteAllExpiredSince(Instant now);
+
+    Optional<RerouteTokenEntity> findByParcelId(final Long parcelId);
 }

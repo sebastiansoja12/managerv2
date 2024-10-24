@@ -1,7 +1,9 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusRequestDto;
+import com.warehouse.shipment.infrastructure.api.dto.*;
 import io.micrometer.common.util.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -10,10 +12,6 @@ import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.UpdateType;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.infrastructure.api.dto.PersonDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentRequestMapper {
@@ -31,8 +29,11 @@ public interface ShipmentRequestMapper {
         final Recipient recipient = mapToRecipient(request.getRecipient());
 		final ShipmentUpdate shipmentUpdate = new ShipmentUpdate(sender, recipient,
 				request.getDestination(), request.getToken());
-        return new ShipmentUpdateRequest(shipmentId, shipmentUpdate, UpdateType.AUTO, processType);
+        return new ShipmentUpdateRequest(shipmentId, shipmentUpdate, UpdateType.AUTO, processType,
+                map(request.getShipmentUpdateType()));
     }
+
+    ShipmentUpdateType map(final ShipmentUpdateTypeDto shipmentUpdateType);
     
     Sender mapToSender(final PersonDto person);
 
@@ -46,7 +47,7 @@ public interface ShipmentRequestMapper {
 
         return switch (token.length()) {
             case 8 -> ProcessType.REDIRECT;
-            case 6 -> ProcessType.REROUTE;
+            case 9 -> ProcessType.REROUTE;
             case 4 -> ProcessType.ROUTE;
             default -> throw new IllegalStateException("Unexpected value: " + token.length());
         };

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 
+import com.warehouse.reroute.domain.port.secondary.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +21,6 @@ import com.warehouse.reroute.domain.enumeration.Status;
 import com.warehouse.reroute.domain.exception.RerouteTokenExpiredException;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
-import com.warehouse.reroute.domain.port.secondary.Logger;
-import com.warehouse.reroute.domain.port.secondary.MailServicePort;
-import com.warehouse.reroute.domain.port.secondary.ParcelReroutePort;
-import com.warehouse.reroute.domain.port.secondary.RerouteTokenRepository;
 import com.warehouse.reroute.domain.service.RerouteService;
 import com.warehouse.reroute.domain.service.RerouteServiceImpl;
 import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
@@ -46,6 +43,9 @@ public class RerouteTokenPortImplTest {
     @Mock
     private Logger logger;
 
+    @Mock
+    private RerouteTrackerServicePort rerouteTrackerServicePort;
+
     private RerouteTokenPortImpl port;
 
     private final Integer TOKEN_VALUE = 27150;
@@ -56,7 +56,7 @@ public class RerouteTokenPortImplTest {
     void setup() {
         final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
         final RerouteService rerouteService = new RerouteServiceImpl(mailServicePort, rerouteTokenRepository);
-        port = new RerouteTokenPortImpl(rerouteService, rerouteTokenGeneratorService, logger);
+        port = new RerouteTokenPortImpl(rerouteService, rerouteTokenGeneratorService, logger, rerouteTrackerServicePort);
     }
 
     @Test
