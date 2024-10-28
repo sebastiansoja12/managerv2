@@ -2,7 +2,7 @@ package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.SoftwareConfigurationDto;
 
-public final class SoftwareConfiguration {
+public class SoftwareConfiguration {
     private final String value;
     private final String url;
 

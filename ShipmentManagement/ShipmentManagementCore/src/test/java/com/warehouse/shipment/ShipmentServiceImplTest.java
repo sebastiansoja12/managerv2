@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
+import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
@@ -60,7 +60,7 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldCreateShip() {
         // given
-        final Shipment shipment = createShipmentParcel();
+        final Shipment shipment = createShipment();
 
         final City city = new City("Katowice");
 
@@ -101,7 +101,7 @@ public class ShipmentServiceImplTest {
     @Test
     void shouldNotCreateShipmentWhenDestinationDepotIsNotDetermined() {
         // given
-        final Shipment shipment = createShipmentParcel();
+        final Shipment shipment = createShipment();
 
         doReturn(new City(null))
                 .when(pathFinderServicePort)
@@ -109,8 +109,8 @@ public class ShipmentServiceImplTest {
         // when
         final Executable executable = () -> service.createShipment(shipment);
         // then
-        final DestinationDepotDeterminationException exception =
-                assertThrows(DestinationDepotDeterminationException.class, executable);
+        final DestinationDepartmentDeterminationException exception =
+                assertThrows(DestinationDepartmentDeterminationException.class, executable);
 
         assertEquals(exception.getMessage(),
                 expectedToBe("Delivery depot could not be determined"));

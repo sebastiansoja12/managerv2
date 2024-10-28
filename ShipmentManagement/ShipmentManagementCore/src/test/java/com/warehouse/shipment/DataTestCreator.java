@@ -56,7 +56,7 @@ public class DataTestCreator {
         return new Money(new BigDecimal(10L), Currency.PLN);
     }
 
-    static Shipment createShipmentParcel() {
+    static Shipment createShipment() {
 		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, money(), LocalDateTime.now(),
 				LocalDateTime.now(), false);
     }

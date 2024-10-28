@@ -3,7 +3,7 @@ package com.warehouse.shipment.domain.vo;
 import com.warehouse.shipment.domain.model.Shipment;
 
 
-public final class ShipmentRequest {
+public class ShipmentRequest {
 
 	private final Shipment shipment;
 

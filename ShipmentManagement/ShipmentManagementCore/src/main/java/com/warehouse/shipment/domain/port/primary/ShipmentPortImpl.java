@@ -6,13 +6,13 @@ import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExcept
 
 import java.util.Objects;
 
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.exception.DestinationDepotDeterminationException;
+import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
 import com.warehouse.shipment.domain.model.Notification;
@@ -20,6 +20,7 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
+import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.*;
@@ -69,8 +70,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final City city = this.pathFinderServicePort.determineDeliveryDepot(address);
 
-        if (Objects.isNull(city) || city.getValue() == null) {
-            throw new DestinationDepotDeterminationException(SHIPMENT_202);
+        if (Objects.isNull(city) || StringUtils.isEmpty(city.getValue())) {
+            throw new DestinationDepartmentDeterminationException(SHIPMENT_202);
         }
 
         shipment.updateDestination(city);
@@ -160,11 +161,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     public void changeShipmentSignatureTo(final ShipmentRequest request) {
         final Shipment shipment = Shipment.from(request);
         // change signature in service
-    }
-
-    @Override
-    public void updateShipmentStatus(final ShipmentStatusRequest request) {
-        this.shipmentService.changeShipmentStatusTo(request.getShipmentId(), request.getShipmentStatus());
     }
 
     @Override

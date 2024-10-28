@@ -1,7 +1,7 @@
 package com.warehouse.shipment;
 
 
-import static com.warehouse.shipment.DataTestCreator.createShipmentParcel;
+import static com.warehouse.shipment.DataTestCreator.createShipment;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
@@ -58,7 +58,7 @@ public class ShipmentIntegrationTest {
     @Test
     void shouldNotShipParcelWhenRouteLogIsNotAvailable() {
         // given
-        final Shipment shipment = createShipmentParcel();
+        final Shipment shipment = createShipment();
         final ShipmentRequest request = new ShipmentRequest(shipment);
         final ShipmentId shipmentId = DataTestCreator.shipmentId();
         when(voronoiService.findFastestRoute(shipment.getDestination())).thenReturn("KT3");
