@@ -145,7 +145,7 @@ class ShipmentPortImplTest {
         shipmentPort.changeSenderTo(request);
         // then
         verify(shipmentRepository).findById(shipmentId);
-        verify(shipmentRepository).update(shipment);
+        verify(shipmentRepository).createOrUpdate(shipment);
     }
 
     @Test
@@ -161,7 +161,7 @@ class ShipmentPortImplTest {
         shipmentPort.changeRecipientTo(request);
         // then
         verify(shipmentRepository).findById(shipmentId);
-        verify(shipmentRepository).update(shipment);
+        verify(shipmentRepository).createOrUpdate(shipment);
     }
 
     @Test
@@ -177,7 +177,7 @@ class ShipmentPortImplTest {
         shipmentPort.changeShipmentTypeTo(request);
         // then
         verify(shipmentRepository).findById(shipmentId);
-        verify(shipmentRepository).update(shipment);
+        verify(shipmentRepository).createOrUpdate(shipment);
     }
 
     @Test

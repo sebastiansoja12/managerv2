@@ -78,7 +78,7 @@ public class ShipmentServiceImplTest {
 
         doReturn(parcel)
                 .when(shipmentRepository)
-                .save(shipment);
+                .createOrUpdate(shipment);
 
         doReturn(notification)
                 .when(notificationCreatorProvider)

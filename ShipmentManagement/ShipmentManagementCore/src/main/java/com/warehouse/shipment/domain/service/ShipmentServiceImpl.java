@@ -37,7 +37,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
 	public void createShipment(final Shipment shipment) {
-        this.shipmentRepository.save(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
 	}
 
     @Override
@@ -46,7 +46,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         final Shipment copiedShipment = shipment.snapshot();
         copiedShipment.setShipmentId(newShipmentId);
-        this.shipmentRepository.save(copiedShipment);
+        this.shipmentRepository.createOrUpdate(copiedShipment);
         return newShipmentId;
     }
 
@@ -59,7 +59,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void updateShipment(final ShipmentUpdate shipmentUpdate, final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.update(shipmentUpdate);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
@@ -77,119 +77,119 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeSender(sender);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeRecipient(recipient);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeShipmentTypeTo(final ShipmentId shipmentId, final ShipmentType shipmentType) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeShipmentType(shipmentType);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeShipmentStatusTo(final ShipmentId shipmentId, final ShipmentStatus shipmentStatus) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeShipmentStatus(shipmentStatus);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeShipmentRelatedIdTo(final ShipmentId shipmentId, final ShipmentId relatedShipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeShipmentRelatedId(relatedShipmentId);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeShipmentPriorityTo(final ShipmentId shipmentId, final ShipmentPriority shipmentPriority) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeShipmentPriority(shipmentPriority);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeCurrencyTo(final ShipmentId shipmentId, final Currency currency) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeCurrency(currency);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeShipmentOriginCountryTo(final ShipmentId shipmentId, final Country originCountry) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeShipmentOrigin(originCountry);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeShipmentDestinationCountryTo(final ShipmentId shipmentId, final Country destinationCountry) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeShipmentDestinationCountry(destinationCountry);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeSignatureRequiredTo(final ShipmentId shipmentId, final boolean signatureRequired) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeSignatureRequired(signatureRequired);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeDangerousGoodTo(final ShipmentId shipmentId, final DangerousGood dangerousGood) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeDangerousGood(dangerousGood);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void notifyRelatedShipmentRedirected(final ShipmentId shipmentId, final ShipmentId relatedShipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyRelatedShipmentRedirected(relatedShipmentId);
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void notifyShipmentRerouted(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentRerouted();
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void notifyRelatedShipmentLocked(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyRelatedShipmentLocked();
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void notifyShipmentSent(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentSent();
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void notifyShipmentReturned(ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentReturned();
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void notifyShipmentDelivered(ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentDelivered();
-        this.shipmentRepository.update(shipment);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override

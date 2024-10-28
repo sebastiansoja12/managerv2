@@ -5,9 +5,7 @@ import com.warehouse.shipment.domain.model.Shipment;
 
 public interface ShipmentRepository {
 
-    void save(final Shipment parcel);
-
-    void update(final Shipment shipment);
+    void createOrUpdate(final Shipment shipment);
 
     Shipment findById(final ShipmentId shipmentId);
 

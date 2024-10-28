@@ -1,16 +1,16 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
+import static org.mapstruct.factory.Mappers.getMapper;
+
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEntityMapper;
-
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentModelMapper;
-import lombok.AllArgsConstructor;
 
-import static org.mapstruct.factory.Mappers.getMapper;
+import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
@@ -23,13 +23,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     private final ShipmentReadRepository repository;
 
     @Override
-    public void save(final Shipment shipment) {
-        final ParcelEntity entity = shipmentEntityMapper.map(shipment);
-        repository.save(entity);
-    }
-
-    @Override
-    public void update(final Shipment shipment) {
+    public void createOrUpdate(final Shipment shipment) {
         final ParcelEntity entity = shipmentEntityMapper.map(shipment);
         repository.save(entity);
     }

@@ -42,7 +42,7 @@ public class ShipmentRepositoryTest {
     }
 
     @Test
-    void shouldSaveParcel() {
+    void shouldCreateParcel() {
         // given
         final Shipment parcel = mock(Shipment.class);
         when(parcel.getShipmentStatus()).thenReturn(ShipmentStatus.CREATED);
@@ -52,7 +52,7 @@ public class ShipmentRepositoryTest {
         when(shipmentEntityMapper.map(parcel)).thenReturn(entity);
 
         // when
-        shipmentRepository.save(parcel);
+        shipmentRepository.createOrUpdate(parcel);
         // then
         Mockito.verify(readRepository).save(entity);
     }
@@ -85,7 +85,7 @@ public class ShipmentRepositoryTest {
     }
 
     @Test
-    void shouldUpdate() {
+    void shouldCreateOrUpdate() {
         // given
         final ShipmentUpdate shipmentUpdate = mock(ShipmentUpdate.class);
         final ParcelEntity entity = new ParcelEntity();
@@ -93,7 +93,7 @@ public class ShipmentRepositoryTest {
         when(shipmentEntityMapper.map(shipmentUpdate)).thenReturn(entity);
         when(readRepository.save(entity)).thenReturn(entity);
         // when
-        shipmentRepository.update(mock(Shipment.class));
+        shipmentRepository.createOrUpdate(mock(Shipment.class));
 
         // then
         verify(readRepository, times(1)).save(entity);
