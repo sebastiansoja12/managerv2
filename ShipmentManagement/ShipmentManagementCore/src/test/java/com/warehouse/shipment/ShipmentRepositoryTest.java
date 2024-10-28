@@ -42,7 +42,7 @@ public class ShipmentRepositoryTest {
     }
 
     @Test
-    void shouldCreateParcel() {
+    void shouldCreateShipment() {
         // given
         final Shipment parcel = mock(Shipment.class);
         when(parcel.getShipmentStatus()).thenReturn(ShipmentStatus.CREATED);
@@ -58,7 +58,7 @@ public class ShipmentRepositoryTest {
     }
 
     @Test
-    void shouldReturnParcelById() {
+    void shouldReturnShipmentById() {
         // given
         final ShipmentId shipmentId = new ShipmentId(1L);
         final ParcelEntity entity = new ParcelEntity();
@@ -73,7 +73,7 @@ public class ShipmentRepositoryTest {
     }
 
     @Test
-    void shouldNotFindParcelAndThrowException() {
+    void shouldNotFindShipmentAndThrowException() {
         // given
         final ShipmentId shipmentId = new ShipmentId(1L);
         when(readRepository.findParcelEntityById(shipmentId.getValue())).thenReturn(Optional.empty());
