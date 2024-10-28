@@ -10,12 +10,14 @@ import com.warehouse.reroute.domain.exception.enumeration.RerouteExceptionCodes;
 import com.warehouse.reroute.domain.model.*;
 import com.warehouse.reroute.domain.port.secondary.Logger;
 import com.warehouse.reroute.domain.port.secondary.RerouteTrackerServicePort;
+import com.warehouse.reroute.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.reroute.domain.service.RerouteService;
 import com.warehouse.reroute.domain.service.RerouteTokenGeneratorService;
 import com.warehouse.reroute.domain.vo.GeneratedToken;
 import com.warehouse.reroute.domain.vo.RerouteParcelResponse;
 import com.warehouse.reroute.domain.vo.RerouteResponse;
 
+import com.warehouse.reroute.domain.vo.SoftwareConfiguration;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -28,7 +30,8 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
     private final Logger logger;
 
     private final RerouteTrackerServicePort rerouteTrackerServicePort;
-
+    
+    private final SoftwareConfigurationServicePort softwareConfigurationServicePort;
 
     @Override
     public RerouteToken findByToken(Token token) {
@@ -73,7 +76,9 @@ public class RerouteTokenPortImpl implements RerouteTokenPort {
     @Override
     public void invalidateToken(final ShipmentId shipmentId) {
         this.rerouteService.invalidateToken(shipmentId);
-        this.rerouteTrackerServicePort.sendRerouteRequest();
+		final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort
+				.getSoftwareConfiguration();
+        this.rerouteTrackerServicePort.sendRerouteRequest(softwareConfiguration, shipmentId);
     }
 
     private void logReroute(RerouteParcelRequest request) {

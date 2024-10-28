@@ -2,6 +2,7 @@ package com.warehouse.shipment.configuration;
 
 import java.time.Duration;
 
+import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import com.warehouse.tracking.TrackingStatusEventPublisher;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -58,7 +59,7 @@ public class ShipmentConfiguration {
 				notificationCreatorProvider, mailServicePort, trackingStatusServicePort);
 	}
 
-	@Bean
+	@Bean("shipment.softwareConfigurationServicePort")
 	public SoftwareConfigurationServicePort softwareConfigurationServicePort() {
 		final RetryConfig config = RetryConfig.custom()
 				.maxAttempts(4)

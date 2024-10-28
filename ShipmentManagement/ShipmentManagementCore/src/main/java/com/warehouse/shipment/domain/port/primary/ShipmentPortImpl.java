@@ -6,6 +6,7 @@ import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExcept
 
 import java.util.Objects;
 
+import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -101,12 +102,13 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ShipmentId shipmentId = request.getShipmentId();
         final Sender sender = request.getSender();
         final Recipient recipient = request.getRecipient();
+        final ShipmentUpdateType shipmentUpdateType = request.getShipmentUpdateType();
 
-        if (REDIRECT.equals(request.getShipmentUpdateType())) {
+        if (REDIRECT.equals(shipmentUpdateType)) {
             this.shipmentService.changeRecipientTo(shipmentId, recipient);
             this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, this.shipmentService.nextShipmentId());
             this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REDIRECT);
-        } else if (REROUTE.equals(request.getShipmentUpdateType())) {
+        } else if (REROUTE.equals(shipmentUpdateType)) {
             this.shipmentService.changeRecipientTo(shipmentId, recipient);
             this.shipmentService.changeSenderTo(shipmentId, sender);
             this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REROUTE);

@@ -1,14 +1,14 @@
-package com.warehouse.shipment.infrastructure.adapter.secondary;
+package com.warehouse.reroute.infrastructure.adapter.secondary;
 
 import java.util.function.Supplier;
 
+import com.warehouse.reroute.domain.port.secondary.SoftwareConfigurationServicePort;
+import com.warehouse.reroute.domain.vo.SoftwareConfiguration;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.commonassets.model.SoftwareProperty;
-import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
-import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.SoftwareConfigurationDto;
 
 import io.github.resilience4j.retry.Retry;
@@ -24,10 +24,10 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
 
 	public SoftwareConfigurationServiceAdapter(final RetryConfig retryConfig,
 			final SoftwareConfigurationProperties softwareConfigurationProperties) {
-        this.retry = Retry.of("softwareConfiguration", retryConfig);
-        this.softwareConfigurationProperties = softwareConfigurationProperties;
-    }
-    
+		this.retry = Retry.of("softwareConfiguration", retryConfig);
+		this.softwareConfigurationProperties = softwareConfigurationProperties;
+	}
+
 	private ResponseEntity<SoftwareConfigurationDto> getSoftwareConfiguration(final RestClient restClient,
 			final SoftwareProperty property) {
         return restClient
@@ -46,7 +46,7 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
                 .build();
 
 		final SoftwareProperty softwareProperty = new SoftwareProperty(softwareConfigurationProperties.getEndpoint(),
-				"route-tracker-initialize-url","");
+				"reroute-tracker-url","");
 
         final Supplier<ResponseEntity<SoftwareConfigurationDto>> retryableSupplier = Retry
                 .decorateSupplier(retry, () -> getSoftwareConfiguration(restClient, softwareProperty));

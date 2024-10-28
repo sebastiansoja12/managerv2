@@ -1,6 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import java.time.Duration;
 import java.util.function.Supplier;
 
 import org.springframework.http.MediaType;
@@ -23,13 +22,6 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
     private final Retry retry;
 
     public RouteLogServiceAdapter(final RetryConfig retryConfig) {
-        final RetryConfig config = RetryConfig.custom()
-                .maxAttempts(3)
-                .waitDuration(Duration.ofSeconds(2))
-                .retryExceptions(RuntimeException.class)
-                .writableStackTraceEnabled(true)
-                .build();
-
         this.retry = Retry.of("routeProcessRetry", retryConfig);
     }
 
