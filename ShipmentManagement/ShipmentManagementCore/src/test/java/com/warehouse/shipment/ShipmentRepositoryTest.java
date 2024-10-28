@@ -64,7 +64,6 @@ public class ShipmentRepositoryTest {
         final ParcelEntity entity = new ParcelEntity();
         final Parcel parcel = mock(Parcel.class);
         when(readRepository.findParcelEntityById(shipmentId.getValue())).thenReturn(Optional.of(entity));
-        when(shipmentEntityMapper.map(entity)).thenReturn(parcel);
         // when
         final Shipment result = shipmentRepository.findById(shipmentId);
 
@@ -90,7 +89,6 @@ public class ShipmentRepositoryTest {
         final ShipmentUpdate shipmentUpdate = mock(ShipmentUpdate.class);
         final ParcelEntity entity = new ParcelEntity();
 
-        when(shipmentEntityMapper.map(shipmentUpdate)).thenReturn(entity);
         when(readRepository.save(entity)).thenReturn(entity);
         // when
         shipmentRepository.createOrUpdate(mock(Shipment.class));
