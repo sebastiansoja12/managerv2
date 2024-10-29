@@ -2,6 +2,7 @@ package com.warehouse.reroute.infrastructure.adapter.secondary;
 
 import java.util.function.Supplier;
 
+import com.warehouse.commonassets.enumeration.SoftwareConfigurationUrl;
 import com.warehouse.reroute.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.reroute.domain.vo.SoftwareConfiguration;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
@@ -46,7 +47,7 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
                 .build();
 
 		final SoftwareProperty softwareProperty = new SoftwareProperty(softwareConfigurationProperties.getEndpoint(),
-				"reroute-tracker-url","");
+                SoftwareConfigurationUrl.REROUTE_TRACKER_URL.getUrl(),"");
 
         final Supplier<ResponseEntity<SoftwareConfigurationDto>> retryableSupplier = Retry
                 .decorateSupplier(retry, () -> getSoftwareConfiguration(restClient, softwareProperty));

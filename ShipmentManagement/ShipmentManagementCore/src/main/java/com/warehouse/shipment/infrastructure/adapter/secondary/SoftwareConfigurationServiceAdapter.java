@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import java.util.function.Supplier;
 
+import com.warehouse.commonassets.enumeration.SoftwareConfigurationUrl;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
@@ -46,7 +47,7 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
                 .build();
 
 		final SoftwareProperty softwareProperty = new SoftwareProperty(softwareConfigurationProperties.getEndpoint(),
-				"route-tracker-initialize-url","");
+                SoftwareConfigurationUrl.ROUTE_TRACKER_URL.getUrl(),"");
 
         final Supplier<ResponseEntity<SoftwareConfigurationDto>> retryableSupplier = Retry
                 .decorateSupplier(retry, () -> getSoftwareConfiguration(restClient, softwareProperty));
