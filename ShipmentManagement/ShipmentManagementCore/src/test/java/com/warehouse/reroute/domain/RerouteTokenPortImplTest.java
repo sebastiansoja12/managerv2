@@ -46,6 +46,9 @@ public class RerouteTokenPortImplTest {
     @Mock
     private RerouteTrackerServicePort rerouteTrackerServicePort;
 
+    @Mock
+    private SoftwareConfigurationServicePort softwareConfigurationServicePort;
+
     private RerouteTokenPortImpl port;
 
     private final Integer TOKEN_VALUE = 27150;
@@ -56,7 +59,8 @@ public class RerouteTokenPortImplTest {
     void setup() {
         final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
         final RerouteService rerouteService = new RerouteServiceImpl(mailServicePort, rerouteTokenRepository);
-        port = new RerouteTokenPortImpl(rerouteService, rerouteTokenGeneratorService, logger, rerouteTrackerServicePort);
+        port = new RerouteTokenPortImpl(rerouteService, rerouteTokenGeneratorService, logger, rerouteTrackerServicePort,
+                softwareConfigurationServicePort);
     }
 
     @Test
