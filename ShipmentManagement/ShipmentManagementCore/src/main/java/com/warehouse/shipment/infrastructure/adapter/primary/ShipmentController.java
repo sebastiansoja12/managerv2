@@ -51,7 +51,7 @@ public class ShipmentController {
     }
 
     @GetMapping("/{value}")
-    public ResponseEntity<?> get(final Long value) {
+    public ResponseEntity<?> get(@PathVariable final Long value) {
         final ShipmentId shipmentId = new ShipmentId(value);
         final Shipment shipment = shipmentPort.loadShipment(shipmentId);
         final ShipmentDto shipmentResponse = responseMapper.map(shipment);

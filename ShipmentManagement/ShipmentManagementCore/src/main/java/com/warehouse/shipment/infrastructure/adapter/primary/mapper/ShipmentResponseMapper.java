@@ -19,6 +19,9 @@ public interface ShipmentResponseMapper {
     ShipmentDto map(final Shipment shipment);
 
 	default MoneyDto map(final Money amount) {
+        if (amount == null) {
+            return new MoneyDto();
+        }
 		return new MoneyDto(amount.getAmount(), amount.getCurrency().name());
 	}
 

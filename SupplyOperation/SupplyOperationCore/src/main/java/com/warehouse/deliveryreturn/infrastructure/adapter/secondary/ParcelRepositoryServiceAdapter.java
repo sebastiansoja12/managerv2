@@ -28,10 +28,10 @@ public class ParcelRepositoryServiceAdapter implements ParcelRepositoryServicePo
     }
 
     @Override
-    public Shipment downloadParcel(Long parcelId) {
+    public Shipment downloadParcel(Long value) {
         final ResponseEntity<ShipmentDto> parcelResponse = restClient
                 .get()
-                .uri("/v2/api/shipments/{parcelId}", parcelId)
+                .uri("/v2/api/shipments/{value}", value)
                 .retrieve()
 				.onStatus(HttpStatusCode::is5xxServerError,
 						(req, res) -> {
@@ -40,7 +40,7 @@ public class ParcelRepositoryServiceAdapter implements ParcelRepositoryServicePo
 						})
                 .onStatus(HttpStatusCode::is4xxClientError,
                         (req, res) -> {
-                            logger.error("Parcel {} was not found", parcelId);
+                            logger.error("Parcel {} was not found", value);
                             throw new BusinessException(res.getStatusCode().value(), res.getStatusText());
                         })
                 .toEntity(ShipmentDto.class);
