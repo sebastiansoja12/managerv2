@@ -40,85 +40,85 @@ public class RouteTrackerController {
     }
 
     @PostMapping("/initialize")
-    public ResponseEntity<?> initialize(@RequestBody ShipmentIdDto id) {
+    public ResponseEntity<?> initialize(@RequestBody final ShipmentIdDto id) {
         final ShipmentId shipmentId = requestMapper.map(id);
         final RouteProcess routeProcess = trackerLogPort.initializeRouteProcess(shipmentId);
         return new ResponseEntity<>(responseMapper.map(routeProcess), HttpStatus.OK);
 
     }
 
-    @PostMapping("/zebraidinformation")
-    public ResponseEntity<?> saveZebraId(@RequestBody ZebraIdInformationDto information) {
-        final TerminalIdInformation terminalIdInformation = requestMapper.map(information);
+    @PostMapping("/terminal-id")
+    public ResponseEntity<?> saveTerminalId(@RequestBody final TerminalIdRequestDto request) {
+        final TerminalIdInformation terminalIdInformation = requestMapper.map(request);
         trackerLogPort.saveTerminalIdInformation(terminalIdInformation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/zebraversion")
-    public ResponseEntity<?> saveZebraVersion(@RequestBody ZebraVersionInformationDto versionInformation) {
-        final TerminalVersionInformation terminalVersionInformation = requestMapper.map(versionInformation);
+    @PostMapping("/terminal-version")
+    public ResponseEntity<?> saveZebraVersion(@RequestBody final TerminalVersionRequestDto versionRequest) {
+        final TerminalVersionInformation terminalVersionInformation = requestMapper.map(versionRequest);
         trackerLogPort.saveZebraVersionInformation(terminalVersionInformation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/error")
-    public ResponseEntity<?> saveError(@RequestBody ErrorInformationDto errorInformation) {
-        final ErrorInformation information = requestMapper.map(errorInformation);
+    public ResponseEntity<?> saveError(@RequestBody final ErrorInformationRequestDto errorRequest) {
+        final ErrorInformation information = requestMapper.map(errorRequest);
         trackerLogPort.saveReturnErrorCode(information);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/suppliercode")
-    public ResponseEntity<?> saveSupplierCode(@RequestBody SupplierCodeRequestDto supplierCodeRequest) {
+    public ResponseEntity<?> saveSupplierCode(@RequestBody final SupplierCodeRequestDto supplierCodeRequest) {
         final SupplierCodeRequest request = requestMapper.map(supplierCodeRequest);
         trackerLogPort.saveSupplierCode(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/depotcode")
-    public ResponseEntity<?> saveDepotCode(@RequestBody DepotCodeRequestDto depotCodeRequest) {
+    public ResponseEntity<?> saveDepotCode(@RequestBody final DepotCodeRequestDto depotCodeRequest) {
         final DepotCodeRequest request = requestMapper.map(depotCodeRequest);
         trackerLogPort.saveDepotCode(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/username")
-    public ResponseEntity<?> saveUsername(@RequestBody UsernameRequestDto usernameRequest) {
+    public ResponseEntity<?> saveUsername(@RequestBody final UsernameRequestDto usernameRequest) {
         final UsernameRequest request = requestMapper.map(usernameRequest);
         trackerLogPort.saveUsername(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/description")
-    public ResponseEntity<?> saveDescription(@RequestBody DescriptionRequestDto descriptionRequest) {
+    public ResponseEntity<?> saveDescription(@RequestBody final DescriptionRequestDto descriptionRequest) {
         final DescriptionRequest request = requestMapper.map(descriptionRequest);
         trackerLogPort.saveDescription(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/terminalrequest")
-    public ResponseEntity<?> saveTerminalRequest(@RequestBody TerminalRequestDto terminalRequest) {
+    @PostMapping("/terminal-request")
+    public ResponseEntity<?> saveTerminalRequest(@RequestBody final TerminalRequestDto terminalRequest) {
         final TerminalRequest request = requestMapper.map(terminalRequest);
         trackerLogPort.saveTerminalRequest(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/returntrackrequest")
-    public ResponseEntity<?> saveReturnTrackRequest(@RequestBody ReturnTrackRequestDto returnTrackRequest) {
+    @PostMapping("/return-track-request")
+    public ResponseEntity<?> saveReturnTrackRequest(@RequestBody final ReturnTrackRequestDto returnTrackRequest) {
         final ReturnTrackRequest request = requestMapper.map(returnTrackRequest);
         trackerLogPort.saveReturnTrackRequest(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/delivery-return-request")
-    public ResponseEntity<?> saveDeliveryReturnRequest(@RequestBody DeliveryReturnRequestDto deliveryReturnRequest) {
+    public ResponseEntity<?> saveDeliveryReturnRequest(@RequestBody final DeliveryReturnRequestDto deliveryReturnRequest) {
         final DeliveryReturnRequest request = requestMapper.map(deliveryReturnRequest);
         trackerLogPort.saveDeliveryReturnRequest(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/delivery")
-    public ResponseEntity<?> saveDeliveryStatus(@RequestBody DeliveryStatusRequestDto deliveryStatusRequest) {
+    public ResponseEntity<?> saveDeliveryStatus(@RequestBody final DeliveryStatusRequestDto deliveryStatusRequest) {
         final DeliveryStatusRequest request = requestMapper.map(deliveryStatusRequest);
         trackerLogPort.saveDeliveryStatus(request);
         return new ResponseEntity<>(HttpStatus.OK);

@@ -1,21 +1,22 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 
-public class DescriptionRequestDto {
-    private String value;
+public class TerminalVersionRequestDto {
+    private String version;
     private ShipmentIdDto shipmentId;
     private ProcessTypeDto processType;
 
-    public DescriptionRequestDto() {
+    public TerminalVersionRequestDto() {
     }
 
-    public DescriptionRequestDto(final String value, final ShipmentIdDto shipmentId, final ProcessTypeDto processType) {
-        this.value = value;
+	public TerminalVersionRequestDto(final ShipmentIdDto shipmentId, final String version,
+			final ProcessTypeDto processType) {
         this.shipmentId = shipmentId;
+        this.version = version;
         this.processType = processType;
     }
 
-    public String getValue() {
-        return value;
+    public String getVersion() {
+        return version;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -26,3 +27,4 @@ public class DescriptionRequestDto {
         return processType;
     }
 }
+

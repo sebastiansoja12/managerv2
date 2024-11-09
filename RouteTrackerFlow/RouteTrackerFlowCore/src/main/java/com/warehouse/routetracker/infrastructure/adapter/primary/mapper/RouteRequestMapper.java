@@ -13,11 +13,11 @@ public interface RouteRequestMapper {
 
     ShipmentId map(ShipmentIdDto id);
 
-    TerminalIdInformation map(ZebraIdInformationDto zebraIdInformation);
+    TerminalIdInformation map(TerminalIdRequestDto zebraIdInformation);
 
-    TerminalVersionInformation map(ZebraVersionInformationDto versionInformation);
+    TerminalVersionInformation map(TerminalVersionRequestDto versionInformation);
 
-    ErrorInformation map(ErrorInformationDto errorInformation);
+    ErrorInformation map(ErrorInformationRequestDto errorInformation);
 
     TerminalRequest map(TerminalRequestDto terminalRequest);
 
