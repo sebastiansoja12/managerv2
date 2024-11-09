@@ -9,16 +9,16 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.routetracker.configuration.common.RestException;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.vo.*;
-import com.warehouse.routetracker.domain.vo.ParcelId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn.DeliveryReturnRequestDto;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteRequestMapper;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteResponseMapper;
-import com.warehouse.routetracker.configuration.common.RestException;
 
 import lombok.AllArgsConstructor;
 
@@ -41,23 +41,23 @@ public class RouteTrackerController {
 
     @PostMapping("/initialize")
     public ResponseEntity<?> initialize(@RequestBody ShipmentIdDto id) {
-        final ParcelId parcelId = requestMapper.map(id);
-        final RouteProcess routeProcess = trackerLogPort.initializeRouteProcess(parcelId);
+        final ShipmentId shipmentId = requestMapper.map(id);
+        final RouteProcess routeProcess = trackerLogPort.initializeRouteProcess(shipmentId);
         return new ResponseEntity<>(responseMapper.map(routeProcess), HttpStatus.OK);
 
     }
 
     @PostMapping("/zebraidinformation")
     public ResponseEntity<?> saveZebraId(@RequestBody ZebraIdInformationDto information) {
-        final ZebraIdInformation zebraIdInformation = requestMapper.map(information);
-        trackerLogPort.saveZebraIdInformation(zebraIdInformation);
+        final TerminalIdInformation terminalIdInformation = requestMapper.map(information);
+        trackerLogPort.saveTerminalIdInformation(terminalIdInformation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/zebraversion")
     public ResponseEntity<?> saveZebraVersion(@RequestBody ZebraVersionInformationDto versionInformation) {
-        final ZebraVersionInformation zebraVersionInformation = requestMapper.map(versionInformation);
-        trackerLogPort.saveZebraVersionInformation(zebraVersionInformation);
+        final TerminalVersionInformation terminalVersionInformation = requestMapper.map(versionInformation);
+        trackerLogPort.saveZebraVersionInformation(terminalVersionInformation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -96,13 +96,6 @@ public class RouteTrackerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/zebra-initialize-request")
-    public ResponseEntity<?> saveZebraInitializeRequest(@RequestBody ZebraInitializeRequestDto initializeRequest) {
-        final ZebraInitializeRequest request = requestMapper.map(initializeRequest);
-        trackerLogPort.saveCreateRequest(request);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @PostMapping("/terminalrequest")
     public ResponseEntity<?> saveTerminalRequest(@RequestBody TerminalRequestDto terminalRequest) {
         final TerminalRequest request = requestMapper.map(terminalRequest);
@@ -133,7 +126,8 @@ public class RouteTrackerController {
 
     @GetMapping("/{parcelId}")
     public ResponseEntity<?> getByParcelId(@PathVariable Long parcelId) {
-        final RouteLogRecord routeLogRecord = trackerLogPort.find(parcelId);
+        final ShipmentId shipmentId = new ShipmentId(parcelId);
+        final RouteLogRecord routeLogRecord = trackerLogPort.find(shipmentId);
         return new ResponseEntity<>(responseMapper.map(routeLogRecord), HttpStatus.OK);
     }
 

@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.domain.model;
 
 
+import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
@@ -35,13 +36,13 @@ public class RouteLogRecord {
         this.faultDescription = faultDescription;
     }
 
-    public void saveZebraIdInformation(ProcessType processType, Long zebraId) {
+    public void saveTerminalId(final ProcessType processType, final TerminalId terminalId) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
-        routeLogRecordDetail.saveZebraIdInformation(zebraId);
+        routeLogRecordDetail.saveTerminalId(terminalId);
     }
 
-    public void saveZebraVersionInformation(ProcessType processType, String version) {
+    public void saveTerminalVersion(ProcessType processType, String version) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveZebraVersionInformation(version);
@@ -71,7 +72,7 @@ public class RouteLogRecord {
         routeLogRecordDetail.saveSupplierCode(supplierCode);
     }
 
-    public void saveParcelStatus(ProcessType processType, ParcelStatus parcelStatus) {
+    public void updateShipmentStatus(ProcessType processType, ParcelStatus parcelStatus) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveParcelStatus(parcelStatus);

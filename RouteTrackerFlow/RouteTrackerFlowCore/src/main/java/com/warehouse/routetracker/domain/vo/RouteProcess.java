@@ -1,13 +1,24 @@
 package com.warehouse.routetracker.domain.vo;
 
-import lombok.Builder;
-import lombok.Value;
-
 import java.util.UUID;
 
-@Value
-@Builder
+import com.warehouse.commonassets.identificator.ShipmentId;
+
+
 public class RouteProcess {
-    Long parcelId;
-    UUID processId;
+    private final ShipmentId shipmentId;
+    private final UUID processId;
+
+    public RouteProcess(final ShipmentId shipmentId, final UUID processId) {
+        this.shipmentId = shipmentId;
+        this.processId = processId;
+    }
+
+    public ShipmentId getShipmentId() {
+        return shipmentId;
+    }
+
+    public UUID getProcessId() {
+        return processId;
+    }
 }

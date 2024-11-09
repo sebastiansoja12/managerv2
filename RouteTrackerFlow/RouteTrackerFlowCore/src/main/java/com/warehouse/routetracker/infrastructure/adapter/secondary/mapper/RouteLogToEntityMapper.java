@@ -9,9 +9,9 @@ import org.mapstruct.Mapping;
 
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
-import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
 
 @Mapper
@@ -40,7 +40,7 @@ public interface RouteLogToEntityMapper {
         entity.setVersion(routeLogRecordDetail.getVersion());
         entity.setSupplier(mapSupplierEntity(routeLogRecordDetail));
         entity.setProcessType(map(routeLogRecordDetail.getProcessType()));
-        entity.setZebraId(routeLogRecordDetail.getZebraId());
+        entity.setZebraId(routeLogRecordDetail.getTerminalId().getValue().longValue());
         return entity;
     }
 
@@ -90,7 +90,7 @@ public interface RouteLogToEntityMapper {
         entity.setVersion(routeLogRecordDetail.getVersion());
         entity.setSupplier(mapSupplierEntity(routeLogRecordDetail));
         entity.setProcessType(map(routeLogRecordDetail.getProcessType()));
-        entity.setZebraId(routeLogRecordDetail.getZebraId());
+        entity.setZebraId(routeLogRecordDetail.getTerminalId().getValue().longValue());
         return entity;
     }
 }

@@ -1,5 +1,6 @@
 package com.warehouse.routetracker.domain.model;
 
+import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import lombok.*;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RouteLogRecordDetail {
     private Long id;
-    private Long zebraId;
+    private TerminalId terminalId;
     private String version;
     private String username;
     private String supplierCode;
@@ -24,8 +25,8 @@ public class RouteLogRecordDetail {
     private ProcessType processType;
     private String request;
 
-    public void saveZebraIdInformation(Long zebraId) {
-        this.zebraId = zebraId;
+    public void saveTerminalId(final TerminalId terminalId) {
+        this.terminalId = terminalId;
     }
 
     public void saveZebraVersionInformation(String version) {

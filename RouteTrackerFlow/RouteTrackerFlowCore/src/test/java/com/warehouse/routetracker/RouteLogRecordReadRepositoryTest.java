@@ -49,7 +49,7 @@ public class RouteLogRecordReadRepositoryTest {
         // given
         final Long id = 123456L;
         // when
-        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByParcelId(id);
+        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByShipmentId(id);
         // then
         assertTrue(routeLogRecord.isPresent());
     }
@@ -69,7 +69,7 @@ public class RouteLogRecordReadRepositoryTest {
         // given
         final Long id = 2L;
         // when
-        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByParcelId(id);
+        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByShipmentId(id);
         // then
         assertTrue(routeLogRecord.isEmpty());
     }

@@ -12,6 +12,6 @@ import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteL
 public interface RouteLogRecordReadRepository extends JpaRepository<RouteLogRecordEntity, String> {
 
 	@Query("SELECT r FROM RouteLogRecordEntity r LEFT JOIN r.routeLogRecordDetails d " +
-            "WHERE r.parcelId = :parcelId ORDER BY d.id DESC")
-    Optional<RouteLogRecordEntity> findByParcelId(Long parcelId);
+            "WHERE r.parcelId = :shipmentId ORDER BY d.id DESC")
+    Optional<RouteLogRecordEntity> findByShipmentId(Long shipmentId);
 }

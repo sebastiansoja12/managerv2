@@ -2,16 +2,17 @@ package com.warehouse.routetracker.domain.port.secondary;
 
 import java.util.List;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
 
 public interface RouteLogRepository {
 
-    RouteProcess save(RouteLogRecord routeLogRecord);
+    RouteProcess save(final RouteLogRecord routeLogRecord);
 
-    RouteLogRecord find(Long parcelId);
+    RouteLogRecord find(final ShipmentId shipmentId);
 
-    void update(RouteLogRecord routeLogRecord);
+    void update(final RouteLogRecord routeLogRecord);
 
     List<RouteLogRecord> findAll();
 }

@@ -4,31 +4,32 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 
 
-public class UsernameRequest {
-    private String username;
+public class TerminalVersionInformation {
+    private String version;
     private ShipmentId shipmentId;
     private ProcessType processType;
 
-    public UsernameRequest(final String username, final ShipmentId shipmentId, final ProcessType processType) {
-        this.username = username;
+	public TerminalVersionInformation(final String version, final ShipmentId shipmentId,
+			final ProcessType processType) {
+        this.version = version;
         this.shipmentId = shipmentId;
         this.processType = processType;
     }
 
-    public String getUsername() {
-        return username;
+    public String getVersion() {
+        return version;
     }
 
-    public void setUsername(final String username) {
-        this.username = username;
+    public void setVersion(final String version) {
+        this.version = version;
     }
 
     public ShipmentId getShipmentId() {
         return shipmentId;
     }
 
-    public void setShipmentId(final ShipmentId shipmentId) {
-        this.shipmentId = shipmentId;
+    public void setShipmentId(final ShipmentId parcelId) {
+        this.shipmentId = parcelId;
     }
 
     public ProcessType getProcessType() {

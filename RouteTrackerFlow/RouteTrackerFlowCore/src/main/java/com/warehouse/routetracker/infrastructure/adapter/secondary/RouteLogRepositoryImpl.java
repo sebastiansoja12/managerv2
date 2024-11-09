@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
@@ -23,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RouteLogRepositoryImpl implements RouteLogRepository {
 
-
     private final RouteLogRecordReadRepository routeLogRecordReadRepository;
 
     private final RouteModelMapper mapper = getMapper(RouteModelMapper.class);
@@ -34,17 +34,17 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
 
 
     @Override
-    public RouteProcess save(RouteLogRecord routeLogRecord) {
+    public RouteProcess save(final RouteLogRecord routeLogRecord) {
         validateNotExists(routeLogRecord.getParcelId());
         final RouteLogRecordEntity entity = logToEntityMapper.map(routeLogRecord);
-		routeLogRecordReadRepository.save(entity);
+		this.routeLogRecordReadRepository.save(entity);
 		log.info("Created route process {} for parcel {}", entity.getId(),
 				routeLogRecord.getParcelId());
         return mapper.map(entity);
     }
 
-    private void validateNotExists(Long id) {
-        final Optional<RouteLogRecordEntity> routeLogRecord = routeLogRecordReadRepository.findByParcelId(id);
+    private void validateNotExists(final Long id) {
+        final Optional<RouteLogRecordEntity> routeLogRecord = this.routeLogRecordReadRepository.findByShipmentId(id);
 
         if (routeLogRecord.isPresent()) {
             throw new RouteLogException("Route log record already exists");
@@ -52,9 +52,9 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
     }
 
     @Override
-    public RouteLogRecord find(Long parcelId) {
+    public RouteLogRecord find(final ShipmentId shipmentId) {
 		return routeLogRecordReadRepository
-                .findByParcelId(parcelId)
+                .findByShipmentId(shipmentId.getValue())
                 .map(logToModelMapper::map)
 				.orElseThrow(() -> new RouteLogException("Route log does not exist"));
     }
@@ -62,7 +62,7 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
     @Override
     public void update(RouteLogRecord routeLogRecord) {
         final RouteLogRecordEntity routeLogRecordEntity = logToEntityMapper.map(routeLogRecord);
-        routeLogRecordReadRepository.save(routeLogRecordEntity);
+        this.routeLogRecordReadRepository.save(routeLogRecordEntity);
     }
 
     @Override
