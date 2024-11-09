@@ -27,34 +27,45 @@ public class RouteLogRecordDetail {
 
     public void saveTerminalId(final TerminalId terminalId) {
         this.terminalId = terminalId;
+        markAsModified();
     }
 
-    public void saveZebraVersionInformation(String version) {
+    public void saveZebraVersionInformation(final String version) {
         this.version = version;
+        markAsModified();
     }
 
-    public void updateRequest(String request) {
+    public void updateRequest(final String request) {
         this.request = request;
-        this.timestamp = LocalDateTime.now();
+        markAsModified();
     }
 
-    public void saveSupplierCode(String supplierCode) {
+    public void saveSupplierCode(final String supplierCode) {
         this.supplierCode = supplierCode;
+        markAsModified();
     }
 
-    public void saveDescription(String description) {
+    public void saveDescription(final String description) {
         this.description = description;
+        markAsModified();
     }
 
-    public void saveUsername(String username) {
+    public void saveUsername(final String username) {
         this.username = username;
+        markAsModified();
     }
 
-    public void saveDepotCode(String depotCode) {
+    public void saveDepotCode(final String depotCode) {
         this.depotCode = depotCode;
+        markAsModified();
     }
 
-    public void saveParcelStatus(ParcelStatus parcelStatus) {
+    public void saveParcelStatus(final ParcelStatus parcelStatus) {
         this.parcelStatus = parcelStatus;
+        markAsModified();
+    }
+
+    private void markAsModified() {
+        this.timestamp = LocalDateTime.now();
     }
 }
