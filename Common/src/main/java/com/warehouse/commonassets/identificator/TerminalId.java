@@ -3,13 +3,13 @@ package com.warehouse.commonassets.identificator;
 import java.io.Serializable;
 
 public class TerminalId implements Serializable {
-    private final Double value;
+    private final Long value;
 
-    public TerminalId(final Double value) {
+    public TerminalId(final Long value) {
         this.value = value;
     }
 
-    public Double getValue() {
+    public Long getValue() {
         return value;
     }
 }

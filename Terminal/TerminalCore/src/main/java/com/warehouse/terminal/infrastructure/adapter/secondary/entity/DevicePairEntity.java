@@ -3,15 +3,18 @@ package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
 
+import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.vo.DevicePairId;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "terminal_pair")
-public class TerminalPairEntity {
+@Table(name = "device_pair")
+public class DevicePairEntity {
 
     @Id
-    @Column(name = "terminal_pair_id", nullable = false)
-    private Long terminalPairId;
+    @Column(name = "device_pair_id", nullable = false)
+    private Long devicePairId;
 
     @OneToOne(fetch = FetchType.LAZY)
     private DeviceEntity deviceEntity;
@@ -25,41 +28,45 @@ public class TerminalPairEntity {
     @Column(name = "error_description")
     private String errorDescription;
 
-    public TerminalPairEntity() {
+    public DevicePairEntity() {
     }
 
-    public TerminalPairEntity(final DeviceEntity deviceEntity) {
+    public DevicePairEntity(final DeviceEntity deviceEntity) {
         this.deviceEntity = deviceEntity;
         this.paired = true;
         this.loginTime = Instant.now();
         this.errorDescription = "";
     }
 
-	public TerminalPairEntity(final Long terminalPairId,
+	public DevicePairEntity(final DevicePairId devicePairId,
                               final DeviceEntity deviceEntity,
                               final boolean paired,
                               final Instant loginTime,
                               final String errorDescription) {
-        this.terminalPairId = terminalPairId;
+        this.devicePairId = devicePairId.value();
         this.deviceEntity = deviceEntity;
         this.paired = paired;
         this.loginTime = loginTime;
         this.errorDescription = errorDescription;
     }
 
-    public TerminalPairEntity(final DeviceEntity deviceEntity, final String errorDescription) {
+    public DevicePairEntity(final DeviceEntity deviceEntity, final String errorDescription) {
         this.deviceEntity = deviceEntity;
         this.paired = false;
         this.loginTime = Instant.now();
         this.errorDescription = errorDescription;
     }
 
-    public Long getTerminalPairId() {
-        return terminalPairId;
+    public static DevicePairEntity from(final Terminal terminal) {
+        return new DevicePairEntity();
     }
 
-    public void setTerminalPairId(final Long terminalPairId) {
-        this.terminalPairId = terminalPairId;
+    public Long getDevicePairId() {
+        return devicePairId;
+    }
+
+    public void setDevicePairId(final Long devicePairId) {
+        this.devicePairId = devicePairId;
     }
 
     public DeviceEntity getDeviceEntity() {
