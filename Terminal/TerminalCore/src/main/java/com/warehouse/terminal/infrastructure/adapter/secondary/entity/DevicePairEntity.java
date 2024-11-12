@@ -3,6 +3,7 @@ package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
 
+import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 
@@ -30,6 +31,15 @@ public class DevicePairEntity {
 
     public DevicePairEntity() {
     }
+
+	public DevicePairEntity(final Long devicePairId, final DeviceEntity deviceEntity, final boolean paired,
+			final Instant loginTime, final String errorDescription) {
+		this.devicePairId = devicePairId;
+		this.deviceEntity = deviceEntity;
+		this.paired = paired;
+		this.loginTime = loginTime;
+		this.errorDescription = errorDescription;
+	}
 
     public DevicePairEntity(final DeviceEntity deviceEntity) {
         this.deviceEntity = deviceEntity;
@@ -61,6 +71,11 @@ public class DevicePairEntity {
         return new DevicePairEntity();
     }
 
+    public static DevicePairEntity from(final DevicePair devicePair) {
+        return new DevicePairEntity(devicePair.getDevicePairId(), new DeviceEntity(devicePair.getDeviceId().getValue()),
+                devicePair.isPaired(), devicePair.getLoginTime(), devicePair.getErrorDescription());
+    }
+
     public Long getDevicePairId() {
         return devicePairId;
     }
@@ -77,7 +92,7 @@ public class DevicePairEntity {
         this.deviceEntity = deviceEntity;
     }
 
-    public boolean isPaired() {
+    public Boolean isPaired() {
         return paired;
     }
 

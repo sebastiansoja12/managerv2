@@ -40,7 +40,11 @@ public class DeviceEntity {
         this.active = active;
     }
 
-	public static DeviceEntity from(final Terminal terminal) {
+    public DeviceEntity(final Long value) {
+        this.deviceId = value;
+    }
+
+    public static DeviceEntity from(final Terminal terminal) {
 		return new DeviceEntity(terminal.getTerminalId().getValue(), terminal.getVersion(),
 				terminal.getUserId().getValue(), terminal.getDepotCode(), terminal.getDeviceType(), terminal.isActive());
 	}
