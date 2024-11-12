@@ -1,6 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.identificator.TerminalId;
+import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.terminal.domain.model.DeviceVersion;
 import com.warehouse.terminal.domain.port.secondary.DeviceVersionRepository;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceVersionEntity;
@@ -18,14 +19,28 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
     }
 
     @Override
-    public boolean updateRequired(final TerminalId terminalId) {
+    public boolean updateRequired(final DeviceId deviceId) {
         final DeviceEntity deviceEntity = this.deviceReadRepository
-                .findById(terminalId.getValue())
+                .findById(deviceId.getValue())
                 .orElseThrow(() -> new RuntimeException("Device not found"));
 
         final DeviceVersionEntity deviceVersionEntity = this.deviceVersionReadRepository
-                .findByDeviceId(terminalId.getValue())
+                .findByDeviceId(deviceId.getValue())
                 .orElseThrow(() -> new RuntimeException("Device version not found"));
         return !deviceVersionEntity.getVersion().equals(deviceEntity.getVersion());
+    }
+
+    @Override
+    public DeviceVersion find(final DeviceId deviceId) {
+        return this.deviceVersionReadRepository
+                .findByDeviceId(deviceId.getValue())
+                .map(DeviceVersion::from)
+                .orElse(null);
+    }
+
+    @Override
+    public void update(final DeviceVersion deviceVersion) {
+        final DeviceVersionEntity deviceVersionEntity = DeviceVersionEntity.from(deviceVersion);
+        this.deviceVersionReadRepository.saveAndFlush(deviceVersionEntity);
     }
 }

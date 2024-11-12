@@ -1,4 +1,4 @@
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
                           title VARCHAR(255) NOT NULL,
                           shipment_status ENUM('CREATED', 'REROUTE', 'SENT', 'DELIVERY', 'RETURN', 'REDIRECT') NOT NULL,
@@ -46,7 +46,7 @@ INSERT INTO messages (title, shipment_status, language, message_content, created
 VALUES
     ('Package Returned', 'RETURN', 'EN', 'Your package is being returned to the sender.', '2024-10-21 14:00:00', NULL, 'SenderName'),
     ('Paczka Zwrócona', 'RETURN', 'PL', 'Twoja paczka jest zwracana do nadawcy.', '2024-10-21 14:00:00', NULL, 'SenderName'),
-    ('Colis Renvoyé', 'RETURN', 'FR', 'Votre colis est en cours de retour vers l\'expéditeur.', '2024-10-21 14:00:00', NULL, 'SenderName'),
+    ('Colis Renvoyé', 'RETURN', 'FR', 'Votre colis est en cours de retour vers lexpéditeur.', '2024-10-21 14:00:00', NULL, 'SenderName'),
     ('Paket Zurückgeschickt', 'RETURN', 'DE', 'Ihr Paket wird an den Absender zurückgeschickt.', '2024-10-21 14:00:00', NULL, 'SenderName');
 
 -- Status: REDIRECT

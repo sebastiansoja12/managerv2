@@ -2,7 +2,6 @@ package com.warehouse.terminal.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.TerminalVersion;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
 
@@ -15,6 +14,6 @@ public interface TerminalPairPort {
 
     void pair(final TerminalId terminalId);
     void unpair(final TerminalId terminalId);
-    void update(final Terminal terminal);
+    void update(final TerminalId terminalId);
     void create(final TerminalAddRequest request);
 }

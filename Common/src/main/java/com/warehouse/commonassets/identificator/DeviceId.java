@@ -1,12 +1,9 @@
 package com.warehouse.commonassets.identificator;
 
-import java.io.Serializable;
-
-public class TerminalId extends DeviceId implements Serializable {
+public class DeviceId {
     private final Long value;
 
-    public TerminalId(final Long value) {
-        super(value);
+    public DeviceId(final Long value) {
         this.value = value;
     }
 

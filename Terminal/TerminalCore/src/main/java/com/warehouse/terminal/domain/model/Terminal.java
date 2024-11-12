@@ -14,24 +14,28 @@ public class Terminal {
     private String depotCode;
     private String version;
     private Instant lastUpdate;
+    private Boolean active;
 
 	public Terminal(final TerminalId terminalId,
                     final DeviceType deviceType,
                     final UserId userId,
                     final String depotCode,
                     final String version,
-                    final Instant lastUpdate) {
+                    final Instant lastUpdate, 
+                    final Boolean active) {
         this.terminalId = terminalId;
         this.deviceType = deviceType;
         this.userId = userId;
         this.depotCode = depotCode;
         this.version = version;
         this.lastUpdate = lastUpdate;
+        this.active = active;
     }
 
-    public static Terminal from(final TerminalAddRequest request, final UserId userId) {
-        return new Terminal(null, request.getDeviceType(), userId, request.getDepotCode(), request.getVersion(), Instant.now());
-    }
+	public static Terminal from(final TerminalAddRequest request, final UserId userId) {
+		return new Terminal(null, request.getDeviceType(), userId, request.getDepotCode(), request.getVersion(),
+				Instant.now(), true);
+	}
 
     public TerminalId getTerminalId() {
         return terminalId;
@@ -79,5 +83,14 @@ public class Terminal {
     public void updateVersion(final String version) {
         this.version = version;
         markAsModified();
+    }
+
+    public void assignUser(final UserId userId) {
+        this.userId = userId;
+        markAsModified();
+    }
+
+    public Boolean isActive() {
+        return active;
     }
 }

@@ -2,7 +2,10 @@ package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
 
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.terminal.domain.model.DeviceVersion;
 import jakarta.persistence.*;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "device_version")
@@ -21,6 +24,9 @@ public class DeviceVersionEntity {
     @Column(name = "device_id", nullable = false)
     private String deviceId;
 
+    @Column(name = "last_update", nullable = false)
+    private Instant lastUpdate;
+
     public DeviceVersionEntity() {
     }
 
@@ -29,6 +35,16 @@ public class DeviceVersionEntity {
         this.deviceType = deviceType;
         this.version = version;
         this.deviceId = deviceId;
+        this.lastUpdate = Instant.now();
+    }
+
+	public static DeviceVersionEntity from(final DeviceVersion deviceVersion) {
+		return new DeviceVersionEntity(deviceVersion.getId(), deviceVersion.getDeviceType(), deviceVersion.getVersion(),
+				deviceVersion.getDeviceId().getValue().toString());
+	}
+
+    public Instant getLastUpdate() {
+        return lastUpdate;
     }
 
     public Long getId() {

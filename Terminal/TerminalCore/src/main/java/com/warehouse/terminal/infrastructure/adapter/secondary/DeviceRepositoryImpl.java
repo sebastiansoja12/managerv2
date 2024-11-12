@@ -1,6 +1,6 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.identificator.TerminalId;
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
@@ -14,8 +14,10 @@ public class DeviceRepositoryImpl<T> implements DeviceRepository {
     }
 
     @Override
-    public Object findById(final TerminalId terminalId) {
-        return deviceReadRepository.findById(terminalId.getValue()).orElseThrow(RuntimeException::new);
+    public Object findById(final DeviceId deviceId) {
+        return deviceReadRepository
+                .findById(deviceId.getValue())
+                .orElseThrow(RuntimeException::new);
     }
 
     @Override

@@ -60,7 +60,7 @@ public class TerminalPairPortImpl implements TerminalPairPort {
 
     @Override
     public void pair(final TerminalId terminalId) {
-        final Terminal terminal = this.terminalService.findByTerminalId(terminalId);
+        final Terminal terminal = this.terminalService.findByDeviceId(terminalId);
         log.info("Pairing terminal {}", terminal.getTerminalId());
 
         this.terminalValidatorService.validateDepartment(terminal.getDepotCode());
@@ -75,7 +75,8 @@ public class TerminalPairPortImpl implements TerminalPairPort {
     }
 
     @Override
-    public void update(final Terminal terminal) {
+    public void update(final TerminalId terminalId) {
+        final Terminal terminal = this.terminalService.findByDeviceId(terminalId);
 
     }
 
