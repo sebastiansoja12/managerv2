@@ -17,13 +17,24 @@ public class DevicePair {
 
 	private String errorDescription;
 
+	private String pairKey;
+
 	public DevicePair(final Long devicePairId, final DeviceId deviceId, final boolean paired, final Instant loginTime,
-			final String errorDescription) {
+                      final String errorDescription, String pairKey) {
 		this.devicePairId = devicePairId;
 		this.deviceId = deviceId;
 		this.paired = paired;
 		this.loginTime = loginTime;
 		this.errorDescription = errorDescription;
+        this.pairKey = pairKey;
+    }
+
+	public String getPairKey() {
+		return pairKey;
+	}
+
+	public void setPairKey(String pairKey) {
+		this.pairKey = pairKey;
 	}
 
 	public Long getDevicePairId() {
@@ -75,6 +86,7 @@ public class DevicePair {
         return new DevicePair(devicePairEntity.getDevicePairId(),
                 new DeviceId(devicePairEntity.getDevicePairId()),
                 devicePairEntity.isPaired(), devicePairEntity.getLoginTime(),
-                devicePairEntity.getErrorDescription());
+                devicePairEntity.getErrorDescription(),
+				devicePairEntity.getPairKey());
     }
 }

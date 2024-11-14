@@ -42,7 +42,7 @@ public class RouteTrackerLogPortImplTest {
 
     private final ShipmentId shipmentId = new ShipmentId(100001L);
     
-    private final TerminalId terminalId = new TerminalId(1.0);
+    private final TerminalId terminalId = new TerminalId(1L);
 
     @Test
     void shouldInitializeRouteProcess() {
@@ -540,7 +540,7 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldNotSaveTerminalIdInformationWhenProcessIsNotFound() {
         // given
-        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.MISS, shipmentId, new TerminalId(1.0));
+        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.MISS, shipmentId, new TerminalId(1L));
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
                 .find(shipmentId);

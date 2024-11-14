@@ -23,7 +23,7 @@ public class TerminalPairController {
     @PostMapping
     private ResponseEntity<?> addDevice(@RequestBody final TerminalAddRequestDto terminalAddRequest) {
         final TerminalAddRequest request = TerminalAddRequest.from(terminalAddRequest);
-        this.terminalPairPort.create(request);
+        //this.terminalPairPort.create(request);
         return ResponseEntity.ok().build();
     }
 

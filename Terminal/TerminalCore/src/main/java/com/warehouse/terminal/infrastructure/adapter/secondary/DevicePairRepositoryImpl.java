@@ -27,7 +27,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
         final DeviceEntity deviceEntity = DeviceEntity.from(terminal);
         validateNotPaired(terminal.getTerminalId());
 		final DevicePairEntity devicePairEntity = new DevicePairEntity(devicePairId, deviceEntity, true, Instant.now(),
-				StringUtils.EMPTY);
+				StringUtils.EMPTY, "pairKey");
         this.repository.save(devicePairEntity);
     }
 
@@ -35,7 +35,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
     public void unpair(final Terminal terminal, final DevicePairId devicePairId) {
         final DeviceEntity deviceEntity = DeviceEntity.from(terminal);
         final DevicePairEntity devicePairEntity = new DevicePairEntity(devicePairId, deviceEntity, false, Instant.now(),
-                StringUtils.EMPTY);
+                StringUtils.EMPTY, null);
         this.repository.save(devicePairEntity);
     }
 

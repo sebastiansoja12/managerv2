@@ -29,16 +29,20 @@ public class DevicePairEntity {
     @Column(name = "error_description")
     private String errorDescription;
 
+    @Column(name = "pair_key")
+    private String pairKey;
+
     public DevicePairEntity() {
     }
 
 	public DevicePairEntity(final Long devicePairId, final DeviceEntity deviceEntity, final boolean paired,
-			final Instant loginTime, final String errorDescription) {
+			final Instant loginTime, final String errorDescription, final String pairKey) {
 		this.devicePairId = devicePairId;
 		this.deviceEntity = deviceEntity;
 		this.paired = paired;
 		this.loginTime = loginTime;
 		this.errorDescription = errorDescription;
+        this.pairKey = pairKey;
 	}
 
     public DevicePairEntity(final DeviceEntity deviceEntity) {
@@ -52,12 +56,14 @@ public class DevicePairEntity {
                               final DeviceEntity deviceEntity,
                               final boolean paired,
                               final Instant loginTime,
-                              final String errorDescription) {
+                              final String errorDescription,
+                              final String pairKey) {
         this.devicePairId = devicePairId.value();
         this.deviceEntity = deviceEntity;
         this.paired = paired;
         this.loginTime = loginTime;
         this.errorDescription = errorDescription;
+        this.pairKey = pairKey;
     }
 
     public DevicePairEntity(final DeviceEntity deviceEntity, final String errorDescription) {
@@ -73,7 +79,8 @@ public class DevicePairEntity {
 
     public static DevicePairEntity from(final DevicePair devicePair) {
         return new DevicePairEntity(devicePair.getDevicePairId(), new DeviceEntity(devicePair.getDeviceId().getValue()),
-                devicePair.isPaired(), devicePair.getLoginTime(), devicePair.getErrorDescription());
+                devicePair.isPaired(), devicePair.getLoginTime(), devicePair.getErrorDescription(),
+                devicePair.getPairKey());
     }
 
     public Long getDevicePairId() {
@@ -114,6 +121,10 @@ public class DevicePairEntity {
 
     public void setErrorDescription(final String errorDescription) {
         this.errorDescription = errorDescription;
+    }
+
+    public String getPairKey() {
+        return pairKey;
     }
 }
 

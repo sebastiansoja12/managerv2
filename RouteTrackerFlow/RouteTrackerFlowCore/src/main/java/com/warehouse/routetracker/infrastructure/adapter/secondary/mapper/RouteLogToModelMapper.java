@@ -51,7 +51,7 @@ public interface RouteLogToModelMapper {
                 .username(routeLogRecordDetailEntity.getUser() != null ?
                         routeLogRecordDetailEntity.getUser().getUsername() : null)
                 .version(routeLogRecordDetailEntity.getVersion())
-                .terminalId(new TerminalId(Double.parseDouble(routeLogRecordDetailEntity.getZebraId().toString())))
+                .terminalId(new TerminalId(routeLogRecordDetailEntity.getZebraId()))
                 .build();
     }
 
