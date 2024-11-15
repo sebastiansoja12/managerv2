@@ -1,12 +1,12 @@
 package com.warehouse.terminal.domain.service;
 
+import java.util.Objects;
+
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.TerminalId;
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.Department;
 import com.warehouse.terminal.domain.port.secondary.DepartmentRepository;
 import com.warehouse.terminal.domain.port.secondary.DeviceVersionRepository;
-
-import java.util.Objects;
 
 public class TerminalValidatorServiceImpl implements TerminalValidatorService {
 
@@ -29,8 +29,8 @@ public class TerminalValidatorServiceImpl implements TerminalValidatorService {
     }
 
     @Override
-    public void validateTerminalVersion(final TerminalId terminalId) {
-        if (deviceVersionRepository.updateRequired(terminalId)) {
+    public void validateTerminalVersion(final DeviceId deviceId) {
+        if (deviceVersionRepository.updateRequired(deviceId)) {
             throw new RuntimeException("Device needs to be updated");
         }
     }

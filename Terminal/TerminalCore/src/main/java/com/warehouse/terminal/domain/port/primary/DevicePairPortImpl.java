@@ -77,7 +77,7 @@ public class DevicePairPortImpl implements DevicePairPort {
         log.info("Pairing terminal [{}]", terminal.getTerminalId().getValue());
         final DeviceId deviceId = terminal.getDeviceId();
         this.terminalValidatorService.validateDepartment(terminal.getDepotCode());
-        this.terminalValidatorService.validateTerminalVersion(terminal.getTerminalId());
+        this.terminalValidatorService.validateTerminalVersion(deviceId);
         final Boolean userValid = this.userService.existsByUserId(terminal.getUserId())
                 && this.userService.existsByUserId(request.getUserId());
 
