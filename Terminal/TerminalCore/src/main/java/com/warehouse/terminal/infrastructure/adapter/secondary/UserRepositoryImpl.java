@@ -26,4 +26,9 @@ public class UserRepositoryImpl implements UserRepository {
         final Optional<UserEntity> user = this.repository.findById(userId.getValue());
         return user.map(User::from).orElseThrow();
     }
+
+    @Override
+    public Boolean existsById(final UserId userId) {
+        return this.repository.existsById(userId.getValue());
+    }
 }

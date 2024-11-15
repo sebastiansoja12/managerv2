@@ -7,7 +7,7 @@ import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
 
 import java.time.Instant;
 
-public class Terminal {
+public class Terminal extends Device {
     private TerminalId terminalId;
     private DeviceType deviceType;
     private UserId userId;
@@ -23,6 +23,7 @@ public class Terminal {
                     final String version,
                     final Instant lastUpdate, 
                     final Boolean active) {
+        super(terminalId, version, deviceType, "", userId);
         this.terminalId = terminalId;
         this.deviceType = deviceType;
         this.userId = userId;
@@ -42,7 +43,7 @@ public class Terminal {
     }
 
     public DeviceType getDeviceType() {
-        return deviceType;
+        return DeviceType.TERMINAL;
     }
 
     public UserId getUserId() {

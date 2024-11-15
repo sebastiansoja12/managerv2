@@ -15,11 +15,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsername(final String username) {
-        return null;
+        return this.userRepository.findByUsername(username);
     }
 
     @Override
     public UserToken validateUser(final UserId userId) {
         return new UserToken("token");
+    }
+
+    @Override
+    public Boolean existsByUserId(final UserId userId) {
+        return userRepository.existsById(userId);
     }
 }
