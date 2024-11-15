@@ -2,6 +2,7 @@ package com.warehouse.terminal.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.terminal.domain.enumeration.PairStatus;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.DeviceVersion;
@@ -11,6 +12,7 @@ import com.warehouse.terminal.domain.model.response.DevicePairResponse;
 import com.warehouse.terminal.domain.service.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class DevicePairPortImpl implements DevicePairPort {
@@ -81,12 +83,13 @@ public class DevicePairPortImpl implements DevicePairPort {
 
         final DeviceVersion deviceVersion = new DeviceVersion(terminal.getVersion(), terminal.getTerminalId());
         final Boolean deviceUpToDate = !updateRequired(deviceId, deviceVersion);
-        if (deviceUpToDate && userValid) {
+        if (deviceUpToDate && userValid && terminal.isActive()) {
             this.devicePairService.pairDevice(terminal);
         }
         final DevicePair devicePair = this.devicePairService.findByDeviceId(request.getDeviceId());
 		return new DevicePairResponse(request.getUserId(), request.getDeviceId(), devicePair.getDevicePairId(),
-				devicePair.isPaired() ? "paired" : "unpaired", "pairKey", userValid, terminal.isActive(),
+				devicePair.isPaired() ? PairStatus.PAIRED.name() : PairStatus.UNPAIRED.name(), devicePair.isPaired() ?
+                devicePair.getPairKey() : StringUtils.EMPTY, userValid, terminal.isActive(),
 				deviceUpToDate);
     }
 
