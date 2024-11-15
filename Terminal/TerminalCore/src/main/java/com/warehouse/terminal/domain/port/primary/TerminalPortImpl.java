@@ -1,5 +1,7 @@
 package com.warehouse.terminal.domain.port.primary;
 
+import java.util.List;
+
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
@@ -32,6 +34,11 @@ public class TerminalPortImpl implements TerminalPort {
         final User user = this.userService.findByUsername(request.getUsername());
         final Terminal terminal = Terminal.from(request, user.userId());
         this.terminalService.createTerminal(terminal);
+    }
+
+    @Override
+    public List<Terminal> allDevices() {
+        return this.terminalService.findAll();
     }
 
     private void logTerminalCreate(final TerminalAddRequest request) {

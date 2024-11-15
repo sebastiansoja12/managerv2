@@ -1,5 +1,7 @@
 package com.warehouse.terminal.domain.service;
 
+import java.util.List;
+
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -11,4 +13,5 @@ public interface TerminalService {
     void assignUser(final DeviceId deviceId, final UserId userId);
     void updateVersion(final DeviceId deviceId, final String version);
     Terminal findByDeviceId(final DeviceId deviceId);
+    List<Terminal> findAll();
 }

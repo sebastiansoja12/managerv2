@@ -10,5 +10,5 @@ import com.warehouse.terminal.request.DevicePairRequestDto;
 public interface TerminalRequestMapper {
 
     @Mapping(target = "deviceId.value", source = "terminalId.value")
-    DevicePairRequest map(DevicePairRequestDto terminalPairRequest);
+    DevicePairRequest map(final DevicePairRequestDto terminalPairRequest);
 }

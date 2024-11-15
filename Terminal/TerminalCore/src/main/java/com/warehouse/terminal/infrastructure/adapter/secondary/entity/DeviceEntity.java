@@ -57,7 +57,7 @@ public class DeviceEntity {
     }
 
     public static DeviceEntity from(final Terminal terminal) {
-		return new DeviceEntity(terminal.getTerminalId().getValue(), terminal.getVersion(),
+		return new DeviceEntity(terminal.getDeviceId().getValue(), terminal.getVersion(),
 				terminal.getUserId().getValue(), terminal.getDepotCode(), terminal.getDeviceType(), terminal.isActive());
 	}
 

@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.port.primary.DevicePairPortImpl;
+import com.warehouse.terminal.domain.port.primary.TerminalPort;
+import com.warehouse.terminal.domain.port.primary.TerminalPortImpl;
 import com.warehouse.terminal.domain.port.secondary.*;
 import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.infrastructure.adapter.secondary.*;
@@ -73,5 +75,11 @@ public class TerminalConfiguration {
     @Bean
     public DevicePairRepository devicePairRepository(final DevicePairReadRepository devicePairReadRepository) {
         return new DevicePairRepositoryImpl(devicePairReadRepository);
+    }
+
+    @Bean
+    public TerminalPort terminalPort(final TerminalService terminalService,
+                                     final UserService userService) {
+        return new TerminalPortImpl(terminalService, userService);
     }
 }
