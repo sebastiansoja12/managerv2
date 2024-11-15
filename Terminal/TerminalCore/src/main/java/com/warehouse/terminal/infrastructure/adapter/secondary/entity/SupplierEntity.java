@@ -35,6 +35,6 @@ public class SupplierEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
-    private DepotEntity depot;
+    private DepartmentEntity depot;
 
 }

@@ -1,19 +1,14 @@
 package com.warehouse.terminal.configuration;
 
 
-import com.warehouse.terminal.infrastructure.adapter.secondary.DevicePairReadRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.terminal.domain.port.primary.TerminalPairPort;
 import com.warehouse.terminal.domain.port.primary.TerminalPairPortImpl;
-import com.warehouse.terminal.domain.port.secondary.DevicePairRepository;
-import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
-import com.warehouse.terminal.domain.port.secondary.UserRepository;
+import com.warehouse.terminal.domain.port.secondary.*;
 import com.warehouse.terminal.domain.service.*;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DevicePairRepositoryImpl;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DeviceReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DeviceRepositoryImpl;
+import com.warehouse.terminal.infrastructure.adapter.secondary.*;
 
 @Configuration
 public class TerminalConfiguration {
@@ -26,6 +21,17 @@ public class TerminalConfiguration {
         return new TerminalPairPortImpl(terminalValidatorService, terminalService, userService, devicePairService);
     }
 
+    @Bean
+    public TerminalValidatorService terminalValidatorService(final DeviceVersionRepository deviceVersionRepository,
+                                                             final DepartmentRepository departmentRepository) {
+        return new TerminalValidatorServiceImpl(deviceVersionRepository, departmentRepository);
+    }
+
+    @Bean
+    public DeviceVersionRepository deviceVersionRepository(final DeviceReadRepository deviceReadRepository,
+                                                           final DeviceVersionReadRepository deviceVersionReadRepository) {
+        return new DeviceVersionRepositoryImpl(deviceReadRepository, deviceVersionReadRepository);
+    }
 
     @Bean
     public TerminalService terminalService(final DeviceRepository deviceRepository) {
@@ -40,6 +46,11 @@ public class TerminalConfiguration {
     @Bean
     public UserService userService(final UserRepository userRepository) {
         return new UserServiceImpl(userRepository);
+    }
+
+    @Bean
+    public UserRepository userRepository(final UserReadRepository repository) {
+        return new UserRepositoryImpl(repository);
     }
 
     @Bean

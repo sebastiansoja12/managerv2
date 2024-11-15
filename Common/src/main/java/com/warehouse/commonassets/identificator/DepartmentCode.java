@@ -4,14 +4,14 @@ import java.util.Objects;
 
 public class DepartmentCode {
 
-	private final String departmentCode;
+	private final String value;
 
-	public DepartmentCode(String departmentCode) {
-		this.departmentCode = departmentCode;
+	public DepartmentCode(String value) {
+		this.value = value;
 	}
 
-	public String getDepartmentCode() {
-		return departmentCode;
+	public String getValue() {
+		return value;
 	}
 
 	@Override
@@ -21,11 +21,11 @@ public class DepartmentCode {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final DepartmentCode that = (DepartmentCode) o;
-		return Objects.equals(departmentCode, that.departmentCode);
+		return Objects.equals(value, that.value);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(departmentCode);
+		return Objects.hashCode(value);
 	}
 }
