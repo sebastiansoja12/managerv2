@@ -3,11 +3,12 @@ package com.warehouse.terminal.domain.model;
 import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.terminal.domain.vo.DevicePairId;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DevicePairEntity;
 
 public class DevicePair {
 
-	private Long devicePairId;
+	private DevicePairId devicePairId;
 
 	private DeviceId deviceId;
 
@@ -19,7 +20,7 @@ public class DevicePair {
 
 	private String pairKey;
 
-	public DevicePair(final Long devicePairId, final DeviceId deviceId, final boolean paired, final Instant loginTime,
+	public DevicePair(final DevicePairId devicePairId, final DeviceId deviceId, final boolean paired, final Instant loginTime,
                       final String errorDescription, String pairKey) {
 		this.devicePairId = devicePairId;
 		this.deviceId = deviceId;
@@ -37,11 +38,11 @@ public class DevicePair {
 		this.pairKey = pairKey;
 	}
 
-	public Long getDevicePairId() {
+	public DevicePairId getDevicePairId() {
 		return devicePairId;
 	}
 
-	public void setDevicePairId(final Long devicePairId) {
+	public void setDevicePairId(final DevicePairId devicePairId) {
 		this.devicePairId = devicePairId;
 	}
 
@@ -83,8 +84,8 @@ public class DevicePair {
 	}
 
     public static DevicePair from(final DevicePairEntity devicePairEntity) {
-        return new DevicePair(devicePairEntity.getDevicePairId(),
-                new DeviceId(devicePairEntity.getDevicePairId()),
+		final DevicePairId pairId = new DevicePairId(devicePairEntity.getDevicePairId());
+        return new DevicePair(pairId, new DeviceId(devicePairEntity.getDevicePairId()),
                 devicePairEntity.isPaired(), devicePairEntity.getLoginTime(),
                 devicePairEntity.getErrorDescription(),
 				devicePairEntity.getPairKey());

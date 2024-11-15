@@ -48,7 +48,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
     @Override
     public DevicePair findDevicePairByDeviceId(final DeviceId deviceId) {
         final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDeviceId(deviceId.getValue().toString());
-        return devicePairEntity.map(DevicePair::from).orElseThrow();
+        return devicePairEntity.map(DevicePair::from).orElse(null);
     }
 
     @Override

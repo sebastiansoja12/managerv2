@@ -4,8 +4,8 @@ package com.warehouse.terminal.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.warehouse.terminal.domain.port.primary.TerminalPairPort;
-import com.warehouse.terminal.domain.port.primary.TerminalPairPortImpl;
+import com.warehouse.terminal.domain.port.primary.DevicePairPort;
+import com.warehouse.terminal.domain.port.primary.DevicePairPortImpl;
 import com.warehouse.terminal.domain.port.secondary.*;
 import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.infrastructure.adapter.secondary.*;
@@ -14,11 +14,13 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.*;
 public class TerminalConfiguration {
 
     @Bean
-    public TerminalPairPort terminalPairPort(final TerminalValidatorService terminalValidatorService,
-                                             final TerminalService terminalService,
-                                             final UserService userService,
-                                             final DevicePairService devicePairService) {
-        return new TerminalPairPortImpl(terminalValidatorService, terminalService, userService, devicePairService);
+    public DevicePairPort terminalPairPort(final TerminalValidatorService terminalValidatorService,
+                                           final TerminalService terminalService,
+                                           final UserService userService,
+                                           final DevicePairService devicePairService,
+                                           final DeviceVersionService deviceVersionService) {
+        return new DevicePairPortImpl(terminalValidatorService, terminalService, userService, devicePairService,
+                deviceVersionService);
     }
 
     @Bean
@@ -28,9 +30,19 @@ public class TerminalConfiguration {
     }
 
     @Bean
+    public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
+        return new DepartmentRepositoryImpl(repository);
+    }
+
+    @Bean
     public DeviceVersionRepository deviceVersionRepository(final DeviceReadRepository deviceReadRepository,
                                                            final DeviceVersionReadRepository deviceVersionReadRepository) {
         return new DeviceVersionRepositoryImpl(deviceReadRepository, deviceVersionReadRepository);
+    }
+
+    @Bean
+    public DeviceVersionService deviceVersionService(final DeviceVersionRepository deviceVersionRepository) {
+        return new DeviceVersionServiceImpl(deviceVersionRepository);
     }
 
     @Bean
