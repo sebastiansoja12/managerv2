@@ -4,7 +4,6 @@ package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 import java.time.Instant;
 
 import com.warehouse.terminal.domain.model.DevicePair;
-import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 
 import jakarta.persistence.*;
@@ -50,6 +49,7 @@ public class DevicePairEntity {
         this.paired = true;
         this.loginTime = Instant.now();
         this.errorDescription = "";
+        this.pairKey = "pairKey";
     }
 
 	public DevicePairEntity(final DevicePairId devicePairId,
@@ -71,10 +71,6 @@ public class DevicePairEntity {
         this.paired = false;
         this.loginTime = Instant.now();
         this.errorDescription = errorDescription;
-    }
-
-    public static DevicePairEntity from(final Terminal terminal) {
-        return new DevicePairEntity();
     }
 
     public static DevicePairEntity from(final DevicePair devicePair) {
@@ -125,6 +121,11 @@ public class DevicePairEntity {
 
     public String getPairKey() {
         return pairKey;
+    }
+
+    public DevicePairEntity pair() {
+        this.paired = true;
+        return this;
     }
 }
 

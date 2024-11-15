@@ -55,12 +55,12 @@ public class TerminalConfiguration {
         return new DeviceRepositoryImpl(deviceReadRepository);
     }
 
-    @Bean
+    @Bean("device.userService")
     public UserService userService(final UserRepository userRepository) {
         return new UserServiceImpl(userRepository);
     }
 
-    @Bean
+    @Bean("device.userRepository")
     public UserRepository userRepository(final UserReadRepository repository) {
         return new UserRepositoryImpl(repository);
     }

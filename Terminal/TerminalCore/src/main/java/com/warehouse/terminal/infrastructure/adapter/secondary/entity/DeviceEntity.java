@@ -1,6 +1,8 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
 
+import java.time.Instant;
+
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.terminal.domain.model.Terminal;
 
@@ -11,8 +13,7 @@ import jakarta.persistence.*;
 public class DeviceEntity {
 
     @Id
-    @Column(name = "device_id", nullable = false)
-    private Long deviceId;
+    private Long id;
 
     @Column(name = "version", nullable = false)
     private String version;
@@ -27,21 +28,32 @@ public class DeviceEntity {
     @Column(name = "device_type", nullable = false)
     private DeviceType deviceType;
 
+    @Column(name = "last_update", nullable = false)
+    private Instant lastUpdate;
+
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-	public DeviceEntity(final Long deviceId, final String version, final Long userId, final String depotCode,
-                        final DeviceType deviceType, final Boolean active) {
-		this.deviceId = deviceId;
+    public DeviceEntity() {
+    }
+
+    public DeviceEntity(final Long id) {
+        this.id = id;
+    }
+
+    public DeviceEntity(final Long id,
+                        final String version,
+                        final Long userId,
+                        final String depotCode,
+                        final DeviceType deviceType,
+                        final Boolean active) {
+        this.id = id;
 		this.version = version;
 		this.userId = userId;
 		this.depotCode = depotCode;
 		this.deviceType = deviceType;
+        this.lastUpdate = Instant.now();
         this.active = active;
-    }
-
-    public DeviceEntity(final Long value) {
-        this.deviceId = value;
     }
 
     public static DeviceEntity from(final Terminal terminal) {
@@ -49,12 +61,12 @@ public class DeviceEntity {
 				terminal.getUserId().getValue(), terminal.getDepotCode(), terminal.getDeviceType(), terminal.isActive());
 	}
 
-    public Boolean getActive() {
+    public Boolean isActive() {
         return active;
     }
 
     public Long getDeviceId() {
-        return deviceId;
+        return id;
     }
 
     public String getVersion() {

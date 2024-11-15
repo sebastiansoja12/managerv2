@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 
 
 
-@Entity(name = "terminal.DepotEntity")
+@Entity(name = "device.DepartmentEntity")
 @Table(name = "depot")
 public class DepartmentEntity {
 

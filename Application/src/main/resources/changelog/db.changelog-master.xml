@@ -17,15 +17,13 @@
     <include file="/changelog/db/message_sequence.xml"/>
     <include file="/changelog/db/returning_information_seq.xml"/>
     <include file="/changelog/db/message.xml"/>
+    <include file="/changelog/db/device.xml"/>
+    <include file="/changelog/db/device_pair.xml"/>
+    <include file="/changelog/db/device_version.xml"/>
 
     <!--Insert default start data-->
     <include file="/changelog/insertDepots.xml"/>
     <include file="/changelog/insertSuppliers.xml"/>
     <include file="/changelog/insertUser.xml"/>
-
-<!--    <include file="/liquibase/changelog/insertMessageSequence.sql"/>-->
-<!--
-    <include file="/liquibase/changelog/insertParcel.sql"/>
--->
 
 </databaseChangeLog>

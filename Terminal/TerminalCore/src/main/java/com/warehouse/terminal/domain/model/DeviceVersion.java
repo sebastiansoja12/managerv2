@@ -30,6 +30,11 @@ public class DeviceVersion {
         this.lastUpdate = lastUpdate;
     }
 
+    public DeviceVersion(final String version, final DeviceId deviceId) {
+        this.version = version;
+        this.deviceId = deviceId;
+    }
+
     public Long getId() {
         return id;
     }

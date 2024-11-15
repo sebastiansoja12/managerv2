@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 
 import java.time.Instant;
 
@@ -37,6 +38,12 @@ public class Terminal extends Device {
 		return new Terminal(null, request.getDeviceType(), userId, request.getDepotCode(), request.getVersion(),
 				Instant.now(), true);
 	}
+
+    public static Terminal from(final DeviceEntity device) {
+        return new Terminal(new TerminalId(device.getDeviceId()), device.getDeviceType(), new UserId(device.getUserId()),
+                device.getDepotCode(), device.getVersion(),
+                Instant.now(), device.isActive());
+    }
 
     public TerminalId getTerminalId() {
         return terminalId;

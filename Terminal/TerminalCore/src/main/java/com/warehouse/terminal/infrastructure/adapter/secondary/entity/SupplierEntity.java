@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "supplier.SupplierEntity")
+@Entity(name = "device.SupplierEntity")
 @Builder
 @Table(name = "supplier")
-@NamedEntityGraph(name = "SupplierEntity.full", attributeNodes = {
+@NamedEntityGraph(name = "device.SupplierEntity.full", attributeNodes = {
         @NamedAttributeNode("depot")
 })
 public class SupplierEntity {

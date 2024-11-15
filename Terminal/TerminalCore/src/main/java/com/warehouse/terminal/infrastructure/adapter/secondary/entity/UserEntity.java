@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "device.UserEntity")
 @Table(name = "users")
 public class UserEntity {
 
     @Id
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "id", nullable = false)
+    private Long id;
 
     @Column(name = "username", unique = true, nullable = false)
     private String username;
@@ -29,10 +29,10 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "firstName", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "lastName", nullable = false)
     private String lastName;
 
     @Column(name = "email", nullable = false)
@@ -41,6 +41,6 @@ public class UserEntity {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @Column(name = "depot_code", nullable = false)
+    @Column(name = "depotCode", nullable = false)
     private String depotCode;
 }

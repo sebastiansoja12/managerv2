@@ -26,9 +26,10 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
     public void pair(final Terminal terminal, final DevicePairId devicePairId) {
         final DeviceEntity deviceEntity = DeviceEntity.from(terminal);
         validateNotPaired(terminal.getTerminalId());
-		final DevicePairEntity devicePairEntity = new DevicePairEntity(devicePairId, deviceEntity, true, Instant.now(),
-				StringUtils.EMPTY, "pairKey");
-        this.repository.save(devicePairEntity);
+        this.repository
+                .findByDeviceId(deviceEntity.getDeviceId())
+                .map(DevicePairEntity::pair)
+                .orElseGet(() -> this.repository.save(new DevicePairEntity(deviceEntity)));
     }
 
     @Override
@@ -47,8 +48,8 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
 
     @Override
     public DevicePair findDevicePairByDeviceId(final DeviceId deviceId) {
-        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDeviceId(deviceId.getValue().toString());
-        return devicePairEntity.map(DevicePair::from).orElse(null);
+        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDeviceId(deviceId.getValue());
+        return devicePairEntity.map(DevicePair::from).orElse(new DevicePair(false));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
 
     private void validateNotPaired(final DeviceId deviceId) {
         final Boolean devicePaired = this.repository
-                .findByDeviceId(deviceId.getValue().toString())
+                .findByDeviceId(deviceId.getValue())
                 .map(DevicePairEntity::isPaired)
                 .orElse(Boolean.FALSE);
         if (devicePaired) {

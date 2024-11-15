@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="create-device-pair-table" author="s-soja">
+        <createTable tableName="device_pair">
+            <column name="device_pair_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="device_entity_id" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+            <column name="paired" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="pair_time" type="TIMESTAMP">
+                <constraints nullable="true" />
+            </column>
+            <column name="error_description" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="pair_key" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="device_pair"
+                baseColumnNames="device_entity_id"
+                referencedTableName="device"
+                referencedColumnNames="id"
+                constraintName="fk_device_pair_device" />
+    </changeSet>
+</databaseChangeLog>

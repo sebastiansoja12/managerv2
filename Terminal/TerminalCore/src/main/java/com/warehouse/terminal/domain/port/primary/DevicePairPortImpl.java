@@ -72,18 +72,18 @@ public class DevicePairPortImpl implements DevicePairPort {
     @Override
     public DevicePairResponse pair(final DevicePairRequest request) {
         final Terminal terminal = this.terminalService.findByDeviceId(request.getDeviceId());
-        log.info("Pairing terminal {}", terminal.getTerminalId());
-
+        log.info("Pairing terminal [{}]", terminal.getTerminalId().getValue());
+        final DeviceId deviceId = terminal.getDeviceId();
         this.terminalValidatorService.validateDepartment(terminal.getDepotCode());
         this.terminalValidatorService.validateTerminalVersion(terminal.getTerminalId());
-        this.userService.validateUser(terminal.getUserId());
-        this.userService.validateUser(request.getUserId());
-        this.devicePairService.pairDevice(terminal);
-        final Boolean userValid = this.userService.existsByUserId(terminal.getUserId()) 
+        final Boolean userValid = this.userService.existsByUserId(terminal.getUserId())
                 && this.userService.existsByUserId(request.getUserId());
 
-        // TODO change
-        final Boolean deviceUpToDate = true;
+        final DeviceVersion deviceVersion = new DeviceVersion(terminal.getVersion(), terminal.getTerminalId());
+        final Boolean deviceUpToDate = !updateRequired(deviceId, deviceVersion);
+        if (deviceUpToDate && userValid) {
+            this.devicePairService.pairDevice(terminal);
+        }
         final DevicePair devicePair = this.devicePairService.findByDeviceId(request.getDeviceId());
 		return new DevicePairResponse(request.getUserId(), request.getDeviceId(), devicePair.getDevicePairId(),
 				devicePair.isPaired() ? "paired" : "unpaired", "pairKey", userValid, terminal.isActive(),

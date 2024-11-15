@@ -35,6 +35,6 @@ public class DevicePairServiceImpl implements DevicePairService {
     }
 
     private DevicePairId nextDevicePairId() {
-        return new DevicePairId(UUID.randomUUID().getLeastSignificantBits());
+        return new DevicePairId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
 }

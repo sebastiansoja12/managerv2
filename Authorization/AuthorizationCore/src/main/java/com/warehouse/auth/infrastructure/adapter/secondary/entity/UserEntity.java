@@ -2,12 +2,15 @@ package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import java.util.Collection;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +25,9 @@ import lombok.NoArgsConstructor;
 public class UserEntity implements UserDetails {
 
     @Id
+    @Column(name = "id", unique = true, nullable = false)
+    private Long id;
+
     @Column(unique = true, nullable = false)
     private String username;
 

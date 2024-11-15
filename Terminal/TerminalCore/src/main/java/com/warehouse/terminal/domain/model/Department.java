@@ -1,25 +1,14 @@
 package com.warehouse.terminal.domain.model;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.DepartmentId;
 
 public class Department {
-    private DepartmentId departmentId;
     private DepartmentCode departmentCode;
     private Boolean valid;
 
-    public Department(final DepartmentId departmentId, final DepartmentCode departmentCode, final Boolean valid) {
-        this.departmentId = departmentId;
+    public Department(final DepartmentCode departmentCode, final Boolean valid) {
         this.departmentCode = departmentCode;
         this.valid = valid;
-    }
-
-    public DepartmentId getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(final DepartmentId departmentId) {
-        this.departmentId = departmentId;
     }
 
     public DepartmentCode getDepartmentCode() {

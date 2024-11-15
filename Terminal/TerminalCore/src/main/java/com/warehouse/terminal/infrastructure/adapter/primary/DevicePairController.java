@@ -16,7 +16,7 @@ import com.warehouse.terminal.request.DevicePairRequestDto;
 import com.warehouse.terminal.request.TerminalAddRequestDto;
 
 @RestController
-@RequestMapping("/terminals")
+@RequestMapping("/device-pairing")
 public class DevicePairController {
 
     private final DevicePairPort devicePairPort;
@@ -27,18 +27,18 @@ public class DevicePairController {
         this.devicePairPort = devicePairPort;
     }
 
-    @PostMapping
+
     private ResponseEntity<?> addDevice(@RequestBody final TerminalAddRequestDto terminalAddRequest) {
         final TerminalAddRequest request = TerminalAddRequest.from(terminalAddRequest);
         //this.terminalPairPort.create(request);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/pair")
+    @PostMapping
     private ResponseEntity<?> pairDevice(@RequestBody final DevicePairRequestDto devicePairRequest) {
         final DevicePairRequest request = requestMapper.map(devicePairRequest);
         final DevicePairResponse response = this.devicePairPort.pair(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/{deviceId}")

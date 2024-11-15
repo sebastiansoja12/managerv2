@@ -30,6 +30,10 @@ public class DevicePair {
         this.pairKey = pairKey;
     }
 
+	public DevicePair(final boolean paired) {
+		this.paired = paired;
+	}
+
 	public String getPairKey() {
 		return pairKey;
 	}

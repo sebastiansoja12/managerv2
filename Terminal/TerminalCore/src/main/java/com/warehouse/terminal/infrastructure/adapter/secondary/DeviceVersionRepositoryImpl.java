@@ -25,7 +25,7 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
                 .orElseThrow(() -> new RuntimeException("Device not found"));
 
         final DeviceVersionEntity deviceVersionEntity = this.deviceVersionReadRepository
-                .findByDeviceId(deviceId.getValue())
+                .findByDeviceId(deviceId.getValue().toString())
                 .orElseThrow(() -> new RuntimeException("Device version not found"));
         return !deviceVersionEntity.getVersion().equals(deviceEntity.getVersion());
     }
@@ -33,7 +33,7 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
     @Override
     public DeviceVersion find(final DeviceId deviceId) {
         return this.deviceVersionReadRepository
-                .findByDeviceId(deviceId.getValue())
+                .findByDeviceId(deviceId.getValue().toString())
                 .map(DeviceVersion::from)
                 .orElse(null);
     }
