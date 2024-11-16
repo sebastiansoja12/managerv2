@@ -2,7 +2,7 @@ package com.warehouse.department.infrastructure.adapter.secondary;
 
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.DepotCode;
-import com.warehouse.department.domain.port.secondary.DepotRepository;
+import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepotEntity;
 import com.warehouse.department.infrastructure.adapter.secondary.exception.DepotNotFoundException;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMapper;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-public class DepotRepositoryImpl implements DepotRepository {
+public class DepartmentRepositoryImpl implements DepartmentRepository {
 
     private final DepotReadRepository repository;
 

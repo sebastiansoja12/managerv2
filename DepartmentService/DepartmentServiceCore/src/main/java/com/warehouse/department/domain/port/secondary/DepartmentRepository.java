@@ -5,13 +5,13 @@ import com.warehouse.department.domain.vo.DepotCode;
 
 import java.util.List;
 
-public interface DepotRepository {
+public interface DepartmentRepository {
 
-    void save(Department department);
+    void save(final Department department);
 
-    void saveAll(List<Department> departments);
+    void saveAll(final List<Department> departments);
 
-    Department findByCode(DepotCode depotCode);
+    Department findByCode(final DepotCode depotCode);
 
     List<Department> findAll();
 

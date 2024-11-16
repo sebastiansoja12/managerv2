@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.DepotCode;
 import com.warehouse.department.infrastructure.adapter.secondary.DepotReadRepository;
-import com.warehouse.department.infrastructure.adapter.secondary.DepotRepositoryImpl;
+import com.warehouse.department.infrastructure.adapter.secondary.DepartmentRepositoryImpl;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepotEntity;
 import com.warehouse.department.infrastructure.adapter.secondary.exception.DepotNotFoundException;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMapper;
@@ -31,7 +31,7 @@ public class DepartmentRepositoryTest {
     private DepotMapper mapper;
 
     @InjectMocks
-    private DepotRepositoryImpl depotRepository;
+    private DepartmentRepositoryImpl depotRepository;
 
     public static final String KT1 = "KT1";
 
