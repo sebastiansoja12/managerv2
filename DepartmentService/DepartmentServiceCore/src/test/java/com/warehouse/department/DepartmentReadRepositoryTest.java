@@ -3,7 +3,7 @@ package com.warehouse.department;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.department.configuration.DepotTestConfiguration;
-import com.warehouse.department.infrastructure.adapter.secondary.DepotReadRepository;
+import com.warehouse.department.infrastructure.adapter.secondary.DepartmentReadRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class DepartmentReadRepositoryTest {
 
     @Autowired
-    private DepotReadRepository repository;
+    private DepartmentReadRepository repository;
 
     @Test
     @DatabaseSetup("/dataset/depots.xml")

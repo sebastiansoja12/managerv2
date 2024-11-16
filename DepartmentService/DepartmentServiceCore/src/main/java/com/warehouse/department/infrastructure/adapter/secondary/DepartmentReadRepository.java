@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface DepotReadRepository extends JpaRepository<DepartmentEntity, String> {
+@Repository("department.departmentReadRepository")
+public interface DepartmentReadRepository extends JpaRepository<DepartmentEntity, String> {
 
-    Optional<DepartmentEntity> findByDepotCode(String depotCode);
+    Optional<DepartmentEntity> findByDepotCode(final String depotCode);
 }

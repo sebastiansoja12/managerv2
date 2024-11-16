@@ -16,24 +16,24 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public Department viewDepotByCode(DepartmentCode departmentCode) {
-        return departmentRepository.findByCode(departmentCode);
+    public Department findByDepartmentCode(final DepartmentCode departmentCode) {
+        return this.departmentRepository.findByCode(departmentCode);
     }
 
     @Override
     public List<Department> findAll() {
-        return departmentRepository.findAll();
+        return this.departmentRepository.findAll();
     }
 
     @Override
-    public void addMultipleDepots(List<Department> departments) {
-        departmentRepository.saveAll(departments);
+    public void addDepartments(final List<Department> departments) {
+        this.departmentRepository.saveAll(departments);
     }
 
     @Override
-    public void updateStreet(UpdateStreetRequest request) {
-        final Department department = departmentRepository.findByCode(request.departmentCode());
+    public void updateStreet(final UpdateStreetRequest request) {
+        final Department department = this.departmentRepository.findByCode(request.departmentCode());
         department.updateStreet(request.street());
-        departmentRepository.save(department);
+        this.departmentRepository.save(department);
     }
 }

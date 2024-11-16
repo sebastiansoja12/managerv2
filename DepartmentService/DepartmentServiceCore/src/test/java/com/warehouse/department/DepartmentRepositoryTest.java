@@ -5,8 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import com.warehouse.department.domain.vo.DepartmentCode;
-import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,8 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.infrastructure.adapter.secondary.DepotReadRepository;
+import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.infrastructure.adapter.secondary.DepartmentRepositoryImpl;
+import com.warehouse.department.infrastructure.adapter.secondary.DepartmentReadRepository;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.department.infrastructure.adapter.secondary.exception.DepotNotFoundException;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMapper;
 
@@ -25,7 +25,7 @@ import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMap
 public class DepartmentRepositoryTest {
 
     @Mock
-    private DepotReadRepository repository;
+    private DepartmentReadRepository repository;
 
     @Mock
     private DepotMapper mapper;
@@ -59,7 +59,7 @@ public class DepartmentRepositoryTest {
     @Test
     public void shouldThrowDepotNotFoundExceptionWhenNotFoundByDepotCode() {
         // given
-        final String exceptionMessage = "Depot was not found";
+        final String exceptionMessage = "Department was not found";
         final DepartmentCode code = new DepartmentCode(KT1);
 
         when(repository.findByDepotCode(KT1)).thenReturn(Optional.empty());

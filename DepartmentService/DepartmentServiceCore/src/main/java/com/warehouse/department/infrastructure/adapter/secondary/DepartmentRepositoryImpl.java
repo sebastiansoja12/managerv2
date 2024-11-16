@@ -15,7 +15,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
-    private final DepotReadRepository repository;
+    private final DepartmentReadRepository repository;
 
     private final DepotMapper depotMapper;
 
@@ -23,7 +23,7 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     @Cacheable("depotCodeCache")
     public Department findByCode(DepartmentCode departmentCode) {
         final Optional<DepartmentEntity> depot = repository.findByDepotCode(departmentCode.getValue());
-        return depot.map(depotMapper::map).orElseThrow(() -> new DepotNotFoundException("Depot was not found"));
+        return depot.map(depotMapper::map).orElseThrow(() -> new DepotNotFoundException("Department was not found"));
     }
 
     @Override

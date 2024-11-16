@@ -35,7 +35,7 @@ public class DepartmentController {
     @PostMapping
     public ResponseEntity<?> add(@RequestBody List<DepartmentDto> depotList) {
         final List<Department> departments = requestMapper.map(depotList);
-        departmentPort.addMultipleDepots(departments);
+        departmentPort.addDepartments(departments);
         return ResponseEntity.ok().body(HttpStatus.OK);
     }
 
@@ -49,7 +49,7 @@ public class DepartmentController {
     @GetMapping("/depotCode/{value}")
     public ResponseEntity<?> viewByDepartmentCode(DepotCodeDto code) {
         final DepartmentCode departmentCode = requestMapper.map(code);
-        final Department department = departmentPort.viewDepotByCode(departmentCode);
+        final Department department = departmentPort.findByDepartmentCode(departmentCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(responseMapper.map(department));

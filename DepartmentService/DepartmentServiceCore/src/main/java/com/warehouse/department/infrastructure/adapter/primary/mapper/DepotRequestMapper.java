@@ -21,6 +21,6 @@ public interface DepotRequestMapper {
 
     DepartmentCode map(DepotCodeDto code);
 
-    @Mapping(target = "depotCode.value", source = "depotCode")
+    @Mapping(target = "departmentCode.value", source = "depotCode")
     UpdateStreetRequest map(UpdateStreetRequestDto updateStreetRequest);
 }
