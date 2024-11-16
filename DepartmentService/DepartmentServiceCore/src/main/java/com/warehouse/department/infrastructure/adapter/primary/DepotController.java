@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.department.domain.port.primary.DepotPort;
+import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.vo.DepotCode;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepotCodeDto;
@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class DepotController {
 
-    private final DepotPort depotPort;
+    private final DepartmentPort departmentPort;
 
     private final DepotRequestMapper requestMapper = getMapper(DepotRequestMapper.class);
 
@@ -35,21 +35,21 @@ public class DepotController {
     @PostMapping
     public ResponseEntity<?> add(@RequestBody List<DepotDto> depotList) {
         final List<Department> departments = requestMapper.map(depotList);
-        depotPort.addMultipleDepots(departments);
+        departmentPort.addMultipleDepots(departments);
         return ResponseEntity.ok().body(HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<?> updateStreet(@RequestBody UpdateStreetRequestDto updateStreetRequest) {
         final UpdateStreetRequest request = requestMapper.map(updateStreetRequest);
-        depotPort.updateStreet(request);
+        departmentPort.updateStreet(request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/depotCode/{value}")
     public ResponseEntity<?> viewDepotByCode(DepotCodeDto code) {
         final DepotCode depotCode = requestMapper.map(code);
-        final Department department = depotPort.viewDepotByCode(depotCode);
+        final Department department = departmentPort.viewDepotByCode(depotCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(responseMapper.map(department));
@@ -59,6 +59,6 @@ public class DepotController {
     public ResponseEntity<?> allDepots() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(responseMapper.map(depotPort.findAll()));
+                .body(responseMapper.map(departmentPort.findAll()));
     }
 }

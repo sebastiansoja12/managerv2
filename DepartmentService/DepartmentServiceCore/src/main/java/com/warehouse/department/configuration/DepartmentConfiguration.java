@@ -1,7 +1,7 @@
 package com.warehouse.department.configuration;
 
-import com.warehouse.department.domain.port.primary.DepotPort;
-import com.warehouse.department.domain.port.primary.DepotPortImpl;
+import com.warehouse.department.domain.port.primary.DepartmentPort;
+import com.warehouse.department.domain.port.primary.DepartmentPortImpl;
 import com.warehouse.department.domain.port.secondary.DepotRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.DepotReadRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.DepotRepositoryImpl;
@@ -20,7 +20,7 @@ public class DepartmentConfiguration {
         return new DepotRepositoryImpl(repository, depotMapper);
     }
     @Bean
-    public DepotPort depotPort(DepotRepository depotRepository) {
-        return new DepotPortImpl(depotRepository);
+    public DepartmentPort depotPort(DepotRepository depotRepository) {
+        return new DepartmentPortImpl(depotRepository);
     }
 }

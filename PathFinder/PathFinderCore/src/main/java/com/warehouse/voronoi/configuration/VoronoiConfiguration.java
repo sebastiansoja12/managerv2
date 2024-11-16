@@ -4,7 +4,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.warehouse.department.domain.port.primary.DepotPort;
+import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
@@ -35,8 +35,8 @@ public class VoronoiConfiguration {
 	}
 
     @Bean
-    public DepotServicePort depotServicePort(DepotPort depotPort) {
-        return new DepotServiceAdapter(depotPort, Mappers.getMapper(DepotResponseMapper.class));
+    public DepotServicePort depotServicePort(DepartmentPort departmentPort) {
+        return new DepotServiceAdapter(departmentPort, Mappers.getMapper(DepotResponseMapper.class));
     }
 
 	@Bean

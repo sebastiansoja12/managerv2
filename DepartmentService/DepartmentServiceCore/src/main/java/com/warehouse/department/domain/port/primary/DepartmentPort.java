@@ -6,7 +6,7 @@ import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.DepotCode;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
 
-public interface DepotPort {
+public interface DepartmentPort {
 
     Department viewDepotByCode(DepotCode depotCode);
 

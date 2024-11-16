@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.department.domain.port.primary.DepotPort;
+import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.DepotServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.mapper.DepotResponseMapper;
@@ -20,7 +20,7 @@ public class DepartmentServiceAdapterTest {
 
 
     @Mock
-    private DepotPort depotPort;
+    private DepartmentPort departmentPort;
 
     @Mock
     private DepotResponseMapper responseMapper;
@@ -29,7 +29,7 @@ public class DepartmentServiceAdapterTest {
 
     @BeforeEach
     void setup() {
-        depotServiceAdapter = new DepotServiceAdapter(depotPort, responseMapper);
+        depotServiceAdapter = new DepotServiceAdapter(departmentPort, responseMapper);
     }
 
     @Test

@@ -7,13 +7,13 @@ import com.warehouse.department.domain.port.secondary.DepotRepository;
 import com.warehouse.department.domain.vo.DepotCode;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
-public class DepotPortImpl implements DepotPort {
-
+public class DepartmentPortImpl implements DepartmentPort {
 
     private final DepotRepository depotRepository;
+
+    public DepartmentPortImpl(final DepotRepository depotRepository) {
+        this.depotRepository = depotRepository;
+    }
 
     @Override
     public Department viewDepotByCode(DepotCode depotCode) {

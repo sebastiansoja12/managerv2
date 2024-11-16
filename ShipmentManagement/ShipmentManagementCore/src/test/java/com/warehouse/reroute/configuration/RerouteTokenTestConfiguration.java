@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import com.warehouse.department.domain.port.primary.DepotPort;
+import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.reroute.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.voronoi.VoronoiService;
@@ -26,7 +26,7 @@ public class RerouteTokenTestConfiguration {
     public VoronoiService voronoiService;
 
     @MockBean
-    public DepotPort depotPort;
+    public DepartmentPort departmentPort;
 
     @MockBean
     public MailServicePort mailServicePort;
