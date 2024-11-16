@@ -1,4 +1,4 @@
-package com.warehouse.terminal.domain.model.exception;
+package com.warehouse.terminal.domain.exception;
 
 import com.warehouse.commonassets.identificator.UserId;
 import org.springframework.web.client.RestClientException;

@@ -6,7 +6,7 @@ import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.Terminal;
-import com.warehouse.terminal.domain.model.exception.UserNotFoundException;
+import com.warehouse.terminal.domain.exception.UserNotFoundException;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
 import com.warehouse.terminal.domain.service.DeviceVersionService;
 import com.warehouse.terminal.domain.service.TerminalService;
