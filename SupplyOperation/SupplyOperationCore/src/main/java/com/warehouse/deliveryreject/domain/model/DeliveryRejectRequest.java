@@ -1,27 +1,30 @@
 package com.warehouse.deliveryreject.domain.model;
 
-import java.io.Serializable;
-
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.deliveryreject.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreject.domain.enumeration.ExecutionSourceType;
 
-public class DeliveryReject implements Serializable, ExecutionSourceResolver {
+import java.io.Serializable;
+
+public class DeliveryRejectRequest implements Serializable, ExecutionSourceResolver {
     private DeliveryId deliveryId;
     private ShipmentId shipmentId;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
     private DeviceId deviceId;
     private DeliveryStatus deliveryStatus;
+    private RejectReason rejectReason;
 
-	public DeliveryReject(final DeliveryId deliveryId, final ShipmentId shipmentId, final DepartmentCode departmentCode,
-			final SupplierCode supplierCode, final DeviceId deviceId, final DeliveryStatus deliveryStatus) {
+	public DeliveryRejectRequest(final DeliveryId deliveryId, final ShipmentId shipmentId,
+			final DepartmentCode departmentCode, final SupplierCode supplierCode, final DeviceId deviceId,
+			final DeliveryStatus deliveryStatus, final RejectReason rejectReason) {
         this.deliveryId = deliveryId;
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deviceId = deviceId;
         this.deliveryStatus = deliveryStatus;
+        this.rejectReason = rejectReason;
     }
 
     public DeliveryId getDeliveryId() {
@@ -70,6 +73,14 @@ public class DeliveryReject implements Serializable, ExecutionSourceResolver {
 
     public void setDeliveryStatus(final DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;
+    }
+
+    public RejectReason getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(final RejectReason rejectReason) {
+        this.rejectReason = rejectReason;
     }
 
     @Override

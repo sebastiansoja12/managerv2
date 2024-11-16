@@ -1,4 +1,4 @@
 package com.warehouse.deliveryreject.domain.port.secondary;
 
-public interface RouteLogMissedServicePort {
+public interface RejectShipmentServicePort {
 }
