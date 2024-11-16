@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DepotServicesCore</artifactId>
+            <artifactId>DepartmentServiceCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -19,7 +19,7 @@
 		<module>Application</module>
 		<module>ShipmentManagement</module>
 		<module>MailService</module>
-		<module>DepotServices</module>
+		<module>DepartmentService</module>
 		<module>RouteTrackerFlow</module>
 		<module>SupplyOperation</module>
 		<module>PathFinder</module>

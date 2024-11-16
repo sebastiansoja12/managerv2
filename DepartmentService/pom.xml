@@ -9,12 +9,12 @@
         <version>2024.7-SNAPSHOT</version>
     </parent>
 
-    <artifactId>DepotServices</artifactId>
+    <artifactId>DepartmentService</artifactId>
     <packaging>pom</packaging>
 
 
     <modules>
-        <module>DepotServicesCore</module>
+        <module>DepartmentServiceCore</module>
     </modules>
 
 </project>
