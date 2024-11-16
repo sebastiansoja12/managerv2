@@ -1,10 +1,10 @@
 package com.warehouse.department.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.domain.vo.DepotCode;
+import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepotCodeDto;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepotDto;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentDto;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateStreetRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,11 +15,11 @@ import java.util.List;
 public interface DepotRequestMapper {
     
     @Mapping(target = "depotCode", source = "depotCode.value")
-    Department map(DepotDto depot);
+    Department map(DepartmentDto depot);
     
-    List<Department> map(List<DepotDto> depots);
+    List<Department> map(List<DepartmentDto> depots);
 
-    DepotCode map(DepotCodeDto code);
+    DepartmentCode map(DepotCodeDto code);
 
     @Mapping(target = "depotCode.value", source = "depotCode")
     UpdateStreetRequest map(UpdateStreetRequestDto updateStreetRequest);

@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "depot.DepotEntity")
+@Entity(name = "department.DepartmentEntity")
 @Builder
 @Table(name = "depot")
-public class DepotEntity {
+public class DepartmentEntity {
 
     @Id
     @Column(name = "depot_code", nullable = false, unique = true)

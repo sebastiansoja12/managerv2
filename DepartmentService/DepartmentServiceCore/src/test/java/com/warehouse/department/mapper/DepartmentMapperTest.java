@@ -1,7 +1,7 @@
 package com.warehouse.department.mapper;
 
 import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.infrastructure.adapter.secondary.entity.DepotEntity;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMapper;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMapperImpl;
 import org.junit.jupiter.api.Test;
@@ -23,12 +23,12 @@ public class DepartmentMapperTest {
         department.setCity(KATOWICE);
         department.setDepotCode("KT3");
 
-        final DepotEntity expectedEntity = new DepotEntity();
+        final DepartmentEntity expectedEntity = new DepartmentEntity();
         expectedEntity.setDepotCode("KT3");
         expectedEntity.setCity(KATOWICE);
 
         // When
-        final DepotEntity result = mapper.map(department);
+        final DepartmentEntity result = mapper.map(department);
 
         // Then
         assertEquals(expectedEntity.getCity(), result.getCity());
@@ -37,16 +37,16 @@ public class DepartmentMapperTest {
     @Test
     public void shouldMapDepotEntityToDepot() {
         // Given
-        final DepotEntity depotEntity = new DepotEntity();
-        depotEntity.setCity(KATOWICE);
-        depotEntity.setDepotCode("KT3");
+        final DepartmentEntity departmentEntity = new DepartmentEntity();
+        departmentEntity.setCity(KATOWICE);
+        departmentEntity.setDepotCode("KT3");
 
 
         final Department expectedDepartment = new Department();
         expectedDepartment.setCity(KATOWICE);
 
         // When
-        final Department result = mapper.map(depotEntity);
+        final Department result = mapper.map(departmentEntity);
 
         // Then
         assertEquals(expectedDepartment.getCity(), result.getCity());
@@ -55,7 +55,7 @@ public class DepartmentMapperTest {
     @Test
     public void shouldMapListDepotEntityToListDepot() {
         // Given
-        final List<DepotEntity> depotEntities = Arrays.asList(new DepotEntity(), new DepotEntity());
+        final List<DepartmentEntity> depotEntities = Arrays.asList(new DepartmentEntity(), new DepartmentEntity());
 
         // When
         final List<Department> result = mapper.map(depotEntities);
@@ -74,7 +74,7 @@ public class DepartmentMapperTest {
         final List<Department> departments = Arrays.asList(department1, department2);
 
         // When
-        final List<DepotEntity> result = mapper.mapToDepotEntityList(departments);
+        final List<DepartmentEntity> result = mapper.mapToDepotEntityList(departments);
 
         // Then
         assertEquals(departments.size(), result.size());

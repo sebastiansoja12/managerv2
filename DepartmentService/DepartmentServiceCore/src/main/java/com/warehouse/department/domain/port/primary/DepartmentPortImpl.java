@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
-import com.warehouse.department.domain.vo.DepotCode;
+import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
 
 public class DepartmentPortImpl implements DepartmentPort {
@@ -16,8 +16,8 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public Department viewDepotByCode(DepotCode depotCode) {
-        return departmentRepository.findByCode(depotCode);
+    public Department viewDepotByCode(DepartmentCode departmentCode) {
+        return departmentRepository.findByCode(departmentCode);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     public void updateStreet(UpdateStreetRequest request) {
-        final Department department = departmentRepository.findByCode(request.depotCode());
+        final Department department = departmentRepository.findByCode(request.departmentCode());
         department.updateStreet(request.street());
         departmentRepository.save(department);
     }

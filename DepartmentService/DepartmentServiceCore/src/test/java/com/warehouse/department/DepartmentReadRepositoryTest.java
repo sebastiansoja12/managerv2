@@ -4,7 +4,7 @@ import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.department.configuration.DepotTestConfiguration;
 import com.warehouse.department.infrastructure.adapter.secondary.DepotReadRepository;
-import com.warehouse.department.infrastructure.adapter.secondary.entity.DepotEntity;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class DepartmentReadRepositoryTest {
         // given
         final String depotCode = "PL1";
         // when
-        final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode);
+        final Optional<DepartmentEntity> depot = repository.findByDepotCode(depotCode);
         // then
         assertTrue(depot.isPresent());
         assertEquals(depotCode, depot.get().getDepotCode());
@@ -53,7 +53,7 @@ public class DepartmentReadRepositoryTest {
     @DatabaseSetup("/dataset/depots.xml")
     void shouldFindAll() {
         // when
-        final List<DepotEntity> depot = repository.findAll();
+        final List<DepartmentEntity> depot = repository.findAll();
         // then
         assertTrue(depot.size() > 0);
     }
@@ -64,7 +64,7 @@ public class DepartmentReadRepositoryTest {
         // given
         final String depotCode = "abc";
         // when
-        final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode);
+        final Optional<DepartmentEntity> depot = repository.findByDepotCode(depotCode);
         // then
         assertFalse(depot.isPresent());
     }

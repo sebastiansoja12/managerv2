@@ -1,9 +1,9 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
 import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.domain.vo.DepotCode;
+import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
-import com.warehouse.department.infrastructure.adapter.secondary.entity.DepotEntity;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.department.infrastructure.adapter.secondary.exception.DepotNotFoundException;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMapper;
 import lombok.AllArgsConstructor;
@@ -21,27 +21,27 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
 
     @Override
     @Cacheable("depotCodeCache")
-    public Department findByCode(DepotCode depotCode) {
-        final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode.getValue());
+    public Department findByCode(DepartmentCode departmentCode) {
+        final Optional<DepartmentEntity> depot = repository.findByDepotCode(departmentCode.getValue());
         return depot.map(depotMapper::map).orElseThrow(() -> new DepotNotFoundException("Depot was not found"));
     }
 
     @Override
     @Cacheable("depotsCache")
     public List<Department> findAll() {
-        final List<DepotEntity> depots = repository.findAll();
+        final List<DepartmentEntity> depots = repository.findAll();
         return depotMapper.map(depots);
     }
 
     @Override
     public void save(final Department department) {
-        final DepotEntity depotEntity = depotMapper.map(department);
-        repository.save(depotEntity);
+        final DepartmentEntity departmentEntity = depotMapper.map(department);
+        repository.save(departmentEntity);
     }
 
     @Override
     public void saveAll(final List<Department> departments) {
-        final List<DepotEntity> depotEntities = depotMapper.mapToDepotEntityList(departments);
+        final List<DepartmentEntity> depotEntities = depotMapper.mapToDepotEntityList(departments);
         repository.saveAll(depotEntities);
     }
 }
