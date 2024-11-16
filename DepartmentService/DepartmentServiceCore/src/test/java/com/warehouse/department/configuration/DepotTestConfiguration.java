@@ -5,7 +5,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @ComponentScan(basePackages = {"com.warehouse.department"})
-@EntityScan(basePackages = { "com.warehouse.depot" })
+@EntityScan(basePackages = { "com.warehouse.department" })
 @EnableJpaRepositories(basePackages = {"com.warehouse.department"})
 public class DepotTestConfiguration {
 }
