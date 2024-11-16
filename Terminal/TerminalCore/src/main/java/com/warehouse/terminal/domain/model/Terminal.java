@@ -3,12 +3,13 @@ package com.warehouse.terminal.domain.model;
 import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.terminal.domain.enumeration.ExecutionSourceType;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 
 import java.time.Instant;
 
-public class Terminal extends Device {
+public class Terminal extends Device implements ExecutionSourceResolver {
     private TerminalId terminalId;
     private DeviceType deviceType;
     private UserId userId;
@@ -24,7 +25,7 @@ public class Terminal extends Device {
                     final String version,
                     final Instant lastUpdate, 
                     final Boolean active) {
-        super(terminalId, version, deviceType, "", userId);
+        super(terminalId, version, deviceType, userId);
         this.terminalId = terminalId;
         this.deviceType = deviceType;
         this.userId = userId;
@@ -100,5 +101,10 @@ public class Terminal extends Device {
 
     public Boolean isActive() {
         return active;
+    }
+
+    @Override
+    public ExecutionSourceType getExecutionSourceType() {
+        return ExecutionSourceType.DEVICE;
     }
 }

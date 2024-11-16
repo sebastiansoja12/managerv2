@@ -79,7 +79,8 @@ public class TerminalConfiguration {
 
     @Bean
     public TerminalPort terminalPort(final TerminalService terminalService,
-                                     final UserService userService) {
-        return new TerminalPortImpl(terminalService, userService);
+                                     final UserService userService,
+                                     final DeviceVersionService deviceVersionService) {
+        return new TerminalPortImpl(terminalService, userService, deviceVersionService);
     }
 }

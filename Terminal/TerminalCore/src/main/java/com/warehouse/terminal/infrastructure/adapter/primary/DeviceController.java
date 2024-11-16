@@ -23,6 +23,7 @@ public class DeviceController {
     private final TerminalPort terminalPort;
 
     private final TerminalRequestMapper requestMapper = getMapper(TerminalRequestMapper.class);
+
     private final TerminalResponseMapper responseMapper = getMapper(TerminalResponseMapper.class);
 
     public DeviceController(final TerminalPort terminalPort) {
@@ -39,8 +40,10 @@ public class DeviceController {
     @GetMapping
     public ResponseEntity<?> getAllDevices() {
         final List<Terminal> devices = this.terminalPort.allDevices();
-        final List<DeviceDto> deviceResponse =
-                devices.stream().map(responseMapper::mapToDeviceResponse).toList();
+        final List<DeviceDto> deviceResponse = devices
+                .stream()
+                .map(responseMapper::mapToDeviceResponse)
+                .toList();
         return ResponseEntity.ok().body(deviceResponse);
     }
 }

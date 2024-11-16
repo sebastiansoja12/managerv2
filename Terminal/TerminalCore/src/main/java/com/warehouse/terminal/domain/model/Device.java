@@ -3,20 +3,21 @@ package com.warehouse.terminal.domain.model;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.terminal.domain.enumeration.ExecutionSourceType;
 
 public class Device {
     private DeviceId deviceId;
     private String version;
     private DeviceType deviceType;
-    private String type;
     private UserId userId;
 
-	public Device(final DeviceId deviceId, final String version, final DeviceType deviceType, final String type,
-			final UserId userId) {
+	public Device(final DeviceId deviceId,
+                  final String version,
+                  final DeviceType deviceType,
+                  final UserId userId) {
         this.deviceId = deviceId;
         this.version = version;
         this.deviceType = deviceType;
-        this.type = type;
         this.userId = userId;
     }
 
@@ -45,11 +46,7 @@ public class Device {
     }
 
     public String getType() {
-        return type;
-    }
-
-    public void setType(final String type) {
-        this.type = type;
+        return ExecutionSourceType.DEVICE.name();
     }
 
     public UserId getUserId() {

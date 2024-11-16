@@ -13,7 +13,7 @@ public class TerminalServiceImpl implements TerminalService {
 
     private final DeviceRepository deviceRepository;
 
-    public TerminalServiceImpl(final DeviceRepository deviceRepository) {
+	public TerminalServiceImpl(final DeviceRepository deviceRepository) {
         this.deviceRepository = deviceRepository;
     }
 

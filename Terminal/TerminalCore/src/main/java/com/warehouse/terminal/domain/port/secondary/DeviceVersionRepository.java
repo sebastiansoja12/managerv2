@@ -6,5 +6,5 @@ import com.warehouse.terminal.domain.model.DeviceVersion;
 public interface DeviceVersionRepository {
     boolean updateRequired(final DeviceId deviceId);
     DeviceVersion find(final DeviceId deviceId);
-    void update(final DeviceVersion deviceVersion);
+    void saveOrUpdate(final DeviceVersion deviceVersion);
 }

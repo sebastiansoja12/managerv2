@@ -13,6 +13,8 @@ import com.warehouse.terminal.domain.vo.DevicePairId;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DevicePairEntity;
 
+import jakarta.transaction.Transactional;
+
 public class DevicePairRepositoryImpl implements DevicePairRepository {
     
     private final DevicePairReadRepository repository;
@@ -23,13 +25,13 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
     }
 
     @Override
+    @Transactional
     public void pair(final Terminal terminal, final DevicePairId devicePairId) {
         final DeviceEntity deviceEntity = DeviceEntity.from(terminal);
         validateNotPaired(terminal.getTerminalId());
         this.repository
                 .findByDeviceId(deviceEntity.getDeviceId())
-                .map(DevicePairEntity::pair)
-                .orElseGet(() -> this.repository.save(new DevicePairEntity(deviceEntity)));
+                .ifPresentOrElse(DevicePairEntity::pair, () -> this.repository.save(new DevicePairEntity(deviceEntity)));
     }
 
     @Override
@@ -64,7 +66,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
                 .map(DevicePairEntity::isPaired)
                 .orElse(Boolean.FALSE);
         if (devicePaired) {
-            throw new RuntimeException(String.format(alreadyPairedExceptionMessage, deviceId));
+            return;
         }
     }
 }
