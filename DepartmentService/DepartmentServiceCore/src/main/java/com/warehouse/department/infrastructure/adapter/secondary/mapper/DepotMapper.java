@@ -5,19 +5,19 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.department.domain.model.Depot;
+import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepotEntity;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DepotMapper {
 
 
-    DepotEntity map(Depot depot);
+    DepotEntity map(Department department);
 
-    Depot map(DepotEntity depot);
+    Department map(DepotEntity depot);
 
-    List<Depot> map(List<DepotEntity> depots);
+    List<Department> map(List<DepotEntity> depots);
 
-    List<DepotEntity> mapToDepotEntityList(List<Depot> depots);
+    List<DepotEntity> mapToDepotEntityList(List<Department> departments);
 
 }

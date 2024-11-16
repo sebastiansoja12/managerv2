@@ -1,6 +1,6 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
-import com.warehouse.department.domain.model.Depot;
+import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.DepotCode;
 import com.warehouse.department.domain.port.secondary.DepotRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepotEntity;
@@ -21,27 +21,27 @@ public class DepotRepositoryImpl implements DepotRepository {
 
     @Override
     @Cacheable("depotCodeCache")
-    public Depot findByCode(DepotCode depotCode) {
+    public Department findByCode(DepotCode depotCode) {
         final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode.getValue());
         return depot.map(depotMapper::map).orElseThrow(() -> new DepotNotFoundException("Depot was not found"));
     }
 
     @Override
     @Cacheable("depotsCache")
-    public List<Depot> findAll() {
+    public List<Department> findAll() {
         final List<DepotEntity> depots = repository.findAll();
         return depotMapper.map(depots);
     }
 
     @Override
-    public void save(final Depot depot) {
-        final DepotEntity depotEntity = depotMapper.map(depot);
+    public void save(final Department department) {
+        final DepotEntity depotEntity = depotMapper.map(department);
         repository.save(depotEntity);
     }
 
     @Override
-    public void saveAll(final List<Depot> depots) {
-        final List<DepotEntity> depotEntities = depotMapper.mapToDepotEntityList(depots);
+    public void saveAll(final List<Department> departments) {
+        final List<DepotEntity> depotEntities = depotMapper.mapToDepotEntityList(departments);
         repository.saveAll(depotEntities);
     }
 }

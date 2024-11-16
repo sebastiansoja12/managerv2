@@ -16,7 +16,7 @@ import com.warehouse.voronoi.infrastructure.adapter.secondary.DepotServiceAdapte
 import com.warehouse.voronoi.infrastructure.adapter.secondary.mapper.DepotResponseMapper;
 
 @ExtendWith(MockitoExtension.class)
-public class DepotServiceAdapterTest {
+public class DepartmentServiceAdapterTest {
 
 
     @Mock

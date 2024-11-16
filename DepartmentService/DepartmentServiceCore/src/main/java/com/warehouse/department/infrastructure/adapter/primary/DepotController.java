@@ -4,11 +4,11 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.List;
 
+import com.warehouse.department.domain.model.Department;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.department.domain.model.Depot;
 import com.warehouse.department.domain.port.primary.DepotPort;
 import com.warehouse.department.domain.vo.DepotCode;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
@@ -34,8 +34,8 @@ public class DepotController {
 
     @PostMapping
     public ResponseEntity<?> add(@RequestBody List<DepotDto> depotList) {
-        final List<Depot> depots = requestMapper.map(depotList);
-        depotPort.addMultipleDepots(depots);
+        final List<Department> departments = requestMapper.map(depotList);
+        depotPort.addMultipleDepots(departments);
         return ResponseEntity.ok().body(HttpStatus.OK);
     }
 
@@ -49,10 +49,10 @@ public class DepotController {
     @GetMapping("/depotCode/{value}")
     public ResponseEntity<?> viewDepotByCode(DepotCodeDto code) {
         final DepotCode depotCode = requestMapper.map(code);
-        final Depot depot = depotPort.viewDepotByCode(depotCode);
+        final Department department = depotPort.viewDepotByCode(depotCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(responseMapper.map(depot));
+                .body(responseMapper.map(department));
     }
 
     @GetMapping

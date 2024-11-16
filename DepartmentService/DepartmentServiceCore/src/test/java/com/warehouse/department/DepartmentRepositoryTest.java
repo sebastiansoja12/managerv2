@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.department.domain.model.Depot;
+import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.DepotCode;
 import com.warehouse.department.infrastructure.adapter.secondary.DepotReadRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.DepotRepositoryImpl;
@@ -22,7 +22,7 @@ import com.warehouse.department.infrastructure.adapter.secondary.exception.Depot
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMapper;
 
 @ExtendWith(MockitoExtension.class)
-public class DepotRepositoryTest {
+public class DepartmentRepositoryTest {
 
     @Mock
     private DepotReadRepository repository;
@@ -37,18 +37,18 @@ public class DepotRepositoryTest {
 
     @Test
     public void shouldViewByDepotCode() {
-        final Depot depot = new Depot();
-        depot.setDepotCode(KT1);
+        final Department department = new Department();
+        department.setDepotCode(KT1);
         final DepotCode code = new DepotCode(KT1);
 
         final DepotEntity entity = new DepotEntity();
         entity.setDepotCode(KT1);
 
         when(repository.findByDepotCode(KT1)).thenReturn(Optional.of(entity));
-        when(mapper.map(entity)).thenReturn(depot);
+        when(mapper.map(entity)).thenReturn(department);
 
         // when
-        final Depot result = depotRepository.findByCode(code);
+        final Department result = depotRepository.findByCode(code);
 
         // then
         assertNotNull(result);

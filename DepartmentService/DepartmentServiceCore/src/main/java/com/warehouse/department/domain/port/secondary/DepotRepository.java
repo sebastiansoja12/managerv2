@@ -1,18 +1,18 @@
 package com.warehouse.department.domain.port.secondary;
 
-import com.warehouse.department.domain.model.Depot;
+import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.DepotCode;
 
 import java.util.List;
 
 public interface DepotRepository {
 
-    void save(Depot depot);
+    void save(Department department);
 
-    void saveAll(List<Depot> depots);
+    void saveAll(List<Department> departments);
 
-    Depot findByCode(DepotCode depotCode);
+    Department findByCode(DepotCode depotCode);
 
-    List<Depot> findAll();
+    List<Department> findAll();
 
 }

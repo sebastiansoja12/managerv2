@@ -1,5 +1,6 @@
 package com.warehouse.voronoi.infrastructure.adapter.secondary;
 
+import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.primary.DepotPort;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.domain.port.secondary.DepotServicePort;
@@ -17,7 +18,7 @@ public class DepotServiceAdapter implements DepotServicePort {
 
     @Override
     public List<Depot> downloadDepots() {
-        final List<com.warehouse.department.domain.model.Depot> depots = depotPort.findAll();
-        return depotResponseMapper.map(depots);
+        final List<Department> departments = depotPort.findAll();
+        return depotResponseMapper.map(departments);
     }
 }

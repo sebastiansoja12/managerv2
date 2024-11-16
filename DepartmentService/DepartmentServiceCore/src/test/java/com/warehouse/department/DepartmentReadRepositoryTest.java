@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class DepotReadRepositoryTest {
+public class DepartmentReadRepositoryTest {
 
     @Autowired
     private DepotReadRepository repository;

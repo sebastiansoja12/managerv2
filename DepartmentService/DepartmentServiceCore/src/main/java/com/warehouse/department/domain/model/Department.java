@@ -1,6 +1,6 @@
 package com.warehouse.department.domain.model;
 
-public class Depot {
+public class Department {
 
     private String city;
 
@@ -18,10 +18,10 @@ public class Depot {
 
     private String openingHours;
 
-    public Depot() {
+    public Department() {
     }
 
-    public Depot(String city, String street, String country, String depotCode, String postalCode, String nip, String telephoneNumber, String openingHours) {
+    public Department(String city, String street, String country, String depotCode, String postalCode, String nip, String telephoneNumber, String openingHours) {
         this.city = city;
         this.street = street;
         this.country = country;
