@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class DepotConfiguration {
+public class DepartmentConfiguration {
 
 
-    @Bean(name = "depotDepotRepository")
+    @Bean(name = "department.departmentRepository")
     public DepotRepository depotRepository(DepotReadRepository repository) {
         final DepotMapper depotMapper = Mappers.getMapper(DepotMapper.class);
         return new DepotRepositoryImpl(repository, depotMapper);
