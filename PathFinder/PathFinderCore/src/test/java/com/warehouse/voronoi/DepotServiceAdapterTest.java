@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.depot.domain.port.primary.DepotPort;
+import com.warehouse.department.domain.port.primary.DepotPort;
 import com.warehouse.voronoi.domain.model.Depot;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.DepotServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.mapper.DepotResponseMapper;
