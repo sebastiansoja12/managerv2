@@ -1,5 +1,14 @@
 package com.warehouse.deliveryreject.dto;
 
 public enum DeliveryStatusDto {
-    REJECT
+    DEPOT,
+    CLIENT,
+    DELIVERY,
+    SENDER,
+    LOST,
+    UNKNOWN,
+    DELIVERED,
+    REJECTED,
+    RETURN,
+    UNAVAILABLE
 }

@@ -6,27 +6,25 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@XmlRootElement(name = "DeliveryReturnDetail")
+@XmlRootElement(name = "DeliveryReturnResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeliveryReturnDetail {
+public class DeliveryReturnResponse {
+
+    @XmlElement(name = "SupplierCode")
+    private String supplierCode;
 
     @XmlElement(name = "ShipmentID")
     private Long shipmentId;
 
-    @XmlElement(name = "DeliveryStatus")
-    private DeliveryStatus deliveryStatus;
+    @XmlElement(name = "ReturnToken")
+    private String returnToken;
 
-    @XmlElement(name = "DepartmentCode")
-    private String departmentCode;
-
-    @XmlElement(name = "SupplierCode")
-    private String supplierCode;
+    @XmlElement(name = "DeliveryID")
+    private String deliveryId;
 }

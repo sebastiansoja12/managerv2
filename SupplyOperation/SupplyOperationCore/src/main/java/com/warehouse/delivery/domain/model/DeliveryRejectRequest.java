@@ -1,36 +1,36 @@
-package com.warehouse.deliveryreject.domain.model;
+package com.warehouse.delivery.domain.model;
 
 import java.io.Serializable;
 
-import com.warehouse.commonassets.identificator.*;
-import com.warehouse.deliveryreject.domain.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.delivery.domain.vo.RejectReason;
 import com.warehouse.terminal.enumeration.ExecutionSourceType;
 import com.warehouse.terminal.information.ExecutionSourceResolver;
 
-public class DeliveryReject implements Serializable, ExecutionSourceResolver {
-    private DeliveryId deliveryId;
+public class DeliveryRejectRequest implements Serializable, ExecutionSourceResolver {
     private ShipmentId shipmentId;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
     private DeviceId deviceId;
     private DeliveryStatus deliveryStatus;
+    private RejectReason rejectReason;
 
-	public DeliveryReject(final DeliveryId deliveryId, final ShipmentId shipmentId, final DepartmentCode departmentCode,
-			final SupplierCode supplierCode, final DeviceId deviceId, final DeliveryStatus deliveryStatus) {
-        this.deliveryId = deliveryId;
+	public DeliveryRejectRequest(final ShipmentId shipmentId,
+                                 final DepartmentCode departmentCode,
+                                 final SupplierCode supplierCode,
+                                 final DeviceId deviceId,
+                                 final DeliveryStatus deliveryStatus,
+                                 final RejectReason rejectReason) {
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deviceId = deviceId;
         this.deliveryStatus = deliveryStatus;
-    }
-
-    public DeliveryId getDeliveryId() {
-        return deliveryId;
-    }
-
-    public void setDeliveryId(final DeliveryId deliveryId) {
-        this.deliveryId = deliveryId;
+        this.rejectReason = rejectReason;
     }
 
     public ShipmentId getShipmentId() {
@@ -49,10 +49,6 @@ public class DeliveryReject implements Serializable, ExecutionSourceResolver {
         this.departmentCode = departmentCode;
     }
 
-    public SupplierCode getSupplierCode() {
-        return supplierCode;
-    }
-
     public void setSupplierCode(final SupplierCode supplierCode) {
         this.supplierCode = supplierCode;
     }
@@ -65,12 +61,24 @@ public class DeliveryReject implements Serializable, ExecutionSourceResolver {
         this.deviceId = deviceId;
     }
 
-    public DeliveryStatus getDeliveryStatus() {
-        return deliveryStatus;
-    }
-
     public void setDeliveryStatus(final DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;
+    }
+
+    public RejectReason getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(final RejectReason rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
+    public SupplierCode getSupplierCode() {
+        return supplierCode;
+    }
+
+    public DeliveryStatus getDeliveryStatus() {
+        return deliveryStatus;
     }
 
     @Override

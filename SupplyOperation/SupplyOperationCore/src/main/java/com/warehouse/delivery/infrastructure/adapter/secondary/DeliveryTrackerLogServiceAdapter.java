@@ -1,34 +1,34 @@
-package com.warehouse.deliverymissed.infrastructure.adapter.secondary;
+package com.warehouse.delivery.infrastructure.adapter.secondary;
 
-import com.warehouse.deliverymissed.domain.port.secondary.RouteLogMissedServicePort;
+import static org.mapstruct.factory.Mappers.getMapper;
+
+import com.warehouse.delivery.domain.port.secondary.DeliveryTrackerLogServicePort;
+import com.warehouse.delivery.domain.vo.DepartmentCodeRequest;
+import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryEventMapper;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.mapper.DeliveryMissedEventMapper;
 import com.warehouse.routelogger.RouteLogEvent;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.event.*;
 import com.warehouse.terminal.request.TerminalRequest;
-import lombok.AllArgsConstructor;
 
-import static org.mapstruct.factory.Mappers.getMapper;
+import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
-public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
-
+public class DeliveryTrackerLogServiceAdapter implements DeliveryTrackerLogServicePort {
 
     private final RouteLogEventPublisher routeLogEventPublisher;
 
-    private final DeliveryMissedEventMapper eventMapper = getMapper(DeliveryMissedEventMapper.class);
-
+    private final DeliveryEventMapper eventMapper = getMapper(DeliveryEventMapper.class);
 
     @Override
-    public void logRouteLogMissedDelivery(final DeliveryMissed deliveryMissed) {
+    public void logDeliveryTracker(final DeliveryMissed deliveryMissed) {
         sendEvent(buildDeliveryLogEvent(deliveryMissed));
     }
 
     @Override
-    public void logDepotCodeMissedDelivery(final DeliveryMissed deliveryMissed) {
-        sendEvent(buildDepotCodeLogEvent(deliveryMissed));
+    public void logDepartmentCode(final DepartmentCodeRequest departmentCodeRequest) {
+        sendEvent(buildDepartmentCodeEvent(departmentCodeRequest));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
     }
 
     @Override
-    public void logTerminalId(TerminalRequest terminalRequest) {
+    public void logDeviceId(TerminalRequest terminalRequest) {
         sendEvent(buildTerminalLogEvent(terminalRequest));
     }
 
@@ -51,9 +51,9 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
         sendEvent(buildVersionLogEvent(terminalRequest));
     }
 
-    private DepartmentCodeLogEvent buildDepotCodeLogEvent(final DeliveryMissed deliveryMissed) {
+    private DepartmentCodeLogEvent buildDepartmentCodeEvent(final DepartmentCodeRequest departmentCodeRequest) {
         return DepartmentCodeLogEvent.builder()
-                .depotCodeRequest(eventMapper.mapToDepotCodeRequest(deliveryMissed))
+                .depotCodeRequest(eventMapper.mapToDepotCodeRequest(departmentCodeRequest))
                 .build();
     }
 

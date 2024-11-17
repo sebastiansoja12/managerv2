@@ -1,5 +1,9 @@
-package com.warehouse.deliveryreject.domain.enumeration;
+package com.warehouse.terminal.enumeration;
 
+
+import jakarta.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "DeliveryStatus")
 public enum DeliveryStatus {
     DEPOT,
     CLIENT,

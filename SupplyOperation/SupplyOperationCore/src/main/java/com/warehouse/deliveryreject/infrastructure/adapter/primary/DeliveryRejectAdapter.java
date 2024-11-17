@@ -1,5 +1,12 @@
 package com.warehouse.deliveryreject.infrastructure.adapter.primary;
 
+import static com.warehouse.commonassets.enumeration.ProcessType.REJECT;
+import static org.mapstruct.factory.Mappers.getMapper;
+
+import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.delivery.domain.model.DeliveryRequest;
+import com.warehouse.delivery.domain.model.DeliveryResponse;
+import com.warehouse.delivery.infrastructure.adapter.primary.ProcessHandler;
 import com.warehouse.deliveryreject.DeliveryRejectService;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
 import com.warehouse.deliveryreject.domain.port.primary.DeliveryRejectPort;
@@ -9,9 +16,7 @@ import com.warehouse.deliveryreject.dto.response.DeliveryRejectResponseDto;
 import com.warehouse.deliveryreject.infrastructure.adapter.primary.mapper.DeliveryRejectRequestMapper;
 import com.warehouse.deliveryreject.infrastructure.adapter.primary.mapper.DeliveryRejectResponseMapper;
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
-public class DeliveryRejectAdapter implements DeliveryRejectService {
+public class DeliveryRejectAdapter implements DeliveryRejectService, ProcessHandler {
 
     private final DeliveryRejectPort deliveryRejectPort;
     private final DeliveryRejectRequestMapper requestMapper = getMapper(DeliveryRejectRequestMapper.class);
@@ -26,5 +31,17 @@ public class DeliveryRejectAdapter implements DeliveryRejectService {
         final DeliveryRejectRequest request = this.requestMapper.map(deliveryRejectRequest);
         final DeliveryRejectResponse response = this.deliveryRejectPort.registerDeliveryRejection(request);
         return this.responseMapper.map(response);
+    }
+
+    @Override
+    public boolean supports(final ProcessType processType) {
+        return REJECT.equals(processType);
+    }
+
+    @Override
+    public DeliveryResponse processRequest(final DeliveryRequest deliveryRequest) {
+        final DeliveryRejectRequest request = this.requestMapper.map(deliveryRequest);
+        final DeliveryRejectResponse response = this.deliveryRejectPort.registerDeliveryRejection(request);
+        return null;
     }
 }

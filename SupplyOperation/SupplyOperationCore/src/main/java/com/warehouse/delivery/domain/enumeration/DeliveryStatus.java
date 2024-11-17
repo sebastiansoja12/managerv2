@@ -10,5 +10,6 @@ public enum DeliveryStatus {
     UNKNOWN,
     DELIVERED,
     REJECTED,
-    RETURN
+    RETURN,
+    UNAVAILABLE
 }

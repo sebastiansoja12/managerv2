@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface DeliveryPort {
 
-    List<DeliveryResponse> deliver(List<DeliveryRequest> deliveryRequest);
+    List<DeliveryResponse> processDelivery(List<DeliveryRequest> deliveryRequest);
 }

@@ -56,8 +56,8 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
         buildVersionLogEvents(terminalRequest).forEach(this::sendEvent);
     }
 
-    private List<DepotCodeLogEvent> buildDepotCodeLogEvents(final DeliveryReturnRequest deliveryReturnRequest) {
-        final List<DepotCodeLogEvent> depotCodeLogEvents = new ArrayList<>();
+    private List<DepartmentCodeLogEvent> buildDepotCodeLogEvents(final DeliveryReturnRequest deliveryReturnRequest) {
+        final List<DepartmentCodeLogEvent> departmentCodeLogEvents = new ArrayList<>();
         deliveryReturnRequest.getDeliveryReturnDetails().forEach(
                 deliveryReturnDetails -> {
                     final DepotCodeRequestDto depotCodeRequest = DepotCodeRequestDto
@@ -66,10 +66,10 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
                             .parcelId(deliveryReturnDetails.getParcelId())
                             .processType(deliveryReturnRequest.getProcessType().name())
                             .build();
-                    depotCodeLogEvents.add(new DepotCodeLogEvent(depotCodeRequest));
+                    departmentCodeLogEvents.add(new DepartmentCodeLogEvent(depotCodeRequest));
                 }
         );
-        return depotCodeLogEvents;
+        return departmentCodeLogEvents;
     }
 
     private List<DeliveryLogEvent> buildDeliveryLogEvents(final DeliveryReturnRouteRequest deliveryReturnRequest) {
@@ -100,7 +100,7 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
         deliveryReturnDetails.forEach(
                 deliveryReturnDetail -> {
                     final RequestDto request = RequestDto.builder()
-                            .parcelId(deliveryReturnDetail.getParcelId())
+                            .parcelId(deliveryReturnDetail.getShipmentId())
                             .request(requestAsJson)
                             .processType(ProcessTypeDto.RETURN)
                             .build();
@@ -115,8 +115,8 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
 		final List<TerminalLogEvent> terminalLogEvents = new ArrayList<>();
 		deliveryReturnDetails.forEach(deliveryReturnDetail -> {
 			final TerminalLogRequestDto request = new TerminalLogRequestDto(
-					String.valueOf(terminalRequest.getTerminalDeviceInformation().getTerminalId()),
-					ProcessTypeDto.RETURN, deliveryReturnDetail.getParcelId());
+					String.valueOf(terminalRequest.getDevice().getDeviceId()),
+					ProcessTypeDto.RETURN, deliveryReturnDetail.getShipmentId());
 			terminalLogEvents.add(new TerminalLogEvent(request));
 		});
 		return terminalLogEvents;
@@ -126,8 +126,8 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
         final List<DeliveryReturnDetail> deliveryReturnDetails = terminalRequest.getDeliveryReturnDetails();
         final List<VersionLogEvent> terminalLogEvents = new ArrayList<>();
         deliveryReturnDetails.forEach(deliveryReturnDetail -> {
-            final VersionLogRequestDto request = new VersionLogRequestDto(deliveryReturnDetail.getParcelId(),
-                    ProcessTypeDto.RETURN, terminalRequest.getTerminalDeviceInformation().getVersion());
+            final VersionLogRequestDto request = new VersionLogRequestDto(deliveryReturnDetail.getShipmentId(),
+                    ProcessTypeDto.RETURN, terminalRequest.getDevice().getVersion());
             terminalLogEvents.add(new VersionLogEvent(request));
         });
         return terminalLogEvents;

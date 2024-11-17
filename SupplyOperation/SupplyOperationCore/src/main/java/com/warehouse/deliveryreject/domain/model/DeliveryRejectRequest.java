@@ -1,10 +1,11 @@
 package com.warehouse.deliveryreject.domain.model;
 
-import com.warehouse.commonassets.identificator.*;
-import com.warehouse.deliveryreject.domain.enumeration.DeliveryStatus;
-import com.warehouse.deliveryreject.domain.enumeration.ExecutionSourceType;
-
 import java.io.Serializable;
+
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.identificator.*;
+import com.warehouse.terminal.enumeration.ExecutionSourceType;
+import com.warehouse.terminal.information.ExecutionSourceResolver;
 
 public class DeliveryRejectRequest implements Serializable, ExecutionSourceResolver {
     private DeliveryId deliveryId;
@@ -51,10 +52,6 @@ public class DeliveryRejectRequest implements Serializable, ExecutionSourceResol
         this.departmentCode = departmentCode;
     }
 
-    public SupplierCode getSupplierCode() {
-        return supplierCode;
-    }
-
     public void setSupplierCode(final SupplierCode supplierCode) {
         this.supplierCode = supplierCode;
     }
@@ -67,10 +64,6 @@ public class DeliveryRejectRequest implements Serializable, ExecutionSourceResol
         this.deviceId = deviceId;
     }
 
-    public DeliveryStatus getDeliveryStatus() {
-        return deliveryStatus;
-    }
-
     public void setDeliveryStatus(final DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;
     }
@@ -81,6 +74,14 @@ public class DeliveryRejectRequest implements Serializable, ExecutionSourceResol
 
     public void setRejectReason(final RejectReason rejectReason) {
         this.rejectReason = rejectReason;
+    }
+
+    public SupplierCode getSupplierCode() {
+        return supplierCode;
+    }
+
+    public DeliveryStatus getDeliveryStatus() {
+        return deliveryStatus;
     }
 
     @Override

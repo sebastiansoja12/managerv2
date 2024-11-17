@@ -1,16 +1,13 @@
 package com.warehouse.delivery.domain.model;
 
 
+import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class DeliveryRequest {
     private Long parcelId;
@@ -18,6 +15,7 @@ public class DeliveryRequest {
     private String supplierCode;
     private DeliveryStatus deliveryStatus;
     private String token;
+    private ProcessType processType;
 
     public void updateDeliveryStatus() {
         this.deliveryStatus = DeliveryStatus.DELIVERY;

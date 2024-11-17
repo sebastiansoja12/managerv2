@@ -1,15 +1,16 @@
 package com.warehouse.terminal.request;
 
-import com.warehouse.terminal.model.DeliveryReturnDetail;
+import java.util.List;
+
 import com.warehouse.terminal.enumeration.ProcessType;
-import com.warehouse.terminal.information.TerminalDeviceInformation;
+import com.warehouse.terminal.information.Device;
+import com.warehouse.terminal.model.DeliveryRejectRequest;
+import com.warehouse.terminal.model.DeliveryReturnDetail;
 
 import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @XmlRootElement(name = "TerminalRequest")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -27,11 +28,16 @@ public class TerminalRequest {
      *
      * @return
      */
-    @XmlElement(name = "TerminalDeviceInformation")
-    private TerminalDeviceInformation terminalDeviceInformation;
+    @XmlElement(name = "Device")
+    private Device device;
 
-    @XmlElement(name = "ParcelID")
-    private Long parcelId;
+    /**
+     * -- GETTER
+     * DeliveryRejectRequests.
+     */
+    @XmlElementWrapper(name = "DeliveryRejectRequests")
+    @XmlElement(name = "DeliveryRejectRequest")
+    private List<DeliveryRejectRequest> deliveryRejectRequests;
 
     /**
      * -- GETTER --

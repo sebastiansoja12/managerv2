@@ -1,22 +1,20 @@
 package com.warehouse.terminal.model;
 
-
+import com.warehouse.terminal.enumeration.DeliveryStatus;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@XmlRootElement(name = "DeliveryReturnDetail")
+@XmlRootElement(name = "DeliveryRejectRequest")
 @XmlAccessorType(XmlAccessType.FIELD)
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeliveryReturnDetail {
+public class DeliveryRejectRequest {
 
     @XmlElement(name = "ShipmentID")
     private Long shipmentId;
@@ -24,9 +22,7 @@ public class DeliveryReturnDetail {
     @XmlElement(name = "DeliveryStatus")
     private DeliveryStatus deliveryStatus;
 
-    @XmlElement(name = "DepartmentCode")
-    private String departmentCode;
+    @XmlElement(name = "RejectReason")
+    private String rejectReason;
 
-    @XmlElement(name = "SupplierCode")
-    private String supplierCode;
 }
