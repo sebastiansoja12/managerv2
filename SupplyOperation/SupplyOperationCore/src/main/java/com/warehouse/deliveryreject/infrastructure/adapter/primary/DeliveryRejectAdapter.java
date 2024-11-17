@@ -4,8 +4,8 @@ import static com.warehouse.commonassets.enumeration.ProcessType.REJECT;
 import static org.mapstruct.factory.Mappers.getMapper;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
-import com.warehouse.delivery.domain.model.DeliveryRequest;
-import com.warehouse.delivery.domain.model.DeliveryResponse;
+import com.warehouse.delivery.domain.model.Request;
+import com.warehouse.delivery.domain.model.Response;
 import com.warehouse.delivery.infrastructure.adapter.primary.ProcessHandler;
 import com.warehouse.deliveryreject.DeliveryRejectService;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
@@ -39,9 +39,9 @@ public class DeliveryRejectAdapter implements DeliveryRejectService, ProcessHand
     }
 
     @Override
-    public DeliveryResponse processRequest(final DeliveryRequest deliveryRequest) {
-        final DeliveryRejectRequest request = this.requestMapper.map(deliveryRequest);
-        final DeliveryRejectResponse response = this.deliveryRejectPort.registerDeliveryRejection(request);
+    public Response processRequest(final Request request) {
+        final DeliveryRejectRequest deliveryRequest = null;
+        final DeliveryRejectResponse deliveryRejectResponse = this.deliveryRejectPort.registerDeliveryRejection(deliveryRequest);
         return null;
     }
 }

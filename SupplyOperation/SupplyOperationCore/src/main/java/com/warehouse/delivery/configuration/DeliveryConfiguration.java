@@ -1,15 +1,15 @@
 package com.warehouse.delivery.configuration;
 
 import org.mapstruct.factory.Mappers;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.delivery.domain.port.primary.DeliveryPort;
 import com.warehouse.delivery.domain.port.primary.DeliveryPortImpl;
-import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
-import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
-import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
-import com.warehouse.delivery.domain.port.secondary.RouteLogDeliveryStatusServicePort;
+import com.warehouse.delivery.domain.port.primary.TerminalRequestLoggerPort;
+import com.warehouse.delivery.domain.port.primary.TerminalRequestLoggerPortImpl;
+import com.warehouse.delivery.domain.port.secondary.*;
 import com.warehouse.delivery.domain.service.DeliveryService;
 import com.warehouse.delivery.domain.service.DeliveryServiceImpl;
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
@@ -17,6 +17,7 @@ import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResp
 import com.warehouse.delivery.infrastructure.adapter.secondary.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
 import com.warehouse.routelogger.RouteLogEventPublisher;
+import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 
 @Configuration
@@ -33,6 +34,21 @@ public class DeliveryConfiguration {
 			ParcelStatusProperties parcelStatusProperties) {
 		return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperties);
 	}
+
+    @Bean
+    public TerminalRequestLoggerPort terminalRequestLoggerPort(final DeliveryTrackerLogServicePort deliveryTrackerLogServicePort) {
+        return new TerminalRequestLoggerPortImpl(deliveryTrackerLogServicePort);
+    }
+
+    @Bean
+    public DeliveryTrackerLogServicePort deliveryTrackerLogServicePort(final RouteLogEventPublisher routeLogEventPublisher) {
+        return new DeliveryTrackerLogServiceAdapter(routeLogEventPublisher);
+    }
+
+    @Bean("delivery.routeLogEventPublisher")
+    public RouteLogEventPublisher routeLogEventPublisher(final ApplicationEventPublisher eventPublisher) {
+        return new RouteLogEventPublisherImpl(eventPublisher);
+    }
 
 	@Bean
 	public DeliveryService deliveryService(DeliveryRepository deliveryRepository,

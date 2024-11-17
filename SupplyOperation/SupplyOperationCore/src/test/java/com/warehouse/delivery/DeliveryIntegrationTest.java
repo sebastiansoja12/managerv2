@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,7 +60,7 @@ public class DeliveryIntegrationTest {
         when(parcelStatusControlChangeServicePort.updateParcelStatus(new UpdateStatusParcelRequest(1L)))
                 .thenReturn(UpdateStatus.OK);
         // when
-        final List<DeliveryResponse> deliveryResponses = deliveryPort.processDelivery(deliveryRequestList);
+        final Set<DeliveryResponse> deliveryResponses = deliveryPort.processDelivery(deliveryRequestList);
         // then
 
     }

@@ -5,14 +5,15 @@ import com.warehouse.terminal.request.TerminalRequest;
 import com.warehouse.xmlconverter.XmlToStringService;
 import com.warehouse.xmlconverter.XmlToStringServiceImpl;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class TerminalRequestLoggerPortImpl implements TerminalRequestLoggerPort {
 
     private final DeliveryTrackerLogServicePort deliveryTrackerLogServicePort;
 
     private final XmlToStringService xmlToStringService = new XmlToStringServiceImpl();
+
+    public TerminalRequestLoggerPortImpl(final DeliveryTrackerLogServicePort deliveryTrackerLogServicePort) {
+        this.deliveryTrackerLogServicePort = deliveryTrackerLogServicePort;
+    }
 
     @Override
     public void logRequest(final TerminalRequest terminalRequest) {

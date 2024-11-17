@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
-import com.warehouse.delivery.domain.model.DeliveryRequest;
-import com.warehouse.delivery.domain.model.DeliveryResponse;
+import com.warehouse.delivery.domain.model.Request;
+import com.warehouse.delivery.domain.model.Response;
 
 @Component
 public class ProcessDispatcher {
@@ -17,12 +17,12 @@ public class ProcessDispatcher {
         this.handlers = handlers;
     }
 
-    public DeliveryResponse process(final DeliveryRequest deliveryRequest) {
-        final ProcessType processType = deliveryRequest.getProcessType();
+    public Response process(final Request request) {
+        final ProcessType processType = request.getProcessType();
         return handlers.stream()
                 .filter(handler -> handler.supports(processType))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported process type: " + processType))
-                .processRequest(deliveryRequest);
+                .processRequest(request);
     }
 }

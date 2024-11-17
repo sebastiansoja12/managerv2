@@ -4,7 +4,6 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.primary;
 import static com.warehouse.commonassets.enumeration.ProcessType.RETURN;
 import static org.mapstruct.factory.Mappers.getMapper;
 
-import com.warehouse.terminal.information.Device;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
-import com.warehouse.delivery.domain.model.DeliveryRequest;
-import com.warehouse.delivery.domain.model.DeliveryResponse;
+import com.warehouse.delivery.domain.model.Request;
+import com.warehouse.delivery.domain.model.Response;
 import com.warehouse.delivery.infrastructure.adapter.primary.ProcessHandler;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
@@ -24,6 +23,7 @@ import com.warehouse.deliveryreturn.domain.port.primary.TerminalRequestLoggerPor
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
 import com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper.DeliveryReturnRequestMapper;
 import com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper.DeliveryReturnResponseMapper;
+import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.request.TerminalRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -90,7 +90,7 @@ public class DeliveryReturnAdapter implements ProcessHandler {
     }
 
     @Override
-    public DeliveryResponse processRequest(final DeliveryRequest deliveryRequest) {
+    public Response processRequest(final Request request) {
         return null;
     }
 }

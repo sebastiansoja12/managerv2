@@ -6,7 +6,6 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.time.LocalDateTime;
 
-import com.warehouse.terminal.information.Device;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -14,8 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
-import com.warehouse.delivery.domain.model.DeliveryRequest;
-import com.warehouse.delivery.domain.model.DeliveryResponse;
+import com.warehouse.delivery.domain.model.Request;
+import com.warehouse.delivery.domain.model.Response;
 import com.warehouse.delivery.infrastructure.adapter.primary.ProcessHandler;
 import com.warehouse.deliverymissed.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPort;
@@ -29,6 +28,7 @@ import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.ErrorResp
 import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.exception.RestException;
 import com.warehouse.deliverymissed.infrastructure.adapter.primary.mapper.DeliveryMissedRequestMapper;
 import com.warehouse.deliverymissed.infrastructure.adapter.primary.mapper.DeliveryMissedResponseMapper;
+import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.request.TerminalRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -110,7 +110,7 @@ public class DeliveryMissedAdapter implements ProcessHandler, DeliveryMissedServ
     }
 
     @Override
-    public DeliveryResponse processRequest(final DeliveryRequest deliveryRequest) {
+    public Response processRequest(final Request request) {
         return null;
     }
 }
