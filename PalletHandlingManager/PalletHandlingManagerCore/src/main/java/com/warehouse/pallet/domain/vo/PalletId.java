@@ -1,4 +1,5 @@
 package com.warehouse.pallet.domain.vo;
 
-public record PalletId(Long value) {
+public record PalletId(String value) {
+
 }

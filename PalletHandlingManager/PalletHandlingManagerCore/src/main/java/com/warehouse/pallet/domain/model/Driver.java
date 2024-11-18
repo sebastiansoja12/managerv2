@@ -11,7 +11,6 @@ public class Driver {
     private String lastName;
     private List<DepartmentCode> assignedDepartments;
 
-
     public Driver(final DriverId driverId,
                   final String firstName,
                   final String lastName,
