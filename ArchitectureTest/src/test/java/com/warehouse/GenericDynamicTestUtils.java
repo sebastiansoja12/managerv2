@@ -19,25 +19,25 @@ class GenericDynamicTestUtils {
 
     }
 
-	public static DynamicTest classShouldHaveMethodEndsWith(JavaClass javaClass, String methodNamePrefix) {
+	public static DynamicTest classShouldHaveMethodEndsWith(final JavaClass javaClass, final String methodNamePrefix) {
 		return DynamicTest.dynamicTest(javaClass.getFullName() + " should have methods ends with " + methodNamePrefix,
 				() -> assertTrue(javaClass.getMethods().stream()
 						.anyMatch(method -> StringUtils.endsWithIgnoreCase(method.getName(), methodNamePrefix))));
     }
 
-    public static DynamicTest classShouldNotHaveMethodStartsWith(JavaClass javaClass, String methodNamePrefix) {
+    public static DynamicTest classShouldNotHaveMethodStartsWith(final JavaClass javaClass, final String methodNamePrefix) {
         return DynamicTest.dynamicTest(javaClass.getFullName() + " should have methods ends with " + methodNamePrefix,
                 () -> assertTrue(javaClass.getMethods().stream()
                         .noneMatch(method -> method.getName().startsWith(methodNamePrefix))));
     }
 
-    public static DynamicTest classShouldNotHaveMethodEndsWith(JavaClass javaClass, String methodNamePrefix) {
+    public static DynamicTest classShouldNotHaveMethodEndsWith(final JavaClass javaClass, final String methodNamePrefix) {
         return DynamicTest.dynamicTest(javaClass.getFullName() + " should not have methods ends with " + methodNamePrefix,
                 () -> assertTrue(javaClass.getMethods().stream()
                         .noneMatch(method -> StringUtils.endsWithIgnoreCase(method.getName(), methodNamePrefix))));
     }
     
-    public static DynamicTest classShouldNotHaveDependenciesToPackage(JavaClass javaClass, String notAllowedPackage) {
+    public static DynamicTest classShouldNotHaveDependenciesToPackage(final JavaClass javaClass, final String notAllowedPackage) {
         return DynamicTest.dynamicTest(
                 javaClass.getFullName() + " should not have dependencies to package " + notAllowedPackage,
                 () -> {
@@ -75,7 +75,7 @@ class GenericDynamicTestUtils {
                 });
     }
 
-    public static DynamicTest classShouldHaveDependenciesToPackage(JavaClass javaClass, String allowedPackage) {
+    public static DynamicTest classShouldHaveDependenciesToPackage(final JavaClass javaClass, final String allowedPackage) {
         return DynamicTest.dynamicTest(
                 javaClass.getFullName() + " should have dependencies to package " + allowedPackage,
                 () -> {
@@ -114,7 +114,7 @@ class GenericDynamicTestUtils {
     }
 
 
-    public static JavaClasses importClasses(String... packages) {
+    public static JavaClasses importClasses(final String... packages) {
         return new ClassFileImporter()
                 .withImportOption(new ImportOption.DoNotIncludeTests())
                 .importPackages(packages);
