@@ -41,7 +41,7 @@ public class TerminalPortImpl implements TerminalPort {
         final User user = this.userService.findByUsername(request.getUsername());
         final Terminal terminal = Terminal.from(request, user.userId());
         this.terminalService.createTerminal(terminal);
-        this.deviceVersionService.saveOrUpdateDeviceVersion(terminal.getTerminalId(), terminal.getVersion());
+        this.deviceVersionService.saveOrUpdate(terminal.getTerminalId(), terminal.getVersion());
     }
 
     @Override

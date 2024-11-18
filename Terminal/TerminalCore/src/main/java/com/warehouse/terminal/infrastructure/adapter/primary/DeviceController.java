@@ -32,7 +32,7 @@ public class DeviceController {
 
     @PostMapping
     public ResponseEntity<?> addDevice(@RequestBody final TerminalAddRequestDto terminalAddRequest) {
-        final TerminalAddRequest request = TerminalAddRequest.from(terminalAddRequest);
+        final TerminalAddRequest request = requestMapper.map(terminalAddRequest);
         this.terminalPort.create(request);
         return ResponseEntity.ok().build();
     }

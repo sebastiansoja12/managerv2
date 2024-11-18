@@ -7,14 +7,14 @@ import com.warehouse.terminal.request.TerminalAddRequestDto;
 public class TerminalAddRequest {
     private String username;
     private String version;
-    private String depotCode;
+    private String departmentCode;
     private DeviceType deviceType;
 
-	public TerminalAddRequest(final String username, final String version, final String depotCode,
+	public TerminalAddRequest(final String username, final String version, final String departmentCode,
 			final DeviceType deviceType) {
         this.username = username;
         this.version = version;
-        this.depotCode = depotCode;
+        this.departmentCode = departmentCode;
         this.deviceType = deviceType;
     }
 
@@ -34,12 +34,12 @@ public class TerminalAddRequest {
         this.version = version;
     }
 
-    public String getDepotCode() {
-        return depotCode;
+    public String getDepartmentCode() {
+        return departmentCode;
     }
 
-    public void setDepotCode(final String depotCode) {
-        this.depotCode = depotCode;
+    public void setDepartmentCode(final String departmentCode) {
+        this.departmentCode = departmentCode;
     }
 
     public DeviceType getDeviceType() {
@@ -52,7 +52,7 @@ public class TerminalAddRequest {
 
     public static TerminalAddRequest from(final TerminalAddRequestDto terminalAddRequest) {
         return new TerminalAddRequest(terminalAddRequest.username().value(),
-                terminalAddRequest.version().value(), terminalAddRequest.depotCode().value(),
+                terminalAddRequest.version().value(), terminalAddRequest.departmentCode().value(),
                 determineDeviceType(terminalAddRequest.deviceType()));
     }
 

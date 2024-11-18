@@ -36,7 +36,7 @@ public class Terminal extends Device implements ExecutionSourceResolver {
     }
 
 	public static Terminal from(final TerminalAddRequest request, final UserId userId) {
-		return new Terminal(null, request.getDeviceType(), userId, request.getDepotCode(), request.getVersion(),
+		return new Terminal(null, request.getDeviceType(), userId, request.getDepartmentCode(), request.getVersion(),
 				Instant.now(), true);
 	}
 

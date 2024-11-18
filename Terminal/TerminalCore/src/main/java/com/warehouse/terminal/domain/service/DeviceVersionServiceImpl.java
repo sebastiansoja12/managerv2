@@ -18,7 +18,7 @@ public class DeviceVersionServiceImpl implements DeviceVersionService {
     }
 
     @Override
-    public void saveOrUpdateDeviceVersion(final DeviceId deviceId, final String version) {
+    public void saveOrUpdate(final DeviceId deviceId, final String version) {
         final DeviceVersion deviceVersion = this.deviceVersionRepository.find(deviceId);
         deviceVersion.updateVersion(version);
         this.deviceVersionRepository.saveOrUpdate(deviceVersion);

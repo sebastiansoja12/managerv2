@@ -13,7 +13,7 @@ import org.mapstruct.Mapper;
 public interface TerminalResponseMapper {
 
     default DeviceDto mapToDeviceResponse(final Terminal terminal) {
-        final DepotCodeDto depotCode = new DepotCodeDto(terminal.getDepotCode());
+        final DepartmentCodeDto depotCode = new DepartmentCodeDto(terminal.getDepotCode());
         final DeviceIdDto deviceId = new DeviceIdDto(terminal.getTerminalId().getValue());
         final VersionDto version = new VersionDto(terminal.getVersion());
         final UserIdDto userId = new UserIdDto(terminal.getUserId().getValue());
