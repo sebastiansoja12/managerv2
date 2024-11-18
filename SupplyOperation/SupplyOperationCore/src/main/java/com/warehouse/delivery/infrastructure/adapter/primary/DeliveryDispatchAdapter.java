@@ -12,11 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.model.Request;
 import com.warehouse.delivery.domain.model.Response;
 import com.warehouse.delivery.domain.port.primary.DeliveryPort;
 import com.warehouse.delivery.domain.port.primary.TerminalRequestLoggerPort;
+import com.warehouse.delivery.infrastructure.adapter.primary.creator.DeliveryCreator;
 import com.warehouse.delivery.infrastructure.adapter.primary.dto.ErrorResponseDto;
 import com.warehouse.delivery.infrastructure.adapter.primary.exception.RestException;
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
@@ -33,6 +35,8 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
     private final DeliveryPort deliveryPort;
 
+    private final Set<DeliveryCreator> deliveryCreators;
+
     private final TerminalRequestLoggerPort terminalRequestLoggerPort;
 
     private final DeliveryRequestMapper requestMapper = getMapper(DeliveryRequestMapper.class);
@@ -40,9 +44,11 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
     private final DeliveryResponseMapper responseMapper = getMapper(DeliveryResponseMapper.class);
 
     public DeliveryDispatchAdapter(final List<ProcessHandler> handlers, final DeliveryPort deliveryPort,
+                                   final Set<DeliveryCreator> deliveryCreators,
                                    final TerminalRequestLoggerPort terminalRequestLoggerPort) {
         super(handlers);
         this.deliveryPort = deliveryPort;
+        this.deliveryCreators = deliveryCreators;
         this.terminalRequestLoggerPort = terminalRequestLoggerPort;
     }
 
@@ -65,13 +71,24 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         final Response response = this.process(request);
 
-        final Set<DeliveryResponse> deliveryResponses = this.deliveryPort.processDelivery(null);
+        final DeliveryCreator deliveryCreator = determineDeliveryCreator(request.getProcessType());
+
+        final Set<DeliveryResponse> deliveryResponses = this.deliveryPort.processDelivery(
+                deliveryCreator.create(request, response)
+        );
 
         response.updateDeliveryResponse(deliveryResponses);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(responseMapper.map(response));
+    }
+
+    private DeliveryCreator determineDeliveryCreator(final ProcessType processType) {
+        return deliveryCreators.stream()
+                .filter(deliveryCreator -> deliveryCreator.canHandle(processType))
+                .findFirst()
+                .orElseThrow();
     }
 
     private void logDeviceId(final TerminalRequest terminalRequest) {

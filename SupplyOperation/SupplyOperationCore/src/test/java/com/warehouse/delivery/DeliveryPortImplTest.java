@@ -78,7 +78,7 @@ public class DeliveryPortImplTest {
 				.thenReturn(UpdateStatus.OK);
 
 		// when
-		final Set<DeliveryResponse> deliveries = deliveryPort.processDelivery(List.of(deliveryRequestSet));
+		final Set<DeliveryResponse> deliveries = deliveryPort.processDelivery(Set.of(deliveryRequestSet));
 		// then
 		assertThat(deliveries).size().isEqualTo(1);
 		final UUID id = null;

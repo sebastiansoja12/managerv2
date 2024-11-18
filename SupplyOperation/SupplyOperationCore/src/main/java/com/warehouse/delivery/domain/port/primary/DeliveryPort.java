@@ -1,12 +1,11 @@
 package com.warehouse.delivery.domain.port.primary;
 
+import java.util.Set;
+
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 
-import java.util.List;
-import java.util.Set;
-
 public interface DeliveryPort {
 
-    Set<DeliveryResponse> processDelivery(List<DeliveryRequest> deliveryRequest);
+    Set<DeliveryResponse> processDelivery(Set<DeliveryRequest> deliveryRequest);
 }

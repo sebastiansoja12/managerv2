@@ -24,7 +24,7 @@ public class DeliveryPortImpl implements DeliveryPort {
     private final ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
     @Override
-    public Set<DeliveryResponse> processDelivery(List<DeliveryRequest> deliveryRequest) {
+    public Set<DeliveryResponse> processDelivery(Set<DeliveryRequest> deliveryRequest) {
         final Set<DeliveryRequest> deliveryRequests = deliveryRequest.stream()
                 .filter(Objects::nonNull)
                 .peek(DeliveryRequest::updateDeliveryStatus)

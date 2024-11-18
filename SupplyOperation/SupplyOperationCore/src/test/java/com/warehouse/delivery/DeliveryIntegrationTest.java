@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -53,7 +52,7 @@ public class DeliveryIntegrationTest {
     @Test
     void shouldDeliver() {
         // given
-        final List<DeliveryRequest> deliveryRequestList = Collections.singletonList(createDeliveryRequest());
+        final Set<DeliveryRequest> deliveryRequestList = Collections.singleton(createDeliveryRequest());
         final Parcel parcel = new Parcel(1L, null, ShipmentType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenReturn(parcel);
@@ -68,7 +67,7 @@ public class DeliveryIntegrationTest {
     @Test
     void shouldNotDeliverWhenSupplierCodeDoesNotMatchOneFromMock() {
         // given
-        final List<DeliveryRequest> deliveryRequestList = Collections.singletonList(DeliveryRequest.builder()
+        final Set<DeliveryRequest> deliveryRequestList = Collections.singleton(DeliveryRequest.builder()
                 .depotCode("KT1")
                 .supplierCode("abc")
                 .parcelId(1L)
