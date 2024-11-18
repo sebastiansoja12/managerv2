@@ -1,5 +1,6 @@
 package com.warehouse.pallet.domain.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -46,6 +47,9 @@ public class Driver {
     }
 
     public List<DepartmentCode> getAssignedDepartments() {
+        if (assignedDepartments == null) {
+            assignedDepartments = new ArrayList<>();
+        }
         return assignedDepartments;
     }
 
