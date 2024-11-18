@@ -65,7 +65,7 @@ class BoundedContext {
     private ArchRule valueObjectsInProperPackageRule;
 
     @Builder
-    BoundedContext(String name, String rootPackage) {
+    BoundedContext(final String name, final String rootPackage) {
         this.rootPackage = rootPackage;
         this.name = name;
         setUpRules();
@@ -195,7 +195,7 @@ class BoundedContext {
         return dynamicContainer(name + " bounded context tests", BoundedContextTestScanner.scanForTests(this));
     }
 
-    private String pack(String packageName) {
+    private String pack(final String packageName) {
         return rootPackage + packageName;
     }
 
@@ -203,7 +203,7 @@ class BoundedContext {
     public static class BoundedContextBuilder {
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) {
                 return true;
             }
