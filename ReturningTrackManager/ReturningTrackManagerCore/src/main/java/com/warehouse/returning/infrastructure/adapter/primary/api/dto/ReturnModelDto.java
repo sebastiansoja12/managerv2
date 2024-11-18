@@ -9,7 +9,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class ReturnModelDto {
-    ParcelIdDto parcelId;
+    ShipmentIdDto shipmentId;
     ReasonDto reason;
     ReturnStatusDto returnStatus;
     ReturnTokenDto returnToken;

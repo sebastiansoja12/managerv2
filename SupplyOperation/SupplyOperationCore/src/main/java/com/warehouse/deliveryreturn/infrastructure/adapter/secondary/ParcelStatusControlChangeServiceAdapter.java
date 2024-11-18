@@ -34,8 +34,8 @@ public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
     public UpdateStatus updateStatus(UpdateStatusParcelRequest updateStatusParcelRequest) {
         final UpdateStatusParcelRequestDto request = updateStatusParcelRequestMapper.map(updateStatusParcelRequest);
         return restClient
-                .post()
-                .uri("/v2/api/{url}", parcelStatusProperties.getEndpoint())
+                .put()
+                .uri("/v2/api/shipments/status")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .exchange((req, res) -> {

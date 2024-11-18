@@ -10,8 +10,8 @@ import com.warehouse.terminal.request.TerminalRequest;
 public interface DeliveryMissedRequestMapper {
 
 
-    @Mapping(target = "depotCode", source = "terminalDeviceInformation.depotCode")
-    @Mapping(target = "supplierCode", source = "terminalDeviceInformation.username")
+    @Mapping(target = "depotCode", source = "device.departmentCode")
+    @Mapping(target = "supplierCode", source = "device.username")
     DeliveryMissedRequest map(TerminalRequest terminalRequest);
 
 }

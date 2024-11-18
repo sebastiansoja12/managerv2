@@ -1,14 +1,19 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
-
 import java.util.UUID;
 
-@Value
-@Builder
-@Jacksonized
+
 public class ProcessIdDto {
-    UUID value;
+    private UUID value;
+
+    public ProcessIdDto() {
+    }
+
+    public ProcessIdDto(final UUID value) {
+        this.value = value;
+    }
+
+    public UUID getValue() {
+        return value;
+    }
 }

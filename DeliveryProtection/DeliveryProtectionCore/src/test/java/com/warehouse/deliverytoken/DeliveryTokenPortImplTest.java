@@ -1,7 +1,7 @@
 package com.warehouse.deliverytoken;
 
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.deliverytoken.domain.exception.MissingParcelIdException;
 import com.warehouse.deliverytoken.domain.model.*;
 import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPortImpl;
@@ -51,14 +51,14 @@ public class DeliveryTokenPortImplTest {
         );
 
 		final List<DeliveryPackageResponse> deliveryPackageResponses = createDeliveryPackageResponses(
-                1L, null, ParcelType.PARENT, "KT1", "1", "1"
+                1L, null, ShipmentType.PARENT, "KT1", "1", "1"
         );
 
 		final DeliveryTokenResponse expectedResponse = new DeliveryTokenResponse(deliveryPackageResponses, "abc");
 
 		final ParcelId parcelId = new ParcelId(1L);
 
-		final Parcel parcel = createParcel(1L, null, ParcelType.PARENT, "KT1");
+		final Parcel parcel = createParcel(1L, null, ShipmentType.PARENT, "KT1");
 
 		doReturn(parcel)
                 .when(parcelServicePort)
@@ -113,18 +113,18 @@ public class DeliveryTokenPortImplTest {
     }
 
     private List<DeliveryPackageResponse> createDeliveryPackageResponses(Long parcelId, Long parcelRelatedId,
-			ParcelType parcelType, String destination, String supplierTokenServiceApplicationId,
-			String deliveryId) {
+                                                                         ShipmentType shipmentType, String destination, String supplierTokenServiceApplicationId,
+                                                                         String deliveryId) {
 		return Collections.singletonList(
-				new DeliveryPackageResponse(createParcel(parcelId, parcelRelatedId, parcelType, destination),
+				new DeliveryPackageResponse(createParcel(parcelId, parcelRelatedId, shipmentType, destination),
                         supplierTokenServiceApplicationId, createProtectedDelivery(deliveryId)));
 	}
 
 	private List<DeliveryPackageRequest> createDeliveryRequests(Long parcelId, Long parcelRelatedId,
-                                                                ParcelType parcelType, String destination, String deliveryId) {
+                                                                ShipmentType shipmentType, String destination, String deliveryId) {
         return Collections
                 .singletonList(new DeliveryPackageRequest(
-                        createParcel(parcelId, parcelRelatedId, parcelType, destination),
+                        createParcel(parcelId, parcelRelatedId, shipmentType, destination),
                         createDelivery(deliveryId))
                 );
     }
@@ -137,8 +137,8 @@ public class DeliveryTokenPortImplTest {
         return new Supplier(supplierCode);
     }
 
-    private Parcel createParcel(Long id, Long parcelRelatedId, ParcelType parcelType, String destination) {
-        return new Parcel(id, parcelRelatedId, parcelType, destination);
+    private Parcel createParcel(Long id, Long parcelRelatedId, ShipmentType shipmentType, String destination) {
+        return new Parcel(id, parcelRelatedId, shipmentType, destination);
     }
 
     private ProtectedDelivery createProtectedDelivery(String deliveryId) {

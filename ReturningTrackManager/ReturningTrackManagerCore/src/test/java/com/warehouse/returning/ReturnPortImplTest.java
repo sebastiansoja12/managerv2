@@ -181,7 +181,7 @@ public class ReturnPortImplTest {
         final ReturnResponse response = returnPort.process(request);
         // then
 		assertThat(response.processReturn())
-				.extracting(ProcessReturn::parcelId, ProcessReturn::returnId, ProcessReturn::processStatus)
+				.extracting(ProcessReturn::shipmentId, ProcessReturn::returnId, ProcessReturn::processStatus)
 				.containsExactly(tuple(1L, null, "Return token not available"));
     }
 

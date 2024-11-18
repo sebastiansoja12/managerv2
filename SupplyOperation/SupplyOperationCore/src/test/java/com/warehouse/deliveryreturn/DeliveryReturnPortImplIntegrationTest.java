@@ -112,14 +112,14 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(1L);
 
-		final Parcel parcel = Parcel.builder().recipientEmail("recipient").parcelStatus("RETURN").id(1L)
+		final Shipment shipment = Shipment.builder().recipientEmail("recipient").shipmentStatus("RETURN").id(1L)
 				.senderEmail("sender").build();
 
 		when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest))
 				.thenReturn(UpdateStatus.NOT_OK);
-		when(parcelRepositoryServicePort.downloadParcel(1L)).thenReturn(parcel);
+		when(parcelRepositoryServicePort.downloadParcel(1L)).thenReturn(shipment);
 
-		doNothing().when(mailServicePort).sendNotification(parcel);
+		doNothing().when(mailServicePort).sendNotification(shipment);
 		// when
 		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
 		// then
@@ -141,12 +141,12 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(1L);
 
-		final Parcel parcel = Parcel.builder().recipientEmail("recipient").parcelStatus("RETURN").id(1L)
+		final Shipment shipment = Shipment.builder().recipientEmail("recipient").shipmentStatus("RETURN").id(1L)
 				.senderEmail("sender").build();
 
 		when(parcelStatusControlChangeServicePort.updateStatus(updateStatusParcelRequest)).thenReturn(UpdateStatus.OK);
-		when(parcelRepositoryServicePort.downloadParcel(1L)).thenReturn(parcel);
-		doNothing().when(mailServicePort).sendNotification(parcel);
+		when(parcelRepositoryServicePort.downloadParcel(1L)).thenReturn(shipment);
+		doNothing().when(mailServicePort).sendNotification(shipment);
 		// when
 		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
 		// then

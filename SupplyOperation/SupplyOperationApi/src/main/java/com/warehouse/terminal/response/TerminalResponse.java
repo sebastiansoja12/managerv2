@@ -1,9 +1,13 @@
 package com.warehouse.terminal.response;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+
+import com.warehouse.terminal.information.Device;
+import com.warehouse.terminal.model.DeliveryMissedResponse;
+import com.warehouse.terminal.model.DeliveryRejectResponse;
+import com.warehouse.terminal.model.DeliveryReturnResponse;
+
+import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,18 +19,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TerminalResponse {
 
-    @XmlElement(name = "ZebraID")
-    private Long terminalId;
+    @XmlElement(name = "Device")
+    private Device device;
 
-    @XmlElement(name = "Version")
-    private String version;
+    @XmlElementWrapper(name = "DeliveryMissedResponses")
+    @XmlElement(name = "DeliveryMissedResponse")
+    private List<DeliveryMissedResponse> deliveryMissedResponses;
 
-    @XmlElement(name = "ResponsibleUser")
-    private String username;
+    @XmlElementWrapper(name = "DeliveryRejectResponses")
+    @XmlElement(name = "DeliveryRejectResponse")
+    private List<DeliveryRejectResponse> deliveryRejectResponses;
 
-    @XmlElement(name = "ParcelID")
-    private Long parcelId;
-
-    @XmlElement(name = "DeliveryID")
-    private Long deliveryId;
+    @XmlElementWrapper(name = "DeliveryReturnResponses")
+    @XmlElement(name = "DeliveryReturnResponse")
+    private List<DeliveryReturnResponse> deliveryReturnResponses;
 }

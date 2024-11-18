@@ -1,14 +1,28 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
-
-@Value
-@Builder
-@Jacksonized
 public class DepotCodeRequestDto {
-    String depotCode;
-    Long parcelId;
-    ProcessTypeDto processType;
+    private String depotCode;
+    private ShipmentIdDto shipmentId;
+    private ProcessTypeDto processType;
+
+    public DepotCodeRequestDto() {
+    }
+
+    public DepotCodeRequestDto(final String depotCode, final ShipmentIdDto shipmentId, final ProcessTypeDto processType) {
+        this.depotCode = depotCode;
+        this.shipmentId = shipmentId;
+        this.processType = processType;
+    }
+
+    public String getDepotCode() {
+        return depotCode;
+    }
+
+    public ShipmentIdDto getShipmentId() {
+        return shipmentId;
+    }
+
+    public ProcessTypeDto getProcessType() {
+        return processType;
+    }
 }

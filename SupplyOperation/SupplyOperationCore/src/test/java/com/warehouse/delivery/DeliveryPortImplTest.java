@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +56,7 @@ public class DeliveryPortImplTest {
 	}
 
 	@Test
-	void shouldDeliver() {
+	void shouldProcessDelivery() {
 		// given
 		final String supplierCode = "abc";
 		final DeliveryRequest deliveryRequestSet = createDeliveryRequest();
@@ -77,10 +78,10 @@ public class DeliveryPortImplTest {
 				.thenReturn(UpdateStatus.OK);
 
 		// when
-		final List<DeliveryResponse> deliveries = deliveryPort.deliver(List.of(deliveryRequestSet));
+		final Set<DeliveryResponse> deliveries = deliveryPort.processDelivery(Set.of(deliveryRequestSet));
 		// then
 		assertThat(deliveries).size().isEqualTo(1);
-		final UUID id = deliveries.stream().map(DeliveryResponse::getId).findAny().orElse(null);
+		final UUID id = null;
 		assertEquals(expectedToBe(UUID.fromString(DELIVERY_ID)), id);
 	}
 

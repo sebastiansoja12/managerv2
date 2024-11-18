@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2024.6-SNAPSHOT</version>
+        <version>2024.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>ArchitectureTest</artifactId>
@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DepotServicesCore</artifactId>
+            <artifactId>DepartmentServiceCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -64,17 +64,12 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ParcelManagementApi</artifactId>
+            <artifactId>ShipmentManagementApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ParcelManagementCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>ParcelStatusControlChangeCore</artifactId>
+            <artifactId>ShipmentManagementCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -119,12 +114,12 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ZebraIntegrationApi</artifactId>
+            <artifactId>TerminalApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ZebraIntegrationCore</artifactId>
+            <artifactId>TerminalCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -140,6 +135,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>PalletHandlingManagerCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>MessageProviderCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

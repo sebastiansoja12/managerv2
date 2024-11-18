@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.delivery.domain.vo.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +54,7 @@ public class DeliveryTokenAdapterIntegrationTest {
 										.deliveryStatus(DeliveryStatus.DELIVERY).parcelId(1L).depotCode("abc").build())
 								.build()))
 				.build();
-        final Parcel parcel = new Parcel(1L, null, ParcelType.PARENT, "KT1");
+        final Parcel parcel = new Parcel(1L, null, ShipmentType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenReturn(parcel);
         // when

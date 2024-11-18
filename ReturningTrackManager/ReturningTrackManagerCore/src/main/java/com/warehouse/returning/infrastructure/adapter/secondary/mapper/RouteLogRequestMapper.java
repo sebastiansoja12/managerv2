@@ -14,7 +14,7 @@ public interface RouteLogRequestMapper {
                 .username(username)
                 .depotCode(depotCode)
                 .processType(ProcessTypeDto.RETURN)
-                .parcelId(processReturn.parcelId())
+                .parcelId(processReturn.shipmentId())
                 .build();
     }
 }

@@ -51,8 +51,8 @@ public class RouteLogMissedServiceAdapter implements RouteLogMissedServicePort {
         sendEvent(buildVersionLogEvent(terminalRequest));
     }
 
-    private DepotCodeLogEvent buildDepotCodeLogEvent(final DeliveryMissed deliveryMissed) {
-        return DepotCodeLogEvent.builder()
+    private DepartmentCodeLogEvent buildDepotCodeLogEvent(final DeliveryMissed deliveryMissed) {
+        return DepartmentCodeLogEvent.builder()
                 .depotCodeRequest(eventMapper.mapToDepotCodeRequest(deliveryMissed))
                 .build();
     }

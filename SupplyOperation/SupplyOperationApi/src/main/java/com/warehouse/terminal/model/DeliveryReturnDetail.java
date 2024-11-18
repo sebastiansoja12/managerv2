@@ -18,14 +18,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DeliveryReturnDetail {
 
-    @XmlElement(name = "ParcelID")
-    private Long parcelId;
+    @XmlElement(name = "ShipmentID")
+    private Long shipmentId;
 
     @XmlElement(name = "DeliveryStatus")
     private DeliveryStatus deliveryStatus;
 
-    @XmlElement(name = "DepotCode")
-    private String depotCode;
+    @XmlElement(name = "DepartmentCode")
+    private String departmentCode;
 
     @XmlElement(name = "SupplierCode")
     private String supplierCode;

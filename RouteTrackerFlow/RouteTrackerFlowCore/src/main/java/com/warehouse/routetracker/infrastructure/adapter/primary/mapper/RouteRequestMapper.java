@@ -1,23 +1,23 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
-import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
-import com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn.DeliveryReturnRequestDto;
 import org.mapstruct.Mapper;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.vo.*;
-import com.warehouse.routetracker.domain.vo.ParcelId;
+import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
+import com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn.DeliveryReturnRequestDto;
 
 @Mapper
 public interface RouteRequestMapper {
 
-    ParcelId map(ParcelIdDto id);
+    ShipmentId map(ShipmentIdDto id);
 
-    ZebraIdInformation map(ZebraIdInformationDto zebraIdInformation);
+    TerminalIdInformation map(TerminalIdRequestDto zebraIdInformation);
 
-    ZebraVersionInformation map(ZebraVersionInformationDto versionInformation);
+    TerminalVersionInformation map(TerminalVersionRequestDto versionInformation);
 
-    ErrorInformation map(ErrorInformationDto errorInformation);
+    ErrorInformation map(ErrorInformationRequestDto errorInformation);
 
     TerminalRequest map(TerminalRequestDto terminalRequest);
 

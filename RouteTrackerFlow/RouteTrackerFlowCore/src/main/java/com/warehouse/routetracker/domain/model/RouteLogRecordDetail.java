@@ -1,5 +1,6 @@
 package com.warehouse.routetracker.domain.model;
 
+import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import lombok.*;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RouteLogRecordDetail {
     private Long id;
-    private Long zebraId;
+    private TerminalId terminalId;
     private String version;
     private String username;
     private String supplierCode;
@@ -24,36 +25,47 @@ public class RouteLogRecordDetail {
     private ProcessType processType;
     private String request;
 
-    public void saveZebraIdInformation(Long zebraId) {
-        this.zebraId = zebraId;
+    public void saveTerminalId(final TerminalId terminalId) {
+        this.terminalId = terminalId;
+        markAsModified();
     }
 
-    public void saveZebraVersionInformation(String version) {
+    public void saveZebraVersionInformation(final String version) {
         this.version = version;
+        markAsModified();
     }
 
-    public void updateRequest(String request) {
+    public void updateRequest(final String request) {
         this.request = request;
-        this.timestamp = LocalDateTime.now();
+        markAsModified();
     }
 
-    public void saveSupplierCode(String supplierCode) {
+    public void saveSupplierCode(final String supplierCode) {
         this.supplierCode = supplierCode;
+        markAsModified();
     }
 
-    public void saveDescription(String description) {
+    public void saveDescription(final String description) {
         this.description = description;
+        markAsModified();
     }
 
-    public void saveUsername(String username) {
+    public void saveUsername(final String username) {
         this.username = username;
+        markAsModified();
     }
 
-    public void saveDepotCode(String depotCode) {
+    public void saveDepotCode(final String depotCode) {
         this.depotCode = depotCode;
+        markAsModified();
     }
 
-    public void saveParcelStatus(ParcelStatus parcelStatus) {
+    public void saveParcelStatus(final ParcelStatus parcelStatus) {
         this.parcelStatus = parcelStatus;
+        markAsModified();
+    }
+
+    private void markAsModified() {
+        this.timestamp = LocalDateTime.now();
     }
 }

@@ -22,7 +22,7 @@ public interface ReturnResponseMapper {
     List<ProcessReturnDto> map(List<ProcessReturn> processReturn);
 
 
-    @Mapping(target = "parcelId.value", source = "parcelId")
+    @Mapping(target = "shipmentId.value", source = "shipmentId")
     @Mapping(target = "reason.value", source = "reason")
     @Mapping(target = "returnStatus", source = "returnStatus")
     @Mapping(target = "returnToken.value", source = "returnToken")

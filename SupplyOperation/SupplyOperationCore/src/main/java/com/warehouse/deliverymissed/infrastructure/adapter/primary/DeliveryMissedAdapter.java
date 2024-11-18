@@ -1,36 +1,44 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.primary;
 
 
+import static com.warehouse.commonassets.enumeration.ProcessType.MISS;
 import static org.mapstruct.factory.Mappers.getMapper;
 
-import com.warehouse.deliverymissed.domain.port.primary.TerminalRequestLoggerPort;
-import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.ErrorResponseDto;
-import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.exception.RestException;
+import java.time.LocalDateTime;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
+import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.delivery.domain.model.Request;
+import com.warehouse.delivery.domain.model.Response;
+import com.warehouse.delivery.infrastructure.adapter.primary.ProcessHandler;
+import com.warehouse.deliverymissed.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPort;
 import com.warehouse.deliverymissed.domain.port.primary.SupplierValidatorPort;
+import com.warehouse.deliverymissed.domain.port.primary.TerminalRequestLoggerPort;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissedResponse;
+import com.warehouse.deliverymissed.dto.DeliveryMissedRequestDto;
+import com.warehouse.deliverymissed.dto.DeliveryMissedResponseDto;
+import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.ErrorResponseDto;
+import com.warehouse.deliverymissed.infrastructure.adapter.primary.dto.exception.RestException;
 import com.warehouse.deliverymissed.infrastructure.adapter.primary.mapper.DeliveryMissedRequestMapper;
 import com.warehouse.deliverymissed.infrastructure.adapter.primary.mapper.DeliveryMissedResponseMapper;
-import com.warehouse.terminal.information.TerminalDeviceInformation;
+import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.request.TerminalRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
-
 @RestController
 @RequestMapping("/delivery-missings")
 @RequiredArgsConstructor
 @Slf4j
-public class DeliveryMissedAdapter {
+public class DeliveryMissedAdapter implements ProcessHandler, DeliveryMissedService {
 
     private final DeliveryMissedRequestMapper requestMapper = getMapper(DeliveryMissedRequestMapper.class);
 
@@ -45,13 +53,13 @@ public class DeliveryMissedAdapter {
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> deliveryMiss(@RequestBody final TerminalRequest terminalRequest) {
 
-        final TerminalDeviceInformation terminalDeviceInformation = terminalRequest.getTerminalDeviceInformation();
+        final Device device = terminalRequest.getDevice();
 
         log.info("Detected request from Terminal device: ID - {}, Version - {}, Responsible User - {}, Depot - {}",
-                terminalDeviceInformation.getTerminalId(), terminalDeviceInformation.getVersion(),
-                terminalDeviceInformation.getUsername(), terminalDeviceInformation.getDepotCode());
+                device.getDeviceId(), device.getVersion(),
+                device.getUsername(), device.getDepartmentCode());
 
-        validatorPort.validateSupplierCode(terminalDeviceInformation.getUsername());
+        validatorPort.validateSupplierCode(device.getUsername());
 
         logTerminalRequest(terminalRequest);
 
@@ -89,5 +97,20 @@ public class DeliveryMissedAdapter {
                 .timestamp(LocalDateTime.now())
                 .build();
         return new ResponseEntity<>(error, HttpStatusCode.valueOf(error.getStatus()));
+    }
+
+    @Override
+    public DeliveryMissedResponseDto processDeliveryMiss(final DeliveryMissedRequestDto deliveryMissedRequestDto) {
+        return null;
+    }
+
+    @Override
+    public boolean supports(final ProcessType processType) {
+        return MISS.equals(processType);
+    }
+
+    @Override
+    public Response processRequest(final Request request) {
+        return null;
     }
 }

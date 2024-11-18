@@ -5,21 +5,21 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version>
+		<version>3.3.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.warehouse</groupId>
 	<artifactId>warehouse</artifactId>
-	<version>2024.6-SNAPSHOT</version>
+	<version>2024.7-SNAPSHOT</version>
 	<name>warehouse</name>
 	<description>Pom file for all modules</description>
 	<packaging>pom</packaging>
 
 	<modules>
 		<module>Application</module>
-		<module>ParcelManagement</module>
+		<module>ShipmentManagement</module>
 		<module>MailService</module>
-		<module>DepotServices</module>
+		<module>DepartmentService</module>
 		<module>RouteTrackerFlow</module>
 		<module>SupplyOperation</module>
 		<module>PathFinder</module>
@@ -29,8 +29,7 @@
         <module>Generator</module>
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
-		<module>ParcelStatusControlChange</module>
-        <module>ZebraIntegration</module>
+        <module>Terminal</module>
         <module>ReturningTrackManager</module>
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>
@@ -40,13 +39,14 @@
         <module>RouteLogger</module>
         <module>AssetConverter</module>
         <module>PalletHandlingManager</module>
-    </modules>
+		<module>MessageProvider</module>
+	</modules>
 
 	<properties>
 		<java.version>21</java.version>
 		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 		<org.projectlombok.version>1.18.30</org.projectlombok.version>
-		<spring-starter.version>3.3.4</spring-starter.version>
+		<spring-starter.version>3.3.5</spring-starter.version>
 		<maven-jaxb2-plugin.version>0.15.1</maven-jaxb2-plugin.version>
 		<maven-jaxb2-basics-plugin.version>1.11.1</maven-jaxb2-basics-plugin.version>
 		<sonar.organization>sebastiansoja</sonar.organization>
@@ -337,6 +337,16 @@
 				<groupId>org.apache.xmlbeans</groupId>
 				<artifactId>xmlbeans</artifactId>
 				<version>5.0.2</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-retry</artifactId>
+				<version>1.7.1</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-core</artifactId>
+				<version>1.7.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

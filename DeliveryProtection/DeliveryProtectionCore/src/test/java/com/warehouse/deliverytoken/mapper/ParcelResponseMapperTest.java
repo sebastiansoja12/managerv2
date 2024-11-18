@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mapstruct.factory.Mappers.getMapper;
 
-import com.warehouse.commonassets.enumeration.ParcelType;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.deliverytoken.domain.vo.Parcel;
@@ -41,8 +41,8 @@ public class ParcelResponseMapperTest {
         // given
         final ParcelTypeDto parcelTypeDto = ParcelTypeDto.CHILD;
         // when
-        final ParcelType parcelType = mapper.mapToParcelType(parcelTypeDto);
+        final ShipmentType shipmentType = mapper.mapToParcelType(parcelTypeDto);
         // then
-        assertEquals(parcelTypeDto.name(), parcelType.name());
+        assertEquals(parcelTypeDto.name(), shipmentType.name());
     }
 }

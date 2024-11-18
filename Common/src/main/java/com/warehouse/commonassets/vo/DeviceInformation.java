@@ -4,15 +4,15 @@ public class DeviceInformation {
 
      private final String version;
 
-     private final Long zebraId;
+     private final Long terminalId;
 
      private final String username;
 
      private final String depotCode;
 
-     public DeviceInformation(String version, Long zebraId, String username, String depotCode) {
+     public DeviceInformation(String version, Long terminalId, String username, String depotCode) {
           this.version = version;
-          this.zebraId = zebraId;
+          this.terminalId = terminalId;
           this.username = username;
           this.depotCode = depotCode;
      }
@@ -21,8 +21,8 @@ public class DeviceInformation {
           return version;
      }
 
-     public Long getZebraId() {
-          return zebraId;
+     public Long getTerminalId() {
+          return terminalId;
      }
 
      public String getUsername() {

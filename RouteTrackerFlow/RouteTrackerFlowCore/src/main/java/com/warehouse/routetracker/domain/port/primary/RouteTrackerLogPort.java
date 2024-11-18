@@ -2,26 +2,27 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
-import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
+import com.warehouse.routetracker.domain.model.FaultDescription;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.vo.*;
 
 public interface RouteTrackerLogPort {
 
-    RouteProcess initializeRouteProcess(ParcelId parcelId);
+    RouteProcess initializeRouteProcess(final ShipmentId shipmentId);
 
-    RouteLogRecord find(Long parcelId);
+    RouteLogRecord find(final ShipmentId shipmentId);
 
     List<RouteLogRecord> findAll();
 
-    void saveZebraIdInformation(ZebraIdInformation zebraIdInformation);
+    void saveTerminalIdInformation(TerminalIdInformation terminalIdInformation);
 
-    void saveZebraVersionInformation(ZebraVersionInformation zebraVersionInformation);
+    void saveZebraVersionInformation(TerminalVersionInformation terminalVersionInformation);
 
     void saveReturnErrorCode(ErrorInformation information);
 
-    void saveFaultDescription(ProcessType processType, Long parcelId, String faultDescription);
+    void saveFaultDescription(final FaultDescription faultDescription);
 
     void saveDescription(DescriptionRequest request);
 
@@ -30,8 +31,6 @@ public interface RouteTrackerLogPort {
     void saveUsername(UsernameRequest usernameRequest);
 
     void saveDepotCode(DepotCodeRequest depotCodeRequest);
-
-    void saveCreateRequest(ZebraInitializeRequest request);
 
     void saveTerminalRequest(TerminalRequest request);
 

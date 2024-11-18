@@ -1,11 +1,21 @@
 package com.warehouse.routetracker.domain.vo;
 
-import lombok.Builder;
-import lombok.Value;
+import com.warehouse.commonassets.identificator.ShipmentId;
 
-@Value
-@Builder
 public class ErrorInformation {
-    Long parcelId;
-    Error error;
+    private final ShipmentId shipmentId;
+    private final Error error;
+
+    public ErrorInformation(final ShipmentId shipmentId, final Error error) {
+        this.shipmentId = shipmentId;
+        this.error = error;
+    }
+
+    public ShipmentId getShipmentId() {
+        return shipmentId;
+    }
+
+    public Error getError() {
+        return error;
+    }
 }

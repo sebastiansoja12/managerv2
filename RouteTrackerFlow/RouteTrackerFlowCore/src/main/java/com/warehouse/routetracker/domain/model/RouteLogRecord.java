@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.domain.model;
 
 
+import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
@@ -27,57 +28,57 @@ public class RouteLogRecord {
         return routeLogRecordDetails;
     }
 
-    public void saveErrorReturnCode(Error error) {
+    public void saveErrorReturnCode(final Error error) {
         this.returnCode = error.getValue();
     }
 
-    public void saveFaultDescription(String faultDescription) {
+    public void saveFaultDescription(final String faultDescription) {
         this.faultDescription = faultDescription;
     }
 
-    public void saveZebraIdInformation(ProcessType processType, Long zebraId) {
+    public void saveTerminalId(final ProcessType processType, final TerminalId terminalId) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
-        routeLogRecordDetail.saveZebraIdInformation(zebraId);
+        routeLogRecordDetail.saveTerminalId(terminalId);
     }
 
-    public void saveZebraVersionInformation(ProcessType processType, String version) {
+    public void saveTerminalVersion(final ProcessType processType, final String version) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveZebraVersionInformation(version);
     }
 
-    public void saveUsername(ProcessType processType, String username) {
+    public void saveUsername(final ProcessType processType, final String username) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveUsername(username);
     }
 
-    public void saveDepotCode(ProcessType processType, String depotCode) {
+    public void saveDepotCode(final ProcessType processType, final String depotCode) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveDepotCode(depotCode);
     }
 
-    public void saveDescription(ProcessType processType, String description) {
+    public void saveDescription(final ProcessType processType, final String description) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveDescription(description);
     }
 
-    public void saveSupplierCode(ProcessType processType, String supplierCode) {
+    public void saveSupplierCode(final ProcessType processType, final String supplierCode) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveSupplierCode(supplierCode);
     }
 
-    public void saveParcelStatus(ProcessType processType, ParcelStatus parcelStatus) {
+    public void updateShipmentStatus(final ProcessType processType, final ParcelStatus parcelStatus) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveParcelStatus(parcelStatus);
     }
 
-    public void updateRequest(ProcessType processType, String request) {
+    public void updateRequest(final ProcessType processType, final String request) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
 

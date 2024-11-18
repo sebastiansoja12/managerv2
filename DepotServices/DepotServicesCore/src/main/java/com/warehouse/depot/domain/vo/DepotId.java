@@ -1,9 +1,0 @@
-package com.warehouse.depot.domain.vo;
-
-import lombok.Value;
-
-
-@Value
-public class DepotId {
-    Long value;
-}

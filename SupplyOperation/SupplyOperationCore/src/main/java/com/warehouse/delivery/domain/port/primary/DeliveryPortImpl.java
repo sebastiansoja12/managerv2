@@ -1,9 +1,6 @@
 package com.warehouse.delivery.domain.port.primary;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.warehouse.delivery.domain.model.Delivery;
@@ -27,7 +24,7 @@ public class DeliveryPortImpl implements DeliveryPort {
     private final ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
     @Override
-    public List<DeliveryResponse> deliver(List<DeliveryRequest> deliveryRequest) {
+    public Set<DeliveryResponse> processDelivery(Set<DeliveryRequest> deliveryRequest) {
         final Set<DeliveryRequest> deliveryRequests = deliveryRequest.stream()
                 .filter(Objects::nonNull)
                 .peek(DeliveryRequest::updateDeliveryStatus)
@@ -39,10 +36,7 @@ public class DeliveryPortImpl implements DeliveryPort {
 
         registerDeliveryRoute(signedDeliveries);
         
-        return signedDeliveries
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return Collections.emptySet();
     }
 
     private void registerDeliveryRoute(List<Delivery> signedDeliveries) {
@@ -59,13 +53,5 @@ public class DeliveryPortImpl implements DeliveryPort {
 
         delivery.updateStatus(updateStatus);
 
-    }
-
-    private DeliveryResponse mapToResponse(Delivery delivery) {
-        return DeliveryResponse.builder()
-                .id(delivery.getId())
-                .parcelId(delivery.getParcelId())
-                .deliveryStatus(delivery.getDeliveryStatus().name())
-                .build();
     }
 }

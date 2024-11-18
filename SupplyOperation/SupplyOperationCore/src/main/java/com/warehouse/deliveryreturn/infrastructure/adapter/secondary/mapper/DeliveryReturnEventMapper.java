@@ -25,9 +25,9 @@ public interface DeliveryReturnEventMapper {
     @Mapping(target = "processType", constant = "RETURN")
     SupplierCodeRequestDto mapToSupplierCodeRequest(DeliveryReturn deliveryReturn);
 
-    @Mapping(target = "terminalId", source = "terminalDeviceInformation.terminalId")
+    @Mapping(target = "terminalId", source = "device.deviceId")
     TerminalLogRequestDto mapToTerminalLogRequest(TerminalRequest terminalRequest);
 
-    @Mapping(target = "version", source = "terminalDeviceInformation.version")
+    @Mapping(target = "version", source = "device.version")
     VersionLogRequestDto mapToVersionLogRequest(TerminalRequest terminalRequest);
 }

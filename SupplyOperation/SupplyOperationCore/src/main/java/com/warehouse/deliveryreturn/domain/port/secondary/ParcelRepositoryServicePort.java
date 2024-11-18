@@ -1,7 +1,7 @@
 package com.warehouse.deliveryreturn.domain.port.secondary;
 
-import com.warehouse.deliveryreturn.domain.vo.Parcel;
+import com.warehouse.deliveryreturn.domain.vo.Shipment;
 
 public interface ParcelRepositoryServicePort {
-    Parcel downloadParcel(Long parcelId);
+    Shipment downloadParcel(Long parcelId);
 }

@@ -7,9 +7,6 @@ import static org.mockito.Mockito.*;
 import java.util.Set;
 import java.util.UUID;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
-import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -19,9 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TerminalId;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
-import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
-import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
+import com.warehouse.routetracker.domain.model.*;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.*;
@@ -39,42 +38,33 @@ public class RouteTrackerLogPortImplTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final UUID ROUTE_ID = UUID.fromString("1d614a30-910f-486e-8c7b-e3043744088f");
+    private final UUID processId = UUID.fromString("1d614a30-910f-486e-8c7b-e3043744088f");
 
-    public static final Long PARCEL_ID = 100001L;
-
+    private final ShipmentId shipmentId = new ShipmentId(100001L);
+    
+    private final TerminalId terminalId = new TerminalId(1L);
 
     @Test
     void shouldInitializeRouteProcess() {
         // given
-        final ParcelId parcelId = ParcelId.builder().value(PARCEL_ID).build();
-        final RouteProcess expectedRouteProcess = RouteProcess
-                .builder()
-                .processId(ROUTE_ID)
-                .parcelId(PARCEL_ID)
-                .build();
+        final RouteProcess expectedRouteProcess = new RouteProcess(shipmentId, processId);
 
         doReturn(expectedRouteProcess)
                 .when(repository)
                 .save(any(RouteLogRecord.class));
         // when
-        final RouteProcess routeProcess = routeTrackerLogPort.initializeRouteProcess(parcelId);
+        final RouteProcess routeProcess = routeTrackerLogPort.initializeRouteProcess(shipmentId);
         // then
         assertAll(
-                () -> assertEquals(PARCEL_ID, routeProcess.getParcelId()),
-                () -> assertEquals(ROUTE_ID, routeProcess.getProcessId())
+                () -> assertEquals(shipmentId, routeProcess.getShipmentId()),
+                () -> assertEquals(processId, routeProcess.getProcessId())
         );
     }
 
     @Test
-    void shouldSaveZebraIdInformation() {
+    void shouldSaveTerminalIdInformation() {
         // given
-        final ZebraIdInformation information = ZebraIdInformation
-                .builder()
-                .zebraId(1L)
-                .parcelId(PARCEL_ID)
-                .processType(ProcessType.RETURN)
-                .build();
+        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.RETURN, shipmentId, terminalId);
 
         final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
                 .builder()
@@ -89,55 +79,42 @@ public class RouteTrackerLogPortImplTest {
 
         final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
-                .id(ROUTE_ID)
+                .id(processId)
                 .routeLogRecordDetails(routeLogRecordDetails)
-                .parcelId(PARCEL_ID)
+                .parcelId(shipmentId.getValue())
                 .build();
 
         doReturn(routeLogRecord)
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         doNothing()
                 .when(repository)
                 .update(routeLogRecord);
         // when
-        routeTrackerLogPort.saveZebraIdInformation(information);
+        routeTrackerLogPort.saveTerminalIdInformation(information);
         // then
         verify(repository, times(1)).update(any());
     }
 
     @Test
-    void shouldSaveZebraIdInformationToNewProcessWhenGivenWasNotFound() {
+    void shouldSaveTerminalIdInformationToNewProcessWhenGivenWasNotFound() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final Long zebraId = 1L;
-        final ZebraIdInformation information = ZebraIdInformation
-                .builder()
-                .zebraId(zebraId)
-                .parcelId(PARCEL_ID)
-                .processType(processType)
-                .build();
-
+        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.RETURN, shipmentId, terminalId);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
-        routeTrackerLogPort.saveZebraIdInformation(information);
+        routeTrackerLogPort.saveTerminalIdInformation(information);
         // then
-        verify(routeLogRecord).saveZebraIdInformation(processType, zebraId);
+        verify(routeLogRecord).saveTerminalId(processType, terminalId);
         verify(repository, times(1)).update(any());
     }
     
     @Test
     void shouldSaveZebraVersionInformation() {
         // given
-        final ZebraVersionInformation information = ZebraVersionInformation
-                .builder()
-                .version("1.0")
-                .parcelId(PARCEL_ID)
-                .processType(ProcessType.RETURN)
-                .build();
+        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.RETURN);
 
         final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
                 .builder()
@@ -152,14 +129,14 @@ public class RouteTrackerLogPortImplTest {
         
         final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
-                .id(ROUTE_ID)
+                .id(processId)
                 .routeLogRecordDetails(routeLogRecordDetails)
-                .parcelId(PARCEL_ID)
+                .parcelId(shipmentId.getValue())
                 .build();
 
         doReturn(routeLogRecord)
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         doNothing()
                 .when(repository)
@@ -179,31 +156,20 @@ public class RouteTrackerLogPortImplTest {
         // given
         final ProcessType processType = ProcessType.RETURN;
         final String version = "1.0";
-        final ZebraVersionInformation information = ZebraVersionInformation
-                .builder()
-                .parcelId(PARCEL_ID)
-                .version(version)
-                .processType(processType)
-                .build();
-
+        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.RETURN);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveZebraVersionInformation(information);
         // then
-        verify(routeLogRecord).saveZebraVersionInformation(processType, version);
+        verify(routeLogRecord).saveTerminalVersion(processType, version);
         verify(repository, times(1)).update(any());
     }
 
     @Test
     void shouldSaveReturnCode() {
         // given
-        final ErrorInformation information = ErrorInformation
-                .builder()
-                .error(new Error("1234"))
-                .parcelId(PARCEL_ID)
-                .build();
+        final ErrorInformation information = new ErrorInformation(shipmentId, new Error("1234"));
 
         final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
                 .builder()
@@ -218,14 +184,14 @@ public class RouteTrackerLogPortImplTest {
 
         final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
-                .id(ROUTE_ID)
+                .id(processId)
                 .routeLogRecordDetails(routeLogRecordDetails)
-                .parcelId(PARCEL_ID)
+                .parcelId(shipmentId.getValue())
                 .build();
 
         doReturn(routeLogRecord)
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         doNothing()
                 .when(repository)
@@ -242,6 +208,8 @@ public class RouteTrackerLogPortImplTest {
     void shouldSaveFaultDescription() {
         // given
         final ProcessType processType = ProcessType.REDIRECT;
+        final String description = "Error";
+        final FaultDescription faultDescription = new FaultDescription(processType, shipmentId, description);
         final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
                 .builder()
                 .processType(processType)
@@ -255,57 +223,47 @@ public class RouteTrackerLogPortImplTest {
 
         final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
-                .id(ROUTE_ID)
+                .id(processId)
                 .routeLogRecordDetails(routeLogRecordDetails)
-                .parcelId(PARCEL_ID)
+                .parcelId(shipmentId.getValue())
                 .build();
 
         doReturn(routeLogRecord)
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         doNothing()
                 .when(repository)
                 .update(routeLogRecord);
 
         // when
-        routeTrackerLogPort.saveFaultDescription(processType, PARCEL_ID, "Error");
+        routeTrackerLogPort.saveFaultDescription(faultDescription);
         // then
         verify(repository, times(1)).update(routeLogRecord);
-        assertEquals("Error", routeLogRecord.getFaultDescription());
+        assertEquals(description, routeLogRecord.getFaultDescription());
     }
 
     @Test
     void shouldSaveTerminalRequest() {
         // given
         final ProcessType processType = ProcessType.REDIRECT;
-        final TerminalRequest request = TerminalRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .processType(processType)
-                .request("request")
-                .build();
+        final String requestValue = "request";
+        final TerminalRequest request = new TerminalRequest(processType, shipmentId, requestValue);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveTerminalRequest(request);
         // then
-        verify(routeLogRecord).updateRequest(processType, "request");
+        verify(routeLogRecord).updateRequest(processType, requestValue);
     }
 
     @Test
     void shouldSaveReturnTrackRequest() throws JsonProcessingException {
         // given
         final ProcessType processType = ProcessType.REDIRECT;
-        final ReturnTrackRequest request = ReturnTrackRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .username("s-soja")
-                .depotCode("KT1")
-                .processType(processType)
-                .build();
+        final ReturnTrackRequest request = new ReturnTrackRequest(shipmentId, processType, "s-soja", "KT1");
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         final String requestAsString = objectMapper.writeValueAsString(request);
         // when
         routeTrackerLogPort.saveReturnTrackRequest(request);
@@ -317,18 +275,10 @@ public class RouteTrackerLogPortImplTest {
     void shouldSaveDeliveryReturnRequest() throws JsonProcessingException {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final DeliveryReturnRequest request = DeliveryReturnRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .username("s-soja")
-                .depotCode("KT1")
-                .processType(processType)
-                .deliveryStatus("RETURN")
-                .returnToken("12345")
-                .updateStatus("OK")
-                .build();
+		final DeliveryReturnRequest request = new DeliveryReturnRequest(UUID.randomUUID(), shipmentId, "RETURN",
+				"12345", "OK", "KT1", "s-soja", processType);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         final String requestAsString = objectMapper.writeValueAsString(request);
         // when
         routeTrackerLogPort.saveDeliveryReturnRequest(request);
@@ -340,107 +290,80 @@ public class RouteTrackerLogPortImplTest {
     void shouldSaveUsername() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final UsernameRequest request = UsernameRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .username("s-soja")
-                .processType(processType)
-                .build();
+        final String username = "s-soja";
+        final UsernameRequest request = new UsernameRequest(username, shipmentId, processType);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveUsername(request);
         // then
-        verify(routeLogRecord).saveUsername(processType, "s-soja");
+        verify(routeLogRecord).saveUsername(processType, username);
     }
 
     @Test
     void shouldSaveDepotCode() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final DepotCodeRequest request = DepotCodeRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .depotCode("KT1")
-                .processType(processType)
-                .build();
+        final String depotCode = "KT1";
+        final DepotCodeRequest request = new DepotCodeRequest(depotCode, shipmentId, processType);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveDepotCode(request);
         // then
-        verify(routeLogRecord).saveDepotCode(processType, "KT1");
+        verify(routeLogRecord).saveDepotCode(processType, depotCode);
     }
 
     @Test
     void shouldSaveSupplierCode() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final SupplierCodeRequest request = SupplierCodeRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .supplierCode("abc")
-                .processType(processType)
-                .build();
+        final String supplierCode = "abc";
+        final SupplierCodeRequest request = new SupplierCodeRequest(supplierCode, shipmentId, processType);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveSupplierCode(request);
         // then
-        verify(routeLogRecord).saveSupplierCode(processType, "abc");
+        verify(routeLogRecord).saveSupplierCode(processType, supplierCode);
     }
 
     @Test
     void shouldSaveDescription() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final DescriptionRequest request = DescriptionRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .processType(processType)
-                .value("value")
-                .build();
+        final String value = "value";
+        final DescriptionRequest request = new DescriptionRequest(value, shipmentId, processType);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveDescription(request);
         // then
-        verify(routeLogRecord).saveDescription(processType, "value");
+        verify(routeLogRecord).saveDescription(processType, value);
     }
+
 
     @Test
     void shouldSaveDeliveryStatus() {
         // given
         final ProcessType processType = ProcessType.MISS;
-        final DeliveryStatusRequest request = DeliveryStatusRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .processType(processType)
-                .depotCode("KT1")
-                .supplierCode("ABC")
-                .build();
+        final DeliveryStatusRequest request = new DeliveryStatusRequest(shipmentId, "ABC", "KT1", processType);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
-        when(repository.find(PARCEL_ID)).thenReturn(routeLogRecord);
+        when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
         routeTrackerLogPort.saveDeliveryStatus(request);
         // then
-        verify(routeLogRecord).saveParcelStatus(processType, ParcelStatus.DELIVERY);
+        verify(routeLogRecord).updateShipmentStatus(processType, ParcelStatus.DELIVERY);
     }
 
     @Test
     void shouldNotSaveDeliveryStatus() {
         // given
         final ProcessType processType = ProcessType.MISS;
-        final DeliveryStatusRequest request = DeliveryStatusRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .processType(processType)
-                .depotCode("KT1")
-                .supplierCode("ABC")
-                .build();
+        final DeliveryStatusRequest request = new DeliveryStatusRequest(shipmentId, "ABC", "KT1", processType);
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
         // when
         final Executable executable = () -> routeTrackerLogPort.saveDeliveryStatus(request);
         // then
@@ -452,16 +375,10 @@ public class RouteTrackerLogPortImplTest {
     void shouldNotSaveReturnTrackRequestWhenProcessWasNotFound() {
         // given
         final ProcessType processType = ProcessType.REDIRECT;
-        final ReturnTrackRequest request = ReturnTrackRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .username("s-soja")
-                .depotCode("KT1")
-                .processType(processType)
-                .build();
+        final ReturnTrackRequest request = new ReturnTrackRequest(shipmentId, processType, "s-soja", "KT1");
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
         final Executable executable = () -> routeTrackerLogPort.saveReturnTrackRequest(request);
@@ -474,17 +391,11 @@ public class RouteTrackerLogPortImplTest {
     void shouldNotSaveDeliveryReturnRequestWhenProcessWasNotFound() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final DeliveryReturnRequest request = DeliveryReturnRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .username("s-soja")
-                .depotCode("KT1")
-                .processType(processType)
-                .build();
+        final DeliveryReturnRequest request = new DeliveryReturnRequest(null, shipmentId, "RETURN", "12345",
+                "OK", "KT1", "s-soja", processType);
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
-
+                .find(shipmentId);
         // when
         final Executable executable = () -> routeTrackerLogPort.saveDeliveryReturnRequest(request);
         // then
@@ -496,15 +407,10 @@ public class RouteTrackerLogPortImplTest {
     void shouldNotSaveSupplierCode() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final SupplierCodeRequest request = SupplierCodeRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .supplierCode("abc")
-                .processType(processType)
-                .build();
+        final SupplierCodeRequest request = new SupplierCodeRequest("abc", shipmentId, processType);
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
         final Executable executable = () -> routeTrackerLogPort.saveSupplierCode(request);
@@ -517,15 +423,10 @@ public class RouteTrackerLogPortImplTest {
     void shouldNotSaveUsername() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final UsernameRequest request = UsernameRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .username("s-soja")
-                .processType(processType)
-                .build();
+        final UsernameRequest request = new UsernameRequest("abc", shipmentId, processType);
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
         final Executable executable = () -> routeTrackerLogPort.saveUsername(request);
@@ -538,15 +439,10 @@ public class RouteTrackerLogPortImplTest {
     void shouldNotSaveDepotCode() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final DepotCodeRequest request = DepotCodeRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .depotCode("KT1")
-                .processType(processType)
-                .build();
+        final DepotCodeRequest request = new DepotCodeRequest("abc", shipmentId, processType);
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
         final Executable executable = () -> routeTrackerLogPort.saveDepotCode(request);
@@ -556,19 +452,13 @@ public class RouteTrackerLogPortImplTest {
     }
 
     @Test
-    void shouldNotDescription() {
+    void shouldNotSaveDescription() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final DescriptionRequest request = DescriptionRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .value("value")
-                .processType(processType)
-                .build();
+        final DescriptionRequest request = new DescriptionRequest("value", shipmentId, processType);
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
-
+                .find(shipmentId);
         // when
         final Executable executable = () -> routeTrackerLogPort.saveDescription(request);
         // then
@@ -579,11 +469,10 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldFindRouteLogRecord() {
         // given
-        final Long parcelId = 1L;
         final RouteLogRecord expected = mock(RouteLogRecord.class);
-        when(repository.find(parcelId)).thenReturn(expected);
+        when(repository.find(shipmentId)).thenReturn(expected);
         // when
-        final RouteLogRecord routeLogRecord = routeTrackerLogPort.find(parcelId);
+        final RouteLogRecord routeLogRecord = routeTrackerLogPort.find(shipmentId);
         // then
         assertEquals(expected, routeLogRecord);
     }
@@ -591,12 +480,11 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldNotFindRouteLogRecord() {
         // given
-        final Long parcelId = 1L;
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(parcelId);
+                .find(shipmentId);
         // when
-        final Executable executable = () -> routeTrackerLogPort.find(parcelId);
+        final Executable executable = () -> routeTrackerLogPort.find(shipmentId);
         // then
         assertThrows(RouteLogException.class, executable);
     }
@@ -605,14 +493,10 @@ public class RouteTrackerLogPortImplTest {
     void shouldNotSaveTerminalRequestWhenProcessWasNotFound() {
         // given
         final ProcessType processType = ProcessType.REDIRECT;
-        final TerminalRequest request = TerminalRequest
-                .builder()
-                .parcelId(PARCEL_ID)
-                .processType(processType)
-                .build();
+        final TerminalRequest request = new TerminalRequest(processType, shipmentId, "requestAsJson");
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
         final Executable executable = () -> routeTrackerLogPort.saveTerminalRequest(request);
@@ -625,12 +509,13 @@ public class RouteTrackerLogPortImplTest {
     void shouldNotSaveFaultDescriptionWhenProcessWasNotFound() {
         // given
         final ProcessType processType = ProcessType.REDIRECT;
+        final FaultDescription faultDescription = new FaultDescription(processType, shipmentId, "faultDescription");
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
-        final Executable executable = () -> routeTrackerLogPort.saveFaultDescription(processType, PARCEL_ID, "Error");
+        final Executable executable = () -> routeTrackerLogPort.saveFaultDescription(faultDescription);
         // then
         assertThrows(RouteLogException.class, executable);
         verify(repository, times(0)).update(any());
@@ -639,15 +524,11 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldNotSaveReturnCodeWhenProcessWasNotFound() {
         // given
-        final ErrorInformation information = ErrorInformation
-                .builder()
-                .error(new Error("1234"))
-                .parcelId(PARCEL_ID)
-                .build();
+        final ErrorInformation information = new ErrorInformation(shipmentId, new Error("12345"));
 
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
         final Executable executable = () -> routeTrackerLogPort.saveReturnErrorCode(information);
@@ -657,21 +538,15 @@ public class RouteTrackerLogPortImplTest {
     }
 
     @Test
-    void shouldNotSaveZebraIdInformationWhenProcessIsNotFound() {
+    void shouldNotSaveTerminalIdInformationWhenProcessIsNotFound() {
         // given
-        final ZebraIdInformation information = ZebraIdInformation
-                .builder()
-                .zebraId(1L)
-                .parcelId(PARCEL_ID)
-                .processType(ProcessType.RETURN)
-                .build();
-
+        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.MISS, shipmentId, new TerminalId(1L));
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
-        final Executable executable = () -> routeTrackerLogPort.saveZebraIdInformation(information);
+        final Executable executable = () -> routeTrackerLogPort.saveTerminalIdInformation(information);
         // then
         assertThrows(RouteLogException.class, executable);
         verify(repository, times(0)).update(any());
@@ -680,16 +555,11 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldNotSaveZebraVersionInformationWhenProcessWasNotFound() {
         // given
-        final ZebraVersionInformation information = ZebraVersionInformation
-                .builder()
-                .version("1.0")
-                .parcelId(PARCEL_ID)
-                .processType(ProcessType.RETURN)
-                .build();
+        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.MISS);
 
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
-                .find(PARCEL_ID);
+                .find(shipmentId);
 
         // when
         final Executable executable = () -> routeTrackerLogPort.saveZebraVersionInformation(information);

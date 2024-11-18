@@ -13,7 +13,7 @@ public class JsonToStringServiceImplTest {
     @Test
     void shouldMapToString() {
         // given
-        final ReturnTrackRequest request = ReturnTrackRequest.builder().build();
+        final ReturnTrackRequest request = new ReturnTrackRequest();
         // when
         final String mappedJsonString = jsonToStringService.convertToString(request);
         // then

@@ -27,7 +27,6 @@ public class RouteLogDeliveryStatusAdapter implements RouteLogDeliveryStatusServ
 
     private DeliveryLogEvent buildEvent(Delivery delivery) {
         return DeliveryLogEvent.builder()
-                .deliveryRequest(eventMapper.map(delivery))
                 .build();
     }
 
