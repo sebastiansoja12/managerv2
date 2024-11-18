@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.warehouse.pallet.infrastructure.adapter.secondary.entity.PalletEntity;
 
 @Repository
-public interface PalletReadRepository extends JpaRepository<PalletEntity, Long> {
+public interface PalletReadRepository extends JpaRepository<PalletEntity, String> {
 }
