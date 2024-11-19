@@ -17,6 +17,7 @@ import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
+import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -151,8 +152,8 @@ public class ShipmentPortImpl implements ShipmentPort {
         shipmentStatusHandlers.stream()
                 .filter(shipmentStatusHandler -> shipmentStatusHandler.canHandle(status))
                 .findAny()
-                .ifPresentOrElse(shipmentStatusHandler -> shipmentStatusHandler.notifyShipmentStatusChange(shipmentId),
-                        () -> logger.warn("Invalid shipment status: " + status));
+                .ifPresentOrElse(shipmentStatusHandler ->
+                                shipmentStatusHandler.notifyShipmentStatusChange(shipmentId), ShipmentDefaultHandler::new);
 	}
 
     @Override
