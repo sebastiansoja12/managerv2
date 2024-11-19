@@ -55,6 +55,6 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
         log.info("Successfully registered route {} for shipment {}", process.getBody().getProcessId(),
                 shipmentId.getValue());
 
-        return RouteProcess.from(shipmentId, process.getBody() != null ? process.getBody().getProcessId() : null);
+        return RouteProcess.from(shipmentId, process.getBody().getProcessId());
     }
 }
