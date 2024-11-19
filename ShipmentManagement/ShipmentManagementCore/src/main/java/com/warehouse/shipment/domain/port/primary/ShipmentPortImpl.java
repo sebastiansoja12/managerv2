@@ -5,17 +5,19 @@ import static com.warehouse.shipment.domain.enumeration.ShipmentUpdateType.REROU
 import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_202;
 
 import java.util.Objects;
+import java.util.Set;
 
-import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
+import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.Logger;
@@ -41,17 +43,20 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final TrackingStatusServicePort trackingStatusServicePort;
 
+    private final Set<ShipmentStatusHandler> shipmentStatusHandlers;
+
 	public ShipmentPortImpl(final ShipmentService shipmentService, final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
                             final NotificationCreatorProvider notificationCreatorProvider,
                             final MailServicePort mailServicePort,
-                            final TrackingStatusServicePort trackingStatusServicePort) {
+                            final TrackingStatusServicePort trackingStatusServicePort, final Set<ShipmentStatusHandler> shipmentStatusHandlers) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
 		this.mailServicePort = mailServicePort;
         this.trackingStatusServicePort = trackingStatusServicePort;
+        this.shipmentStatusHandlers = shipmentStatusHandlers;
     }
 
     @Override
@@ -143,20 +148,11 @@ public class ShipmentPortImpl implements ShipmentPort {
 	public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
 		final ShipmentStatus status = request.getShipmentStatus();
 		final ShipmentId shipmentId = request.getShipmentId();
-		switch (status) {
-		case REDIRECT -> {
-			final Shipment shipment = this.shipmentService.find(shipmentId);
-			this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, shipment.getShipmentRelatedId());
-		}
-		case REROUTE -> this.shipmentService.notifyShipmentRerouted(shipmentId);
-		case SENT -> this.shipmentService.notifyShipmentSent(shipmentId);
-		case RETURN -> this.shipmentService.notifyShipmentReturned(shipmentId);
-        case DELIVERY -> this.shipmentService.notifyShipmentDelivered(shipmentId);
-        case CREATED -> {
-            logger.warn("Shipment {} already created, status {} cannot be changed", shipmentId, status);
-            throw new RuntimeException("Shipment already created, status cannot be changed");
-        }
-		}
+        shipmentStatusHandlers.stream()
+                .filter(shipmentStatusHandler -> shipmentStatusHandler.canHandle(status))
+                .findAny()
+                .ifPresentOrElse(shipmentStatusHandler -> shipmentStatusHandler.notifyShipmentStatusChange(shipmentId),
+                        () -> logger.warn("Invalid shipment status: " + status));
 	}
 
     @Override

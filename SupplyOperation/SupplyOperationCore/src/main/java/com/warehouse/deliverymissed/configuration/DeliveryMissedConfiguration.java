@@ -24,7 +24,7 @@ public class DeliveryMissedConfiguration {
 		return new DeliveryMissedPortImpl(deliveryMissedService, logMissedServicePort);
 	}
 
-	@Bean
+	@Bean("deliveryMissed.terminalRequestLoggerPort")
 	public TerminalRequestLoggerPort terminalRequestLoggerPort(RouteLogMissedServicePort routeLogMissedServicePort) {
 		return new TerminalRequestLoggerPortImpl(routeLogMissedServicePort);
 	}

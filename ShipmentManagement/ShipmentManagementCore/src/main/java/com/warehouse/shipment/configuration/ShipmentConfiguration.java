@@ -1,9 +1,8 @@
 package com.warehouse.shipment.configuration;
 
 import java.time.Duration;
+import java.util.Set;
 
-import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
-import com.warehouse.tracking.TrackingStatusEventPublisher;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
+import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
@@ -25,6 +25,8 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
+import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
+import com.warehouse.tracking.TrackingStatusEventPublisher;
 import com.warehouse.voronoi.VoronoiService;
 
 import io.github.resilience4j.retry.RetryConfig;
@@ -54,9 +56,17 @@ public class ShipmentConfiguration {
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
 									 final MailServicePort mailServicePort,
-									 final TrackingStatusServicePort trackingStatusServicePort) {
+									 final TrackingStatusServicePort trackingStatusServicePort,
+									 final Set<ShipmentStatusHandler> shipmentStatusHandlers) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, mailServicePort, trackingStatusServicePort);
+				notificationCreatorProvider, mailServicePort, trackingStatusServicePort, shipmentStatusHandlers);
+	}
+
+	@Bean
+	public Set<ShipmentStatusHandler> shipmentStatusHandlers(final ShipmentService service) {
+		return Set.of(new ShipmentCreatedHandler(), new ShipmentRerouteHandler(service),
+				new ShipmentSentHandler(service), new ShipmentDeliveryHandler(service),
+				new ShipmentRedirectHandler(service));
 	}
 
 	@Bean("shipment.softwareConfigurationServicePort")
