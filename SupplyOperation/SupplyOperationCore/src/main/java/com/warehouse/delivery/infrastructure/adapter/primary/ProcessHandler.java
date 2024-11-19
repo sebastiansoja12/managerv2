@@ -6,6 +6,6 @@ import com.warehouse.delivery.domain.model.Response;
 
 public interface ProcessHandler {
     boolean supports(final ProcessType processType);
-    Response processRequest(final Request deliveryRequest);
+    Response processRequest(final Request request);
 }
 
