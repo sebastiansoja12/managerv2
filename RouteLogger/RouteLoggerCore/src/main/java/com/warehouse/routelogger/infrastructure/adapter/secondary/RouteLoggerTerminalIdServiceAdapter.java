@@ -34,7 +34,7 @@ public class RouteLoggerTerminalIdServiceAdapter implements RouteLoggerTerminalS
         final TerminalLogRequestDto request = requestMapper.map(terminalLogRequest);
         restClient
                 .post()
-                .uri("/v2/api/routes/{endpoint}", routeTrackerLogProperties.getZebraIdInformation())
+                .uri("/v2/api/routes/{endpoint}", routeTrackerLogProperties.getTerminalIdInformation())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
