@@ -20,7 +20,6 @@
 		<module>ShipmentManagement</module>
 		<module>MailService</module>
 		<module>DepartmentService</module>
-		<module>RouteTrackerFlow</module>
 		<module>SupplyOperation</module>
 		<module>PathFinder</module>
 		<module>Authorization</module>
