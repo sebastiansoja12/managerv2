@@ -79,6 +79,18 @@ public class ShipmentConfiguration {
 				.build();
 		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties());
 	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	public SoftwareConfigurationServicePort softwareConfigurationServiceMockPort() {
+		return new SoftwareConfigurationServiceMockAdapter();
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	public RouteLogServicePort routeLogServiceMockPort() {
+		return new RouteLogServiceMockAdapter();
+	}
 	
 	@Bean("shipment.rerouteTokenServicePort")
 	public TrackingStatusServicePort rerouteTokenServicePort(
