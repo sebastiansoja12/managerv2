@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -55,4 +56,6 @@ public interface ShipmentRequestMapper {
     }
 
     ShipmentStatusRequest map(final ShipmentStatusRequestDto shipmentStatusRequest);
+
+    SignatureChangeRequest map(final SignatureChangeRequestDto signatureChangeRequest);
 }

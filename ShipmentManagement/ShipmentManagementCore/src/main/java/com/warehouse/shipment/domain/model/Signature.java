@@ -1,20 +1,39 @@
 package com.warehouse.shipment.domain.model;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.SignatureMethod;
+
 import java.time.LocalDateTime;
 
 public class Signature {
 
     private String signerName;
     private LocalDateTime signedAt;
-    private String signatureMethod;
+    private SignatureMethod signatureMethod;
     private String documentReference;
+    private ShipmentId shipmentId;
 
-    public Signature(final String signerName, final LocalDateTime signedAt,
-                     final String signatureMethod, final String documentReference) {
+    public Signature() {
+    }
+
+    public Signature(final String signerName,
+                     final LocalDateTime signedAt,
+                     final SignatureMethod signatureMethod,
+                     final String documentReference,
+                     final ShipmentId shipmentId) {
         this.signerName = signerName;
         this.signedAt = signedAt;
         this.signatureMethod = signatureMethod;
         this.documentReference = documentReference;
+        this.shipmentId = shipmentId;
+    }
+
+    public ShipmentId getShipmentId() {
+        return shipmentId;
+    }
+
+    public void setShipmentId(final ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
     }
 
     public String getSignerName() {
@@ -33,11 +52,11 @@ public class Signature {
         this.signedAt = signedAt;
     }
 
-    public String getSignatureMethod() {
+    public SignatureMethod getSignatureMethod() {
         return signatureMethod;
     }
 
-    public void setSignatureMethod(final String signatureMethod) {
+    public void setSignatureMethod(final SignatureMethod signatureMethod) {
         this.signatureMethod = signatureMethod;
     }
 

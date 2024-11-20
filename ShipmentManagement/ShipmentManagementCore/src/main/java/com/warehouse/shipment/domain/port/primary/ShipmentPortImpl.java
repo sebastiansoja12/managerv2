@@ -21,6 +21,7 @@ import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
@@ -50,7 +51,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final PathFinderServicePort pathFinderServicePort,
                             final NotificationCreatorProvider notificationCreatorProvider,
                             final MailServicePort mailServicePort,
-                            final TrackingStatusServicePort trackingStatusServicePort, final Set<ShipmentStatusHandler> shipmentStatusHandlers) {
+                            final TrackingStatusServicePort trackingStatusServicePort,
+                            final Set<ShipmentStatusHandler> shipmentStatusHandlers) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -117,6 +119,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         } else if (REROUTE.equals(shipmentUpdateType)) {
             this.shipmentService.changeRecipientTo(shipmentId, recipient);
             this.shipmentService.changeSenderTo(shipmentId, sender);
+            this.shipmentService.notifyShipmentRerouted(shipmentId);
             this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REROUTE);
         }
     }
@@ -157,8 +160,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 	}
 
     @Override
-    public void changeShipmentSignatureTo(final ShipmentRequest request) {
-        final Shipment shipment = Shipment.from(request);
+    public void changeShipmentSignatureTo(final SignatureChangeRequest request) {
         // change signature in service
     }
 

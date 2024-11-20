@@ -4,10 +4,12 @@ import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusR
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
 import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
+import com.warehouse.shipment.infrastructure.api.dto.SignatureChangeRequestDto;
 
 public interface ShipmentRequestValidator {
     void validateBody(final ShipmentRequestDto shipmentRequest);
     void validateBody(final ShipmentUpdateRequestDto shipmentRequest);
     void validateBody(final ShipmentIdDto parcelId);
     void validateBody(final ShipmentStatusRequestDto shipmentStatusRequest);
+    void validateBody(final SignatureChangeRequestDto signatureChangeRequest);
 }

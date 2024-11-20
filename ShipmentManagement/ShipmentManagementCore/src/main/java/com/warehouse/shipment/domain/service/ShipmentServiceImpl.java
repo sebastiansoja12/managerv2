@@ -2,12 +2,8 @@ package com.warehouse.shipment.domain.service;
 
 import java.util.UUID;
 
-import com.warehouse.commonassets.enumeration.Country;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;

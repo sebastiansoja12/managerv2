@@ -49,16 +49,19 @@ public class Shipment {
 
     private Country destinationCountry;
 
+    private Signature signature;
+
 	public Shipment(final ShipmentId shipmentId,
                     final Sender sender,
                     final Recipient recipient,
                     final ShipmentSize shipmentSize,
-			        final ShipmentStatus shipmentStatus,
+                    final ShipmentStatus shipmentStatus,
                     final ShipmentId shipmentRelatedId,
                     final Money price,
                     final LocalDateTime createdAt,
                     final LocalDateTime updatedAt,
-                    final Boolean locked) {
+                    final Boolean locked,
+                    final Signature signature) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -70,7 +73,8 @@ public class Shipment {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.locked = locked;
-	}
+        this.signature = signature;
+    }
 
     public static Shipment from(final ShipmentRequest request) {
         return request.getShipment();
@@ -170,6 +174,15 @@ public class Shipment {
 
     public void setShipmentId(final ShipmentId shipmentId) {
         this.shipmentId = shipmentId;
+    }
+
+    public Signature getSignature() {
+        return signature;
+    }
+
+    public void changeSignature(final Signature signature) {
+        this.signature = signature;
+        markAsModified();
     }
 
     public void prepareShipmentToCreate() {
@@ -340,7 +353,8 @@ public class Shipment {
                 this.price,
                 this.createdAt,
                 this.updatedAt,
-                this.locked
+                this.locked,
+                this.signature
         );
     }
 
