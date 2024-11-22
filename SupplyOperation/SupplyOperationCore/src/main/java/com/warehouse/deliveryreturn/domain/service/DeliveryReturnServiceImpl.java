@@ -5,8 +5,11 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.warehouse.deliveryreturn.domain.exception.SupplierNotAvailableInRequestException;
-import com.warehouse.deliveryreturn.domain.model.*;
+import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
+import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
@@ -14,7 +17,6 @@ import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServic
 import com.warehouse.deliveryreturn.domain.vo.*;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 
 @AllArgsConstructor
 public class DeliveryReturnServiceImpl implements DeliveryReturnService {
@@ -41,7 +43,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 
         return deliveries.stream()
                 .peek(deliveryReturn -> {
-                    final Shipment shipment = parcelRepositoryServicePort.downloadParcel(deliveryReturn.getParcelId());
+                    final Shipment shipment = parcelRepositoryServicePort.downloadShipment(deliveryReturn.getShipmentId());
                     mailServicePort.sendNotification(shipment);
                 })
                 .map(deliveryReturnRepository::saveDeliveryReturn)
@@ -56,9 +58,10 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .toList();
         final String supplierCode = deliveries.stream()
                 .map(DeliveryReturnDetails::getSupplierCode)
-                .filter(StringUtils::isNotEmpty)
+                .filter(ObjectUtils::isNotEmpty)
                 .findAny()
-                .orElseThrow(() -> new SupplierNotAvailableInRequestException("Supplier not available"));
+                .orElseThrow(() -> new SupplierNotAvailableInRequestException("Supplier not available"))
+                .getValue();
         return DeliveryReturnTokenRequest.builder()
                 .requests(deliveryPackageRequests)
                 .supplier(new Supplier(supplierCode, Boolean.TRUE))
@@ -78,22 +81,22 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
     private DeliveryReturnInformation buildDeliveryInformation(DeliveryReturnDetails delivery) {
         return DeliveryReturnInformation.builder()
                 .deliveryStatus(String.valueOf(delivery.getDeliveryStatus()))
-                .depotCode(delivery.getDepotCode())
-                .parcelId(delivery.getParcelId())
-                .locked(parcelRepositoryServicePort.downloadParcel(delivery.getParcelId()).getLocked())
+                .depotCode(delivery.getDepartmentCode().getValue())
+                .parcelId(delivery.getShipmentId().getValue())
+                .locked(parcelRepositoryServicePort.downloadShipment(delivery.getShipmentId()).getLocked())
                 .build();
     }
 
 	private List<DeliveryReturnDetails> assignTokenToDeliveryReturn(Map<Long, DeliveryReturnSignature> signaturesMap,
 			Set<DeliveryReturnDetails> deliveryReturnRequests) {
         return deliveryReturnRequests.stream().map(delivery -> {
-			final DeliveryReturnSignature deliveryReturnSignature = signaturesMap.get(delivery.getParcelId());
+			final DeliveryReturnSignature deliveryReturnSignature = signaturesMap.get(delivery.getShipmentId());
             return DeliveryReturnDetails.builder()
                     .supplierCode(delivery.getSupplierCode())
                     .deliveryStatus(delivery.getDeliveryStatus())
                     .token(deliveryReturnSignature != null ? deliveryReturnSignature.getToken() : null)
-                    .depotCode(delivery.getDepotCode())
-                    .parcelId(delivery.getParcelId())
+                    .departmentCode(delivery.getDepartmentCode())
+                    .shipmentId(delivery.getShipmentId())
                     .build();
 		}).toList();
 	}

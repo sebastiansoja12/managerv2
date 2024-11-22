@@ -4,5 +4,5 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
 
 public interface DeliveryReturnPort {
-    DeliveryReturnResponse deliverReturn(DeliveryReturnRequest deliveryRequest);
+    DeliveryReturnResponse deliverReturn(final DeliveryReturnRequest deliveryRequest);
 }

@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestGatewaySupport;
 
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatusParcelRequest;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.UpdateStatusParcelRequestDto;
@@ -15,8 +15,8 @@ import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.Upda
 import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 
 
-public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
-		implements ParcelStatusControlChangeServicePort {
+public class ShipmentStatusControlServiceAdapter extends RestGatewaySupport
+		implements ShipmentStatusControlServicePort {
 
     private final RestClient restClient;
 
@@ -25,13 +25,13 @@ public class ParcelStatusControlChangeServiceAdapter extends RestGatewaySupport
     private final UpdateStatusParcelRequestMapper updateStatusParcelRequestMapper =
             getMapper(UpdateStatusParcelRequestMapper.class);
 
-    public ParcelStatusControlChangeServiceAdapter(ParcelStatusProperties parcelStatusProperties) {
+    public ShipmentStatusControlServiceAdapter(ParcelStatusProperties parcelStatusProperties) {
         this.restClient = RestClient.builder().baseUrl(parcelStatusProperties.getUrl()).build();
         this.parcelStatusProperties = parcelStatusProperties;
     }
 
     @Override
-    public UpdateStatus updateStatus(UpdateStatusParcelRequest updateStatusParcelRequest) {
+    public UpdateStatus updateStatus(final UpdateStatusParcelRequest updateStatusParcelRequest) {
         final UpdateStatusParcelRequestDto request = updateStatusParcelRequestMapper.map(updateStatusParcelRequest);
         return restClient
                 .put()

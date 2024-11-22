@@ -34,8 +34,8 @@ public class DeliveryReturnRepositoryImplTest {
         final DeliveryReturnDetails deliveryReturnDetails = DeliveryReturnDetails.builder()
                 .deliveryStatus(DeliveryStatus.RETURN)
                 .token("12345")
-                .parcelId(1L)
-                .depotCode("KT1")
+                .shipmentId(1L)
+                .departmentCode("KT1")
                 .supplierCode("abc")
                 .build();
         // when

@@ -28,23 +28,18 @@ public class DeliveryReturnConfiguration {
 	@Bean
 	public DeliveryReturnPort deliveryReturnPort(final DeliveryReturnRepository deliveryReturnRepository,
 			final DeliveryReturnTokenServicePort deliveryReturnTokenServicePort,
-			final ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort,
+			final ShipmentStatusControlServicePort shipmentStatusControlServicePort,
 			final ParcelRepositoryServicePort parcelRepositoryServicePort, MailServicePort mailServicePort,
 			final RouteLogReturnServicePort routeLogReturnServicePort) {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
 				deliveryReturnTokenServicePort, parcelRepositoryServicePort, mailServicePort);
-		return new DeliveryReturnPortImpl(deliveryReturnService, parcelStatusControlChangeServicePort,
+		return new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort,
 				routeLogReturnServicePort);
 	}
     
     @Bean
     public RouteLogReturnServicePort routeLogReturnServicePort(final RouteLogEventPublisher routeLogEventPublisher) {
         return new RouteLogReturnServiceAdapter(routeLogEventPublisher);
-    }
-
-    @Bean("deliveryReturn.terminalRequestLoggerPort")
-    public TerminalRequestLoggerPort terminalRequestLoggerPort(RouteLogReturnServicePort routeLogReturnServicePort) {
-        return new TerminalRequestLoggerPortImpl(routeLogReturnServicePort);
     }
 
     @Bean("deliveryReturn.mailServicePort")
@@ -95,9 +90,9 @@ public class DeliveryReturnConfiguration {
     }
 
     @Bean("deliveryReturn.parcelStatusControlChangeServicePort")
-    public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
+    public ShipmentStatusControlServicePort parcelStatusControlChangeServicePort(
 			ParcelStatusProperties parcelStatusProperties) {
-        return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperties);
+        return new ShipmentStatusControlServiceAdapter(parcelStatusProperties);
     }
     
     @Bean
