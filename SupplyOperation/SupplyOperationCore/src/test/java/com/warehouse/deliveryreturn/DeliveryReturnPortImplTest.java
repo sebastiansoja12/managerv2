@@ -13,6 +13,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
@@ -30,7 +34,7 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 public class DeliveryReturnPortImplTest {
 
 	@Mock
-	private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
+	private ShipmentStatusControlServicePort shipmentStatusControlServicePort;
 
 	@Mock
 	private DeliveryReturnRepository deliveryReturnRepository;
@@ -49,13 +53,14 @@ public class DeliveryReturnPortImplTest {
 
 	private DeliveryReturnPortImpl returnPort;
 
-	private final DeviceInformation deviceInformation = new DeviceInformation("1", 1L, "s-soja", "KT1");
+	private final DeviceInformation deviceInformation = new DeviceInformation("1", new DeviceId(1L), "s-soja",
+			new DepartmentCode("KT1"));
 
 	@BeforeEach
 	void setup() {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
 				deliveryReturnTokenServicePort, parcelRepositoryServicePort, mailServicePort);
-		returnPort = new DeliveryReturnPortImpl(deliveryReturnService, parcelStatusControlChangeServicePort,
+		returnPort = new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort,
 				routeLogReturnServicePort);
 	}
 
@@ -123,7 +128,7 @@ public class DeliveryReturnPortImplTest {
 			String depotCode, String supplierCode, String token) {
 
 		final DeliveryReturnDetails deliveryReturnDetails = DeliveryReturnDetails.builder()
-				.deliveryStatus(deliveryStatus).parcelId(parcelId).supplierCode(supplierCode).depotCode(depotCode)
+				.deliveryStatus(deliveryStatus).shipmentId(new ShipmentId(parcelId)).supplierCode(new SupplierCode(supplierCode)).departmentCode(new DepartmentCode(depotCode))
 				.token(token).build();
 
 		return List.of(deliveryReturnDetails);

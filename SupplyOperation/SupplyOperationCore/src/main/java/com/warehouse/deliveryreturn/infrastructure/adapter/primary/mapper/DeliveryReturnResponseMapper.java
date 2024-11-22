@@ -1,11 +1,12 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper;
 
 
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
-import com.warehouse.deliveryreturn.infrastructure.api.response.ZebraDeliveryReturnResponse;
 import org.mapstruct.Mapper;
+
+import com.warehouse.delivery.domain.model.Response;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
 
 @Mapper
 public interface DeliveryReturnResponseMapper {
-    ZebraDeliveryReturnResponse map(DeliveryReturnResponse response);
+    Response map(final DeliveryReturnResponse response);
 }
