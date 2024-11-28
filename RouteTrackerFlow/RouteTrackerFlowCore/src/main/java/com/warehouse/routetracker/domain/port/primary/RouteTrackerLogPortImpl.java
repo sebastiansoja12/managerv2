@@ -40,7 +40,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public void saveDeviceVersionInformation(final TerminalVersionInformation information) {
+    public void saveDeviceVersionInformation(final DeviceVersionInformation information) {
         final RouteLogRecord routeLogRecord = this.repository.find(information.getShipmentId());
         routeLogRecord.saveDeviceVersion(information.getProcessType(), information.getVersion());
         this.repository.update(routeLogRecord);

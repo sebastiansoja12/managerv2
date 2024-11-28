@@ -114,7 +114,7 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldSaveDeviceVersionInformation() {
         // given
-        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.RETURN);
+        final DeviceVersionInformation information = new DeviceVersionInformation("1.0", shipmentId, ProcessType.RETURN);
 
         final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
                 .builder()
@@ -156,7 +156,7 @@ public class RouteTrackerLogPortImplTest {
         // given
         final ProcessType processType = ProcessType.RETURN;
         final String version = "1.0";
-        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.RETURN);
+        final DeviceVersionInformation information = new DeviceVersionInformation("1.0", shipmentId, ProcessType.RETURN);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
         when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
@@ -555,7 +555,7 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldNotSaveDeviceVersionInformationWhenProcessWasNotFound() {
         // given
-        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.MISS);
+        final DeviceVersionInformation information = new DeviceVersionInformation("1.0", shipmentId, ProcessType.MISS);
 
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)

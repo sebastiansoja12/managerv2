@@ -15,7 +15,7 @@ public interface RouteRequestMapper {
 
     DeviceIdInformation map(TerminalIdRequestDto zebraIdInformation);
 
-    TerminalVersionInformation map(TerminalVersionRequestDto versionInformation);
+    DeviceVersionInformation map(TerminalVersionRequestDto versionInformation);
 
     ErrorInformation map(ErrorInformationRequestDto errorInformation);
 

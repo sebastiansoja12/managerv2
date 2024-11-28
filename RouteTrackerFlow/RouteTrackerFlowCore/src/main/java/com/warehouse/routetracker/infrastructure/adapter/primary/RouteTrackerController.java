@@ -56,8 +56,8 @@ public class RouteTrackerController {
 
     @PostMapping("/terminal-version")
     public ResponseEntity<?> saveZebraVersion(@RequestBody final TerminalVersionRequestDto versionRequest) {
-        final TerminalVersionInformation terminalVersionInformation = requestMapper.map(versionRequest);
-        trackerLogPort.saveDeviceVersionInformation(terminalVersionInformation);
+        final DeviceVersionInformation deviceVersionInformation = requestMapper.map(versionRequest);
+        trackerLogPort.saveDeviceVersionInformation(deviceVersionInformation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

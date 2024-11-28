@@ -18,7 +18,7 @@ public interface RouteTrackerLogPort {
 
     void saveDeviceIdInformation(DeviceIdInformation deviceIdInformation);
 
-    void saveDeviceVersionInformation(TerminalVersionInformation terminalVersionInformation);
+    void saveDeviceVersionInformation(DeviceVersionInformation deviceVersionInformation);
 
     void saveReturnErrorCode(ErrorInformation information);
 
