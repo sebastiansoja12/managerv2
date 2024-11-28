@@ -3,6 +3,8 @@ package com.warehouse.deliveryreject.infrastructure.adapter.primary;
 import static com.warehouse.commonassets.enumeration.ProcessType.REJECT;
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import org.springframework.stereotype.Component;
+
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.delivery.domain.model.Request;
 import com.warehouse.delivery.domain.model.Response;
@@ -16,6 +18,7 @@ import com.warehouse.deliveryreject.dto.response.DeliveryRejectResponseDto;
 import com.warehouse.deliveryreject.infrastructure.adapter.primary.mapper.DeliveryRejectRequestMapper;
 import com.warehouse.deliveryreject.infrastructure.adapter.primary.mapper.DeliveryRejectResponseMapper;
 
+@Component
 public class DeliveryRejectAdapter implements DeliveryRejectService, ProcessHandler {
 
     private final DeliveryRejectPort deliveryRejectPort;

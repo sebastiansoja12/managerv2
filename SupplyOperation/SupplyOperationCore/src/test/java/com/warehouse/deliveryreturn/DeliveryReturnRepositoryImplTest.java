@@ -1,5 +1,8 @@
 package com.warehouse.deliveryreturn;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturn;
@@ -34,9 +37,9 @@ public class DeliveryReturnRepositoryImplTest {
         final DeliveryReturnDetails deliveryReturnDetails = DeliveryReturnDetails.builder()
                 .deliveryStatus(DeliveryStatus.RETURN)
                 .token("12345")
-                .parcelId(1L)
-                .depotCode("KT1")
-                .supplierCode("abc")
+                .shipmentId(new ShipmentId(1L))
+                .departmentCode(new DepartmentCode("KT1"))
+                .supplierCode(new SupplierCode("abc"))
                 .build();
         // when
         final DeliveryReturn deliveryReturn = deliveryReturnRepository.saveDeliveryReturn(deliveryReturnDetails);

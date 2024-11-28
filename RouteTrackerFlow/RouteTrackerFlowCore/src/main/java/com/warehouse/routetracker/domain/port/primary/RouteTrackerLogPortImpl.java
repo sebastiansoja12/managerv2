@@ -29,91 +29,91 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
                 .builder()
                 .parcelId(shipmentId.getValue())
                 .build();
-        return repository.save(routeLogRecord);
+        return this.repository.save(routeLogRecord);
     }
 
     @Override
     public void saveTerminalIdInformation(final TerminalIdInformation information) {
-        final RouteLogRecord routeLogRecord = repository.find(information.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(information.getShipmentId());
         routeLogRecord.saveTerminalId(information.getProcessType(), information.getTerminalId());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveZebraVersionInformation(final TerminalVersionInformation information) {
-        final RouteLogRecord routeLogRecord = repository.find(information.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(information.getShipmentId());
         routeLogRecord.saveTerminalVersion(information.getProcessType(), information.getVersion());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveReturnErrorCode(final ErrorInformation information) {
-        final RouteLogRecord routeLogRecord = repository.find(information.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(information.getShipmentId());
         routeLogRecord.saveErrorReturnCode(information.getError());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveFaultDescription(final FaultDescription faultDescription) {
-        final RouteLogRecord routeLogRecord = repository.find(faultDescription.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(faultDescription.getShipmentId());
         routeLogRecord.saveFaultDescription(faultDescription.getDescription());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveDescription(final DescriptionRequest request) {
-        final RouteLogRecord routeLogRecord = repository.find(request.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
         routeLogRecord.saveDescription(request.getProcessType(), request.getValue());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveSupplierCode(final SupplierCodeRequest request) {
-        final RouteLogRecord routeLogRecord = repository.find(request.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
         routeLogRecord.saveSupplierCode(request.getProcessType(), request.getSupplierCode());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveUsername(final UsernameRequest request) {
-        final RouteLogRecord routeLogRecord = repository.find(request.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
         routeLogRecord.saveUsername(request.getProcessType(), request.getUsername());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveDepotCode(final DepotCodeRequest request) {
-        final RouteLogRecord routeLogRecord = repository.find(request.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
         routeLogRecord.saveDepotCode(request.getProcessType(), request.getDepotCode());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveTerminalRequest(final TerminalRequest terminalRequest) {
-        final RouteLogRecord routeLogRecord = repository.find(terminalRequest.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(terminalRequest.getShipmentId());
         routeLogRecord.updateRequest(terminalRequest.getProcessType(), terminalRequest.getRequestAsJson());
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveReturnTrackRequest(final ReturnTrackRequest request) {
-        final RouteLogRecord routeLogRecord = repository.find(request.getShipmentId());
-        routeLogRecord.updateRequest(request.getProcessType(), jsonToStringService.convertToString(request));
-        repository.update(routeLogRecord);
+        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
+        routeLogRecord.updateRequest(request.getProcessType(), this.jsonToStringService.convertToString(request));
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveDeliveryReturnRequest(final DeliveryReturnRequest request) {
-        final RouteLogRecord routeLogRecord = repository.find(request.getShipmentId());
-        routeLogRecord.updateRequest(request.getProcessType(), jsonToStringService.convertToString(request));
-        repository.update(routeLogRecord);
+        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
+        routeLogRecord.updateRequest(request.getProcessType(), this.jsonToStringService.convertToString(request));
+        this.repository.update(routeLogRecord);
     }
 
     @Override
     public void saveDeliveryStatus(final DeliveryStatusRequest request) {
-        final RouteLogRecord routeLogRecord = repository.find(request.getShipmentId());
+        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
         routeLogRecord.updateShipmentStatus(request.getProcessType(), determineParcelStatus(request));
-        repository.update(routeLogRecord);
+        this.repository.update(routeLogRecord);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
     @Override
     public List<RouteLogRecord> findAll() {
-        return repository.findAll();
+        return this.repository.findAll();
     }
 
     private ParcelStatus determineParcelStatus(DeliveryStatusRequest request) {

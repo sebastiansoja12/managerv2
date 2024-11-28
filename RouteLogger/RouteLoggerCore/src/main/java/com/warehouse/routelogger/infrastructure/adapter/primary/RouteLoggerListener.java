@@ -27,49 +27,49 @@ public class RouteLoggerListener {
     }
 
     @EventListener
-    void handleEvent(final DeliveryLogEvent event) {
+    void handle(final DeliveryLogEvent event) {
         logEvent(event);
         final AnyDeliveryRequest request = eventMapper.map(event.getDeliveryRequest());
         routeLoggerPort.logAnyDelivery(request);
     }
 
     @EventListener
-    void handleEvent(final DepartmentCodeLogEvent event) {
+    void handle(final DepartmentCodeLogEvent event) {
         logEvent(event);
         final DepotCodeRequest request = eventMapper.mapFromDepotCodeRequest(event.getDepotCodeRequest());
         routeLoggerPort.logDepotCode(request);
     }
 
     @EventListener
-    void handleEvent(final RequestLogEvent event) {
+    void handle(final RequestLogEvent event) {
         logEvent(event);
         final Request request = eventMapper.mapToRequest(event.getRequest());
         routeLoggerPort.logRequest(request);
     }
 
     @EventListener
-    void handleEvent(final SupplierCodeLogEvent event) {
+    void handle(final SupplierCodeLogEvent event) {
         logEvent(event);
         final SupplierCodeRequest request = eventMapper.mapToSupplierCodeRequest(event.getSupplierCodeRequest());
         routeLoggerPort.logSupplierCode(request);
     }
 
     @EventListener
-    void handleEvent(final TerminalLogEvent event) {
+    void handle(final TerminalLogEvent event) {
         logEvent(event);
         final TerminalLogRequest request = eventMapper.mapToTerminalLogRequest(event.getTerminalLogRequest());
         routeLoggerPort.logTerminalId(request);
     }
 
     @EventListener
-    void handleEvent(final VersionLogEvent event) {
+    void handle(final VersionLogEvent event) {
         logEvent(event);
         final VersionLogRequest request = eventMapper.mapToVersionLogRequest(event.getVersionLogRequest());
         routeLoggerPort.logVersion(request);
     }
 
     @EventListener
-    void handleEvent(final UsernameLogEvent event) {
+    void handle(final UsernameLogEvent event) {
         logEvent(event);
         final UsernameLogRequest request = eventMapper.mapToUsernameLogRequest(event.getUsernameLogRequest());
         routeLoggerPort.logUsername(request);

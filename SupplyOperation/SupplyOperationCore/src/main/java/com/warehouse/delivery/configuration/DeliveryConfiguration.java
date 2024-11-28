@@ -19,6 +19,7 @@ import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTo
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class DeliveryConfiguration {
@@ -46,6 +47,7 @@ public class DeliveryConfiguration {
     }
 
     @Bean("delivery.routeLogEventPublisher")
+    @Primary
     public RouteLogEventPublisher routeLogEventPublisher(final ApplicationEventPublisher eventPublisher) {
         return new RouteLogEventPublisherImpl(eventPublisher);
     }

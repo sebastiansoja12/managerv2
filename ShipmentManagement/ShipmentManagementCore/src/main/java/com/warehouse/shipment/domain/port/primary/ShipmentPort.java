@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
 import com.warehouse.shipment.domain.vo.ShipmentResponse;
 import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
@@ -21,7 +22,7 @@ public interface ShipmentPort {
 
     void changeShipmentStatusTo(final ShipmentStatusRequest request);
 
-    void changeShipmentSignatureTo(final ShipmentRequest request);
+    void changeShipmentSignatureTo(final SignatureChangeRequest request);
 
     Shipment loadShipment(final ShipmentId shipmentId);
 

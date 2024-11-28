@@ -1,24 +1,25 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusRequestDto;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.Status;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentResponseInformation;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
+import com.warehouse.shipment.domain.vo.ShipmentUpdateRequest;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentResponseInformation;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusRequestDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.Status;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
+import com.warehouse.shipment.infrastructure.api.dto.*;
 
 @RestController
 @RequestMapping("/shipments")
@@ -71,6 +72,14 @@ public class ShipmentController {
         shipmentRequestValidator.validateBody(shipmentStatusRequest);
         final ShipmentStatusRequest request = requestMapper.map(shipmentStatusRequest);
         shipmentPort.changeShipmentStatusTo(request);
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
+    }
+
+    @PutMapping("/signature")
+    public ResponseEntity<?> changeSignature(@RequestBody final SignatureChangeRequestDto signatureChangeRequest) {
+        shipmentRequestValidator.validateBody(signatureChangeRequest);
+        final SignatureChangeRequest request = requestMapper.map(signatureChangeRequest);
+        shipmentPort.changeShipmentSignatureTo(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 

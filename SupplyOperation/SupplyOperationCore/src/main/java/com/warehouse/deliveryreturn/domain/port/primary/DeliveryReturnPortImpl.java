@@ -5,20 +5,19 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogReturnServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
-import com.warehouse.deliveryreturn.domain.vo.*;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteDetails;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.DeliveryReturnRouteRequest;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturn;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private final DeliveryReturnService deliveryReturnService;
 
-    private final ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
+    private final ShipmentStatusControlServicePort shipmentStatusControlServicePort;
 
     private final RouteLogReturnServicePort routeLogReturnServicePort;
 
@@ -62,69 +61,37 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
         logSupplierCode(deliveryReturnResponses);
 
-		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturnResponses.stream()
-                .map(deliveryReturn -> {
-					final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(
-							deliveryReturn.getParcelId());
-					final UpdateStatus updateStatus = parcelStatusControlChangeServicePort
-							.updateStatus(updateStatusParcelRequest);
-                    return new DeliveryReturnResponseDetails(deliveryReturn.getId(), deliveryReturn.getParcelId(),
-                            deliveryReturn.getDeliveryStatus(), deliveryReturn.getToken(), updateStatus);
-				}).collect(Collectors.toList());
+//		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturnResponses.stream()
+//                .map(deliveryReturn -> {
+//					final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(
+//							deliveryReturn.getParcelId());
+//					final UpdateStatus updateStatus = shipmentStatusControlServicePort
+//							.updateStatus(updateStatusParcelRequest);
+//                    return new DeliveryReturnResponseDetails(deliveryReturn.getId(), deliveryReturn.getParcelId(),
+//                            deliveryReturn.getDeliveryStatus(), deliveryReturn.getToken(), updateStatus);
+//				}).collect(Collectors.toList());
 		
 		final DeliveryReturnResponse deliveryReturnResponse = DeliveryReturnResponse
                 .builder()
-				.deliveryReturnResponses(deliveryReturnResponseDetails)
-                .supplierCode(deliveryRequest.getDeviceInformation().getUsername())
-                .depotCode(deliveryRequest.getDeviceInformation().getDepotCode())
+                .supplierCode(new SupplierCode(deliveryRequest.getDeviceInformation().getUsername()))
+                .departmentCode(deliveryRequest.getDeviceInformation().getDepartmentCode())
                 .build();
 
-        logRouteFlow(deliveryReturnResponse);
-        
         return deliveryReturnResponse;
     }
 
-    private void logDepotCode(DeliveryReturnRequest deliveryRequest) {
+    private void logDepotCode(final DeliveryReturnRequest deliveryRequest) {
         log.warn("Logging depot code {} in tracker", deliveryRequest.getDepotCode());
         routeLogReturnServicePort.logDepotCodeReturnDelivery(deliveryRequest);
     }
 
-    private void validateRequest(DeliveryReturnRequest deliveryRequest) {
+    private void validateRequest(final DeliveryReturnRequest deliveryRequest) {
         if (Objects.isNull(deliveryRequest)) {
             throw new DeliveryRequestException("Delivery return request cannot be null");
         }
         if (CollectionUtils.isEmpty(deliveryRequest.getDeliveryReturnDetails())) {
             throw new DeliveryReturnDetailsException("Delivery return details cannot be null");
         }
-    }
-
-    private void logRouteFlow(DeliveryReturnResponse deliveryReturnResponse) {
-        final DeliveryReturnRouteRequest request = DeliveryReturnRouteRequest.builder()
-                .depotCode(deliveryReturnResponse.getDepotCode())
-                .username(deliveryReturnResponse.getSupplierCode())
-				.deliveryReturnRouteDetails(
-						deliveryReturnRouteDetails(deliveryReturnResponse.getDeliveryReturnResponses()))
-                .supplierCode(deliveryReturnResponse.getSupplierCode())
-                .build();
-        routeLogReturnServicePort.logRouteLogReturnDelivery(request);
-    }
-    
-	private List<DeliveryReturnRouteDetails> deliveryReturnRouteDetails(
-			List<DeliveryReturnResponseDetails> deliveryReturnResponses) {
-        return deliveryReturnResponses.stream()
-                .map(this::convertToDeliveryReturnRouteDetails)
-                .collect(Collectors.toList());
-    }
-
-	private DeliveryReturnRouteDetails convertToDeliveryReturnRouteDetails(DeliveryReturnResponseDetails response) {
-        return DeliveryReturnRouteDetails.builder()
-                .deliveryStatus(response.getDeliveryStatus())
-                .id(response.getId())
-                .parcelId(response.getParcelId())
-				.updateStatus(
-						response.getUpdateStatus() != null ? response.getUpdateStatus().name() : StringUtils.EMPTY)
-                .returnToken(response.getReturnToken())
-                .build();
     }
     
 	private void logSupplierCode(List<DeliveryReturn> deliveryReturns) {

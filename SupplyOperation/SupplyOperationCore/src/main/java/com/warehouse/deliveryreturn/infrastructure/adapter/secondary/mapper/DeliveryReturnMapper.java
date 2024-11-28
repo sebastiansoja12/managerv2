@@ -14,6 +14,8 @@ public interface DeliveryReturnMapper {
     DeliveryReturn map(DeliveryReturnEntity deliveryReturnEntity);
 
     @Mapping(target = "created", expression = "java(getLocalDateTime())")
+    @Mapping(target = "supplierCode", source = "supplierCode.value")
+    @Mapping(target = "depotCode", source = "departmentCode.value")
     DeliveryReturnEntity map(DeliveryReturnDetails deliveryReturnRequest);
 
 

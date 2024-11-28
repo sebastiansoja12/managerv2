@@ -5,11 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 import org.junit.jupiter.api.DynamicNode;
-import org.junit.jupiter.api.DynamicTest;
 import org.springframework.data.repository.Repository;
 
 import com.tngtech.archunit.core.domain.JavaClass;
@@ -61,16 +59,13 @@ class BoundedContext {
 
     private ArchRule hexagonalArchitectureRule;
     private ArchRule domainRepositoryInterfacesRule;
-    private ArchRule domainWithoutSpringRule;
-    private ArchRule domainWithoutLog4JRule;
     private ArchRule adapterRepositoryInterfacesRule;
     private ArchRule repositoryClassesAsInterfacesRule;
     private ArchRule enumsInProperPackageRule;
     private ArchRule valueObjectsInProperPackageRule;
-    private ArchRule enumsProperStructureRule;
 
     @Builder
-    BoundedContext(String name, String rootPackage) {
+    BoundedContext(final String name, final String rootPackage) {
         this.rootPackage = rootPackage;
         this.name = name;
         setUpRules();
@@ -196,30 +191,11 @@ class BoundedContext {
                 () -> enumsInProperPackageRule.check(allClasses));
     }
 
-    /*@BoundedContextTest
-    private DynamicNode valueObjectsShouldResideInVoDirectory() {
-        return dynamicTest(name + " value object classes should reside in proper package",
-                () -> valueObjectsInProperPackageRule.check(allClasses));
-    }*/
-
-    private DynamicTest shouldContainAtLeastOneBuilder(JavaClass javaClass) {
-        return GenericDynamicTestUtils.classShouldNotHaveMethodEndsWith(javaClass, "builder");
-    }
-    
-    private boolean isDomainObjectClass(JavaClass javaClass) {
-		return javaClass.isTopLevelClass() && !javaClass.isInterface()
-				&& !Modifier.isAbstract(javaClass.reflect().getModifiers());
-    }
-
-    private boolean isValueObjectClass(JavaClass javaClass) {
-        return javaClass.isTopLevelClass() && !javaClass.isInterface();
-    }
-
     DynamicNode boundedContextTests() {
         return dynamicContainer(name + " bounded context tests", BoundedContextTestScanner.scanForTests(this));
     }
 
-    private String pack(String packageName) {
+    private String pack(final String packageName) {
         return rootPackage + packageName;
     }
 
@@ -227,7 +203,7 @@ class BoundedContext {
     public static class BoundedContextBuilder {
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) {
                 return true;
             }

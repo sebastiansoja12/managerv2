@@ -15,8 +15,8 @@ public class RouteTrackerLogProperties {
     private String initialize;
     private String returnTrackRequest;
     private String deliveryReturnRequest;
-    private String zebraVersionInformation;
-    private String zebraIdInformation;
+    private String terminalVersionInformation;
+    private String terminalIdInformation;
     private String supplierCode;
     private String depotCode;
     private String username;

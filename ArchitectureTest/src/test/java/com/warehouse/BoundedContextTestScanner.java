@@ -9,14 +9,14 @@ import java.util.stream.Stream;
 
 class BoundedContextTestScanner {
 
-    static Stream<DynamicNode> scanForTests(Object invoke) {
+    static Stream<DynamicNode> scanForTests(final Object invoke) {
         return Arrays
                 .stream(invoke.getClass().getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(BoundedContextTest.class))
                 .map(method -> methodInvokerWrapper(method, invoke));
     }
 
-    private static DynamicNode methodInvokerWrapper(Method method, Object invoke) {
+    private static DynamicNode methodInvokerWrapper(final Method method, final Object invoke) {
         method.setAccessible(true);
         try {
             return (DynamicNode) method.invoke(invoke);

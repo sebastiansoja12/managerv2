@@ -1,17 +1,19 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
-import com.warehouse.shipment.domain.vo.*;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusRequestDto;
-import com.warehouse.shipment.infrastructure.api.dto.*;
-import io.micrometer.common.util.StringUtils;
+import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.enumeration.UpdateType;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
+import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusRequestDto;
+import com.warehouse.shipment.infrastructure.api.dto.*;
+
+import io.micrometer.common.util.StringUtils;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentRequestMapper {
@@ -54,4 +56,6 @@ public interface ShipmentRequestMapper {
     }
 
     ShipmentStatusRequest map(final ShipmentStatusRequestDto shipmentStatusRequest);
+
+    SignatureChangeRequest map(final SignatureChangeRequestDto signatureChangeRequest);
 }

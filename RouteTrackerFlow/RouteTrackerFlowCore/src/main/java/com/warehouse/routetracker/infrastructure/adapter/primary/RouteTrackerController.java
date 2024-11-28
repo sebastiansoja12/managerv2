@@ -68,14 +68,14 @@ public class RouteTrackerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/suppliercode")
+    @PostMapping("/supplier-code")
     public ResponseEntity<?> saveSupplierCode(@RequestBody final SupplierCodeRequestDto supplierCodeRequest) {
         final SupplierCodeRequest request = requestMapper.map(supplierCodeRequest);
         trackerLogPort.saveSupplierCode(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/depotcode")
+    @PostMapping("/depot-code")
     public ResponseEntity<?> saveDepotCode(@RequestBody final DepotCodeRequestDto depotCodeRequest) {
         final DepotCodeRequest request = requestMapper.map(depotCodeRequest);
         trackerLogPort.saveDepotCode(request);

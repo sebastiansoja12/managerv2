@@ -35,7 +35,7 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
     }
 
     @Override
-    public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs) {
+    public FileVisitResult preVisitDirectory(final Path path, final BasicFileAttributes attrs) {
         final String absolutePath = normalize(path.toAbsolutePath().toString());
         final Matcher matcher = PATTERN.matcher(absolutePath);
         final boolean isDomainDirectory = matcher.find();
@@ -62,7 +62,7 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
         return FileVisitResult.CONTINUE;
     }
 
-    private void validateModuleInDependencies(@NonNull String domain, @NonNull String module) {
+    private void validateModuleInDependencies(@NonNull final String domain, @NonNull final String module) {
         final boolean moduleInPom = dependencies
                 .stream()
                 .anyMatch(line -> line.contains(module));
@@ -79,19 +79,19 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
         return Files.readAllLines(path);
     }
 
-    private String getModule(Matcher matcher) {
+    private String getModule(final Matcher matcher) {
         return matcher.group(2);
     }
 
-    private String createName(String domain) {
+    private String createName(final String domain) {
         return domain.toUpperCase();
     }
 
-    private String getDomain(Matcher matcher) {
+    private String getDomain(final Matcher matcher) {
         return matcher.group(2);
     }
 
-    private String pack(String domain) {
+    private String pack(final String domain) {
         return ROOT + domain;
     }
 
@@ -99,7 +99,7 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
         return Paths.get("").toAbsolutePath();
     }
 
-    private static String normalize(String path) {
+    private static String normalize(final String path) {
         return path.replace("/", "\\");
     }
 

@@ -33,7 +33,7 @@ public class RouteLoggerVersionServiceAdapter implements RouteLoggerVersionServi
         final VersionLogRequestDto request = requestMapper.map(versionLogRequest);
         restClient
                 .post()
-                .uri("/v2/api/routes/{endpoint}", routeTrackerLogProperties.getZebraVersionInformation())
+                .uri("/v2/api/routes/{endpoint}", routeTrackerLogProperties.getTerminalVersionInformation())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()

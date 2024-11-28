@@ -5,6 +5,7 @@ import static com.warehouse.shipment.DataTestCreator.shipmentId;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
+import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
@@ -51,6 +53,9 @@ class ShipmentPortImplTest {
     @Mock
     private TrackingStatusServicePort trackingStatusServicePort;
 
+    @Mock
+    private Set<ShipmentStatusHandler> shipmentStatusHandlers;
+
     private ShipmentPortImpl shipmentPort;
 
     private final static UUID processId = UUID.fromString("2d255296-3f50-4cc1-b8dc-ef6e634aab0d");
@@ -63,7 +68,7 @@ class ShipmentPortImplTest {
                 softwareConfigurationServicePort);
         final Logger logger = mock(Logger.class);
         shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
-                mailServicePort, trackingStatusServicePort);
+                mailServicePort, trackingStatusServicePort, shipmentStatusHandlers);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
@@ -27,20 +28,24 @@ public class ParcelRepositoryServiceAdapter implements ParcelRepositoryServicePo
         this.restClient = RestClient.builder().baseUrl(shipmentProperties.getUrl()).build();
     }
 
+    private Shipment emptyShipment() {
+        return Shipment.builder().build();
+    }
+
     @Override
-    public Shipment downloadParcel(Long value) {
+    public Shipment downloadShipment(final ShipmentId shipmentId) {
         final ResponseEntity<ShipmentDto> parcelResponse = restClient
                 .get()
-                .uri("/v2/api/shipments/{value}", value)
+                .uri("/v2/api/shipments/{value}", shipmentId.getValue())
                 .retrieve()
-				.onStatus(HttpStatusCode::is5xxServerError,
-						(req, res) -> {
-							logger.error("Could not establish connection");
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        (req, res) -> {
+                            logger.error("Could not establish connection");
                             throw new TechnicalException(res.getStatusCode().value(), res.getStatusText());
-						})
+                        })
                 .onStatus(HttpStatusCode::is4xxClientError,
                         (req, res) -> {
-                            logger.error("Parcel {} was not found", value);
+                            logger.error("Shipment {} was not found", shipmentId);
                             throw new BusinessException(res.getStatusCode().value(), res.getStatusText());
                         })
                 .toEntity(ShipmentDto.class);
@@ -49,10 +54,6 @@ public class ParcelRepositoryServiceAdapter implements ParcelRepositoryServicePo
                 return Shipment.from(parcelResponse.getBody());
             }
         }
-        return emptyResponseParcel();
-    }
-
-    private Shipment emptyResponseParcel() {
-        return Shipment.builder().build();
+        return emptyShipment();
     }
 }

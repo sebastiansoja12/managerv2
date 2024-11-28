@@ -20,7 +20,6 @@
 		<module>ShipmentManagement</module>
 		<module>MailService</module>
 		<module>DepartmentService</module>
-		<module>RouteTrackerFlow</module>
 		<module>SupplyOperation</module>
 		<module>PathFinder</module>
 		<module>Authorization</module>
@@ -33,7 +32,6 @@
         <module>ReturningTrackManager</module>
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>
-        <module>SoftwareConfiguration</module>
         <module>E2E</module>
         <module>Common</module>
         <module>RouteLogger</module>

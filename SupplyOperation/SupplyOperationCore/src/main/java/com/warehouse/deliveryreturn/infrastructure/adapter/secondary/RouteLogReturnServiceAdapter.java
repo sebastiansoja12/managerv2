@@ -12,10 +12,12 @@ import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.Deliver
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryReturnEventMapper;
 import com.warehouse.routelogger.RouteLogEvent;
 import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.routelogger.dto.*;
-import com.warehouse.routelogger.event.*;
-import com.warehouse.terminal.model.DeliveryReturnDetail;
-import com.warehouse.terminal.request.TerminalRequest;
+import com.warehouse.routelogger.dto.DeliveryRequestDto;
+import com.warehouse.routelogger.dto.DepotCodeRequestDto;
+import com.warehouse.routelogger.dto.ProcessTypeDto;
+import com.warehouse.routelogger.event.DeliveryLogEvent;
+import com.warehouse.routelogger.event.DepartmentCodeLogEvent;
+import com.warehouse.routelogger.event.SupplierCodeLogEvent;
 
 import lombok.AllArgsConstructor;
 
@@ -37,23 +39,8 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
     }
 
     @Override
-    public void logRequest(final TerminalRequest terminalRequest, final String requestAsJson) {
-        buildRequestLogEvent(terminalRequest, requestAsJson).forEach(this::sendEvent);
-    }
-
-    @Override
     public void logSupplierCode(final DeliveryReturn deliveryReturn) {
         sendEvent(buildSupplierCodeLogEvent(deliveryReturn));
-    }
-
-    @Override
-    public void logTerminalId(final TerminalRequest terminalRequest) {
-        buildTerminalLogEvents(terminalRequest).forEach(this::sendEvent);
-    }
-
-    @Override
-    public void logVersion(final TerminalRequest terminalRequest) {
-        buildVersionLogEvents(terminalRequest).forEach(this::sendEvent);
     }
 
     private List<DepartmentCodeLogEvent> buildDepotCodeLogEvents(final DeliveryReturnRequest deliveryReturnRequest) {
@@ -63,7 +50,7 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
                     final DepotCodeRequestDto depotCodeRequest = DepotCodeRequestDto
                             .builder()
                             .depotCode(deliveryReturnRequest.getDepotCode())
-                            .parcelId(deliveryReturnDetails.getParcelId())
+                            .parcelId(deliveryReturnDetails.getShipmentId().getValue())
                             .processType(deliveryReturnRequest.getProcessType().name())
                             .build();
                     departmentCodeLogEvents.add(new DepartmentCodeLogEvent(depotCodeRequest));
@@ -92,45 +79,6 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
         return SupplierCodeLogEvent.builder()
                 .supplierCodeRequest(eventMapper.mapToSupplierCodeRequest(deliveryReturn))
                 .build();
-    }
-
-    private List<RequestLogEvent> buildRequestLogEvent(final TerminalRequest terminalRequest, final String requestAsJson) {
-        final List<DeliveryReturnDetail> deliveryReturnDetails = terminalRequest.getDeliveryReturnDetails();
-        final List<RequestLogEvent> requestLogEvents = new ArrayList<>();
-        deliveryReturnDetails.forEach(
-                deliveryReturnDetail -> {
-                    final RequestDto request = RequestDto.builder()
-                            .parcelId(deliveryReturnDetail.getShipmentId())
-                            .request(requestAsJson)
-                            .processType(ProcessTypeDto.RETURN)
-                            .build();
-                    requestLogEvents.add(new RequestLogEvent(request));
-                }
-        );
-        return requestLogEvents;
-    }
-
-	private List<TerminalLogEvent> buildTerminalLogEvents(final TerminalRequest terminalRequest) {
-		final List<DeliveryReturnDetail> deliveryReturnDetails = terminalRequest.getDeliveryReturnDetails();
-		final List<TerminalLogEvent> terminalLogEvents = new ArrayList<>();
-		deliveryReturnDetails.forEach(deliveryReturnDetail -> {
-			final TerminalLogRequestDto request = new TerminalLogRequestDto(
-					String.valueOf(terminalRequest.getDevice().getDeviceId()),
-					ProcessTypeDto.RETURN, deliveryReturnDetail.getShipmentId());
-			terminalLogEvents.add(new TerminalLogEvent(request));
-		});
-		return terminalLogEvents;
-	}
-
-    private List<VersionLogEvent> buildVersionLogEvents(final TerminalRequest terminalRequest) {
-        final List<DeliveryReturnDetail> deliveryReturnDetails = terminalRequest.getDeliveryReturnDetails();
-        final List<VersionLogEvent> terminalLogEvents = new ArrayList<>();
-        deliveryReturnDetails.forEach(deliveryReturnDetail -> {
-            final VersionLogRequestDto request = new VersionLogRequestDto(deliveryReturnDetail.getShipmentId(),
-                    ProcessTypeDto.RETURN, terminalRequest.getDevice().getVersion());
-            terminalLogEvents.add(new VersionLogEvent(request));
-        });
-        return terminalLogEvents;
     }
 
     private void sendEvent(final RouteLogEvent event) {

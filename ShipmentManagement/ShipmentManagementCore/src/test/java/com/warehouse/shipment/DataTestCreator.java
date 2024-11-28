@@ -58,6 +58,6 @@ public class DataTestCreator {
 
     static Shipment createShipment() {
 		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, money(), LocalDateTime.now(),
-				LocalDateTime.now(), false);
+				LocalDateTime.now(), false, null);
     }
 }
