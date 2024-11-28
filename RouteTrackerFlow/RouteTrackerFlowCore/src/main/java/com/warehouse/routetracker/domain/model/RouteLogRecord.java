@@ -42,7 +42,7 @@ public class RouteLogRecord {
         routeLogRecordDetail.saveTerminalId(terminalId);
     }
 
-    public void saveTerminalVersion(final ProcessType processType, final String version) {
+    public void saveDeviceVersion(final ProcessType processType, final String version) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
         routeLogRecordDetail.saveZebraVersionInformation(version);
