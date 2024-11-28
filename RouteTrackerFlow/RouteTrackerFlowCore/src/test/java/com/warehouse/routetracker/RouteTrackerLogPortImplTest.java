@@ -64,7 +64,7 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldSaveDeviceIdInformation() {
         // given
-        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.RETURN, shipmentId, terminalId);
+        final DeviceIdInformation information = new DeviceIdInformation(ProcessType.RETURN, shipmentId, terminalId);
 
         final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
                 .builder()
@@ -101,7 +101,7 @@ public class RouteTrackerLogPortImplTest {
     void shouldSaveDeviceIdInformationToNewProcessWhenGivenWasNotFound() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.RETURN, shipmentId, terminalId);
+        final DeviceIdInformation information = new DeviceIdInformation(ProcessType.RETURN, shipmentId, terminalId);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
         when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
@@ -540,7 +540,7 @@ public class RouteTrackerLogPortImplTest {
     @Test
     void shouldNotSaveDeviceIdInformationWhenProcessIsNotFound() {
         // given
-        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.MISS, shipmentId, new TerminalId(1L));
+        final DeviceIdInformation information = new DeviceIdInformation(ProcessType.MISS, shipmentId, new TerminalId(1L));
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
                 .find(shipmentId);

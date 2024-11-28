@@ -16,7 +16,7 @@ public interface RouteTrackerLogPort {
 
     List<RouteLogRecord> findAll();
 
-    void saveDeviceIdInformation(TerminalIdInformation terminalIdInformation);
+    void saveDeviceIdInformation(DeviceIdInformation deviceIdInformation);
 
     void saveDeviceVersionInformation(TerminalVersionInformation terminalVersionInformation);
 

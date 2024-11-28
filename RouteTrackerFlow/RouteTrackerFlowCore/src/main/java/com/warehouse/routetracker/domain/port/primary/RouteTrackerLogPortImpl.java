@@ -33,7 +33,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public void saveDeviceIdInformation(final TerminalIdInformation information) {
+    public void saveDeviceIdInformation(final DeviceIdInformation information) {
         final RouteLogRecord routeLogRecord = this.repository.find(information.getShipmentId());
         routeLogRecord.saveTerminalId(information.getProcessType(), information.getTerminalId());
         this.repository.update(routeLogRecord);

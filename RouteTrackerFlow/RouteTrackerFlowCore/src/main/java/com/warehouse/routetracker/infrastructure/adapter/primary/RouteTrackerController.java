@@ -49,8 +49,8 @@ public class RouteTrackerController {
 
     @PostMapping("/terminal-id")
     public ResponseEntity<?> saveTerminalId(@RequestBody final TerminalIdRequestDto request) {
-        final TerminalIdInformation terminalIdInformation = requestMapper.map(request);
-        trackerLogPort.saveDeviceIdInformation(terminalIdInformation);
+        final DeviceIdInformation deviceIdInformation = requestMapper.map(request);
+        trackerLogPort.saveDeviceIdInformation(deviceIdInformation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

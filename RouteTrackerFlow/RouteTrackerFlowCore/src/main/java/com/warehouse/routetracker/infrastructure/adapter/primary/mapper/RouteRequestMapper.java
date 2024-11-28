@@ -13,7 +13,7 @@ public interface RouteRequestMapper {
 
     ShipmentId map(ShipmentIdDto id);
 
-    TerminalIdInformation map(TerminalIdRequestDto zebraIdInformation);
+    DeviceIdInformation map(TerminalIdRequestDto zebraIdInformation);
 
     TerminalVersionInformation map(TerminalVersionRequestDto versionInformation);
 
