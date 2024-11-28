@@ -44,7 +44,8 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
     private final DeliveryResponseMapper responseMapper = getMapper(DeliveryResponseMapper.class);
 
-    public DeliveryDispatchAdapter(final List<ProcessHandler> handlers, final DeliveryPort deliveryPort,
+    public DeliveryDispatchAdapter(final List<ProcessHandler> handlers,
+                                   final DeliveryPort deliveryPort,
                                    final Set<DeliveryCreator> deliveryCreators,
                                    final TerminalRequestLoggerPort terminalRequestLoggerPort) {
         super(handlers);
