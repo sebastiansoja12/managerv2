@@ -1,6 +1,7 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -26,8 +27,7 @@ public interface DeliveryReturnRequestMapper {
     }
 
     default DeliveryReturnRequest map(TerminalRequest request) {
-        return new DeliveryReturnRequest(map(request.getProcessType()), map(request.getDevice()),
-                map(request.getDeliveryReturnDetails()));
+        return new DeliveryReturnRequest(map(request.getProcessType()), map(request.getDevice()), Collections.emptyList());
     }
 
     List<DeliveryReturnDetails> map(List<DeliveryReturnDetail> deliveryReturnRequests);

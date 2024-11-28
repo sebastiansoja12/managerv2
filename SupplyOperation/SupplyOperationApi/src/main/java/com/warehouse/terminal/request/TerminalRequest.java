@@ -5,7 +5,6 @@ import java.util.List;
 import com.warehouse.terminal.enumeration.ProcessType;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectRequest;
-import com.warehouse.terminal.model.DeliveryReturnDetail;
 
 import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
@@ -38,14 +37,4 @@ public class TerminalRequest {
     @XmlElementWrapper(name = "DeliveryRejectRequests")
     @XmlElement(name = "DeliveryRejectRequest")
     private List<DeliveryRejectRequest> deliveryRejectRequests;
-
-    /**
-     * -- GETTER --
-     *  DeliverReturnDetails.
-     *
-     * @return
-     */
-    @XmlElementWrapper(name = "DeliveryReturnDetails")
-    @XmlElement(name = "DeliveryReturnDetail")
-    private List<DeliveryReturnDetail> deliveryReturnDetails;
 }

@@ -25,6 +25,7 @@ import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryRequ
 import com.warehouse.delivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.request.TerminalRequest;
+import com.warehouse.terminal.response.TerminalResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,7 +54,7 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<?> processRequest(@RequestBody final TerminalRequest terminalRequest) {
+    public ResponseEntity<TerminalResponse> processRequest(@RequestBody final TerminalRequest terminalRequest) {
 
         final Device device = terminalRequest.getDevice();
 

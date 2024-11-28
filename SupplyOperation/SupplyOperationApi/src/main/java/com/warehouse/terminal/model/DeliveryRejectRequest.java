@@ -1,6 +1,7 @@
 package com.warehouse.terminal.model;
 
 import com.warehouse.terminal.enumeration.DeliveryStatus;
+
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;

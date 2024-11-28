@@ -28,4 +28,10 @@ public class Device {
     @XmlElement(name = "DepartmentCode")
     private String departmentCode;
 
+    @XmlElement(name = "DeviceUserType")
+    private String deviceUserType;
+
+    @XmlElement(name = "DeviceType")
+    private String deviceType;
+
 }
