@@ -3,13 +3,10 @@ package com.warehouse.deliveryreturn.infrastructure.api.dto;
 import com.warehouse.delivery.dto.DeliveryStatusDto;
 
 public class DeliveryReturnResponseDetailsDto {
-    private ProcessIdDto processId;
-    private DeliveryStatusDto deliveryStatus;
-    private ReturnTokenDto returnToken;
-    private UpdateStatusDto updateStatus;
-
-    public DeliveryReturnResponseDetailsDto() {
-    }
+    private final ProcessIdDto processId;
+    private final DeliveryStatusDto deliveryStatus;
+    private final ReturnTokenDto returnToken;
+    private final UpdateStatusDto updateStatus;
 
     public DeliveryReturnResponseDetailsDto(final ProcessIdDto processId,
                                             final DeliveryStatusDto deliveryStatus,
