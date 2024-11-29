@@ -1,5 +1,9 @@
 package com.warehouse.deliveryreject.dto.request;
 
+import com.warehouse.delivery.dto.DeliveryStatusDto;
+import com.warehouse.delivery.dto.DepartmentCodeDto;
+import com.warehouse.delivery.dto.DeviceIdDto;
+import com.warehouse.delivery.dto.ShipmentIdDto;
 import com.warehouse.deliveryreject.dto.*;
 
 public class DeliveryRejectRequestDto {

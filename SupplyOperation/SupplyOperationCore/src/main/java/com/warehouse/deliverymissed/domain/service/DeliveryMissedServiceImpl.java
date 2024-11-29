@@ -17,7 +17,6 @@ public class DeliveryMissedServiceImpl implements DeliveryMissedService {
     @Override
     public DeliveryMissed saveDelivery(DeliveryMissedRequest request) {
         final UpdateStatusParcelRequest updateStatusParcelRequest = UpdateStatusParcelRequest.builder()
-                .parcelId(request.getParcelId())
                 .build();
         parcelStatusServicePort.updateParcelStatus(updateStatusParcelRequest);
         return deliveryMissedRepository.saveDeliveryMissed(request);

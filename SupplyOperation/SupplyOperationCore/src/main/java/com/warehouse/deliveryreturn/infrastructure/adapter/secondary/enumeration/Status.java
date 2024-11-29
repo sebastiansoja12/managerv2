@@ -9,5 +9,6 @@ public enum Status {
     UNKNOWN,
     DELIVERED,
     REJECTED,
-    RETURN
+    RETURN,
+    UNAVAILABLE
 }

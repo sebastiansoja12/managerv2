@@ -3,6 +3,7 @@ package com.warehouse.delivery.infrastructure.adapter.primary;
 import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -10,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.model.Request;
 import com.warehouse.delivery.domain.model.Response;
@@ -75,9 +78,11 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         final DeliveryCreator deliveryCreator = determineDeliveryCreator(request.getProcessType());
 
-        final Set<DeliveryResponse> deliveryResponses = this.deliveryPort.processDelivery(
-                deliveryCreator.create(request, response)
-        );
+        final Set<DeliveryRequest> deliveryRequests = deliveryCreator.create(request, response);
+
+        final Set<DeliveryResponse> deliveryResponses =
+                !CollectionUtils.isEmpty(deliveryRequests) ? this.deliveryPort.processDelivery(deliveryRequests)
+                : Collections.emptySet();
 
         response.updateDeliveryResponse(deliveryResponses);
 

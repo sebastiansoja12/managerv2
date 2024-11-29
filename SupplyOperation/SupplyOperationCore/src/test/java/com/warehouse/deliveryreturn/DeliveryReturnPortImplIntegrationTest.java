@@ -21,12 +21,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.client.RestClient;
 
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
@@ -212,7 +212,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 			String depotCode, String supplierCode, String token) {
 
 		final DeliveryReturnDetails deliveryReturnDetails = DeliveryReturnDetails.builder()
-				.deliveryStatus(deliveryStatus).shipmentId(new ShipmentId(parcelId)).supplierCode(new SupplierCode(supplierCode))
+				.deliveryStatus(deliveryStatus)
+				.shipmentId(new ShipmentId(parcelId))
+				.supplierCode(new SupplierCode(supplierCode))
 				.departmentCode(new DepartmentCode(depotCode))
 				.token(token).build();
 

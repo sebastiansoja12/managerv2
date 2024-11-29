@@ -1,11 +1,10 @@
 package com.warehouse.deliveryreturn.domain.model;
 
-import static com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus.RETURN;
 
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.deliveryreturn.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
 
 import lombok.Builder;
@@ -71,14 +70,14 @@ public class DeliveryReturnDetails {
     }
 
     public void validateDeliveryStatus() {
-        if (!RETURN.equals(deliveryStatus)) {
+        if (!DeliveryStatus.RETURN.equals(deliveryStatus)) {
             throw new WrongDeliveryStatusException(500, "Wrong delivery status");
         }
     }
 
     public DeliveryReturnDetails updateDeliveryStatus() {
         return DeliveryReturnDetails.builder()
-                .deliveryStatus(RETURN)
+                .deliveryStatus(DeliveryStatus.RETURN)
                 .shipmentId(shipmentId)
                 .supplierCode(supplierCode)
                 .departmentCode(departmentCode)

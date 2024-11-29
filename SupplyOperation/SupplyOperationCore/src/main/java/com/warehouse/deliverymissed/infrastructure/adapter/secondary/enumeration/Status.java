@@ -1,5 +1,5 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary.enumeration;
 
 public enum Status {
-    UNAVAILABLE, TEST
+    DEPOT, CLIENT, DELIVERY, SENDER, LOST, UNKNOWN, DELIVERED, REJECTED, RETURN, UNAVAILABLE
 }

@@ -2,5 +2,5 @@ package com.warehouse.deliverymissed.domain.enumeration;
 
 
 public enum DeliveryStatus {
-    UNAVAILABLE, TEST
+    DEPOT, CLIENT, DELIVERY, SENDER, LOST, UNKNOWN, DELIVERED, REJECTED, RETURN, UNAVAILABLE
 }
