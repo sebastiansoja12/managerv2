@@ -3,8 +3,7 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 public class ShipmentIdDto {
     private Long value;
 
-    public ShipmentIdDto() {
-    }
+    public ShipmentIdDto() {}
 
     public ShipmentIdDto(final Long value) {
         this.value = value;

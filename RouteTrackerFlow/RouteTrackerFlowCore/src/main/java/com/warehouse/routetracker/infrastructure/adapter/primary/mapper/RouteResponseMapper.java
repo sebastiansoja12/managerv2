@@ -22,7 +22,10 @@ public interface RouteResponseMapper {
     @Mapping(target = "status", source = "parcelStatus")
     RouteInformationDto map(final RouteInformation routeInformation);
 
-    RouteProcessDto map(final RouteProcess routeProcess);
+    default RouteProcessDto map(final RouteProcess routeProcess) {
+        final ShipmentIdDto shipmentId = new ShipmentIdDto(routeProcess.getShipmentId().getValue());
+        return new RouteProcessDto(shipmentId, routeProcess.getProcessId());
+    }
 
     default RouteLogRecordDto map(final RouteLogRecord routeLogRecord) {
         final ProcessIdDto processId = new ProcessIdDto(routeLogRecord.getId());
