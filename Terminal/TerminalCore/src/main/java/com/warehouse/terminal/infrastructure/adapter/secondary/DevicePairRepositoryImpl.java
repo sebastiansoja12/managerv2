@@ -18,7 +18,6 @@ import jakarta.transaction.Transactional;
 public class DevicePairRepositoryImpl implements DevicePairRepository {
     
     private final DevicePairReadRepository repository;
-    private final String alreadyPairedExceptionMessage = "Device %s already paired";
 
     public DevicePairRepositoryImpl(final DevicePairReadRepository repository) {
         this.repository = repository;
