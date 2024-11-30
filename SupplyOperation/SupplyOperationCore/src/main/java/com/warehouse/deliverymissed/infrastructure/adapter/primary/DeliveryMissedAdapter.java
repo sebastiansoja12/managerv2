@@ -33,7 +33,7 @@ public class DeliveryMissedAdapter implements DeliveryMissedService {
     @Override
     public DeliveryMissedResponseDto processDeliveryMiss(final DeliveryMissedRequestDto deliveryMissedRequest) {
         final DeliveryMissedRequest request = requestMapper.map(deliveryMissedRequest);
-        final DeliveryMissedResponse response = deliveryMissedPort.logMissedDelivery(request);
+        final DeliveryMissedResponse response = deliveryMissedPort.process(request);
         return responseMapper.map(response);
     }
 }

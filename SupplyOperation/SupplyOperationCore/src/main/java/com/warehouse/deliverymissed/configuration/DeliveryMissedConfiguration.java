@@ -1,14 +1,11 @@
 package com.warehouse.deliverymissed.configuration;
 
+import com.warehouse.deliverymissed.domain.port.secondary.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.deliverymissed.domain.port.primary.*;
-import com.warehouse.deliverymissed.domain.port.secondary.DeliveryMissedRepository;
-import com.warehouse.deliverymissed.domain.port.secondary.ParcelStatusServicePort;
-import com.warehouse.deliverymissed.domain.port.secondary.RouteLogMissedServicePort;
-import com.warehouse.deliverymissed.domain.port.secondary.SupplierRepository;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedServiceImpl;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.*;
@@ -19,9 +16,15 @@ import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 public class DeliveryMissedConfiguration {
 
 	@Bean
-	public DeliveryMissedPort deliveryMissedPort(DeliveryMissedService deliveryMissedService,
-			RouteLogMissedServicePort logMissedServicePort) {
-		return new DeliveryMissedPortImpl(deliveryMissedService, logMissedServicePort);
+	public DeliveryMissedPort deliveryMissedPort(final DeliveryMissedService deliveryMissedService,
+												 final RouteLogMissedServicePort logMissedServicePort,
+												 final DeliveryInstructionServicePort deliveryInstructionServicePort) {
+		return new DeliveryMissedPortImpl(deliveryMissedService, logMissedServicePort, deliveryInstructionServicePort);
+	}
+
+	@Bean
+	public DeliveryInstructionServicePort deliveryInstructionServicePort() {
+		return new DeliveryInstructionServiceAdapter();
 	}
 
 	@Bean("deliveryMissed.terminalRequestLoggerPort")

@@ -1,10 +1,13 @@
 package com.warehouse.deliverymissed.domain.vo;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import lombok.Builder;
 
 import java.time.Instant;
 
+@Builder
 public class DeliveryMissedDetail {
+    private final DeliveryMissedDetailId deliveryMissedDetailId;
     private final Instant plannedDeliveryDate;
     private final Instant deliveryDate;
     private final Instant created;
@@ -16,7 +19,8 @@ public class DeliveryMissedDetail {
     private final String incidentReport;
     private final ShipmentId shipmentId;
 
-    public DeliveryMissedDetail(final Instant plannedDeliveryDate,
+    public DeliveryMissedDetail(final DeliveryMissedDetailId deliveryMissedDetailId,
+                                final Instant plannedDeliveryDate,
                                 final Instant deliveryDate,
                                 final Instant created,
                                 final Instant newProposedDate,
@@ -26,6 +30,7 @@ public class DeliveryMissedDetail {
                                 final String suggestedAction,
                                 final String incidentReport,
                                 final ShipmentId shipmentId) {
+        this.deliveryMissedDetailId = deliveryMissedDetailId;
         this.plannedDeliveryDate = plannedDeliveryDate;
         this.deliveryDate = deliveryDate;
         this.created = created;
@@ -36,6 +41,10 @@ public class DeliveryMissedDetail {
         this.suggestedAction = suggestedAction;
         this.incidentReport = incidentReport;
         this.shipmentId = shipmentId;
+    }
+
+    public DeliveryMissedDetailId getDeliveryMissedDetailId() {
+        return deliveryMissedDetailId;
     }
 
     public ShipmentId getShipmentId() {
