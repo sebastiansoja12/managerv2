@@ -1,4 +1,4 @@
-package com.warehouse.deliverymissed;
+package com.warehouse.delivery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,12 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.deliverymissed.domain.port.primary.SupplierValidatorPortImpl;
-import com.warehouse.deliverymissed.domain.port.secondary.SupplierRepository;
+import com.warehouse.delivery.domain.port.primary.SupplierValidatorPortImpl;
+import com.warehouse.delivery.domain.port.secondary.SupplierRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SupplierValidatorPortImplTest {
-
 
     @Mock
     private SupplierRepository supplierRepository;

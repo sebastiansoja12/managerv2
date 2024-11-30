@@ -1,5 +1,6 @@
-package com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity;
+package com.warehouse.delivery.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.DepotEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "deliveryMissed.SupplierEntity")
+@Entity(name = "delivery.SupplierEntity")
 @Builder
 @Table(name = "supplier")
-@NamedEntityGraph(name = "deliveryMissed.SupplierEntity.full", attributeNodes = {
+@NamedEntityGraph(name = "delivery.SupplierEntity.full", attributeNodes = {
         @NamedAttributeNode("depot")
 })
 public class SupplierEntity {
@@ -36,5 +37,9 @@ public class SupplierEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
     private DepotEntity depot;
+
+    public boolean isActive() {
+        return active;
+    }
 
 }

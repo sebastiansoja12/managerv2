@@ -3,16 +3,18 @@ package com.warehouse.delivery.infrastructure.adapter.primary;
 import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
@@ -20,6 +22,7 @@ import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.model.Request;
 import com.warehouse.delivery.domain.model.Response;
 import com.warehouse.delivery.domain.port.primary.DeliveryPort;
+import com.warehouse.delivery.domain.port.primary.SupplierValidatorPort;
 import com.warehouse.delivery.domain.port.primary.TerminalRequestLoggerPort;
 import com.warehouse.delivery.infrastructure.adapter.primary.creator.DeliveryCreator;
 import com.warehouse.delivery.infrastructure.adapter.primary.dto.ErrorResponseDto;
@@ -37,30 +40,39 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/deliveries")
 public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
+
     private final DeliveryPort deliveryPort;
 
     private final Set<DeliveryCreator> deliveryCreators;
 
     private final TerminalRequestLoggerPort terminalRequestLoggerPort;
 
+    private final SupplierValidatorPort supplierValidatorPort;
+
     private final DeliveryRequestMapper requestMapper = getMapper(DeliveryRequestMapper.class);
 
     private final DeliveryResponseMapper responseMapper = getMapper(DeliveryResponseMapper.class);
 
+    final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd H:mm:ss", Locale.of("PL"));
+
     public DeliveryDispatchAdapter(final List<ProcessHandler> handlers,
                                    final DeliveryPort deliveryPort,
                                    final Set<DeliveryCreator> deliveryCreators,
-                                   final TerminalRequestLoggerPort terminalRequestLoggerPort) {
+                                   final TerminalRequestLoggerPort terminalRequestLoggerPort,
+                                   final SupplierValidatorPort supplierValidatorPort) {
         super(handlers);
         this.deliveryPort = deliveryPort;
         this.deliveryCreators = deliveryCreators;
         this.terminalRequestLoggerPort = terminalRequestLoggerPort;
+        this.supplierValidatorPort = supplierValidatorPort;
     }
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<TerminalResponse> processRequest(@RequestBody final TerminalRequest terminalRequest) {
 
         final Device device = terminalRequest.getDevice();
+
+        supplierValidatorPort.validateSupplierCode(device.getUsername());
 
         log.info("Detected request from Terminal device: ID - {}, Version - {}, Responsible User - {}, Department - {}",
                 device.getDeviceId(), device.getVersion(),
@@ -114,8 +126,12 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
     }
 
     @ExceptionHandler(RestException.class)
-    public ResponseEntity<?> handleException(final RestException ex) {
-        final ErrorResponseDto error = new ErrorResponseDto(LocalDateTime.now(), ex.getCode(), ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatusCode.valueOf(error.getStatus()));
+    @ResponsePayload
+    public ResponseEntity<ErrorResponseDto> handleException(final RestException ex) {
+        final ErrorResponseDto errorResponse =
+                new ErrorResponseDto(LocalDateTime.now().format(dtf), ex.getCode(), ex.getMessage());
+        return ResponseEntity.status(ex.getCode())
+                .header("Content-Type", "application/xml")
+                .body(errorResponse);
     }
 }
