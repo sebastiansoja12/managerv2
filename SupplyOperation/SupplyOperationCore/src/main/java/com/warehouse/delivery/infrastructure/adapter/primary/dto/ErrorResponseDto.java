@@ -1,23 +1,31 @@
 package com.warehouse.delivery.infrastructure.adapter.primary.dto;
 
-import java.time.LocalDateTime;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-
+@XmlRootElement(name = "ErrorResponse")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ErrorResponseDto {
-    private LocalDateTime timestamp;
+
+    @XmlElement(name = "Timestamp")
+    private String timestamp;
+    @XmlElement(name = "Status")
     private int status;
+    @XmlElement(name = "Error")
     private String error;
 
     public ErrorResponseDto() {
     }
 
-    public ErrorResponseDto(final LocalDateTime timestamp, final int status, final String error) {
+    public ErrorResponseDto(final String timestamp, final int status, final String error) {
         this.timestamp = timestamp;
         this.status = status;
         this.error = error;
     }
 
-    public LocalDateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 

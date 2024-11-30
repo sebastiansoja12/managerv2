@@ -1,14 +1,14 @@
-package com.warehouse.deliveryreject.dto;
+package com.warehouse.delivery.dto;
 
 import java.util.Objects;
 
-public record ShipmentIdDto(Long value) {
+public record DepartmentCodeDto(String value) {
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final ShipmentIdDto that = (ShipmentIdDto) o;
+        final DepartmentCodeDto that = (DepartmentCodeDto) o;
         return Objects.equals(value, that.value);
     }
 

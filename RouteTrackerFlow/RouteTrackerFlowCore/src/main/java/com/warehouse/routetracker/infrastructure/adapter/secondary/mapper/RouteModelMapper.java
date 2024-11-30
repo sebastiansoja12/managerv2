@@ -31,5 +31,6 @@ public interface RouteModelMapper {
     RouteLogRecordDetail map(RouteLogRecordDetailEntity routeLogRecordDetailEntity);
 
     @Mapping(target = "processId", source = "id")
+    @Mapping(target = "shipmentId.value", source = "parcelId")
     RouteProcess map(RouteLogRecordEntity entity);
 }

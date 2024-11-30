@@ -1,4 +1,4 @@
-package com.warehouse.deliveryreject.dto;
+package com.warehouse.delivery.dto;
 
 public record DeliveryIdDto(String value) {
 }

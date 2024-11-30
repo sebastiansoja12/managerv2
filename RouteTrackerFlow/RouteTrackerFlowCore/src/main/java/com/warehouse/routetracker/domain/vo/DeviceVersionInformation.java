@@ -4,13 +4,13 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 
 
-public class TerminalVersionInformation {
+public class DeviceVersionInformation {
     private String version;
     private ShipmentId shipmentId;
     private ProcessType processType;
 
-	public TerminalVersionInformation(final String version, final ShipmentId shipmentId,
-			final ProcessType processType) {
+	public DeviceVersionInformation(final String version, final ShipmentId shipmentId,
+                                    final ProcessType processType) {
         this.version = version;
         this.shipmentId = shipmentId;
         this.processType = processType;

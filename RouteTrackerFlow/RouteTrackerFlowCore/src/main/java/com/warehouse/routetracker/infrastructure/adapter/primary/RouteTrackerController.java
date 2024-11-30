@@ -49,15 +49,15 @@ public class RouteTrackerController {
 
     @PostMapping("/terminal-id")
     public ResponseEntity<?> saveTerminalId(@RequestBody final TerminalIdRequestDto request) {
-        final TerminalIdInformation terminalIdInformation = requestMapper.map(request);
-        trackerLogPort.saveTerminalIdInformation(terminalIdInformation);
+        final DeviceIdInformation deviceIdInformation = requestMapper.map(request);
+        trackerLogPort.saveDeviceIdInformation(deviceIdInformation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/terminal-version")
     public ResponseEntity<?> saveZebraVersion(@RequestBody final TerminalVersionRequestDto versionRequest) {
-        final TerminalVersionInformation terminalVersionInformation = requestMapper.map(versionRequest);
-        trackerLogPort.saveZebraVersionInformation(terminalVersionInformation);
+        final DeviceVersionInformation deviceVersionInformation = requestMapper.map(versionRequest);
+        trackerLogPort.saveDeviceVersionInformation(deviceVersionInformation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

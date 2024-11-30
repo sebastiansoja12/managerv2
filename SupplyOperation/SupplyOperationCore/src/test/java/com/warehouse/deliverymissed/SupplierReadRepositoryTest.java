@@ -18,8 +18,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.deliverymissed.configuration.DeliveryMissedTestConfiguration;
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.SupplierReadRepository;
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.SupplierEntity;
+import com.warehouse.delivery.infrastructure.adapter.secondary.SupplierReadRepository;
+import com.warehouse.delivery.infrastructure.adapter.secondary.entity.SupplierEntity;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest

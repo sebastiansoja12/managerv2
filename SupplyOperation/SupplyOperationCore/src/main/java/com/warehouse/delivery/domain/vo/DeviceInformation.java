@@ -13,18 +13,60 @@ public class DeviceInformation {
     private final String version;
     private final String username;
 
-    public DeviceInformation(final DeviceId deviceId,
-                             final DepartmentCode departmentCode,
-                             final DeviceType deviceType,
-                             final DeviceUserType deviceUserType,
-                             final String version,
-                             final String username) {
-        this.deviceId = deviceId;
-        this.departmentCode = departmentCode;
-        this.deviceType = deviceType;
-        this.deviceUserType = deviceUserType;
-        this.version = version;
-        this.username = username;
+    private DeviceInformation(Builder builder) {
+        this.deviceId = builder.deviceId;
+        this.departmentCode = builder.departmentCode;
+        this.deviceType = builder.deviceType;
+        this.deviceUserType = builder.deviceUserType;
+        this.version = builder.version;
+        this.username = builder.username;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private DeviceId deviceId;
+        private DepartmentCode departmentCode;
+        private DeviceType deviceType;
+        private DeviceUserType deviceUserType;
+        private String version;
+        private String username;
+
+        public Builder deviceId(final DeviceId deviceId) {
+            this.deviceId = deviceId;
+            return this;
+        }
+
+        public Builder departmentCode(final DepartmentCode departmentCode) {
+            this.departmentCode = departmentCode;
+            return this;
+        }
+
+        public Builder deviceType(final DeviceType deviceType) {
+            this.deviceType = deviceType;
+            return this;
+        }
+
+        public Builder deviceUserType(final DeviceUserType deviceUserType) {
+            this.deviceUserType = deviceUserType;
+            return this;
+        }
+
+        public Builder version(final String version) {
+            this.version = version;
+            return this;
+        }
+
+        public Builder username(final String username) {
+            this.username = username;
+            return this;
+        }
+
+        public DeviceInformation build() {
+            return new DeviceInformation(this);
+        }
     }
 
     public DeviceType getDeviceType() {
@@ -51,3 +93,4 @@ public class DeviceInformation {
         return username;
     }
 }
+

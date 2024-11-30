@@ -62,9 +62,9 @@ public class RouteTrackerLogPortImplTest {
     }
 
     @Test
-    void shouldSaveTerminalIdInformation() {
+    void shouldSaveDeviceIdInformation() {
         // given
-        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.RETURN, shipmentId, terminalId);
+        final DeviceIdInformation information = new DeviceIdInformation(ProcessType.RETURN, shipmentId, terminalId);
 
         final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
                 .builder()
@@ -92,29 +92,29 @@ public class RouteTrackerLogPortImplTest {
                 .when(repository)
                 .update(routeLogRecord);
         // when
-        routeTrackerLogPort.saveTerminalIdInformation(information);
+        routeTrackerLogPort.saveDeviceIdInformation(information);
         // then
         verify(repository, times(1)).update(any());
     }
 
     @Test
-    void shouldSaveTerminalIdInformationToNewProcessWhenGivenWasNotFound() {
+    void shouldSaveDeviceIdInformationToNewProcessWhenGivenWasNotFound() {
         // given
         final ProcessType processType = ProcessType.RETURN;
-        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.RETURN, shipmentId, terminalId);
+        final DeviceIdInformation information = new DeviceIdInformation(ProcessType.RETURN, shipmentId, terminalId);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
         when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
-        routeTrackerLogPort.saveTerminalIdInformation(information);
+        routeTrackerLogPort.saveDeviceIdInformation(information);
         // then
         verify(routeLogRecord).saveTerminalId(processType, terminalId);
         verify(repository, times(1)).update(any());
     }
     
     @Test
-    void shouldSaveZebraVersionInformation() {
+    void shouldSaveDeviceVersionInformation() {
         // given
-        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.RETURN);
+        final DeviceVersionInformation information = new DeviceVersionInformation("1.0", shipmentId, ProcessType.RETURN);
 
         final RouteLogRecordDetail routeLogRecordDetail = RouteLogRecordDetail
                 .builder()
@@ -143,7 +143,7 @@ public class RouteTrackerLogPortImplTest {
                 .update(routeLogRecord);
 
         // when
-        routeTrackerLogPort.saveZebraVersionInformation(information);
+        routeTrackerLogPort.saveDeviceVersionInformation(information);
         // then
         assertThat(routeLogRecord.getRouteLogRecordDetails()
                 .getRouteLogRecordDetailSet())
@@ -152,17 +152,17 @@ public class RouteTrackerLogPortImplTest {
     }
 
     @Test
-    void shouldSaveZebraVersionInformationAndCreateNewProcessWhenGivenWasNotFound() {
+    void shouldSaveDeviceVersionInformationAndCreateNewProcessWhenGivenWasNotFound() {
         // given
         final ProcessType processType = ProcessType.RETURN;
         final String version = "1.0";
-        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.RETURN);
+        final DeviceVersionInformation information = new DeviceVersionInformation("1.0", shipmentId, ProcessType.RETURN);
         final RouteLogRecord routeLogRecord = mock(RouteLogRecord.class);
         when(repository.find(shipmentId)).thenReturn(routeLogRecord);
         // when
-        routeTrackerLogPort.saveZebraVersionInformation(information);
+        routeTrackerLogPort.saveDeviceVersionInformation(information);
         // then
-        verify(routeLogRecord).saveTerminalVersion(processType, version);
+        verify(routeLogRecord).saveDeviceVersion(processType, version);
         verify(repository, times(1)).update(any());
     }
 
@@ -538,31 +538,31 @@ public class RouteTrackerLogPortImplTest {
     }
 
     @Test
-    void shouldNotSaveTerminalIdInformationWhenProcessIsNotFound() {
+    void shouldNotSaveDeviceIdInformationWhenProcessIsNotFound() {
         // given
-        final TerminalIdInformation information = new TerminalIdInformation(ProcessType.MISS, shipmentId, new TerminalId(1L));
+        final DeviceIdInformation information = new DeviceIdInformation(ProcessType.MISS, shipmentId, new TerminalId(1L));
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
                 .find(shipmentId);
 
         // when
-        final Executable executable = () -> routeTrackerLogPort.saveTerminalIdInformation(information);
+        final Executable executable = () -> routeTrackerLogPort.saveDeviceIdInformation(information);
         // then
         assertThrows(RouteLogException.class, executable);
         verify(repository, times(0)).update(any());
     }
 
     @Test
-    void shouldNotSaveZebraVersionInformationWhenProcessWasNotFound() {
+    void shouldNotSaveDeviceVersionInformationWhenProcessWasNotFound() {
         // given
-        final TerminalVersionInformation information = new TerminalVersionInformation("1.0", shipmentId, ProcessType.MISS);
+        final DeviceVersionInformation information = new DeviceVersionInformation("1.0", shipmentId, ProcessType.MISS);
 
         doThrow(new RouteLogException("Route log was not found"))
                 .when(repository)
                 .find(shipmentId);
 
         // when
-        final Executable executable = () -> routeTrackerLogPort.saveZebraVersionInformation(information);
+        final Executable executable = () -> routeTrackerLogPort.saveDeviceVersionInformation(information);
         // then
         assertThrows(RouteLogException.class, executable);
         verify(repository, times(0)).update(any());

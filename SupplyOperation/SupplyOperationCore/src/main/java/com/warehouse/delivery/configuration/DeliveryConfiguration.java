@@ -4,11 +4,9 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
-import com.warehouse.delivery.domain.port.primary.DeliveryPort;
-import com.warehouse.delivery.domain.port.primary.DeliveryPortImpl;
-import com.warehouse.delivery.domain.port.primary.TerminalRequestLoggerPort;
-import com.warehouse.delivery.domain.port.primary.TerminalRequestLoggerPortImpl;
+import com.warehouse.delivery.domain.port.primary.*;
 import com.warehouse.delivery.domain.port.secondary.*;
 import com.warehouse.delivery.domain.service.DeliveryService;
 import com.warehouse.delivery.domain.service.DeliveryServiceImpl;
@@ -19,7 +17,6 @@ import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTo
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
-import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class DeliveryConfiguration {
@@ -71,6 +68,26 @@ public class DeliveryConfiguration {
     @Bean(name = "delivery.supplierTokenServicePort")
     public DeliveryTokenServicePort supplierTokenServicePort(DeliveryTokenService service) {
         return new DeliveryTokenAdapter(service);
+    }
+
+    @Bean
+    public SupplierValidatorPort supplierValidatorPort(final SupplierRepository supplierRepository) {
+        return new SupplierValidatorPortImpl(supplierRepository);
+    }
+
+    @Bean("delivery.supplierRepository")
+    public SupplierRepository supplierRepository(final SupplierReadRepository repository) {
+        return new SupplierRepositoryImpl(repository);
+    }
+
+    @Bean
+    public DepartmentValidatorPort departmentValidatorPort(final DepartmentRepository repository) {
+        return new DepartmentValidatorPortImpl(repository);
+    }
+
+    @Bean("delivery.departmentRepository")
+    public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
+        return new DepartmentRepositoryImpl(repository);
     }
 
     // Mappers

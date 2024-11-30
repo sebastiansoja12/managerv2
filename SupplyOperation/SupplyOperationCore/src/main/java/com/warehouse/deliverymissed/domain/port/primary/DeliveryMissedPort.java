@@ -4,5 +4,5 @@ import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissedResponse;
 
 public interface DeliveryMissedPort {
-    DeliveryMissedResponse logMissedDelivery(DeliveryMissedRequest request);
+    DeliveryMissedResponse process(final DeliveryMissedRequest request);
 }
