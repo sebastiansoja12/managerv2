@@ -22,6 +22,7 @@ import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.model.Request;
 import com.warehouse.delivery.domain.model.Response;
 import com.warehouse.delivery.domain.port.primary.DeliveryPort;
+import com.warehouse.delivery.domain.port.primary.DepartmentValidatorPort;
 import com.warehouse.delivery.domain.port.primary.SupplierValidatorPort;
 import com.warehouse.delivery.domain.port.primary.TerminalRequestLoggerPort;
 import com.warehouse.delivery.infrastructure.adapter.primary.creator.DeliveryCreator;
@@ -49,6 +50,8 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
     private final SupplierValidatorPort supplierValidatorPort;
 
+    private final DepartmentValidatorPort departmentValidatorPort;
+
     private final DeliveryRequestMapper requestMapper = getMapper(DeliveryRequestMapper.class);
 
     private final DeliveryResponseMapper responseMapper = getMapper(DeliveryResponseMapper.class);
@@ -59,12 +62,14 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
                                    final DeliveryPort deliveryPort,
                                    final Set<DeliveryCreator> deliveryCreators,
                                    final TerminalRequestLoggerPort terminalRequestLoggerPort,
-                                   final SupplierValidatorPort supplierValidatorPort) {
+                                   final SupplierValidatorPort supplierValidatorPort,
+                                   final DepartmentValidatorPort departmentValidatorPort) {
         super(handlers);
         this.deliveryPort = deliveryPort;
         this.deliveryCreators = deliveryCreators;
         this.terminalRequestLoggerPort = terminalRequestLoggerPort;
         this.supplierValidatorPort = supplierValidatorPort;
+        this.departmentValidatorPort = departmentValidatorPort;
     }
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
@@ -72,11 +77,13 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         final Device device = terminalRequest.getDevice();
 
-        supplierValidatorPort.validateSupplierCode(device.getUsername());
-
         log.info("Detected request from Terminal device: ID - {}, Version - {}, Responsible User - {}, Department - {}",
                 device.getDeviceId(), device.getVersion(),
                 device.getUsername(), device.getDepartmentCode());
+
+        supplierValidatorPort.validateSupplierCode(device);
+
+        departmentValidatorPort.validateDepartment(device);
 
         logTerminalRequest(terminalRequest);
 

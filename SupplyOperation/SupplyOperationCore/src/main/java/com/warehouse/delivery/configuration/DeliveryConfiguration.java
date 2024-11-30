@@ -80,6 +80,16 @@ public class DeliveryConfiguration {
         return new SupplierRepositoryImpl(repository);
     }
 
+    @Bean
+    public DepartmentValidatorPort departmentValidatorPort(final DepartmentRepository repository) {
+        return new DepartmentValidatorPortImpl(repository);
+    }
+
+    @Bean("delivery.departmentRepository")
+    public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
+        return new DepartmentRepositoryImpl(repository);
+    }
+
     // Mappers
     @Bean(name = "delivery.requestMapper")
     public DeliveryRequestMapper requestMapper() {
