@@ -10,6 +10,7 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
 
     @Override
     public DeliveryRejectResponse registerDeliveryRejection(final DeliveryRejectRequest request) {
+        log.info("registerDeliveryRejection");
         return null;
     }
 }
