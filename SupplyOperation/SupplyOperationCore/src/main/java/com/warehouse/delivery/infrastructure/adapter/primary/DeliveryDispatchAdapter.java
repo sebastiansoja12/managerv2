@@ -103,11 +103,11 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
                 !CollectionUtils.isEmpty(deliveryRequests) ? this.deliveryPort.processDelivery(deliveryRequests)
                 : Collections.emptySet();
 
-        response.updateDeliveryResponse(deliveryResponses);
+        //response.updateDeliveryResponse(deliveryResponses);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(responseMapper.map(response));
+                .body(null);
     }
 
     private DeliveryCreator determineDeliveryCreator(final ProcessType processType) {

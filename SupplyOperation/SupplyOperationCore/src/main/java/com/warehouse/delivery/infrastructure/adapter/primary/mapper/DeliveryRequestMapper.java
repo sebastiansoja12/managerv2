@@ -1,28 +1,27 @@
 package com.warehouse.delivery.infrastructure.adapter.primary.mapper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.delivery.domain.model.DeliveryMissedRequest;
-import com.warehouse.delivery.domain.model.DeliveryRejectRequest;
-import com.warehouse.delivery.domain.model.DeliveryRequest;
-import com.warehouse.delivery.domain.model.Request;
+import com.warehouse.delivery.domain.model.*;
 import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.delivery.infrastructure.adapter.primary.dto.DeliveryRequestDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedInformationDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedRequestDto;
+import com.warehouse.deliveryreject.dto.DeliveryRejectDetailsDto;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
 import com.warehouse.terminal.information.Device;
+import com.warehouse.terminal.model.DeliveryRejectDetail;
 import com.warehouse.terminal.request.TerminalRequest;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
@@ -31,11 +30,17 @@ public interface DeliveryRequestMapper {
     @Mapping(target = "deliveryStatus", ignore = true)
     DeliveryRequest map(DeliveryRequestDto deliveryRequest);
 
-    List<DeliveryRequest> map(List<DeliveryRequestDto> deliveryRequest);
+    List<DeliveryRequest> mapToDeliveryRequest(List<DeliveryRequestDto> deliveryRequest);
+
+    @Mapping(target = "deviceInformation", ignore = true)
+    DeliveryRejectRequest map(com.warehouse.terminal.model.DeliveryRejectRequest deliveryRejectRequest);
 
     @Mapping(target = "shipmentId.value", source = "shipmentId")
+    @Mapping(target = "departmentCode.value", source = "departmentCode")
+    @Mapping(target = "supplierCode.value", source = "supplierCode")
+    @Mapping(target = "deliveryStatus", source = "deliveryStatus")
     @Mapping(target = "rejectReason.value", source = "rejectReason")
-    DeliveryRejectRequest map(com.warehouse.terminal.model.DeliveryRejectRequest deliveryRejectRequest);
+    DeliveryRejectDetails map(final DeliveryRejectDetail deliveryRejectDetail);
 
     @Mapping(target = "deviceInformation", source = "device")
     Request map(final TerminalRequest terminalRequest);
@@ -48,9 +53,17 @@ public interface DeliveryRequestMapper {
 
     DeliveryMissedRequestDto map(final DeliveryMissedRequest deliveryMissedRequest);
 
-    default List<DeliveryRejectRequestDto> mapToDeliveryRejectRequest(final Request request) {
-        return request.getDeliveryRejectRequests().stream().map(this::map).collect(Collectors.toList());
+    default DeliveryRejectRequestDto mapToDeliveryRejectRequest(final Request request) {
+        final DeviceInformationDto deviceInformation = map(request.getDeviceInformation());
+        final DeliveryRejectRequest deliveryRejectRequest = request.getDeliveryRejectRequest();
+        final ProcessTypeDto processType = map(request.getProcessType());
+        return new DeliveryRejectRequestDto(map(deliveryRejectRequest.getDeliveryRejectDetails()),
+                deviceInformation, processType);
     }
+
+    List<DeliveryRejectDetailsDto> map(final List<DeliveryRejectDetails> deliveryRejectDetails);
+
+    ProcessTypeDto map(final ProcessType processType);
 
     default DeliveryMissedRequestDto mapToDeliveryMissedRequest(final Request request) {
         final List<DeliveryMissedInformationDto> deliveryMissedInformations = request.getDeliveryMissedRequests()

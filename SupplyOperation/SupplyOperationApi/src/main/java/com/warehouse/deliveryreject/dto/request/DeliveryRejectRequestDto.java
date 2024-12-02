@@ -1,54 +1,33 @@
 package com.warehouse.deliveryreject.dto.request;
 
-import com.warehouse.delivery.dto.DeliveryStatusDto;
-import com.warehouse.delivery.dto.DepartmentCodeDto;
-import com.warehouse.delivery.dto.DeviceIdDto;
-import com.warehouse.delivery.dto.ShipmentIdDto;
-import com.warehouse.deliveryreject.dto.*;
+import java.util.List;
+
+import com.warehouse.delivery.dto.DeviceInformationDto;
+import com.warehouse.delivery.dto.ProcessTypeDto;
+import com.warehouse.deliveryreject.dto.DeliveryRejectDetailsDto;
 
 public class DeliveryRejectRequestDto {
-    private final DeviceIdDto deviceId;
-    private final DepartmentCodeDto departmentCode;
-    private final SupplierCodeDto supplierCode;
-    private final DeliveryStatusDto deliveryStatus;
-    private final ShipmentIdDto shipmentId;
-    private final RejectReasonDto rejectReason;
+    private final List<DeliveryRejectDetailsDto> deliveryRejectDetails;
+    private final DeviceInformationDto deviceInformation;
+    private final ProcessTypeDto processType;
 
-    public DeliveryRejectRequestDto(final DeviceIdDto deviceId,
-                                    final DepartmentCodeDto departmentCode,
-                                    final SupplierCodeDto supplierCode,
-                                    final DeliveryStatusDto deliveryStatus,
-                                    final ShipmentIdDto shipmentId,
-                                    final RejectReasonDto rejectReason) {
-        this.deviceId = deviceId;
-        this.departmentCode = departmentCode;
-        this.supplierCode = supplierCode;
-        this.deliveryStatus = deliveryStatus;
-        this.shipmentId = shipmentId;
-        this.rejectReason = rejectReason;
+    public DeliveryRejectRequestDto(final List<DeliveryRejectDetailsDto> deliveryRejectDetails,
+                                    final DeviceInformationDto deviceInformation,
+                                    final ProcessTypeDto processType) {
+        this.deliveryRejectDetails = deliveryRejectDetails;
+        this.deviceInformation = deviceInformation;
+        this.processType = processType;
     }
 
-    public DeviceIdDto getDeviceId() {
-        return deviceId;
+    public ProcessTypeDto getProcessType() {
+        return processType;
     }
 
-    public DepartmentCodeDto getDepartmentCode() {
-        return departmentCode;
+    public List<DeliveryRejectDetailsDto> getDeliveryRejectDetails() {
+        return deliveryRejectDetails;
     }
 
-    public SupplierCodeDto getSupplierCode() {
-        return supplierCode;
-    }
-
-    public DeliveryStatusDto getDeliveryStatus() {
-        return deliveryStatus;
-    }
-
-    public ShipmentIdDto getShipmentId() {
-        return shipmentId;
-    }
-
-    public RejectReasonDto getRejectReason() {
-        return rejectReason;
+    public DeviceInformationDto getDeviceInformation() {
+        return deviceInformation;
     }
 }

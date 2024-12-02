@@ -28,7 +28,7 @@ public class RouteLoggerRequestServiceAdapter implements RouteLoggerRequestServi
     }
 
     @Override
-    public void logRequest(Request request) {
+    public void logRequest(final Request request) {
         final TerminalRequestDto terminalRequest = requestMapper.map(request);
         restClient
                 .post()

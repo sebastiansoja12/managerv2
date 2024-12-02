@@ -1,9 +1,10 @@
 package com.warehouse.deliveryreject.dto.response;
 
 import com.warehouse.delivery.dto.DeviceInformationDto;
-import com.warehouse.delivery.dto.ShipmentIdDto;
-import com.warehouse.deliveryreject.dto.RejectReasonDto;
+import com.warehouse.deliveryreject.dto.DeliveryRejectResponseDetailsDto;
 
-public record DeliveryRejectResponseDto(ShipmentIdDto shipmentId, ShipmentIdDto newShipmentId,
-                                        RejectReasonDto rejectReason, DeviceInformationDto deviceInformation) {
+import java.util.List;
+
+public record DeliveryRejectResponseDto(List<DeliveryRejectResponseDetailsDto> deliveryRejectResponseDetails,
+                                        DeviceInformationDto deviceInformation) {
 }

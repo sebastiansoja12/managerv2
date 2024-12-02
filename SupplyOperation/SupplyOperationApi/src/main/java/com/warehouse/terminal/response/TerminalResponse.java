@@ -1,13 +1,12 @@
 package com.warehouse.terminal.response;
 
-import java.util.List;
-
 import com.warehouse.terminal.information.Device;
-import com.warehouse.terminal.model.DeliveryMissedResponse;
 import com.warehouse.terminal.model.DeliveryRejectResponse;
-import com.warehouse.terminal.model.DeliveryReturnResponse;
 
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,16 +20,15 @@ public class TerminalResponse {
 
     @XmlElement(name = "Device")
     private Device device;
+//
+//    @XmlElementWrapper(name = "DeliveryMissedResponses")
+//    @XmlElement(name = "DeliveryMissedResponse")
+//    private List<DeliveryMissedResponse> deliveryMissedResponses;
 
-    @XmlElementWrapper(name = "DeliveryMissedResponses")
-    @XmlElement(name = "DeliveryMissedResponse")
-    private List<DeliveryMissedResponse> deliveryMissedResponses;
-
-    @XmlElementWrapper(name = "DeliveryRejectResponses")
     @XmlElement(name = "DeliveryRejectResponse")
-    private List<DeliveryRejectResponse> deliveryRejectResponses;
+    private DeliveryRejectResponse deliveryRejectResponse;
 
-    @XmlElementWrapper(name = "DeliveryReturnResponses")
-    @XmlElement(name = "DeliveryReturnResponse")
-    private List<DeliveryReturnResponse> deliveryReturnResponses;
+//    @XmlElementWrapper(name = "DeliveryReturnResponses")
+//    @XmlElement(name = "DeliveryReturnResponse")
+//    private List<DeliveryReturnResponse> deliveryReturnResponses;
 }

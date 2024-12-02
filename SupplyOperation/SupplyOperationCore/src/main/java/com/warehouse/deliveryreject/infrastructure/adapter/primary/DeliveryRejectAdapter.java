@@ -2,8 +2,6 @@ package com.warehouse.deliveryreject.infrastructure.adapter.primary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 import com.warehouse.deliveryreject.DeliveryRejectService;
@@ -27,9 +25,9 @@ public class DeliveryRejectAdapter implements DeliveryRejectService {
     }
 
     @Override
-    public List<DeliveryRejectResponseDto> reportDeliveryRejection(final List<DeliveryRejectRequestDto> deliveryRejectRequest) {
-        final List<DeliveryRejectRequest> request = requestMapper.map(deliveryRejectRequest);
-        final List<DeliveryRejectResponse> response = this.deliveryRejectPort.registerDeliveryRejection(request);
+    public DeliveryRejectResponseDto reportDeliveryRejection(final DeliveryRejectRequestDto deliveryRejectRequest) {
+        final DeliveryRejectRequest request = requestMapper.map(deliveryRejectRequest);
+        final DeliveryRejectResponse response = this.deliveryRejectPort.registerDeliveryRejection(request);
         return responseMapper.map(response);
     }
 }

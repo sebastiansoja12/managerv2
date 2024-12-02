@@ -1,4 +1,5 @@
 package com.warehouse.delivery.dto;
 
-public record DeviceInformationDto(DeviceIdDto deviceId, DepartmentCodeDto departmentCode, VersionDto version, UsernameDto username) {
+public record DeviceInformationDto(DeviceIdDto deviceId, DepartmentCodeDto departmentCode, VersionDto version, UsernameDto username,
+                                   DeviceUserTypeDto deviceUserType, DeviceTypeDto deviceType) {
 }

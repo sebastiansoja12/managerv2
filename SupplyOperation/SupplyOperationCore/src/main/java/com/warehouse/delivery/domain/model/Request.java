@@ -12,17 +12,17 @@ public class Request {
 
     private DeviceInformation deviceInformation;
 
-    private List<DeliveryRejectRequest> deliveryRejectRequests;
+    private DeliveryRejectRequest deliveryRejectRequest;
 
     private List<DeliveryMissedRequest> deliveryMissedRequests;
 
 	public Request(final ProcessType processType,
                    final DeviceInformation deviceInformation,
-                   final List<DeliveryRejectRequest> deliveryRejectRequests,
+                   final DeliveryRejectRequest deliveryRejectRequest,
                    final List<DeliveryMissedRequest> deliveryMissedRequests) {
         this.processType = processType;
         this.deviceInformation = deviceInformation;
-        this.deliveryRejectRequests = deliveryRejectRequests;
+        this.deliveryRejectRequest = deliveryRejectRequest;
         this.deliveryMissedRequests = deliveryMissedRequests;
     }
 
@@ -42,12 +42,12 @@ public class Request {
         this.deviceInformation = deviceInformation;
     }
 
-    public List<DeliveryRejectRequest> getDeliveryRejectRequests() {
-        return deliveryRejectRequests;
+    public DeliveryRejectRequest getDeliveryRejectRequest() {
+        return deliveryRejectRequest;
     }
 
-    public void setDeliveryRejectRequests(final List<DeliveryRejectRequest> deliveryRejectRequests) {
-        this.deliveryRejectRequests = deliveryRejectRequests;
+    public void setDeliveryRejectRequest(final DeliveryRejectRequest deliveryRejectRequest) {
+        this.deliveryRejectRequest = deliveryRejectRequest;
     }
 
     public List<DeliveryMissedRequest> getDeliveryMissedRequests() {

@@ -1,7 +1,5 @@
 package com.warehouse.terminal.request;
 
-import java.util.List;
-
 import com.warehouse.terminal.enumeration.ProcessType;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectRequest;
@@ -32,9 +30,8 @@ public class TerminalRequest {
 
     /**
      * -- GETTER
-     * DeliveryRejectRequests.
+     * DeliveryRejectRequest.
      */
-    @XmlElementWrapper(name = "DeliveryRejectRequests")
     @XmlElement(name = "DeliveryRejectRequest")
-    private List<DeliveryRejectRequest> deliveryRejectRequests;
+    private DeliveryRejectRequest deliveryRejectRequest;
 }

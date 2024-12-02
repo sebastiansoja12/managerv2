@@ -11,59 +11,59 @@ import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
 public class Response {
     private DeviceInformation deviceInformation;
     private Set<DeliveryResponse> deliveryResponses;
-    private List<DeliveryReturnResponse> deliveryReturnResponses;
-    private List<DeliveryRejectResponse> deliveryRejectResponses;
+    private DeliveryReturnResponse deliveryReturnResponse;
+    private DeliveryRejectResponse deliveryRejectResponse;
     private List<DeliveryMissedResponse> deliveryMissedResponses;
 
-    public Response(final Set<DeliveryResponse> deliveryResponses,
-                    final DeviceInformation deviceInformation,
-                    final List<DeliveryReturnResponse> deliveryReturnResponses,
-                    final List<DeliveryRejectResponse> deliveryRejectResponses,
+    public Response(final DeviceInformation deviceInformation,
+                    final Set<DeliveryResponse> deliveryResponses,
+                    final DeliveryReturnResponse deliveryReturnResponse,
+                    final DeliveryRejectResponse deliveryRejectResponse,
                     final List<DeliveryMissedResponse> deliveryMissedResponses) {
-        this.deliveryResponses = deliveryResponses;
         this.deviceInformation = deviceInformation;
-        this.deliveryReturnResponses = deliveryReturnResponses;
-        this.deliveryRejectResponses = deliveryRejectResponses;
+        this.deliveryResponses = deliveryResponses;
+        this.deliveryReturnResponse = deliveryReturnResponse;
+        this.deliveryRejectResponse = deliveryRejectResponse;
         this.deliveryMissedResponses = deliveryMissedResponses;
-    }
-
-    public Set<DeliveryResponse> getDeliveryResponses() {
-        return deliveryResponses;
-    }
-
-    public DeviceInformation getDeviceInformation() {
-        return deviceInformation;
-    }
-
-    public List<DeliveryReturnResponse> getDeliveryReturnResponses() {
-        return deliveryReturnResponses;
-    }
-
-    public List<DeliveryRejectResponse> getDeliveryRejectResponses() {
-        return deliveryRejectResponses;
-    }
-
-    public List<DeliveryMissedResponse> getDeliveryMissedResponses() {
-        return deliveryMissedResponses;
-    }
-
-    public void updateDeliveryResponse(final Set<DeliveryResponse> deliveryResponse) {
-        this.deliveryResponses = deliveryResponse;
     }
 
     public void setDeviceInformation(final DeviceInformation deviceInformation) {
         this.deviceInformation = deviceInformation;
     }
 
-    public void setDeliveryReturnResponses(final List<DeliveryReturnResponse> deliveryReturnResponses) {
-        this.deliveryReturnResponses = deliveryReturnResponses;
+    public void setDeliveryResponses(final Set<DeliveryResponse> deliveryResponses) {
+        this.deliveryResponses = deliveryResponses;
     }
 
-    public void setDeliveryRejectResponses(final List<DeliveryRejectResponse> deliveryRejectResponses) {
-        this.deliveryRejectResponses = deliveryRejectResponses;
+    public void setDeliveryReturnResponse(final DeliveryReturnResponse deliveryReturnResponse) {
+        this.deliveryReturnResponse = deliveryReturnResponse;
+    }
+
+    public void setDeliveryRejectResponse(final DeliveryRejectResponse deliveryRejectResponse) {
+        this.deliveryRejectResponse = deliveryRejectResponse;
     }
 
     public void setDeliveryMissedResponses(final List<DeliveryMissedResponse> deliveryMissedResponses) {
         this.deliveryMissedResponses = deliveryMissedResponses;
+    }
+
+    public DeviceInformation getDeviceInformation() {
+        return deviceInformation;
+    }
+
+    public Set<DeliveryResponse> getDeliveryResponses() {
+        return deliveryResponses;
+    }
+
+    public DeliveryReturnResponse getDeliveryReturnResponse() {
+        return deliveryReturnResponse;
+    }
+
+    public DeliveryRejectResponse getDeliveryRejectResponse() {
+        return deliveryRejectResponse;
+    }
+
+    public List<DeliveryMissedResponse> getDeliveryMissedResponses() {
+        return deliveryMissedResponses;
     }
 }

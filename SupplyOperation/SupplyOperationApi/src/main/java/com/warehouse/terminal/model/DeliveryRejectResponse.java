@@ -1,10 +1,11 @@
 package com.warehouse.terminal.model;
 
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import java.util.List;
+
+import com.warehouse.terminal.information.Device;
+
+import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,18 +17,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DeliveryRejectResponse {
 
-    @XmlElement(name = "SupplierCode")
-    private String supplierCode;
+    @XmlElementWrapper(name = "DeliveryRejectResponseDetails")
+    @XmlElement(name = "DeliveryRejectResponseDetail")
+    private List<DeliveryRejectResponseDetail> deliveryRejectResponseDetails;
 
-    @XmlElement(name = "ShipmentID")
-    private Long shipmentId;
-
-    @XmlElement(name = "ShipmentID")
-    private Long newShipmentId;
-
-    @XmlElement(name = "RejectReason")
-    private String rejectReason;
-
-    @XmlElement(name = "DeliveryID")
-    private String deliveryId;
+    @XmlElement(name = "Device")
+    private Device device;
 }
