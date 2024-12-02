@@ -15,7 +15,7 @@ import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequest
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnResponseDto;
 
 @Component
-public class ProcessReturnHandler implements ProcessHandler {
+public class ProcessReturnResolver implements ProcessHandler {
 
     private final DeliveryReturnService deliveryReturnService;
 
@@ -23,7 +23,7 @@ public class ProcessReturnHandler implements ProcessHandler {
 
     private final DeliveryResponseMapper responseMapper = getMapper(DeliveryResponseMapper.class);
 
-    public ProcessReturnHandler(final DeliveryReturnService deliveryReturnService) {
+    public ProcessReturnResolver(final DeliveryReturnService deliveryReturnService) {
         this.deliveryReturnService = deliveryReturnService;
     }
 
