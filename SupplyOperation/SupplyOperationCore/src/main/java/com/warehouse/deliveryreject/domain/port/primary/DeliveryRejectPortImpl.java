@@ -1,5 +1,7 @@
 package com.warehouse.deliveryreject.domain.port.primary;
 
+import java.util.Collections;
+
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
 import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse;
 
@@ -11,6 +13,6 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
     @Override
     public DeliveryRejectResponse registerDeliveryRejection(final DeliveryRejectRequest request) {
         log.info("registerDeliveryRejection");
-        return null;
+        return new DeliveryRejectResponse(Collections.emptyList(), request.getDeviceInformation());
     }
 }

@@ -84,7 +84,7 @@ public interface DeliveryRequestMapper {
     ShipmentIdDto map(final ShipmentId shipmentId);
 
     @Mapping(target = "version.value", source = "version")
-    @Mapping(target = "username.value", source = "version")
+    @Mapping(target = "username.value", source = "username")
     DeviceInformationDto map(final DeviceInformation deviceInformation);
 
     default DeliveryReturnRequestDto mapToDeliveryReturnRequest(final Request request) {

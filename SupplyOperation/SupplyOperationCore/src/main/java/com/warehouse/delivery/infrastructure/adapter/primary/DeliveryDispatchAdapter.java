@@ -107,7 +107,7 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(null);
+                .body(responseMapper.map(response));
     }
 
     private DeliveryCreator determineDeliveryCreator(final ProcessType processType) {

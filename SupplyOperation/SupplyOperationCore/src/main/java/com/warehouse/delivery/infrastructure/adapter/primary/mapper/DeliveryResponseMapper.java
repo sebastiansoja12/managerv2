@@ -35,8 +35,7 @@ public interface DeliveryResponseMapper {
 
     default DeliveryRejectResponse map(final com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse response) {
         final List<DeliveryRejectResponseDetail> deliveryRejectResponseDetails = mapToRejectResponseDetail(response.getDeliveryRejectResponseDetails());
-        final Device device = map(response.getDeviceInformation());
-        return new DeliveryRejectResponse(deliveryRejectResponseDetails, device);
+        return new DeliveryRejectResponse(deliveryRejectResponseDetails);
     }
 
     default Device map(final DeviceInformation deviceInformation) {

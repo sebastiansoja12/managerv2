@@ -3,8 +3,6 @@ package com.warehouse.terminal.model;
 
 import java.util.List;
 
-import com.warehouse.terminal.information.Device;
-
 import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +18,4 @@ public class DeliveryRejectResponse {
     @XmlElementWrapper(name = "DeliveryRejectResponseDetails")
     @XmlElement(name = "DeliveryRejectResponseDetail")
     private List<DeliveryRejectResponseDetail> deliveryRejectResponseDetails;
-
-    @XmlElement(name = "Device")
-    private Device device;
 }
