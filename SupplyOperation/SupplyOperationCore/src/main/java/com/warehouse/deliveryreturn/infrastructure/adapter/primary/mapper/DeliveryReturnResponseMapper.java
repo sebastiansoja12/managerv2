@@ -1,6 +1,10 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper;
 
 
+import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.delivery.domain.vo.ReturnToken;
+import com.warehouse.delivery.dto.DeliveryIdDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -14,6 +18,8 @@ import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponseDetails;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.*;
 
+import java.util.UUID;
+
 @Mapper
 public interface DeliveryReturnResponseMapper {
 
@@ -24,13 +30,20 @@ public interface DeliveryReturnResponseMapper {
     DeviceInformationDto map(final DeviceInformation deviceInformation);
 
     default DeliveryReturnResponseDetailsDto map(final DeliveryReturnResponseDetails deliveryReturnResponseDetails) {
-        final ProcessIdDto processId = new ProcessIdDto(deliveryReturnResponseDetails.getId(),
+        final ProcessIdDto processId = new ProcessIdDto(UUID.fromString(deliveryReturnResponseDetails.getProcessId().getValue()),
                 map(deliveryReturnResponseDetails.getShipmentId()));
         final DeliveryStatusDto deliveryStatus = map(deliveryReturnResponseDetails.getDeliveryStatus());
-        final ReturnTokenDto returnToken = new ReturnTokenDto(deliveryReturnResponseDetails.getReturnToken());
-        final UpdateStatusDto updateStatus = map(deliveryReturnResponseDetails.getUpdateStatus());
-        return new DeliveryReturnResponseDetailsDto(processId, deliveryStatus, returnToken, updateStatus);
+        final ReturnTokenDto returnToken = map((deliveryReturnResponseDetails.getReturnToken()));
+        final DeliveryIdDto deliveryId = map(deliveryReturnResponseDetails.getDeliveryId());
+        return new DeliveryReturnResponseDetailsDto(processId, deliveryId, deliveryStatus, returnToken);
     }
+
+    DeliveryIdDto map(final DeliveryId deliveryId);
+
+    @Mapping(target = "processId", source = "value")
+    ProcessIdDto map(final ProcessId processId);
+
+    ReturnTokenDto map(final ReturnToken returnToken);
 
     ShipmentIdDto map(final ShipmentId shipmentId);
 

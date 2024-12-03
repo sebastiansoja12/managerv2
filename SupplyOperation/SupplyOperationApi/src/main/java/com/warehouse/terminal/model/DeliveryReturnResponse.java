@@ -1,13 +1,12 @@
 package com.warehouse.terminal.model;
 
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @XmlRootElement(name = "DeliveryReturnResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -15,16 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeliveryReturnResponse {
-
-    @XmlElement(name = "SupplierCode")
-    private String supplierCode;
-
-    @XmlElement(name = "ShipmentID")
-    private Long shipmentId;
-
-    @XmlElement(name = "ReturnToken")
-    private String returnToken;
-
-    @XmlElement(name = "DeliveryID")
-    private String deliveryId;
+    
+	@XmlElementWrapper(name = "DeliveryReturnResponseDetails")
+	@XmlElement(name = "DeliveryReturnResponseDetail")
+	private List<DeliveryReturnResponseDetail> deliveryReturnResponseDetails;
 }

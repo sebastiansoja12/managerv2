@@ -83,11 +83,11 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         departmentValidatorPort.validateDepartment(device);
 
-        logTerminalRequest(terminalRequest);
-
-        logDeviceId(terminalRequest);
-
-        logVersion(terminalRequest);
+//        logTerminalRequest(terminalRequest);
+//
+//        logDeviceId(terminalRequest);
+//
+//        logVersion(terminalRequest);
 
         final Request request = this.requestMapper.map(terminalRequest);
 

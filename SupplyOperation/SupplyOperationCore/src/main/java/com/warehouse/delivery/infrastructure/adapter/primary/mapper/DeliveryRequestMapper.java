@@ -1,5 +1,6 @@
 package com.warehouse.delivery.infrastructure.adapter.primary.mapper;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -22,6 +23,7 @@ import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetails
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectDetail;
+import com.warehouse.terminal.model.DeliveryReturnDetail;
 import com.warehouse.terminal.request.TerminalRequest;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
@@ -37,8 +39,23 @@ public interface DeliveryRequestMapper {
     @Mapping(target = "rejectReason.value", source = "rejectReason")
     DeliveryRejectDetails map(final DeliveryRejectDetail deliveryRejectDetail);
 
-    @Mapping(target = "deviceInformation", source = "device")
-    Request map(final TerminalRequest terminalRequest);
+    default Request map(final TerminalRequest terminalRequest) {
+        final ProcessType processType = map(terminalRequest.getProcessType());
+        final DeviceInformation deviceInformation = map(terminalRequest.getDevice());
+        final DeliveryRejectRequest deliveryRejectRequest = map(terminalRequest.getDeliveryRejectRequest());
+        final DeliveryReturnRequest deliveryReturnRequest = map(terminalRequest.getDeliveryReturnRequest());
+        return new Request(processType, deviceInformation, deliveryRejectRequest, Collections.emptyList(), deliveryReturnRequest);
+    }
+
+    DeliveryReturnRequest map(final com.warehouse.terminal.model.DeliveryReturnRequest deliveryReturnRequest);
+
+    @Mapping(target = "shipmentId.value", source = "shipmentId")
+    @Mapping(target = "supplierCode.value", source = "supplierCode")
+    @Mapping(target = "deliveryStatus", source = "deliveryStatus")
+    @Mapping(target = "departmentCode.value", source = "departmentCode")
+    DeliveryReturnDetails map(final DeliveryReturnDetail deliveryReturnDetail);
+
+    ProcessType map(final com.warehouse.terminal.enumeration.ProcessType processType);
 
     @Mapping(target = "deviceId.value", source = "deviceId")
     @Mapping(target = "departmentCode.value", source = "departmentCode")

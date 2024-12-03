@@ -4,6 +4,7 @@ import com.warehouse.terminal.enumeration.ProcessType;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectRequest;
 
+import com.warehouse.terminal.model.DeliveryReturnRequest;
 import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,4 +35,12 @@ public class TerminalRequest {
      */
     @XmlElement(name = "DeliveryRejectRequest")
     private DeliveryRejectRequest deliveryRejectRequest;
+
+    /**
+     * -- GETTER
+     * DeliveryRejectRequest.
+     */
+    @XmlElement(name = "DeliveryReturnRequest")
+    private DeliveryReturnRequest deliveryReturnRequest;
+
 }

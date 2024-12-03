@@ -21,6 +21,12 @@ import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventP
 public class DeliveryConfiguration {
 
     @Bean
+    public DeliveryPort deliveryPort(final DeliveryService deliveryService,
+                                     final RouteLogDeliveryStatusServicePort logServicePort) {
+        return new DeliveryPortImpl(deliveryService, logServicePort);
+    }
+
+    @Bean
     public TerminalRequestLoggerPort terminalRequestLoggerPort(final DeliveryTrackerLogServicePort deliveryTrackerLogServicePort) {
         return new TerminalRequestLoggerPortImpl(deliveryTrackerLogServicePort);
     }

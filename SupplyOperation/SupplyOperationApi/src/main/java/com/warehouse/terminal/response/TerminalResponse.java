@@ -2,11 +2,9 @@ package com.warehouse.terminal.response;
 
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectResponse;
+import com.warehouse.terminal.model.DeliveryReturnResponse;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,6 @@ public class TerminalResponse {
     @XmlElement(name = "DeliveryRejectResponse")
     private DeliveryRejectResponse deliveryRejectResponse;
 
-//    @XmlElementWrapper(name = "DeliveryReturnResponses")
-//    @XmlElement(name = "DeliveryReturnResponse")
-//    private List<DeliveryReturnResponse> deliveryReturnResponses;
+    @XmlElement(name = "DeliveryReturnResponse")
+    private DeliveryReturnResponse deliveryReturnResponses;
 }

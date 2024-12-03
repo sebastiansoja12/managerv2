@@ -1,34 +1,40 @@
 package com.warehouse.deliveryreturn.domain.vo;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import lombok.Builder;
+import com.warehouse.delivery.domain.vo.ReturnToken;
 
-import java.util.UUID;
+import lombok.Builder;
 
 
 @Builder
 public class DeliveryReturnResponseDetails {
-    private UUID id;
+    private ProcessId processId;
+    private DeliveryId deliveryId;
     private ShipmentId shipmentId;
     private DeliveryStatus deliveryStatus;
-    private String returnToken;
-    private UpdateStatus updateStatus;
+    private ReturnToken returnToken;
 
-    public DeliveryReturnResponseDetails(final UUID id,
+    public DeliveryReturnResponseDetails(final ProcessId processId,
+                                         final DeliveryId deliveryId,
                                          final ShipmentId shipmentId,
                                          final DeliveryStatus deliveryStatus,
-                                         final String returnToken,
-                                         final UpdateStatus updateStatus) {
-        this.id = id;
+                                         final ReturnToken returnToken) {
+        this.processId = processId;
+        this.deliveryId = deliveryId;
         this.shipmentId = shipmentId;
         this.deliveryStatus = deliveryStatus;
         this.returnToken = returnToken;
-        this.updateStatus = updateStatus;
     }
 
-    public UUID getId() {
-        return id;
+    public ProcessId getProcessId() {
+        return processId;
+    }
+
+    public DeliveryId getDeliveryId() {
+        return deliveryId;
     }
 
     public ShipmentId getShipmentId() {
@@ -39,11 +45,7 @@ public class DeliveryReturnResponseDetails {
         return deliveryStatus;
     }
 
-    public String getReturnToken() {
+    public ReturnToken getReturnToken() {
         return returnToken;
-    }
-
-    public UpdateStatus getUpdateStatus() {
-        return updateStatus;
     }
 }
