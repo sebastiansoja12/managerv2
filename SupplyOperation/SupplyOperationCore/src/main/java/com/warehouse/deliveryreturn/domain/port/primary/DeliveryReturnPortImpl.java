@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
 
-import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
@@ -70,14 +69,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 //                    return new DeliveryReturnResponseDetails(deliveryReturn.getId(), deliveryReturn.getParcelId(),
 //                            deliveryReturn.getDeliveryStatus(), deliveryReturn.getToken(), updateStatus);
 //				}).collect(Collectors.toList());
-		
-		final DeliveryReturnResponse deliveryReturnResponse = DeliveryReturnResponse
-                .builder()
-                .supplierCode(new SupplierCode(deliveryRequest.getDeviceInformation().getUsername()))
-                .departmentCode(deliveryRequest.getDeviceInformation().getDepartmentCode())
-                .build();
 
-        return deliveryReturnResponse;
+		return DeliveryReturnResponse.builder().build();
     }
 
     private void logDepotCode(final DeliveryReturnRequest deliveryRequest) {

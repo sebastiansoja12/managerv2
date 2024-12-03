@@ -131,8 +131,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 				DeliveryReturnResponseDetails::getDeliveryStatus, DeliveryReturnResponseDetails::getUpdateStatus)
 				.containsExactly(Tuple.tuple("12345", "RETURN", null));
 
-		assertEquals("s-soja", response.getSupplierCode());
-		assertEquals("KT1", response.getDepartmentCode());
 	}
 
 	@Test
@@ -158,8 +156,7 @@ public class DeliveryReturnPortImplIntegrationTest {
 				DeliveryReturnResponseDetails::getDeliveryStatus, DeliveryReturnResponseDetails::getUpdateStatus)
 				.containsExactly(Tuple.tuple("12345", "RETURN", null));
 
-		assertEquals("s-soja", response.getSupplierCode());
-		assertEquals("KT1", response.getDepartmentCode());
+
 	}
 
 	@Test

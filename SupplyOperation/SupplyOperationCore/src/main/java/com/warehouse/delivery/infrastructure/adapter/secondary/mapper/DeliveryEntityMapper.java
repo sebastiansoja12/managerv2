@@ -1,14 +1,33 @@
 package com.warehouse.delivery.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.delivery.domain.model.DeliveryRequest;
+import java.time.LocalDateTime;
+
 import org.mapstruct.Mapper;
 
-import com.warehouse.delivery.domain.model.Delivery;
+import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
+import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.infrastructure.adapter.secondary.entity.DeliveryEntity;
+import com.warehouse.delivery.infrastructure.adapter.secondary.enumeration.Status;
 
 @Mapper
 public interface DeliveryEntityMapper {
-    DeliveryEntity map(DeliveryRequest delivery);
+    default DeliveryEntity map(final DeliveryRequest delivery) {
+        final DeliveryEntity deliveryEntity = new DeliveryEntity();
+        deliveryEntity.setDeliveryStatus(map(delivery.getDeliveryStatus()));
+        deliveryEntity.setCreated(LocalDateTime.now());
+        deliveryEntity.setToken(delivery.getDeliveryToken().getValue());
+        deliveryEntity.setParcelId(delivery.getShipmentId().getValue());
+        deliveryEntity.setDepotCode(delivery.getDepartmentCode().getValue());
+        deliveryEntity.setSupplierCode(delivery.getSupplierCode().getValue());
+        return deliveryEntity;
+    }
 
-    Delivery map(DeliveryEntity entity);
+    Status map(final DeliveryStatus deliveryStatus);
+
+    DeliveryStatus map(final Status deliveryStatus);
+
+    default DeliveryId map(final String deliveryId) {
+        return new DeliveryId(deliveryId);
+    }
 }

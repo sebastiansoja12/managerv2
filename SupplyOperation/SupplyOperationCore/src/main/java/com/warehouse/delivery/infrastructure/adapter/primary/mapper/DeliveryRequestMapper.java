@@ -14,11 +14,11 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.domain.model.*;
 import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.delivery.dto.*;
-import com.warehouse.delivery.infrastructure.adapter.primary.dto.DeliveryRequestDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedInformationDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedRequestDto;
 import com.warehouse.deliveryreject.dto.DeliveryRejectDetailsDto;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
+import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetailsDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectDetail;
@@ -26,11 +26,6 @@ import com.warehouse.terminal.request.TerminalRequest;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface DeliveryRequestMapper {
-
-    @Mapping(target = "deliveryStatus", ignore = true)
-    DeliveryRequest map(DeliveryRequestDto deliveryRequest);
-
-    List<DeliveryRequest> mapToDeliveryRequest(List<DeliveryRequestDto> deliveryRequest);
 
     @Mapping(target = "deviceInformation", ignore = true)
     DeliveryRejectRequest map(com.warehouse.terminal.model.DeliveryRejectRequest deliveryRejectRequest);
@@ -57,11 +52,11 @@ public interface DeliveryRequestMapper {
         final DeviceInformationDto deviceInformation = map(request.getDeviceInformation());
         final DeliveryRejectRequest deliveryRejectRequest = request.getDeliveryRejectRequest();
         final ProcessTypeDto processType = map(request.getProcessType());
-        return new DeliveryRejectRequestDto(map(deliveryRejectRequest.getDeliveryRejectDetails()),
+        return new DeliveryRejectRequestDto(mapToDeliveryRejectDetails(deliveryRejectRequest.getDeliveryRejectDetails()),
                 deviceInformation, processType);
     }
 
-    List<DeliveryRejectDetailsDto> map(final List<DeliveryRejectDetails> deliveryRejectDetails);
+    List<DeliveryRejectDetailsDto> mapToDeliveryRejectDetails(final List<DeliveryRejectDetails> deliveryRejectDetails);
 
     ProcessTypeDto map(final ProcessType processType);
 
@@ -88,6 +83,12 @@ public interface DeliveryRequestMapper {
     DeviceInformationDto map(final DeviceInformation deviceInformation);
 
     default DeliveryReturnRequestDto mapToDeliveryReturnRequest(final Request request) {
-        return new DeliveryReturnRequestDto();
+        final List<DeliveryReturnDetailsDto> deliveryReturnDetails =
+                mapToDeliveryReturnDetails(request.getDeliveryReturnRequest().getDeliveryReturnDetails());
+        final ProcessTypeDto processType = map(request.getProcessType());
+        final DeviceInformationDto deviceInformation = map(request.getDeviceInformation());
+        return new DeliveryReturnRequestDto(processType, deviceInformation, deliveryReturnDetails);
     }
+
+    List<DeliveryReturnDetailsDto> mapToDeliveryReturnDetails(final List<DeliveryReturnDetails> deliveryReturnDetails);
 }

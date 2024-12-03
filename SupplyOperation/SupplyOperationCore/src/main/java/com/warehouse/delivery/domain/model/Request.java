@@ -16,14 +16,26 @@ public class Request {
 
     private List<DeliveryMissedRequest> deliveryMissedRequests;
 
+    private DeliveryReturnRequest deliveryReturnRequest;
+
 	public Request(final ProcessType processType,
                    final DeviceInformation deviceInformation,
                    final DeliveryRejectRequest deliveryRejectRequest,
-                   final List<DeliveryMissedRequest> deliveryMissedRequests) {
+                   final List<DeliveryMissedRequest> deliveryMissedRequests,
+                   final DeliveryReturnRequest deliveryReturnRequest) {
         this.processType = processType;
         this.deviceInformation = deviceInformation;
         this.deliveryRejectRequest = deliveryRejectRequest;
         this.deliveryMissedRequests = deliveryMissedRequests;
+        this.deliveryReturnRequest = deliveryReturnRequest;
+    }
+
+    public DeliveryReturnRequest getDeliveryReturnRequest() {
+        return deliveryReturnRequest;
+    }
+
+    public void setDeliveryReturnRequest(final DeliveryReturnRequest deliveryReturnRequest) {
+        this.deliveryReturnRequest = deliveryReturnRequest;
     }
 
     public ProcessType getProcessType() {

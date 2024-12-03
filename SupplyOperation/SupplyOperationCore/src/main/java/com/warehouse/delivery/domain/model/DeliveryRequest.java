@@ -2,26 +2,121 @@ package com.warehouse.delivery.domain.model;
 
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
+import com.warehouse.delivery.domain.vo.RejectReason;
+import com.warehouse.delivery.domain.vo.ReturnToken;
 
 import lombok.Builder;
-import lombok.Data;
 
-@Data
+
 @Builder
 public class DeliveryRequest {
-    private Long parcelId;
-    private String depotCode;
-    private String supplierCode;
+    private ShipmentId shipmentId;
+    private ShipmentId newShipmentId;
+    private DepartmentCode departmentCode;
+    private SupplierCode supplierCode;
     private DeliveryStatus deliveryStatus;
-    private String token;
     private ProcessType processType;
+    private ReturnToken returnToken;
+    private DeliveryToken deliveryToken;
+    private RejectReason rejectReason;
+
+    public DeliveryRequest(final ShipmentId shipmentId,
+                           final ShipmentId newShipmentId,
+                           final DepartmentCode departmentCode,
+                           final SupplierCode supplierCode,
+                           final DeliveryStatus deliveryStatus,
+                           final ProcessType processType,
+                           final ReturnToken returnToken,
+                           final DeliveryToken deliveryToken,
+                           final RejectReason rejectReason) {
+        this.shipmentId = shipmentId;
+        this.newShipmentId = newShipmentId;
+        this.departmentCode = departmentCode;
+        this.supplierCode = supplierCode;
+        this.deliveryStatus = deliveryStatus;
+        this.processType = processType;
+        this.returnToken = returnToken;
+        this.deliveryToken = deliveryToken;
+        this.rejectReason = rejectReason;
+    }
+
+    public ShipmentId getShipmentId() {
+        return shipmentId;
+    }
+
+    public void setShipmentId(final ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
+    }
+
+    public ShipmentId getNewShipmentId() {
+        return newShipmentId;
+    }
+
+    public void setNewShipmentId(final ShipmentId newShipmentId) {
+        this.newShipmentId = newShipmentId;
+    }
+
+    public DepartmentCode getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public void setDepartmentCode(final DepartmentCode departmentCode) {
+        this.departmentCode = departmentCode;
+    }
+
+    public SupplierCode getSupplierCode() {
+        return supplierCode;
+    }
+
+    public void setSupplierCode(final SupplierCode supplierCode) {
+        this.supplierCode = supplierCode;
+    }
+
+    public DeliveryStatus getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(final DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
+
+    public ProcessType getProcessType() {
+        return processType;
+    }
+
+    public void setProcessType(final ProcessType processType) {
+        this.processType = processType;
+    }
+
+    public ReturnToken getReturnToken() {
+        return returnToken;
+    }
+
+    public void setReturnToken(final ReturnToken returnToken) {
+        this.returnToken = returnToken;
+    }
+
+    public DeliveryToken getDeliveryToken() {
+        return deliveryToken;
+    }
+
+    public void setDeliveryToken(final DeliveryToken deliveryToken) {
+        this.deliveryToken = deliveryToken;
+    }
+
+    public RejectReason getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(final RejectReason rejectReason) {
+        this.rejectReason = rejectReason;
+    }
 
     public void updateDeliveryStatus() {
         this.deliveryStatus = DeliveryStatus.DELIVERY;
-    }
-
-    public void assignTokenToDelivery(String token) {
-        this.token = token;
     }
 }

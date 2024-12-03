@@ -4,5 +4,5 @@ import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.Delive
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.dto.DeliveryTokenResponseDto;
 
 public interface DeliveryTokenService {
-    DeliveryTokenResponseDto protect(DeliveryTokenRequestDto request);
+    DeliveryTokenResponseDto signDelivery(final DeliveryTokenRequestDto request);
 }

@@ -7,5 +7,5 @@ import com.warehouse.delivery.domain.model.DeliveryResponse;
 
 public interface DeliveryPort {
 
-    Set<DeliveryResponse> processDelivery(Set<DeliveryRequest> deliveryRequest);
+    Set<DeliveryResponse> processDelivery(final Set<DeliveryRequest> deliveryRequest);
 }

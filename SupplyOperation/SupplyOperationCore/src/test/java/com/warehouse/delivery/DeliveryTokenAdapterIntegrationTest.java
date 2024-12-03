@@ -45,7 +45,7 @@ public class DeliveryTokenAdapterIntegrationTest {
     private final static String TOKEN = "abcdefghjklk";
     
     @Test
-    void shouldProtectDelivery() {
+    void shouldSignDeliveryDelivery() {
         // given
 		final DeliveryTokenRequest request = DeliveryTokenRequest.builder().supplier(new Supplier(SUPPLIER_CODE))
 				.deliveryPackageRequests(

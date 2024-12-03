@@ -4,5 +4,5 @@ import com.warehouse.delivery.domain.vo.DeliveryTokenRequest;
 import com.warehouse.delivery.domain.vo.DeliveryTokenResponse;
 
 public interface DeliveryTokenServicePort {
-    DeliveryTokenResponse protect(DeliveryTokenRequest request);
+    DeliveryTokenResponse protect(final DeliveryTokenRequest request);
 }

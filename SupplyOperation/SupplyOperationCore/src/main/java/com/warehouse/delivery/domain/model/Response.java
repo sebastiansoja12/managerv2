@@ -31,10 +31,6 @@ public class Response {
         this.deviceInformation = deviceInformation;
     }
 
-    public void setDeliveryResponses(final Set<DeliveryResponse> deliveryResponses) {
-        this.deliveryResponses = deliveryResponses;
-    }
-
     public void setDeliveryReturnResponse(final DeliveryReturnResponse deliveryReturnResponse) {
         this.deliveryReturnResponse = deliveryReturnResponse;
     }
@@ -65,5 +61,9 @@ public class Response {
 
     public List<DeliveryMissedResponse> getDeliveryMissedResponses() {
         return deliveryMissedResponses;
+    }
+
+    public void updateDeliveryResponse(final Set<DeliveryResponse> deliveryResponses) {
+        this.deliveryResponses = deliveryResponses;
     }
 }

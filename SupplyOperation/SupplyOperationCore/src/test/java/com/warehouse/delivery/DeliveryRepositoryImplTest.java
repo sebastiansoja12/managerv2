@@ -1,7 +1,5 @@
 package com.warehouse.delivery;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +14,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.delivery.configuration.DeliveryTestConfiguration;
 import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
-import com.warehouse.delivery.domain.model.Delivery;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryReadRepository;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryRepositoryImpl;
@@ -40,17 +37,13 @@ public class DeliveryRepositoryImplTest {
     }
 
     @Test
-    void shouldSaveDelivery() {
+    void shouldCreateDelivery() {
         // given
         final DeliveryRequest delivery = DeliveryRequest.builder()
                 .deliveryStatus(DeliveryStatus.DELIVERY)
-                .parcelId(1L)
-                .supplierCode("supplierCode")
-                .depotCode("abc")
                 .build();
         // when
-        final Delivery savedDelivery = deliveryRepository.saveDelivery(delivery);
+        deliveryRepository.create(delivery);
         // then
-        assertThat(savedDelivery.getId()).isNotNull();
     }
 }
