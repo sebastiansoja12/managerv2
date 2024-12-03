@@ -36,7 +36,6 @@
         <module>Common</module>
         <module>RouteLogger</module>
         <module>AssetConverter</module>
-        <module>PalletHandlingManager</module>
 		<module>MessageProvider</module>
 	</modules>
 
