@@ -15,6 +15,8 @@ import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponseDetails;
 import com.warehouse.deliveryreject.dto.DeliveryRejectResponseDetailsDto;
 import com.warehouse.deliveryreject.dto.response.DeliveryRejectResponseDto;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponseDetails;
+import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnResponseDetailsDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnResponseDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.ReturnTokenDto;
 import com.warehouse.terminal.information.Device;
@@ -86,6 +88,13 @@ public interface DeliveryResponseMapper {
     default Response mapDeliveryReturnResponse(final DeliveryReturnResponseDto deliveryReturnResponse) {
         final DeviceInformationDto deviceInformation = deliveryReturnResponse.getDeviceInformation();
         return new Response(map(deviceInformation), Collections.emptySet(),
-                null, null, Collections.emptyList());
+                map(deliveryReturnResponse), null, Collections.emptyList());
     }
+
+    DeliveryReturnResponse map(final DeliveryReturnResponseDto deliveryReturnResponseDto);
+
+    @Mapping(target = "processId.value", source = "processId.processId")
+    @Mapping(target = "shipmentId.value", source = "processId.shipmentId.value")
+    DeliveryReturnResponseDetails map(final DeliveryReturnResponseDetailsDto deliveryReturnResponseDetailsDto);
+
 }
