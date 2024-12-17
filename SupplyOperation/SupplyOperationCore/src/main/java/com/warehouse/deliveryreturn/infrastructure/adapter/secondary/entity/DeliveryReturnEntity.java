@@ -36,6 +36,6 @@ public class DeliveryReturnEntity {
     @Column(name = "delivery_status", nullable = false)
     private Status deliveryStatus;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "token")
     private String token;
 }

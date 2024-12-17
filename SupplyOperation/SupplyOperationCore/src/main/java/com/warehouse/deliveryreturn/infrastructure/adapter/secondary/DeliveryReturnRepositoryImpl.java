@@ -18,7 +18,7 @@ public class DeliveryReturnRepositoryImpl implements DeliveryReturnRepository {
     private final DeliveryReturnMapper deliveryReturnMapper = getMapper(DeliveryReturnMapper.class);
 
     @Override
-    public DeliveryReturn saveDeliveryReturn(DeliveryReturnDetails deliveryReturnRequest) {
+    public DeliveryReturn saveDeliveryReturn(final DeliveryReturnDetails deliveryReturnRequest) {
         final DeliveryReturnEntity deliveryReturnEntity = deliveryReturnMapper.map(deliveryReturnRequest);
         deliveryReturnReadRepository.save(deliveryReturnEntity);
         return deliveryReturnMapper.map(deliveryReturnEntity);

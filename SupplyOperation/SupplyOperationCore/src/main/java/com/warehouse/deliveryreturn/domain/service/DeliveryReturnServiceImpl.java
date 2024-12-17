@@ -13,24 +13,32 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.vo.*;
 
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 
     private final DeliveryReturnRepository deliveryReturnRepository;
 
     private final DeliveryReturnTokenServicePort deliveryReturnTokenServicePort;
 
-    private final ParcelRepositoryServicePort parcelRepositoryServicePort;
+    private final ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
     private final MailServicePort mailServicePort;
 
+    public DeliveryReturnServiceImpl(final DeliveryReturnRepository deliveryReturnRepository,
+                                     final DeliveryReturnTokenServicePort deliveryReturnTokenServicePort,
+                                     final ShipmentRepositoryServicePort shipmentRepositoryServicePort,
+                                     final MailServicePort mailServicePort) {
+        this.deliveryReturnRepository = deliveryReturnRepository;
+        this.deliveryReturnTokenServicePort = deliveryReturnTokenServicePort;
+        this.shipmentRepositoryServicePort = shipmentRepositoryServicePort;
+        this.mailServicePort = mailServicePort;
+    }
+
     @Override
-    public List<DeliveryReturn> deliverReturn(Set<DeliveryReturnDetails> deliveryReturnRequests) {
+    public List<DeliveryReturn> deliverReturn(final Set<DeliveryReturnDetails> deliveryReturnRequests) {
 
         final DeliveryReturnTokenRequest deliveryReturnTokenRequest = buildTokenRequest(deliveryReturnRequests);
 
@@ -43,7 +51,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 
         return deliveries.stream()
                 .peek(deliveryReturn -> {
-                    final Shipment shipment = parcelRepositoryServicePort.downloadShipment(deliveryReturn.getShipmentId());
+                    final Shipment shipment = shipmentRepositoryServicePort.downloadShipment(deliveryReturn.getShipmentId());
                     mailServicePort.sendNotification(shipment);
                 })
                 .map(deliveryReturnRepository::saveDeliveryReturn)
@@ -83,7 +91,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .deliveryStatus(String.valueOf(delivery.getDeliveryStatus()))
                 .depotCode(delivery.getDepartmentCode().getValue())
                 .parcelId(delivery.getShipmentId().getValue())
-                .locked(parcelRepositoryServicePort.downloadShipment(delivery.getShipmentId()).getLocked())
+                .locked(shipmentRepositoryServicePort.downloadShipment(delivery.getShipmentId()).isLocked())
                 .build();
     }
 

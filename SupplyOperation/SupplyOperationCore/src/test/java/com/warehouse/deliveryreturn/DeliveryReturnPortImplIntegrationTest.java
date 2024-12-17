@@ -27,12 +27,12 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
-import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
 import com.warehouse.deliveryreturn.domain.vo.*;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
@@ -58,7 +58,7 @@ public class DeliveryReturnPortImplIntegrationTest {
 		public ShipmentProperties shipmentProperties;
 
 		@MockBean
-		public ParcelRepositoryServicePort parcelRepositoryServicePort;
+		public ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
 		@MockBean
 		public MailServicePort mailServicePort;
@@ -91,15 +91,17 @@ public class DeliveryReturnPortImplIntegrationTest {
 	private ShipmentStatusControlServicePort shipmentStatusControlServicePort;
 
 	@Autowired
-	private ParcelRepositoryServicePort parcelRepositoryServicePort;
+	private ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
 	@Autowired
 	private MailServicePort mailServicePort;
 
-	@Autowired
-	private SupplierValidatorProperties supplierValidatorProperties;
-
-	private final DeviceInformation deviceInformation = new DeviceInformation("1", new DeviceId(1L), "s-soja", new DepartmentCode("KT1"));
+	private final DeviceInformation deviceInformation = DeviceInformation.builder()
+			.version("1")
+			.deviceId(new DeviceId(1L))
+			.username("s-soja")
+			.departmentCode(new DepartmentCode("KT1"))
+			.build();
 
 	@BeforeEach
 	void setup() {
@@ -114,14 +116,18 @@ public class DeliveryReturnPortImplIntegrationTest {
 		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN, deviceInformation,
 				deliveryReturnDetails);
 
-		final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(1L);
+		final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(1L);
 
-		final Shipment shipment = Shipment.builder().recipientEmail("recipient").shipmentStatus("RETURN").id(1L)
-				.senderEmail("sender").build();
+		final Shipment shipment = Shipment.builder()
+				.recipientEmail("recipient")
+				.shipmentStatus("RETURN")
+				.shipmentId(new ShipmentId(1L))
+				.senderEmail("sender")
+				.build();
 
-		when(shipmentStatusControlServicePort.updateStatus(updateStatusParcelRequest))
+		when(shipmentStatusControlServicePort.updateStatus(updateStatusShipmentRequest))
 				.thenReturn(UpdateStatus.NOT_OK);
-		when(parcelRepositoryServicePort.downloadShipment(new ShipmentId(1L))).thenReturn(shipment);
+		when(shipmentRepositoryServicePort.downloadShipment(new ShipmentId(1L))).thenReturn(shipment);
 
 		doNothing().when(mailServicePort).sendNotification(shipment);
 		// when
@@ -141,13 +147,13 @@ public class DeliveryReturnPortImplIntegrationTest {
 		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN,
 				deviceInformation, deliveryReturnDetails);
 
-		final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(1L);
+		final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(1L);
 
-		final Shipment shipment = Shipment.builder().recipientEmail("recipient").shipmentStatus("RETURN").id(1L)
+		final Shipment shipment = Shipment.builder().recipientEmail("recipient").shipmentStatus("RETURN").shipmentId(new ShipmentId(1L))
 				.senderEmail("sender").build();
 
-		when(shipmentStatusControlServicePort.updateStatus(updateStatusParcelRequest)).thenReturn(UpdateStatus.OK);
-		when(parcelRepositoryServicePort.downloadShipment(new ShipmentId(1L))).thenReturn(shipment);
+		when(shipmentStatusControlServicePort.updateStatus(updateStatusShipmentRequest)).thenReturn(UpdateStatus.OK);
+		when(shipmentRepositoryServicePort.downloadShipment(new ShipmentId(1L))).thenReturn(shipment);
 		doNothing().when(mailServicePort).sendNotification(shipment);
 		// when
 		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
@@ -167,11 +173,11 @@ public class DeliveryReturnPortImplIntegrationTest {
 		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN, deviceInformation,
 				deliveryReturnDetails);
 
-		final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(1L);
+		final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(1L);
 
-		when(shipmentStatusControlServicePort.updateStatus(updateStatusParcelRequest))
+		when(shipmentStatusControlServicePort.updateStatus(updateStatusShipmentRequest))
 				.thenReturn(UpdateStatus.NOT_OK);
-		doThrow(new BusinessException(404, "Parcel 1 was not found")).when(parcelRepositoryServicePort)
+		doThrow(new BusinessException(404, "Parcel 1 was not found")).when(shipmentRepositoryServicePort)
 				.downloadShipment(new ShipmentId(1L));
 		// when
 		final Executable executable = () -> deliveryReturnPort.deliverReturn(request);
@@ -188,10 +194,10 @@ public class DeliveryReturnPortImplIntegrationTest {
 		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN, deviceInformation,
 				deliveryReturnDetails);
 
-		final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(1L);
+		final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(1L);
 
-		when(shipmentStatusControlServicePort.updateStatus(updateStatusParcelRequest)).thenReturn(UpdateStatus.OK);
-		doThrow(new TechnicalException(500, "Could not establish connection")).when(parcelRepositoryServicePort)
+		when(shipmentStatusControlServicePort.updateStatus(updateStatusShipmentRequest)).thenReturn(UpdateStatus.OK);
+		doThrow(new TechnicalException(500, "Could not establish connection")).when(shipmentRepositoryServicePort)
 				.downloadShipment(new ShipmentId(1L));
 		// when
 		final Executable executable = () -> deliveryReturnPort.deliverReturn(request);

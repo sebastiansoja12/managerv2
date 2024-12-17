@@ -1,5 +1,6 @@
 package com.warehouse.deliveryreturn;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.deliveryreturn.domain.vo.Shipment;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.MailAdapter;
 import com.warehouse.mail.domain.port.primary.MailPort;
@@ -31,7 +32,7 @@ public class MailAdapterTest {
         // given
         final Shipment shipment = Shipment.builder()
                 .senderEmail("email")
-                .id(1L)
+                .shipmentId(new ShipmentId(1L))
                 .shipmentStatus("RETURN")
                 .recipientEmail("email")
                 .build();

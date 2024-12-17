@@ -16,17 +16,29 @@ public class DeliveryReturnResponseDetails {
     private ShipmentId shipmentId;
     private DeliveryStatus deliveryStatus;
     private ReturnToken returnToken;
+    private UpdateStatus updateStatus;
 
     public DeliveryReturnResponseDetails(final ProcessId processId,
                                          final DeliveryId deliveryId,
                                          final ShipmentId shipmentId,
                                          final DeliveryStatus deliveryStatus,
-                                         final ReturnToken returnToken) {
+                                         final ReturnToken returnToken,
+                                         final UpdateStatus updateStatus) {
         this.processId = processId;
         this.deliveryId = deliveryId;
         this.shipmentId = shipmentId;
         this.deliveryStatus = deliveryStatus;
         this.returnToken = returnToken;
+        this.updateStatus = updateStatus;
+    }
+
+    public static DeliveryReturnResponseDetails from(final DeliveryReturn deliveryReturn, final UpdateStatus updateStatus) {
+        final ProcessId id = new ProcessId(deliveryReturn.getProcessId().toString());
+        final DeliveryId deliveryId = new DeliveryId(deliveryReturn.getProcessId().toString());
+        final ShipmentId shipmentIdentificator = new ShipmentId(deliveryReturn.getShipmentId());
+        final DeliveryStatus status = DeliveryStatus.valueOf(deliveryReturn.getDeliveryStatus());
+        final ReturnToken token = new ReturnToken(deliveryReturn.getToken());
+        return new DeliveryReturnResponseDetails(id, deliveryId, shipmentIdentificator, status, token, updateStatus);
     }
 
     public ProcessId getProcessId() {

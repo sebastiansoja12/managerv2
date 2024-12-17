@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.vo.Shipment;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ShipmentDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
@@ -15,15 +15,15 @@ import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.T
 import com.warehouse.tools.shipment.ShipmentProperties;
 
 
-public class ParcelRepositoryServiceAdapter implements ParcelRepositoryServicePort {
+public class ShipmentRepositoryServiceAdapter implements ShipmentRepositoryServicePort {
 
     private final RestClient restClient;
     
     private final ShipmentProperties shipmentProperties;
 
-    private final Logger logger = LoggerFactory.getLogger(ParcelRepositoryServicePort.class);
+    private final Logger logger = LoggerFactory.getLogger(ShipmentRepositoryServicePort.class);
 
-    public ParcelRepositoryServiceAdapter(ShipmentProperties shipmentProperties) {
+    public ShipmentRepositoryServiceAdapter(final ShipmentProperties shipmentProperties) {
         this.shipmentProperties = shipmentProperties;
         this.restClient = RestClient.builder().baseUrl(shipmentProperties.getUrl()).build();
     }

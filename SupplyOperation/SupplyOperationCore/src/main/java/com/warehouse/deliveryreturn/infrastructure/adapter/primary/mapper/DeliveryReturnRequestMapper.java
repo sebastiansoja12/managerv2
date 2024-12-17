@@ -7,10 +7,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.delivery.dto.DeviceInformationDto;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
-import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryReturnDetail;
@@ -19,11 +19,11 @@ import com.warehouse.terminal.request.TerminalRequest;
 @Mapper
 public interface DeliveryReturnRequestMapper {
 
-    default DeliveryReturnRequest map(TerminalRequest request) {
+    default DeliveryReturnRequest map(final TerminalRequest request) {
         return new DeliveryReturnRequest(map(request.getProcessType()), map(request.getDevice()), Collections.emptyList());
     }
 
-    List<DeliveryReturnDetails> map(List<DeliveryReturnDetail> deliveryReturnRequests);
+    List<DeliveryReturnDetails> map(final List<DeliveryReturnDetail> deliveryReturnRequests);
 
     @Mapping(target = "token", ignore = true)
     @Mapping(target = "departmentCode.value", source = "departmentCode")
@@ -33,9 +33,9 @@ public interface DeliveryReturnRequestMapper {
 
     @Mapping(target = "deviceId.value", source = "deviceId")
     @Mapping(target = "departmentCode.value", source = "departmentCode")
-    DeviceInformation map(Device device);
+    DeviceInformation map(final Device device);
 
-    ProcessType map(com.warehouse.terminal.enumeration.ProcessType processType);
+    ProcessType map(final com.warehouse.terminal.enumeration.ProcessType processType);
 
     DeliveryReturnRequest mapToDeliveryReturnRequest(final DeliveryReturnRequestDto deliveryReturnRequest);
 

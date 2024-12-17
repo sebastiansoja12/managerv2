@@ -18,13 +18,13 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
-import com.warehouse.deliveryreturn.domain.model.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
 import com.warehouse.deliveryreturn.domain.port.secondary.*;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
@@ -43,7 +43,7 @@ public class DeliveryReturnPortImplTest {
 	private DeliveryReturnTokenServicePort deliveryReturnTokenServicePort;
 
 	@Mock
-	private ParcelRepositoryServicePort parcelRepositoryServicePort;
+	private ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
 	@Mock
 	private MailServicePort mailServicePort;
@@ -53,13 +53,17 @@ public class DeliveryReturnPortImplTest {
 
 	private DeliveryReturnPortImpl returnPort;
 
-	private final DeviceInformation deviceInformation = new DeviceInformation("1", new DeviceId(1L), "s-soja",
-			new DepartmentCode("KT1"));
+	private final DeviceInformation deviceInformation = DeviceInformation.builder()
+			.version("1")
+			.deviceId(new DeviceId(1L))
+			.username("s-soja")
+			.departmentCode(new DepartmentCode("KT1"))
+			.build();
 
 	@BeforeEach
 	void setup() {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
-				deliveryReturnTokenServicePort, parcelRepositoryServicePort, mailServicePort);
+				deliveryReturnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
 		returnPort = new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort,
 				routeLogReturnServicePort);
 	}
