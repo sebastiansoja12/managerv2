@@ -24,7 +24,7 @@ public class DeliveryReturnServiceMockAdapter implements DeliveryReturnTokenServ
     private List<DeliveryReturnSignature> map(List<DeliveryPackageRequest> packageRequests) {
         return packageRequests.stream()
                 .map(packageRequest -> DeliveryReturnSignature.builder()
-                        .parcelId(packageRequest.getDelivery().getParcelId())
+                        .parcelId(packageRequest.getDelivery().getShipmentId())
                         .token(TOKEN)
                         .build())
                 .collect(Collectors.toList());

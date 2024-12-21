@@ -1,7 +1,9 @@
 package com.warehouse.delivery.infrastructure.adapter.primary.mapper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,6 +24,7 @@ import com.warehouse.deliveryreturn.infrastructure.api.dto.ReturnTokenDto;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectResponse;
 import com.warehouse.terminal.model.DeliveryRejectResponseDetail;
+import com.warehouse.terminal.model.DeliveryReturnResponseDetail;
 import com.warehouse.terminal.response.TerminalResponse;
 
 @Mapper
@@ -34,9 +37,22 @@ public interface DeliveryResponseMapper {
 
     String map(final SupplierCode supplierCode);
 
+    com.warehouse.terminal.model.DeliveryReturnResponse map(final DeliveryReturnResponse deliveryReturnResponse);
+
+    default DeliveryReturnResponseDetail map(final DeliveryReturnResponseDetails deliveryReturnResponseDetails) {
+        final String supplierCode = deliveryReturnResponseDetails.getSupplierCode().getValue();
+        final String departmentCode = deliveryReturnResponseDetails.getDepartmentCode().getValue();
+        final Long shipmentId = deliveryReturnResponseDetails.getShipmentId().getValue();
+        final String deliveryStatus = deliveryReturnResponseDetails.getDeliveryStatus().name();
+        final String returnToken = deliveryReturnResponseDetails.getReturnToken().value();
+        final String deliveryId = deliveryReturnResponseDetails.getDeliveryId() != null ? deliveryReturnResponseDetails.getDeliveryId().getId() : null;
+        final String updateStatus = deliveryReturnResponseDetails.getUpdateStatus().name();
+        return new DeliveryReturnResponseDetail(supplierCode, departmentCode, shipmentId, returnToken, updateStatus,
+                deliveryStatus, deliveryId);
+    }
 
     default DeliveryRejectResponse map(final com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse response) {
-        final List<DeliveryRejectResponseDetail> deliveryRejectResponseDetails = mapToRejectResponseDetail(response.getDeliveryRejectResponseDetails());
+        final List<DeliveryRejectResponseDetail> deliveryRejectResponseDetails = new ArrayList<>();
         return new DeliveryRejectResponse(deliveryRejectResponseDetails);
     }
 
@@ -70,14 +86,14 @@ public interface DeliveryResponseMapper {
 
     default Response mapDeliveryRejectResponse(final DeliveryRejectResponseDto deliveryRejectResponse) {
         final DeviceInformation deviceInformation = map(deliveryRejectResponse.deviceInformation());
-        final List<DeliveryRejectResponseDetails> deliveryRejectResponseDetails = map(deliveryRejectResponse.deliveryRejectResponseDetails());
+        final List<DeliveryRejectResponseDetails> deliveryRejectResponseDetails = mapToDeliveryRejectResponseDetailsList(deliveryRejectResponse.deliveryRejectResponseDetails());
         final com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse response =
                 new com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse(deliveryRejectResponseDetails, deviceInformation);
         return new Response(deviceInformation, Collections.emptySet(), null,
                 response, Collections.emptyList());
     }
 
-    List<DeliveryRejectResponseDetails> map(final List<DeliveryRejectResponseDetailsDto> deliveryRejectResponseDetailsDtos);
+    List<DeliveryRejectResponseDetails> mapToDeliveryRejectResponseDetailsList(final List<DeliveryRejectResponseDetailsDto> deliveryRejectResponseDetailsDtos);
 
     DeliveryRejectResponseDetails map(final DeliveryRejectResponseDetailsDto deliveryRejectResponseDetailsDto);
 
@@ -91,10 +107,22 @@ public interface DeliveryResponseMapper {
                 map(deliveryReturnResponse), null, Collections.emptyList());
     }
 
-    DeliveryReturnResponse map(final DeliveryReturnResponseDto deliveryReturnResponseDto);
+    default DeliveryReturnResponse map(final DeliveryReturnResponseDto deliveryReturnResponse) {
+        return DeliveryReturnResponse
+                .builder()
+                .deliveryReturnResponseDetails(map(deliveryReturnResponse.getDeliveryReturnResponseDetails()))
+                .deviceInformation(map(deliveryReturnResponse.getDeviceInformation()))
+                .build();
+    }
+
+    default List<DeliveryReturnResponseDetails> map(final List<DeliveryReturnResponseDetailsDto> deliveryReturnResponseDetails) {
+        return deliveryReturnResponseDetails.stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
 
     @Mapping(target = "processId.value", source = "processId.processId")
-    @Mapping(target = "shipmentId.value", source = "processId.shipmentId.value")
+    @Mapping(target = "shipmentId.value", source = "shipmentId.value")
     DeliveryReturnResponseDetails map(final DeliveryReturnResponseDetailsDto deliveryReturnResponseDetailsDto);
 
 }

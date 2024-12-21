@@ -1,6 +1,9 @@
 package com.warehouse.delivery.domain.service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,15 +28,9 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     public Set<DeliveryResponse> save(final Set<DeliveryRequest> deliveryRequest) {
-        final DeliveryTokenRequest deliveryTokenRequest = buildTokenRequest(deliveryRequest);
-
-        final DeliveryTokenResponse deliveryTokenResponse = secureDelivery(deliveryTokenRequest);
-
-        final Map<ShipmentId, SupplierSignature> signaturesMap = assignToHashMap(deliveryTokenResponse);
-
-        assignTokenToDelivery(signaturesMap, deliveryRequest);
-
-		return Collections.emptySet();
+		return deliveryRequest.stream()
+                .map(deliveryRepository::create)
+                .collect(Collectors.toSet());
     }
 
     private DeliveryTokenRequest buildTokenRequest(final Set<DeliveryRequest> deliveries) {
@@ -59,7 +56,6 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     private DeliveryInformation buildDeliveryInformation(DeliveryRequest delivery) {
         return DeliveryInformation.builder()
-                .deliveryStatus(delivery.getDeliveryStatus())
                 .build();
     }
 

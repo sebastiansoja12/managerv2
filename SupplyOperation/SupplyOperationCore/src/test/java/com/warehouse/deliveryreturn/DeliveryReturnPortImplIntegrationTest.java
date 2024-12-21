@@ -133,7 +133,7 @@ public class DeliveryReturnPortImplIntegrationTest {
 		// when
 		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
 		// then
-		assertThat(response.getDeliveryReturnResponses()).extracting(DeliveryReturnResponseDetails::getReturnToken,
+		assertThat(response.getDeliveryReturnResponseDetails()).extracting(DeliveryReturnResponseDetails::getReturnToken,
 				DeliveryReturnResponseDetails::getDeliveryStatus)
 				.containsExactly(Tuple.tuple("12345", "RETURN"));
 
@@ -158,7 +158,7 @@ public class DeliveryReturnPortImplIntegrationTest {
 		// when
 		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
 		// then
-		assertThat(response.getDeliveryReturnResponses()).extracting(DeliveryReturnResponseDetails::getReturnToken,
+		assertThat(response.getDeliveryReturnResponseDetails()).extracting(DeliveryReturnResponseDetails::getReturnToken,
 				DeliveryReturnResponseDetails::getDeliveryStatus)
 				.containsExactly(Tuple.tuple("12345", "RETURN"));
 

@@ -73,7 +73,7 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
 		return DeliveryReturnResponse
                 .builder()
-                .deliveryReturnResponses(deliveryReturnResponseDetails)
+                .deliveryReturnResponseDetails(deliveryReturnResponseDetails)
                 .deviceInformation(deliveryReturnRequest.getDeviceInformation())
                 .build();
     }
@@ -86,19 +86,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
             throw new DeliveryReturnDetailsException("Delivery return details cannot be null");
         }
     }
-    
-	private void logSupplierCode(List<DeliveryReturn> deliveryReturns) {
-		deliveryReturns.forEach(deliveryReturn -> {
-			logSupplierCodeSave(deliveryReturn.getSupplierCode());
-			routeLogReturnServicePort.logSupplierCode(deliveryReturn);
-		});
-	}
 
     private void logWrongProcessTypeInformation() {
         log.warn("Process type is different than RETURN");
-    }
-    
-    private void logSupplierCodeSave(String supplierCode) {
-        log.warn("Saving supplier code {} in process", supplierCode);
     }
 }

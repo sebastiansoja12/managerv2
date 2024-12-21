@@ -1,13 +1,14 @@
 package com.warehouse.delivery.domain.model;
 
 
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.domain.vo.RejectReason;
 import com.warehouse.delivery.domain.vo.ReturnToken;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponseDetails;
 
 import lombok.Builder;
 
@@ -119,4 +120,12 @@ public class DeliveryRequest {
     public void updateDeliveryStatus() {
         this.deliveryStatus = DeliveryStatus.DELIVERY;
     }
+
+    public static DeliveryRequest from(final ProcessType processType,
+                                       final DeliveryReturnResponseDetails returnResponseDetails) {
+        return new DeliveryRequest(returnResponseDetails.getShipmentId(), null, returnResponseDetails.getDepartmentCode(),
+                returnResponseDetails.getSupplierCode(), returnResponseDetails.getDeliveryStatus(),
+                processType, returnResponseDetails.getReturnToken(), null, null);
+    }
+
 }

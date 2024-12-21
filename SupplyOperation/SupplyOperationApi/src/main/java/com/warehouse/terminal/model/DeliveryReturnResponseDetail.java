@@ -28,4 +28,13 @@ public class DeliveryReturnResponseDetail {
 
     @XmlElement(name = "ReturnToken")
     private String returnToken;
+
+    @XmlElement(name = "UpdateStatus")
+    private String updateStatus;
+
+    @XmlElement(name = "DeliveryStatus")
+    private String deliveryStatus;
+
+    @XmlElement(name = "DeliveryID")
+    private String deliveryID;
 }

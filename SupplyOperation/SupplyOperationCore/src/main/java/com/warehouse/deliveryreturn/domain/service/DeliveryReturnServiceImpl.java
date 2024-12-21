@@ -54,7 +54,14 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                     final Shipment shipment = shipmentRepositoryServicePort.downloadShipment(deliveryReturn.getShipmentId());
                     mailServicePort.sendNotification(shipment);
                 })
-                .map(deliveryReturnRepository::saveDeliveryReturn)
+                .map(deliveryReturnDetails -> DeliveryReturn
+                        .builder()
+                        .token(deliveryReturnDetails.getToken())
+                        .supplierCode(deliveryReturnDetails.getSupplierCode().getValue())
+                        .departmentCode(deliveryReturnDetails.getDepartmentCode().getValue())
+                        .shipmentId(deliveryReturnDetails.getShipmentId().getValue())
+                        .deliveryStatus(deliveryReturnDetails.getDeliveryStatus().name())
+                        .build())
                 .toList();
     }
 
@@ -89,8 +96,8 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
     private DeliveryReturnInformation buildDeliveryInformation(DeliveryReturnDetails delivery) {
         return DeliveryReturnInformation.builder()
                 .deliveryStatus(String.valueOf(delivery.getDeliveryStatus()))
-                .depotCode(delivery.getDepartmentCode().getValue())
-                .parcelId(delivery.getShipmentId().getValue())
+                .departmentCode(delivery.getDepartmentCode().getValue())
+                .shipmentId(delivery.getShipmentId().getValue())
                 .locked(shipmentRepositoryServicePort.downloadShipment(delivery.getShipmentId()).isLocked())
                 .build();
     }

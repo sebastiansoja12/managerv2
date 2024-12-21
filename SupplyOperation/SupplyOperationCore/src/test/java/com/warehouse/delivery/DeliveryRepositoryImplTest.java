@@ -13,7 +13,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.delivery.configuration.DeliveryTestConfiguration;
-import com.warehouse.delivery.domain.enumeration.DeliveryStatus;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryReadRepository;
 import com.warehouse.delivery.infrastructure.adapter.secondary.DeliveryRepositoryImpl;
@@ -40,7 +39,6 @@ public class DeliveryRepositoryImplTest {
     void shouldCreateDelivery() {
         // given
         final DeliveryRequest delivery = DeliveryRequest.builder()
-                .deliveryStatus(DeliveryStatus.DELIVERY)
                 .build();
         // when
         deliveryRepository.create(delivery);

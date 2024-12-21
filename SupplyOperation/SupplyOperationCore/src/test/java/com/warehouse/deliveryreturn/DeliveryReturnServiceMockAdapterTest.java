@@ -23,8 +23,8 @@ public class DeliveryReturnServiceMockAdapterTest {
         final List<DeliveryPackageRequest> requests = List.of(DeliveryPackageRequest.builder()
                 .delivery(DeliveryReturnInformation.builder()
                         .deliveryStatus("DELIVERY")
-                        .depotCode("KT1")
-                        .parcelId(1L)
+                        .departmentCode("KT1")
+                        .shipmentId(1L)
                         .build())
                 .build());
         final DeliveryReturnTokenRequest request = new DeliveryReturnTokenRequest(requests, new Supplier("abc",

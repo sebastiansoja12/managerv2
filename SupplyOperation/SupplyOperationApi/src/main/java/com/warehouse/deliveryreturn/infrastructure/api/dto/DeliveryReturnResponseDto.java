@@ -6,17 +6,17 @@ import java.util.List;
 import com.warehouse.delivery.dto.DeviceInformationDto;
 
 public class DeliveryReturnResponseDto {
-    private final List<DeliveryReturnResponseDetailsDto> deliveryReturnResponses;
+    private final List<DeliveryReturnResponseDetailsDto> deliveryReturnResponseDetails;
     private final DeviceInformationDto deviceInformation;
 
-    public DeliveryReturnResponseDto(final List<DeliveryReturnResponseDetailsDto> deliveryReturnResponses,
+    public DeliveryReturnResponseDto(final List<DeliveryReturnResponseDetailsDto> deliveryReturnResponseDetails,
                                      final DeviceInformationDto deviceInformation) {
-        this.deliveryReturnResponses = deliveryReturnResponses;
+        this.deliveryReturnResponseDetails = deliveryReturnResponseDetails;
         this.deviceInformation = deviceInformation;
     }
 
-    public List<DeliveryReturnResponseDetailsDto> getDeliveryReturnResponses() {
-        return deliveryReturnResponses;
+    public List<DeliveryReturnResponseDetailsDto> getDeliveryReturnResponseDetails() {
+        return deliveryReturnResponseDetails;
     }
 
     public DeviceInformationDto getDeviceInformation() {

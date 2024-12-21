@@ -11,11 +11,11 @@ import lombok.Builder;
 
 @Builder
 public class DeliveryReturnResponse {
-    private final List<DeliveryReturnResponseDetails> deliveryReturnResponses;
+    private final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails;
     private final DeviceInformation deviceInformation;
 
-	public List<DeliveryReturnResponseDetails> getDeliveryReturnResponses() {
-		return deliveryReturnResponses;
+	public List<DeliveryReturnResponseDetails> getDeliveryReturnResponseDetails() {
+		return deliveryReturnResponseDetails;
 	}
 
 	public DeviceInformation getDeviceInformation() {

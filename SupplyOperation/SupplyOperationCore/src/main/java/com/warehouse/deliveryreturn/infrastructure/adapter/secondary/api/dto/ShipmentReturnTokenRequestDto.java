@@ -7,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class ParcelReturnTokenRequestDto {
+public class ShipmentReturnTokenRequestDto {
     Long id;
     Long parcelRelatedId;
     String parcelStatus;

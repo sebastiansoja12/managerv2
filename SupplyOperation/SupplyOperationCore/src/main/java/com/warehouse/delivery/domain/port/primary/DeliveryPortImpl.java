@@ -1,6 +1,5 @@
 package com.warehouse.delivery.domain.port.primary;
 
-import java.util.Collections;
 import java.util.Set;
 
 import com.warehouse.delivery.domain.model.DeliveryRequest;
@@ -22,9 +21,6 @@ public class DeliveryPortImpl implements DeliveryPort {
 
     @Override
     public Set<DeliveryResponse> processDelivery(final Set<DeliveryRequest> deliveryRequests) {
-
-        this.deliveryService.save(deliveryRequests);
-
-        return Collections.emptySet();
+        return this.deliveryService.save(deliveryRequests);
     }
 }

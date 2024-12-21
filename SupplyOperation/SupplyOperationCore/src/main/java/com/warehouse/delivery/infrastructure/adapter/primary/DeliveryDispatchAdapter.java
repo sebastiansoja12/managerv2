@@ -39,7 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/deliveries")
 public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
-
     private final DeliveryPort deliveryPort;
 
     private final Set<DeliveryCreator> deliveryCreators;

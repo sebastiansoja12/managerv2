@@ -27,5 +27,5 @@ public class TerminalResponse {
     private DeliveryRejectResponse deliveryRejectResponse;
 
     @XmlElement(name = "DeliveryReturnResponse")
-    private DeliveryReturnResponse deliveryReturnResponses;
+    private DeliveryReturnResponse deliveryReturnResponse;
 }

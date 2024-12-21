@@ -4,5 +4,5 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnTokenResponse;
 
 public interface DeliveryReturnTokenServicePort {
-    DeliveryReturnTokenResponse sign(DeliveryReturnTokenRequest deliveryReturnTokenRequest);
+    DeliveryReturnTokenResponse sign(final DeliveryReturnTokenRequest deliveryReturnTokenRequest);
 }
