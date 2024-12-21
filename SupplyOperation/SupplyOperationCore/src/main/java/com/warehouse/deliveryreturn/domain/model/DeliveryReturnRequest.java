@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 
 
 public class DeliveryReturnRequest {
@@ -65,7 +66,7 @@ public class DeliveryReturnRequest {
                 .collect(Collectors.toList());
     }
 
-    public void rewriteDepotCodeFromDevice() {
+    public void rewriteDepartmentCodeFromDevice() {
         deliveryReturnDetails = deliveryReturnDetails
                 .stream()
                 .peek(deliveryReturnDetail -> deliveryReturnDetail

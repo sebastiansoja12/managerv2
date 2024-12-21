@@ -16,22 +16,15 @@ import com.warehouse.delivery.infrastructure.adapter.secondary.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
-import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
 
 @Configuration
 public class DeliveryConfiguration {
 
-	@Bean
-	public DeliveryPort deliveryPort(DeliveryService service, RouteLogDeliveryStatusServicePort logServicePort,
-			ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort) {
-		return new DeliveryPortImpl(service, logServicePort, parcelStatusControlChangeServicePort);
-	}
-    
-	@Bean("delivery.parcelStatusControlChangeServicePort")
-	public ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort(
-			ParcelStatusProperties parcelStatusProperties) {
-		return new ParcelStatusControlChangeServiceAdapter(parcelStatusProperties);
-	}
+    @Bean
+    public DeliveryPort deliveryPort(final DeliveryService deliveryService,
+                                     final RouteLogDeliveryStatusServicePort logServicePort) {
+        return new DeliveryPortImpl(deliveryService, logServicePort);
+    }
 
     @Bean
     public TerminalRequestLoggerPort terminalRequestLoggerPort(final DeliveryTrackerLogServicePort deliveryTrackerLogServicePort) {

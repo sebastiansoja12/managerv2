@@ -1,11 +1,16 @@
 package com.warehouse.deliveryreturn.domain.vo;
 
-
 import lombok.Builder;
-import lombok.Value;
 
-@Value
 @Builder
 public class DeliveryPackageRequest {
-    DeliveryReturnInformation delivery;
+    private final DeliveryReturnInformation delivery;
+
+    public DeliveryPackageRequest(final DeliveryReturnInformation delivery) {
+        this.delivery = delivery;
+    }
+
+    public DeliveryReturnInformation getDelivery() {
+        return delivery;
+    }
 }

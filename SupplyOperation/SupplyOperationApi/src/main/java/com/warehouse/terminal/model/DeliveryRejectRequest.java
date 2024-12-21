@@ -1,11 +1,8 @@
 package com.warehouse.terminal.model;
 
-import com.warehouse.terminal.enumeration.DeliveryStatus;
+import java.util.List;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,13 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DeliveryRejectRequest {
 
-    @XmlElement(name = "ShipmentID")
-    private Long shipmentId;
-
-    @XmlElement(name = "DeliveryStatus")
-    private DeliveryStatus deliveryStatus;
-
-    @XmlElement(name = "RejectReason")
-    private String rejectReason;
+    @XmlElementWrapper(name = "DeliveryRejectDetails")
+    @XmlElement(name = "DeliveryRejectDetail")
+    private List<DeliveryRejectDetail> deliveryRejectDetails;
 
 }

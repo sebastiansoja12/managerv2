@@ -9,10 +9,10 @@ import org.springframework.web.client.support.RestGatewaySupport;
 
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
-import com.warehouse.deliveryreturn.domain.vo.UpdateStatusParcelRequest;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.UpdateStatusParcelRequestDto;
+import com.warehouse.deliveryreturn.domain.vo.UpdateStatusShipmentRequest;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.UpdateStatusShipmentRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.UpdateStatusParcelRequestMapper;
-import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
+import com.warehouse.tools.shipment.ShipmentProperties;
 
 
 public class ShipmentStatusControlServiceAdapter extends RestGatewaySupport
@@ -20,19 +20,19 @@ public class ShipmentStatusControlServiceAdapter extends RestGatewaySupport
 
     private final RestClient restClient;
 
-    private final ParcelStatusProperties parcelStatusProperties;
+    private final ShipmentProperties shipmentProperties;
 
     private final UpdateStatusParcelRequestMapper updateStatusParcelRequestMapper =
             getMapper(UpdateStatusParcelRequestMapper.class);
 
-    public ShipmentStatusControlServiceAdapter(ParcelStatusProperties parcelStatusProperties) {
-        this.restClient = RestClient.builder().baseUrl(parcelStatusProperties.getUrl()).build();
-        this.parcelStatusProperties = parcelStatusProperties;
+    public ShipmentStatusControlServiceAdapter(final ShipmentProperties shipmentProperties) {
+        this.restClient = RestClient.builder().baseUrl(shipmentProperties.getUrl()).build();
+        this.shipmentProperties = shipmentProperties;
     }
 
     @Override
-    public UpdateStatus updateStatus(final UpdateStatusParcelRequest updateStatusParcelRequest) {
-        final UpdateStatusParcelRequestDto request = updateStatusParcelRequestMapper.map(updateStatusParcelRequest);
+    public UpdateStatus updateStatus(final UpdateStatusShipmentRequest updateStatusShipmentRequest) {
+        final UpdateStatusShipmentRequestDto request = updateStatusParcelRequestMapper.map(updateStatusShipmentRequest);
         return restClient
                 .put()
                 .uri("/v2/api/shipments/status")

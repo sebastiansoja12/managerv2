@@ -16,16 +16,16 @@ import static org.mapstruct.factory.Mappers.getMapper;
 @AllArgsConstructor
 public class DeliveryTokenAdapter implements DeliveryTokenServicePort {
 
-    private final DeliveryTokenService service;
+    private final DeliveryTokenService deliveryTokenService;
 
     private final DeliveryTokenRequestMapper requestMapper = getMapper(DeliveryTokenRequestMapper.class);
 
     private final DeliveryTokenResponseMapper responseMapper = getMapper(DeliveryTokenResponseMapper.class);
 
     @Override
-    public DeliveryTokenResponse protect(DeliveryTokenRequest deliveryTokenRequest) {
+    public DeliveryTokenResponse protect(final DeliveryTokenRequest deliveryTokenRequest) {
         final DeliveryTokenRequestDto request = requestMapper.map(deliveryTokenRequest);
-        final DeliveryTokenResponseDto response = service.protect(request);
+        final DeliveryTokenResponseDto response = deliveryTokenService.signDelivery(request);
         return responseMapper.map(response);
     }
 }

@@ -1,87 +1,44 @@
 package com.warehouse.deliveryreject.domain.model;
 
 import java.io.Serializable;
+import java.util.List;
 
-import com.warehouse.commonassets.enumeration.DeliveryStatus;
-import com.warehouse.commonassets.identificator.*;
+import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.terminal.enumeration.ExecutionSourceType;
 import com.warehouse.terminal.information.ExecutionSourceResolver;
 
 public class DeliveryRejectRequest implements Serializable, ExecutionSourceResolver {
-    private DeliveryId deliveryId;
-    private ShipmentId shipmentId;
-    private DepartmentCode departmentCode;
-    private SupplierCode supplierCode;
-    private DeviceId deviceId;
-    private DeliveryStatus deliveryStatus;
-    private RejectReason rejectReason;
+    private List<DeliveryRejectDetails> deliveryRejectDetails;
+    private DeviceInformation deviceInformation;
+    private final ProcessType processType;
 
-	public DeliveryRejectRequest(final DeliveryId deliveryId, final ShipmentId shipmentId,
-			final DepartmentCode departmentCode, final SupplierCode supplierCode, final DeviceId deviceId,
-			final DeliveryStatus deliveryStatus, final RejectReason rejectReason) {
-        this.deliveryId = deliveryId;
-        this.shipmentId = shipmentId;
-        this.departmentCode = departmentCode;
-        this.supplierCode = supplierCode;
-        this.deviceId = deviceId;
-        this.deliveryStatus = deliveryStatus;
-        this.rejectReason = rejectReason;
+    public DeliveryRejectRequest(final List<DeliveryRejectDetails> deliveryRejectDetails,
+                                 final DeviceInformation deviceInformation,
+                                 final ProcessType processType) {
+        this.deliveryRejectDetails = deliveryRejectDetails;
+        this.deviceInformation = deviceInformation;
+        this.processType = processType;
     }
 
-    public DeliveryId getDeliveryId() {
-        return deliveryId;
+    public ProcessType getProcessType() {
+        return processType;
     }
 
-    public void setDeliveryId(final DeliveryId deliveryId) {
-        this.deliveryId = deliveryId;
+    public void setDeliveryRejectDetails(final List<DeliveryRejectDetails> deliveryRejectDetails) {
+        this.deliveryRejectDetails = deliveryRejectDetails;
     }
 
-    public ShipmentId getShipmentId() {
-        return shipmentId;
+    public void setDeviceInformation(final DeviceInformation deviceInformation) {
+        this.deviceInformation = deviceInformation;
     }
 
-    public void setShipmentId(final ShipmentId shipmentId) {
-        this.shipmentId = shipmentId;
+    public List<DeliveryRejectDetails> getDeliveryRejectDetails() {
+        return deliveryRejectDetails;
     }
 
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
-    }
-
-    public void setDepartmentCode(final DepartmentCode departmentCode) {
-        this.departmentCode = departmentCode;
-    }
-
-    public void setSupplierCode(final SupplierCode supplierCode) {
-        this.supplierCode = supplierCode;
-    }
-
-    public DeviceId getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(final DeviceId deviceId) {
-        this.deviceId = deviceId;
-    }
-
-    public void setDeliveryStatus(final DeliveryStatus deliveryStatus) {
-        this.deliveryStatus = deliveryStatus;
-    }
-
-    public RejectReason getRejectReason() {
-        return rejectReason;
-    }
-
-    public void setRejectReason(final RejectReason rejectReason) {
-        this.rejectReason = rejectReason;
-    }
-
-    public SupplierCode getSupplierCode() {
-        return supplierCode;
-    }
-
-    public DeliveryStatus getDeliveryStatus() {
-        return deliveryStatus;
+    public DeviceInformation getDeviceInformation() {
+        return deviceInformation;
     }
 
     @Override

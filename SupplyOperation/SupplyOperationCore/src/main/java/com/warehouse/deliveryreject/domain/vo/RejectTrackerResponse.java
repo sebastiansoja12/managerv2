@@ -1,4 +1,8 @@
 package com.warehouse.deliveryreject.domain.vo;
 
-public record RejectTrackerResponse() {
+import com.warehouse.commonassets.identificator.ShipmentId;
+
+import java.util.UUID;
+
+public record RejectTrackerResponse(ShipmentId shipmentId, ShipmentId newShipmentId, UUID processId) {
 }

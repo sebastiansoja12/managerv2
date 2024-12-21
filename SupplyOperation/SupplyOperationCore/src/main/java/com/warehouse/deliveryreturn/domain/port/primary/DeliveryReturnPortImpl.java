@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
 
-import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
@@ -16,13 +15,11 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogReturnServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturn;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
+import com.warehouse.deliveryreturn.domain.vo.*;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
+
 @Slf4j
 public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
@@ -32,57 +29,53 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private final RouteLogReturnServicePort routeLogReturnServicePort;
 
-    @Override
-    public DeliveryReturnResponse deliverReturn(final DeliveryReturnRequest deliveryRequest) {
+    public DeliveryReturnPortImpl(final DeliveryReturnService deliveryReturnService,
+                                  final ShipmentStatusControlServicePort shipmentStatusControlServicePort,
+                                  final RouteLogReturnServicePort routeLogReturnServicePort) {
+        this.deliveryReturnService = deliveryReturnService;
+        this.shipmentStatusControlServicePort = shipmentStatusControlServicePort;
+        this.routeLogReturnServicePort = routeLogReturnServicePort;
+    }
 
-        validateRequest(deliveryRequest);
+    @Override
+    public DeliveryReturnResponse deliverReturn(final DeliveryReturnRequest deliveryReturnRequest) {
+
+        validateRequest(deliveryReturnRequest);
         
-        if (!deliveryRequest.isReturnProcessType()) {
+        if (!deliveryReturnRequest.isReturnProcessType()) {
             logWrongProcessTypeInformation();
             throw new WrongProcessTypeException(403, "Wrong process type");
         }
 
-        deliveryRequest.validateStatuses();
+        deliveryReturnRequest.validateStatuses();
 
-        deliveryRequest.rewriteSupplierCodeFromDevice();
+        deliveryReturnRequest.rewriteSupplierCodeFromDevice();
 
-        deliveryRequest.rewriteDepotCodeFromDevice();
+        deliveryReturnRequest.rewriteDepartmentCodeFromDevice();
 
-        logDepotCode(deliveryRequest);
-
-        final Set<DeliveryReturnDetails> deliveryReturnRequests = deliveryRequest.getDeliveryReturnDetails()
+        final Set<DeliveryReturnDetails> deliveryReturnRequests = deliveryReturnRequest.getDeliveryReturnDetails()
                 .stream()
                 .filter(Objects::nonNull)
                 .map(DeliveryReturnDetails::updateDeliveryStatus)
                 .collect(Collectors.toSet());
 
-        final List<DeliveryReturn> deliveryReturnResponses =
+        final List<DeliveryReturn> deliveryReturns =
                 deliveryReturnService.deliverReturn(deliveryReturnRequests);
 
-        logSupplierCode(deliveryReturnResponses);
+		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturns.stream()
+                .map(deliveryReturn -> {
+					final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(
+							deliveryReturn.getShipmentId());
+					final UpdateStatus updateStatus = shipmentStatusControlServicePort
+							.updateStatus(updateStatusShipmentRequest);
+                    return DeliveryReturnResponseDetails.from(deliveryReturn, updateStatus);
+				}).toList();
 
-//		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturnResponses.stream()
-//                .map(deliveryReturn -> {
-//					final UpdateStatusParcelRequest updateStatusParcelRequest = new UpdateStatusParcelRequest(
-//							deliveryReturn.getParcelId());
-//					final UpdateStatus updateStatus = shipmentStatusControlServicePort
-//							.updateStatus(updateStatusParcelRequest);
-//                    return new DeliveryReturnResponseDetails(deliveryReturn.getId(), deliveryReturn.getParcelId(),
-//                            deliveryReturn.getDeliveryStatus(), deliveryReturn.getToken(), updateStatus);
-//				}).collect(Collectors.toList());
-		
-		final DeliveryReturnResponse deliveryReturnResponse = DeliveryReturnResponse
+		return DeliveryReturnResponse
                 .builder()
-                .supplierCode(new SupplierCode(deliveryRequest.getDeviceInformation().getUsername()))
-                .departmentCode(deliveryRequest.getDeviceInformation().getDepartmentCode())
+                .deliveryReturnResponseDetails(deliveryReturnResponseDetails)
+                .deviceInformation(deliveryReturnRequest.getDeviceInformation())
                 .build();
-
-        return deliveryReturnResponse;
-    }
-
-    private void logDepotCode(final DeliveryReturnRequest deliveryRequest) {
-        log.warn("Logging depot code {} in tracker", deliveryRequest.getDepotCode());
-        routeLogReturnServicePort.logDepotCodeReturnDelivery(deliveryRequest);
     }
 
     private void validateRequest(final DeliveryReturnRequest deliveryRequest) {
@@ -93,19 +86,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
             throw new DeliveryReturnDetailsException("Delivery return details cannot be null");
         }
     }
-    
-	private void logSupplierCode(List<DeliveryReturn> deliveryReturns) {
-		deliveryReturns.forEach(deliveryReturn -> {
-			logSupplierCodeSave(deliveryReturn.getSupplierCode());
-			routeLogReturnServicePort.logSupplierCode(deliveryReturn);
-		});
-	}
 
     private void logWrongProcessTypeInformation() {
         log.warn("Process type is different than RETURN");
-    }
-    
-    private void logSupplierCodeSave(String supplierCode) {
-        log.warn("Saving supplier code {} in process", supplierCode);
     }
 }

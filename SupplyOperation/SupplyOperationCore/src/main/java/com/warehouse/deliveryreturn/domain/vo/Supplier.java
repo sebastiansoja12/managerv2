@@ -1,11 +1,17 @@
 package com.warehouse.deliveryreturn.domain.vo;
 
-import lombok.Value;
-
-@Value
 public class Supplier {
-    String supplierCode;
-    Boolean active;
+    private final String supplierCode;
+    private final Boolean active;
+
+    public Supplier(final String supplierCode, final Boolean active) {
+        this.supplierCode = supplierCode;
+        this.active = active;
+    }
+
+    public String getSupplierCode() {
+        return supplierCode;
+    }
 
     public boolean isActive() {
         return active;

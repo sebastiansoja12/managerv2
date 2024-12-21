@@ -4,7 +4,6 @@ import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -12,7 +11,6 @@ import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
@@ -40,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/deliveries")
 public class DeliveryDispatchAdapter extends ProcessDispatcher {
-
 
     private final DeliveryPort deliveryPort;
 
@@ -85,11 +82,11 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         departmentValidatorPort.validateDepartment(device);
 
-        logTerminalRequest(terminalRequest);
-
-        logDeviceId(terminalRequest);
-
-        logVersion(terminalRequest);
+//        logTerminalRequest(terminalRequest);
+//
+//        logDeviceId(terminalRequest);
+//
+//        logVersion(terminalRequest);
 
         final Request request = this.requestMapper.map(terminalRequest);
 
@@ -99,9 +96,7 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         final Set<DeliveryRequest> deliveryRequests = deliveryCreator.create(request, response);
 
-        final Set<DeliveryResponse> deliveryResponses =
-                !CollectionUtils.isEmpty(deliveryRequests) ? this.deliveryPort.processDelivery(deliveryRequests)
-                : Collections.emptySet();
+        final Set<DeliveryResponse> deliveryResponses = this.deliveryPort.processDelivery(deliveryRequests);
 
         response.updateDeliveryResponse(deliveryResponses);
 

@@ -23,7 +23,7 @@ public class DeliveryTokenAdapter implements DeliveryTokenService {
     private final DeliveryTokenPort deliveryTokenPort;
 
     @Override
-    public DeliveryTokenResponseDto protect(DeliveryTokenRequestDto deliveryTokenRequest) {
+    public DeliveryTokenResponseDto signDelivery(final DeliveryTokenRequestDto deliveryTokenRequest) {
         final DeliveryTokenRequest request = requestMapper.map(deliveryTokenRequest);
         final DeliveryTokenResponse response = deliveryTokenPort.protect(request);
         return responseMapper.map(response);

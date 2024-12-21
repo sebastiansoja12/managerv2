@@ -22,9 +22,6 @@ import com.warehouse.delivery.configuration.DeliveryTestConfiguration;
 import com.warehouse.delivery.domain.model.DeliveryRequest;
 import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.port.primary.DeliveryPort;
-import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
-import com.warehouse.delivery.domain.vo.UpdateStatusParcelRequest;
-import com.warehouse.delivery.infrastructure.adapter.secondary.api.UpdateStatus;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
 import com.warehouse.deliverytoken.domain.vo.Parcel;
 import com.warehouse.deliverytoken.domain.vo.ParcelId;
@@ -41,9 +38,6 @@ public class DeliveryIntegrationTest {
     private DeliveryPort deliveryPort;
 
     @Autowired
-    private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
-
-    @Autowired
     private com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort deliveryTokenServicePort;
 
     @Autowired
@@ -56,8 +50,6 @@ public class DeliveryIntegrationTest {
         final Parcel parcel = new Parcel(1L, null, ShipmentType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
                 .thenReturn(parcel);
-        when(parcelStatusControlChangeServicePort.updateParcelStatus(new UpdateStatusParcelRequest(1L)))
-                .thenReturn(UpdateStatus.OK);
         // when
         final Set<DeliveryResponse> deliveryResponses = deliveryPort.processDelivery(deliveryRequestList);
         // then
@@ -68,9 +60,6 @@ public class DeliveryIntegrationTest {
     void shouldNotDeliverWhenSupplierCodeDoesNotMatchOneFromMock() {
         // given
         final Set<DeliveryRequest> deliveryRequestList = Collections.singleton(DeliveryRequest.builder()
-                .depotCode("KT1")
-                .supplierCode("abc")
-                .parcelId(1L)
                 .build());
         final Parcel parcel = new Parcel(1L, null, ShipmentType.PARENT, "KT1");
         when(parcelServicePort.downloadParcel(new ParcelId(1L)))
@@ -81,9 +70,6 @@ public class DeliveryIntegrationTest {
 
     private DeliveryRequest createDeliveryRequest() {
         return DeliveryRequest.builder()
-                .depotCode("KT1")
-                .supplierCode("dwvscq")
-                .parcelId(1L)
                 .build();
     }
 

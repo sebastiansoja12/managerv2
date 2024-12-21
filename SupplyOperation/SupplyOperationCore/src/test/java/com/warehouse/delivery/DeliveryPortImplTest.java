@@ -21,21 +21,16 @@ import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.port.primary.DeliveryPortImpl;
 import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
-import com.warehouse.delivery.domain.port.secondary.ParcelStatusControlChangeServicePort;
 import com.warehouse.delivery.domain.port.secondary.RouteLogDeliveryStatusServicePort;
 import com.warehouse.delivery.domain.service.DeliveryService;
 import com.warehouse.delivery.domain.service.DeliveryServiceImpl;
 import com.warehouse.delivery.domain.vo.*;
-import com.warehouse.delivery.infrastructure.adapter.secondary.api.UpdateStatus;
 
 @ExtendWith(MockitoExtension.class)
 public class DeliveryPortImplTest {
 
 	@Mock
 	private RouteLogDeliveryStatusServicePort logServicePort;
-
-	@Mock
-	private ParcelStatusControlChangeServicePort parcelStatusControlChangeServicePort;
 
 	@Mock
 	private DeliveryRepository deliveryRepository;
@@ -52,14 +47,14 @@ public class DeliveryPortImplTest {
 	@BeforeEach
 	void setup() {
 		deliveryService = new DeliveryServiceImpl(deliveryRepository, deliveryTokenServicePort);
-		deliveryPort = new DeliveryPortImpl(deliveryService, logServicePort, parcelStatusControlChangeServicePort);
+		deliveryPort = new DeliveryPortImpl(deliveryService, logServicePort);
 	}
 
 	@Test
 	void shouldProcessDelivery() {
 		// given
 		final String supplierCode = "abc";
-		final DeliveryRequest deliveryRequestSet = createDeliveryRequest();
+		final DeliveryRequest deliveryRequestSet = null;
 		final List<DeliveryPackageRequest> deliveryPackageRequests = createDeliveryPackageRequests("KT1",
 				DeliveryStatus.DELIVERY, 1L);
 		final Supplier supplier = createSupplier(supplierCode);
@@ -72,10 +67,7 @@ public class DeliveryPortImplTest {
 		final Delivery updatedDelivery = createDelivery();
 		updatedDelivery.setId(UUID.fromString(DELIVERY_ID));
 
-		when(deliveryRepository.saveDelivery(deliveryRequestSet)).thenReturn(updatedDelivery);
 		when(deliveryTokenServicePort.protect(deliveryTokenRequest)).thenReturn(deliveryTokenResponse);
-		when(parcelStatusControlChangeServicePort.updateParcelStatus(new UpdateStatusParcelRequest(1L)))
-				.thenReturn(UpdateStatus.OK);
 
 		// when
 		final Set<DeliveryResponse> deliveries = deliveryPort.processDelivery(Set.of(deliveryRequestSet));
@@ -86,7 +78,7 @@ public class DeliveryPortImplTest {
 	}
 
 	private SupplierSignature buildSupplierSignature(final String token, final Long parcelId) {
-		return SupplierSignature.builder().deliveryId(UUID.fromString(DELIVERY_ID)).token(token).parcelId(parcelId)
+		return SupplierSignature.builder().deliveryId(UUID.fromString(DELIVERY_ID)).token(token)
 				.build();
 	}
 
@@ -108,10 +100,6 @@ public class DeliveryPortImplTest {
 	private Delivery createDelivery() {
 		return Delivery.builder().deliveryStatus(DeliveryStatus.DELIVERY).depotCode("KT1").supplierCode("abc")
 				.parcelId(1L).build();
-	}
-
-	private DeliveryRequest createDeliveryRequest() {
-		return DeliveryRequest.builder().depotCode("KT1").supplierCode("abc").parcelId(1L).build();
 	}
 
 	private <T> T expectedToBe(T t) {

@@ -1,13 +1,16 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
-
-
-@Value
-@Builder
-@Jacksonized
 public class ShipmentIdDto {
-    Long value;
+    private Long value;
+
+    public ShipmentIdDto() {
+    }
+
+    public ShipmentIdDto(final Long value) {
+        this.value = value;
+    }
+
+    public Long getValue() {
+        return value;
+    }
 }

@@ -9,6 +9,8 @@
         <version>2024.7-SNAPSHOT</version>
     </parent>
 
+    <packaging>jar</packaging>
+
     <artifactId>PalletHandlingManagerCore</artifactId>
 
     <properties>

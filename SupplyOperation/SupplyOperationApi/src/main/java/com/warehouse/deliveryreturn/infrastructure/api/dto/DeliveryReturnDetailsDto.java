@@ -6,25 +6,19 @@ import com.warehouse.delivery.dto.ShipmentIdDto;
 import com.warehouse.delivery.dto.SupplierCodeDto;
 
 public class DeliveryReturnDetailsDto {
-    private ShipmentIdDto shipmentId;
-    private DeliveryStatusDto deliveryStatus;
-    private DepartmentCodeDto departmentCode;
-    private SupplierCodeDto supplierCode;
-    private ReturnTokenDto returnTokenDto;
-
-    public DeliveryReturnDetailsDto() {
-    }
+    private final ShipmentIdDto shipmentId;
+    private final DeliveryStatusDto deliveryStatus;
+    private final DepartmentCodeDto departmentCode;
+    private final SupplierCodeDto supplierCode;
 
     public DeliveryReturnDetailsDto(final ShipmentIdDto shipmentId,
                                     final DeliveryStatusDto deliveryStatus,
                                     final DepartmentCodeDto departmentCode,
-                                    final SupplierCodeDto supplierCode,
-                                    final ReturnTokenDto returnTokenDto) {
+                                    final SupplierCodeDto supplierCode) {
         this.shipmentId = shipmentId;
         this.deliveryStatus = deliveryStatus;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
-        this.returnTokenDto = returnTokenDto;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -43,7 +37,4 @@ public class DeliveryReturnDetailsDto {
         return supplierCode;
     }
 
-    public ReturnTokenDto getReturnTokenDto() {
-        return returnTokenDto;
-    }
 }

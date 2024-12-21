@@ -6,14 +6,12 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @XmlRootElement(name = "DeliveryReturnDetail")
 @XmlAccessorType(XmlAccessType.FIELD)
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeliveryReturnDetail {
@@ -22,7 +20,7 @@ public class DeliveryReturnDetail {
     private Long shipmentId;
 
     @XmlElement(name = "DeliveryStatus")
-    private DeliveryStatus deliveryStatus;
+    private String deliveryStatus;
 
     @XmlElement(name = "DepartmentCode")
     private String departmentCode;

@@ -2,8 +2,6 @@ package com.warehouse.delivery.infrastructure.adapter.primary.processresolver;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
@@ -36,8 +34,8 @@ public class ProcessRejectResolver implements ProcessHandler {
 
     @Override
     public Response processRequest(final Request request) {
-        final List<DeliveryRejectRequestDto> deliveryRejectRequest = requestMapper.mapToDeliveryRejectRequest(request);
-        final List<DeliveryRejectResponseDto> deliveryRejectResponse =
+        final DeliveryRejectRequestDto deliveryRejectRequest = requestMapper.mapToDeliveryRejectRequest(request);
+        final DeliveryRejectResponseDto deliveryRejectResponse =
                 deliveryRejectService.reportDeliveryRejection(deliveryRejectRequest);
         return responseMapper.mapDeliveryRejectResponse(deliveryRejectResponse);
     }

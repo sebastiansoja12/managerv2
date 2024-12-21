@@ -12,7 +12,7 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnTokenResponse;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ParcelReturnTokenRequestDto;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ShipmentReturnTokenRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.TokenDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryReturnTokenRequestMapper;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryReturnTokenResponseMapper;
@@ -35,7 +35,7 @@ public class DeliveryReturnServiceAdapter implements DeliveryReturnTokenServiceP
 
 
 	private DeliveryReturnSignature signWithReturnToken(PropertiesConfiguration configuration,
-			ParcelReturnTokenRequestDto request) {
+			ShipmentReturnTokenRequestDto request) {
 
         final ResponseEntity<? extends TokenDto> responseEntity = restClient
                 .post()
@@ -49,14 +49,14 @@ public class DeliveryReturnServiceAdapter implements DeliveryReturnTokenServiceP
     }
     
 	private DeliveryReturnSignature sign(PropertiesConfiguration configuration,
-			ParcelReturnTokenRequestDto request) {
+			ShipmentReturnTokenRequestDto request) {
         return signWithReturnToken(configuration, request);
 	}
     
     @Override
     public DeliveryReturnTokenResponse sign(DeliveryReturnTokenRequest deliveryReturnTokenRequest) {
         final PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration(returnTokenProperties);
-        final List<ParcelReturnTokenRequestDto> returnTokenRequests = requestMapper.map(deliveryReturnTokenRequest);
+        final List<ShipmentReturnTokenRequestDto> returnTokenRequests = requestMapper.map(deliveryReturnTokenRequest);
         
         final List<DeliveryReturnSignature> signatures = returnTokenRequests.stream()
                 .map(parcelReturnTokenRequest -> sign(propertiesConfiguration, parcelReturnTokenRequest))

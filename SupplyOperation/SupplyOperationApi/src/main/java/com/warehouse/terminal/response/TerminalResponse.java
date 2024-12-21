@@ -1,9 +1,6 @@
 package com.warehouse.terminal.response;
 
-import java.util.List;
-
 import com.warehouse.terminal.information.Device;
-import com.warehouse.terminal.model.DeliveryMissedResponse;
 import com.warehouse.terminal.model.DeliveryRejectResponse;
 import com.warehouse.terminal.model.DeliveryReturnResponse;
 
@@ -21,16 +18,14 @@ public class TerminalResponse {
 
     @XmlElement(name = "Device")
     private Device device;
+//
+//    @XmlElementWrapper(name = "DeliveryMissedResponses")
+//    @XmlElement(name = "DeliveryMissedResponse")
+//    private List<DeliveryMissedResponse> deliveryMissedResponses;
 
-    @XmlElementWrapper(name = "DeliveryMissedResponses")
-    @XmlElement(name = "DeliveryMissedResponse")
-    private List<DeliveryMissedResponse> deliveryMissedResponses;
-
-    @XmlElementWrapper(name = "DeliveryRejectResponses")
     @XmlElement(name = "DeliveryRejectResponse")
-    private List<DeliveryRejectResponse> deliveryRejectResponses;
+    private DeliveryRejectResponse deliveryRejectResponse;
 
-    @XmlElementWrapper(name = "DeliveryReturnResponses")
     @XmlElement(name = "DeliveryReturnResponse")
-    private List<DeliveryReturnResponse> deliveryReturnResponses;
+    private DeliveryReturnResponse deliveryReturnResponse;
 }

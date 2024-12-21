@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.ParcelRepositoryServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.supplier.SupplierValidatorProperties;
 
@@ -26,7 +26,7 @@ public class DeliveryReturnTestConfiguration {
     }
 
     @MockBean
-    public ParcelRepositoryServicePort parcelRepositoryServicePort;
+    public ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
     @MockBean
     public MailServicePort mailServicePort;

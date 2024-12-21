@@ -3,8 +3,7 @@ package com.warehouse.deliveryreturn.domain.vo;
 
 import java.util.List;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 
 import lombok.Builder;
 
@@ -12,19 +11,14 @@ import lombok.Builder;
 
 @Builder
 public class DeliveryReturnResponse {
-    private final List<DeliveryReturnResponseDetails> deliveryReturnResponses;
-    private final SupplierCode supplierCode;
-    private final DepartmentCode departmentCode;
+    private final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails;
+    private final DeviceInformation deviceInformation;
 
-    public List<DeliveryReturnResponseDetails> getDeliveryReturnResponses() {
-        return deliveryReturnResponses;
-    }
+	public List<DeliveryReturnResponseDetails> getDeliveryReturnResponseDetails() {
+		return deliveryReturnResponseDetails;
+	}
 
-    public SupplierCode getSupplierCode() {
-        return supplierCode;
-    }
-
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
-    }
+	public DeviceInformation getDeviceInformation() {
+		return deviceInformation;
+	}
 }

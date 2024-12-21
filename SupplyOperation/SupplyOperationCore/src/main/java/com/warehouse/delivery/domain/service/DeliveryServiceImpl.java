@@ -1,53 +1,46 @@
 package com.warehouse.delivery.domain.service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.warehouse.delivery.domain.model.*;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.delivery.domain.model.DeliveryRequest;
+import com.warehouse.delivery.domain.model.DeliveryResponse;
 import com.warehouse.delivery.domain.port.secondary.DeliveryRepository;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTokenServicePort;
-
 import com.warehouse.delivery.domain.vo.*;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 public class DeliveryServiceImpl implements DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
 
     private final DeliveryTokenServicePort deliveryTokenServicePort;
 
-    @Override
-    public List<Delivery> save(Set<DeliveryRequest> deliveryRequest) {
-        final DeliveryTokenRequest deliveryTokenRequest = buildTokenRequest(deliveryRequest);
-
-        final DeliveryTokenResponse deliveryTokenResponse = secureDelivery(deliveryTokenRequest);
-
-        final Map<Long, SupplierSignature> signaturesMap = assignToHashMap(deliveryTokenResponse);
-
-        assignTokenToDelivery(signaturesMap, deliveryRequest);
-
-		return deliveryRequest
-                .stream()
-                .map(deliveryRepository::saveDelivery)
-                .toList();
+    public DeliveryServiceImpl(final DeliveryRepository deliveryRepository,
+                               final DeliveryTokenServicePort deliveryTokenServicePort) {
+        this.deliveryRepository = deliveryRepository;
+        this.deliveryTokenServicePort = deliveryTokenServicePort;
     }
 
-    private DeliveryTokenRequest buildTokenRequest(Set<DeliveryRequest> deliveries) {
+    @Override
+    public Set<DeliveryResponse> save(final Set<DeliveryRequest> deliveryRequest) {
+		return deliveryRequest.stream()
+                .map(deliveryRepository::create)
+                .collect(Collectors.toSet());
+    }
+
+    private DeliveryTokenRequest buildTokenRequest(final Set<DeliveryRequest> deliveries) {
         final List<DeliveryPackageRequest> deliveryPackageRequests = deliveries
                 .stream()
                 .map(this::createDeliveryPackageRequests)
                 .flatMap(Collection::stream)
                 .toList();
-        final Supplier supplier = deliveries.stream()
-                .map(DeliveryRequest::getSupplierCode)
-                .map(Supplier::new)
-                .findAny()
-                .orElse(null);
         return DeliveryTokenRequest.builder()
                 .deliveryPackageRequests(deliveryPackageRequests)
-                .supplier(supplier)
                 .build();
     }
 
@@ -63,33 +56,30 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     private DeliveryInformation buildDeliveryInformation(DeliveryRequest delivery) {
         return DeliveryInformation.builder()
-                .deliveryStatus(delivery.getDeliveryStatus())
-                .depotCode(delivery.getDepotCode())
-                .parcelId(delivery.getParcelId())
                 .build();
     }
 
-    private void assignTokenToDelivery(Map<Long, SupplierSignature> supplierTokenResponseMap,
+    private void assignTokenToDelivery(final Map<ShipmentId, SupplierSignature> supplierTokenResponseMap,
 			Set<DeliveryRequest> deliveries) {
 		deliveries.forEach(delivery -> {
-			final SupplierSignature supplierSignature = supplierTokenResponseMap.get(delivery.getParcelId());
-			delivery.assignTokenToDelivery(supplierSignature.getToken());
+			final SupplierSignature supplierSignature = supplierTokenResponseMap.get(delivery.getShipmentId());
+
 		});
 	}
 
-    private Map<Long, SupplierSignature> assignToHashMap(DeliveryTokenResponse responses) {
+    private Map<ShipmentId, SupplierSignature> assignToHashMap(DeliveryTokenResponse responses) {
         return responses.getSupplierSignature().stream()
                 .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
     }
 
-    private Long generateKeyFromResponse(SupplierSignature supplierSignature) {
+    private ShipmentId generateKeyFromResponse(final SupplierSignature supplierSignature) {
 		if (supplierSignature != null) {
-			return supplierSignature.getParcelId();
+			return null;
 		}
 		return null;
 	}
 
-    private DeliveryTokenResponse secureDelivery(DeliveryTokenRequest request) {
+    private DeliveryTokenResponse secureDelivery(final DeliveryTokenRequest request) {
         return deliveryTokenServicePort.protect(request);
     }
 }
