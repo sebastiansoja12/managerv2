@@ -6,34 +6,31 @@ DB_USER=""
 DB_PASSWORD=""
 DB_NAME="dev"
 
-# Sprawdzenie, czy mysql jest dostępny
 if ! command -v mysql &> /dev/null; then
-  echo "Polecenie 'mysql' nie zostało znalezione! Upewnij się, że jest zainstalowane i znajduje się w PATH."
+  echo "The 'mysql' command was not found! Please ensure it is installed and available in the PATH."
   exit 1
 fi
 
-# Definicja komendy SQL
 SQL_COMMAND="mysql -h $DB_HOST -u $DB_USER --password=$DB_PASSWORD $DB_NAME"
 
-# Sprawdzenie, czy folder migration istnieje
 if [ ! -d "$MIGRATION_DIR" ]; then
-  echo "Folder $MIGRATION_DIR nie istnieje!"
+  echo "The folder $MIGRATION_DIR does not exist!"
   exit 1
 fi
 
-echo "Przechodzę do folderu migration: $MIGRATION_DIR"
+echo "Navigating to the migration folder: $MIGRATION_DIR"
 cd "$MIGRATION_DIR" || exit 1
 
-echo "Rozpoczynam migracje..."
+echo "Starting migrations..."
 for FILE in *.sql; do
   if [ -f "$FILE" ]; then
-    echo "Wykonuję: $FILE"
+    echo "Executing: $FILE"
     $SQL_COMMAND < "$FILE"
     if [ $? -ne 0 ]; then
-      echo "Błąd podczas wykonywania $FILE"
+      echo "Error occurred while executing $FILE"
       exit 1
     fi
   fi
 done
 
-echo "Wszystkie migracje zakończone."
+echo "All migrations completed."
