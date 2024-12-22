@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
 
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
@@ -59,8 +60,10 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
                 .map(DeliveryReturnDetails::updateDeliveryStatus)
                 .collect(Collectors.toSet());
 
+        final DeviceInformation deviceInformation = deliveryReturnRequest.getDeviceInformation();
+
         final List<DeliveryReturn> deliveryReturns =
-                deliveryReturnService.deliverReturn(deliveryReturnRequests);
+                deliveryReturnService.deliverReturn(deliveryReturnRequests, deviceInformation);
 
 		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturns.stream()
                 .map(deliveryReturn -> {

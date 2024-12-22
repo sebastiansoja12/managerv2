@@ -1,4 +1,4 @@
-package com.warehouse.deliveryreturn.domain.model;
+package com.warehouse.deliveryreturn.domain.vo;
 
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
@@ -10,20 +10,31 @@ import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusExceptio
 import lombok.Builder;
 
 @Builder
-public class DeliveryReturnDetails {
+public class ReturnTokenDetails {
     private ShipmentId shipmentId;
     private DeliveryStatus deliveryStatus;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
+    private ReturnToken returnToken;
 
-    public DeliveryReturnDetails(final ShipmentId shipmentId,
-                                 final DeliveryStatus deliveryStatus,
-                                 final DepartmentCode departmentCode,
-                                 final SupplierCode supplierCode) {
+    public ReturnTokenDetails(final ShipmentId shipmentId,
+                              final DeliveryStatus deliveryStatus,
+                              final DepartmentCode departmentCode,
+                              final SupplierCode supplierCode,
+                              final ReturnToken returnToken) {
         this.shipmentId = shipmentId;
         this.deliveryStatus = deliveryStatus;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
+        this.returnToken = returnToken;
+    }
+
+    public ReturnToken getReturnToken() {
+        return returnToken;
+    }
+
+    public void setReturnToken(final ReturnToken returnToken) {
+        this.returnToken = returnToken;
     }
 
     public ShipmentId getShipmentId() {
@@ -64,8 +75,8 @@ public class DeliveryReturnDetails {
         }
     }
 
-    public DeliveryReturnDetails updateDeliveryStatus() {
-        return DeliveryReturnDetails.builder()
+    public ReturnTokenDetails updateDeliveryStatus() {
+        return ReturnTokenDetails.builder()
                 .deliveryStatus(DeliveryStatus.RETURN)
                 .shipmentId(shipmentId)
                 .supplierCode(supplierCode)

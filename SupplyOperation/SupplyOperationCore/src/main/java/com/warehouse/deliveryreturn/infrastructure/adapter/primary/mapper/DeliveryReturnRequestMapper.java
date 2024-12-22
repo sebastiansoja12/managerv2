@@ -25,7 +25,6 @@ public interface DeliveryReturnRequestMapper {
 
     List<DeliveryReturnDetails> map(final List<DeliveryReturnDetail> deliveryReturnRequests);
 
-    @Mapping(target = "token", ignore = true)
     @Mapping(target = "departmentCode.value", source = "departmentCode")
     @Mapping(target = "supplierCode.value", source = "supplierCode")
     @Mapping(target = "shipmentId.value", source = "shipmentId")

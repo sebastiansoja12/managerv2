@@ -37,7 +37,6 @@ public class DeliveryReturnRepositoryImplTest {
         // given
         final DeliveryReturnDetails deliveryReturnDetails = DeliveryReturnDetails.builder()
                 .deliveryStatus(DeliveryStatus.RETURN)
-                .token("12345")
                 .shipmentId(new ShipmentId(1L))
                 .departmentCode(new DepartmentCode("KT1"))
                 .supplierCode(new SupplierCode("abc"))

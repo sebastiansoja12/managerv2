@@ -1,11 +1,23 @@
 package com.warehouse.deliveryreturn.domain.vo;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import lombok.Builder;
-import lombok.Value;
 
-@Value
 @Builder
 public class DeliveryReturnSignature {
-    Long parcelId;
-    String token;
+    private final ShipmentId shipmentId;
+    private final ReturnToken returnToken;
+
+    public DeliveryReturnSignature(final ShipmentId shipmentId, final ReturnToken returnToken) {
+        this.shipmentId = shipmentId;
+        this.returnToken = returnToken;
+    }
+
+    public ShipmentId getShipmentId() {
+        return shipmentId;
+    }
+
+    public ReturnToken getReturnToken() {
+        return returnToken;
+    }
 }

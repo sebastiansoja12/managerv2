@@ -1,15 +1,17 @@
 package com.warehouse.deliveryreturn.domain.service;
 
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ObjectUtils;
-
-import com.warehouse.deliveryreturn.domain.exception.SupplierNotAvailableInRequestException;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
-import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
+import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
@@ -38,15 +40,16 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
     }
 
     @Override
-    public List<DeliveryReturn> deliverReturn(final Set<DeliveryReturnDetails> deliveryReturnRequests) {
+    public List<DeliveryReturn> deliverReturn(final Set<DeliveryReturnDetails> deliveryReturnRequests,
+                                              final DeviceInformation deviceInformation) {
 
-        final DeliveryReturnTokenRequest deliveryReturnTokenRequest = buildTokenRequest(deliveryReturnRequests);
+        final ReturnTokenRequest returnTokenRequest = ReturnTokenRequest.from(deliveryReturnRequests, deviceInformation);
 
-        final DeliveryReturnTokenResponse deliveryReturnTokenResponse = secureDeliveryReturn(deliveryReturnTokenRequest);
+        final ReturnTokenResponse returnTokenResponse = deliveryReturnTokenServicePort.sign(returnTokenRequest);
 
-        final Map<Long, DeliveryReturnSignature> signaturesMap = assignToHashMap(deliveryReturnTokenResponse);
+        final Map<ShipmentId, DeliveryReturnSignature> signaturesMap = assignToHashMap(returnTokenResponse);
 
-        final List<DeliveryReturnDetails> deliveries = assignTokenToDeliveryReturn(signaturesMap, 
+        final List<ReturnTokenDetails> deliveries = assignTokenToDeliveryReturn(signaturesMap,
                 deliveryReturnRequests);
 
         return deliveries.stream()
@@ -56,7 +59,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 })
                 .map(deliveryReturnDetails -> DeliveryReturn
                         .builder()
-                        .token(deliveryReturnDetails.getToken())
+                        .token(deliveryReturnDetails.getReturnToken().value())
                         .supplierCode(deliveryReturnDetails.getSupplierCode().getValue())
                         .departmentCode(deliveryReturnDetails.getDepartmentCode().getValue())
                         .shipmentId(deliveryReturnDetails.getShipmentId().getValue())
@@ -65,67 +68,26 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .toList();
     }
 
-    private DeliveryReturnTokenRequest buildTokenRequest(Set<DeliveryReturnDetails> deliveries) {
-        final List<DeliveryPackageRequest> deliveryPackageRequests = deliveries
-                .stream()
-                .map(this::createDeliveryPackageRequests)
-                .flatMap(Collection::stream)
-                .toList();
-        final String supplierCode = deliveries.stream()
-                .map(DeliveryReturnDetails::getSupplierCode)
-                .filter(ObjectUtils::isNotEmpty)
-                .findAny()
-                .orElseThrow(() -> new SupplierNotAvailableInRequestException("Supplier not available"))
-                .getValue();
-        return DeliveryReturnTokenRequest.builder()
-                .requests(deliveryPackageRequests)
-                .supplier(new Supplier(supplierCode, Boolean.TRUE))
-                .build();
-    }
-
-    private List<DeliveryPackageRequest> createDeliveryPackageRequests(DeliveryReturnDetails delivery) {
-        return List.of(createDeliveryPackageRequest(delivery));
-    }
-
-    private DeliveryPackageRequest createDeliveryPackageRequest(DeliveryReturnDetails delivery) {
-        return DeliveryPackageRequest.builder()
-                .delivery(buildDeliveryInformation(delivery))
-                .build();
-    }
-
-    private DeliveryReturnInformation buildDeliveryInformation(DeliveryReturnDetails delivery) {
-        return DeliveryReturnInformation.builder()
-                .deliveryStatus(String.valueOf(delivery.getDeliveryStatus()))
-                .departmentCode(delivery.getDepartmentCode().getValue())
-                .shipmentId(delivery.getShipmentId().getValue())
-                .locked(shipmentRepositoryServicePort.downloadShipment(delivery.getShipmentId()).isLocked())
-                .build();
-    }
-
-	private List<DeliveryReturnDetails> assignTokenToDeliveryReturn(Map<Long, DeliveryReturnSignature> signaturesMap,
-			Set<DeliveryReturnDetails> deliveryReturnRequests) {
+	private List<ReturnTokenDetails> assignTokenToDeliveryReturn(final Map<ShipmentId, DeliveryReturnSignature> signaturesMap,
+			final Set<DeliveryReturnDetails> deliveryReturnRequests) {
         return deliveryReturnRequests.stream().map(delivery -> {
 			final DeliveryReturnSignature deliveryReturnSignature = signaturesMap.get(delivery.getShipmentId());
-            return DeliveryReturnDetails.builder()
+            return ReturnTokenDetails.builder()
                     .supplierCode(delivery.getSupplierCode())
                     .deliveryStatus(delivery.getDeliveryStatus())
-                    .token(deliveryReturnSignature != null ? deliveryReturnSignature.getToken() : null)
                     .departmentCode(delivery.getDepartmentCode())
                     .shipmentId(delivery.getShipmentId())
+                    .returnToken(deliveryReturnSignature.getReturnToken())
                     .build();
 		}).toList();
 	}
 
-    private Map<Long, DeliveryReturnSignature> assignToHashMap(DeliveryReturnTokenResponse responses) {
+    private Map<ShipmentId, DeliveryReturnSignature> assignToHashMap(final ReturnTokenResponse responses) {
         return responses.getDeliveryReturnSignatures().stream()
                 .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
     }
 
-    private Long generateKeyFromResponse(DeliveryReturnSignature deliveryReturnSignature) {
-        return !Objects.isNull(deliveryReturnSignature) ? deliveryReturnSignature.getParcelId() : null;
-    }
-
-    private DeliveryReturnTokenResponse secureDeliveryReturn(DeliveryReturnTokenRequest request) {
-        return deliveryReturnTokenServicePort.sign(request);
+    private ShipmentId generateKeyFromResponse(final DeliveryReturnSignature deliveryReturnSignature) {
+        return !Objects.isNull(deliveryReturnSignature) ? deliveryReturnSignature.getShipmentId() : null;
     }
 }

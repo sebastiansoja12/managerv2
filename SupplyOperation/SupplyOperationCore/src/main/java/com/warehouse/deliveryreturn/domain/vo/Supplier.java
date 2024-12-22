@@ -1,19 +1,15 @@
 package com.warehouse.deliveryreturn.domain.vo;
 
+import com.warehouse.commonassets.identificator.SupplierCode;
+
 public class Supplier {
-    private final String supplierCode;
-    private final Boolean active;
+    private final SupplierCode supplierCode;
 
-    public Supplier(final String supplierCode, final Boolean active) {
+    public Supplier(final SupplierCode supplierCode) {
         this.supplierCode = supplierCode;
-        this.active = active;
     }
 
-    public String getSupplierCode() {
+    public SupplierCode getSupplierCode() {
         return supplierCode;
-    }
-
-    public boolean isActive() {
-        return active;
     }
 }

@@ -8,10 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
-import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
+import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnTokenResponse;
+import com.warehouse.deliveryreturn.domain.vo.ReturnTokenResponse;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ShipmentReturnTokenRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.TokenDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryReturnTokenRequestMapper;
@@ -54,15 +54,15 @@ public class DeliveryReturnServiceAdapter implements DeliveryReturnTokenServiceP
 	}
     
     @Override
-    public DeliveryReturnTokenResponse sign(DeliveryReturnTokenRequest deliveryReturnTokenRequest) {
+    public ReturnTokenResponse sign(ReturnTokenRequest returnTokenRequest) {
         final PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration(returnTokenProperties);
-        final List<ShipmentReturnTokenRequestDto> returnTokenRequests = requestMapper.map(deliveryReturnTokenRequest);
+        final List<ShipmentReturnTokenRequestDto> returnTokenRequests = requestMapper.map(returnTokenRequest);
         
         final List<DeliveryReturnSignature> signatures = returnTokenRequests.stream()
-                .map(parcelReturnTokenRequest -> sign(propertiesConfiguration, parcelReturnTokenRequest))
+                .map(shipmentTokenRequest -> sign(propertiesConfiguration, shipmentTokenRequest))
                 .toList();
 
-		return new DeliveryReturnTokenResponse(signatures, deliveryReturnTokenRequest.getSupplier().getSupplierCode());
+		return new ReturnTokenResponse(signatures, returnTokenRequest.getSupplier().getSupplierCode());
     }
     
     

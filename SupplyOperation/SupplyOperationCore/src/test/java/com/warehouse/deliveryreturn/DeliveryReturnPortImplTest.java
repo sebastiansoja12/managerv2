@@ -136,7 +136,7 @@ public class DeliveryReturnPortImplTest {
 				.shipmentId(new ShipmentId(parcelId))
 				.supplierCode(new SupplierCode(supplierCode))
 				.departmentCode(new DepartmentCode(depotCode))
-				.token(token).build();
+				.build();
 
 		return List.of(deliveryReturnDetails);
 	}
