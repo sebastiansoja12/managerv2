@@ -19,17 +19,21 @@ if [ ! -d "$MIGRATION_DIR" ]; then
 fi
 
 echo "Navigating to the migration folder: $MIGRATION_DIR"
-cd "$MIGRATION_DIR" || exit 1
+
+SQL_FILES=$(find "$MIGRATION_DIR" -type f -name "*.sql" | sort)
+
+if [ -z "$SQL_FILES" ]; then
+  echo "No migration files found in $MIGRATION_DIR!"
+  exit 1
+fi
 
 echo "Starting migrations..."
-for FILE in *.sql; do
-  if [ -f "$FILE" ]; then
-    echo "Executing: $FILE"
-    $SQL_COMMAND < "$FILE"
-    if [ $? -ne 0 ]; then
-      echo "Error occurred while executing $FILE"
-      exit 1
-    fi
+for FILE in $SQL_FILES; do
+  echo "Executing: $FILE"
+  $SQL_COMMAND < "$FILE"
+  if [ $? -ne 0 ]; then
+    echo "Error occurred while executing $FILE"
+    exit 1
   fi
 done
 
