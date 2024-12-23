@@ -1,8 +1,8 @@
 package com.warehouse.deliverymissed.domain.port.secondary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.deliverymissed.domain.vo.DeliveryMissedDetail;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissedDetails;
 
 public interface DeliveryInstructionServicePort {
-    DeliveryMissedDetail getDeliveryInstruction(final ShipmentId shipmentId);
+    DeliveryMissedDetails getDeliveryInstruction(final ShipmentId shipmentId);
 }

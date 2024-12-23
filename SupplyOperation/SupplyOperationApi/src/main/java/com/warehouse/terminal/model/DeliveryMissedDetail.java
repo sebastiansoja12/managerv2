@@ -9,12 +9,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@XmlRootElement(name = "DeliveryReturnDetail")
+@XmlRootElement(name = "DeliveryMissedDetail")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeliveryReturnDetail {
+public class DeliveryMissedDetail {
 
     @XmlElement(name = "ShipmentID")
     private Long shipmentId;

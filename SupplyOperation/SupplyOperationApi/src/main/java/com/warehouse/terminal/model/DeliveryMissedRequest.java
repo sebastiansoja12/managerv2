@@ -1,18 +1,20 @@
 package com.warehouse.terminal.model;
 
-import jakarta.xml.bind.annotation.*;
-import lombok.*;
-
 import java.util.List;
 
-@XmlRootElement(name = "DeliveryReturnRequest")
+import jakarta.xml.bind.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@XmlRootElement(name = "DeliveryMissedRequest")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeliveryReturnRequest {
+public class DeliveryMissedRequest {
 
-    @XmlElementWrapper(name = "DeliveryReturnDetails")
-    @XmlElement(name = "DeliveryReturnDetail")
-    private List<DeliveryReturnDetail> deliveryReturnDetails;
+    @XmlElementWrapper(name = "DeliveryMissedDetails")
+    @XmlElement(name = "DeliveryMissedDetail")
+    private List<DeliveryMissedDetail> deliveryMissedDetails;
 }
