@@ -13,7 +13,7 @@ import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
-import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.vo.*;
@@ -23,18 +23,18 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 
     private final DeliveryReturnRepository deliveryReturnRepository;
 
-    private final DeliveryReturnTokenServicePort deliveryReturnTokenServicePort;
+    private final ReturnTokenServicePort returnTokenServicePort;
 
     private final ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
     private final MailServicePort mailServicePort;
 
     public DeliveryReturnServiceImpl(final DeliveryReturnRepository deliveryReturnRepository,
-                                     final DeliveryReturnTokenServicePort deliveryReturnTokenServicePort,
+                                     final ReturnTokenServicePort returnTokenServicePort,
                                      final ShipmentRepositoryServicePort shipmentRepositoryServicePort,
                                      final MailServicePort mailServicePort) {
         this.deliveryReturnRepository = deliveryReturnRepository;
-        this.deliveryReturnTokenServicePort = deliveryReturnTokenServicePort;
+        this.returnTokenServicePort = returnTokenServicePort;
         this.shipmentRepositoryServicePort = shipmentRepositoryServicePort;
         this.mailServicePort = mailServicePort;
     }
@@ -45,7 +45,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 
         final ReturnTokenRequest returnTokenRequest = ReturnTokenRequest.from(deliveryReturnRequests, deviceInformation);
 
-        final ReturnTokenResponse returnTokenResponse = deliveryReturnTokenServicePort.sign(returnTokenRequest);
+        final ReturnTokenResponse returnTokenResponse = returnTokenServicePort.sign(returnTokenRequest);
 
         final Map<ShipmentId, ReturnPackageResponse> signaturesMap = assignToHashMap(returnTokenResponse);
 

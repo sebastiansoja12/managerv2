@@ -4,16 +4,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
-import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
-import com.warehouse.deliveryreturn.domain.vo.ReturnPackageResponse;
+import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.vo.ReturnPackageRequest;
+import com.warehouse.deliveryreturn.domain.vo.ReturnPackageResponse;
 import com.warehouse.deliveryreturn.domain.vo.ReturnToken;
 import com.warehouse.deliveryreturn.domain.vo.ReturnTokenResponse;
 
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class DeliveryReturnServiceMockAdapter implements DeliveryReturnTokenServicePort {
+public class ReturnTokenServiceMockAdapter implements ReturnTokenServicePort {
 
     private final static String TOKEN = "12345";
 

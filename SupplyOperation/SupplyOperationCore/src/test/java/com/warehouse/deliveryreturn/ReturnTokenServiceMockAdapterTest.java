@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.vo.*;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.DeliveryReturnServiceMockAdapter;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.ReturnTokenServiceMockAdapter;
 
-public class DeliveryReturnServiceMockAdapterTest {
+public class ReturnTokenServiceMockAdapterTest {
 
-    private final DeliveryReturnServiceMockAdapter adapter = new DeliveryReturnServiceMockAdapter();
+    private final ReturnTokenServiceMockAdapter adapter = new ReturnTokenServiceMockAdapter();
 
     @Test
     void shouldSignDeliveryReturn() {

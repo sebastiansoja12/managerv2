@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
-import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.vo.ReturnTokenResponse;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ReturnTokenRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ReturnTokenResponseDto;
@@ -19,7 +19,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 @Builder
-public class DeliveryReturnServiceAdapter implements DeliveryReturnTokenServicePort {
+public class ReturnTokenServiceAdapter implements ReturnTokenServicePort {
 
 
     private final ReturnTokenProperties returnTokenProperties;
