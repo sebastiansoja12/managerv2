@@ -13,8 +13,8 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.domain.enumeration.DeviceUserType;
 import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.delivery.dto.*;
-import com.warehouse.deliverymissed.domain.vo.DeliveryMissedDetails;
-import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
+import com.warehouse.deliverymissed.domain.model.DeliveryMissedDetails;
+import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.dto.DeliveryMissedDetailsDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedRequestDto;
 

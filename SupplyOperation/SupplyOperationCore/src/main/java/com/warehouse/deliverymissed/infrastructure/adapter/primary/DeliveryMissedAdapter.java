@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.warehouse.deliverymissed.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPort;
-import com.warehouse.deliverymissed.domain.vo.DeliveryMissedRequest;
+import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissedResponse;
 import com.warehouse.deliverymissed.dto.DeliveryMissedRequestDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedResponseDto;

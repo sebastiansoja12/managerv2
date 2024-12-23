@@ -1,6 +1,9 @@
-package com.warehouse.deliverymissed.domain.vo;
+package com.warehouse.deliverymissed.domain.model;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.deliverymissed.domain.vo.DeliveryAttemptNumber;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissedDetailId;
+import com.warehouse.deliverymissed.domain.vo.PenaltyFee;
 import lombok.Builder;
 
 import java.time.Instant;

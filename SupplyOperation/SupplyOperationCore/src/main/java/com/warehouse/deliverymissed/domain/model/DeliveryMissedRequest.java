@@ -1,11 +1,10 @@
-package com.warehouse.deliverymissed.domain.vo;
+package com.warehouse.deliverymissed.domain.model;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.util.CollectionUtils;
 
-import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.delivery.domain.vo.DeviceInformation;
 
@@ -17,7 +16,7 @@ public class DeliveryMissedRequest {
 
     public DeliveryMissedRequest(final Set<DeliveryMissedDetails> deliveryMissedDetails,
                                  final DeviceInformation deviceInformation) {
-        this.deliveryMissedDetails = Sets.newHashSet(deliveryMissedDetails);
+        this.deliveryMissedDetails = deliveryMissedDetails;
         this.deviceInformation = deviceInformation;
     }
 
