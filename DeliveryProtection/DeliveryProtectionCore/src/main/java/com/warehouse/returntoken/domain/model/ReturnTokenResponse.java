@@ -1,6 +1,8 @@
-package com.warehouse.deliveryreturn.domain.vo;
+package com.warehouse.returntoken.domain.model;
 
 import java.util.List;
+
+import com.warehouse.returntoken.domain.vo.Supplier;
 
 
 public class ReturnTokenResponse {
@@ -12,7 +14,7 @@ public class ReturnTokenResponse {
         this.supplier = supplier;
     }
 
-    public List<ReturnPackageResponse> getDeliveryReturnSignatures() {
+    public List<ReturnPackageResponse> getReturnPackageResponses() {
         return returnPackageResponses;
     }
 

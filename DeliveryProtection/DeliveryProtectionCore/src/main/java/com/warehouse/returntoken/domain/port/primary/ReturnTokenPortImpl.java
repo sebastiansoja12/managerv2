@@ -3,9 +3,9 @@ package com.warehouse.returntoken.domain.port.primary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.warehouse.returntoken.domain.model.Parcel;
+import com.warehouse.returntoken.domain.model.ReturnTokenResponse;
 import com.warehouse.returntoken.domain.service.ReturnTokenService;
-import com.warehouse.returntoken.domain.vo.Token;
+import com.warehouse.returntoken.domain.vo.ReturnTokenRequest;
 
 import lombok.AllArgsConstructor;
 
@@ -17,8 +17,7 @@ public class ReturnTokenPortImpl implements ReturnTokenPort {
     private final Logger log = LoggerFactory.getLogger("ReturnToken");
 
     @Override
-    public Token determine(Parcel parcel) {
-        log.info("Generating return token for parcel {}", parcel.getId());
-        return returnTokenService.determineToken(parcel);
+    public ReturnTokenResponse signWith(final ReturnTokenRequest request) {
+        return null;
     }
 }

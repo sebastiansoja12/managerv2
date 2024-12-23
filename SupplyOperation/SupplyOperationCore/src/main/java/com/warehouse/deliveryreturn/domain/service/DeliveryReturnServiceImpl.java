@@ -47,7 +47,7 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 
         final ReturnTokenResponse returnTokenResponse = deliveryReturnTokenServicePort.sign(returnTokenRequest);
 
-        final Map<ShipmentId, DeliveryReturnSignature> signaturesMap = assignToHashMap(returnTokenResponse);
+        final Map<ShipmentId, ReturnPackageResponse> signaturesMap = assignToHashMap(returnTokenResponse);
 
         final List<ReturnTokenDetails> deliveries = assignTokenToDeliveryReturn(signaturesMap,
                 deliveryReturnRequests);
@@ -68,26 +68,26 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
                 .toList();
     }
 
-	private List<ReturnTokenDetails> assignTokenToDeliveryReturn(final Map<ShipmentId, DeliveryReturnSignature> signaturesMap,
+	private List<ReturnTokenDetails> assignTokenToDeliveryReturn(final Map<ShipmentId, ReturnPackageResponse> signaturesMap,
 			final Set<DeliveryReturnDetails> deliveryReturnRequests) {
         return deliveryReturnRequests.stream().map(delivery -> {
-			final DeliveryReturnSignature deliveryReturnSignature = signaturesMap.get(delivery.getShipmentId());
+			final ReturnPackageResponse returnPackageResponse = signaturesMap.get(delivery.getShipmentId());
             return ReturnTokenDetails.builder()
                     .supplierCode(delivery.getSupplierCode())
                     .deliveryStatus(delivery.getDeliveryStatus())
                     .departmentCode(delivery.getDepartmentCode())
                     .shipmentId(delivery.getShipmentId())
-                    .returnToken(deliveryReturnSignature.getReturnToken())
+                    .returnToken(returnPackageResponse.getReturnToken())
                     .build();
 		}).toList();
 	}
 
-    private Map<ShipmentId, DeliveryReturnSignature> assignToHashMap(final ReturnTokenResponse responses) {
+    private Map<ShipmentId, ReturnPackageResponse> assignToHashMap(final ReturnTokenResponse responses) {
         return responses.getDeliveryReturnSignatures().stream()
                 .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
     }
 
-    private ShipmentId generateKeyFromResponse(final DeliveryReturnSignature deliveryReturnSignature) {
-        return !Objects.isNull(deliveryReturnSignature) ? deliveryReturnSignature.getShipmentId() : null;
+    private ShipmentId generateKeyFromResponse(final ReturnPackageResponse returnPackageResponse) {
+        return !Objects.isNull(returnPackageResponse) ? returnPackageResponse.getShipmentId() : null;
     }
 }

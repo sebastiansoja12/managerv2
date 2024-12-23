@@ -2,18 +2,15 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.secondary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
-import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
 import com.warehouse.deliveryreturn.domain.vo.ReturnTokenResponse;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ShipmentReturnTokenRequestDto;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.TokenDto;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ReturnTokenRequestDto;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ReturnTokenResponseDto;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryReturnTokenRequestMapper;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.DeliveryReturnTokenResponseMapper;
 import com.warehouse.tools.returntoken.ReturnTokenProperties;
@@ -34,35 +31,27 @@ public class DeliveryReturnServiceAdapter implements DeliveryReturnTokenServiceP
     private final DeliveryReturnTokenResponseMapper responseMapper = getMapper(DeliveryReturnTokenResponseMapper.class);
 
 
-	private DeliveryReturnSignature signWithReturnToken(PropertiesConfiguration configuration,
-			ShipmentReturnTokenRequestDto request) {
+	private ReturnTokenResponseDto signWithReturnToken(final PropertiesConfiguration configuration,
+			final ReturnTokenRequestDto request) {
 
-        final ResponseEntity<? extends TokenDto> responseEntity = restClient
+        final ResponseEntity<? extends ReturnTokenResponseDto> responseEntity = restClient
                 .post()
 				.uri("/v2/api/{endpoint}", configuration.getEndpoint())
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .toEntity(TokenDto.class);
+                .toEntity(ReturnTokenResponseDto.class);
 
-        return responseMapper.map(responseEntity.getBody());
+        return responseEntity.getBody();
     }
     
-	private DeliveryReturnSignature sign(PropertiesConfiguration configuration,
-			ShipmentReturnTokenRequestDto request) {
-        return signWithReturnToken(configuration, request);
-	}
-    
     @Override
-    public ReturnTokenResponse sign(ReturnTokenRequest returnTokenRequest) {
+    public ReturnTokenResponse sign(final ReturnTokenRequest returnTokenRequest) {
         final PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration(returnTokenProperties);
-        final List<ShipmentReturnTokenRequestDto> returnTokenRequests = requestMapper.map(returnTokenRequest);
-        
-        final List<DeliveryReturnSignature> signatures = returnTokenRequests.stream()
-                .map(shipmentTokenRequest -> sign(propertiesConfiguration, shipmentTokenRequest))
-                .toList();
+        final ReturnTokenRequestDto request = requestMapper.map(returnTokenRequest);
+        final ReturnTokenResponseDto response = signWithReturnToken(propertiesConfiguration, request);
 
-		return new ReturnTokenResponse(signatures, returnTokenRequest.getSupplier().getSupplierCode());
+		return responseMapper.map(response);
     }
     
     

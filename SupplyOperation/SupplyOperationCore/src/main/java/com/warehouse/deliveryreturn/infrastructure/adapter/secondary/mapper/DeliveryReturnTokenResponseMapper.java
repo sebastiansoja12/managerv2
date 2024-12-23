@@ -1,10 +1,11 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.TokenDto;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ReturnTokenResponseDto;
 import org.mapstruct.Mapper;
+
+import com.warehouse.deliveryreturn.domain.vo.ReturnTokenResponse;
 
 @Mapper
 public interface DeliveryReturnTokenResponseMapper {
-    DeliveryReturnSignature map(TokenDto token);
+    ReturnTokenResponse map(final ReturnTokenResponseDto response);
 }

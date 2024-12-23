@@ -1,4 +1,4 @@
-package com.warehouse.deliveryreturn.domain.vo;
+package com.warehouse.returntoken.domain.model;
 
 import java.util.UUID;
 

@@ -6,7 +6,7 @@ public class DepartmentCode {
 
 	private final String value;
 
-	public DepartmentCode(String value) {
+	public DepartmentCode(final String value) {
 		this.value = value;
 	}
 
@@ -15,7 +15,7 @@ public class DepartmentCode {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o)
 			return true;
 		if (o == null || getClass() != o.getClass())

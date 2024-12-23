@@ -1,4 +1,4 @@
-package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto;
+package com.warehouse.returntoken.infrastructure.adapter.primary.dto;
 
 public class SupplierDto {
     private SupplierCodeDto supplierCode;

@@ -1,7 +1,6 @@
-package com.warehouse.returntoken.infrastructure.adapter.primary.dto;
+package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto;
 
 import java.util.List;
-
 
 public class ReturnTokenRequestDto {
     private List<ReturnPackageRequestDto> returnPackageRequests;

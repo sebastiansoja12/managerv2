@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnTokenServicePort;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnSignature;
+import com.warehouse.deliveryreturn.domain.vo.ReturnPackageResponse;
 import com.warehouse.deliveryreturn.domain.vo.ReturnPackageRequest;
 import com.warehouse.deliveryreturn.domain.vo.ReturnToken;
 import com.warehouse.deliveryreturn.domain.vo.ReturnTokenResponse;
@@ -20,12 +20,12 @@ public class DeliveryReturnServiceMockAdapter implements DeliveryReturnTokenServ
     @Override
     public ReturnTokenResponse sign(final ReturnTokenRequest returnTokenRequest) {
 		return new ReturnTokenResponse(map(returnTokenRequest.getReturnPackageRequests()),
-                returnTokenRequest.getSupplier().getSupplierCode());
+                returnTokenRequest.getSupplier());
 	}
     
-    private List<DeliveryReturnSignature> map(final List<ReturnPackageRequest> packageRequests) {
+    private List<ReturnPackageResponse> map(final List<ReturnPackageRequest> packageRequests) {
         return packageRequests.stream()
-                .map(packageRequest -> DeliveryReturnSignature.builder()
+                .map(packageRequest -> ReturnPackageResponse.builder()
                         .shipmentId(packageRequest.getShipmentId())
                         .returnToken(new ReturnToken(TOKEN))
                         .build())

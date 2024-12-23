@@ -24,7 +24,7 @@ public class DeliveryReturnServiceMockAdapterTest {
         final ReturnTokenResponse response = adapter.sign(request);
         // then
         assertThat(response.getDeliveryReturnSignatures())
-                .extracting(DeliveryReturnSignature::getReturnToken)
+                .extracting(ReturnPackageResponse::getReturnToken)
                 .extracting(ReturnToken::value)
                 .containsExactly("12345");
     }
