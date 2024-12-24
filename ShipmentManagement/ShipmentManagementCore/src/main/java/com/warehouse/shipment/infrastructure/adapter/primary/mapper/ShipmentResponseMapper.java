@@ -28,6 +28,12 @@ public interface ShipmentResponseMapper {
     ShipmentUpdateResponseDto map(final ShipmentUpdateResponse response);
 
     default ShipmentIdDto map(final ShipmentId shipmentId) {
-        return new ShipmentIdDto(shipmentId.getValue());
+        final ShipmentIdDto id;
+        if (shipmentId == null) {
+            id = new ShipmentIdDto();
+        } else {
+            id = new ShipmentIdDto(shipmentId.value());
+        }
+        return id;
     }
 }

@@ -17,7 +17,6 @@ import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes;
-import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -152,11 +151,16 @@ public class ShipmentPortImpl implements ShipmentPort {
 	public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
 		final ShipmentStatus status = request.getShipmentStatus();
 		final ShipmentId shipmentId = request.getShipmentId();
-        shipmentStatusHandlers.stream()
-                .filter(shipmentStatusHandler -> shipmentStatusHandler.canHandle(status))
-                .findAny()
-                .ifPresentOrElse(shipmentStatusHandler ->
-                                shipmentStatusHandler.notifyShipmentStatusChange(shipmentId), ShipmentDefaultHandler::new);
+        for (final ShipmentStatusHandler shipmentStatusHandler : shipmentStatusHandlers) {
+            if (shipmentStatusHandler.canHandle(status)) {
+                shipmentStatusHandler.notifyShipmentStatusChange(shipmentId);
+            }
+        }
+//        shipmentStatusHandlers.stream()
+//                .filter(shipmentStatusHandler -> shipmentStatusHandler.canHandle(status))
+//                .findAny()
+//                .ifPresentOrElse(shipmentStatusHandler ->
+//                                shipmentStatusHandler.notifyShipmentStatusChange(shipmentId), ShipmentDefaultHandler::new);
 	}
 
     @Override

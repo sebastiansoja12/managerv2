@@ -3,13 +3,8 @@ package com.warehouse.commonassets.identificator;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class ShipmentId implements Serializable {
 
-	private final Long value;
-
-	public ShipmentId(final Long value) {
-		this.value = value;
-	}
+public record ShipmentId(Long value) implements Serializable {
 
 	public Long getValue() {
 		return value;

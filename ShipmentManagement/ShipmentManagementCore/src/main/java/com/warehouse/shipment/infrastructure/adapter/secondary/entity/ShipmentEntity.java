@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.identificator.ShipmentId;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -20,13 +21,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "parcel")
-@Entity(name = "parcel.ParcelEntity")
+@Table(name = "shipment")
+@Entity(name = "shipment.ShipmentEntity")
 @EntityListeners(AuditingEntityListener.class)
-public class ParcelEntity {
+public class ShipmentEntity {
 
-    @Id
-    private Long id;
+    @Column(name = "id")
+    @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id"))
+    private ShipmentId shipmentId;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -94,8 +97,10 @@ public class ParcelEntity {
     @Column(name = "type", nullable = false)
     private ShipmentType shipmentType;
 
-    @Column(name = "parent_related_id")
-    private Long parcelRelatedId;
+    @Column(name = "shipment_related_id")
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "shipment_related_id"))
+    private ShipmentId shipmentRelatedId;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

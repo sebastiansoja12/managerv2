@@ -1,7 +1,10 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.id;
 
+import jakarta.persistence.Embeddable;
+
 import java.util.Objects;
 
+@Embeddable
 public record DeliveryMissedDetailId(Long value) {
 
     @Override

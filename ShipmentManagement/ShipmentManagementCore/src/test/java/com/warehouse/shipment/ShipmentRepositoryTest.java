@@ -21,7 +21,7 @@ import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentRepositoryImpl;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEntityMapper;
 
@@ -47,7 +47,7 @@ public class ShipmentRepositoryTest {
         final Shipment parcel = mock(Shipment.class);
         when(parcel.getShipmentStatus()).thenReturn(ShipmentStatus.CREATED);
 
-        final ParcelEntity entity = new ParcelEntity();
+        final ShipmentEntity entity = new ShipmentEntity();
 
         when(shipmentEntityMapper.map(parcel)).thenReturn(entity);
 
@@ -61,9 +61,9 @@ public class ShipmentRepositoryTest {
     void shouldReturnShipmentById() {
         // given
         final ShipmentId shipmentId = new ShipmentId(1L);
-        final ParcelEntity entity = new ParcelEntity();
+        final ShipmentEntity entity = new ShipmentEntity();
         final Parcel parcel = mock(Parcel.class);
-        when(readRepository.findParcelEntityById(shipmentId.getValue())).thenReturn(Optional.of(entity));
+        when(readRepository.findByShipmentId(shipmentId)).thenReturn(Optional.of(entity));
         // when
         final Shipment result = shipmentRepository.findById(shipmentId);
 
@@ -75,7 +75,7 @@ public class ShipmentRepositoryTest {
     void shouldNotFindShipmentAndThrowException() {
         // given
         final ShipmentId shipmentId = new ShipmentId(1L);
-        when(readRepository.findParcelEntityById(shipmentId.getValue())).thenReturn(Optional.empty());
+        when(readRepository.findByShipmentId(shipmentId)).thenReturn(Optional.empty());
 
         // when && then
         Assertions.assertThrows(ShipmentNotFoundException.class, () -> {
@@ -87,7 +87,7 @@ public class ShipmentRepositoryTest {
     void shouldCreateOrUpdate() {
         // given
         final ShipmentUpdate shipmentUpdate = mock(ShipmentUpdate.class);
-        final ParcelEntity entity = new ParcelEntity();
+        final ShipmentEntity entity = new ShipmentEntity();
 
         when(readRepository.save(entity)).thenReturn(entity);
         // when

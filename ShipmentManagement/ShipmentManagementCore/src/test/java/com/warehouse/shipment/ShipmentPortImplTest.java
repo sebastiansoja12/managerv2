@@ -78,7 +78,7 @@ class ShipmentPortImplTest {
         final ShipmentRequest request = new ShipmentRequest(createShipment());
         final City city = new City("KT1");
         final RouteProcess routeProcess = new RouteProcess(shipmentId, processId);
-        final SoftwareConfiguration softwareConfiguration = new SoftwareConfiguration("value", "url");
+        final SoftwareConfiguration softwareConfiguration = new SoftwareConfiguration("id", "url");
 
         doReturn(city)
                 .when(pathFinderServicePort)

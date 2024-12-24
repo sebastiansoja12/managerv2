@@ -42,6 +42,7 @@ public class DeliveryMissedDetailsEntity {
 	@Column(name = "incident_report", length = 2000)
 	private String incidentReport;
 
+    @Column(name = "shipment_id")
 	@Embedded
     @AttributeOverride(name = "value", column = @Column(name = "shipment_id"))
     private ShipmentId shipmentId;
