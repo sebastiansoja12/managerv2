@@ -1,17 +1,28 @@
 package com.warehouse.deliverymissed.domain.vo;
 
 
+import java.util.List;
+
+import com.warehouse.delivery.domain.vo.DeviceInformation;
+
 import lombok.Builder;
-import lombok.Value;
 
-import java.time.LocalDateTime;
-
-@Value
 @Builder
 public class DeliveryMissedResponse {
-    String deliveryId;
-    Long parcelId;
-    String depotCode;
-    String supplierCode;
-    LocalDateTime timestamp;
+    private List<DeliveryMissedResponseDetails> deliveryMissedResponseDetails;
+    private DeviceInformation deviceInformation;
+
+    public DeliveryMissedResponse(final List<DeliveryMissedResponseDetails> deliveryMissedResponseDetails,
+                                  final DeviceInformation deviceInformation) {
+        this.deliveryMissedResponseDetails = deliveryMissedResponseDetails;
+        this.deviceInformation = deviceInformation;
+    }
+
+    public List<DeliveryMissedResponseDetails> getDeliveryMissedResponseDetails() {
+        return deliveryMissedResponseDetails;
+    }
+
+    public DeviceInformation getDeviceInformation() {
+        return deviceInformation;
+    }
 }
