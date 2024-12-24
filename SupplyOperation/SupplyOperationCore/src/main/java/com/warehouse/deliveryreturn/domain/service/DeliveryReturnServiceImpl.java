@@ -13,8 +13,8 @@ import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
-import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.vo.*;
 
@@ -49,10 +49,10 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 
         final Map<ShipmentId, ReturnPackageResponse> signaturesMap = assignToHashMap(returnTokenResponse);
 
-        final List<ReturnTokenDetails> deliveries = assignTokenToDeliveryReturn(signaturesMap,
+        final List<ReturnTokenDetails> returnTokenDetails = assignTokenToDeliveryReturn(signaturesMap,
                 deliveryReturnRequests);
 
-        return deliveries.stream()
+        return returnTokenDetails.stream()
                 .peek(deliveryReturn -> {
                     final Shipment shipment = shipmentRepositoryServicePort.downloadShipment(deliveryReturn.getShipmentId());
                     mailServicePort.sendNotification(shipment);
