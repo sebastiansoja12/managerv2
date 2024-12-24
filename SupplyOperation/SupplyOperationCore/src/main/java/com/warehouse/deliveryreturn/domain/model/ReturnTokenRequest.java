@@ -70,6 +70,7 @@ public class ReturnTokenRequest {
                 .supplierCode(delivery.getSupplierCode())
                 .departmentCode(delivery.getDepartmentCode())
                 .shipmentId(delivery.getShipmentId())
+                .locked(false)
                 .build();
     }
 }
