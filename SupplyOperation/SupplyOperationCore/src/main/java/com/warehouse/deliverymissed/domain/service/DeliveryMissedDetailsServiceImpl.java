@@ -51,4 +51,9 @@ public class DeliveryMissedDetailsServiceImpl implements DeliveryMissedDetailsSe
     public void removeDeliveryMissedDetails(final DeliveryMissedDetailId deliveryMissedDetailId) {
 
     }
+
+    @Override
+    public DeliveryMissedDetailId nextDeliveryMissedDetailId() {
+        return null;
+    }
 }

@@ -34,5 +34,7 @@ public interface DeliveryMissedDetailsService {
     boolean isPackageDelivered(final DeliveryMissedDetailId deliveryMissedDetailId);
 
     void removeDeliveryMissedDetails(final DeliveryMissedDetailId deliveryMissedDetailId);
+
+    DeliveryMissedDetailId nextDeliveryMissedDetailId();
 }
 
