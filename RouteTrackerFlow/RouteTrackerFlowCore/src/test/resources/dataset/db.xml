@@ -8,7 +8,7 @@
             last_name="Soja"
             email="sebastian5152@wp.pl"
             role="2"
-            depot_code="TST"
+            department_code="TST"
     />
     <parcel
             id="100"
@@ -64,7 +64,7 @@
             city="Test"
             street="Test"
             country="Test"
-            depot_code="TST"
+            department_code="TST"
     />
 
     <supplier
@@ -72,7 +72,7 @@
             first_name="test"
             last_name="test"
             telephone="123"
-            depot_code="TST"
+            department_code="TST"
             active="1"
     />
 

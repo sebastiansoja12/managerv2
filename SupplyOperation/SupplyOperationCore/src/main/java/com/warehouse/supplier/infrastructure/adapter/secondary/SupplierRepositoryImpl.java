@@ -57,7 +57,7 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     @Override
     @Cacheable("suppliersDepotCodeCache")
     public List<Supplier> findByDepotCode(String depotCode) {
-        final List<SupplierEntity> supplierEntities = supplierReadRepository.findByDepot_DepotCode(depotCode);
+        final List<SupplierEntity> supplierEntities = supplierReadRepository.findByDepartment_DepartmentCode(depotCode);
         return supplierEntityMapper.map(supplierEntities);
     }
 

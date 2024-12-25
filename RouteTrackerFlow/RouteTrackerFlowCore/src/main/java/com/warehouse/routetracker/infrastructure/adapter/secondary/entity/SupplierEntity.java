@@ -31,7 +31,7 @@ public class SupplierEntity {
     private Boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
-    private DepotEntity depot;
+    @JoinColumn(name = "department_code", referencedColumnName = "department_code")
+    private DepartmentEntity department;
 
 }

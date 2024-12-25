@@ -1,6 +1,6 @@
 package com.warehouse.delivery.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.DepotEntity;
+import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table(name = "supplier")
 @NamedEntityGraph(name = "delivery.SupplierEntity.full", attributeNodes = {
-        @NamedAttributeNode("depot")
+        @NamedAttributeNode("department")
 })
 public class SupplierEntity {
 
@@ -35,8 +35,8 @@ public class SupplierEntity {
     private Boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
-    private DepotEntity depot;
+    @JoinColumn(name = "department_code", referencedColumnName = "department_code")
+    private DepartmentEntity department;
 
     public boolean isActive() {
         return active;

@@ -59,7 +59,7 @@ public class SupplyPortImpl implements SupplyPort {
 				.supplierCode(
 						StringUtils.isNotEmpty(supplierRequest.getSupplierCode()) ? supplierRequest.getSupplierCode()
 								: generatorService.generate())
-                .depotCode(supplierRequest.getDepotCode())
+                .departmentCode(supplierRequest.getDepotCode())
                 .firstName(supplierRequest.getFirstName())
                 .lastName(supplierRequest.getLastName())
                 .telephone(supplierRequest.getTelephone())

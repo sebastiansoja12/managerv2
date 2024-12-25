@@ -17,7 +17,7 @@ public class SupplierDto {
 
     String telephone;
 
-    String depotCode;
+    String departmentCode;
 
     Boolean active;
 }

@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository("department.departmentReadRepository")
 public interface DepartmentReadRepository extends JpaRepository<DepartmentEntity, String> {
 
-    Optional<DepartmentEntity> findByDepotCode(final String depotCode);
+    Optional<DepartmentEntity> findByDepartmentCode(final String departmentCode);
 }

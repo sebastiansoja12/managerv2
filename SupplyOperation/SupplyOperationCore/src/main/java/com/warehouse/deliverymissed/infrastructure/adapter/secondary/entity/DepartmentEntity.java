@@ -1,4 +1,4 @@
-package com.warehouse.supplier.infrastructure.adapter.secondary.entity;
+package com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,14 +13,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "supplier.DepotEntity")
+@Entity(name = "deliveryMissed.DepartmentEntity")
 @Builder
-@Table(name = "depot")
-public class DepotEntity {
+@Table(name = "department")
+public class DepartmentEntity {
 
     @Id
-    @Column(name = "depot_code", nullable = false, unique = true)
-    private String depotCode;
+    @Column(name = "department_code", nullable = false, unique = true)
+    private String departmentCode;
 
     @Column(name = "city", nullable = false)
     private String city;

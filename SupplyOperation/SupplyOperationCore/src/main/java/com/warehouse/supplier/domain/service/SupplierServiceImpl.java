@@ -56,7 +56,7 @@ public class SupplierServiceImpl implements SupplierService {
                 .telephone(supplierModelRequest.getTelephone())
                 .lastName(supplierModelRequest.getTelephone())
                 .supplierCode(supplierModelRequest.getSupplierCode())
-                .depotCode(supplierModelRequest.getDepotCode())
+                .departmentCode(supplierModelRequest.getDepartmentCode())
                 .build();
     }
 }

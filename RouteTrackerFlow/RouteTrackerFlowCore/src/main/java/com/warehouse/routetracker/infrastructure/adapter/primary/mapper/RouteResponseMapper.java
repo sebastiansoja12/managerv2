@@ -44,7 +44,7 @@ public interface RouteResponseMapper {
                         routeLogRecordDetail.getVersion(),
                         routeLogRecordDetail.getUsername(),
                         routeLogRecordDetail.getSupplierCode(),
-                        routeLogRecordDetail.getDepotCode(),
+                        routeLogRecordDetail.getDepartmentCode(),
                         map(routeLogRecordDetail.getParcelStatus()),
                         routeLogRecordDetail.getDescription(),
                         routeLogRecordDetail.getTimestamp(),

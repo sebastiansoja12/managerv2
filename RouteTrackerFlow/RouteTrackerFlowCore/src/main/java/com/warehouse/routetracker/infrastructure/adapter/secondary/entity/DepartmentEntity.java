@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "route.DepotEntity")
+@Entity(name = "route.DepartmentEntity")
 @Builder
-@Table(name = "depot")
-public class DepotEntity {
+@Table(name = "department")
+public class DepartmentEntity {
 
     @Id
-    @Column(name = "depot_code", nullable = false)
-    private String depotCode;
+    @Column(name = "department_code", nullable = false)
+    private String departmentCode;
 
     @Column(name = "city", nullable = false)
     private String city;

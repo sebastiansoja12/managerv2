@@ -42,9 +42,9 @@ public class DepartmentRepositoryTest {
         final DepartmentCode code = new DepartmentCode(KT1);
 
         final DepartmentEntity entity = new DepartmentEntity();
-        entity.setDepotCode(KT1);
+        entity.setDepartmentCode(KT1);
 
-        when(repository.findByDepotCode(KT1)).thenReturn(Optional.of(entity));
+        when(repository.findByDepartmentCode(KT1)).thenReturn(Optional.of(entity));
         when(mapper.map(entity)).thenReturn(department);
 
         // when
@@ -52,7 +52,7 @@ public class DepartmentRepositoryTest {
 
         // then
         assertNotNull(result);
-        Assertions.assertEquals(result.getDepotCode(), entity.getDepotCode());
+        Assertions.assertEquals(result.getDepotCode(), entity.getDepartmentCode());
     }
 
 
@@ -62,7 +62,7 @@ public class DepartmentRepositoryTest {
         final String exceptionMessage = "Department was not found";
         final DepartmentCode code = new DepartmentCode(KT1);
 
-        when(repository.findByDepotCode(KT1)).thenReturn(Optional.empty());
+        when(repository.findByDepartmentCode(KT1)).thenReturn(Optional.empty());
 
         // when
         final Executable executable = () -> depotRepository.findByCode(code);

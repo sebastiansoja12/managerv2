@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Optional;
 
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.routetracker.configuration.RouteTrackerTestConfiguration;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteDepotReadRepository;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.DepotEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteDepartmentReadRepository;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -28,37 +28,37 @@ import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.DepotE
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DatabaseSetup("/dataset/db.xml")
-public class DepotReadRepositoryTest {
+public class DepartmentReadRepositoryTest {
 
     @Autowired
-    private RouteDepotReadRepository repository;
+    private RouteDepartmentReadRepository repository;
 
     @Test
-    void shouldFindDepotByCode() {
+    void shouldFindDepartmentByCode() {
         // given
-        final String depotCode = "TST";
+        final String departmentCode = "TST";
         // when
-        final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode);
+        final Optional<DepartmentEntity> department = repository.findByDepartmentCode(departmentCode);
         // then
-        assertTrue(depot.isPresent());
-        assertEquals(depotCode, depot.get().getDepotCode());
+        assertTrue(department.isPresent());
+        assertEquals(departmentCode, department.get().getDepartmentCode());
     }
 
     @Test
     void shouldFindAll() {
         // when
-        final List<DepotEntity> depot = repository.findAll();
+        final List<DepartmentEntity> departments = repository.findAll();
         // then
-        assertFalse(depot.isEmpty());
+        assertFalse(departments.isEmpty());
     }
 
     @Test
-    void shouldNotFindDepotByCode() {
+    void shouldNotFindDepartmentByCode() {
         // given
-        final String depotCode = "abc";
+        final String departmentCode = "abc";
         // when
-        final Optional<DepotEntity> depot = repository.findByDepotCode(depotCode);
+        final Optional<DepartmentEntity> department = repository.findByDepartmentCode(departmentCode);
         // then
-        assertFalse(depot.isPresent());
+        assertFalse(department.isPresent());
     }
 }

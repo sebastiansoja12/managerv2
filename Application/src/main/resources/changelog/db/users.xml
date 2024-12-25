@@ -36,7 +36,7 @@
         <addForeignKeyConstraint
                 baseTableName="users"
                 baseColumnNames="depot_code"
-                referencedTableName="depot"
+                referencedTableName="department"
                 referencedColumnNames="depot_code"
                 constraintName="FK1r271p0jw8cic2j8xdtj53d0"
         />

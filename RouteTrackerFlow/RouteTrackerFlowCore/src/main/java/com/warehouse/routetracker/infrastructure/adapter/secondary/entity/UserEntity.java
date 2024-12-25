@@ -35,6 +35,6 @@ public class UserEntity {
     private Role role;
 
     @Column(nullable = false)
-    private String depotCode;
+    private String departmentCode;
 
 }

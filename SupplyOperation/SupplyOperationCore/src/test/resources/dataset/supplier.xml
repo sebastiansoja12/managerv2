@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dataset>
-    <depot
+    <department
             city="Test"
             street="Test"
             country="Test"
-            depot_code="TST"
+            department_code="TST"
     />
 
     <supplier
@@ -12,7 +12,7 @@
             first_name="test"
             last_name="test"
             telephone="123"
-            depot_code="TST"
+            department_code="TST"
             active="1"
     />
 
@@ -21,7 +21,7 @@
             first_name="test"
             last_name="test"
             telephone="123"
-            depot_code="TST"
+            department_code="TST"
             active="1"
     />
 

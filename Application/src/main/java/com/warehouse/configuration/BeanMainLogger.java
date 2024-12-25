@@ -10,11 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class BeanLogger implements CommandLineRunner {
+public class BeanMainLogger implements CommandLineRunner {
 
     private final ApplicationContext applicationContext;
 
-    public BeanLogger(final ApplicationContext applicationContext) {
+    public BeanMainLogger(final ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 

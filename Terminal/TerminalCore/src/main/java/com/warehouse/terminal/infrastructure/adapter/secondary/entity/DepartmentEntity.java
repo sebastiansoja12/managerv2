@@ -8,12 +8,12 @@ import jakarta.persistence.Table;
 
 
 @Entity(name = "device.DepartmentEntity")
-@Table(name = "depot")
+@Table(name = "department")
 public class DepartmentEntity {
 
     @Id
-    @Column(name = "depot_code", nullable = false, unique = true)
-    private String depotCode;
+    @Column(name = "department_code", nullable = false, unique = true)
+    private String departmentCode;
 
     @Column(name = "city", nullable = false)
     private String city;
@@ -27,19 +27,19 @@ public class DepartmentEntity {
     public DepartmentEntity() {
     }
 
-    public DepartmentEntity(final String depotCode, final String city, final String street, final String country) {
-        this.depotCode = depotCode;
+    public DepartmentEntity(final String departmentCode, final String city, final String street, final String country) {
+        this.departmentCode = departmentCode;
         this.city = city;
         this.street = street;
         this.country = country;
     }
 
-    public String getDepotCode() {
-        return depotCode;
+    public String getDepartmentCode() {
+        return departmentCode;
     }
 
-    public void setDepotCode(final String depotCode) {
-        this.depotCode = depotCode;
+    public void setDepartmentCode(final String depotCode) {
+        this.departmentCode = depotCode;
     }
 
     public String getCity() {

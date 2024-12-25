@@ -25,7 +25,7 @@
     <addForeignKeyConstraint
             baseTableName="supplier"
             baseColumnNames="depot_code"
-            referencedTableName="depot"
+            referencedTableName="department"
             referencedColumnNames="depot_code"
             constraintName="FKbxmw0i9gg06jh9dx8a1cnck7n"
     />

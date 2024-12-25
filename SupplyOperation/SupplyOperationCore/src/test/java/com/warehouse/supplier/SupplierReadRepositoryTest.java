@@ -38,7 +38,7 @@ public class SupplierReadRepositoryTest {
         // given
         final String depotCode = "TST";
         // when
-        final List<SupplierEntity> suppliers = repository.findByDepot_DepotCode(depotCode);
+        final List<SupplierEntity> suppliers = repository.findByDepartment_DepartmentCode(depotCode);
         // then
         assertNotNull(suppliers);
     }
@@ -48,7 +48,7 @@ public class SupplierReadRepositoryTest {
         // given
         final String depotCode = "test";
         // when
-        final List<SupplierEntity> suppliers = repository.findByDepot_DepotCode(depotCode);
+        final List<SupplierEntity> suppliers = repository.findByDepartment_DepartmentCode(depotCode);
         // then
         assertTrue(suppliers.isEmpty());
     }

@@ -22,7 +22,7 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     @Override
     @Cacheable("depotCodeCache")
     public Department findByCode(DepartmentCode departmentCode) {
-        final Optional<DepartmentEntity> depot = repository.findByDepotCode(departmentCode.getValue());
+        final Optional<DepartmentEntity> depot = repository.findByDepartmentCode(departmentCode.getValue());
         return depot.map(depotMapper::map).orElseThrow(() -> new DepotNotFoundException("Department was not found"));
     }
 

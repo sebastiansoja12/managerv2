@@ -9,6 +9,6 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Department
 @Mapper
 public interface DepartmentToModelMapper {
     default Department map(final DepartmentEntity department) {
-        return new Department(new DepartmentCode(department.getDepotCode()), true);
+        return new Department(new DepartmentCode(department.getDepartmentCode()), true);
     }
 }

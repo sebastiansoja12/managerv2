@@ -13,10 +13,10 @@ import java.util.Optional;
 public interface SupplierReadRepository extends JpaRepository<SupplierEntity, Long> {
 
     @EntityGraph(value = "SupplierEntity.full", type = EntityGraph.EntityGraphType.FETCH)
-    List<SupplierEntity> findByDepot_DepotCode(String depotCode);
+    List<SupplierEntity> findByDepartment_DepartmentCode(final String departmentCode);
 
     @EntityGraph(value = "SupplierEntity.full", type = EntityGraph.EntityGraphType.FETCH)
-    Optional<SupplierEntity> findBySupplierCode(String supplierCode);
+    Optional<SupplierEntity> findBySupplierCode(final String supplierCode);
 
     @EntityGraph(value = "SupplierEntity.full", type = EntityGraph.EntityGraphType.FETCH)
     @NotNull
