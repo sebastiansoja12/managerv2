@@ -8,7 +8,7 @@
             last_name="Soja"
             email="sebastian5152@wp.pl"
             role="2"
-            depot_code="TST"
+            department_code="TST"
     />
 
     <route_log
@@ -29,7 +29,7 @@
     <route_log_details
             id = "1"
             route_log_record_id='7ecaa82b-eda9-4b5d-ae9f-933f9adaee27'
-            zebra_id="123"
+            device_id="123"
             version="v1.0"
             created="2023-01-01 12:00:00"
             description="Detail Description 1"
@@ -42,7 +42,7 @@
     <route_log_details
             id = "2"
             route_log_record_id='7ecaa82b-eda9-4b5d-ae9f-933f9adaee28'
-            zebra_id="456"
+            device_id="456"
             version="v2.0"
             created="2023-02-01 14:30:00"
             description="Detail Description 2"
@@ -52,11 +52,11 @@
             username="s-soja"
     />
 
-    <depot
+    <department
             city="Test"
             street="Test"
             country="Test"
-            depot_code="TST"
+            department_code="TST"
     />
 
     <supplier
@@ -64,7 +64,7 @@
             first_name="test"
             last_name="test"
             telephone="123"
-            depot_code="TST"
+            department_code="TST"
             active="1"
     />
 

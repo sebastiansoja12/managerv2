@@ -60,7 +60,7 @@
             locked = "false"
     />
 
-    <depot
+    <department
             city="Test"
             street="Test"
             country="Test"
