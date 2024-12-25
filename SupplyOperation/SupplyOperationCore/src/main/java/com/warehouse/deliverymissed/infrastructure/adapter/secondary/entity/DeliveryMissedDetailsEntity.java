@@ -12,6 +12,8 @@ import jakarta.persistence.*;
 @Table(name = "delivery_missed_details")
 public class DeliveryMissedDetailsEntity {
 
+    @Column(name = "delivery_missed_detail_id")
+    @AttributeOverride(name = "value", column = @Column(name = "delivery_missed_detail_id"))
 	@EmbeddedId
 	private DeliveryMissedDetailId deliveryMissedDetailId;
 
