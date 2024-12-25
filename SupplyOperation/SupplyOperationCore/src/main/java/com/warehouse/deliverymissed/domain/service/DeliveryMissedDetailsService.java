@@ -9,30 +9,30 @@ import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.id.D
 public interface DeliveryMissedDetailsService {
 
     DeliveryMissedDetailsEntity recordDeliveryAttempt(
-            DeliveryMissedDetailId deliveryMissedDetailId,
-            int attemptNumber,
-            Instant deliveryDate,
-            boolean addressChanged
+            final DeliveryMissedDetailId deliveryMissedDetailId,
+            final int attemptNumber,
+            final Instant deliveryDate,
+            final boolean addressChanged
     );
 
-    boolean shouldReturnToSender(DeliveryMissedDetailId deliveryMissedDetailId);
+    boolean shouldReturnToSender(final DeliveryMissedDetailId deliveryMissedDetailId);
 
-    BigDecimal calculatePenaltyFee(DeliveryMissedDetailId deliveryMissedDetailId);
+    BigDecimal calculatePenaltyFee(final DeliveryMissedDetailId deliveryMissedDetailId);
 
     DeliveryMissedDetailsEntity updateDeliveryAddress(
-            DeliveryMissedDetailId deliveryMissedDetailId,
-            String newAddress
+            final DeliveryMissedDetailId deliveryMissedDetailId,
+            final String newAddress
     );
 
-    DeliveryMissedDetailsEntity getDetails(DeliveryMissedDetailId deliveryMissedDetailId);
+    DeliveryMissedDetailsEntity getDetails(final DeliveryMissedDetailId deliveryMissedDetailId);
 
     DeliveryMissedDetailsEntity reportIncident(
-            DeliveryMissedDetailId deliveryMissedDetailId,
-            String incidentReport
+            final DeliveryMissedDetailId deliveryMissedDetailId,
+            final String incidentReport
     );
 
-    boolean isPackageDelivered(DeliveryMissedDetailId deliveryMissedDetailId);
+    boolean isPackageDelivered(final DeliveryMissedDetailId deliveryMissedDetailId);
 
-    void removeDeliveryMissedDetails(DeliveryMissedDetailId deliveryMissedDetailId);
+    void removeDeliveryMissedDetails(final DeliveryMissedDetailId deliveryMissedDetailId);
 }
 
