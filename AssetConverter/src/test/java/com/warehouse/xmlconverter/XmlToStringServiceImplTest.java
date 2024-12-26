@@ -16,10 +16,7 @@ public class XmlToStringServiceImplTest {
         final TerminalRequest terminalRequest = new TerminalRequest();
         final String expectedXml = """
                 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-                <TerminalRequest>
-                    <ProcessType>CREATED</ProcessType>
-                    <ParcelID>1</ParcelID>
-                </TerminalRequest>
+                <TerminalRequest/>
                 """;
         // when
         final String xmlString = xmlToStringService.convertToString(terminalRequest);

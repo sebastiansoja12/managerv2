@@ -25,6 +25,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
+import com.warehouse.tracking.TrackingStatusEventPublisher;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -41,6 +42,9 @@ public class ShipmentReadRepositoryTest {
 
         @MockBean
         public MailService mailService;
+
+        @MockBean
+        public TrackingStatusEventPublisher trackingStatusEventPublisher;
     }
 
     @Autowired

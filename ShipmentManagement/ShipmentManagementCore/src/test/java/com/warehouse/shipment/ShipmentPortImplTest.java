@@ -15,11 +15,12 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
-import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
+import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
@@ -53,7 +54,6 @@ class ShipmentPortImplTest {
     @Mock
     private TrackingStatusServicePort trackingStatusServicePort;
 
-    @Mock
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
@@ -67,6 +67,10 @@ class ShipmentPortImplTest {
         final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository, routeLogServicePort,
                 softwareConfigurationServicePort);
         final Logger logger = mock(Logger.class);
+        shipmentStatusHandlers = Sets.newHashSet(Sets.newHashSet(
+                new ShipmentCreatedHandler(), new ShipmentRerouteHandler(shipmentService),
+                new ShipmentSentHandler(shipmentService), new ShipmentDeliveryHandler(shipmentService),
+                new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
         shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
                 mailServicePort, trackingStatusServicePort, shipmentStatusHandlers);
     }
