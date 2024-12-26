@@ -11,7 +11,7 @@ public class RouteLogRecordDetailDto {
     private String version;
     private String username;
     private String supplierCode;
-    private String depotCode;
+    private String departmentCode;
     private ShipmentStatusDto shipmentStatus;
     private String description;
     private LocalDateTime timestamp;
@@ -22,7 +22,7 @@ public class RouteLogRecordDetailDto {
     }
 
 	public RouteLogRecordDetailDto(final Long id, final TerminalIdDto terminalId, final String version, final String username,
-                                   final String supplierCode, final String depotCode, final ShipmentStatusDto shipmentStatus,
+                                   final String supplierCode, final String departmentCode, final ShipmentStatusDto shipmentStatus,
                                    final String description, final LocalDateTime timestamp, final ProcessTypeDto processType,
                                    final String request) {
         this.id = id;
@@ -30,7 +30,7 @@ public class RouteLogRecordDetailDto {
         this.version = version;
         this.username = username;
         this.supplierCode = supplierCode;
-        this.depotCode = depotCode;
+        this.departmentCode = departmentCode;
         this.shipmentStatus = shipmentStatus;
         this.description = description;
         this.timestamp = timestamp;
@@ -58,8 +58,8 @@ public class RouteLogRecordDetailDto {
         return supplierCode;
     }
 
-    public String getDepotCode() {
-        return depotCode;
+    public String getDepartmentCode() {
+        return departmentCode;
     }
 
     public ShipmentStatusDto getShipmentStatus() {

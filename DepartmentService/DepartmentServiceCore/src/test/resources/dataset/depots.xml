@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <dataset>
-    <depot
+    <department
            city="Poznań"
            street="Polska 11"
-           depot_code="PL1"
+           department_code="PL1"
            country="Polska"
            postal_code="44-213"
            nip="123"

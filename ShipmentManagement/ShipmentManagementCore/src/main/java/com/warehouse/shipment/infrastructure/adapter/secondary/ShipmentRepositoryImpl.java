@@ -5,7 +5,7 @@ import static org.mapstruct.factory.Mappers.getMapper;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEntityMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentModelMapper;
@@ -24,7 +24,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     @Override
     public void createOrUpdate(final Shipment shipment) {
-        final ParcelEntity entity = shipmentEntityMapper.map(shipment);
+        final ShipmentEntity entity = shipmentEntityMapper.map(shipment);
         repository.save(entity);
     }
 
@@ -33,7 +33,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         if (shipmentId == null) {
             return null;
         }
-        return repository.findShipmentById(shipmentId.getValue())
+        return repository.findByShipmentId(shipmentId)
                 .map(shipmentModelMapper::map)
                 .orElseThrow(() -> new ShipmentNotFoundException("Shipment was not found"));
     }
@@ -43,6 +43,6 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         if (shipmentId == null) {
             return false;
         }
-        return repository.existsById(shipmentId.getValue());
+        return repository.existsById(shipmentId);
     }
 }

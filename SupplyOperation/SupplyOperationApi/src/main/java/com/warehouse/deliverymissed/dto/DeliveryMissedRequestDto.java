@@ -5,23 +5,23 @@ import com.warehouse.delivery.dto.*;
 import java.util.List;
 
 public class DeliveryMissedRequestDto {
-    private List<DeliveryMissedInformationDto> deliveryMissedInformations;
-    private DeviceInformationDto deviceInformationDto;
+    private List<DeliveryMissedDetailsDto> deliveryMissedDetails;
+    private DeviceInformationDto deviceInformation;
 
     public DeliveryMissedRequestDto() {
     }
 
-    public DeliveryMissedRequestDto(final List<DeliveryMissedInformationDto> deliveryMissedInformations,
-                                    final DeviceInformationDto deviceInformationDto) {
-        this.deliveryMissedInformations = deliveryMissedInformations;
-        this.deviceInformationDto = deviceInformationDto;
+    public DeliveryMissedRequestDto(final List<DeliveryMissedDetailsDto> deliveryMissedDetails,
+                                    final DeviceInformationDto deviceInformation) {
+        this.deliveryMissedDetails = deliveryMissedDetails;
+        this.deviceInformation = deviceInformation;
     }
 
-    public List<DeliveryMissedInformationDto> getDeliveryMissedInformations() {
-        return deliveryMissedInformations;
+    public List<DeliveryMissedDetailsDto> getDeliveryMissedDetails() {
+        return deliveryMissedDetails;
     }
 
-    public DeviceInformationDto getDeviceInformationDto() {
-        return deviceInformationDto;
+    public DeviceInformationDto getDeviceInformation() {
+        return deviceInformation;
     }
 }

@@ -20,8 +20,12 @@ public class DevicePair {
 
 	private String pairKey;
 
-	public DevicePair(final DevicePairId devicePairId, final DeviceId deviceId, final boolean paired, final Instant loginTime,
-                      final String errorDescription, String pairKey) {
+	public DevicePair(final DevicePairId devicePairId,
+					  final DeviceId deviceId,
+					  final boolean paired,
+					  final Instant loginTime,
+                      final String errorDescription,
+					  final String pairKey) {
 		this.devicePairId = devicePairId;
 		this.deviceId = deviceId;
 		this.paired = paired;

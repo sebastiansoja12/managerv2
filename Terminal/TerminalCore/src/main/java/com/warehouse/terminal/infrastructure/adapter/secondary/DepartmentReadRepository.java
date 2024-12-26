@@ -9,7 +9,7 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Department
 
 public interface DepartmentReadRepository extends JpaRepository<DepartmentEntity, String> {
 
-    @Query("SELECT d FROM device.DepartmentEntity d WHERE d.depotCode = :departmentCode")
+    @Query("SELECT d FROM device.DepartmentEntity d WHERE d.departmentCode = :departmentCode")
     Optional<DepartmentEntity> findByDepartmentCode(final String departmentCode);
 
 }

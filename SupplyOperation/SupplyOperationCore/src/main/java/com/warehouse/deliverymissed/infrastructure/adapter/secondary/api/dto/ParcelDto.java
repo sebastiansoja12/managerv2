@@ -9,8 +9,8 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class ParcelDto {
 
-    ParcelIdDto parcelId;
+    ShipmentIdDto parcelId;
 
-    StatusDto parcelStatus;
+    ShipmentStatusDto parcelStatus;
 
 }

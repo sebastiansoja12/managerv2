@@ -101,7 +101,7 @@ public class SupplierRestIntegrationTest {
                 .firstName("Anna")
                 .lastName("test")
                 .telephone("123")
-                .depotCode("TST")
+                .departmentCode("TST")
                 .active(Boolean.TRUE)
                 .build();
         // when

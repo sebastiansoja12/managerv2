@@ -2,31 +2,55 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper;
 
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
-import com.warehouse.deliveryreturn.domain.model.DeliveryReturnTokenRequest;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryPackageRequest;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnInformation;
-import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.ShipmentReturnTokenRequestDto;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
+import com.warehouse.deliveryreturn.domain.vo.ReturnPackageRequest;
+import com.warehouse.deliveryreturn.domain.vo.Supplier;
+import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.*;
 
 @Mapper
 public interface DeliveryReturnTokenRequestMapper {
 
-    default List<ShipmentReturnTokenRequestDto> map(DeliveryReturnTokenRequest deliveryReturnTokenRequest) {
-        return deliveryReturnTokenRequest.getRequests().stream()
-                .map(this::buildParcel)
-                .collect(Collectors.toList());
+    default ReturnTokenRequestDto map(final ReturnTokenRequest returnTokenRequest) {
+        final SupplierDto supplier = map(returnTokenRequest.getSupplier());
+        final List<ReturnPackageRequestDto> returnPackageRequests = returnTokenRequest
+                .getReturnPackageRequests()
+                .stream()
+                .map(this::map)
+                .toList();
+        return new ReturnTokenRequestDto(returnPackageRequests, supplier);
     }
 
-    default ShipmentReturnTokenRequestDto buildParcel(DeliveryPackageRequest deliveryPackageRequest) {
-        return Objects.isNull(deliveryPackageRequest) ? null : map(deliveryPackageRequest.getDelivery());
+    default ReturnPackageRequestDto map(final ReturnPackageRequest returnPackageRequest) {
+        final UUID id = returnPackageRequest.getId();
+        final ShipmentIdDto shipmentId = map(returnPackageRequest.getShipmentId());
+        final DepartmentCodeDto departmentCode = map(returnPackageRequest.getDepartmentCode());
+        final SupplierCodeDto supplierCode = map(returnPackageRequest.getSupplierCode());
+        final String deliveryStatus = returnPackageRequest.getDeliveryStatus().name();
+        return new ReturnPackageRequestDto(id, shipmentId, departmentCode, supplierCode, deliveryStatus, returnPackageRequest.isLocked());
     }
 
-    @Mapping(source = "deliveryStatus", target = "parcelStatus")
-    @Mapping(source = "shipmentId", target = "id")
-    ShipmentReturnTokenRequestDto map(final DeliveryReturnInformation information);
+    default SupplierCodeDto map(final SupplierCode supplierCode) {
+        return new SupplierCodeDto(supplierCode.getValue());
+    }
+
+    default SupplierDto map(final Supplier supplier) {
+        final SupplierCodeDto supplierCode = map(supplier.getSupplierCode());
+        return new SupplierDto(supplierCode);
+    }
+
+    default ShipmentIdDto map(final ShipmentId shipmentId) {
+        return new ShipmentIdDto(shipmentId.getValue());
+    }
+
+    default DepartmentCodeDto map(final DepartmentCode departmentCode) {
+        return new DepartmentCodeDto(departmentCode.getValue());
+    }
+
 }

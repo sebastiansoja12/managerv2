@@ -32,7 +32,7 @@ public interface RouteLogToEntityMapper {
         final RouteLogRecordDetailEntity entity = new RouteLogRecordDetailEntity();
         entity.setId(routeLogRecordDetail.getId());
         entity.setCreated(routeLogRecordDetail.getTimestamp());
-        entity.setDepot(mapDepotEntity(routeLogRecordDetail));
+        entity.setDepartment(mapDepartmentEntity(routeLogRecordDetail));
         entity.setParcelStatus(map(routeLogRecordDetail.getParcelStatus()));
         entity.setRequest(routeLogRecordDetail.getRequest());
         entity.setDescription(routeLogRecordDetail.getDescription());
@@ -40,7 +40,7 @@ public interface RouteLogToEntityMapper {
         entity.setVersion(routeLogRecordDetail.getVersion());
         entity.setSupplier(mapSupplierEntity(routeLogRecordDetail));
         entity.setProcessType(map(routeLogRecordDetail.getProcessType()));
-        entity.setZebraId(routeLogRecordDetail.getTerminalId().getValue().longValue());
+        entity.setDeviceId(routeLogRecordDetail.getTerminalId().getValue());
         return entity;
     }
 
@@ -54,11 +54,11 @@ public interface RouteLogToEntityMapper {
         return null;
     }
 
-    default DepotEntity mapDepotEntity(RouteLogRecordDetail routeLogRecord) {
-        final String depotCode = routeLogRecord.getDepotCode();
-        if (StringUtils.isNotEmpty(depotCode)) {
-            return DepotEntity.builder()
-                    .depotCode(depotCode)
+    default DepartmentEntity mapDepartmentEntity(RouteLogRecordDetail routeLogRecord) {
+        final String departmentCode = routeLogRecord.getDepartmentCode();
+        if (StringUtils.isNotEmpty(departmentCode)) {
+            return DepartmentEntity.builder()
+                    .departmentCode(departmentCode)
                     .build();
         }
         return null;
@@ -82,7 +82,7 @@ public interface RouteLogToEntityMapper {
     default RouteLogRecordDetailEntity map(Long id, RouteLogRecordDetail routeLogRecordDetail) {
         final RouteLogRecordDetailEntity entity = new RouteLogRecordDetailEntity();
         entity.setId(id);
-        entity.setDepot(mapDepotEntity(routeLogRecordDetail));
+        entity.setDepartment(mapDepartmentEntity(routeLogRecordDetail));
         entity.setParcelStatus(map(routeLogRecordDetail.getParcelStatus()));
         entity.setRequest(routeLogRecordDetail.getRequest());
         entity.setDescription(routeLogRecordDetail.getDescription());
@@ -90,7 +90,7 @@ public interface RouteLogToEntityMapper {
         entity.setVersion(routeLogRecordDetail.getVersion());
         entity.setSupplier(mapSupplierEntity(routeLogRecordDetail));
         entity.setProcessType(map(routeLogRecordDetail.getProcessType()));
-        entity.setZebraId(routeLogRecordDetail.getTerminalId().getValue().longValue());
+        entity.setDeviceId(routeLogRecordDetail.getTerminalId().getValue());
         return entity;
     }
 }

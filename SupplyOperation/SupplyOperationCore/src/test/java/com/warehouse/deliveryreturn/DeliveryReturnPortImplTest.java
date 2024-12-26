@@ -40,7 +40,7 @@ public class DeliveryReturnPortImplTest {
 	private DeliveryReturnRepository deliveryReturnRepository;
 
 	@Mock
-	private DeliveryReturnTokenServicePort deliveryReturnTokenServicePort;
+	private ReturnTokenServicePort returnTokenServicePort;
 
 	@Mock
 	private ShipmentRepositoryServicePort shipmentRepositoryServicePort;
@@ -63,7 +63,7 @@ public class DeliveryReturnPortImplTest {
 	@BeforeEach
 	void setup() {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
-				deliveryReturnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
+				returnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
 		returnPort = new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort,
 				routeLogReturnServicePort);
 	}
@@ -136,7 +136,7 @@ public class DeliveryReturnPortImplTest {
 				.shipmentId(new ShipmentId(parcelId))
 				.supplierCode(new SupplierCode(supplierCode))
 				.departmentCode(new DepartmentCode(depotCode))
-				.token(token).build();
+				.build();
 
 		return List.of(deliveryReturnDetails);
 	}

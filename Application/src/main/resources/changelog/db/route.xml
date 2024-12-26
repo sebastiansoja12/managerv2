@@ -30,7 +30,7 @@
         <addForeignKeyConstraint
                 baseTableName="route"
                 baseColumnNames="depot_code"
-                referencedTableName="depot"
+                referencedTableName="department"
                 referencedColumnNames="depot_code"
                 constraintName="FK377hf607ildmeres3rcbemmgf"
         />

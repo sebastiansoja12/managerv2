@@ -18,7 +18,7 @@ public class RouteLogRecordDetail {
     private String version;
     private String username;
     private String supplierCode;
-    private String depotCode;
+    private String departmentCode;
     private ParcelStatus parcelStatus;
     private String description;
     private LocalDateTime timestamp;
@@ -55,8 +55,8 @@ public class RouteLogRecordDetail {
         markAsModified();
     }
 
-    public void saveDepotCode(final String depotCode) {
-        this.depotCode = depotCode;
+    public void saveDepartmentCode(final String departmentCode) {
+        this.departmentCode = departmentCode;
         markAsModified();
     }
 

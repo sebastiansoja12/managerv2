@@ -123,9 +123,8 @@ public class DevicePairEntity {
         return pairKey;
     }
 
-    public DevicePairEntity pair() {
+    public void pair() {
         this.paired = true;
-        return this;
     }
 }
 

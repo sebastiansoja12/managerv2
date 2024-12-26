@@ -44,14 +44,14 @@ public interface RouteLogToModelMapper {
                 .processType(map(routeLogRecordDetailEntity.getProcessType()))
                 .description(routeLogRecordDetailEntity.getDescription())
                 .timestamp(routeLogRecordDetailEntity.getCreated())
-                .depotCode(routeLogRecordDetailEntity.getDepot() != null ?
-                        routeLogRecordDetailEntity.getDepot().getDepotCode() : null)
+                .departmentCode(routeLogRecordDetailEntity.getDepartment() != null ?
+                        routeLogRecordDetailEntity.getDepartment().getDepartmentCode() : null)
                 .supplierCode(routeLogRecordDetailEntity.getSupplier() != null ? routeLogRecordDetailEntity
                         .getSupplier().getSupplierCode() : null)
                 .username(routeLogRecordDetailEntity.getUser() != null ?
                         routeLogRecordDetailEntity.getUser().getUsername() : null)
                 .version(routeLogRecordDetailEntity.getVersion())
-                .terminalId(new TerminalId(routeLogRecordDetailEntity.getZebraId()))
+                .terminalId(routeLogRecordDetailEntity.getDeviceId() != null ? new TerminalId(routeLogRecordDetailEntity.getDeviceId()) : null)
                 .build();
     }
 

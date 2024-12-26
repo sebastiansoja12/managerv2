@@ -17,6 +17,6 @@ public class TerminalIdDto {
     }
 
     public static TerminalIdDto from(final TerminalId terminalId) {
-        return new TerminalIdDto(terminalId.getValue());
+        return new TerminalIdDto(terminalId != null ? terminalId.getValue() : null);
     }
 }

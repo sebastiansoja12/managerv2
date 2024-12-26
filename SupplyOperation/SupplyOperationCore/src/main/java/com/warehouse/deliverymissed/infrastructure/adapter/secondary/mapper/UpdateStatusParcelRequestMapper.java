@@ -1,25 +1,31 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.commonassets.enumeration.ParcelStatus;
-import com.warehouse.deliverymissed.domain.vo.UpdateStatusParcelRequest;
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.ParcelDto;
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.ParcelIdDto;
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.StatusDto;
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.UpdateStatusParcelRequestDto;
 import org.mapstruct.Mapper;
+
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.deliverymissed.domain.vo.UpdateStatusShipmentRequest;
+import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.ShipmentIdDto;
+import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.ShipmentStatusDto;
+import com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto.UpdateStatusShipmentRequestDto;
 
 @Mapper
 public interface UpdateStatusParcelRequestMapper {
-    default UpdateStatusParcelRequestDto map(UpdateStatusParcelRequest updateStatusParcelRequest) {
-        return UpdateStatusParcelRequestDto.builder()
-                .parcel(ParcelDto.builder()
-                        .parcelId(ParcelIdDto.builder()
-                                .value(updateStatusParcelRequest.getParcelId())
-                                .build())
-                        .parcelStatus(map(updateStatusParcelRequest.getParcelStatus()))
-                        .build())
-                .build();
+    default UpdateStatusShipmentRequestDto map(final UpdateStatusShipmentRequest updateStatusShipmentRequest) {
+        final ShipmentIdDto shipmentId = map(updateStatusShipmentRequest.getShipmentId());
+        final ShipmentStatusDto shipmentStatus = map(updateStatusShipmentRequest.getShipmentStatus());
+        return new UpdateStatusShipmentRequestDto(shipmentId, shipmentStatus);
     }
 
-    StatusDto map(ParcelStatus parcelStatus);
+    default ShipmentIdDto map(final ShipmentId shipmentId) {
+        final ShipmentIdDto id;
+        if (shipmentId == null) {
+            id = new ShipmentIdDto(null);
+        } else {
+            id = new ShipmentIdDto(shipmentId.getValue());
+        }
+        return id;
+    }
+
+    ShipmentStatusDto map(final ShipmentStatus shipmentStatus);
 }

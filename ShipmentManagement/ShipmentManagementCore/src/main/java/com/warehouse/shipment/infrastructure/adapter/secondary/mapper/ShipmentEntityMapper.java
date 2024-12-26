@@ -5,15 +5,15 @@ import java.time.LocalDateTime;
 import org.mapstruct.Mapper;
 
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 
 @Mapper
 public interface ShipmentEntityMapper {
 
-    default ParcelEntity map(final Shipment shipment) {
-        return ParcelEntity.builder()
-                .id(shipment.getShipmentId().getValue())
-                .parcelRelatedId(shipment.getShipmentRelatedId() != null ? shipment.getShipmentRelatedId().getValue() : null)
+    default ShipmentEntity map(final Shipment shipment) {
+        return ShipmentEntity.builder()
+                .shipmentId(shipment.getShipmentId())
+                .shipmentRelatedId(shipment.getShipmentRelatedId())
                 .shipmentType(shipment.getShipmentType())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())

@@ -20,7 +20,7 @@ public interface SupplierResponseMapper {
     @Mapping(source = "supplier.firstName", target = "firstName")
     @Mapping(source = "supplier.lastName", target = "lastName")
     @Mapping(source = "supplier.telephone", target = "telephone")
-    @Mapping(source = "supplier.depotCode", target = "depotCode")
+    @Mapping(source = "supplier.departmentCode", target = "departmentCode")
     @Mapping(source = "supplier.supplierCode", target = "supplierCode")
     SupplierAddResponseDto map(SupplierAddResponse response);
 

@@ -1,5 +1,6 @@
 package com.warehouse.deliverymissed.configuration;
 
+import com.warehouse.deliverymissed.domain.port.secondary.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,15 +8,11 @@ import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPort;
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPortImpl;
 import com.warehouse.deliverymissed.domain.port.primary.TerminalRequestLoggerPort;
 import com.warehouse.deliverymissed.domain.port.primary.TerminalRequestLoggerPortImpl;
-import com.warehouse.deliverymissed.domain.port.secondary.DeliveryInstructionServicePort;
-import com.warehouse.deliverymissed.domain.port.secondary.DeliveryMissedRepository;
-import com.warehouse.deliverymissed.domain.port.secondary.ParcelStatusServicePort;
-import com.warehouse.deliverymissed.domain.port.secondary.RouteLogMissedServicePort;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedServiceImpl;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.*;
 import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
+import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
 
 @Configuration
 public class DeliveryMissedConfiguration {
@@ -44,18 +41,23 @@ public class DeliveryMissedConfiguration {
 
 	@Bean
 	public DeliveryMissedService deliveryMissedService(DeliveryMissedRepository deliveryMissedRepository,
-			ParcelStatusServicePort parcelStatusServicePort) {
-		return new DeliveryMissedServiceImpl(deliveryMissedRepository, parcelStatusServicePort);
+			ShipmentUpdateServicePort shipmentUpdateServicePort) {
+		return new DeliveryMissedServiceImpl(deliveryMissedRepository, shipmentUpdateServicePort);
 	}
 
 	@Bean
-	public ParcelStatusServicePort parcelStatusServicePort() {
-		return new ParcelStatusServiceAdapter(parcelStatusProperties());
+	public ShipmentUpdateServicePort parcelStatusServicePort() {
+		return new ShipmentUpdateServiceAdapter(parcelStatusProperties());
+	}
+
+	@Bean
+	public DeliveryMissedDetailsRepository deliveryMissedDetailsRepository() {
+		return new DeliveryMissedDetailsRepositoryImpl();
 	}
 
 	@Bean("deliveryMissed.parcelStatusProperties")
-	public ParcelStatusProperties parcelStatusProperties() {
-		return new ParcelStatusProperties();
+	public ShipmentStatusProperties parcelStatusProperties() {
+		return new ShipmentStatusProperties();
 	}
 
 	@Bean

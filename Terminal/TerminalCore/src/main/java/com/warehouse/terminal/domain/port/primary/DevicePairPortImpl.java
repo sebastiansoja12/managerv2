@@ -56,7 +56,7 @@ public class DevicePairPortImpl implements DevicePairPort {
     @Override
     public boolean isUserValid(final DeviceId deviceId, final UserId userId) {
         final Device device = this.terminalService.findByDeviceId(deviceId);
-        return this.userService.existsByUserId(userId) && device.getUserId().equals(userId);
+        return this.userService.existsByUserId(userId) && device != null && device.getUserId().equals(userId);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class DevicePairPortImpl implements DevicePairPort {
         final Terminal terminal = this.terminalService.findByDeviceId(request.getDeviceId());
         log.info("Pairing terminal [{}]", terminal.getTerminalId().getValue());
         final DeviceId deviceId = terminal.getDeviceId();
-        this.terminalValidatorService.validateDepartment(terminal.getDepotCode());
+        this.terminalValidatorService.validateDepartment(terminal.getDepartmentCode());
         this.terminalValidatorService.validateTerminalVersion(deviceId);
         final Boolean userValid = this.userService.existsByUserId(terminal.getUserId())
                 && this.userService.existsByUserId(request.getUserId());

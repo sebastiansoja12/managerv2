@@ -1,7 +1,5 @@
 package com.warehouse.delivery.domain.model;
 
-import java.util.List;
-
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.delivery.domain.vo.DeviceInformation;
 
@@ -14,19 +12,19 @@ public class Request {
 
     private DeliveryRejectRequest deliveryRejectRequest;
 
-    private List<DeliveryMissedRequest> deliveryMissedRequests;
+    private DeliveryMissedRequest deliveryMissedRequest;
 
     private DeliveryReturnRequest deliveryReturnRequest;
 
 	public Request(final ProcessType processType,
                    final DeviceInformation deviceInformation,
                    final DeliveryRejectRequest deliveryRejectRequest,
-                   final List<DeliveryMissedRequest> deliveryMissedRequests,
+                   final DeliveryMissedRequest deliveryMissedRequest,
                    final DeliveryReturnRequest deliveryReturnRequest) {
         this.processType = processType;
         this.deviceInformation = deviceInformation;
         this.deliveryRejectRequest = deliveryRejectRequest;
-        this.deliveryMissedRequests = deliveryMissedRequests;
+        this.deliveryMissedRequest = deliveryMissedRequest;
         this.deliveryReturnRequest = deliveryReturnRequest;
     }
 
@@ -62,11 +60,11 @@ public class Request {
         this.deliveryRejectRequest = deliveryRejectRequest;
     }
 
-    public List<DeliveryMissedRequest> getDeliveryMissedRequests() {
-        return deliveryMissedRequests;
+    public DeliveryMissedRequest getDeliveryMissedRequest() {
+        return deliveryMissedRequest;
     }
 
-    public void setDeliveryMissedRequests(final List<DeliveryMissedRequest> deliveryMissedRequests) {
-        this.deliveryMissedRequests = deliveryMissedRequests;
+    public void setDeliveryMissedRequest(final DeliveryMissedRequest deliveryMissedRequest) {
+        this.deliveryMissedRequest = deliveryMissedRequest;
     }
 }

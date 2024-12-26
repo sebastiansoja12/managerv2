@@ -25,9 +25,10 @@ public interface RouteModelMapper {
     Set<RouteLogRecordDetail> mapToLogRecordDetails(List<RouteLogRecordDetailEntity> value);
 
 
-    @Mapping(target = "depotCode", source = "depot.depotCode")
+    @Mapping(target = "departmentCode", source = "department.departmentCode")
     @Mapping(target = "username", source = "user.username")
     @Mapping(target = "supplierCode", source = "supplier.supplierCode")
+    @Mapping(target = "terminalId.value", source = "deviceId")
     RouteLogRecordDetail map(RouteLogRecordDetailEntity routeLogRecordDetailEntity);
 
     @Mapping(target = "processId", source = "id")

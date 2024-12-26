@@ -66,7 +66,7 @@ public class ShipmentConfiguration {
 	public Set<ShipmentStatusHandler> shipmentStatusHandlers(final ShipmentService service) {
 		return Set.of(new ShipmentCreatedHandler(), new ShipmentRerouteHandler(service),
 				new ShipmentSentHandler(service), new ShipmentDeliveryHandler(service),
-				new ShipmentRedirectHandler(service));
+				new ShipmentRedirectHandler(service), new ShipmentReturnHandler(service));
 	}
 
 	@Bean("shipment.softwareConfigurationServicePort")

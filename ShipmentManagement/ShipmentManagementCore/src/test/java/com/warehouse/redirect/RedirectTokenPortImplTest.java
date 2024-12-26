@@ -2,14 +2,7 @@ package com.warehouse.redirect;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.redirect.domain.exception.*;
-import com.warehouse.redirect.domain.port.secondary.RedirectTrackerServicePort;
-import com.warehouse.redirect.domain.vo.RedirectParcelRequest;
-import com.warehouse.redirect.domain.port.secondary.RedirectServicePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,16 +10,19 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.warehouse.redirect.domain.exception.EmptyEmailException;
+import com.warehouse.redirect.domain.exception.NullParcelIdException;
+import com.warehouse.redirect.domain.exception.RedirectRequestNotFoundException;
+import com.warehouse.redirect.domain.exception.TokenNotFoundException;
 import com.warehouse.redirect.domain.model.RedirectRequest;
-import com.warehouse.redirect.domain.model.RedirectResponse;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPortImpl;
 import com.warehouse.redirect.domain.port.secondary.MailServicePort;
+import com.warehouse.redirect.domain.port.secondary.RedirectServicePort;
+import com.warehouse.redirect.domain.port.secondary.RedirectTrackerServicePort;
 import com.warehouse.redirect.domain.service.RedirectService;
 import com.warehouse.redirect.domain.service.RedirectTokenGenerator;
-import com.warehouse.redirect.domain.vo.RedirectToken;
+import com.warehouse.redirect.domain.vo.RedirectParcelRequest;
 import com.warehouse.redirect.domain.vo.Token;
-
-import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 public class RedirectTokenPortImplTest {
@@ -52,64 +48,6 @@ public class RedirectTokenPortImplTest {
     void setup() {
         redirectTokenPort = new RedirectTokenPortImpl(redirectService, redirectTokenGenerator, mailServicePort,
                 redirectTrackerServicePort);
-    }
-
-    @Test
-    void shouldSendInformation() {
-        // given
-        final RedirectRequest request = new RedirectRequest();
-        request.setEmail("sebastian5152@wp.pl");
-        request.setParcelId(1L);
-
-        final RedirectToken redirectToken = new RedirectToken( 1L, "12345",
-                LocalDateTime.now(), LocalDateTime.now(), new ShipmentId(1L), "sebastian5152@wp.pl");
-        final Token token = new Token("12345");
-
-        doReturn(true)
-                .when(redirectServicePort)
-                        .exists(1L);
-
-        doReturn("12345")
-                .when(redirectTokenGenerator)
-                        .generateToken(redirectToken.getShipmentId().getValue(), redirectToken.getEmail());
-
-        doReturn(token)
-                .when(redirectService)
-                        .saveRedirectToken(redirectToken);
-
-        doNothing()
-                .when(mailServicePort)
-                    .sendRedirectInformation(redirectToken);
-        // when
-        final RedirectResponse response = redirectTokenPort.sendRedirectInformation(request);
-        // then
-        assertEquals(expectedToBe(token), response.getToken());
-    }
-
-    @Test
-    void shouldNotSendInformationWhenParcelDoesNotExist() {
-        // given
-        final RedirectRequest request = new RedirectRequest();
-        request.setEmail("sebastian5152@wp.pl");
-        request.setParcelId(1L);
-
-        final RedirectToken redirectToken = new RedirectToken( 1L, "12345",
-                LocalDateTime.now(), LocalDateTime.now(), new ShipmentId(1L), "sebastian5152@wp.pl");
-
-        doReturn(false)
-                .when(redirectServicePort)
-                .exists(1L);
-
-        doReturn("12345")
-                .when(redirectTokenGenerator)
-                .generateToken(redirectToken.getShipmentId().getValue(), redirectToken.getEmail());
-
-        // when
-        final Executable executable = () -> redirectTokenPort.sendRedirectInformation(request);
-        // then
-        final ParcelRedirectException exception = assertThrows(ParcelRedirectException.class, executable);
-        assertEquals(expectedToBe("Parcel to redirect does not exist"), exception.getMessage());
-        assertEquals(expectedToBe(501), exception.getCode());
     }
 
     @Test

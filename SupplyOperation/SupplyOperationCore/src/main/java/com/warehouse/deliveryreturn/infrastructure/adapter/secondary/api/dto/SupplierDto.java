@@ -1,13 +1,16 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
-
-@Value
-@Builder
-@Jacksonized
 public class SupplierDto {
-    Boolean active;
-    String supplierCode;
+    private SupplierCodeDto supplierCode;
+
+    public SupplierDto() {
+    }
+
+    public SupplierDto(final SupplierCodeDto supplierCode) {
+        this.supplierCode = supplierCode;
+    }
+
+    public SupplierCodeDto getSupplierCode() {
+        return supplierCode;
+    }
 }

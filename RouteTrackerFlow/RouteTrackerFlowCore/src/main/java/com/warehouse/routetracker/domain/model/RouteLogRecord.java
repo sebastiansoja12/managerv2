@@ -57,7 +57,7 @@ public class RouteLogRecord {
     public void saveDepotCode(final ProcessType processType, final String depotCode) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
-        routeLogRecordDetail.saveDepotCode(depotCode);
+        routeLogRecordDetail.saveDepartmentCode(depotCode);
     }
 
     public void saveDescription(final ProcessType processType, final String description) {

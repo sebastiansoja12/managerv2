@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -22,7 +22,5 @@ public interface ShipmentModelMapper {
     @Mapping(target = "recipient.city", source = "recipientCity")
     @Mapping(target = "recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "recipient.street", source = "recipientStreet")
-    @Mapping(target = "shipmentId.value", source = "id")
-    @Mapping(target = "shipmentRelatedId.value", source = "parcelRelatedId")
-    Shipment map(final ParcelEntity parcel);
+    Shipment map(final ShipmentEntity parcel);
 }

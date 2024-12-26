@@ -2,15 +2,15 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import java.util.function.Supplier;
 
-import com.warehouse.commonassets.enumeration.SoftwareConfigurationUrl;
-import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
+import com.warehouse.commonassets.enumeration.SoftwareConfigurationUrl;
 import com.warehouse.commonassets.model.SoftwareProperty;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.SoftwareConfigurationDto;
+import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
@@ -47,7 +47,7 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
                 .build();
 
 		final SoftwareProperty softwareProperty = new SoftwareProperty(softwareConfigurationProperties.getEndpoint(),
-                SoftwareConfigurationUrl.ROUTE_TRACKER_URL.getUrl(),"");
+                SoftwareConfigurationUrl.ROUTE_TRACKER_INITIALIZE_URL.getUrl(),"");
 
         final Supplier<ResponseEntity<SoftwareConfigurationDto>> retryableSupplier = Retry
                 .decorateSupplier(retry, () -> getSoftwareConfiguration(restClient, softwareProperty));

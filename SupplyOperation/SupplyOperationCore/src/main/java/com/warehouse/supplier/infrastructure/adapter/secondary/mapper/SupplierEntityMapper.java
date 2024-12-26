@@ -12,13 +12,13 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface SupplierEntityMapper {
 
-    @Mapping(target = "depot.depotCode", source = "depotCode")
+    @Mapping(target = "department.departmentCode", source = "departmentCode")
     SupplierEntity map(Supplier supplier);
 
-    @Mapping(source = "depot.depotCode", target = "depotCode")
+    @Mapping(source = "department.departmentCode", target = "departmentCode")
     SupplierModelRequest mapToModel(SupplierEntity supplier);
 
-    @Mapping(source = "depot.depotCode", target = "depotCode")
+    @Mapping(source = "department.departmentCode", target = "departmentCode")
     Supplier map(SupplierEntity supplier);
 
     List<Supplier> map(List<SupplierEntity> supplier);

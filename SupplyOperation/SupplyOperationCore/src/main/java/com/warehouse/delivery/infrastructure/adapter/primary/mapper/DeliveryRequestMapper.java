@@ -1,7 +1,7 @@
 package com.warehouse.delivery.infrastructure.adapter.primary.mapper;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,13 +15,14 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.domain.model.*;
 import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.delivery.dto.*;
-import com.warehouse.deliverymissed.dto.DeliveryMissedInformationDto;
+import com.warehouse.deliverymissed.dto.DeliveryMissedDetailsDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedRequestDto;
 import com.warehouse.deliveryreject.dto.DeliveryRejectDetailsDto;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetailsDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
 import com.warehouse.terminal.information.Device;
+import com.warehouse.terminal.model.DeliveryMissedDetail;
 import com.warehouse.terminal.model.DeliveryRejectDetail;
 import com.warehouse.terminal.model.DeliveryReturnDetail;
 import com.warehouse.terminal.request.TerminalRequest;
@@ -44,8 +45,11 @@ public interface DeliveryRequestMapper {
         final DeviceInformation deviceInformation = map(terminalRequest.getDevice());
         final DeliveryRejectRequest deliveryRejectRequest = map(terminalRequest.getDeliveryRejectRequest());
         final DeliveryReturnRequest deliveryReturnRequest = map(terminalRequest.getDeliveryReturnRequest());
-        return new Request(processType, deviceInformation, deliveryRejectRequest, Collections.emptyList(), deliveryReturnRequest);
+        final DeliveryMissedRequest deliveryMissedRequest = map(terminalRequest.getDeliveryMissedRequest());
+        return new Request(processType, deviceInformation, deliveryRejectRequest, deliveryMissedRequest, deliveryReturnRequest);
     }
+
+    DeliveryMissedRequest map(final com.warehouse.terminal.model.DeliveryMissedRequest deliveryMissedRequest);
 
     DeliveryReturnRequest map(final com.warehouse.terminal.model.DeliveryReturnRequest deliveryReturnRequest);
 
@@ -54,6 +58,12 @@ public interface DeliveryRequestMapper {
     @Mapping(target = "deliveryStatus", source = "deliveryStatus")
     @Mapping(target = "departmentCode.value", source = "departmentCode")
     DeliveryReturnDetails map(final DeliveryReturnDetail deliveryReturnDetail);
+
+    @Mapping(target = "shipmentId.value", source = "shipmentId")
+    @Mapping(target = "supplierCode.value", source = "supplierCode")
+    @Mapping(target = "deliveryStatus", source = "deliveryStatus")
+    @Mapping(target = "departmentCode.value", source = "departmentCode")
+    DeliveryMissedDetails map(final DeliveryMissedDetail deliveryMissedDetail);
 
     ProcessType map(final com.warehouse.terminal.enumeration.ProcessType processType);
 
@@ -78,14 +88,16 @@ public interface DeliveryRequestMapper {
     ProcessTypeDto map(final ProcessType processType);
 
     default DeliveryMissedRequestDto mapToDeliveryMissedRequest(final Request request) {
-        final List<DeliveryMissedInformationDto> deliveryMissedInformations = request.getDeliveryMissedRequests()
+        final List<DeliveryMissedDetailsDto> deliveryMissedDetails = request
+                .getDeliveryMissedRequest()
+                .getDeliveryMissedDetails()
                 .stream()
-                .map(deliveryMissedRequest ->
-                        new DeliveryMissedInformationDto(map(deliveryMissedRequest.getShipmentId()),
-                        map(deliveryMissedRequest.getDepartmentCode()), map(deliveryMissedRequest.getSupplierCode()),
-                                map(deliveryMissedRequest.getDeliveryStatus()))).toList();
-        return new DeliveryMissedRequestDto(deliveryMissedInformations, map(request.getDeviceInformation()));
+                .map(this::map)
+                .collect(Collectors.toList());
+        return new DeliveryMissedRequestDto(deliveryMissedDetails, map(request.getDeviceInformation()));
     }
+
+    DeliveryMissedDetailsDto map(final DeliveryMissedDetails deliveryMissedDetails);
 
     DeliveryStatusDto map(final DeliveryStatus deliveryStatus);
 

@@ -43,10 +43,10 @@ public class DepartmentReadRepositoryTest {
         // given
         final String depotCode = "PL1";
         // when
-        final Optional<DepartmentEntity> depot = repository.findByDepotCode(depotCode);
+        final Optional<DepartmentEntity> depot = repository.findByDepartmentCode(depotCode);
         // then
         assertTrue(depot.isPresent());
-        assertEquals(depotCode, depot.get().getDepotCode());
+        assertEquals(depotCode, depot.get().getDepartmentCode());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class DepartmentReadRepositoryTest {
         // given
         final String depotCode = "abc";
         // when
-        final Optional<DepartmentEntity> depot = repository.findByDepotCode(depotCode);
+        final Optional<DepartmentEntity> depot = repository.findByDepartmentCode(depotCode);
         // then
         assertFalse(depot.isPresent());
     }

@@ -19,7 +19,7 @@ public class Supplier {
 
     private String telephone;
 
-    private String depotCode;
+    private String departmentCode;
 
     private Boolean active;
 

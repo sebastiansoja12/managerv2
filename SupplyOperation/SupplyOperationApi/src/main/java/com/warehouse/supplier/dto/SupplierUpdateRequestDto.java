@@ -17,7 +17,7 @@ public class SupplierUpdateRequestDto {
 
     String supplierCode;
 
-    String depotCode;
+    String departmentCode;
 
     Boolean active;
 }

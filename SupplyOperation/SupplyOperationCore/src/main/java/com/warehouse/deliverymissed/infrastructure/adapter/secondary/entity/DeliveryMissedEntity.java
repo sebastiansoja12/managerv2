@@ -21,14 +21,14 @@ public class DeliveryMissedEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "parcel_id", nullable = false)
-    private Long parcelId;
+    @Column(name = "shipment_id", nullable = false)
+    private Long shipmentId;
 
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
-    @Column(name = "depot_code", nullable = false)
-    private String depotCode;
+    @Column(name = "department_code", nullable = false)
+    private String departmentCode;
 
     @Column(name = "supplier_code", nullable = false)
     private String supplierCode;

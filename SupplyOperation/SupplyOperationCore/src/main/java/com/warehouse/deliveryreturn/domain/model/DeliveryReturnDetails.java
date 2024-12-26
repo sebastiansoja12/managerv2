@@ -15,18 +15,15 @@ public class DeliveryReturnDetails {
     private DeliveryStatus deliveryStatus;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
-    private String token;
 
     public DeliveryReturnDetails(final ShipmentId shipmentId,
                                  final DeliveryStatus deliveryStatus,
                                  final DepartmentCode departmentCode,
-                                 final SupplierCode supplierCode,
-                                 final String token) {
+                                 final SupplierCode supplierCode) {
         this.shipmentId = shipmentId;
         this.deliveryStatus = deliveryStatus;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
-        this.token = token;
     }
 
     public ShipmentId getShipmentId() {
@@ -59,14 +56,6 @@ public class DeliveryReturnDetails {
 
     public void setSupplierCode(final SupplierCode supplierCode) {
         this.supplierCode = supplierCode;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(final String token) {
-        this.token = token;
     }
 
     public void validateDeliveryStatus() {

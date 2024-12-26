@@ -21,9 +21,11 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ParcelEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
+import com.warehouse.tracking.TrackingStatusEventPublisher;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -40,6 +42,9 @@ public class ShipmentReadRepositoryTest {
 
         @MockBean
         public MailService mailService;
+
+        @MockBean
+        public TrackingStatusEventPublisher trackingStatusEventPublisher;
     }
 
     @Autowired
@@ -48,9 +53,9 @@ public class ShipmentReadRepositoryTest {
     @Test
     void shouldFindById() {
         // given
-        final Long parcelId = 100001L;
+        final ShipmentId shipmentId = new ShipmentId(100001L);
         // when
-        final Optional<ParcelEntity> parcel = repository.findById(parcelId);
+        final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
         // then
         assertTrue(parcel.isPresent());
     }
@@ -58,9 +63,9 @@ public class ShipmentReadRepositoryTest {
     @Test
     void shouldNotFindById() {
         // given
-        final Long parcelId = 1L;
+        final ShipmentId shipmentId = new ShipmentId(1L);
         // when
-        final Optional<ParcelEntity> parcel = repository.findById(parcelId);
+        final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
         // then
         assertFalse(parcel.isPresent());
     }

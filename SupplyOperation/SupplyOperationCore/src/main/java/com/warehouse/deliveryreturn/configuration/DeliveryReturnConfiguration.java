@@ -15,7 +15,7 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
+import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
 import com.warehouse.tools.returntoken.ReturnTokenProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
 
@@ -26,12 +26,12 @@ public class DeliveryReturnConfiguration {
 
 	@Bean
 	public DeliveryReturnPort deliveryReturnPort(final DeliveryReturnRepository deliveryReturnRepository,
-                                                 final DeliveryReturnTokenServicePort deliveryReturnTokenServicePort,
+                                                 final ReturnTokenServicePort returnTokenServicePort,
                                                  final ShipmentStatusControlServicePort shipmentStatusControlServicePort,
                                                  final ShipmentRepositoryServicePort shipmentRepositoryServicePort, MailServicePort mailServicePort,
                                                  final RouteLogReturnServicePort routeLogReturnServicePort) {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
-				deliveryReturnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
+                returnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
 		return new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort,
 				routeLogReturnServicePort);
 	}
@@ -69,8 +69,8 @@ public class DeliveryReturnConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "service.mock", havingValue = "false")
-    public DeliveryReturnTokenServicePort deliveryReturnTokenServicePort(ReturnTokenProperties returnTokenProperties) {
-        return DeliveryReturnServiceAdapter
+    public ReturnTokenServicePort deliveryReturnTokenServicePort(ReturnTokenProperties returnTokenProperties) {
+        return ReturnTokenServiceAdapter
                 .builder()
                 .returnTokenProperties(returnTokenProperties)
                 .restClient(RestClient.builder().baseUrl(returnTokenProperties().getUrl()).build())
@@ -79,13 +79,13 @@ public class DeliveryReturnConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "service.mock", havingValue = "true")
-    public DeliveryReturnTokenServicePort deliveryReturnTokenMockServicePort() {
-        return new DeliveryReturnServiceMockAdapter();
+    public ReturnTokenServicePort deliveryReturnTokenMockServicePort() {
+        return new ReturnTokenServiceMockAdapter();
     }
 
     @Bean("deliveryReturn.parcelStatusProperties")
-    public ParcelStatusProperties parcelStatusProperties() {
-        return new ParcelStatusProperties();
+    public ShipmentStatusProperties parcelStatusProperties() {
+        return new ShipmentStatusProperties();
     }
 
     @Bean("deliveryReturn.parcelStatusControlChangeServicePort")

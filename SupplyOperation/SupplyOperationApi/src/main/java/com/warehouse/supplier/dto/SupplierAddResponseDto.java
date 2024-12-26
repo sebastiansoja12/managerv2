@@ -17,5 +17,5 @@ public class SupplierAddResponseDto {
 
     String supplierCode;
 
-    String depotCode;
+    String departmentCode;
 }

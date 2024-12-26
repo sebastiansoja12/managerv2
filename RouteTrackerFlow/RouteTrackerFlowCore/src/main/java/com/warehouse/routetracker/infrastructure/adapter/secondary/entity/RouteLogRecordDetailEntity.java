@@ -22,8 +22,8 @@ public class RouteLogRecordDetailEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "zebra_id")
-    private Long zebraId;
+    @Column(name = "device_id")
+    private Long deviceId;
 
     @Column(name = "version")
     private String version;
@@ -49,8 +49,8 @@ public class RouteLogRecordDetailEntity {
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "depot_code", referencedColumnName = "depot_code")
-    private DepotEntity depot;
+    @JoinColumn(name = "department_code", referencedColumnName = "department_code")
+    private DepartmentEntity department;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_code", referencedColumnName = "supplier_code")

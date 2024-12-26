@@ -138,7 +138,7 @@ public class SupplierServiceImplTest {
         supplier.setLastName("Soja");
         supplier.setSupplierCode("code");
         supplier.setTelephone("123");
-        supplier.setDepotCode("KT1");
+        supplier.setDepartmentCode("KT1");
         return supplier;
     }
 

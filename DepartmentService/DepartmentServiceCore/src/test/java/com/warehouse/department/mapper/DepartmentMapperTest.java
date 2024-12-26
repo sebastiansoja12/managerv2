@@ -24,7 +24,7 @@ public class DepartmentMapperTest {
         department.setDepotCode("KT3");
 
         final DepartmentEntity expectedEntity = new DepartmentEntity();
-        expectedEntity.setDepotCode("KT3");
+        expectedEntity.setDepartmentCode("KT3");
         expectedEntity.setCity(KATOWICE);
 
         // When
@@ -39,7 +39,7 @@ public class DepartmentMapperTest {
         // Given
         final DepartmentEntity departmentEntity = new DepartmentEntity();
         departmentEntity.setCity(KATOWICE);
-        departmentEntity.setDepotCode("KT3");
+        departmentEntity.setDepartmentCode("KT3");
 
 
         final Department expectedDepartment = new Department();
