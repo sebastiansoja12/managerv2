@@ -1,6 +1,6 @@
 package com.warehouse.configuration;
 
-import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
+import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class PropertiesConfiguration {
 
     @Bean
-    public ParcelStatusProperties parcelStatusProperties() {
-        return new ParcelStatusProperties();
+    public ShipmentStatusProperties parcelStatusProperties() {
+        return new ShipmentStatusProperties();
     }
 
     @Bean

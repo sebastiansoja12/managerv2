@@ -15,7 +15,7 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.tools.parcelstatus.ParcelStatusProperties;
+import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
 import com.warehouse.tools.returntoken.ReturnTokenProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
 
@@ -84,8 +84,8 @@ public class DeliveryReturnConfiguration {
     }
 
     @Bean("deliveryReturn.parcelStatusProperties")
-    public ParcelStatusProperties parcelStatusProperties() {
-        return new ParcelStatusProperties();
+    public ShipmentStatusProperties parcelStatusProperties() {
+        return new ShipmentStatusProperties();
     }
 
     @Bean("deliveryReturn.parcelStatusControlChangeServicePort")

@@ -13,7 +13,7 @@ public class Terminal extends Device implements ExecutionSourceResolver {
     private TerminalId terminalId;
     private DeviceType deviceType;
     private UserId userId;
-    private String depotCode;
+    private String departmentCode;
     private String version;
     private Instant lastUpdate;
     private Boolean active;
@@ -21,7 +21,7 @@ public class Terminal extends Device implements ExecutionSourceResolver {
 	public Terminal(final TerminalId terminalId,
                     final DeviceType deviceType,
                     final UserId userId,
-                    final String depotCode,
+                    final String departmentCode,
                     final String version,
                     final Instant lastUpdate, 
                     final Boolean active) {
@@ -29,7 +29,7 @@ public class Terminal extends Device implements ExecutionSourceResolver {
         this.terminalId = terminalId;
         this.deviceType = deviceType;
         this.userId = userId;
-        this.depotCode = depotCode;
+        this.departmentCode = departmentCode;
         this.version = version;
         this.lastUpdate = lastUpdate;
         this.active = active;
@@ -58,8 +58,8 @@ public class Terminal extends Device implements ExecutionSourceResolver {
         return userId;
     }
 
-    public String getDepotCode() {
-        return depotCode;
+    public String getDepartmentCode() {
+        return departmentCode;
     }
 
     public String getVersion() {
@@ -75,8 +75,8 @@ public class Terminal extends Device implements ExecutionSourceResolver {
         markAsModified();
     }
 
-    public void updateDepotCode(final String depotCode) {
-        this.depotCode = depotCode;
+    public void updateDepartmentCode(final String departmentCode) {
+        this.departmentCode = departmentCode;
         markAsModified();
     }
 

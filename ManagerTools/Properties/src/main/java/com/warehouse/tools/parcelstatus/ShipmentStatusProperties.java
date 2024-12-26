@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @Getter
 @ConfigurationProperties(prefix = "parcel")
-public class ParcelStatusProperties {
+public class ShipmentStatusProperties {
     private String url;
     private String endpoint;
     private Long port;

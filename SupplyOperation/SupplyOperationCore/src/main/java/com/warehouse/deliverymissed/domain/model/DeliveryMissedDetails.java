@@ -1,9 +1,7 @@
 package com.warehouse.deliverymissed.domain.model;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.deliverymissed.domain.vo.DeliveryAttemptNumber;
-import com.warehouse.deliverymissed.domain.vo.DeliveryMissedDetailId;
-import com.warehouse.deliverymissed.domain.vo.PenaltyFee;
+import com.warehouse.deliverymissed.domain.vo.*;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -18,21 +16,15 @@ public class DeliveryMissedDetails {
     private Boolean addressChanged;
     private DeliveryAttemptNumber deliveryAttemptNumber;
     private PenaltyFee penaltyFee;
-    private String suggestedAction;
-    private String incidentReport;
+    private SuggestedAction suggestedAction;
+    private IncidentReport incidentReport;
     private ShipmentId shipmentId;
 
-    public DeliveryMissedDetails(final DeliveryMissedDetailId deliveryMissedDetailId,
-                                 final Instant plannedDeliveryDate,
-                                 final Instant deliveryDate,
-                                 final Instant created,
-                                 final Instant newProposedDate,
-                                 final Boolean addressChanged,
-                                 final DeliveryAttemptNumber deliveryAttemptNumber,
-                                 final PenaltyFee penaltyFee,
-                                 final String suggestedAction,
-                                 final String incidentReport,
-                                 final ShipmentId shipmentId) {
+	public DeliveryMissedDetails(final DeliveryMissedDetailId deliveryMissedDetailId, final Instant plannedDeliveryDate,
+			final Instant deliveryDate, final Instant created, final Instant newProposedDate,
+			final Boolean addressChanged, final DeliveryAttemptNumber deliveryAttemptNumber,
+			final PenaltyFee penaltyFee, final SuggestedAction suggestedAction, final IncidentReport incidentReport,
+			final ShipmentId shipmentId) {
         this.deliveryMissedDetailId = deliveryMissedDetailId;
         this.plannedDeliveryDate = plannedDeliveryDate;
         this.deliveryDate = deliveryDate;
@@ -50,84 +42,84 @@ public class DeliveryMissedDetails {
         return deliveryMissedDetailId;
     }
 
-    public ShipmentId getShipmentId() {
-        return shipmentId;
+    public void setDeliveryMissedDetailId(final DeliveryMissedDetailId deliveryMissedDetailId) {
+        this.deliveryMissedDetailId = deliveryMissedDetailId;
     }
 
     public Instant getPlannedDeliveryDate() {
         return plannedDeliveryDate;
     }
 
-    public Instant getDeliveryDate() {
-        return deliveryDate;
-    }
-
-    public Instant getCreated() {
-        return created;
-    }
-
-    public Instant getNewProposedDate() {
-        return newProposedDate;
-    }
-
-    public Boolean getAddressChanged() {
-        return addressChanged;
-    }
-
-    public DeliveryAttemptNumber getDeliveryAttemptNumber() {
-        return deliveryAttemptNumber;
-    }
-
-    public PenaltyFee getPenaltyFee() {
-        return penaltyFee;
-    }
-
-    public String getSuggestedAction() {
-        return suggestedAction;
-    }
-
-    public String getIncidentReport() {
-        return incidentReport;
-    }
-
-    public void setDeliveryMissedDetailId(final DeliveryMissedDetailId deliveryMissedDetailId) {
-        this.deliveryMissedDetailId = deliveryMissedDetailId;
-    }
-
     public void setPlannedDeliveryDate(final Instant plannedDeliveryDate) {
         this.plannedDeliveryDate = plannedDeliveryDate;
+    }
+
+    public Instant getDeliveryDate() {
+        return deliveryDate;
     }
 
     public void setDeliveryDate(final Instant deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
 
+    public Instant getCreated() {
+        return created;
+    }
+
     public void setCreated(final Instant created) {
         this.created = created;
+    }
+
+    public Instant getNewProposedDate() {
+        return newProposedDate;
     }
 
     public void setNewProposedDate(final Instant newProposedDate) {
         this.newProposedDate = newProposedDate;
     }
 
+    public Boolean getAddressChanged() {
+        return addressChanged;
+    }
+
     public void setAddressChanged(final Boolean addressChanged) {
         this.addressChanged = addressChanged;
+    }
+
+    public DeliveryAttemptNumber getDeliveryAttemptNumber() {
+        return deliveryAttemptNumber;
     }
 
     public void setDeliveryAttemptNumber(final DeliveryAttemptNumber deliveryAttemptNumber) {
         this.deliveryAttemptNumber = deliveryAttemptNumber;
     }
 
+    public PenaltyFee getPenaltyFee() {
+        return penaltyFee;
+    }
+
     public void setPenaltyFee(final PenaltyFee penaltyFee) {
         this.penaltyFee = penaltyFee;
     }
 
-    public void setSuggestedAction(final String suggestedAction) {
+    public SuggestedAction getSuggestedAction() {
+        return suggestedAction;
+    }
+
+    public void setSuggestedAction(final SuggestedAction suggestedAction) {
         this.suggestedAction = suggestedAction;
     }
 
-    public void setIncidentReport(final String incidentReport) {
+    public IncidentReport getIncidentReport() {
+        return incidentReport;
+    }
+
+    public void setIncidentReport(final IncidentReport incidentReport) {
         this.incidentReport = incidentReport;
+    }
+
+    public ShipmentId getShipmentId() {
+        return shipmentId;
     }
 
     public void setShipmentId(final ShipmentId shipmentId) {
