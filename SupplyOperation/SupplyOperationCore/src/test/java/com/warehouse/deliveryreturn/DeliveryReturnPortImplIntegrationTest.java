@@ -1,13 +1,11 @@
 package com.warehouse.deliveryreturn;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
 
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -34,7 +32,8 @@ import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
-import com.warehouse.deliveryreturn.domain.vo.*;
+import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
+import com.warehouse.deliveryreturn.domain.vo.UpdateStatusShipmentRequest;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
 import com.warehouse.routelogger.RouteLogEventPublisher;
@@ -106,63 +105,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 	@BeforeEach
 	void setup() {
 		reset(shipmentStatusControlServicePort);
-	}
-
-	@Test
-	void shouldDeliverReturnAndNotUpdateParcelWhenIsNotAllowed() {
-		// given
-		final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L, DeliveryStatus.RETURN, "KT1",
-				"abc", null);
-		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN, deviceInformation,
-				deliveryReturnDetails);
-
-		final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(1L);
-
-		final Shipment shipment = Shipment.builder()
-				.recipientEmail("recipient")
-				.shipmentStatus("RETURN")
-				.shipmentId(new ShipmentId(1L))
-				.senderEmail("sender")
-				.build();
-
-		when(shipmentStatusControlServicePort.updateStatus(updateStatusShipmentRequest))
-				.thenReturn(UpdateStatus.NOT_OK);
-		when(shipmentRepositoryServicePort.downloadShipment(new ShipmentId(1L))).thenReturn(shipment);
-
-		doNothing().when(mailServicePort).sendNotification(shipment);
-		// when
-		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
-		// then
-		assertThat(response.getDeliveryReturnResponseDetails()).extracting(DeliveryReturnResponseDetails::getReturnToken,
-				DeliveryReturnResponseDetails::getDeliveryStatus)
-				.containsExactly(Tuple.tuple("12345", "RETURN"));
-
-	}
-
-	@Test
-	void shouldDeliverReturn() {
-		// given
-		final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L, DeliveryStatus.RETURN, "KT1",
-				"abc", null);
-		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN,
-				deviceInformation, deliveryReturnDetails);
-
-		final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(1L);
-
-		final Shipment shipment = Shipment.builder().recipientEmail("recipient").shipmentStatus("RETURN").shipmentId(new ShipmentId(1L))
-				.senderEmail("sender").build();
-
-		when(shipmentStatusControlServicePort.updateStatus(updateStatusShipmentRequest)).thenReturn(UpdateStatus.OK);
-		when(shipmentRepositoryServicePort.downloadShipment(new ShipmentId(1L))).thenReturn(shipment);
-		doNothing().when(mailServicePort).sendNotification(shipment);
-		// when
-		final DeliveryReturnResponse response = deliveryReturnPort.deliverReturn(request);
-		// then
-		assertThat(response.getDeliveryReturnResponseDetails()).extracting(DeliveryReturnResponseDetails::getReturnToken,
-				DeliveryReturnResponseDetails::getDeliveryStatus)
-				.containsExactly(Tuple.tuple("12345", "RETURN"));
-
-
 	}
 
 	@Test

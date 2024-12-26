@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "delivery.DepartmentEntity")
 @Builder
 @Table(name = "department")
-public class DepotEntity {
+public class DepartmentEntity {
 
     @Id
     @Column(name = "department_code", nullable = false, unique = true)

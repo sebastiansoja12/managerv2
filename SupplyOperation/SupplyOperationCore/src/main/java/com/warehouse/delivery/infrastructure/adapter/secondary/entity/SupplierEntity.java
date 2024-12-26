@@ -1,6 +1,5 @@
 package com.warehouse.delivery.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
