@@ -6,7 +6,7 @@
     <parent>
         <artifactId>RouteTrackerFlow</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2024.7-SNAPSHOT</version>
+        <version>2025.1-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
     <artifactId>RouteTrackerFlowCore</artifactId>
