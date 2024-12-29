@@ -31,3 +31,8 @@ INSERT INTO device_pair (
              'No errors',
              'ABC123'
          );
+
+
+INSERT INTO device_version (id, device_type, version, device_id, last_update)
+VALUES
+    (1, 'TERMINAL', '1.0.0', '1', '2024-12-29 12:00:00');
