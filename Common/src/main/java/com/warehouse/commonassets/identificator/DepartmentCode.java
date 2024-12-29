@@ -1,14 +1,12 @@
 package com.warehouse.commonassets.identificator;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class DepartmentCode {
+import jakarta.persistence.Embeddable;
 
-	private final String value;
-
-	public DepartmentCode(final String value) {
-		this.value = value;
-	}
+@Embeddable
+public record DepartmentCode(String value) implements Serializable {
 
 	public String getValue() {
 		return value;

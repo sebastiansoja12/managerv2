@@ -1,10 +1,17 @@
 package com.warehouse.commonassets.identificator;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class DeviceId {
-    private final Long value;
+    private Long value;
 
     public DeviceId(final Long value) {
         this.value = value;
+    }
+
+    public DeviceId() {
+
     }
 
     public Long getValue() {

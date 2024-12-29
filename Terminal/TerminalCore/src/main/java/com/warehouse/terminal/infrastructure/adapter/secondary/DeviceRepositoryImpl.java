@@ -18,7 +18,7 @@ public class DeviceRepositoryImpl<T> implements DeviceRepository {
     @Override
     public Object findById(final DeviceId deviceId) {
         return deviceReadRepository
-                .findById(deviceId.getValue())
+                .findById(deviceId)
                 .map(Terminal::from)
                 .orElseThrow(RuntimeException::new);
     }

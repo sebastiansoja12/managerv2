@@ -4,6 +4,9 @@ package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 import java.time.Instant;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.Terminal;
 
 import jakarta.persistence.*;
@@ -12,17 +15,23 @@ import jakarta.persistence.*;
 @Table(name = "device")
 public class DeviceEntity {
 
-    @Id
-    private Long id;
+    @Column(name = "device_id")
+    @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "device_id"))
+    private DeviceId deviceId;
 
     @Column(name = "version", nullable = false)
     private String version;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "user_id"))
+    private UserId userId;
 
-    @Column(name = "depot_code", nullable = false)
-    private String depotCode;
+    @Column(name = "department_code", nullable = false)
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "department_code"))
+    private DepartmentCode departmentCode;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "device_type", nullable = false)
@@ -37,48 +46,49 @@ public class DeviceEntity {
     public DeviceEntity() {
     }
 
-    public DeviceEntity(final Long id) {
-        this.id = id;
+    public DeviceEntity(final DeviceId deviceId) {
+        this.deviceId = deviceId;
     }
 
-    public DeviceEntity(final Long id,
+    public DeviceEntity(final DeviceId deviceId,
                         final String version,
-                        final Long userId,
-                        final String depotCode,
+                        final UserId userId,
+                        final DepartmentCode departmentCode,
                         final DeviceType deviceType,
                         final Boolean active) {
-        this.id = id;
+        this.deviceId = deviceId;
 		this.version = version;
 		this.userId = userId;
-		this.depotCode = depotCode;
+		this.departmentCode = departmentCode;
 		this.deviceType = deviceType;
         this.lastUpdate = Instant.now();
         this.active = active;
     }
 
     public static DeviceEntity from(final Terminal terminal) {
-		return new DeviceEntity(terminal.getDeviceId().getValue(), terminal.getVersion(),
-				terminal.getUserId().getValue(), terminal.getDepartmentCode(), terminal.getDeviceType(), terminal.isActive());
+		return new DeviceEntity(terminal.getDeviceId(), terminal.getVersion(),
+				terminal.getUserId(), new DepartmentCode(terminal.getDepartmentCode()),
+                terminal.getDeviceType(), terminal.isActive());
 	}
 
     public Boolean isActive() {
         return active;
     }
 
-    public Long getDeviceId() {
-        return id;
+    public DeviceId getDeviceId() {
+        return deviceId;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public Long getUserId() {
+    public UserId getUserId() {
         return userId;
     }
 
-    public String getDepotCode() {
-        return depotCode;
+    public DepartmentCode getDepartmentCode() {
+        return departmentCode;
     }
 
     public DeviceType getDeviceType() {

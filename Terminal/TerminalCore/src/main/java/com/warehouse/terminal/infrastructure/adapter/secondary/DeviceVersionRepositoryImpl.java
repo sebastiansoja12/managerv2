@@ -21,7 +21,7 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
     @Override
     public boolean updateRequired(final DeviceId deviceId) {
         final DeviceEntity deviceEntity = this.deviceReadRepository
-                .findById(deviceId.getValue())
+                .findById(deviceId)
                 .orElseThrow(() -> new RuntimeException("Device not found"));
 
         final DeviceVersionEntity deviceVersionEntity = this.deviceVersionReadRepository

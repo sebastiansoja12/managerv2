@@ -28,7 +28,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
     public void pair(final Terminal terminal, final DevicePairId devicePairId) {
         final DeviceEntity deviceEntity = DeviceEntity.from(terminal);
         this.repository
-                .findByDeviceId(deviceEntity.getDeviceId())
+                .findByDevice_DeviceId(deviceEntity.getDeviceId())
                 .ifPresentOrElse(DevicePairEntity::pair, () -> this.repository.save(new DevicePairEntity(deviceEntity)));
     }
 
@@ -48,7 +48,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
 
     @Override
     public DevicePair findDevicePairByDeviceId(final DeviceId deviceId) {
-        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDeviceId(deviceId.getValue());
+        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDevice_DeviceId(deviceId);
         return devicePairEntity.map(DevicePair::from).orElse(new DevicePair(false));
     }
 
