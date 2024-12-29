@@ -10,6 +10,7 @@ import org.mapstruct.ReportingPolicy;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.domain.model.*;
@@ -67,9 +68,12 @@ public interface DeliveryRequestMapper {
 
     ProcessType map(final com.warehouse.terminal.enumeration.ProcessType processType);
 
-    @Mapping(target = "deviceId.value", source = "deviceId")
     @Mapping(target = "departmentCode.value", source = "departmentCode")
     DeviceInformation map(final Device device);
+
+    default DeviceId map(final Long deviceId) {
+        return new DeviceId(deviceId);
+    }
 
     DeliveryRejectRequestDto map(final DeliveryRejectRequest deliveryRejectRequest);
 
