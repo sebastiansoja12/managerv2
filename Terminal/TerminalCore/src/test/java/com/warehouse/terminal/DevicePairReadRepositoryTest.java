@@ -46,4 +46,44 @@ public class DevicePairReadRepositoryTest {
         // then
         assertFalse(devicePair.isPresent());
     }
+
+    @Test
+    void shouldFindById() {
+        // given
+        final Long devicePairId = 1L;
+        // when
+        final Optional<DevicePairEntity> devicePair = repository.findById(devicePairId);
+        // then
+        assertTrue(devicePair.isPresent());
+    }
+
+    @Test
+    void shouldNotFindById() {
+        // given
+        final Long devicePairId = 10L;
+        // when
+        final Optional<DevicePairEntity> devicePair = repository.findById(devicePairId);
+        // then
+        assertFalse(devicePair.isPresent());
+    }
+
+    @Test
+    void shouldExistById() {
+        // given
+        final Long devicePairId = 1L;
+        // when
+        final boolean exists = repository.existsById(devicePairId);
+        // then
+        assertTrue(exists);
+    }
+
+    @Test
+    void shouldNotExistById() {
+        // given
+        final Long devicePairId = 10L;
+        // when
+        final boolean exists = repository.existsById(devicePairId);
+        // then
+        assertFalse(exists);
+    }
 }
