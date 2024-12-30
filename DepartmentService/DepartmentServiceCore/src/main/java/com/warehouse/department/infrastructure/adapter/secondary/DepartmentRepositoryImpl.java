@@ -20,14 +20,14 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     private final DepotMapper depotMapper;
 
     @Override
-    @Cacheable("depotCodeCache")
+    @Cacheable("departmentCodeCache")
     public Department findByCode(DepartmentCode departmentCode) {
         final Optional<DepartmentEntity> depot = repository.findByDepartmentCode(departmentCode.getValue());
         return depot.map(depotMapper::map).orElseThrow(() -> new DepotNotFoundException("Department was not found"));
     }
 
     @Override
-    @Cacheable("depotsCache")
+    @Cacheable("departmentsCache")
     public List<Department> findAll() {
         final List<DepartmentEntity> depots = repository.findAll();
         return depotMapper.map(depots);
