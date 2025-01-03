@@ -5,6 +5,7 @@ import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.deliveryreject.domain.vo.RejectReason;
 
 public class DeliveryRejectDetails {
     private DeliveryId deliveryId;
