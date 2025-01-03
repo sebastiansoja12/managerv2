@@ -1,6 +1,6 @@
 package com.warehouse.deliveryreject.infrastructure.adapter.secondary;
 
-import com.warehouse.deliveryreject.domain.model.RejectTrackerRequest;
+import com.warehouse.deliveryreject.domain.vo.RejectTrackerRequest;
 import com.warehouse.deliveryreject.domain.port.secondary.RejectTrackerServicePort;
 import com.warehouse.deliveryreject.domain.vo.RejectTrackerResponse;
 import com.warehouse.deliveryreject.infrastructure.adapter.secondary.mapper.RejectTrackerRequestMapper;

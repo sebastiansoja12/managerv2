@@ -4,7 +4,7 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.deliveryreject.domain.model.RejectReason;
+import com.warehouse.deliveryreject.domain.vo.RejectReason;
 
 public class DeliveryRejectDetails {
     private ShipmentId shipmentId;

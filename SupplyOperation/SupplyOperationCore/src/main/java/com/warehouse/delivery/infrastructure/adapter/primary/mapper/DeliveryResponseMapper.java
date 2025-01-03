@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.domain.model.Response;
 import com.warehouse.delivery.domain.vo.DeviceInformation;
+import com.warehouse.delivery.dto.DeviceIdDto;
 import com.warehouse.delivery.dto.DeviceInformationDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedResponseDto;
 import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponseDetails;
@@ -79,6 +81,10 @@ public interface DeliveryResponseMapper {
     @Mapping(target = "version", source = "version.value")
     @Mapping(target = "username", source = "username.value")
     DeviceInformation map(final DeviceInformationDto deviceInformationDto);
+
+    default DeviceId map(final DeviceIdDto deviceId) {
+        return new DeviceId(deviceId.value());
+    }
 
     List<DeliveryReturnResponse> mapToDeliveryReturnResponses(final List<DeliveryReturnResponseDto> deliveryReturnResponseDto);
 

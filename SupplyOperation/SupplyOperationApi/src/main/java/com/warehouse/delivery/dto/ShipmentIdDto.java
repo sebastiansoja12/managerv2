@@ -2,14 +2,17 @@ package com.warehouse.delivery.dto;
 
 import java.util.Objects;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
+
 public record ShipmentIdDto(Long value) {
+
+    public static ShipmentIdDto from(final ShipmentId shipmentId) {
+        return new ShipmentIdDto(shipmentId.value());
+    }
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final ShipmentIdDto that = (ShipmentIdDto) o;
-        return Objects.equals(value, that.value);
+        return false;
     }
 
     @Override

@@ -41,8 +41,8 @@ public class Terminal extends Device implements ExecutionSourceResolver {
 	}
 
     public static Terminal from(final DeviceEntity device) {
-        return new Terminal(new TerminalId(device.getDeviceId()), device.getDeviceType(), new UserId(device.getUserId()),
-                device.getDepotCode(), device.getVersion(),
+        return new Terminal(new TerminalId(device.getDeviceId().getValue()), device.getDeviceType(), device.getUserId(),
+                device.getDepartmentCode().getValue(), device.getVersion(),
                 Instant.now(), device.isActive());
     }
 
