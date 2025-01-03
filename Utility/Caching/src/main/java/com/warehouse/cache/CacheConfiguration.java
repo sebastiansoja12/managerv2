@@ -19,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 public class CacheConfiguration {
 
 
-    private static final String DEPOTS_CACHE = "depotsCache";
+    private static final String DEPARTMENT_CACHE = "departmentsCache";
 
-    private static final String DEPOT_CODE = "depotCodeCache";
+    private static final String DEPARTMENT_CODE = "departmentCodeCache";
 
     private static final String SUPPLIERS_CACHE = "suppliersCache";
 
@@ -29,33 +29,33 @@ public class CacheConfiguration {
 
     private static final String SUPPLIERS_CODE = "suppliersCodeCache";
 
-    private static final String SUPPLIERS_DEPOT_CODE = "suppliersDepotCodeCache";
+    private static final String SUPPLIERS_DEPARTMENT_CODE = "suppliersDepartmentCodeCache";
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager(DEPOTS_CACHE, DEPOT_CODE, SUPPLIERS_CACHE, SUPPLIER_CODE,
-                SUPPLIERS_CODE, SUPPLIERS_DEPOT_CODE);
+        return new ConcurrentMapCacheManager(DEPARTMENT_CACHE, DEPARTMENT_CODE, SUPPLIERS_CACHE, SUPPLIER_CODE,
+                SUPPLIERS_CODE, SUPPLIERS_DEPARTMENT_CODE);
     }
 
     @Scheduled(fixedRate = 3600000)
-    @CacheEvict(value = DEPOTS_CACHE, allEntries = true)
-    public void clearDepotsCache() {
-        log.info("Cache for {} is being deleted", DEPOTS_CACHE);
-        Objects.requireNonNull(cacheManager().getCache(DEPOTS_CACHE)).clear();
+    @CacheEvict(value = DEPARTMENT_CACHE, allEntries = true)
+    public void clearDepartmentCache() {
+        log.info("Cache for {} is being deleted", DEPARTMENT_CACHE);
+        Objects.requireNonNull(cacheManager().getCache(DEPARTMENT_CACHE)).clear();
     }
 
     @Scheduled(fixedRate = 1800000)
-    @CacheEvict(value = DEPOT_CODE, allEntries = true)
-    public void clearDepotCodeCache() {
-        log.info("Cache for {} is being deleted", DEPOT_CODE);
-        Objects.requireNonNull(cacheManager().getCache(DEPOT_CODE)).clear();
+    @CacheEvict(value = DEPARTMENT_CODE, allEntries = true)
+    public void clearDepartmentCodeCache() {
+        log.info("Cache for {} is being deleted", DEPARTMENT_CODE);
+        Objects.requireNonNull(cacheManager().getCache(DEPARTMENT_CODE)).clear();
     }
 
     @Scheduled(fixedRate = 3600000)
-    @CacheEvict(value = {SUPPLIERS_CACHE, SUPPLIER_CODE, SUPPLIERS_CODE, SUPPLIERS_DEPOT_CODE}, allEntries = true)
+    @CacheEvict(value = {SUPPLIERS_CACHE, SUPPLIER_CODE, SUPPLIERS_CODE, SUPPLIERS_DEPARTMENT_CODE}, allEntries = true)
     public void clearSupplierCaches() {
         log.info("Cache for {} is being deleted", String.join(", ", SUPPLIERS_CACHE, SUPPLIER_CODE,
-                SUPPLIERS_CODE, SUPPLIERS_DEPOT_CODE));
+                SUPPLIERS_CODE, SUPPLIERS_DEPARTMENT_CODE));
     }
 
 }

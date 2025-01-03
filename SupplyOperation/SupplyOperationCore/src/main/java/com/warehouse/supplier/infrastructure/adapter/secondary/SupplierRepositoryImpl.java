@@ -3,6 +3,8 @@ package com.warehouse.supplier.infrastructure.adapter.secondary;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
+
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.model.SupplierModelRequest;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
@@ -11,7 +13,6 @@ import com.warehouse.supplier.infrastructure.adapter.secondary.exception.Supplie
 import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.SupplierEntityMapper;
 
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 
 @AllArgsConstructor
 public class SupplierRepositoryImpl implements SupplierRepository {
@@ -55,7 +56,7 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
-    @Cacheable("suppliersDepotCodeCache")
+    @Cacheable("suppliersDepartmentCodeCache")
     public List<Supplier> findByDepotCode(String depotCode) {
         final List<SupplierEntity> supplierEntities = supplierReadRepository.findByDepartment_DepartmentCode(depotCode);
         return supplierEntityMapper.map(supplierEntities);

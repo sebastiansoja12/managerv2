@@ -1,12 +1,11 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
 
-import java.time.Instant;
-
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.vo.DevicePairId;
-
 import jakarta.persistence.*;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "device_pair")
@@ -17,7 +16,9 @@ public class DevicePairEntity {
     private Long devicePairId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    private DeviceEntity deviceEntity;
+    @JoinColumn(name = "device_id", nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "device_id"))
+    private DeviceEntity device;
 
     @Column(name = "paired")
     private boolean paired;
@@ -34,18 +35,18 @@ public class DevicePairEntity {
     public DevicePairEntity() {
     }
 
-	public DevicePairEntity(final Long devicePairId, final DeviceEntity deviceEntity, final boolean paired,
-			final Instant loginTime, final String errorDescription, final String pairKey) {
+	public DevicePairEntity(final Long devicePairId, final DeviceEntity device, final boolean paired,
+                            final Instant loginTime, final String errorDescription, final String pairKey) {
 		this.devicePairId = devicePairId;
-		this.deviceEntity = deviceEntity;
+		this.device = device;
 		this.paired = paired;
 		this.loginTime = loginTime;
 		this.errorDescription = errorDescription;
         this.pairKey = pairKey;
 	}
 
-    public DevicePairEntity(final DeviceEntity deviceEntity) {
-        this.deviceEntity = deviceEntity;
+    public DevicePairEntity(final DeviceEntity device) {
+        this.device = device;
         this.paired = true;
         this.loginTime = Instant.now();
         this.errorDescription = "";
@@ -53,28 +54,28 @@ public class DevicePairEntity {
     }
 
 	public DevicePairEntity(final DevicePairId devicePairId,
-                              final DeviceEntity deviceEntity,
+                              final DeviceEntity device,
                               final boolean paired,
                               final Instant loginTime,
                               final String errorDescription,
                               final String pairKey) {
         this.devicePairId = devicePairId.value();
-        this.deviceEntity = deviceEntity;
+        this.device = device;
         this.paired = paired;
         this.loginTime = loginTime;
         this.errorDescription = errorDescription;
         this.pairKey = pairKey;
     }
 
-    public DevicePairEntity(final DeviceEntity deviceEntity, final String errorDescription) {
-        this.deviceEntity = deviceEntity;
+    public DevicePairEntity(final DeviceEntity device, final String errorDescription) {
+        this.device = device;
         this.paired = false;
         this.loginTime = Instant.now();
         this.errorDescription = errorDescription;
     }
 
     public static DevicePairEntity from(final DevicePair devicePair) {
-        return new DevicePairEntity(devicePair.getDevicePairId(), new DeviceEntity(devicePair.getDeviceId().getValue()),
+        return new DevicePairEntity(devicePair.getDevicePairId(), new DeviceEntity(devicePair.getDeviceId()),
                 devicePair.isPaired(), devicePair.getLoginTime(), devicePair.getErrorDescription(),
                 devicePair.getPairKey());
     }
@@ -87,12 +88,12 @@ public class DevicePairEntity {
         this.devicePairId = devicePairId;
     }
 
-    public DeviceEntity getDeviceEntity() {
-        return deviceEntity;
+    public DeviceEntity getDevice() {
+        return device;
     }
 
-    public void setDeviceEntity(final DeviceEntity deviceEntity) {
-        this.deviceEntity = deviceEntity;
+    public void setDevice(final DeviceEntity deviceEntity) {
+        this.device = deviceEntity;
     }
 
     public Boolean isPaired() {

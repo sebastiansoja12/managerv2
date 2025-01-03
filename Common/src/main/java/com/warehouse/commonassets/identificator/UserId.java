@@ -1,14 +1,11 @@
 package com.warehouse.commonassets.identificator;
 
+import jakarta.persistence.Embeddable;
+
 import java.util.Objects;
 
-public class UserId {
-
-	private final Long value;
-
-	public UserId(final Long value) {
-		this.value = value;
-	}
+@Embeddable
+public record UserId(Long value) {
 
 	public Long getValue() {
 		return value;

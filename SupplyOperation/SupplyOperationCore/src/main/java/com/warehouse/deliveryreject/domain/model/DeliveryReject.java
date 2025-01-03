@@ -2,35 +2,70 @@ package com.warehouse.deliveryreject.domain.model;
 
 import java.io.Serializable;
 
-import com.warehouse.commonassets.identificator.*;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreject.domain.enumeration.DeliveryStatus;
+import com.warehouse.deliveryreject.domain.vo.Person;
+import com.warehouse.deliveryreject.domain.vo.RejectReason;
+import com.warehouse.deliveryreject.domain.vo.RejectReasonId;
+import com.warehouse.deliveryreject.infrastructure.adapter.secondary.entity.RejectReasonEntity;
 import com.warehouse.terminal.enumeration.ExecutionSourceType;
 import com.warehouse.terminal.information.ExecutionSourceResolver;
 
 public class DeliveryReject implements Serializable, ExecutionSourceResolver {
-    private DeliveryId deliveryId;
+    private RejectReasonId rejectReasonId;
     private ShipmentId shipmentId;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
     private DeviceId deviceId;
     private DeliveryStatus deliveryStatus;
+    private RejectReason rejectReason;
+    private Person recipient;
 
-	public DeliveryReject(final DeliveryId deliveryId, final ShipmentId shipmentId, final DepartmentCode departmentCode,
-			final SupplierCode supplierCode, final DeviceId deviceId, final DeliveryStatus deliveryStatus) {
-        this.deliveryId = deliveryId;
+	public DeliveryReject(
+            final RejectReasonId rejectReasonId,
+            final ShipmentId shipmentId,
+            final DepartmentCode departmentCode,
+            final SupplierCode supplierCode,
+            final DeviceId deviceId,
+            final DeliveryStatus deliveryStatus,
+            final RejectReason rejectReason,
+            final Person recipient) {
+        this.rejectReasonId = rejectReasonId;
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deviceId = deviceId;
         this.deliveryStatus = deliveryStatus;
+        this.rejectReason = rejectReason;
+        this.recipient = recipient;
     }
 
-    public DeliveryId getDeliveryId() {
-        return deliveryId;
+    public static DeliveryReject from(final RejectReasonEntity rejectReason) {
+        final RejectReasonId reasonId = new RejectReasonId(rejectReason.getId());
+        final RejectReason reason = new RejectReason(rejectReason.getReason());
+        final Person recipient = new Person(rejectReason.getRecipient(), null , null);
+        return new DeliveryReject(reasonId, rejectReason.getShipmentId(), rejectReason.getRejectDepartmentCode(),
+                rejectReason.getSupplierCode(), null, DeliveryStatus.valueOf(rejectReason.getDeliveryStatus()),
+                reason, recipient);
     }
 
-    public void setDeliveryId(final DeliveryId deliveryId) {
-        this.deliveryId = deliveryId;
+    public Person getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(final Person recipient) {
+        this.recipient = recipient;
+    }
+
+    public RejectReasonId getRejectReasonId() {
+        return rejectReasonId;
+    }
+
+    public void setRejectReasonId(final RejectReasonId rejectReasonId) {
+        this.rejectReasonId = rejectReasonId;
     }
 
     public ShipmentId getShipmentId() {
@@ -73,8 +108,20 @@ public class DeliveryReject implements Serializable, ExecutionSourceResolver {
         this.deliveryStatus = deliveryStatus;
     }
 
+    public RejectReason getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(final RejectReason rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
     @Override
     public ExecutionSourceType getExecutionSourceType() {
         return ExecutionSourceType.DEVICE;
+    }
+
+    public void updateRejectReasonId(final Long id) {
+        this.rejectReasonId = new RejectReasonId(id);
     }
 }

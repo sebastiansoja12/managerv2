@@ -7,7 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.delivery.domain.vo.DeviceInformation;
+import com.warehouse.delivery.dto.DeviceIdDto;
 import com.warehouse.delivery.dto.DeviceInformationDto;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
@@ -30,9 +32,12 @@ public interface DeliveryReturnRequestMapper {
     @Mapping(target = "shipmentId.value", source = "shipmentId")
     DeliveryReturnDetails map(final DeliveryReturnDetail deliveryReturnDetail);
 
-    @Mapping(target = "deviceId.value", source = "deviceId")
     @Mapping(target = "departmentCode.value", source = "departmentCode")
     DeviceInformation map(final Device device);
+
+    default DeviceId map(final Long deviceId) {
+        return new DeviceId(deviceId);
+    }
 
     ProcessType map(final com.warehouse.terminal.enumeration.ProcessType processType);
 
@@ -41,4 +46,8 @@ public interface DeliveryReturnRequestMapper {
     @Mapping(target = "version", source = "version.value")
     @Mapping(target = "username", source = "username.value")
     DeviceInformation map(final DeviceInformationDto deviceInformation);
+
+    default DeviceId map(DeviceIdDto deviceId) {
+        return new DeviceId(deviceId.value());
+    }
 }
