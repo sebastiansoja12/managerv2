@@ -74,7 +74,7 @@ public class DeliveryReturnRequest {
                 .collect(Collectors.toList());
     }
 
-    public String getDepotCode() {
+    public String getDepartmentCode() {
         return deviceInformation != null ? deviceInformation.getDepartmentCode().getValue() : StringUtils.EMPTY;
     }
 }
