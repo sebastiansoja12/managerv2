@@ -5,7 +5,7 @@
     <parent>
         <artifactId>SupplyOperation</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2024.7-SNAPSHOT</version>
+        <version>2025.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>SupplyOperationApi</artifactId>

@@ -4,6 +4,7 @@ import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.delivery.domain.enumeration.DeviceUserType;
+import com.warehouse.terminal.information.Device;
 
 public class DeviceInformation {
     private final DeviceId deviceId;
@@ -24,6 +25,17 @@ public class DeviceInformation {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static DeviceInformation from(final Device device) {
+        return DeviceInformation.builder()
+                .departmentCode(new DepartmentCode(device.getDepartmentCode()))
+                .deviceId(new DeviceId(device.getDeviceId()))
+                .username(device.getUsername())
+                .version(device.getVersion())
+                .deviceType(DeviceType.valueOf(device.getDeviceType()))
+                .deviceUserType(DeviceUserType.valueOf(device.getDeviceUserType()))
+                .build();
     }
 
     public static class Builder {

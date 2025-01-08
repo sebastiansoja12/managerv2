@@ -1,8 +1,19 @@
 package com.warehouse.deliveryreject.domain.vo;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
+import java.util.List;
+import java.util.Objects;
 
-import java.util.UUID;
+public record RejectTrackerResponse(List<RejectTrackerResponseDetails> rejectTrackerResponseDetails) {
 
-public record RejectTrackerResponse(ShipmentId shipmentId, ShipmentId newShipmentId, UUID processId) {
+    @Override
+    public boolean equals(final Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        final RejectTrackerResponse that = (RejectTrackerResponse) o;
+        return Objects.equals(rejectTrackerResponseDetails, that.rejectTrackerResponseDetails);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(rejectTrackerResponseDetails);
+    }
 }

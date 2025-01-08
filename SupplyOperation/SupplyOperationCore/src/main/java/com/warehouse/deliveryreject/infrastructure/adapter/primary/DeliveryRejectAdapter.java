@@ -25,9 +25,9 @@ public class DeliveryRejectAdapter implements DeliveryRejectService {
     }
 
     @Override
-    public DeliveryRejectResponseDto reportDeliveryRejection(final DeliveryRejectRequestDto deliveryRejectRequest) {
+    public DeliveryRejectResponseDto processDeliveryReject(final DeliveryRejectRequestDto deliveryRejectRequest) {
         final DeliveryRejectRequest request = requestMapper.map(deliveryRejectRequest);
-        final DeliveryRejectResponse response = this.deliveryRejectPort.registerDeliveryRejection(request);
+        final DeliveryRejectResponse response = this.deliveryRejectPort.deliverReject(request);
         return responseMapper.map(response);
     }
 }

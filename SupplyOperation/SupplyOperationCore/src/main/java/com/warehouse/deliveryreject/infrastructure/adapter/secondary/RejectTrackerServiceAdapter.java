@@ -5,6 +5,7 @@ import com.warehouse.deliveryreject.domain.port.secondary.RejectTrackerServicePo
 import com.warehouse.deliveryreject.domain.vo.RejectTrackerResponse;
 import com.warehouse.deliveryreject.infrastructure.adapter.secondary.mapper.RejectTrackerRequestMapper;
 import com.warehouse.deliveryreject.infrastructure.adapter.secondary.mapper.RejectTrackerResponseMapper;
+import com.warehouse.routelogger.RouteLogEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.mapstruct.factory.Mappers.getMapper;
@@ -15,6 +16,12 @@ public class RejectTrackerServiceAdapter implements RejectTrackerServicePort {
     private final RejectTrackerRequestMapper requestMapper = getMapper(RejectTrackerRequestMapper.class);
 
     private final RejectTrackerResponseMapper responseMapper = getMapper(RejectTrackerResponseMapper.class);
+
+    private final RouteLogEventPublisher routeLogEventPublisher;
+
+    public RejectTrackerServiceAdapter(final RouteLogEventPublisher routeLogEventPublisher) {
+        this.routeLogEventPublisher = routeLogEventPublisher;
+    }
 
     @Override
     public RejectTrackerResponse logRejectInTracker(final RejectTrackerRequest rejectTrackerRequest) {

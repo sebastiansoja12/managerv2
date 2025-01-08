@@ -9,5 +9,5 @@ import com.warehouse.delivery.infrastructure.adapter.secondary.entity.Department
 
 @Repository("delivery.departmentReadRepository")
 public interface DepartmentReadRepository extends JpaRepository<DepartmentEntity, String> {
-    Optional<DepartmentEntity> findByDepartmentCode(final String depotCode);
+    Optional<DepartmentEntity> findByDepartmentCode(final String departmentCode);
 }

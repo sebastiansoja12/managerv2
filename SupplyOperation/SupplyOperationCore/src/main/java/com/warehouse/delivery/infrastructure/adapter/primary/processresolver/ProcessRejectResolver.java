@@ -36,7 +36,7 @@ public class ProcessRejectResolver implements ProcessHandler {
     public Response processRequest(final Request request) {
         final DeliveryRejectRequestDto deliveryRejectRequest = requestMapper.mapToDeliveryRejectRequest(request);
         final DeliveryRejectResponseDto deliveryRejectResponse =
-                deliveryRejectService.reportDeliveryRejection(deliveryRejectRequest);
+                deliveryRejectService.processDeliveryReject(deliveryRejectRequest);
         return responseMapper.mapDeliveryRejectResponse(deliveryRejectResponse);
     }
 }

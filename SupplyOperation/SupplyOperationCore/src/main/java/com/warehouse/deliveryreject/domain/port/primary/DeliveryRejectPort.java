@@ -4,5 +4,5 @@ import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
 import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse;
 
 public interface DeliveryRejectPort {
-    DeliveryRejectResponse registerDeliveryRejection(final DeliveryRejectRequest request);
+    DeliveryRejectResponse deliverReject(final DeliveryRejectRequest request);
 }

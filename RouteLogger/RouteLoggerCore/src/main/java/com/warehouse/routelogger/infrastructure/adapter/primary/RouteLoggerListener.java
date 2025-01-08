@@ -75,6 +75,13 @@ public class RouteLoggerListener {
         routeLoggerPort.logUsername(request);
     }
 
+    @EventListener
+    void handle(final RejectTrackerLogEvent event) {
+        logEvent(event);
+        final RejectTrackerRequest request = RejectTrackerRequest.from(event.getRejectTrackerRequest());
+        routeLoggerPort.logRejectTrackerRequest(request);
+    }
+
     private void logEvent(final RouteLogBaseEvent event) {
         log.info("Detected event {} at {}", event.getClass().getSimpleName(),
                 event.getLocalDateTime().format(FORMATTER));

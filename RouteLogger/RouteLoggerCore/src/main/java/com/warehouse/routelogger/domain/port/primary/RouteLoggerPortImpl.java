@@ -56,4 +56,9 @@ public class RouteLoggerPortImpl implements RouteLoggerPort {
     public void logUsername(UsernameLogRequest request) {
         routeLoggerUsernameServicePort.logUsername(request);
     }
+
+    @Override
+    public void logRejectTrackerRequest(final RejectTrackerRequest request) {
+        // TODO log in tracker
+    }
 }

@@ -49,7 +49,7 @@ public class RouteLogReturnServiceAdapter implements RouteLogReturnServicePort {
                 deliveryReturnDetails -> {
                     final DepotCodeRequestDto depotCodeRequest = DepotCodeRequestDto
                             .builder()
-                            .depotCode(deliveryReturnRequest.getDepotCode())
+                            .depotCode(deliveryReturnRequest.getDepartmentCode())
                             .parcelId(deliveryReturnDetails.getShipmentId().getValue())
                             .processType(deliveryReturnRequest.getProcessType().name())
                             .build();

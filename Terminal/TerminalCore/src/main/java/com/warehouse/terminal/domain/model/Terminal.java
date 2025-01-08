@@ -5,6 +5,7 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.terminal.domain.enumeration.ExecutionSourceType;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
+import com.warehouse.terminal.dto.DeviceValidationRequestDto;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 
 import java.time.Instant;
@@ -44,6 +45,12 @@ public class Terminal extends Device implements ExecutionSourceResolver {
         return new Terminal(new TerminalId(device.getDeviceId().getValue()), device.getDeviceType(), device.getUserId(),
                 device.getDepartmentCode().getValue(), device.getVersion(),
                 Instant.now(), device.isActive());
+    }
+
+    public static Terminal from(final DeviceValidationRequestDto request) {
+        return new Terminal(new TerminalId(request.deviceId().value()), DeviceType.valueOf(request.deviceType().name()),
+                new UserId(request.userId().value()), request.departmentCode().value(), request.version().value(),
+                null, request.active());
     }
 
     public TerminalId getTerminalId() {

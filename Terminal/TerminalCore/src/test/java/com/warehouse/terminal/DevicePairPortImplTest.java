@@ -42,12 +42,16 @@ public class DevicePairPortImplTest {
 
     @Mock
     private DevicePairRepository devicePairRepository;
+    
+    @Mock
+    private SupplierRepository supplierRepository;
 
     private DevicePairPortImpl devicePairPort;
     
     @BeforeEach
     void setup() {
-        final TerminalValidatorService terminalValidatorService = new TerminalValidatorServiceImpl(deviceVersionRepository, departmentRepository);
+		final TerminalValidatorService terminalValidatorService = new TerminalValidatorServiceImpl(
+				deviceVersionRepository, departmentRepository, userRepository, supplierRepository, deviceRepository);
         final TerminalService terminalService = new TerminalServiceImpl(deviceRepository);
         final UserService userService = new UserServiceImpl(userRepository);
         final DevicePairService devicePairService = new DevicePairServiceImpl(devicePairRepository);
@@ -65,7 +69,7 @@ public class DevicePairPortImplTest {
                 .when(devicePairRepository)
                 .findDevicePairByDeviceId(deviceId);
         // when
-        final boolean connected = devicePairPort.isConnected(deviceId);
+        final boolean connected = devicePairPort.isPaired(deviceId);
         // then
         assertTrue(connected);
     }
@@ -79,7 +83,7 @@ public class DevicePairPortImplTest {
                 .when(devicePairRepository)
                 .findDevicePairByDeviceId(deviceId);
         // when
-        final boolean connected = devicePairPort.isConnected(deviceId);
+        final boolean connected = devicePairPort.isPaired(deviceId);
         // then
         assertFalse(connected);
     }

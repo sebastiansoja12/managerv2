@@ -1,5 +1,5 @@
 package com.warehouse.routelogger;
 
 public interface RouteLogEventPublisher {
-    void send(RouteLogEvent routeLogEvent);
+    void send(final RouteLogEvent routeLogEvent);
 }
