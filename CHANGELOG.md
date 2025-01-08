@@ -1,3 +1,49 @@
+## [2024.7] - 2024-12-31
+
+### Added
+- New module Terminal
+- Pairing devices
+- Updating devices versions
+- Delivery return
+- Delivery reject
+- Delivery missed
+- New endpoint for deliveries
+- New ShipmentManagement module
+- New DepartmentService module
+- New MessageProvider module
+- Signatures for shipments
+
+### Changed
+- Update Spring Boot to version 3.4.1
+- Software Configuration separated
+- RouteTrackerFlow separated
+- PalletHandlingManager separated
+- Device request and response
+- Reimplemented Shipment module
+- Change Parcel id to Shipment id
+- Rename depot to department
+
+### Fixed
+- Bugs with deliveries
+- Problems with request and response from device
+
+### Deprecated
+- Old route process - to be deleted in 2024.2
+
+## [2024.6] - 2024-09-26
+
+### Added
+- Add PalletHandlingManager module
+
+### Changed
+- Zebra device properties
+- Request and response of device
+- Update Spring Boot to version 3.3.4
+- Refactor tests
+
+### Fixed
+- Bugs
+
 ## [2024.5] - 2024-06-02
 
 ### Added
