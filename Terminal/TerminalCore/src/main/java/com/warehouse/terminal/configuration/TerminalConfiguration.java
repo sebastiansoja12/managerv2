@@ -27,8 +27,17 @@ public class TerminalConfiguration {
 
     @Bean
     public TerminalValidatorService terminalValidatorService(final DeviceVersionRepository deviceVersionRepository,
-                                                             final DepartmentRepository departmentRepository) {
-        return new TerminalValidatorServiceImpl(deviceVersionRepository, departmentRepository);
+                                                             final DepartmentRepository departmentRepository,
+                                                             final UserRepository userRepository,
+                                                             final SupplierRepository supplierRepository,
+                                                             final DeviceRepository deviceRepository) {
+        return new TerminalValidatorServiceImpl(deviceVersionRepository, departmentRepository,
+                userRepository, supplierRepository, deviceRepository);
+    }
+
+    @Bean("terminal.supplierRepository")
+    public SupplierRepository supplierRepository(final SupplierReadRepository repository) {
+        return new SupplierRepositoryImpl(repository);
     }
 
     @Bean

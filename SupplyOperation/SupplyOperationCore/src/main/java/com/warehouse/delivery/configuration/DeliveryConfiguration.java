@@ -16,6 +16,7 @@ import com.warehouse.delivery.infrastructure.adapter.secondary.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
+import com.warehouse.terminal.DeviceEventPublisher;
 
 @Configuration
 public class DeliveryConfiguration {
@@ -24,6 +25,16 @@ public class DeliveryConfiguration {
     public DeliveryPort deliveryPort(final DeliveryService deliveryService,
                                      final RouteLogDeliveryStatusServicePort logServicePort) {
         return new DeliveryPortImpl(deliveryService, logServicePort);
+    }
+
+    @Bean
+    public DeviceValidatorPort deviceValidatorPort(final DeviceValidatorServicePort deviceValidatorServicePort) {
+        return new DeviceValidatorPortImpl(deviceValidatorServicePort);
+    }
+
+    @Bean
+    public DeviceValidatorServicePort deviceValidatorServicePort(final DeviceEventPublisher deviceEventPublisher) {
+        return new DeviceValidatorServiceAdapter(deviceEventPublisher);
     }
 
     @Bean

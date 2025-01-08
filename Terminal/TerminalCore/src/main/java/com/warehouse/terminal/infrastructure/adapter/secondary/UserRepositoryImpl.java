@@ -24,7 +24,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findById(final UserId userId) {
         final Optional<UserEntity> user = this.repository.findById(userId.getValue());
-        return user.map(User::from).orElseThrow();
+        return user.map(User::from).orElse(null);
     }
 
     @Override
