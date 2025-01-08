@@ -28,7 +28,7 @@
 - Problems with request and response from device
 
 ### Deprecated
-- Old route process - to be deleted in 2024.2
+- Reroute and redirect processes
 
 ## [2024.6] - 2024-09-26
 
