@@ -8,7 +8,7 @@ import com.warehouse.terminal.domain.model.request.DevicePairRequest;
 import com.warehouse.terminal.domain.model.response.DevicePairResponse;
 
 public interface DevicePairPort {
-    boolean isConnected(final DeviceId deviceId);
+    boolean isPaired(final DeviceId deviceId);
     boolean isValid(final DeviceId deviceId);
     boolean isUserValid(final DeviceId deviceId, final UserId userId);
     boolean isVersionValid(final DeviceId deviceId, final DeviceVersion version);

@@ -69,7 +69,7 @@ public class DevicePairPortImplTest {
                 .when(devicePairRepository)
                 .findDevicePairByDeviceId(deviceId);
         // when
-        final boolean connected = devicePairPort.isConnected(deviceId);
+        final boolean connected = devicePairPort.isPaired(deviceId);
         // then
         assertTrue(connected);
     }
@@ -83,7 +83,7 @@ public class DevicePairPortImplTest {
                 .when(devicePairRepository)
                 .findDevicePairByDeviceId(deviceId);
         // when
-        final boolean connected = devicePairPort.isConnected(deviceId);
+        final boolean connected = devicePairPort.isPaired(deviceId);
         // then
         assertFalse(connected);
     }

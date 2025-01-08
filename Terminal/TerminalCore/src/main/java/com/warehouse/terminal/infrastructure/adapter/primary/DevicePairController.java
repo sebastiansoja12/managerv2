@@ -42,7 +42,7 @@ public class DevicePairController {
     @GetMapping("/connected/{deviceId}")
     private ResponseEntity<?> isConnected(@PathVariable final Long deviceId) {
         final DeviceId terminalId = new DeviceId(deviceId);
-        final DeviceInformationResponse response = new DeviceInformationResponse(this.devicePairPort.isConnected(terminalId));
+        final DeviceInformationResponse response = new DeviceInformationResponse(this.devicePairPort.isPaired(terminalId));
         return ResponseEntity.ok().body(responseMapper.map(response));
     }
 

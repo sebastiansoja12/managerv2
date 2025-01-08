@@ -40,7 +40,7 @@ public class DevicePairPortImpl implements DevicePairPort {
     }
 
     @Override
-    public boolean isConnected(final DeviceId deviceId) {
+    public boolean isPaired(final DeviceId deviceId) {
         final DevicePair devicePair = this.devicePairService.findByDeviceId(deviceId);
         return devicePair != null && devicePair.isPaired();
     }
