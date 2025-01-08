@@ -1,45 +1,35 @@
 package com.warehouse.deliveryreject.domain.vo;
 
-import com.warehouse.commonassets.enumeration.ProcessType;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.warehouse.deliveryreject.domain.model.DeliveryRejectDetails;
+import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
 
 public class RejectTrackerRequest {
-    private ShipmentId shipmentId;
-    private ShipmentId newShipmentId;
-    private RejectReason rejectReason;
-    private ShipmentStatus shipmentStatus;
-    private ProcessType processType;
+    private final List<RejectTrackerRequestDetails> rejectTrackerRequestDetails;
 
-    public RejectTrackerRequest(final ShipmentId shipmentId,
-                                final ShipmentId newShipmentId,
-                                final RejectReason rejectReason,
-                                final ShipmentStatus shipmentStatus,
-                                final ProcessType processType) {
-        this.shipmentId = shipmentId;
-        this.newShipmentId = newShipmentId;
-        this.rejectReason = rejectReason;
-        this.shipmentStatus = shipmentStatus;
-        this.processType = processType;
+    public RejectTrackerRequest(final List<RejectTrackerRequestDetails> rejectTrackerRequestDetails) {
+        this.rejectTrackerRequestDetails = rejectTrackerRequestDetails;
     }
 
-    public ShipmentId getNewShipmentId() {
-        return newShipmentId;
+    public static RejectTrackerRequest from(final DeliveryRejectRequest request) {
+        final List<RejectTrackerRequestDetails> rejectTrackerRequestDetails = new ArrayList<>();
+        final List<DeliveryRejectDetails> deliveryRejectDetails = request.getDeliveryRejectDetails();
+        for (final DeliveryRejectDetails deliveryRejectDetail : deliveryRejectDetails) {
+            final RejectTrackerRequestDetails rejectTrackerRequestDetail = new RejectTrackerRequestDetails(
+                    deliveryRejectDetail.getShipmentId(),
+                    deliveryRejectDetail.getShipmentId(),
+                    deliveryRejectDetail.getRejectReason(),
+                    deliveryRejectDetail.getShipmentStatus(),
+                    deliveryRejectDetail.getProcessType()
+            );
+            rejectTrackerRequestDetails.add(rejectTrackerRequestDetail);
+        }
+        return new RejectTrackerRequest(rejectTrackerRequestDetails);
     }
 
-    public ShipmentId getShipmentId() {
-        return shipmentId;
-    }
-
-    public RejectReason getRejectReason() {
-        return rejectReason;
-    }
-
-    public ShipmentStatus getShipmentStatus() {
-        return shipmentStatus;
-    }
-
-    public ProcessType getProcessType() {
-        return processType;
+    public List<RejectTrackerRequestDetails> getRejectTrackerRequestDetails() {
+        return rejectTrackerRequestDetails;
     }
 }

@@ -1,6 +1,7 @@
-package com.warehouse.deliveryreject.infrastructure.adapter.secondary.api;
+package com.warehouse.routelogger.dto;
 
 import java.util.List;
+
 
 public record RejectTrackerRequestDto(List<RejectTrackerRequestDetailsDto> rejectTrackerRequestDetails) {
 }

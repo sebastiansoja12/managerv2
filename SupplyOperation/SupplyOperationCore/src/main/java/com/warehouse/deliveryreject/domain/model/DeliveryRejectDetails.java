@@ -1,6 +1,8 @@
 package com.warehouse.deliveryreject.domain.model;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
@@ -13,17 +15,23 @@ public class DeliveryRejectDetails {
     private SupplierCode supplierCode;
     private DeliveryStatus deliveryStatus;
     private RejectReason rejectReason;
+    private ShipmentStatus shipmentStatus;
+    private ProcessType processType;
 
     public DeliveryRejectDetails(final ShipmentId shipmentId,
                                  final DepartmentCode departmentCode,
                                  final SupplierCode supplierCode,
                                  final DeliveryStatus deliveryStatus,
-                                 final RejectReason rejectReason) {
+                                 final RejectReason rejectReason,
+                                 final ShipmentStatus shipmentStatus,
+                                 final ProcessType processType) {
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deliveryStatus = deliveryStatus;
         this.rejectReason = rejectReason;
+        this.shipmentStatus = shipmentStatus;
+        this.processType = processType;
     }
 
     public ShipmentId getShipmentId() {
@@ -70,5 +78,13 @@ public class DeliveryRejectDetails {
         if (!DeliveryStatus.REJECTED.equals(deliveryStatus)) {
             throw new WrongDeliveryStatusException(500, "Wrong delivery status");
         }
+    }
+
+    public ProcessType getProcessType() {
+        return processType;
+    }
+
+    public ShipmentStatus getShipmentStatus() {
+        return shipmentStatus;
     }
 }

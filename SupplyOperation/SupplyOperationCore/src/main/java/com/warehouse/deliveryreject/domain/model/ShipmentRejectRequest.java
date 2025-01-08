@@ -21,12 +21,18 @@ public class ShipmentRejectRequest {
         this.shipmentStatus = shipmentStatus;
     }
 
+    public static ShipmentRejectRequest from(final DeliveryRejectDetails deliveryRejectDetail) {
+        final ShipmentId shipmentId = deliveryRejectDetail.getShipmentId();
+        return new ShipmentRejectRequest(shipmentId, ProcessType.REJECT, deliveryRejectDetail.getDeliveryStatus(),
+                deliveryRejectDetail.getShipmentStatus());
+    }
+
     public ShipmentId getShipmentId() {
         return shipmentId;
     }
 
     public void setShipmentId(final ShipmentId shipmentId) {
-        this.shipmentId = shipmentId;
+
     }
 
     public ProcessType getProcessType() {

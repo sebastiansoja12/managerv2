@@ -1,5 +1,6 @@
 package com.warehouse.deliveryreject.domain.service;
 
+import com.warehouse.deliveryreject.domain.vo.ShipmentRejectResponse;
 import org.springframework.stereotype.Service;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -19,7 +20,7 @@ public class DeliveryRejectConverterServiceImpl implements DeliveryRejectConvert
     }
 
     @Override
-    public DeliveryRejectResponseDetails convertToDeliveryRejectResponseDetails(final DeliveryReject deliveryReject) {
+    public DeliveryRejectResponseDetails convertToDeliveryRejectResponseDetails(final DeliveryReject deliveryReject, final ShipmentRejectResponse response) {
         final RejectReasonId rejectReasonId = deliveryReject.getRejectReasonId();
         final ShipmentId shipmentId = deliveryReject.getShipmentId();
         final ShipmentId newShipmentId = deliveryReject.getShipmentId();

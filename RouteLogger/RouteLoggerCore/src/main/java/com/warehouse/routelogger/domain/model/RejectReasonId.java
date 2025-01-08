@@ -1,4 +1,4 @@
-package com.warehouse.deliveryreject.domain.vo;
+package com.warehouse.routelogger.domain.model;
 
 import java.util.Objects;
 
