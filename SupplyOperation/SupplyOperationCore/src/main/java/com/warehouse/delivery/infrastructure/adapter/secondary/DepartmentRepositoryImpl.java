@@ -15,7 +15,7 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     @Override
     public Department findByCode(final DepartmentCode departmentCode) {
         return repository.findByDepartmentCode(departmentCode.getValue())
-                .map(depotEntity -> new Department())
+                .map(department -> new Department(department.isActive()))
                 .orElse(null);
     }
 }

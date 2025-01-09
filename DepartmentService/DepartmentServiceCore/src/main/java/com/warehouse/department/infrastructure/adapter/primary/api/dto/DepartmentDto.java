@@ -5,7 +5,7 @@ import lombok.Value;
 @Value
 public class DepartmentDto {
 
-    DepotCodeDto depotCode;
+    DepartmentCodeDto departmentCode;
 
     String city;
 
@@ -20,4 +20,6 @@ public class DepartmentDto {
     String telephoneNumber;
 
     String openingHours;
+
+    Boolean active;
 }

@@ -21,7 +21,7 @@ public class DepartmentMapperTest {
         // Given
         final Department department = new Department();
         department.setCity(KATOWICE);
-        department.setDepotCode("KT3");
+        department.setDepartmentCode("KT3");
 
         final DepartmentEntity expectedEntity = new DepartmentEntity();
         expectedEntity.setDepartmentCode("KT3");

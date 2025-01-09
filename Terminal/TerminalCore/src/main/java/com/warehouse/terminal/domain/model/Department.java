@@ -4,11 +4,11 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 
 public class Department {
     private DepartmentCode departmentCode;
-    private Boolean valid;
+    private Boolean active;
 
-    public Department(final DepartmentCode departmentCode, final Boolean valid) {
+    public Department(final DepartmentCode departmentCode, final Boolean active) {
         this.departmentCode = departmentCode;
-        this.valid = valid;
+        this.active = active;
     }
 
     public DepartmentCode getDepartmentCode() {
@@ -19,15 +19,11 @@ public class Department {
         this.departmentCode = departmentCode;
     }
 
-    public Boolean getValid() {
-        return valid;
+    public void setActive(final Boolean active) {
+        this.active = active;
     }
 
-    public void setValid(final Boolean valid) {
-        this.valid = valid;
-    }
-
-    public boolean isValid() {
-        return valid;
+    public boolean isActive() {
+        return active;
     }
 }

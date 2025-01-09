@@ -31,5 +31,11 @@ public class DepartmentEntity {
     @Column(name = "country", nullable = false)
     private String country;
 
+    @Column(name = "active", nullable = false)
+    private Boolean active;
+
+    public Boolean isActive() {
+        return active;
+    }
 }
 

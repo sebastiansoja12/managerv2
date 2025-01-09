@@ -42,4 +42,7 @@ public class DepartmentEntity {
     @Column(name = "opening_hours", nullable = false)
     private String openingHours;
 
+    @Column(name = "active", nullable = false)
+    private Boolean active;
+
 }

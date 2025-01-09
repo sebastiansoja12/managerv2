@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface DepotResponseMapper {
 
-    @Mapping(target = "depotCode.value", source = "depotCode")
+    @Mapping(target = "departmentCode.value", source = "departmentCode")
     DepartmentDto map(Department department);
 
     List<DepartmentDto> map(List<Department> departmentList);
