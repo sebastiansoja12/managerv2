@@ -81,7 +81,7 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         deviceValidatorPort.validateDevice(device);
 
-        logTerminalRequest(terminalRequest);
+//        logTerminalRequest(terminalRequest);
 //
 //        logDeviceId(terminalRequest);
 //
