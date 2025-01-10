@@ -33,7 +33,7 @@ public class RouteLoggerPortImpl implements RouteLoggerPort {
     }
 
     @Override
-    public void logRequest(Request request) {
+    public void logRequest(final Request request) {
         routeLoggerRequestServicePort.logRequest(request);
     }
 

@@ -5,7 +5,7 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet author="s-soja" id="insertSuppliers">
         <sql>
-            INSERT INTO supplier (supplier_code, first_name, last_name, telephone, depot_code)
+            INSERT INTO supplier (supplier_code, first_name, last_name, telephone, department_code)
             VALUES ('ANG_POZ', 'Angelika', 'Lipinska', '123456789', 'POZ'),
                    ('dwvscq', 'Sebastian', 'Soja', '799024163', 'KT1'),
                    ('ADA_WA1', 'Adam', 'Kowalski', '981273645', 'WA1'),

@@ -17,16 +17,16 @@
             <column name="telephone" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="depot_code" type="VARCHAR(255)"/>
+            <column name="department_code" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
 
     <changeSet id="add-supplier-foreign-keys" author="s-soja">
     <addForeignKeyConstraint
             baseTableName="supplier"
-            baseColumnNames="depot_code"
+            baseColumnNames="department_code"
             referencedTableName="department"
-            referencedColumnNames="depot_code"
+            referencedColumnNames="department_code"
             constraintName="FKbxmw0i9gg06jh9dx8a1cnck7n"
     />
     </changeSet>

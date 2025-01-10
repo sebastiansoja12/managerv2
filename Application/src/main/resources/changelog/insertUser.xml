@@ -4,7 +4,7 @@
 
     <changeSet id="insert_initial_users" author="s-soja">
         <insert tableName="users">
-            <!-- Define the columns to insert data into -->
+            <column name="id" value="1"/>
             <column name="username" value="s-soja" />
             <column name="password" value="test" />
             <column name="first_name" value="Sebastian" />

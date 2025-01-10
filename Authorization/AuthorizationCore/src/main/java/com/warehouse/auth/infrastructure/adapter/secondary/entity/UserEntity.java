@@ -46,7 +46,7 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @Column(nullable = false)
+    @Column(name = "depot_code", nullable = false)
     private String depotCode;
 
 

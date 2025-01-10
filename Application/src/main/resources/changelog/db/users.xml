@@ -32,12 +32,12 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="add-users-foreign-key" author="yourname">
+    <changeSet id="add-users-foreign-key" author="s-soja">
         <addForeignKeyConstraint
                 baseTableName="users"
                 baseColumnNames="depot_code"
                 referencedTableName="department"
-                referencedColumnNames="depot_code"
+                referencedColumnNames="department_code"
                 constraintName="FK1r271p0jw8cic2j8xdtj53d0"
         />
     </changeSet>

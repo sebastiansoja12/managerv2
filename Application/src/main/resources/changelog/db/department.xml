@@ -6,7 +6,7 @@
     <changeSet author="s-soja" id="1">
 
         <createTable tableName="department">
-            <column name="depot_code" type="varchar(255)">
+            <column name="department_code" type="varchar(255)">
                 <constraints primaryKey="true" unique="true" nullable="false"/>
             </column>
             <column name="city" type="varchar(255)">
@@ -25,10 +25,13 @@
                 <constraints nullable="false"/>
             </column>
             <column name="telephoneNumber" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="openingHours" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
+            </column>
+            <column name="active" type="boolean">
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>

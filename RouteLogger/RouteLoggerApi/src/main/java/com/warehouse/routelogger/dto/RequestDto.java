@@ -1,12 +1,5 @@
 package com.warehouse.routelogger.dto;
 
-import lombok.Builder;
-import lombok.Value;
+import java.util.List;
 
-@Value
-@Builder
-public class RequestDto {
-    String request;
-    Long parcelId;
-    ProcessTypeDto processType;
-}
+public record RequestDto(String request, List<ShipmentIdDto> shipmentIds, ProcessTypeDto processType) {}

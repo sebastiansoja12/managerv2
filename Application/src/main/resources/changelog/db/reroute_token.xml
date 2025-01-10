@@ -16,8 +16,8 @@
             <column name="timeout" type="datetime(6)">
                 <constraints nullable="true"/>
             </column>
-            <column name="parcel_id" type="bigint">
-                <constraints primaryKey="false" nullable="false" foreignKeyName="FK_reroute_token_parcel_id" references="parcel(id)"/>
+            <column name="shipment_id" type="bigint">
+                <constraints primaryKey="false" nullable="false" foreignKeyName="FK_reroute_token_parcel_id" references="shipment(id)"/>
             </column>
             <column name="token" type="int">
                 <constraints nullable="false"/>

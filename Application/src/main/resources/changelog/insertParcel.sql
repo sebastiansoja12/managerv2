@@ -1,7 +1,7 @@
 -- Sample data for the 'parcel' table
 
 -- Inserting data for the 'parcel' table
-INSERT INTO PARCEL (id, first_name, last_name, recipient_city, recipient_email, recipient_first_name,
+INSERT INTO SHIPMENT (id, first_name, last_name, recipient_city, recipient_email, recipient_first_name,
                     recipient_last_name, recipient_postal_code, recipient_street, recipient_telephone,
                     sender_city, sender_email, sender_postal_code, sender_street, sender_telephone,
                     destination, status, parcel_size, parent_related_id, type, created_at, updated_at)
