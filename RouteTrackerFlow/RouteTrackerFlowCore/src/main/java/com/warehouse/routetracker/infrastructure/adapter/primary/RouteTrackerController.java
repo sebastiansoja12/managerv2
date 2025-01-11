@@ -3,6 +3,7 @@ package com.warehouse.routetracker.infrastructure.adapter.primary;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -121,6 +122,13 @@ public class RouteTrackerController {
     public ResponseEntity<?> saveDeliveryStatus(@RequestBody final DeliveryStatusRequestDto deliveryStatusRequest) {
         final DeliveryStatusRequest request = requestMapper.map(deliveryStatusRequest);
         trackerLogPort.saveDeliveryStatus(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/device-information")
+    public ResponseEntity<?> saveDeviceInformation(@RequestBody final DeviceInformationRequestDto deviceInformationRequest) {
+        final DeviceInformationRequest request = DeviceInformationRequest.from(deviceInformationRequest);
+        trackerLogPort.saveDeviceInformation(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

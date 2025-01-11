@@ -6,6 +6,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
+import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
 import com.warehouse.routetracker.domain.model.FaultDescription;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
@@ -113,6 +114,13 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     public void saveDeliveryStatus(final DeliveryStatusRequest request) {
         final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
         routeLogRecord.updateShipmentStatus(request.getProcessType(), determineParcelStatus(request));
+        this.repository.update(routeLogRecord);
+    }
+
+    @Override
+    public void saveDeviceInformation(final DeviceInformationRequest request) {
+        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
+        routeLogRecord.updateDeviceInformation(request);
         this.repository.update(routeLogRecord);
     }
 

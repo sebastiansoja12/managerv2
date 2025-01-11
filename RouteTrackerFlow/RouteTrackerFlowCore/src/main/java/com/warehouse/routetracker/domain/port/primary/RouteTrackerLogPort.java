@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
+import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
 import com.warehouse.routetracker.domain.model.FaultDescription;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.vo.*;
@@ -39,4 +40,6 @@ public interface RouteTrackerLogPort {
     void saveDeliveryReturnRequest(DeliveryReturnRequest request);
 
     void saveDeliveryStatus(DeliveryStatusRequest request);
+
+    void saveDeviceInformation(final DeviceInformationRequest request);
 }

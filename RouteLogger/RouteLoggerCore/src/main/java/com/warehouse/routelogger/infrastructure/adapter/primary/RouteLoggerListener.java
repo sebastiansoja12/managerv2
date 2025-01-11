@@ -82,6 +82,13 @@ public class RouteLoggerListener {
         routeLoggerPort.logRejectTrackerRequest(request);
     }
 
+    @EventListener
+    void handle(final DeviceInformationLogEvent event) {
+        logEvent(event);
+        final DeviceInformationRequest request = DeviceInformationRequest.from(event.getDevice(), event.getProcessType());
+        routeLoggerPort.logDeviceInformation(request);
+    }
+
     private void logEvent(final RouteLogBaseEvent event) {
         log.info("Detected event {} at {}", event.getClass().getSimpleName(),
                 event.getLocalDateTime().format(FORMATTER));

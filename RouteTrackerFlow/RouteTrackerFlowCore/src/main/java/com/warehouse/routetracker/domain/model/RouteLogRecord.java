@@ -7,6 +7,7 @@ import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Builder
@@ -83,5 +84,11 @@ public class RouteLogRecord {
                 .getRouteLogRecordDetail(processType);
 
         routeLogRecordDetail.updateRequest(request);
+    }
+
+    public void updateDeviceInformation(final DeviceInformationRequest request) {
+        final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetail(request.getProcessType());
+        routeLogRecordDetail.updateDeviceInformation(request);
     }
 }

@@ -19,4 +19,6 @@ public interface RouteLoggerPort {
     void logUsername(final UsernameLogRequest request);
 
     void logRejectTrackerRequest(final RejectTrackerRequest request);
+
+    void logDeviceInformation(final DeviceInformationRequest request);
 }
