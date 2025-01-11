@@ -8,6 +8,6 @@ public class SoftwareConfigurationServiceMockAdapter implements SoftwareConfigur
 
     @Override
     public SoftwareConfiguration getSoftwareConfiguration() {
-        return null;
+        return new SoftwareConfiguration("mock", "initialize");
     }
 }

@@ -5,11 +5,13 @@ import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
 
+import java.util.UUID;
+
 public class RouteLogServiceMockAdapter implements RouteLogServicePort {
 
     @Override
     public RouteProcess initializeRouteProcess(final ShipmentId shipmentId,
                                                final SoftwareConfiguration softwareConfiguration) {
-        return null;
+        return new RouteProcess(shipmentId, UUID.randomUUID());
     }
 }
