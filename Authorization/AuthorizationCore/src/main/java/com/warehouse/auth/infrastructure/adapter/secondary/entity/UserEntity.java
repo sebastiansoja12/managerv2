@@ -6,11 +6,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.commonassets.identificator.UserId;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,8 +23,9 @@ import lombok.NoArgsConstructor;
 public class UserEntity implements UserDetails {
 
     @Id
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
+    @Column(name = "user_id", unique = true, nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "user_id"))
+    private UserId userId;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -46,7 +45,7 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @Column(nullable = false)
+    @Column(name = "depot_code", nullable = false)
     private String depotCode;
 
 

@@ -38,7 +38,7 @@ public class DepartmentRepositoryTest {
     @Test
     public void shouldViewByDepotCode() {
         final Department department = new Department();
-        department.setDepotCode(KT1);
+        department.setDepartmentCode(KT1);
         final DepartmentCode code = new DepartmentCode(KT1);
 
         final DepartmentEntity entity = new DepartmentEntity();
@@ -52,7 +52,7 @@ public class DepartmentRepositoryTest {
 
         // then
         assertNotNull(result);
-        Assertions.assertEquals(result.getDepotCode(), entity.getDepartmentCode());
+        Assertions.assertEquals(result.getDepartmentCode(), entity.getDepartmentCode());
     }
 
 

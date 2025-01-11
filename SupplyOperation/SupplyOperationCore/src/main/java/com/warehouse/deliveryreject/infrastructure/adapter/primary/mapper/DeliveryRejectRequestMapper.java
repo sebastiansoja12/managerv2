@@ -21,7 +21,7 @@ public interface DeliveryRejectRequestMapper {
         final List<DeliveryRejectDetails> deliveryRejectDetails = map(deliveryRejectRequest.getDeliveryRejectDetails());
         final DeviceInformation deviceInformation = map(deliveryRejectRequest.getDeviceInformation());
         final ProcessType processType = map(deliveryRejectRequest.getProcessType());
-        return new DeliveryRejectRequest(deliveryRejectDetails, deviceInformation);
+        return new DeliveryRejectRequest(deliveryRejectDetails, deviceInformation, processType);
     }
 
     List<DeliveryRejectDetails> map(final List<DeliveryRejectDetailsDto> deliveryRejectDetails);

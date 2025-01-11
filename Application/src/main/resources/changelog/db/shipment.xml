@@ -3,8 +3,8 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet author="s-soja" id="createParcelTable">
-        <createTable tableName="parcel">
+    <changeSet author="s-soja" id="createShipmentTable">
+        <createTable tableName="shipment">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -57,7 +57,7 @@
             <column name="parcel_size" type="tinyint">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_related_id" type="bigint"/>
+            <column name="shipment_related_id" type="bigint"/>
             <column name="type" type="tinyint">
                 <constraints nullable="false"/>
             </column>

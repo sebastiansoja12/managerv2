@@ -24,14 +24,19 @@ public class DepartmentEntity {
     @Column(name = "country", nullable = false)
     private String country;
 
+    @Column(name = "active", nullable = false)
+    private Boolean active;
+
     public DepartmentEntity() {
     }
 
-    public DepartmentEntity(final String departmentCode, final String city, final String street, final String country) {
+    public DepartmentEntity(final String departmentCode, final String city, final String street, final String country,
+                            final Boolean active) {
         this.departmentCode = departmentCode;
         this.city = city;
         this.street = street;
         this.country = country;
+        this.active = active;
     }
 
     public String getDepartmentCode() {
@@ -64,6 +69,14 @@ public class DepartmentEntity {
 
     public void setCountry(final String country) {
         this.country = country;
+    }
+
+    public Boolean isActive() {
+        return active;
+    }
+
+    public void setActive(final Boolean active) {
+        this.active = active;
     }
 }
 

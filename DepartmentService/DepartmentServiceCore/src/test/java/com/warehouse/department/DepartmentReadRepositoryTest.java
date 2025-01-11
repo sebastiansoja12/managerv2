@@ -38,19 +38,19 @@ public class DepartmentReadRepositoryTest {
     private DepartmentReadRepository repository;
 
     @Test
-    @DatabaseSetup("/dataset/depots.xml")
-    void shouldFindDepotByCode() {
+    @DatabaseSetup("/dataset/departments.xml")
+    void shouldFindDepartmentByCode() {
         // given
-        final String depotCode = "PL1";
+        final String departmentCode = "PL1";
         // when
-        final Optional<DepartmentEntity> depot = repository.findByDepartmentCode(depotCode);
+        final Optional<DepartmentEntity> department = repository.findByDepartmentCode(departmentCode);
         // then
-        assertTrue(depot.isPresent());
-        assertEquals(depotCode, depot.get().getDepartmentCode());
+        assertTrue(department.isPresent());
+        assertEquals(departmentCode, department.get().getDepartmentCode());
     }
 
     @Test
-    @DatabaseSetup("/dataset/depots.xml")
+    @DatabaseSetup("/dataset/departments.xml")
     void shouldFindAll() {
         // when
         final List<DepartmentEntity> depot = repository.findAll();
@@ -59,13 +59,13 @@ public class DepartmentReadRepositoryTest {
     }
 
     @Test
-    @DatabaseSetup("/dataset/depots.xml")
-    void shouldNotFindDepotByCode() {
+    @DatabaseSetup("/dataset/departments.xml")
+    void shouldNotFindDepartmentByCode() {
         // given
-        final String depotCode = "abc";
+        final String departmentCode = "abc";
         // when
-        final Optional<DepartmentEntity> depot = repository.findByDepartmentCode(depotCode);
+        final Optional<DepartmentEntity> department = repository.findByDepartmentCode(departmentCode);
         // then
-        assertFalse(depot.isPresent());
+        assertFalse(department.isPresent());
     }
 }

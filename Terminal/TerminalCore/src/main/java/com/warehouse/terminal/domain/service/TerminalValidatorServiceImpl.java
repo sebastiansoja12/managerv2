@@ -35,7 +35,7 @@ public class TerminalValidatorServiceImpl implements TerminalValidatorService {
     @Override
     public void validateDepartment(final String departmentCode) {
         final Department department = this.departmentRepository.findByDepartmentCode(new DepartmentCode(departmentCode));
-        if (Objects.isNull(department) || !department.isValid()) {
+        if (Objects.isNull(department) || !department.isActive()) {
             throw new RuntimeException("User is not assigned to given department or department is not valid");
         }
     }

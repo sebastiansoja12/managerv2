@@ -20,7 +20,7 @@ public class DeviceRepositoryImpl<T> implements DeviceRepository {
         return deviceReadRepository
                 .findById(deviceId)
                 .map(Terminal::from)
-                .orElseThrow(RuntimeException::new);
+                .orElse(null);
     }
 
     @Override

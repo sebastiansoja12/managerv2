@@ -13,7 +13,7 @@ import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentDto;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepotCodeDto;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCodeDto;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateStreetRequestDto;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.DepotRequestMapper;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.DepotResponseMapper;
@@ -21,7 +21,7 @@ import com.warehouse.department.infrastructure.adapter.primary.mapper.DepotRespo
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/depots")
+@RequestMapping("/departments")
 @AllArgsConstructor
 public class DepartmentController {
 
@@ -46,8 +46,8 @@ public class DepartmentController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/depotCode/{value}")
-    public ResponseEntity<?> viewByDepartmentCode(DepotCodeDto code) {
+    @GetMapping("/departmentCode/{value}")
+    public ResponseEntity<?> viewByDepartmentCode(DepartmentCodeDto code) {
         final DepartmentCode departmentCode = requestMapper.map(code);
         final Department department = departmentPort.findByDepartmentCode(departmentCode);
         return ResponseEntity

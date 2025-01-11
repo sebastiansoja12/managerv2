@@ -11,6 +11,11 @@ import com.warehouse.terminal.domain.port.primary.TerminalPortImpl;
 import com.warehouse.terminal.domain.port.secondary.*;
 import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.infrastructure.adapter.secondary.*;
+import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
+
+import io.github.resilience4j.retry.RetryConfig;
+
+import java.time.Duration;
 
 @Configuration
 public class TerminalConfiguration {
@@ -33,6 +38,22 @@ public class TerminalConfiguration {
                                                              final DeviceRepository deviceRepository) {
         return new TerminalValidatorServiceImpl(deviceVersionRepository, departmentRepository,
                 userRepository, supplierRepository, deviceRepository);
+    }
+
+    @Bean("device.softwareConfigurationServicePort")
+    public SoftwareConfigurationServicePort softwareConfigurationServicePort(final SoftwareConfigurationProperties softwareConfigurationProperties) {
+        final RetryConfig retryConfig = RetryConfig.custom()
+                .maxAttempts(4)
+                .waitDuration(Duration.ofSeconds(2))
+                .retryExceptions(RuntimeException.class)
+                .writableStackTraceEnabled(true)
+                .build();
+        return new SoftwareConfigurationServiceAdapter(retryConfig, softwareConfigurationProperties);
+    }
+
+    @Bean("device.softwareConfigurationProperties")
+    public SoftwareConfigurationProperties softwareConfigurationProperties() {
+        return new SoftwareConfigurationProperties();
     }
 
     @Bean("terminal.supplierRepository")

@@ -59,7 +59,6 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
 
         deliveryRejectRequest.rewriteDepartmentCodeFromDevice();
 
-
         final List<DeliveryRejectResponseDetails> deliveryRejectResponseDetails = Lists.newArrayList();
         for (final DeliveryRejectDetails deliveryRejectDetail : deliveryRejectRequest.getDeliveryRejectDetails()) {
             final Person recipient = this.personShipmentServicePort.getRecipient(deliveryRejectDetail.getShipmentId());

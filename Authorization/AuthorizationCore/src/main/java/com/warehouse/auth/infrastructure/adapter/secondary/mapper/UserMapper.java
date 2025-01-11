@@ -10,6 +10,7 @@ import org.mapstruct.MappingTarget;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.commonassets.identificator.UserId;
 
 @Mapper
 public interface UserMapper {
@@ -25,8 +26,8 @@ public interface UserMapper {
 
     @AfterMapping
     default void generateIdForUserEntity(@MappingTarget final UserEntity userEntity) {
-        if (userEntity.getId() == null) {
-            userEntity.setId(generateUniqueId());
+        if (userEntity.getUserId() == null) {
+            userEntity.setUserId(new UserId(generateUniqueId()));
         }
     }
 

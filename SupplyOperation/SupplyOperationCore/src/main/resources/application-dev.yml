@@ -1,0 +1,15 @@
+#### Dev
+server:
+  servlet:
+    contextPath: /v2/api
+local:
+  server:
+    port: 8080
+
+shipment:
+  url: http://localhost:8080
+  name: shipment
+  endpoint: shipments
+
+service:
+  mock: true

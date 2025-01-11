@@ -29,6 +29,7 @@
 
 ### Deprecated
 - Reroute and redirect processes
+- Old Device module
 
 ## [2024.6] - 2024-09-26
 

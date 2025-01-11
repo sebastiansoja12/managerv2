@@ -8,7 +8,7 @@ public class Department {
 
     private String country;
 
-    private String depotCode;
+    private String departmentCode;
 
     private String postalCode;
 
@@ -18,18 +18,22 @@ public class Department {
 
     private String openingHours;
 
+    private Boolean active;
+
     public Department() {
     }
 
-    public Department(String city, String street, String country, String depotCode, String postalCode, String nip, String telephoneNumber, String openingHours) {
+    public Department(String city, String street, String country, String departmentCode, String postalCode, String nip, String telephoneNumber, String openingHours,
+                      final Boolean active) {
         this.city = city;
         this.street = street;
         this.country = country;
-        this.depotCode = depotCode;
+        this.departmentCode = departmentCode;
         this.postalCode = postalCode;
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
+        this.active = active;
     }
 
     public String getCity() {
@@ -56,12 +60,12 @@ public class Department {
         this.country = country;
     }
 
-    public String getDepotCode() {
-        return depotCode;
+    public String getDepartmentCode() {
+        return departmentCode;
     }
 
-    public void setDepotCode(String depotCode) {
-        this.depotCode = depotCode;
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
     }
 
     public String getPostalCode() {
@@ -94,5 +98,17 @@ public class Department {
 
     public void setOpeningHours(String openingHours) {
         this.openingHours = openingHours;
+    }
+
+    public void setStreet(final String street) {
+        this.street = street;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(final Boolean active) {
+        this.active = active;
     }
 }

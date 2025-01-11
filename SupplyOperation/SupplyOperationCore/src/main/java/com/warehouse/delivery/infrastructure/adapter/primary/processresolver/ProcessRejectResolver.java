@@ -29,7 +29,8 @@ public class ProcessRejectResolver implements ProcessHandler {
 
     @Override
     public boolean supports(final ProcessType processType) {
-        return ProcessType.REJECT.equals(processType);
+        // return REJECT.equals(processType);
+        return false;
     }
 
     @Override

@@ -40,7 +40,7 @@ public interface RouteLogToEntityMapper {
         entity.setVersion(routeLogRecordDetail.getVersion());
         entity.setSupplier(mapSupplierEntity(routeLogRecordDetail));
         entity.setProcessType(map(routeLogRecordDetail.getProcessType()));
-        entity.setDeviceId(routeLogRecordDetail.getTerminalId().getValue());
+        entity.setDeviceId(routeLogRecordDetail.getTerminalId() != null ? routeLogRecordDetail.getTerminalId().getValue() : null);
         return entity;
     }
 

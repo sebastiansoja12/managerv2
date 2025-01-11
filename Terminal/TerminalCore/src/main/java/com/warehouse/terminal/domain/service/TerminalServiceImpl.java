@@ -50,7 +50,7 @@ public class TerminalServiceImpl implements TerminalService {
     }
 
     @Override
-    public List<Terminal> findAll() {
+    public List findAll() {
         return this.deviceRepository.findAll();
     }
 

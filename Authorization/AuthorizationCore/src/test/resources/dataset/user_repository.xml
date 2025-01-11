@@ -2,7 +2,7 @@
 
 <dataset>
     <users
-            id = "1"
+            user_id = "1"
             username = "s-soja"
             password ="password"
             first_name = "Sebastian"

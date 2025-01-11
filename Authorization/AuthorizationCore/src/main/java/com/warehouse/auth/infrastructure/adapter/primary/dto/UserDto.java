@@ -9,6 +9,8 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class UserDto {
 
+    UserIdDto userId;
+
     String username;
 
     String firstName;
