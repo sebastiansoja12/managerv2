@@ -34,11 +34,6 @@
             <artifactId>DeliveryProtectionCore</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>RouteTrackerFlowCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.warehouse</groupId>
