@@ -23,12 +23,12 @@ public class RouteLoggerPortImpl implements RouteLoggerPort {
     private final RouteLoggerRequestServicePort routeLoggerRequestServicePort;
 
     @Override
-    public void logAnyDelivery(AnyDeliveryRequest request) {
+    public void logAnyDelivery(final AnyDeliveryRequest request) {
         routeLoggerDeliveryServicePort.logAnyDelivery(request);
     }
 
     @Override
-    public void logDepotCode(DepotCodeRequest request) {
+    public void logDepotCode(final DepotCodeRequest request) {
         routeLoggerDepotCodeServicePort.logDepotCode(request);
     }
 
@@ -43,17 +43,17 @@ public class RouteLoggerPortImpl implements RouteLoggerPort {
     }
 
     @Override
-    public void logTerminalId(TerminalLogRequest request) {
+    public void logTerminalId(final TerminalLogRequest request) {
         routeLoggerTerminalServicePort.logTerminalId(request);
     }
 
     @Override
-    public void logVersion(VersionLogRequest request) {
+    public void logVersion(final VersionLogRequest request) {
         routeLoggerVersionServicePort.logVersion(request);
     }
 
     @Override
-    public void logUsername(UsernameLogRequest request) {
+    public void logUsername(final UsernameLogRequest request) {
         routeLoggerUsernameServicePort.logUsername(request);
     }
 
