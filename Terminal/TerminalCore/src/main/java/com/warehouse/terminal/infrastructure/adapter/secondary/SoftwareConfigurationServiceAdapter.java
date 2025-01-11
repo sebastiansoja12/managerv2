@@ -2,6 +2,8 @@ package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.function.Supplier;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
@@ -35,6 +37,7 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
                 .get()
                 .uri(property.getCategory() + "/" + property.getName())
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, (request, response) -> new ResponseEntity<>(HttpStatus.BAD_REQUEST))
                 .toEntity(SoftwareConfigurationDto.class);
     }
 
@@ -55,8 +58,8 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
         final ResponseEntity<SoftwareConfigurationDto> process = retryableSupplier.get();
 
         if (!process.getStatusCode().is2xxSuccessful() || process.getBody() == null) {
-            log.error("Error while retrieving configuration, cause: {}", process.getStatusCode());
-            throw new RuntimeException("Error while retrieving configuration");
+            log.error("Error while retrieving configuration, cause: {}, will use default configuration", process.getStatusCode());
+            return new DeviceValidation(deviceId, true);
         }
 
         return DeviceValidation.from(process.getBody());
