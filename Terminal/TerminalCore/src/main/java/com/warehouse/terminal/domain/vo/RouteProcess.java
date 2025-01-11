@@ -1,7 +1,5 @@
 package com.warehouse.terminal.domain.vo;
 
-import com.warehouse.terminal.domain.model.response.LogStatus;
-
 
 public class RouteProcess {
     private final Long parcelId;

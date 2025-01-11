@@ -8,7 +8,7 @@ import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.DeviceVersion;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.request.DevicePairRequest;
-import com.warehouse.terminal.domain.model.response.DevicePairResponse;
+import com.warehouse.terminal.domain.vo.DevicePairResponse;
 import com.warehouse.terminal.domain.service.*;
 
 import lombok.extern.slf4j.Slf4j;

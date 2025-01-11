@@ -1,11 +1,7 @@
-package com.warehouse.terminal.domain.model.response;
+package com.warehouse.terminal.domain.vo;
 
 import java.util.List;
 import java.util.Objects;
-
-import com.warehouse.terminal.domain.vo.DeviceInformation;
-import com.warehouse.terminal.domain.vo.ProcessReturn;
-import com.warehouse.terminal.domain.vo.RouteProcess;
 
 
 public class Response {
