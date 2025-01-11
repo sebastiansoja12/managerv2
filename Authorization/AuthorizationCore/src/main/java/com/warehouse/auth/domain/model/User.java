@@ -1,6 +1,7 @@
 package com.warehouse.auth.domain.model;
 
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.commonassets.identificator.UserId;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,6 +11,8 @@ import java.util.Collection;
 @Data
 @Builder
 public class User {
+
+    private UserId userId;
 
     private String username;
 

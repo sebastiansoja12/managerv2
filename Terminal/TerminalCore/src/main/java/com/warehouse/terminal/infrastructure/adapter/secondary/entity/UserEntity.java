@@ -1,11 +1,9 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.infrastructure.adapter.secondary.enumeration.Role;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,8 +18,9 @@ import lombok.NoArgsConstructor;
 public class UserEntity {
 
     @Id
-    @Column(name = "id", nullable = false)
-    private Long id;
+    @Column(name = "user_id", nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "user_id"))
+    private UserId userId;
 
     @Column(name = "username", unique = true, nullable = false)
     private String username;
