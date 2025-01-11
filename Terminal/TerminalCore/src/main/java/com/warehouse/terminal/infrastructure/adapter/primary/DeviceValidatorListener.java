@@ -1,11 +1,12 @@
 package com.warehouse.terminal.infrastructure.adapter.primary;
 
-import com.warehouse.terminal.domain.model.Terminal;
-import com.warehouse.terminal.domain.service.TerminalValidatorService;
-import com.warehouse.terminal.dto.DeviceValidationRequestDto;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.service.DeviceValidatorConfigurationService;
+import com.warehouse.terminal.domain.service.TerminalValidatorService;
+import com.warehouse.terminal.dto.DeviceValidationRequestDto;
 import com.warehouse.terminal.event.DeviceEvent;
 import com.warehouse.terminal.event.DeviceValidationEvent;
 
@@ -17,8 +18,12 @@ public class DeviceValidatorListener {
 
     private final TerminalValidatorService terminalValidatorService;
 
-    public DeviceValidatorListener(final TerminalValidatorService terminalValidatorService) {
+    private final DeviceValidatorConfigurationService deviceValidatorConfiguration;
+
+    public DeviceValidatorListener(final TerminalValidatorService terminalValidatorService,
+                                   final DeviceValidatorConfigurationService deviceValidatorConfiguration) {
         this.terminalValidatorService = terminalValidatorService;
+        this.deviceValidatorConfiguration = deviceValidatorConfiguration;
     }
 
     @EventListener
@@ -26,7 +31,9 @@ public class DeviceValidatorListener {
         logEvent(event);
         final DeviceValidationRequestDto deviceValidationRequest = event.getDeviceValidationRequest();
         final Terminal terminal = Terminal.from(deviceValidationRequest);
-        terminalValidatorService.validateDevice(terminal);
+        if (deviceValidatorConfiguration.validateSoftwareConfiguration(terminal.getDeviceId()).validation()) {
+            terminalValidatorService.validateDevice(terminal);
+        }
     }
 
     private void logEvent(final DeviceEvent event) {
