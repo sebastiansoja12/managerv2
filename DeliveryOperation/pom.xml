@@ -9,13 +9,13 @@
         <version>2025.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>SupplyOperation</artifactId>
+    <artifactId>DeliveryOperation</artifactId>
 
     <packaging>pom</packaging>
 
     <modules>
-        <module>SupplyOperationApi</module>
-        <module>SupplyOperationCore</module>
+        <module>DeliveryOperationApi</module>
+        <module>DeliveryOperationCore</module>
     </modules>
 
 
