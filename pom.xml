@@ -25,7 +25,7 @@
 		<module>Authorization</module>
 		<module>Utility</module>
         <module>DestinationDetermination</module>
-        <module>Generator</module>
+        <module>DocumentManager</module>
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
         <module>Terminal</module>

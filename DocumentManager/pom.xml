@@ -11,7 +11,7 @@
 
     <packaging>pom</packaging>
 
-    <artifactId>Generator</artifactId>
+    <artifactId>DocumentManager</artifactId>
 
     <modules>
         <module>BarcodeGenerator</module>
