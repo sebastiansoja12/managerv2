@@ -38,7 +38,8 @@
         <module>AssetConverter</module>
 		<module>MessageProvider</module>
 		<module>Signature</module>
-	</modules>
+        <module>LogisticsOrchestrator</module>
+    </modules>
 
 	<properties>
 		<java.version>21</java.version>
