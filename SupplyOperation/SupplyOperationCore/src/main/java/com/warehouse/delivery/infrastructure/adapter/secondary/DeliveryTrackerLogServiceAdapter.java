@@ -2,12 +2,19 @@ package com.warehouse.delivery.infrastructure.adapter.secondary;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import java.util.Set;
+
+import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTrackerLogServicePort;
 import com.warehouse.delivery.domain.vo.DepartmentCodeRequest;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.delivery.infrastructure.adapter.secondary.mapper.DeliveryEventMapper;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.routelogger.RouteLogEvent;
 import com.warehouse.routelogger.RouteLogEventPublisher;
+import com.warehouse.routelogger.dto.ProcessTypeDto;
+import com.warehouse.routelogger.dto.ShipmentIdDto;
 import com.warehouse.routelogger.event.*;
 import com.warehouse.terminal.request.TerminalRequest;
 
@@ -49,6 +56,23 @@ public class DeliveryTrackerLogServiceAdapter implements DeliveryTrackerLogServi
     @Override
     public void logVersion(TerminalRequest terminalRequest) {
         sendEvent(buildVersionLogEvent(terminalRequest));
+    }
+
+    @Override
+    public void logDeviceInformation(final Set<ShipmentId> shipmentIds,
+                                     final DeviceInformation deviceInformation, final com.warehouse.terminal.enumeration.ProcessType processType) {
+        shipmentIds.forEach(shipmentId ->
+                sendEvent(buildDeviceInformationLogEvent(ProcessType.valueOf(processType.name()), shipmentId, deviceInformation)));
+    }
+
+    private DeviceInformationLogEvent buildDeviceInformationLogEvent(final ProcessType processType,
+                                                                     final ShipmentId shipmentId,
+                                                                     final DeviceInformation deviceInformation) {
+        return DeviceInformationLogEvent.builder()
+                .device(eventMapper.map(deviceInformation))
+                .processType(ProcessTypeDto.valueOf(processType.name()))
+                .shipmentId(new ShipmentIdDto(shipmentId.getValue()))
+                .build();
     }
 
     private DepartmentCodeLogEvent buildDepartmentCodeEvent(final DepartmentCodeRequest departmentCodeRequest) {

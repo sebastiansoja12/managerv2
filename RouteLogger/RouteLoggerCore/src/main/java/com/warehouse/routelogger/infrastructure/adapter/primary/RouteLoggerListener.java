@@ -85,7 +85,8 @@ public class RouteLoggerListener {
     @EventListener
     void handle(final DeviceInformationLogEvent event) {
         logEvent(event);
-        final DeviceInformationRequest request = DeviceInformationRequest.from(event.getDevice(), event.getProcessType());
+        final DeviceInformationRequest request = DeviceInformationRequest.from(event.getDevice(), event.getProcessType(),
+                event.getShipmentId());
         routeLoggerPort.logDeviceInformation(request);
     }
 

@@ -8,6 +8,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routelogger.dto.DeviceDto;
 import com.warehouse.routelogger.dto.ProcessTypeDto;
+import com.warehouse.routelogger.dto.ShipmentIdDto;
 
 public class DeviceInformationRequest {
     private ShipmentId shipmentId;
@@ -34,8 +35,17 @@ public class DeviceInformationRequest {
         this.processType = processType;
     }
 
-    public static DeviceInformationRequest from(final DeviceDto device, final ProcessTypeDto processType) {
-        return null;
+    public static DeviceInformationRequest from(final DeviceDto device, final ProcessTypeDto processType,
+                                                final ShipmentIdDto shipmentId) {
+        final ShipmentId id = new ShipmentId(shipmentId.value());
+        final DeviceId deviceId = new DeviceId(id.value());
+        final UserId userId = new UserId(device.getUserId().value());
+        final DepartmentCode departmentCode = new DepartmentCode(device.getDepartmentCode().value());
+        final DeviceType type = DeviceType.valueOf(device.getDeviceType().name());
+        final ProcessType typeOfProcess = ProcessType.valueOf(processType.name());
+        final String version = device.getDeviceVersion().value();
+
+        return new DeviceInformationRequest(id, deviceId, type, userId, departmentCode, version, typeOfProcess);
     }
 
     public ShipmentId getShipmentId() {

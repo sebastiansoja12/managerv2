@@ -1,6 +1,12 @@
 package com.warehouse.delivery.domain.port.primary;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.delivery.domain.port.secondary.DeliveryTrackerLogServicePort;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
+import com.warehouse.terminal.model.DeliveryReturnDetail;
 import com.warehouse.terminal.request.TerminalRequest;
 import com.warehouse.xmlconverter.XmlToStringService;
 import com.warehouse.xmlconverter.XmlToStringServiceImpl;
@@ -29,5 +35,18 @@ public class TerminalRequestLoggerPortImpl implements TerminalRequestLoggerPort 
     @Override
     public void logVersion(final TerminalRequest terminalRequest) {
         deliveryTrackerLogServicePort.logVersion(terminalRequest);
+    }
+
+    @Override
+    public void logDeviceInformation(final TerminalRequest terminalRequest) {
+        final DeviceInformation deviceInformation = DeviceInformation.from(terminalRequest.getDevice());
+        final Set<ShipmentId> shipmentIds = terminalRequest
+                .getDeliveryReturnRequest()
+                .getDeliveryReturnDetails()
+                .stream()
+                .map(DeliveryReturnDetail::getShipmentId)
+                .map(ShipmentId::new)
+                .collect(Collectors.toSet());
+        deliveryTrackerLogServicePort.logDeviceInformation(shipmentIds, deviceInformation, terminalRequest.getProcessType());
     }
 }

@@ -3,6 +3,7 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -45,10 +46,11 @@ public interface RouteLogToEntityMapper {
     }
 
     default UserEntity mapUserEntity(RouteLogRecordDetail routeLogRecord) {
-        final String username = routeLogRecord.getUsername();
-        if (StringUtils.isNotEmpty(username)) {
+        final Long id = 1L;
+        if (ObjectUtils.isNotEmpty(id)) {
             return UserEntity.builder()
-                    .username(username)
+                    .id(id)
+                    .username(routeLogRecord.getUsername())
                     .build();
         }
         return null;

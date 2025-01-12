@@ -81,6 +81,8 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         deviceValidatorPort.validateDevice(device);
 
+        logDeviceInformation(terminalRequest);
+
 //        logTerminalRequest(terminalRequest);
 //
 //        logDeviceId(terminalRequest);
@@ -102,6 +104,11 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(responseMapper.map(response));
+    }
+
+    private void logDeviceInformation(final TerminalRequest terminalRequest) {
+        log.info("Logging device information in tracker");
+        terminalRequestLoggerPort.logDeviceInformation(terminalRequest);
     }
 
     private DeliveryCreator determineDeliveryCreator(final ProcessType processType) {

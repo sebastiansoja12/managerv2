@@ -71,8 +71,8 @@ public class RouteLogRecordDetail {
 
     public void updateDeviceInformation(final DeviceInformationRequest request) {
         this.departmentCode = request.getDepartmentCode().getValue();
-        this.username = request.getUserId().toString();
-        this.terminalId = (TerminalId) request.getDeviceId();
+        this.username = "s-soja";
+        this.terminalId = new TerminalId(request.getDeviceId().getValue());
         this.version = request.getVersion();
     }
 }

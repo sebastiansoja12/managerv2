@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 
 import com.google.common.collect.Lists;
 import com.warehouse.delivery.domain.vo.DepartmentCodeRequest;
+import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.routelogger.dto.*;
 import com.warehouse.terminal.enumeration.ProcessType;
@@ -19,6 +20,15 @@ public interface DeliveryEventMapper {
 
     @Mapping(target = "processType", constant = "MISS")
     DeliveryRequestDto map(DeliveryMissed deliveryMissed);
+
+    default DeviceDto map(final DeviceInformation deviceInformation) {
+        final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().getValue());
+        final DepartmentCodeDto departmentCode = new DepartmentCodeDto(deviceInformation.getDepartmentCode().getValue());
+        final UserIdDto userId = new UserIdDto(1L);
+        final DeviceVersionDto deviceVersion = new DeviceVersionDto(deviceInformation.getVersion());
+        final DeviceTypeDto deviceType = DeviceTypeDto.valueOf(deviceInformation.getDeviceType().name());
+        return new DeviceDto(deviceId, departmentCode, userId, deviceVersion, deviceType);
+    }
 
     DepotCodeRequestDto mapToDepotCodeRequest(final DepartmentCodeRequest departmentCodeRequest);
 

@@ -8,4 +8,6 @@ public interface TerminalRequestLoggerPort {
     void logDeviceId(final TerminalRequest terminalRequest);
 
     void logVersion(final TerminalRequest terminalRequest);
+
+    void logDeviceInformation(final TerminalRequest terminalRequest);
 }

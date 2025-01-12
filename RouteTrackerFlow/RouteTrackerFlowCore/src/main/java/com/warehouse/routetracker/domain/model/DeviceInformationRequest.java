@@ -34,7 +34,14 @@ public class DeviceInformationRequest {
     }
 
     public static DeviceInformationRequest from(final DeviceInformationRequestDto device) {
-        return null;
+        final ShipmentId shipmentId = new ShipmentId(device.shipmentId().getValue());
+        final DeviceId deviceId = new DeviceId(device.deviceId().value());
+        final DeviceType deviceType = DeviceType.valueOf(device.deviceType().name());
+        final UserId userId = new UserId(device.userId().value());
+        final DepartmentCode departmentCode = new DepartmentCode(device.departmentCode().value());
+        final String version = device.deviceVersion().value();
+        final ProcessType processType = ProcessType.valueOf(device.processType().name());
+        return new DeviceInformationRequest(shipmentId, deviceId, deviceType, userId, departmentCode, version, processType);
     }
 
     public ShipmentId getShipmentId() {
