@@ -1,1 +1,1 @@
- **MANAGER SPRING BOOT APPLICATION**
+ **Manager 2.0 - Development Version 2025.1  - 1st January, 2025**
