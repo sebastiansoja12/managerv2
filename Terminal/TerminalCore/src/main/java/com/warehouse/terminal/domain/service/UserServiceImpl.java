@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserToken validateUser(final UserId userId) {
-        return new UserToken("token");
+        return userRepository.obtainUserToken(userId);
     }
 
     @Override

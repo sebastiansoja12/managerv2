@@ -1,10 +1,12 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.port.secondary.UserRepository;
 import com.warehouse.terminal.domain.vo.User;
+import com.warehouse.terminal.domain.vo.UserToken;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.UserEntity;
 
 public class UserRepositoryImpl implements UserRepository {
@@ -30,5 +32,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Boolean existsById(final UserId userId) {
         return this.repository.existsById(userId);
+    }
+
+    @Override
+    public UserToken obtainUserToken(final UserId userId) {
+        return new UserToken(UUID.randomUUID().toString());
     }
 }
