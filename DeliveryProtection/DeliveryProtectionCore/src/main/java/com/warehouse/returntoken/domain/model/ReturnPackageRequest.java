@@ -8,7 +8,9 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 
 import lombok.Builder;
+import lombok.Setter;
 
+@Setter
 @Builder
 public class ReturnPackageRequest {
     private final UUID id;

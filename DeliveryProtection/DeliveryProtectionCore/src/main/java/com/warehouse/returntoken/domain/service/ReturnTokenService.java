@@ -1,9 +1,12 @@
 package com.warehouse.returntoken.domain.service;
 
-import com.warehouse.returntoken.domain.model.Parcel;
-import com.warehouse.returntoken.domain.vo.Token;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.returntoken.domain.model.ReturnPackageRequest;
+import com.warehouse.returntoken.domain.vo.ReturnPackageResponse;
+import com.warehouse.returntoken.domain.vo.ReturnToken;
 
 public interface ReturnTokenService {
-
-    Token determineToken(Parcel parcel);
+    ReturnPackageResponse sign(final ReturnPackageRequest returnTokenDetails);
+    ReturnToken findByShipmentId(final ShipmentId shipmentId);
+    Boolean exists(final ReturnToken returnToken);
 }

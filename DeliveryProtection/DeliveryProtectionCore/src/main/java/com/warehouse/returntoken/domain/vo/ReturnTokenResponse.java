@@ -1,8 +1,6 @@
-package com.warehouse.returntoken.domain.model;
+package com.warehouse.returntoken.domain.vo;
 
 import java.util.List;
-
-import com.warehouse.returntoken.domain.vo.Supplier;
 
 
 public class ReturnTokenResponse {

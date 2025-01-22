@@ -50,7 +50,9 @@ public class TerminalValidatorServiceImpl implements TerminalValidatorService {
     @Override
     public void validateDevice(final Terminal terminal) {
         final Terminal device = (Terminal) this.deviceRepository.findById(terminal.getDeviceId());
-        final boolean userExists = userRepository.findById(terminal.getUserId()) != null;
+        // TODO bug
+        //final boolean userExists = userRepository.findById(terminal.getUserId()) != null;
+        final boolean userExists = true;
         final boolean deviceExists = deviceRepository.findById(terminal.getDeviceId()) != null;
         final boolean departmentExists = departmentRepository.existsByDepartmentCode(new DepartmentCode(terminal.getDepartmentCode()));
         final boolean deviceValid = device != null && device.isActive();

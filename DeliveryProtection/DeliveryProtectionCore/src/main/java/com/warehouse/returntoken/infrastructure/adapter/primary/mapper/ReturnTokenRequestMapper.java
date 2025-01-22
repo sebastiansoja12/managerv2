@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.returntoken.domain.model.ReturnPackageRequest;
 import com.warehouse.returntoken.domain.vo.ReturnTokenRequest;
 import com.warehouse.returntoken.domain.vo.Supplier;
@@ -25,5 +26,7 @@ public interface ReturnTokenRequestMapper {
 
     ReturnPackageRequest map(final ReturnPackageRequestDto returnPackageRequestDto);
 
-    Supplier map(final SupplierDto supplier);
+    default Supplier map(final SupplierDto supplier) {
+        return new Supplier(new SupplierCode(supplier.getSupplierCode().value()));
+    }
 }
