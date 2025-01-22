@@ -23,12 +23,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findById(final UserId userId) {
-        final Optional<UserEntity> user = this.repository.findById(userId.getValue());
+        final Optional<UserEntity> user = this.repository.findById(userId);
         return user.map(User::from).orElse(null);
     }
 
     @Override
     public Boolean existsById(final UserId userId) {
-        return this.repository.existsById(userId.getValue());
+        return this.repository.existsById(userId);
     }
 }
