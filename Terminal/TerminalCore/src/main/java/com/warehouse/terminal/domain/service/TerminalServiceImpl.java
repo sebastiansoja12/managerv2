@@ -7,6 +7,7 @@ import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.request.DeviceSettingsRequest;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 
 public class TerminalServiceImpl implements TerminalService {
@@ -52,6 +53,11 @@ public class TerminalServiceImpl implements TerminalService {
     @Override
     public List findAll() {
         return this.deviceRepository.findAll();
+    }
+
+    @Override
+    public void updateSettings(final DeviceSettingsRequest request) {
+
     }
 
     private DeviceId nextDeviceId() {
