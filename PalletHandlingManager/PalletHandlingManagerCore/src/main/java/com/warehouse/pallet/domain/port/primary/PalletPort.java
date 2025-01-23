@@ -10,6 +10,7 @@ import java.util.Set;
 
 public interface PalletPort {
     void createPallet(final Pallet pallet);
+    PalletId createEmptyPallet();
     void updatePallet(final Pallet pallet);
     void deletePallet(final Pallet pallet);
     Pallet getPallet(final PalletId palletId);

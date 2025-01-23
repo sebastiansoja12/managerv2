@@ -9,6 +9,12 @@ import com.warehouse.pallet.domain.vo.SealNumber;
 import java.util.Set;
 
 public class PalletPortImpl implements PalletPort {
+
+    @Override
+    public PalletId createEmptyPallet() {
+        return null;
+    }
+
     @Override
     public void createPallet(final Pallet pallet) {
 
