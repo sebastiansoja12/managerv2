@@ -77,13 +77,13 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         shipment.prepareShipmentToCreate();
 
-        final City city = this.pathFinderServicePort.determineDeliveryDepot(address);
+        final VoronoiResponse voronoiResponse = this.pathFinderServicePort.determineDeliveryDepot(address);
 
-        if (Objects.isNull(city) || StringUtils.isEmpty(city.getValue())) {
+        if (Objects.isNull(voronoiResponse) || StringUtils.isEmpty(voronoiResponse.getValue())) {
             throw new DestinationDepartmentDeterminationException(SHIPMENT_202);
         }
 
-        shipment.updateDestination(city);
+        shipment.updateDestination(voronoiResponse);
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
@@ -103,9 +103,9 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final Address address = Address.from(request.getRecipient());
 
-        final City city = this.pathFinderServicePort.determineDeliveryDepot(address);
+        final VoronoiResponse voronoiResponse = this.pathFinderServicePort.determineDeliveryDepot(address);
 
-        request.updateDestination(city);
+        request.updateDestination(voronoiResponse);
 
         final ShipmentId shipmentId = request.getShipmentId();
         final Sender sender = request.getSender();

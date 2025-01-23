@@ -55,9 +55,9 @@ public class ShipmentUpdateRequest {
         return shipmentUpdate.getSender();
     }
 
-    public void updateDestination(final City city) {
-        if (Objects.nonNull(city) && Objects.nonNull(city.getValue())) {
-            this.shipmentUpdate.updateDestination(city.getValue());
+    public void updateDestination(final VoronoiResponse voronoiResponse) {
+        if (Objects.nonNull(voronoiResponse) && Objects.nonNull(voronoiResponse.getValue())) {
+            this.shipmentUpdate.updateDestination(voronoiResponse.getValue());
         }
     }
 }

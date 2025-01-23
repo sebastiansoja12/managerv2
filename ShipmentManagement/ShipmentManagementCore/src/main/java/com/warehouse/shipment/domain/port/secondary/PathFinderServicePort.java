@@ -1,9 +1,9 @@
 package com.warehouse.shipment.domain.port.secondary;
 
 import com.warehouse.shipment.domain.vo.Address;
-import com.warehouse.shipment.domain.vo.City;
+import com.warehouse.shipment.domain.vo.VoronoiResponse;
 
 public interface PathFinderServicePort {
 
-    City determineDeliveryDepot(final Address address);
+    VoronoiResponse determineDeliveryDepot(final Address address);
 }

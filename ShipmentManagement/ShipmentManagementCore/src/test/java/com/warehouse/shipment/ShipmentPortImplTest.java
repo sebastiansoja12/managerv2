@@ -80,11 +80,11 @@ class ShipmentPortImplTest {
         // given
         final ShipmentId shipmentId = shipmentId();
         final ShipmentRequest request = new ShipmentRequest(createShipment());
-        final City city = new City("KT1");
+        final VoronoiResponse voronoiResponse = new VoronoiResponse("KT1");
         final RouteProcess routeProcess = new RouteProcess(shipmentId, processId);
         final SoftwareConfiguration softwareConfiguration = new SoftwareConfiguration("id", "url");
 
-        doReturn(city)
+        doReturn(voronoiResponse)
                 .when(pathFinderServicePort)
                 .determineDeliveryDepot(any(Address.class));
 
@@ -129,8 +129,8 @@ class ShipmentPortImplTest {
     void shouldThrowDestinationDepotDeterminationExceptionWhenCityValueIsEmpty() {
         // given
         final ShipmentRequest request = new ShipmentRequest(createShipment());
-        final City city = new City("");
-        doReturn(city)
+        final VoronoiResponse voronoiResponse = new VoronoiResponse("");
+        doReturn(voronoiResponse)
                 .when(pathFinderServicePort)
                 .determineDeliveryDepot(any(Address.class));
         // when

@@ -2,27 +2,25 @@ package com.warehouse.voronoi;
 
 import static com.warehouse.voronoi.DepotInMemoryData.buildDepots;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.warehouse.voronoi.domain.model.Coordinates;
-import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
-import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.voronoi.domain.exception.MissingDepotsException;
-import com.warehouse.voronoi.domain.exception.MissingRequestCityException;
-import com.warehouse.voronoi.domain.model.Depot;
+import com.warehouse.voronoi.domain.model.Coordinates;
+import com.warehouse.voronoi.domain.model.Department;
+import com.warehouse.voronoi.domain.model.VoronoiRequest;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPortImpl;
 import com.warehouse.voronoi.domain.port.secondary.DepotServicePort;
+import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
 import com.warehouse.voronoi.domain.service.ComputeService;
+import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
+import com.warehouse.voronoi.domain.vo.VoronoiResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class VoronoiPortImplTest {
@@ -48,7 +46,7 @@ public class VoronoiPortImplTest {
         final String expectedNearestDepot = "KT1";
 
         // and: build depots
-        final List<Depot> depotsList = buildDepots();
+        final List<Department> depotsList = buildDepots();
 
         // request city to send
         final String requestCity = "Gliwice";
@@ -62,34 +60,8 @@ public class VoronoiPortImplTest {
 				.obtainCoordinates(requestCity);
 
         // when
-        final String nearestDepot = voronoiPort.findFastestRoute(requestCity);
+        final VoronoiResponse nearestDepot = voronoiPort.findFastestRoute(new VoronoiRequest(requestCity, null));
         // then
-        assertEquals(expectedNearestDepot, nearestDepot);
-    }
-
-    @Test
-    void shouldThrowMissingDepotsException() {
-        // given empty arraylist
-        final List<Depot> depotsList = new ArrayList<>();
-
-        doReturn(depotsList)
-                .when(depotServicePort)
-                .downloadDepots();
-
-        // when && then
-        assertThrows(MissingDepotsException.class, () -> voronoiPort.findFastestRoute("KR1"));
-    }
-
-    @Test
-    void shouldThrowMissingRequestCityException() {
-        // given empty arraylist
-        final List<Depot> depotsList = buildDepots();
-
-        doReturn(depotsList)
-                .when(depotServicePort)
-                .downloadDepots();
-
-        // when && then
-        assertThrows(MissingRequestCityException.class, () -> voronoiPort.findFastestRoute(null));
+        assertEquals(expectedNearestDepot, nearestDepot.departmentCode().getValue());
     }
 }

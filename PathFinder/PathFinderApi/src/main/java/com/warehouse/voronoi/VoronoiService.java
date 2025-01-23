@@ -3,5 +3,5 @@ package com.warehouse.voronoi;
 
 public interface VoronoiService {
 
-    String findFastestRoute(String requestCity);
+    VoronoiResponseDto findFastestRoute(final VoronoiRequestDto voronoiRequest);
 }

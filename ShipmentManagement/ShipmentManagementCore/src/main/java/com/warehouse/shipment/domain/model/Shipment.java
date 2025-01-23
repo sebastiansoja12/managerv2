@@ -7,7 +7,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.vo.City;
+import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
@@ -242,9 +242,9 @@ public class Shipment {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateDestination(final City city) {
-        if (ObjectUtils.isNotEmpty(city) && city.getValue() != null) {
-            this.destination = city.getValue();
+    public void updateDestination(final VoronoiResponse voronoiResponse) {
+        if (ObjectUtils.isNotEmpty(voronoiResponse) && voronoiResponse.getValue() != null) {
+            this.destination = voronoiResponse.getValue();
             markAsModified();
         }
     }

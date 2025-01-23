@@ -163,14 +163,14 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="false")
+	@ConditionalOnProperty(name="service.mock", havingValue="true")
 	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService) {
 		return new PathFinderAdapter(voronoiService);
 	}
 
 	//MOCK
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="true")
+	@ConditionalOnProperty(name="service.mock", havingValue="false")
 	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
 		return new PathFinderMockAdapter(pathFinderMockService);
 	}

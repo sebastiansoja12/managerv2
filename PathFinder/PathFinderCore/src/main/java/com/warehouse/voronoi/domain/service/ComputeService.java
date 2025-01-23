@@ -2,9 +2,11 @@ package com.warehouse.voronoi.domain.service;
 
 import java.util.List;
 
-import com.warehouse.voronoi.domain.model.Depot;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.voronoi.domain.model.Department;
+import com.warehouse.voronoi.domain.model.VoronoiRequest;
 
 public interface ComputeService {
 
-    String calculate(String requestCity, List<Depot> depots);
+    DepartmentCode calculateDepartmentCode(final VoronoiRequest request, final List<Department> departments);
 }

@@ -29,6 +29,7 @@ import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationService
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.tracking.TrackingStatusEventPublisher;
+import com.warehouse.voronoi.VoronoiService;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -57,6 +58,9 @@ public class ShipmentReadRepositoryTest {
 
         @MockBean
         public SoftwareConfigurationServicePort softwareConfigurationServicePort;
+
+        @MockBean
+        public VoronoiService voronoiService;
     }
 
     @Autowired

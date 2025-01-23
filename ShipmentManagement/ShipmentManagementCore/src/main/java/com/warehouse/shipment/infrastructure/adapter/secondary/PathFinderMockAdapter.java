@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.vo.Address;
-import com.warehouse.shipment.domain.vo.City;
+import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,7 +20,7 @@ public class PathFinderMockAdapter implements PathFinderServicePort {
     }
 
     @Override
-    public City determineDeliveryDepot(Address address) {
+    public VoronoiResponse determineDeliveryDepot(Address address) {
         if (Objects.isNull(address) || StringUtils.isEmpty(address.getCity())) {
             throw new DestinationDepartmentDeterminationException(SHIPMENT_202);
         }
