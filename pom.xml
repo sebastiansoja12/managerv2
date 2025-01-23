@@ -37,7 +37,6 @@
         <module>RouteLogger</module>
         <module>AssetConverter</module>
 		<module>MessageProvider</module>
-		<module>Signature</module>
         <module>LogisticsOrchestrator</module>
         <module>CrossLogistics</module>
     </modules>
