@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.pallet.configuration.identificator.DepartmentCode;
+import com.warehouse.pallet.configuration.identificator.ShipmentId;
 import com.warehouse.pallet.domain.enumeration.PalletHandlingPriority;
 import com.warehouse.pallet.domain.enumeration.PalletStatus;
 import com.warehouse.pallet.domain.enumeration.StorageStatus;
