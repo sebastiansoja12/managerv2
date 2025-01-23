@@ -4,15 +4,16 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.pallet.configuration.identificator.DepartmentCode;
+import com.warehouse.pallet.configuration.identificator.ShipmentId;
 import com.warehouse.pallet.domain.enumeration.PalletHandlingPriority;
 import com.warehouse.pallet.domain.enumeration.PalletStatus;
 import com.warehouse.pallet.domain.enumeration.StorageStatus;
 import com.warehouse.pallet.domain.vo.Dimension;
 import com.warehouse.pallet.domain.vo.MaxPalletWeight;
-import com.warehouse.pallet.domain.vo.PalletId;
+import com.warehouse.pallet.configuration.identificator.PalletId;
 import com.warehouse.pallet.domain.vo.SealNumber;
+import com.warehouse.pallet.infrastructure.adapter.secondary.document.PalletDocument;
 
 public class Pallet {
     private PalletId palletId;
@@ -194,4 +195,7 @@ public class Pallet {
     }
 
 
+    public static Pallet from(final PalletDocument palletDocument) {
+        return null;
+    }
 }

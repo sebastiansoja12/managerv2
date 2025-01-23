@@ -1,17 +1,17 @@
 package com.warehouse.voronoi;
 
 import com.warehouse.voronoi.domain.model.Coordinates;
-import com.warehouse.voronoi.domain.model.Depot;
+import com.warehouse.voronoi.domain.model.Department;
 
 import java.util.List;
 
 public class DepotInMemoryData {
 
-    public static List<Depot> buildDepots() {
+    public static List<Department> buildDepots() {
 
         // WROCŁAW
-        final Depot depot = Depot.builder()
-                .depotCode("WRO")
+        final Department department = Department.builder()
+                .departmentCode("WRO")
                 .coordinates(Coordinates.builder()
                         .lon(51.1271647)
                         .lat(16.9218245)
@@ -19,8 +19,8 @@ public class DepotInMemoryData {
                 .build();
 
         // WARSZAWA
-        final Depot depot2 = Depot.builder()
-                .depotCode("WA1")
+        final Department department2 = Department.builder()
+                .departmentCode("WA1")
                 .coordinates(Coordinates.builder()
                         .lon(52.2328001)
                         .lat(20.7741284)
@@ -28,8 +28,8 @@ public class DepotInMemoryData {
                 .build();
 
         // LUBLIN
-        final Depot depot3 = Depot.builder()
-                .depotCode("LUB")
+        final Department department3 = Department.builder()
+                .departmentCode("LUB")
                 .coordinates(Coordinates.builder()
                         .lon(51.2181956)
                         .lat(22.4937308)
@@ -37,8 +37,8 @@ public class DepotInMemoryData {
                 .build();
 
         // GLIWICE
-        final Depot depot4 = Depot.builder()
-                .depotCode("KT1")
+        final Department department4 = Department.builder()
+                .departmentCode("KT1")
                 .coordinates(Coordinates.builder()
                         .lon(50.3013283)
                         .lat(18.5795769)
@@ -46,8 +46,8 @@ public class DepotInMemoryData {
                 .build();
 
         // POZNAŃ
-        final Depot depot5 = Depot.builder()
-                .depotCode("POZ")
+        final Department department5 = Department.builder()
+                .departmentCode("POZ")
                 .coordinates(Coordinates.builder()
                         .lon(52.4080281)
                         .lat(16.7615841)
@@ -55,8 +55,8 @@ public class DepotInMemoryData {
                 .build();
 
         // KRAKÓW
-        final Depot depot6 = Depot.builder()
-                .depotCode("KR1")
+        final Department department6 = Department.builder()
+                .departmentCode("KR1")
                 .coordinates(Coordinates.builder()
                         .lon(50.0468548)
                         .lat(19.9348336)
@@ -64,8 +64,8 @@ public class DepotInMemoryData {
                 .build();
 
         // GDAŃSK
-        final Depot depot7 = Depot.builder()
-                .depotCode("GD1")
+        final Department department7 = Department.builder()
+                .departmentCode("GD1")
                 .coordinates(Coordinates.builder()
                         .lon(54.3612063)
                         .lat(18.5499457)
@@ -74,8 +74,8 @@ public class DepotInMemoryData {
 
 
         // ŁÓDŹ
-        final Depot depot8 = Depot.builder()
-                .depotCode("NCS")
+        final Department department8 = Department.builder()
+                .departmentCode("NCS")
                 .coordinates(Coordinates.builder()
                         .lon(51.7732033)
                         .lat(19.4105532)
@@ -83,8 +83,8 @@ public class DepotInMemoryData {
                 .build();
 
         // CZĘSTOCHOWA
-        final Depot depot9 = Depot.builder()
-                .depotCode("CZW")
+        final Department department9 = Department.builder()
+                .departmentCode("CZW")
                 .coordinates(Coordinates.builder()
                         .lon(50.8094082)
                         .lat(19.0527317)
@@ -92,8 +92,8 @@ public class DepotInMemoryData {
                 .build();
 
         // BYDGOSZCZ
-        final Depot depot10 = Depot.builder()
-                .depotCode("BYD")
+        final Department department10 = Department.builder()
+                .departmentCode("BYD")
                 .coordinates(Coordinates.builder()
                         .lon(53.1257696)
                         .lat(17.9681431)
@@ -101,8 +101,8 @@ public class DepotInMemoryData {
                 .build();
 
         // ZIELONA GÓRA
-        final Depot depot11 = Depot.builder()
-                .depotCode("ZGR")
+        final Department department11 = Department.builder()
+                .departmentCode("ZGR")
                 .coordinates(Coordinates.builder()
                         .lon(51.927740)
                         .lat(15.3813419)
@@ -110,16 +110,16 @@ public class DepotInMemoryData {
                 .build();
 
         // KIELCE
-        final Depot depot12 = Depot.builder()
-                .depotCode("KIE")
+        final Department department12 = Department.builder()
+                .departmentCode("KIE")
                 .coordinates(Coordinates.builder()
                         .lon(50.8541274)
                         .lat(20.5456019)
                         .build())
                 .build();
         // RZESZÓW
-        final Depot depot13 = Depot.builder()
-                .depotCode("RZE")
+        final Department department13 = Department.builder()
+                .departmentCode("RZE")
                 .coordinates(Coordinates.builder()
                         .lon(50.0136105)
                         .lat(21.8363533)
@@ -127,8 +127,8 @@ public class DepotInMemoryData {
                 .build();
 
         // OLSZTYN
-        final Depot depot14 = Depot.builder()
-                .depotCode("OLS")
+        final Department department14 = Department.builder()
+                .departmentCode("OLS")
                 .coordinates(Coordinates.builder()
                         .lon(53.7760917)
                         .lat(20.3956595)
@@ -136,8 +136,8 @@ public class DepotInMemoryData {
                 .build();
 
         // SZCZECIN
-        final Depot depot15 = Depot.builder()
-                .depotCode("SZC")
+        final Department department15 = Department.builder()
+                .departmentCode("SZC")
                 .coordinates(Coordinates.builder()
                         .lon(53.4298189)
                         .lat(14.484542)
@@ -145,8 +145,8 @@ public class DepotInMemoryData {
                 .build();
 
         // CIECHANÓW
-        final Depot depot16 = Depot.builder()
-                .depotCode("CIE")
+        final Department department16 = Department.builder()
+                .departmentCode("CIE")
                 .coordinates(Coordinates.builder()
                         .lon(52.8710294)
                         .lat(20.5821742)
@@ -154,8 +154,8 @@ public class DepotInMemoryData {
                 .build();
 
         // GRUDZIĄDZ
-        final Depot depot17 = Depot.builder()
-                .depotCode("GRU")
+        final Department department17 = Department.builder()
+                .departmentCode("GRU")
                 .coordinates(Coordinates.builder()
                         .lon(53.4730137)
                         .lat(18.71262)
@@ -163,7 +163,7 @@ public class DepotInMemoryData {
                 .build();
 
 
-        return List.of(depot, depot2, depot3, depot4, depot5, depot6, depot7, depot8, depot9, depot10, depot11,
-                depot12, depot13, depot14, depot15, depot16, depot17);
+        return List.of(department, department2, department3, department4, department5, department6, department7, department8, department9, department10, department11,
+                department12, department13, department14, department15, department16, department17);
     }
 }

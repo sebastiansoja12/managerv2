@@ -1,6 +1,7 @@
 package com.warehouse.terminal.configuration;
 
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,6 +42,7 @@ public class TerminalConfiguration {
     }
 
     @Bean("device.softwareConfigurationServicePort")
+    @ConditionalOnProperty(name = "services.mock", havingValue = "false")
     public SoftwareConfigurationServicePort softwareConfigurationServicePort(final SoftwareConfigurationProperties softwareConfigurationProperties) {
         final RetryConfig retryConfig = RetryConfig.custom()
                 .maxAttempts(4)
@@ -49,6 +51,12 @@ public class TerminalConfiguration {
                 .writableStackTraceEnabled(true)
                 .build();
         return new SoftwareConfigurationServiceAdapter(retryConfig, softwareConfigurationProperties);
+    }
+
+    @Bean("device.softwareConfigurationServicePort")
+    @ConditionalOnProperty(name = "services.mock", havingValue = "true")
+    public SoftwareConfigurationServicePort softwareConfigurationServiceMockPort() {
+        return new SoftwareConfigurationServiceMockAdapter();
     }
 
     @Bean("device.softwareConfigurationProperties")

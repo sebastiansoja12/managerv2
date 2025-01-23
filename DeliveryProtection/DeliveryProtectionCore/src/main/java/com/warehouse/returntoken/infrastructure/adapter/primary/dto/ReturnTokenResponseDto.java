@@ -5,21 +5,21 @@ import java.util.List;
 
 public class ReturnTokenResponseDto {
 
-    private List<ReturnPackageResponseDto> deliveryReturnSignatures;
+    private List<ReturnPackageResponseDto> returnPackageResponses;
 
     private SupplierDto supplier;
 
     public ReturnTokenResponseDto() {
     }
 
-    public ReturnTokenResponseDto(final List<ReturnPackageResponseDto> deliveryReturnSignatures,
+    public ReturnTokenResponseDto(final List<ReturnPackageResponseDto> returnPackageResponses,
                                   final SupplierDto supplier) {
-        this.deliveryReturnSignatures = deliveryReturnSignatures;
+        this.returnPackageResponses = returnPackageResponses;
         this.supplier = supplier;
     }
 
-    public List<ReturnPackageResponseDto> getDeliveryReturnSignatures() {
-        return deliveryReturnSignatures;
+    public List<ReturnPackageResponseDto> getReturnPackageResponses() {
+        return returnPackageResponses;
     }
 
     public SupplierDto getSupplier() {

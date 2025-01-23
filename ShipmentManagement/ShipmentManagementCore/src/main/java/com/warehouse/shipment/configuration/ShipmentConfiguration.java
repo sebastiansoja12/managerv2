@@ -36,11 +36,6 @@ public class ShipmentConfiguration {
 
 	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
 
-	@Bean
-	public ShipmentRepository shipmentRepository(final ShipmentReadRepository repository) {
-		return new ShipmentRepositoryImpl(repository);
-	}
-
 	@Bean(name = "shipment.mailPort")
 	public MailPort mailPort(final com.warehouse.mail.domain.service.MailService mailService) {
 		return new MailPortImpl(mailService);
@@ -70,7 +65,9 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean("shipment.softwareConfigurationServicePort")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
 	public SoftwareConfigurationServicePort softwareConfigurationServicePort() {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using software configuration");
 		final RetryConfig config = RetryConfig.custom()
 				.maxAttempts(4)
 				.waitDuration(Duration.ofSeconds(2))
@@ -83,13 +80,42 @@ public class ShipmentConfiguration {
 	@Bean
 	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
 	public SoftwareConfigurationServicePort softwareConfigurationServiceMockPort() {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock software configuration");
 		return new SoftwareConfigurationServiceMockAdapter();
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
 	public RouteLogServicePort routeLogServiceMockPort() {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock Route log service port");
 		return new RouteLogServiceMockAdapter();
+	}
+
+	@Bean(name = "shipment.routeLogServicePort")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
+	public RouteLogServicePort routeLogServicePort() {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Route log service port");
+		final RetryConfig config = RetryConfig.custom()
+				.maxAttempts(3)
+				.waitDuration(Duration.ofSeconds(2))
+				.retryExceptions(RuntimeException.class)
+				.writableStackTraceEnabled(true)
+				.build();
+		return new RouteLogServiceAdapter(config);
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
+	public ShipmentRepository shipmentRepository(final ShipmentReadRepository repository) {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment repository");
+		return new ShipmentRepositoryImpl(repository);
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	public ShipmentRepository shipmentMockRepository() {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment mock repository");
+		return new ShipmentRepositoryMockImpl();
 	}
 	
 	@Bean("shipment.rerouteTokenServicePort")
@@ -125,17 +151,6 @@ public class ShipmentConfiguration {
 		return new ShipmentServiceImpl(shipmentRepository, routeLogServicePort, softwareConfigurationServicePort);
 	}
 
-	@Bean(name = "shipment.routeLogServicePort")
-	public RouteLogServicePort routeLogServicePort() {
-		final RetryConfig config = RetryConfig.custom()
-				.maxAttempts(3)
-				.waitDuration(Duration.ofSeconds(2))
-				.retryExceptions(RuntimeException.class)
-				.writableStackTraceEnabled(true)
-				.build();
-		return new RouteLogServiceAdapter(config);
-	}
-
 	@Bean("shipment.routeTrackerLogProperties")
 	public RouteTrackerLogProperties routeTrackerLogProperties() {
 		return new RouteTrackerLogProperties();
@@ -148,14 +163,14 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="false")
+	@ConditionalOnProperty(name="service.mock", havingValue="true")
 	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService) {
 		return new PathFinderAdapter(voronoiService);
 	}
 
 	//MOCK
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="true")
+	@ConditionalOnProperty(name="service.mock", havingValue="false")
 	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
 		return new PathFinderMockAdapter(pathFinderMockService);
 	}

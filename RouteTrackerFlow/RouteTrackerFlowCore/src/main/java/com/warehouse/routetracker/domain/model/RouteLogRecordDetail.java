@@ -68,4 +68,11 @@ public class RouteLogRecordDetail {
     private void markAsModified() {
         this.timestamp = LocalDateTime.now();
     }
+
+    public void updateDeviceInformation(final DeviceInformationRequest request) {
+        this.departmentCode = request.getDepartmentCode().getValue();
+        this.username = "s-soja";
+        this.terminalId = new TerminalId(request.getDeviceId().getValue());
+        this.version = request.getVersion();
+    }
 }

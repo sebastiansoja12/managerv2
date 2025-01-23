@@ -3,10 +3,16 @@ package com.warehouse.commonassets.identificator;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.persistence.Embeddable;
 
 @Embeddable
 public record DepartmentCode(String value) implements Serializable {
+
+	public static DepartmentCode empty() {
+		return new DepartmentCode(StringUtils.EMPTY);
+	}
 
 	public String getValue() {
 		return value;

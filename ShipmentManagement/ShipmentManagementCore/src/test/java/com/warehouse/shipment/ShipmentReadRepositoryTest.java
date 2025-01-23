@@ -23,9 +23,13 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
+import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.tracking.TrackingStatusEventPublisher;
+import com.warehouse.voronoi.VoronoiService;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -45,6 +49,18 @@ public class ShipmentReadRepositoryTest {
 
         @MockBean
         public TrackingStatusEventPublisher trackingStatusEventPublisher;
+
+        @MockBean
+        public ShipmentRepository shipmentRepository;
+
+        @MockBean
+        public RouteLogServicePort routeLogServicePort;
+
+        @MockBean
+        public SoftwareConfigurationServicePort softwareConfigurationServicePort;
+
+        @MockBean
+        public VoronoiService voronoiService;
     }
 
     @Autowired

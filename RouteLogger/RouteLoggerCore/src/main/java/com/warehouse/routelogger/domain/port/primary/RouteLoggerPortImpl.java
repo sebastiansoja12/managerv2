@@ -22,6 +22,8 @@ public class RouteLoggerPortImpl implements RouteLoggerPort {
 
     private final RouteLoggerRequestServicePort routeLoggerRequestServicePort;
 
+    private final RouteLoggerDeviceInformationServicePort routeLoggerDeviceInformationServicePort;
+
     @Override
     public void logAnyDelivery(final AnyDeliveryRequest request) {
         routeLoggerDeliveryServicePort.logAnyDelivery(request);
@@ -60,5 +62,10 @@ public class RouteLoggerPortImpl implements RouteLoggerPort {
     @Override
     public void logRejectTrackerRequest(final RejectTrackerRequest request) {
         // TODO log in tracker
+    }
+
+    @Override
+    public void logDeviceInformation(final DeviceInformationRequest request) {
+        routeLoggerDeviceInformationServicePort.logDeviceInformation(request);
     }
 }

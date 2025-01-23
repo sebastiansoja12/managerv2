@@ -1,47 +1,38 @@
 package com.warehouse.returntoken.domain.service;
 
 
-import com.warehouse.returntoken.domain.model.Parcel;
-import com.warehouse.returntoken.domain.vo.Token;
-import lombok.AllArgsConstructor;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.returntoken.domain.generator.ReturnTokenGenerator;
+import com.warehouse.returntoken.domain.model.ReturnPackageRequest;
+import com.warehouse.returntoken.domain.port.secondary.ReturnTokenRepository;
+import com.warehouse.returntoken.domain.vo.ReturnPackageResponse;
+import com.warehouse.returntoken.domain.vo.ReturnToken;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class ReturnTokenServiceImpl implements ReturnTokenService {
 
-    private static final int TOKEN_LENGTH = 6;
+    private final ReturnTokenRepository returnTokenRepository;
 
-    private static String hashMD5(String input) {
-        try {
-            final MessageDigest md = MessageDigest.getInstance("MD5");
-            final byte[] messageDigest = md.digest(input.getBytes());
+    @Override
+    public ReturnPackageResponse sign(final ReturnPackageRequest returnPackageRequest) {
+        final ShipmentId shipmentId = returnPackageRequest.getShipmentId();
+        final ReturnToken returnToken = ReturnTokenGenerator.generateReturnToken(shipmentId);
+        return new ReturnPackageResponse(shipmentId, returnToken, null);
+    }
 
-            final StringBuilder hexString = new StringBuilder();
 
-            for (byte b : messageDigest) {
-                hexString.append(String.format("%02X", b));
-            }
-
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("MD5 algorithm not found", e);
-        }
+    @Override
+    public ReturnToken findByShipmentId(final ShipmentId shipmentId) {
+        return returnTokenRepository
+                .findByShipmentId(shipmentId)
+                .map(ReturnToken::from)
+                .orElseGet(ReturnToken::empty);
     }
 
     @Override
-    public Token determineToken(Parcel parcel) {
-        final String input = parcel.getId() + "_" + parcel.getParcelRelatedId() + "_" +
-                parcel.getParcelStatus();
-
-        final String hashedInput = hashMD5(input);
-
-        final String token = hashedInput.substring(0, TOKEN_LENGTH);
-
-        if (!parcel.isLocked()) {
-            return new Token(parcel.getId(), token);
-        }
-        return new Token(parcel.getId(), null);
+    public Boolean exists(final ReturnToken returnToken) {
+        return returnTokenRepository.exists(returnToken.getValue());
     }
 }

@@ -10,8 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.shipment.domain.vo.Address;
-import com.warehouse.shipment.domain.vo.City;
+import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderAdapter;
+import com.warehouse.voronoi.VoronoiRequestDto;
+import com.warehouse.voronoi.VoronoiResponseDto;
 import com.warehouse.voronoi.VoronoiService;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,14 +35,14 @@ public class PathFinderAdapterTest {
         // given
         final Address address = new Address("Kraków", "Krakowska", "00-000");
 
-        doReturn("KR1")
+        doReturn(new VoronoiResponseDto("KR1", null))
                 .when(voronoiService)
-                .findFastestRoute(address.getCity());
+                .findFastestRoute(new VoronoiRequestDto(address.getCity(), "00-000"));
         // when
-        final City city = pathFinderAdapter.determineDeliveryDepot(address);
+        final VoronoiResponse voronoiResponse = pathFinderAdapter.determineDeliveryDepot(address);
         
         // then
-        assertEquals(expectedToBe("KR1"), city.getValue());
+        assertEquals(expectedToBe("KR1"), voronoiResponse.getValue());
     }
 
     private <T> T expectedToBe(T value) {

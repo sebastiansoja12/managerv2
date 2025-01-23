@@ -3,6 +3,7 @@ package com.warehouse.routelogger.configuration;
 
 import com.warehouse.routelogger.domain.port.secondary.*;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,10 +21,23 @@ public class RouteLoggerConfiguration {
 			final RouteLoggerVersionServicePort routeLoggerVersionServicePort,
 			final RouteLoggerUsernameServicePort routeLoggerUsernameServicePort,
 			final RouteLoggerDepotCodeServicePort routeLoggerDepotCodeServicePort,
-			final RouteLoggerRequestServicePort routeLoggerRequestServicePort) {
+			final RouteLoggerRequestServicePort routeLoggerRequestServicePort,
+			final RouteLoggerDeviceInformationServicePort routeLoggerDeviceInformationServicePort) {
 		return new RouteLoggerPortImpl(routeLoggerDeliveryServicePort, routeLoggerSupplierCodeServicePort,
 				routeLoggerTerminalServicePort, routeLoggerVersionServicePort, routeLoggerUsernameServicePort,
-				routeLoggerDepotCodeServicePort, routeLoggerRequestServicePort);
+				routeLoggerDepotCodeServicePort, routeLoggerRequestServicePort, routeLoggerDeviceInformationServicePort);
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
+	public RouteLoggerDeviceInformationServicePort routeLoggerDeviceInformationServicePort(final RouteTrackerLogProperties routeTrackerLogProperties) {
+		return new RouteLoggerDeviceInformationServiceAdapter(routeTrackerLogProperties);
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	public RouteLoggerDeviceInformationServicePort routeLoggerDeviceInformationMockServicePort() {
+		return new RouteLoggerDeviceInformationServiceMockAdapter();
 	}
 	
 	@Bean

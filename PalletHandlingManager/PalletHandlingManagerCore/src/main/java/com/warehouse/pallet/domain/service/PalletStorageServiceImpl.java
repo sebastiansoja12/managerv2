@@ -1,7 +1,9 @@
 package com.warehouse.pallet.domain.service;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ShipmentId;
+
+import com.warehouse.pallet.configuration.identificator.DepartmentCode;
+import com.warehouse.pallet.configuration.identificator.PalletId;
+import com.warehouse.pallet.configuration.identificator.ShipmentId;
 import com.warehouse.pallet.domain.enumeration.PalletHandlingPriority;
 import com.warehouse.pallet.domain.enumeration.PalletStatus;
 import com.warehouse.pallet.domain.enumeration.StorageStatus;

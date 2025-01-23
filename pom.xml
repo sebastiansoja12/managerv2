@@ -20,12 +20,12 @@
 		<module>ShipmentManagement</module>
 		<module>MailService</module>
 		<module>DepartmentService</module>
-		<module>SupplyOperation</module>
+		<module>DeliveryOperation</module>
 		<module>PathFinder</module>
 		<module>Authorization</module>
 		<module>Utility</module>
         <module>DestinationDetermination</module>
-        <module>Generator</module>
+        <module>DocumentManager</module>
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
         <module>Terminal</module>
@@ -37,7 +37,9 @@
         <module>RouteLogger</module>
         <module>AssetConverter</module>
 		<module>MessageProvider</module>
-	</modules>
+        <module>LogisticsOrchestrator</module>
+        <module>CrossLogistics</module>
+    </modules>
 
 	<properties>
 		<java.version>21</java.version>

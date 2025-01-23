@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.department.domain.port.primary.DepartmentPort;
-import com.warehouse.voronoi.domain.model.Depot;
+import com.warehouse.voronoi.domain.model.Department;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.DepotServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.mapper.DepotResponseMapper;
 
@@ -35,8 +35,8 @@ public class DepartmentServiceAdapterTest {
     @Test
     void shouldDownloadDepots() {
         // when
-        final List<Depot> depotList = depotServiceAdapter.downloadDepots();
+        final List<Department> departmentList = depotServiceAdapter.downloadDepots();
         // then
-        assertThat(depotList).isNotNull();
+        assertThat(departmentList).isNotNull();
     }
 }

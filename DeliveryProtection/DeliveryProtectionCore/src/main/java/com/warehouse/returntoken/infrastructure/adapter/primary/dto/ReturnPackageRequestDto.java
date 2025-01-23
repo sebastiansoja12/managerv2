@@ -10,9 +10,6 @@ public class ReturnPackageRequestDto {
     private String deliveryStatus;
     private Boolean locked;
 
-    public ReturnPackageRequestDto() {
-    }
-
     public ReturnPackageRequestDto(final UUID id,
                                    final ShipmentIdDto shipmentId,
                                    final DepartmentCodeDto departmentCode,

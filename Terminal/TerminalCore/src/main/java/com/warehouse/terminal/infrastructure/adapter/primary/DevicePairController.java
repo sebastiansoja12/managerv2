@@ -11,7 +11,7 @@ import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.DeviceVersion;
 import com.warehouse.terminal.domain.model.request.DevicePairRequest;
-import com.warehouse.terminal.domain.model.response.DevicePairResponse;
+import com.warehouse.terminal.domain.vo.DevicePairResponse;
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.vo.DeviceInformationResponse;
 import com.warehouse.terminal.infrastructure.adapter.primary.mapper.TerminalRequestMapper;
