@@ -9,7 +9,7 @@ import com.warehouse.pallet.domain.model.Pallet;
 import com.warehouse.pallet.domain.model.Weight;
 import com.warehouse.pallet.domain.vo.Dimension;
 import com.warehouse.pallet.domain.vo.DriverId;
-import com.warehouse.pallet.domain.vo.PalletId;
+import com.warehouse.pallet.configuration.identificator.PalletId;
 import com.warehouse.pallet.domain.vo.SealNumber;
 
 public interface PalletStorageService {
