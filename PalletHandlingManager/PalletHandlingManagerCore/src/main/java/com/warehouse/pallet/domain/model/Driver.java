@@ -1,25 +1,29 @@
 package com.warehouse.pallet.domain.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.pallet.domain.vo.DriverId;
+import com.warehouse.pallet.domain.vo.TruckId;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Driver {
     private DriverId driverId;
     private String firstName;
     private String lastName;
     private List<DepartmentCode> assignedDepartments;
+    private List<TruckId> assignedTrucks;
 
     public Driver(final DriverId driverId,
                   final String firstName,
                   final String lastName,
-                  final List<DepartmentCode> assignedDepartments) {
+                  final List<DepartmentCode> assignedDepartments,
+                  final List<TruckId> assignedTrucks) {
         this.driverId = driverId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.assignedDepartments = assignedDepartments;
+        this.assignedTrucks = assignedTrucks;
     }
 
     public DriverId getDriverId() {
@@ -55,5 +59,13 @@ public class Driver {
 
     public void setAssignedDepartments(final List<DepartmentCode> assignedDepartments) {
         this.assignedDepartments = assignedDepartments;
+    }
+
+    public List<TruckId> getAssignedTrucks() {
+        return assignedTrucks;
+    }
+
+    public void setAssignedTrucks(final List<TruckId> assignedTrucks) {
+        this.assignedTrucks = assignedTrucks;
     }
 }

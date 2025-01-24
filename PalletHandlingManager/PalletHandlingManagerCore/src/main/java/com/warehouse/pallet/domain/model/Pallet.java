@@ -62,6 +62,14 @@ public class Pallet {
         this.maxPalletWeight = maxPalletWeight;
     }
 
+    public Pallet(final PalletId palletId) {
+        this.palletId = palletId;
+    }
+
+    public static Pallet empty(final PalletId palletId) {
+        return new Pallet(palletId);
+    }
+
     public DepartmentCode getDestinationDepartment() {
         return destinationDepartment;
     }
@@ -181,7 +189,7 @@ public class Pallet {
     }
 
     public void changeMaxPalletWeight(final Double maxPalletWeight) {
-        this.maxPalletWeight = new MaxPalletWeight(maxPalletWeight);
+        this.maxPalletWeight = new MaxPalletWeight(maxPalletWeight, "KG");
         modified();
     }
 

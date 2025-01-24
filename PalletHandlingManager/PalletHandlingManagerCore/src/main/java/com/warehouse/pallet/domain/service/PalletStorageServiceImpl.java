@@ -11,9 +11,11 @@ import com.warehouse.pallet.domain.model.Pallet;
 import com.warehouse.pallet.domain.model.Weight;
 import com.warehouse.pallet.domain.port.secondary.PalletRepository;
 import com.warehouse.pallet.domain.vo.*;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Service
 public class PalletStorageServiceImpl implements PalletStorageService {
 
     private final PalletRepository palletRepository;
@@ -25,6 +27,11 @@ public class PalletStorageServiceImpl implements PalletStorageService {
     @Override
     public PalletId nextPalletId() {
         return new PalletId(UUID.randomUUID().toString());
+    }
+
+    @Override
+    public void createEmptyPallet(final PalletId palletId) {
+        this.palletRepository.createOrUpdate(Pallet.empty(palletId));
     }
 
     @Override

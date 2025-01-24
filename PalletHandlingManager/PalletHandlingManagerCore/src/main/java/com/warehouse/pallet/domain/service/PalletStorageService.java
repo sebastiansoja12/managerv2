@@ -15,6 +15,7 @@ import com.warehouse.pallet.domain.vo.SealNumber;
 
 public interface PalletStorageService {
     PalletId nextPalletId();
+    void createEmptyPallet(final PalletId palletId);
     void createPallet(final Pallet pallet);
     void changeDestinationDepartment(final PalletId palletId, final DepartmentCode destinationDepartment);
     void changeOriginDepartment(final PalletId palletId, final DepartmentCode originDepartment);

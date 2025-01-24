@@ -4,13 +4,19 @@ import java.util.Objects;
 
 public class MaxPalletWeight {
     private final Double value;
+    private final String unit;
 
-    public MaxPalletWeight(final Double value) {
+    public MaxPalletWeight(final Double value, final String unit) {
         this.value = value;
+        this.unit = unit;
     }
 
     public Double getValue() {
         return value;
+    }
+
+    public String getUnit() {
+        return unit;
     }
 
     @Override
