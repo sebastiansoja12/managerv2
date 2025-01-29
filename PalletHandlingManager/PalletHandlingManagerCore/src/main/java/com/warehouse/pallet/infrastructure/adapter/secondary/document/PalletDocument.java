@@ -41,7 +41,12 @@ public class PalletDocument {
     private MaxPalletWeight maxPalletWeight;
 
     public static PalletDocument from(final Pallet pallet) {
-        return null;
+        return new PalletDocument(pallet.getPalletId(), pallet.getShipmentIds(),
+                pallet.getOriginDepartment(), pallet.getDestinationDepartment(),
+                pallet.getCreated(), pallet.getModified(), pallet.getPalletStatus(),
+                pallet.getStorageStatus(), DriverDocument.from(pallet.getDriver()), pallet.getPalletWeight(),
+                pallet.getDimension(), pallet.getPalletHandlingPriority(), pallet.getSealNumber(),
+                pallet.isRefrigerated(), pallet.getMaxPalletWeight());
     }
 
     public PalletDocument(final PalletId palletId,
@@ -180,7 +185,7 @@ public class PalletDocument {
         this.sealNumber = sealNumber;
     }
 
-    public Boolean getRefrigerated() {
+    public Boolean isRefrigerated() {
         return refrigerated;
     }
 

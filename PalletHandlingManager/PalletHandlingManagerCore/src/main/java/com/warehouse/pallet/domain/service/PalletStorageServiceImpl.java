@@ -7,10 +7,12 @@ import com.warehouse.pallet.configuration.identificator.ShipmentId;
 import com.warehouse.pallet.domain.enumeration.PalletHandlingPriority;
 import com.warehouse.pallet.domain.enumeration.PalletStatus;
 import com.warehouse.pallet.domain.enumeration.StorageStatus;
+import com.warehouse.pallet.domain.model.Driver;
 import com.warehouse.pallet.domain.model.Pallet;
 import com.warehouse.pallet.domain.model.Weight;
 import com.warehouse.pallet.domain.port.secondary.PalletRepository;
-import com.warehouse.pallet.domain.vo.*;
+import com.warehouse.pallet.domain.vo.Dimension;
+import com.warehouse.pallet.domain.vo.SealNumber;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -82,9 +84,9 @@ public class PalletStorageServiceImpl implements PalletStorageService {
     }
 
     @Override
-    public void changeDriver(final PalletId palletId, final DriverId driverId) {
+    public void changeDriver(final PalletId palletId, final Driver driver) {
         final Pallet pallet = this.palletRepository.findById(palletId);
-        pallet.changeDriver(null);
+        pallet.changeDriver(driver);
         this.palletRepository.createOrUpdate(pallet);
     }
 
@@ -128,5 +130,10 @@ public class PalletStorageServiceImpl implements PalletStorageService {
         final Pallet pallet = this.palletRepository.findById(palletId);
         pallet.changeWeight(weight);
         this.palletRepository.createOrUpdate(pallet);
+    }
+
+    @Override
+    public Pallet find(final PalletId palletId) {
+        return this.palletRepository.findById(palletId);
     }
 }

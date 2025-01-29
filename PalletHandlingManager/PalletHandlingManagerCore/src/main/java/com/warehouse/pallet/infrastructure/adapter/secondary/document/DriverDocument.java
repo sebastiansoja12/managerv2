@@ -1,6 +1,7 @@
 package com.warehouse.pallet.infrastructure.adapter.secondary.document;
 
 import com.warehouse.pallet.configuration.identificator.DepartmentCode;
+import com.warehouse.pallet.domain.model.Driver;
 import com.warehouse.pallet.domain.vo.DriverId;
 import com.warehouse.pallet.domain.vo.TruckId;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -26,6 +27,25 @@ public class DriverDocument {
         this.lastName = lastName;
         this.assignedDepartments = assignedDepartments;
         this.assignedTrucks = assignedTrucks;
+    }
+
+    public DriverDocument() {
+
+    }
+
+    public static DriverDocument from(final Driver driver) {
+        final DriverDocument driverDocument;
+        if (driver == null) {
+            driverDocument = DriverDocument.empty();
+        } else {
+            driverDocument = new DriverDocument(driver.getDriverId(), driver.getFirstName(), driver.getLastName(),
+                    driver.getAssignedDepartments(), driver.getAssignedTrucks());
+        }
+        return driverDocument;
+    }
+
+    private static DriverDocument empty() {
+        return new DriverDocument();
     }
 
     public DriverId getDriverId() {

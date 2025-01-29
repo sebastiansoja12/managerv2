@@ -1,23 +1,21 @@
 package com.warehouse.pallet.domain.model;
 
+import com.warehouse.pallet.domain.enumeration.Unit;
+
 public class Weight {
     private Double value;
-    private String unit;
+    private Unit unit;
 
-    public Weight(final Double value, final String unit) {
+    public Weight(final Double value, final Unit unit) {
         this.value = value;
         this.unit = unit;
     }
 
-    public Double getValue() {
-        return value;
-    }
-
-    public String getUnit() {
+    public Unit getUnit() {
         return unit;
     }
 
-    public void setUnit(final String unit) {
+    public void setUnit(final Unit unit) {
         this.unit = unit;
     }
 

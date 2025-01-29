@@ -1,19 +1,21 @@
 package com.warehouse.pallet.domain.model;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.warehouse.pallet.configuration.identificator.DepartmentCode;
+import com.warehouse.pallet.configuration.identificator.PalletId;
 import com.warehouse.pallet.configuration.identificator.ShipmentId;
 import com.warehouse.pallet.domain.enumeration.PalletHandlingPriority;
 import com.warehouse.pallet.domain.enumeration.PalletStatus;
 import com.warehouse.pallet.domain.enumeration.StorageStatus;
+import com.warehouse.pallet.domain.enumeration.Unit;
 import com.warehouse.pallet.domain.vo.Dimension;
 import com.warehouse.pallet.domain.vo.MaxPalletWeight;
-import com.warehouse.pallet.configuration.identificator.PalletId;
 import com.warehouse.pallet.domain.vo.SealNumber;
 import com.warehouse.pallet.infrastructure.adapter.secondary.document.PalletDocument;
+import org.apache.commons.lang3.StringUtils;
+
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Pallet {
     private PalletId palletId;
@@ -62,8 +64,63 @@ public class Pallet {
         this.maxPalletWeight = maxPalletWeight;
     }
 
+    public Pallet(final PalletId palletId,
+                  final Set<ShipmentId> shipmentIds,
+                  final DepartmentCode originDepartment,
+                  final DepartmentCode destinationDepartment,
+                  final Instant created,
+                  final Instant modified,
+                  final PalletStatus palletStatus,
+                  final StorageStatus storageStatus,
+                  final Driver driver,
+                  final Weight palletWeight,
+                  final Dimension dimension,
+                  final PalletHandlingPriority palletHandlingPriority,
+                  final SealNumber sealNumber,
+                  final Boolean refrigerated,
+                  final MaxPalletWeight maxPalletWeight) {
+        this.palletId = palletId;
+        this.shipmentIds = shipmentIds;
+        this.originDepartment = originDepartment;
+        this.destinationDepartment = destinationDepartment;
+        this.created = created;
+        this.modified = modified;
+        this.palletStatus = palletStatus;
+        this.storageStatus = storageStatus;
+        this.driver = driver;
+        this.palletWeight = palletWeight;
+        this.dimension = dimension;
+        this.palletHandlingPriority = palletHandlingPriority;
+        this.sealNumber = sealNumber;
+        this.refrigerated = refrigerated;
+        this.maxPalletWeight = maxPalletWeight;
+    }
+
     public Pallet(final PalletId palletId) {
         this.palletId = palletId;
+        this.shipmentIds = new HashSet<>();
+        this.originDepartment = new DepartmentCode(StringUtils.EMPTY);
+        this.destinationDepartment = new DepartmentCode(StringUtils.EMPTY);
+        this.created = Instant.now();
+        this.modified = Instant.now();
+        this.palletStatus = PalletStatus.EMPTY;
+        this.storageStatus = StorageStatus.UNLOCKED;
+        this.driver = Driver.empty();
+        this.palletWeight = null;
+        this.dimension = null;
+        this.palletHandlingPriority = PalletHandlingPriority.LOW;
+        this.sealNumber = null;
+        this.refrigerated = false;
+        this.maxPalletWeight = null;
+    }
+
+    public static Pallet from(final PalletDocument pallet) {
+        return new Pallet(pallet.getPalletId(), pallet.getShipmentIds(),
+                pallet.getOriginDepartment(), pallet.getDestinationDepartment(),
+                pallet.getCreated(), pallet.getModified(), pallet.getPalletStatus(),
+                pallet.getStorageStatus(), Driver.from(pallet.getDriver()), pallet.getPalletWeight(),
+                pallet.getDimension(), pallet.getPalletHandlingPriority(), pallet.getSealNumber(),
+                pallet.isRefrigerated(), pallet.getMaxPalletWeight());
     }
 
     public static Pallet empty(final PalletId palletId) {
@@ -125,7 +182,7 @@ public class Pallet {
         return sealNumber;
     }
 
-    public Boolean getRefrigerated() {
+    public Boolean isRefrigerated() {
         return refrigerated;
     }
 
@@ -189,7 +246,7 @@ public class Pallet {
     }
 
     public void changeMaxPalletWeight(final Double maxPalletWeight) {
-        this.maxPalletWeight = new MaxPalletWeight(maxPalletWeight, "KG");
+        this.maxPalletWeight = new MaxPalletWeight(maxPalletWeight, Unit.KG);
         modified();
     }
 
@@ -200,10 +257,5 @@ public class Pallet {
 
     private void modified() {
         this.modified = Instant.now();
-    }
-
-
-    public static Pallet from(final PalletDocument palletDocument) {
-        return null;
     }
 }
