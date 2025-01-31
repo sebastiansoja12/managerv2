@@ -19,7 +19,7 @@ import com.warehouse.terminal.infrastructure.adapter.primary.mapper.TerminalResp
 import com.warehouse.terminal.request.DevicePairRequestDto;
 
 @RestController
-@RequestMapping("/device-pairing")
+@RequestMapping("/device-pairings")
 public class DevicePairController {
 
     private final DevicePairPort devicePairPort;

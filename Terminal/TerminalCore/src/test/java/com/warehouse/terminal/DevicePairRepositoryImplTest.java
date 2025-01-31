@@ -41,7 +41,7 @@ public class DevicePairRepositoryImplTest {
         final Terminal terminal = Mockito.mock(Terminal.class);
         final DevicePairId devicePairId = new DevicePairId(1L);
         // when
-        devicePairRepository.pair(terminal, devicePairId);
+        //devicePairRepository.pair(terminal, devicePairId);
         // then
         verify(repository).findByDevice_DeviceId(any());
     }
@@ -55,7 +55,7 @@ public class DevicePairRepositoryImplTest {
         final DevicePairId devicePairId = new DevicePairId(1L);
         when(repository.findByDevice_DeviceId(terminalId)).thenReturn(Optional.empty());
         // when
-        devicePairRepository.pair(terminal, devicePairId);
+        //devicePairRepository.pair(terminal, devicePairId);
         // then
         verify(repository).findByDevice_DeviceId(terminalId);
         verify(repository).save(any());

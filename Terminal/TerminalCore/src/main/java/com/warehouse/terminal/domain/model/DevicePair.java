@@ -2,6 +2,8 @@ package com.warehouse.terminal.domain.model;
 
 import java.time.Instant;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DevicePairEntity;
@@ -33,6 +35,15 @@ public class DevicePair {
 		this.errorDescription = errorDescription;
         this.pairKey = pairKey;
     }
+
+	public DevicePair(final DeviceId deviceId, final String pairKey, final DevicePairId devicePairId) {
+		this.pairKey = pairKey;
+		this.paired = false;
+		this.deviceId = deviceId;
+		this.loginTime = Instant.now();
+		this.errorDescription = StringUtils.EMPTY;
+		this.devicePairId = devicePairId;
+	}
 
 	public DevicePair(final boolean paired) {
 		this.paired = paired;
