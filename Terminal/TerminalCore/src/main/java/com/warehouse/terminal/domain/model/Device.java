@@ -2,23 +2,23 @@ package com.warehouse.terminal.domain.model;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.enumeration.ExecutionSourceType;
 
 public class Device {
     private DeviceId deviceId;
     private String version;
     private DeviceType deviceType;
-    private UserId userId;
+    private Username username;
 
 	public Device(final DeviceId deviceId,
                   final String version,
                   final DeviceType deviceType,
-                  final UserId userId) {
+                  final Username username) {
         this.deviceId = deviceId;
         this.version = version;
         this.deviceType = deviceType;
-        this.userId = userId;
+        this.username = username;
     }
 
     public DeviceId getDeviceId() {
@@ -49,7 +49,7 @@ public class Device {
         return ExecutionSourceType.DEVICE.name();
     }
 
-    public UserId getUserId() {
-        return userId;
+    public Username getUsername() {
+        return username;
     }
 }

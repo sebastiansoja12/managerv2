@@ -1,11 +1,13 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.vo.*;
 import org.springframework.stereotype.Service;
 
-import com.warehouse.auth.domain.model.*;
+import com.warehouse.auth.domain.model.RefreshToken;
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.vo.*;
+import com.warehouse.commonassets.identificator.UserId;
 
 import lombok.AllArgsConstructor;
 
@@ -45,5 +47,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void logout(UserLogout userLogout) {
         refreshTokenRepository.delete(userLogout.getRefreshToken());
+    }
+
+    @Override
+    public UserId nextUserId() {
+        return new UserId((System.currentTimeMillis() % 900000) + 100000);
     }
 }

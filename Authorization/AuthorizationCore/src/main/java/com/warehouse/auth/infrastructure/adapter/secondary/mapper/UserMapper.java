@@ -1,16 +1,11 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.mapper;
 
-import java.util.concurrent.ThreadLocalRandom;
-
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
-import com.warehouse.commonassets.identificator.UserId;
 
 @Mapper
 public interface UserMapper {
@@ -23,17 +18,4 @@ public interface UserMapper {
     @Mapping(target = "nonExpired", source = "accountNonExpired")
     @Mapping(target = "nonLocked", source = "accountNonLocked")
     UserResponse mapToUserResponse(UserEntity userEntity);
-
-    @AfterMapping
-    default void generateIdForUserEntity(@MappingTarget final UserEntity userEntity) {
-        if (userEntity.getUserId() == null) {
-            userEntity.setUserId(new UserId(generateUniqueId()));
-        }
-    }
-
-    private static Long generateUniqueId() {
-        final long timestamp = System.currentTimeMillis();
-        final long randomPart = ThreadLocalRandom.current().nextLong(1_000_000L, 10_000_000L);
-        return timestamp * 10_000_000L + randomPart;
-    }
 }

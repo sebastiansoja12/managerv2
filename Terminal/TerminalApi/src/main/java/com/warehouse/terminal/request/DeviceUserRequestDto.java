@@ -1,25 +1,25 @@
 package com.warehouse.terminal.request;
 
 import com.warehouse.terminal.dto.DeviceIdDto;
-import com.warehouse.terminal.dto.UserIdDto;
+import com.warehouse.terminal.dto.UsernameDto;
 
 public class DeviceUserRequestDto {
     private DeviceIdDto deviceId;
-    private UserIdDto userId;
+    private UsernameDto username;
 
     public DeviceUserRequestDto() {
     }
 
-    public DeviceUserRequestDto(final DeviceIdDto deviceId, final UserIdDto userId) {
+    public DeviceUserRequestDto(final DeviceIdDto deviceId, final UsernameDto username) {
         this.deviceId = deviceId;
-        this.userId = userId;
+        this.username = username;
     }
 
     public DeviceIdDto getDeviceId() {
         return deviceId;
     }
 
-    public UserIdDto getUserId() {
-        return userId;
+    public UsernameDto getUserId() {
+        return username;
     }
 }

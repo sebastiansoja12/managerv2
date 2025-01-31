@@ -23,12 +23,12 @@ public class DeviceValidatorServiceAdapter implements DeviceValidatorServicePort
     public void validateDevice(final DeviceInformation deviceInformation) {
         final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().getValue());
         final DepartmentCodeDto departmentCode = new DepartmentCodeDto(deviceInformation.getDepartmentCode().getValue());
-        final UserIdDto userId = new UserIdDto(1L);
+        final UsernameDto username = new UsernameDto(deviceInformation.getUsername());
         final VersionDto version = new VersionDto(deviceInformation.getVersion());
         final DeviceUserTypeDto deviceUserType = DeviceUserTypeDto.valueOf(deviceInformation.getDeviceUserType().name());
         final DeviceTypeDto deviceType = DeviceTypeDto.valueOf(deviceInformation.getDeviceType().name());
         final DeviceValidationRequestDto deviceValidationRequest = new DeviceValidationRequestDto(
-                deviceId, departmentCode, userId, version, deviceUserType, deviceType, true
+                deviceId, departmentCode, username, version, deviceUserType, deviceType, true
         );
         deviceEventPublisher.send(new DeviceValidationEvent(deviceValidationRequest, Instant.now()));
     }

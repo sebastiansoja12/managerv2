@@ -8,12 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.model.DeviceVersion;
 import com.warehouse.terminal.domain.model.request.DevicePairRequest;
-import com.warehouse.terminal.domain.vo.DevicePairResponse;
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.vo.DeviceInformationResponse;
+import com.warehouse.terminal.domain.vo.DevicePairResponse;
 import com.warehouse.terminal.infrastructure.adapter.primary.mapper.TerminalRequestMapper;
 import com.warehouse.terminal.infrastructure.adapter.primary.mapper.TerminalResponseMapper;
 import com.warehouse.terminal.request.DevicePairRequestDto;
@@ -68,9 +68,9 @@ public class DevicePairController {
 
     @GetMapping("/user-valid")
     private ResponseEntity<?> isUserValid(@Param("deviceId") final Long deviceId,
-                                          @Param("userId") final Long userId) {
+                                          @Param("username") final String username) {
         final DeviceId id = new DeviceId(deviceId);
-        final UserId user = new UserId(userId);
+        final Username user = new Username(username);
         final DeviceInformationResponse response =
                 new DeviceInformationResponse(this.devicePairPort.isUserValid(id, user));
         return ResponseEntity.ok().body(responseMapper.map(response));

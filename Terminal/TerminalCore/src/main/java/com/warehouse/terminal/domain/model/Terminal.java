@@ -1,19 +1,19 @@
 package com.warehouse.terminal.domain.model;
 
-import com.warehouse.commonassets.identificator.TerminalId;
-import com.warehouse.commonassets.identificator.UserId;
+import java.time.Instant;
+
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.identificator.TerminalId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.enumeration.ExecutionSourceType;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
 import com.warehouse.terminal.dto.DeviceValidationRequestDto;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 
-import java.time.Instant;
-
 public class Terminal extends Device implements ExecutionSourceResolver {
     private TerminalId terminalId;
     private DeviceType deviceType;
-    private UserId userId;
+    private Username username;
     private String departmentCode;
     private String version;
     private Instant lastUpdate;
@@ -21,35 +21,35 @@ public class Terminal extends Device implements ExecutionSourceResolver {
 
 	public Terminal(final TerminalId terminalId,
                     final DeviceType deviceType,
-                    final UserId userId,
+                    final Username username,
                     final String departmentCode,
                     final String version,
                     final Instant lastUpdate, 
                     final Boolean active) {
-        super(terminalId, version, deviceType, userId);
+        super(terminalId, version, deviceType, username);
         this.terminalId = terminalId;
         this.deviceType = deviceType;
-        this.userId = userId;
+        this.username = username;
         this.departmentCode = departmentCode;
         this.version = version;
         this.lastUpdate = lastUpdate;
         this.active = active;
     }
 
-	public static Terminal from(final TerminalAddRequest request, final UserId userId) {
-		return new Terminal(null, request.getDeviceType(), userId, request.getDepartmentCode(), request.getVersion(),
-				Instant.now(), true);
+	public static Terminal from(final TerminalAddRequest request) {
+		return new Terminal(null, request.getDeviceType(), request.getUsername(), request.getDepartmentCode(),
+				request.getVersion(), Instant.now(), true);
 	}
 
     public static Terminal from(final DeviceEntity device) {
-        return new Terminal(new TerminalId(device.getDeviceId().getValue()), device.getDeviceType(), device.getUserId(),
+        return new Terminal(new TerminalId(device.getDeviceId().getValue()), device.getDeviceType(), device.getUsername(),
                 device.getDepartmentCode().getValue(), device.getVersion(),
                 Instant.now(), device.isActive());
     }
 
     public static Terminal from(final DeviceValidationRequestDto request) {
         return new Terminal(new TerminalId(request.deviceId().value()), DeviceType.valueOf(request.deviceType().name()),
-                new UserId(request.userId().value()), request.departmentCode().value(), request.version().value(),
+                new Username(request.username().value()), request.departmentCode().value(), request.version().value(),
                 null, request.active());
     }
 
@@ -58,11 +58,11 @@ public class Terminal extends Device implements ExecutionSourceResolver {
     }
 
     public DeviceType getDeviceType() {
-        return DeviceType.TERMINAL;
+        return deviceType;
     }
 
-    public UserId getUserId() {
-        return userId;
+    public Username getUsername() {
+        return username;
     }
 
     public String getDepartmentCode() {
@@ -77,8 +77,8 @@ public class Terminal extends Device implements ExecutionSourceResolver {
         return lastUpdate;
     }
 
-    public void updateUserId(final UserId userId) {
-        this.userId = userId;
+    public void updateUserId(final Username username) {
+        this.username = username;
         markAsModified();
     }
 
@@ -101,8 +101,8 @@ public class Terminal extends Device implements ExecutionSourceResolver {
         markAsModified();
     }
 
-    public void assignUser(final UserId userId) {
-        this.userId = userId;
+    public void assignUser(final Username username) {
+        this.username = username;
         markAsModified();
     }
 

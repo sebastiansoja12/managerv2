@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.request.DeviceSettingsRequest;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
@@ -32,9 +33,9 @@ public class TerminalServiceImpl implements TerminalService {
     }
 
     @Override
-    public void assignUser(final DeviceId deviceId, final UserId userId) {
+    public void assignUser(final DeviceId deviceId, final Username username) {
         final Terminal terminal = (Terminal) this.deviceRepository.findById(deviceId);
-        terminal.assignUser(userId);
+        terminal.assignUser(username);
         this.deviceRepository.saveOrUpdate(terminal);
     }
 

@@ -1,18 +1,19 @@
 package com.warehouse.terminal.domain.port.primary;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.enumeration.PairStatus;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.DeviceVersion;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.request.DevicePairRequest;
-import com.warehouse.terminal.domain.vo.DevicePairResponse;
 import com.warehouse.terminal.domain.service.*;
+import com.warehouse.terminal.domain.vo.DevicePairResponse;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class DevicePairPortImpl implements DevicePairPort {
@@ -54,9 +55,9 @@ public class DevicePairPortImpl implements DevicePairPort {
     }
 
     @Override
-    public boolean isUserValid(final DeviceId deviceId, final UserId userId) {
+    public boolean isUserValid(final DeviceId deviceId, final Username username) {
         final Device device = this.terminalService.findByDeviceId(deviceId);
-        return this.userService.existsByUserId(userId) && device != null && device.getUserId().equals(userId);
+        return this.userService.existsByUsername(username) && device != null && device.getUsername().equals(username);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class DevicePairPortImpl implements DevicePairPort {
         final DeviceId deviceId = terminal.getDeviceId();
         this.terminalValidatorService.validateDepartment(terminal.getDepartmentCode());
         this.terminalValidatorService.validateTerminalVersion(deviceId);
-        final Boolean userValid = this.userService.existsByUserId(terminal.getUserId())
+        final Boolean userValid = this.userService.existsByUsername(terminal.getUsername())
                 && this.userService.existsByUserId(request.getUserId());
 
         final DeviceVersion deviceVersion = new DeviceVersion(terminal.getVersion(), terminal.getTerminalId());

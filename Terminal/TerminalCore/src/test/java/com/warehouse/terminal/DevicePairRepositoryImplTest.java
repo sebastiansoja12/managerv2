@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.TerminalId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.vo.DevicePairId;
@@ -50,7 +50,7 @@ public class DevicePairRepositoryImplTest {
     void shouldNotPairAndCreateNewPairing() {
         // given
         final TerminalId terminalId = new TerminalId(1L);
-		final Terminal terminal = new Terminal(terminalId, DeviceType.TERMINAL, new UserId(1L), "KT1", "1.0",
+		final Terminal terminal = new Terminal(terminalId, DeviceType.TERMINAL, new Username("s-soja"), "KT1", "1.0",
 				Instant.now(), true);
         final DevicePairId devicePairId = new DevicePairId(1L);
         when(repository.findByDevice_DeviceId(terminalId)).thenReturn(Optional.empty());

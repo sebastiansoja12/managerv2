@@ -4,6 +4,7 @@ import com.warehouse.auth.domain.vo.LoginResponse;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.vo.UserLogout;
+import com.warehouse.commonassets.identificator.UserId;
 
 public interface AuthenticationService {
 
@@ -14,4 +15,6 @@ public interface AuthenticationService {
     User findUser(String username);
 
     void logout(UserLogout userLogout);
+
+    UserId nextUserId();
 }

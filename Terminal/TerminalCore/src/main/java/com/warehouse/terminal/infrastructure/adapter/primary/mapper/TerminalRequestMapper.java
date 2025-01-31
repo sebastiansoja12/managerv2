@@ -22,7 +22,6 @@ public interface TerminalRequestMapper {
         return new TerminalIdDto(deviceId != null ? deviceId.getValue() : null);
     }
 
-    @Mapping(target = "username", source = "username.value")
     @Mapping(target = "version", source = "version.value")
     @Mapping(target = "departmentCode", source = "departmentCode.value")
     TerminalAddRequest map(final TerminalAddRequestDto terminalAddRequest);
