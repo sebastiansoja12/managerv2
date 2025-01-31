@@ -1,0 +1,11 @@
+package com.warehouse.logistics.domain.vo;
+
+import com.warehouse.logistics.domain.model.DeliveryResponse;
+
+public class DeviceResponse {
+    private final DeliveryResponse deliveryResponse;
+
+    public DeviceResponse(final DeliveryResponse deliveryResponse) {
+        this.deliveryResponse = deliveryResponse;
+    }
+}

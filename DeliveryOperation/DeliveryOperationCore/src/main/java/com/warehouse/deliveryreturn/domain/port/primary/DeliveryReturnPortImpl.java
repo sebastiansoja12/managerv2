@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
 
-import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
@@ -17,6 +16,7 @@ import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogReturnServiceP
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.vo.*;
+import com.warehouse.terminal.DeviceInformation;
 
 import lombok.extern.slf4j.Slf4j;
 

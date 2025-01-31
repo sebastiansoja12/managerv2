@@ -7,12 +7,12 @@ import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectDetails;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
 import com.warehouse.deliveryreject.dto.DeliveryRejectDetailsDto;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
+import com.warehouse.terminal.DeviceInformation;
 
 @Mapper
 public interface DeliveryRejectRequestMapper {

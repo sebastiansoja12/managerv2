@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.util.CollectionUtils;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
-import com.warehouse.delivery.domain.vo.DeviceInformation;
+import com.warehouse.terminal.DeviceInformation;
 
 
 public class DeliveryMissedRequest {

@@ -3,7 +3,7 @@ package com.warehouse.deliverymissed.domain.vo;
 
 import java.util.List;
 
-import com.warehouse.delivery.domain.vo.DeviceInformation;
+import com.warehouse.terminal.DeviceInformation;
 
 import lombok.Builder;
 

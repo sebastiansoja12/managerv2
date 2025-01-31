@@ -108,6 +108,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>LogisticsOrchestrator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>MessageProviderCore</artifactId>
             <version>${project.version}</version>
         </dependency>
