@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.vo.DevicePairId;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DevicePairEntity;
 
 public class DevicePair {
@@ -103,10 +104,15 @@ public class DevicePair {
 	}
 
     public static DevicePair from(final DevicePairEntity devicePairEntity) {
+		final DeviceEntity deviceEntity = devicePairEntity.getDevice();
 		final DevicePairId pairId = new DevicePairId(devicePairEntity.getDevicePairId());
-        return new DevicePair(pairId, new DeviceId(devicePairEntity.getDevicePairId()),
+        return new DevicePair(pairId, deviceEntity.getDeviceId(),
                 devicePairEntity.isPaired(), devicePairEntity.getLoginTime(),
                 devicePairEntity.getErrorDescription(),
 				devicePairEntity.getPairKey());
     }
+
+	public boolean containsApiKey() {
+		return StringUtils.isNotBlank(pairKey);
+	}
 }

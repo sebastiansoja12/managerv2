@@ -89,7 +89,7 @@ public class DevicePairPortImpl implements DevicePairPort {
         }
         final DevicePair devicePair = this.devicePairService.findByDeviceId(request.getDeviceId());
 		return new DevicePairResponse(request.getUserId(), request.getDeviceId(), devicePair.getDevicePairId(),
-				devicePair.isPaired() ? PairStatus.PAIRED.name() : PairStatus.UNPAIRED.name(), devicePair.isPaired() ?
+				devicePair.isPaired() ? PairStatus.PAIRED.name() : PairStatus.UNPAIRED.name(), devicePair.containsApiKey() ?
                 devicePair.getPairKey() : StringUtils.EMPTY, userValid, terminal.isActive(),
 				deviceUpToDate);
     }
