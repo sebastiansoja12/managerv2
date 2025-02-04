@@ -7,10 +7,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.google.common.collect.Lists;
-import com.warehouse.logistics.domain.vo.DepartmentCodeRequest;
-import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
+import com.warehouse.logistics.domain.vo.DepartmentCodeRequest;
 import com.warehouse.routelogger.dto.*;
+import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.enumeration.ProcessType;
 import com.warehouse.terminal.model.*;
 import com.warehouse.terminal.request.TerminalRequest;
@@ -24,10 +24,10 @@ public interface DeliveryEventMapper {
     default DeviceDto map(final DeviceInformation deviceInformation) {
         final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().getValue());
         final DepartmentCodeDto departmentCode = new DepartmentCodeDto(deviceInformation.getDepartmentCode().getValue());
-        final UserIdDto userId = new UserIdDto(1L);
+        final UsernameDto username = new UsernameDto(deviceInformation.getUsername());
         final DeviceVersionDto deviceVersion = new DeviceVersionDto(deviceInformation.getVersion());
         final DeviceTypeDto deviceType = DeviceTypeDto.valueOf(deviceInformation.getDeviceType().name());
-        return new DeviceDto(deviceId, departmentCode, userId, deviceVersion, deviceType);
+        return new DeviceDto(deviceId, departmentCode, username, deviceVersion, deviceType);
     }
 
     DepotCodeRequestDto mapToDepotCodeRequest(final DepartmentCodeRequest departmentCodeRequest);
