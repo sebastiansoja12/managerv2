@@ -10,7 +10,7 @@ import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
 import com.warehouse.terminal.dto.DeviceValidationRequestDto;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 
-public class Terminal extends Device implements ExecutionSourceResolver {
+public class Terminal extends Device implements DeviceHandler, ExecutionSourceResolver {
     private TerminalId terminalId;
     private DeviceType deviceType;
     private Username username;
@@ -24,7 +24,7 @@ public class Terminal extends Device implements ExecutionSourceResolver {
                     final Username username,
                     final String departmentCode,
                     final String version,
-                    final Instant lastUpdate, 
+                    final Instant lastUpdate,
                     final Boolean active) {
         super(terminalId, version, deviceType, username);
         this.terminalId = terminalId;
@@ -113,5 +113,10 @@ public class Terminal extends Device implements ExecutionSourceResolver {
     @Override
     public ExecutionSourceType getExecutionSourceType() {
         return ExecutionSourceType.DEVICE;
+    }
+
+    @Override
+    public boolean canHandle(final DeviceType deviceType) {
+        return deviceType.equals(this.deviceType);
     }
 }
