@@ -12,14 +12,16 @@ public class DeviceInformation {
     private final DeviceUserType deviceUserType;
     private final String version;
     private final String username;
+    private final boolean updateRequired;
 
-    private DeviceInformation(Builder builder) {
+    private DeviceInformation(final Builder builder) {
         this.deviceId = builder.deviceId;
         this.departmentCode = builder.departmentCode;
         this.deviceType = builder.deviceType;
         this.deviceUserType = builder.deviceUserType;
         this.version = builder.version;
         this.username = builder.username;
+        this.updateRequired = builder.updateRequired;
     }
 
     public static Builder builder() {
@@ -44,6 +46,7 @@ public class DeviceInformation {
         private DeviceUserType deviceUserType;
         private String version;
         private String username;
+        private boolean updateRequired;
 
         public Builder deviceId(final DeviceId deviceId) {
             this.deviceId = deviceId;
@@ -75,6 +78,11 @@ public class DeviceInformation {
             return this;
         }
 
+        public Builder updateRequired(final boolean updateRequired) {
+            this.updateRequired = updateRequired;
+            return this;
+        }
+
         public DeviceInformation build() {
             return new DeviceInformation(this);
         }
@@ -102,6 +110,10 @@ public class DeviceInformation {
 
     public String getUsername() {
         return username;
+    }
+
+    public boolean isUpdateRequired() {
+        return updateRequired;
     }
 }
 

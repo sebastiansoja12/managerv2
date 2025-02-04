@@ -10,8 +10,6 @@ import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.logistics.domain.model.Response;
-import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.delivery.dto.DeviceIdDto;
 import com.warehouse.delivery.dto.DeviceInformationDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedResponseDto;
@@ -23,10 +21,13 @@ import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponseDetails;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnResponseDetailsDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnResponseDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.ReturnTokenDto;
+import com.warehouse.logistics.domain.model.Response;
+import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectResponse;
 import com.warehouse.terminal.model.DeliveryRejectResponseDetail;
 import com.warehouse.terminal.model.DeliveryReturnResponseDetail;
+import com.warehouse.terminal.response.DeviceUpToDate;
 import com.warehouse.terminal.response.TerminalResponse;
 
 @Mapper
@@ -65,7 +66,8 @@ public interface DeliveryResponseMapper {
         final String departmentCode = deviceInformation.getDepartmentCode().getValue();
         final String deviceUserType = deviceInformation.getDeviceUserType().toString();
         final String deviceType = deviceInformation.getDeviceType().toString();
-        return new Device(version, deviceId, username, departmentCode, deviceUserType, deviceType);
+        final DeviceUpToDate deviceUpToDate = deviceInformation.isUpdateRequired() ? DeviceUpToDate.NO : DeviceUpToDate.YES;
+        return new Device(version, deviceId, username, departmentCode, deviceUserType, deviceType, deviceUpToDate);
     }
 
     List<DeliveryRejectResponseDetail> mapToRejectResponseDetail(final List<DeliveryRejectResponseDetails> deliveryRejectResponseDetails);

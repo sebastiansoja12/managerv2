@@ -48,6 +48,8 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
     private final DeviceValidatorPort deviceValidatorPort;
 
+    private final DeviceAgentPort deviceAgentPort;
+
     private final DeliveryRequestMapper requestMapper = getMapper(DeliveryRequestMapper.class);
 
     private final DeliveryResponseMapper responseMapper = getMapper(DeliveryResponseMapper.class);
@@ -60,7 +62,8 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
                                    final TerminalRequestLoggerPort terminalRequestLoggerPort,
                                    final SupplierValidatorPort supplierValidatorPort,
                                    final DepartmentValidatorPort departmentValidatorPort,
-                                   final DeviceValidatorPort deviceValidatorPort) {
+                                   final DeviceValidatorPort deviceValidatorPort,
+                                   final DeviceAgentPort deviceAgentPort) {
         super(handlers);
         this.deliveryPort = deliveryPort;
         this.deliveryCreators = deliveryCreators;
@@ -68,6 +71,7 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
         this.supplierValidatorPort = supplierValidatorPort;
         this.departmentValidatorPort = departmentValidatorPort;
         this.deviceValidatorPort = deviceValidatorPort;
+        this.deviceAgentPort = deviceAgentPort;
     }
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
@@ -81,13 +85,15 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         deviceValidatorPort.validateDevice(device);
 
-//        logDeviceInformation(terminalRequest);
-//
-//        logTerminalRequest(terminalRequest);
-//
-//        logDeviceId(terminalRequest);
-//
-//        logVersion(terminalRequest);
+        deviceAgentPort.updateDeviceIfNeed(device);
+
+        logDeviceInformation(terminalRequest);
+
+        logTerminalRequest(terminalRequest);
+
+        logDeviceId(terminalRequest);
+
+        logVersion(terminalRequest);
 
         final Request request = this.requestMapper.map(terminalRequest);
 

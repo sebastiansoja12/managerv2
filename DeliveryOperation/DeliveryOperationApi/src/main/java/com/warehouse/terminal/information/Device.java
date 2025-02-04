@@ -1,6 +1,7 @@
 package com.warehouse.terminal.information;
 
 
+import com.warehouse.terminal.response.DeviceUpToDate;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -33,5 +34,8 @@ public class Device {
 
     @XmlElement(name = "DeviceType")
     private String deviceType;
+
+    @XmlElement(name = "DeviceUpToDate")
+    private DeviceUpToDate deviceUpToDate;
 
 }

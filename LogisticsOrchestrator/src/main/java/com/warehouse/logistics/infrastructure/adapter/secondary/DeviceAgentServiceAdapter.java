@@ -1,6 +1,6 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
-import com.warehouse.logistics.domain.port.secondary.DeviceValidatorServicePort;
+import com.warehouse.logistics.domain.port.secondary.DeviceAgentServicePort;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.DeviceEventPublisher;
 
@@ -11,11 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Instant;
 
 @Slf4j
-public class DeviceValidatorServiceAdapter implements DeviceValidatorServicePort {
+public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
 
     private final DeviceEventPublisher deviceEventPublisher;
 
-    public DeviceValidatorServiceAdapter(final DeviceEventPublisher deviceEventPublisher) {
+    public DeviceAgentServiceAdapter(final DeviceEventPublisher deviceEventPublisher) {
         this.deviceEventPublisher = deviceEventPublisher;
     }
 
@@ -31,5 +31,10 @@ public class DeviceValidatorServiceAdapter implements DeviceValidatorServicePort
                 deviceId, departmentCode, username, version, deviceUserType, deviceType, true
         );
         deviceEventPublisher.send(new DeviceValidationEvent(deviceValidationRequest, Instant.now()));
+    }
+
+    @Override
+    public void updateDevice(final DeviceInformation deviceInformation) {
+
     }
 }

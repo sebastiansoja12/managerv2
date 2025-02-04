@@ -20,7 +20,7 @@ import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventP
 import com.warehouse.terminal.DeviceEventPublisher;
 
 @Configuration
-public class DeliveryConfiguration {
+public class LogisticsConfiguration {
 
     @Bean
     public DeliveryPort deliveryPort(final DeliveryService deliveryService,
@@ -29,13 +29,18 @@ public class DeliveryConfiguration {
     }
 
     @Bean
-    public DeviceValidatorPort deviceValidatorPort(final DeviceValidatorServicePort deviceValidatorServicePort) {
-        return new DeviceValidatorPortImpl(deviceValidatorServicePort);
+    public DeviceValidatorPort deviceValidatorPort(final DeviceAgentServicePort deviceAgentServicePort) {
+        return new DeviceValidatorPortImpl(deviceAgentServicePort);
     }
 
     @Bean
-    public DeviceValidatorServicePort deviceValidatorServicePort(final DeviceEventPublisher deviceEventPublisher) {
-        return new DeviceValidatorServiceAdapter(deviceEventPublisher);
+    public DeviceAgentServicePort deviceValidatorServicePort(final DeviceEventPublisher deviceEventPublisher) {
+        return new DeviceAgentServiceAdapter(deviceEventPublisher);
+    }
+
+    @Bean
+    public DeviceAgentPort deviceAgentPort(final DeviceAgentServicePort deviceAgentServicePort) {
+        return new DeviceAgentPortImpl(deviceAgentServicePort);
     }
 
     @Bean
