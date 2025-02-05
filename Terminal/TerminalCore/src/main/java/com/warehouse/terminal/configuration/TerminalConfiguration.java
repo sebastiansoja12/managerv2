@@ -122,4 +122,9 @@ public class TerminalConfiguration {
                                      final DeviceVersionService deviceVersionService) {
         return new TerminalPortImpl(terminalService, userService, deviceVersionService);
     }
+
+    @Bean
+    public DeviceSettingsRepository deviceSettingsRepository(final DeviceSettingsReadRepository deviceSettingsReadRepository) {
+        return new DeviceSettingsRepositoryImpl(deviceSettingsReadRepository);
+    }
 }
