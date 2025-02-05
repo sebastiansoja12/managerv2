@@ -5,6 +5,7 @@ import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.DeviceEventPublisher;
 
 import com.warehouse.terminal.dto.*;
+import com.warehouse.terminal.event.DeviceUpdateEvent;
 import com.warehouse.terminal.event.DeviceValidationEvent;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +36,9 @@ public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
 
     @Override
     public void updateDevice(final DeviceInformation deviceInformation) {
-
+        final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().getValue());
+        final VersionDto version = new VersionDto(deviceInformation.getVersion());
+        final DeviceUpdateRequestDto deviceUpdateRequest = new DeviceUpdateRequestDto(deviceId, version);
+        deviceEventPublisher.send(new DeviceUpdateEvent(deviceUpdateRequest, Instant.now()));
     }
 }

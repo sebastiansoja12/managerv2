@@ -1,14 +1,15 @@
 package com.warehouse.routelogger.configuration;
 
 
-import com.warehouse.routelogger.domain.port.secondary.*;
-import com.warehouse.routelogger.infrastructure.adapter.secondary.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.support.RetryTemplate;
 
 import com.warehouse.routelogger.domain.port.primary.RouteLoggerPort;
 import com.warehouse.routelogger.domain.port.primary.RouteLoggerPortImpl;
+import com.warehouse.routelogger.domain.port.secondary.*;
+import com.warehouse.routelogger.infrastructure.adapter.secondary.*;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 
 @Configuration
@@ -31,7 +32,15 @@ public class RouteLoggerConfiguration {
 	@Bean
 	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
 	public RouteLoggerDeviceInformationServicePort routeLoggerDeviceInformationServicePort(final RouteTrackerLogProperties routeTrackerLogProperties) {
-		return new RouteLoggerDeviceInformationServiceAdapter(routeTrackerLogProperties);
+		return new RouteLoggerDeviceInformationServiceAdapter(routeTrackerLogProperties, retryTemplate());
+	}
+
+	@Bean
+	public RetryTemplate retryTemplate() {
+		return RetryTemplate.builder()
+				.maxAttempts(3)
+				.fixedBackoff(2000)
+				.build();
 	}
 
 	@Bean
