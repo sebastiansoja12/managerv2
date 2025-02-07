@@ -2,6 +2,7 @@ package com.warehouse.logistics.configuration;
 
 import com.warehouse.logistics.domain.port.primary.*;
 import com.warehouse.logistics.domain.port.secondary.*;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import com.warehouse.logistics.infrastructure.adapter.secondary.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.ApplicationEventPublisher;
@@ -10,10 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 
-import com.warehouse.logistics.domain.service.DeliveryService;
-import com.warehouse.logistics.domain.service.DeliveryServiceImpl;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
+import com.warehouse.logistics.domain.service.LogisticsService;
+import com.warehouse.logistics.domain.service.LogisticsServiceImpl;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
@@ -23,9 +23,9 @@ import com.warehouse.terminal.DeviceEventPublisher;
 public class LogisticsConfiguration {
 
     @Bean
-    public DeliveryPort deliveryPort(final DeliveryService deliveryService,
-                                     final RouteLogDeliveryStatusServicePort logServicePort) {
-        return new DeliveryPortImpl(deliveryService, logServicePort);
+    public LogisticsPort logisticsPort(final LogisticsService logisticsService,
+                                       final RouteLogDeliveryStatusServicePort logServicePort) {
+        return new LogisticsPortImpl(logisticsService, logServicePort);
     }
 
     @Bean
@@ -60,14 +60,14 @@ public class LogisticsConfiguration {
     }
 
 	@Bean
-	public DeliveryService deliveryService(DeliveryRepository deliveryRepository,
-                                           DeliveryTokenServicePort servicePort) {
-		return new DeliveryServiceImpl(deliveryRepository, servicePort);
+	public LogisticsService deliveryService(LogisticsRepository logisticsRepository,
+                                            DeliveryTokenServicePort servicePort) {
+		return new LogisticsServiceImpl(logisticsRepository, servicePort);
 	}
 
     @Bean
-    public DeliveryRepository deliveryRepository(DeliveryReadRepository repository) {
-        return new DeliveryRepositoryImpl(repository);
+    public LogisticsRepository deliveryRepository(LogisticsReadRepository repository) {
+        return new LogisticsRepositoryImpl(repository);
     }
 
     @Bean
@@ -102,12 +102,12 @@ public class LogisticsConfiguration {
 
     // Mappers
     @Bean(name = "logistics.requestMapper")
-    public DeliveryRequestMapper requestMapper() {
-        return Mappers.getMapper(DeliveryRequestMapper.class);
+    public LogisticsRequestMapper requestMapper() {
+        return Mappers.getMapper(LogisticsRequestMapper.class);
     }
 
     @Bean(name = "logistics.responseMapper")
-    public DeliveryResponseMapper responseMapper() {
-        return Mappers.getMapper(DeliveryResponseMapper.class);
+    public LogisticsResponseMapper responseMapper() {
+        return Mappers.getMapper(LogisticsResponseMapper.class);
     }
 }

@@ -31,7 +31,7 @@ import com.warehouse.terminal.response.DeviceUpToDate;
 import com.warehouse.terminal.response.TerminalResponse;
 
 @Mapper
-public interface DeliveryResponseMapper {
+public interface LogisticsResponseMapper {
 
     @Mapping(target = "device.username", source = "deviceInformation.username")
     @Mapping(target = "device.departmentCode", source = "deviceInformation.departmentCode.value")

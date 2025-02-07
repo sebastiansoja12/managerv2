@@ -2,14 +2,14 @@ package com.warehouse.logistics.infrastructure.adapter.primary.processresolver;
 
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.logistics.domain.model.Request;
 import com.warehouse.logistics.domain.model.Response;
 import com.warehouse.logistics.infrastructure.adapter.primary.ProcessHandler;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import com.warehouse.deliveryreject.DeliveryRejectService;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
 import com.warehouse.deliveryreject.dto.response.DeliveryRejectResponseDto;
@@ -19,9 +19,9 @@ public class ProcessRejectResolver implements ProcessHandler {
 
     private final DeliveryRejectService deliveryRejectService;
 
-    private final DeliveryRequestMapper requestMapper = getMapper(DeliveryRequestMapper.class);
+    private final LogisticsRequestMapper requestMapper = getMapper(LogisticsRequestMapper.class);
 
-    private final DeliveryResponseMapper responseMapper = getMapper(DeliveryResponseMapper.class);
+    private final LogisticsResponseMapper responseMapper = getMapper(LogisticsResponseMapper.class);
 
     public ProcessRejectResolver(final DeliveryRejectService deliveryRejectService) {
         this.deliveryRejectService = deliveryRejectService;

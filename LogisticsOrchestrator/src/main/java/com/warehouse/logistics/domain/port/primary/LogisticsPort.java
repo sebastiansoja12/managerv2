@@ -5,7 +5,7 @@ import java.util.Set;
 import com.warehouse.logistics.domain.model.DeliveryRequest;
 import com.warehouse.logistics.domain.model.DeliveryResponse;
 
-public interface DeliveryPort {
+public interface LogisticsPort {
 
     Set<DeliveryResponse> processDelivery(final Set<DeliveryRequest> deliveryRequest);
 }

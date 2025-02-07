@@ -10,26 +10,26 @@ import java.util.stream.Collectors;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.model.DeliveryRequest;
 import com.warehouse.logistics.domain.model.DeliveryResponse;
-import com.warehouse.logistics.domain.port.secondary.DeliveryRepository;
+import com.warehouse.logistics.domain.port.secondary.LogisticsRepository;
 import com.warehouse.logistics.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.logistics.domain.vo.*;
 
-public class DeliveryServiceImpl implements DeliveryService {
+public class LogisticsServiceImpl implements LogisticsService {
 
-    private final DeliveryRepository deliveryRepository;
+    private final LogisticsRepository logisticsRepository;
 
     private final DeliveryTokenServicePort deliveryTokenServicePort;
 
-    public DeliveryServiceImpl(final DeliveryRepository deliveryRepository,
-                               final DeliveryTokenServicePort deliveryTokenServicePort) {
-        this.deliveryRepository = deliveryRepository;
+    public LogisticsServiceImpl(final LogisticsRepository logisticsRepository,
+                                final DeliveryTokenServicePort deliveryTokenServicePort) {
+        this.logisticsRepository = logisticsRepository;
         this.deliveryTokenServicePort = deliveryTokenServicePort;
     }
 
     @Override
     public Set<DeliveryResponse> save(final Set<DeliveryRequest> deliveryRequest) {
 		return deliveryRequest.stream()
-                .map(deliveryRepository::create)
+                .map(logisticsRepository::create)
                 .collect(Collectors.toSet());
     }
 

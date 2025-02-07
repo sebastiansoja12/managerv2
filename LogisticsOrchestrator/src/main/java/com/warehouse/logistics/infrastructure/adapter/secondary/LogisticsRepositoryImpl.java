@@ -4,16 +4,16 @@ import org.mapstruct.factory.Mappers;
 
 import com.warehouse.logistics.domain.model.DeliveryRequest;
 import com.warehouse.logistics.domain.model.DeliveryResponse;
-import com.warehouse.logistics.domain.port.secondary.DeliveryRepository;
+import com.warehouse.logistics.domain.port.secondary.LogisticsRepository;
 import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DeliveryEntity;
 import com.warehouse.logistics.infrastructure.adapter.secondary.mapper.DeliveryEntityMapper;
 
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class DeliveryRepositoryImpl implements DeliveryRepository {
+public class LogisticsRepositoryImpl implements LogisticsRepository {
 
-    private final DeliveryReadRepository repository;
+    private final LogisticsReadRepository repository;
 
     private final DeliveryEntityMapper mapper = Mappers.getMapper(DeliveryEntityMapper.class);
 

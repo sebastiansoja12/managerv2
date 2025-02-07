@@ -26,6 +26,9 @@ public class DeviceSettingsEntity {
     @Column(name = "validate_department_code", nullable = false)
     private Boolean validateDepartmentCode;
 
+    public DeviceSettingsEntity() {
+    }
+
     public DeviceSettingsEntity(final String deviceSettingsId,
                                 final DeviceId deviceId,
                                 final Boolean crossCourierDelivery,

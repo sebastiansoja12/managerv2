@@ -29,7 +29,7 @@ import com.warehouse.terminal.model.DeliveryReturnDetail;
 import com.warehouse.terminal.request.TerminalRequest;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
-public interface DeliveryRequestMapper {
+public interface LogisticsRequestMapper {
 
     @Mapping(target = "deviceInformation", ignore = true)
     DeliveryRejectRequest map(com.warehouse.terminal.model.DeliveryRejectRequest deliveryRejectRequest);

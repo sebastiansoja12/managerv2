@@ -5,6 +5,6 @@ import java.util.Set;
 import com.warehouse.logistics.domain.model.DeliveryRequest;
 import com.warehouse.logistics.domain.model.DeliveryResponse;
 
-public interface DeliveryService {
+public interface LogisticsService {
     Set<DeliveryResponse> save(final Set<DeliveryRequest> delivery);
 }

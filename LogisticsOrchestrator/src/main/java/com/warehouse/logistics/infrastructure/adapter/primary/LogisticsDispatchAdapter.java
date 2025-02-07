@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,7 @@ import com.warehouse.logistics.domain.port.primary.*;
 import com.warehouse.logistics.infrastructure.adapter.primary.creator.DeliveryCreator;
 import com.warehouse.logistics.infrastructure.adapter.primary.dto.ErrorResponseDto;
 import com.warehouse.logistics.infrastructure.adapter.primary.exception.RestException;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.request.TerminalRequest;
 import com.warehouse.terminal.response.TerminalResponse;
@@ -34,9 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/deliveries")
-public class DeliveryDispatchAdapter extends ProcessDispatcher {
+public class LogisticsDispatchAdapter extends ProcessDispatcher {
 
-    private final DeliveryPort deliveryPort;
+    private final LogisticsPort logisticsPort;
 
     private final Set<DeliveryCreator> deliveryCreators;
 
@@ -50,22 +50,22 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
     private final DeviceAgentPort deviceAgentPort;
 
-    private final DeliveryRequestMapper requestMapper = getMapper(DeliveryRequestMapper.class);
+    private final LogisticsRequestMapper requestMapper = getMapper(LogisticsRequestMapper.class);
 
-    private final DeliveryResponseMapper responseMapper = getMapper(DeliveryResponseMapper.class);
+    private final LogisticsResponseMapper responseMapper = getMapper(LogisticsResponseMapper.class);
 
     final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd H:mm:ss", Locale.of("PL"));
 
-    public DeliveryDispatchAdapter(final List<ProcessHandler> handlers,
-                                   final DeliveryPort deliveryPort,
-                                   final Set<DeliveryCreator> deliveryCreators,
-                                   final TerminalRequestLoggerPort terminalRequestLoggerPort,
-                                   final SupplierValidatorPort supplierValidatorPort,
-                                   final DepartmentValidatorPort departmentValidatorPort,
-                                   final DeviceValidatorPort deviceValidatorPort,
-                                   final DeviceAgentPort deviceAgentPort) {
+    public LogisticsDispatchAdapter(final List<ProcessHandler> handlers,
+                                    final LogisticsPort logisticsPort,
+                                    final Set<DeliveryCreator> deliveryCreators,
+                                    final TerminalRequestLoggerPort terminalRequestLoggerPort,
+                                    final SupplierValidatorPort supplierValidatorPort,
+                                    final DepartmentValidatorPort departmentValidatorPort,
+                                    final DeviceValidatorPort deviceValidatorPort,
+                                    final DeviceAgentPort deviceAgentPort) {
         super(handlers);
-        this.deliveryPort = deliveryPort;
+        this.logisticsPort = logisticsPort;
         this.deliveryCreators = deliveryCreators;
         this.terminalRequestLoggerPort = terminalRequestLoggerPort;
         this.supplierValidatorPort = supplierValidatorPort;
@@ -103,7 +103,7 @@ public class DeliveryDispatchAdapter extends ProcessDispatcher {
 
         final Set<DeliveryRequest> deliveryRequests = deliveryCreator.create(request, response);
 
-        final Set<DeliveryResponse> deliveryResponses = this.deliveryPort.processDelivery(deliveryRequests);
+        final Set<DeliveryResponse> deliveryResponses = this.logisticsPort.processDelivery(deliveryRequests);
 
         response.updateDeliveryResponse(deliveryResponses);
 

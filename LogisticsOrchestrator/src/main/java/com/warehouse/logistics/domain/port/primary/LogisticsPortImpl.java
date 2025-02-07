@@ -5,22 +5,22 @@ import java.util.Set;
 import com.warehouse.logistics.domain.model.DeliveryRequest;
 import com.warehouse.logistics.domain.model.DeliveryResponse;
 import com.warehouse.logistics.domain.port.secondary.RouteLogDeliveryStatusServicePort;
-import com.warehouse.logistics.domain.service.DeliveryService;
+import com.warehouse.logistics.domain.service.LogisticsService;
 
-public class DeliveryPortImpl implements DeliveryPort {
+public class LogisticsPortImpl implements LogisticsPort {
 
-    private final DeliveryService deliveryService;
+    private final LogisticsService logisticsService;
 
     private final RouteLogDeliveryStatusServicePort logServicePort;
 
-    public DeliveryPortImpl(final DeliveryService deliveryService,
-                            final RouteLogDeliveryStatusServicePort logServicePort) {
-        this.deliveryService = deliveryService;
+    public LogisticsPortImpl(final LogisticsService logisticsService,
+                             final RouteLogDeliveryStatusServicePort logServicePort) {
+        this.logisticsService = logisticsService;
         this.logServicePort = logServicePort;
     }
 
     @Override
     public Set<DeliveryResponse> processDelivery(final Set<DeliveryRequest> deliveryRequests) {
-        return this.deliveryService.save(deliveryRequests);
+        return this.logisticsService.save(deliveryRequests);
     }
 }
