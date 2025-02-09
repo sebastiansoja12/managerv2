@@ -18,7 +18,6 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
@@ -29,6 +28,7 @@ import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
 import com.warehouse.deliveryreturn.domain.port.secondary.*;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
+import com.warehouse.terminal.DeviceInformation;
 
 @ExtendWith(MockitoExtension.class)
 public class DeliveryReturnPortImplTest {

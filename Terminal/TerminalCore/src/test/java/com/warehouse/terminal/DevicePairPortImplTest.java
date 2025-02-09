@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.TerminalId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.DeviceVersion;
@@ -92,7 +92,8 @@ public class DevicePairPortImplTest {
     void shouldBeValid() {
         // given
         final TerminalId terminalId = new TerminalId(1L);
-        final Device device = createDevice(terminalId, "1.0", new UserId(1L), "KT1", true);
+        final Username username = new Username("s-soja");
+        final Device device = createDevice(terminalId, "1.0", username, "KT1", true);
         final DevicePair devicePair = new DevicePair(true);
         doReturn(device)
                 .when(deviceRepository)
@@ -133,7 +134,8 @@ public class DevicePairPortImplTest {
     void shouldNotBeValidWhenDeviceVersionIsEmpty() {
         // given
         final TerminalId terminalId = new TerminalId(1L);
-        final Device device = createDevice(terminalId, "1.0", new UserId(1L), "KT1", true);
+        final Username username = new Username("s-soja");
+        final Device device = createDevice(terminalId, "1.0", username, "KT1", true);
         final DevicePair devicePair = new DevicePair(false);
         doReturn(device)
                 .when(deviceRepository)
@@ -154,7 +156,8 @@ public class DevicePairPortImplTest {
     void shouldNotBeValidWhenDevicePairIsEmpty() {
         // given
         final TerminalId terminalId = new TerminalId(1L);
-        final Device device = createDevice(terminalId, "1.0", new UserId(1L), "KT1", true);
+        final Username username = new Username("s-soja");
+        final Device device = createDevice(terminalId, "1.0", username, "KT1", true);
         doReturn(device)
                 .when(deviceRepository)
                 .findById(terminalId);
@@ -174,16 +177,16 @@ public class DevicePairPortImplTest {
     void shouldUserBeValid() {
         // given
         final TerminalId terminalId = new TerminalId(1L);
-        final UserId userId = new UserId(1L);
-        final Device device = createDevice(terminalId, "1.0", new UserId(1L), "KT1", true);
+        final Username username = new Username("s-soja");
+        final Device device = createDevice(terminalId, "1.0", username, "KT1", true);
         doReturn(device)
                 .when(deviceRepository)
                 .findById(terminalId);
         doReturn(true)
                 .when(userRepository)
-                .existsById(userId);
+                .existsByUsername(new Username("s-soja"));
         // when
-        final boolean valid = devicePairPort.isUserValid(terminalId, userId);
+        final boolean valid = devicePairPort.isUserValid(terminalId, username);
         // then
         assertTrue(valid);
     }
@@ -192,33 +195,33 @@ public class DevicePairPortImplTest {
     void shouldUserNotBeValidWhenDeviceDoesNotExist() {
         // given
         final TerminalId terminalId = new TerminalId(1L);
-        final UserId userId = new UserId(1L);
+        final Username username = new Username("s-soja");
         doReturn(null)
                 .when(deviceRepository)
                 .findById(terminalId);
         doReturn(true)
                 .when(userRepository)
-                .existsById(userId);
+                .existsByUsername(username);
         // when
-        final boolean valid = devicePairPort.isUserValid(terminalId, userId);
+        final boolean valid = devicePairPort.isUserValid(terminalId, username);
         // then
         assertFalse(valid);
     }
 
     @Test
-    void shouldUserNotBeValidWhenDeviceUserIdIsNotEqualToGivenUserId() {
+    void shouldUserNotBeValidWhenDeviceUsernameIsNotEqualToGivenUsername() {
         // given
         final TerminalId terminalId = new TerminalId(1L);
-        final UserId userId = new UserId(1L);
-        final Device device = createDevice(terminalId, "1.0", new UserId(2L), "KT1", true);
+        final Username username = new Username("s-soja");
+        final Device device = createDevice(terminalId, "1.0", new Username("s-soja2"), "KT1", true);
         doReturn(device)
                 .when(deviceRepository)
                 .findById(terminalId);
         doReturn(true)
                 .when(userRepository)
-                .existsById(userId);
+                .existsByUsername(username);
         // when
-        final boolean valid = devicePairPort.isUserValid(terminalId, userId);
+        final boolean valid = devicePairPort.isUserValid(terminalId, username);
         // then
         assertFalse(valid);
     }
@@ -228,7 +231,8 @@ public class DevicePairPortImplTest {
         // given
         final TerminalId terminalId = new TerminalId(1L);
         final DeviceVersion deviceVersion = new DeviceVersion("1.0", terminalId);
-        final Device device = createDevice(terminalId, "1.0", new UserId(1L), "KT1", true);
+        final Username username = new Username("s-soja");
+        final Device device = createDevice(terminalId, "1.0", username, "KT1", true);
         doReturn(device)
                 .when(deviceRepository)
                 .findById(terminalId);
@@ -243,7 +247,8 @@ public class DevicePairPortImplTest {
         // given
         final TerminalId terminalId = new TerminalId(1L);
         final DeviceVersion deviceVersion = new DeviceVersion("2.0", terminalId);
-        final Device device = createDevice(terminalId, "1.0", new UserId(1L), "KT1", true);
+        final Username username = new Username("s-soja");
+        final Device device = createDevice(terminalId, "1.0", username, "KT1", true);
         doReturn(device)
                 .when(deviceRepository)
                 .findById(terminalId);
@@ -285,7 +290,8 @@ public class DevicePairPortImplTest {
     void shouldUnpairDevice() {
         // given
         final TerminalId terminalId = new TerminalId(1L);
-        final Terminal terminal = createDevice(terminalId, "1.0", new UserId(1L), "KT1", true);
+        final Username username = new Username("s-soja");
+        final Terminal terminal = createDevice(terminalId, "1.0", username, "KT1", true);
         final DevicePair devicePair = new DevicePair(true);
         doReturn(devicePair)
                 .when(devicePairRepository)
@@ -299,8 +305,8 @@ public class DevicePairPortImplTest {
 
     // TODO testy z parowaniem terminala
 
-    private static Terminal createDevice(final TerminalId terminalId, final String version, final UserId userId,
+    private static Terminal createDevice(final TerminalId terminalId, final String version, final Username username,
                                          final String departmentCode, final Boolean active) {
-        return new Terminal(terminalId, DeviceType.TERMINAL, userId, departmentCode, version, Instant.now(), active);
+        return new Terminal(terminalId, DeviceType.TERMINAL, username, departmentCode, version, Instant.now(), active);
     }
 }

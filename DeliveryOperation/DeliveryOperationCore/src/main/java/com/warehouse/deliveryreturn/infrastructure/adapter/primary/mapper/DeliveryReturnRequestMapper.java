@@ -8,12 +8,12 @@ import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.delivery.dto.DeviceIdDto;
 import com.warehouse.delivery.dto.DeviceInformationDto;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
+import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryReturnDetail;
 import com.warehouse.terminal.request.TerminalRequest;

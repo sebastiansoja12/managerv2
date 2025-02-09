@@ -50,6 +50,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         handleRequest(request);
 
         final var user = User.builder()
+                .userId(authenticationService.nextUserId())
                 .username(request.getUsername())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())

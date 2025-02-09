@@ -8,14 +8,14 @@ import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.*;
-import com.warehouse.delivery.domain.vo.DeviceInformation;
-import com.warehouse.delivery.domain.vo.ReturnToken;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponseDetails;
+import com.warehouse.deliveryreturn.domain.vo.ReturnToken;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.*;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.ShipmentIdDto;
+import com.warehouse.terminal.DeviceInformation;
 
 @Mapper
 public interface DeliveryReturnResponseMapper {

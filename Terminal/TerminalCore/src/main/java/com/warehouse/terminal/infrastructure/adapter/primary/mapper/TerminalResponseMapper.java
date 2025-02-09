@@ -16,9 +16,9 @@ public interface TerminalResponseMapper {
         final DepartmentCodeDto depotCode = new DepartmentCodeDto(terminal.getDepartmentCode());
         final DeviceIdDto deviceId = new DeviceIdDto(terminal.getTerminalId().getValue());
         final VersionDto version = new VersionDto(terminal.getVersion());
-        final UserIdDto userId = new UserIdDto(terminal.getUserId().getValue());
+        final UsernameDto username = new UsernameDto(terminal.getUsername().value());
         return new DeviceDto(deviceId, version, map(terminal.getDeviceType()),
-                userId, depotCode, terminal.getLastUpdate(), terminal.isActive());
+                username, depotCode, terminal.getLastUpdate(), terminal.isActive());
     }
 
     DeviceTypeDto map(final DeviceType deviceType);

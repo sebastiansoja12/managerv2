@@ -3,7 +3,6 @@ package com.warehouse.deliveryreject.domain.port.primary;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreject.domain.model.DeliveryReject;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectDetails;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
@@ -14,6 +13,7 @@ import com.warehouse.deliveryreject.domain.port.secondary.RejectTrackerServicePo
 import com.warehouse.deliveryreject.domain.service.DeliveryRejectConverterService;
 import com.warehouse.deliveryreject.domain.service.RejectService;
 import com.warehouse.deliveryreject.domain.vo.*;
+import com.warehouse.terminal.DeviceInformation;
 
 import lombok.extern.slf4j.Slf4j;
 

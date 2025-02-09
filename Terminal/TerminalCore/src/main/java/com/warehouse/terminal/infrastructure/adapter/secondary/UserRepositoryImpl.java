@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.port.secondary.UserRepository;
 import com.warehouse.terminal.domain.vo.User;
 import com.warehouse.terminal.domain.vo.UserToken;
@@ -18,7 +19,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findByUsername(final String username) {
+    public User findByUsername(final Username username) {
         final Optional<UserEntity> user = this.repository.findByUsername(username);
         return user.map(User::from).orElseThrow();
     }
@@ -37,5 +38,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public UserToken obtainUserToken(final UserId userId) {
         return new UserToken(UUID.randomUUID().toString());
+    }
+
+    @Override
+    public Boolean existsByUsername(final Username username) {
+        return this.repository.existsByUsername(username);
     }
 }

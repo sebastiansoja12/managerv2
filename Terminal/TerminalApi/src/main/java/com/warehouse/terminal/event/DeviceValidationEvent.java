@@ -5,7 +5,7 @@ import lombok.Builder;
 
 import java.time.Instant;
 
-public class DeviceValidationEvent extends DeviceEvent implements DeviceLogEvent {
+public class DeviceValidationEvent extends DeviceEvent implements AgentEvent {
 
     private final DeviceValidationRequestDto deviceValidationRequest;
 

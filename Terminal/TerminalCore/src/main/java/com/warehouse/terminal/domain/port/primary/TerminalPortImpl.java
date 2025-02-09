@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.exception.UserNotFoundException;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.request.DeviceSettingsRequest;
@@ -40,7 +40,10 @@ public class TerminalPortImpl implements TerminalPort {
     public void create(final TerminalAddRequest request) {
         logTerminalCreate(request);
         final User user = this.userService.findByUsername(request.getUsername());
-        final Terminal terminal = Terminal.from(request, user.userId());
+        if (user == null) {
+            throw new UserNotFoundException(request.getUsername());
+        }
+        final Terminal terminal = Terminal.from(request);
         this.terminalService.createTerminal(terminal);
         this.deviceVersionService.saveOrUpdate(terminal.getTerminalId(), terminal.getVersion());
     }
@@ -55,12 +58,12 @@ public class TerminalPortImpl implements TerminalPort {
     @Override
     public void changeUserTo(final DeviceUserRequest request) {
         final DeviceId deviceId = request.deviceId();
-        final UserId userId = request.userId();
-        final Boolean userExists = this.userService.existsByUserId(userId);
+        final Username username = request.username();
+        final Boolean userExists = this.userService.existsByUsername(username);
         if (!userExists) {
-            throw new UserNotFoundException(userId);
+            throw new UserNotFoundException(username);
         }
-        this.terminalService.assignUser(deviceId, userId);
+        this.terminalService.assignUser(deviceId, username);
     }
 
     @Override

@@ -1,7 +1,7 @@
 INSERT INTO device (
     device_id,
     version,
-    user_id,
+    username,
     department_code,
     device_type,
     last_update,
@@ -9,7 +9,7 @@ INSERT INTO device (
 ) VALUES (
              1,
              '1.0.0',
-             101,
+             's-soja',
              'KT1',
              'TERMINAL',
              '2024-12-29 12:00:00',

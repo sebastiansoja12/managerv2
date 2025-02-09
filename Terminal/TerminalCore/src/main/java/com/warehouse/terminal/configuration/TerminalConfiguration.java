@@ -111,8 +111,9 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public DevicePairRepository devicePairRepository(final DevicePairReadRepository devicePairReadRepository) {
-        return new DevicePairRepositoryImpl(devicePairReadRepository);
+    public DevicePairRepository devicePairRepository(final DevicePairReadRepository devicePairReadRepository,
+                                                     final DeviceRepository repository) {
+        return new DevicePairRepositoryImpl(devicePairReadRepository, repository);
     }
 
     @Bean
@@ -120,5 +121,10 @@ public class TerminalConfiguration {
                                      final UserService userService,
                                      final DeviceVersionService deviceVersionService) {
         return new TerminalPortImpl(terminalService, userService, deviceVersionService);
+    }
+
+    @Bean
+    public DeviceSettingsRepository deviceSettingsRepository(final DeviceSettingsReadRepository deviceSettingsReadRepository) {
+        return new DeviceSettingsRepositoryImpl(deviceSettingsReadRepository);
     }
 }

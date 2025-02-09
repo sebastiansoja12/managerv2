@@ -1,6 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.infrastructure.adapter.secondary.enumeration.Role;
 
 import jakarta.persistence.*;
@@ -23,7 +24,8 @@ public class UserEntity {
     private UserId userId;
 
     @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    @AttributeOverride(name = "value", column = @Column(name = "username"))
+    private Username username;
 
     @Column(name = "password", nullable = false)
     private String password;

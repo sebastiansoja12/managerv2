@@ -2,6 +2,7 @@ package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
 
 import com.warehouse.terminal.domain.model.DevicePair;
+import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 import jakarta.persistence.*;
 
@@ -12,12 +13,11 @@ import java.time.Instant;
 public class DevicePairEntity {
 
     @Id
-    @Column(name = "device_pair_id", nullable = false)
+    @Column(name = "device_pair_id", unique = true, nullable = false)
     private Long devicePairId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "device_id", nullable = false)
-    @AttributeOverride(name = "value", column = @Column(name = "device_id"))
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "device_id", referencedColumnName = "device_id")
     private DeviceEntity device;
 
     @Column(name = "paired")
@@ -72,6 +72,12 @@ public class DevicePairEntity {
         this.paired = false;
         this.loginTime = Instant.now();
         this.errorDescription = errorDescription;
+    }
+
+    public static DevicePairEntity from(final DevicePair devicePair, final Terminal terminal) {
+        return new DevicePairEntity(devicePair.getDevicePairId(), DeviceEntity.from(terminal),
+                devicePair.isPaired(), devicePair.getLoginTime(), devicePair.getErrorDescription(),
+                devicePair.getPairKey());
     }
 
     public static DevicePairEntity from(final DevicePair devicePair) {

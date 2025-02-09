@@ -8,9 +8,9 @@ import java.util.Set;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.delivery.domain.vo.DeviceInformation;
 import com.warehouse.deliveryreturn.domain.vo.ReturnPackageRequest;
 import com.warehouse.deliveryreturn.domain.vo.Supplier;
+import com.warehouse.terminal.DeviceInformation;
 
 import lombok.Builder;
 

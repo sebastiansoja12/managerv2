@@ -1,6 +1,9 @@
 package com.warehouse.terminal.domain.service;
 
+import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.DevicePair;
@@ -16,11 +19,23 @@ public class DevicePairServiceImpl implements DevicePairService {
         this.devicePairRepository = devicePairRepository;
     }
 
+    @Transactional
     @Override
     public void pairDevice(final Terminal terminal) {
-        final DevicePairId devicePairId = this.nextDevicePairId();
-        this.devicePairRepository.pair(terminal, devicePairId);
-    }
+        final Optional<DevicePair> devicePair = this.devicePairRepository.findByDeviceId(terminal.getDeviceId());
+        devicePair.ifPresent(device -> {
+            if (!device.isPaired()) {
+                device.pair();
+                this.devicePairRepository.save(device);
+            }
+        });
+
+        if (devicePair.isEmpty()) {
+            final DevicePairId devicePairId = this.nextDevicePairId();
+            final String pairKey = DevicePairKeyGeneratorService.generatePairKey();
+            this.devicePairRepository.save(new DevicePair(terminal.getDeviceId(), pairKey, devicePairId));
+        }
+	}
 
     @Override
     public void unpairDevice(final DeviceId deviceId) {

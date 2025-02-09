@@ -163,15 +163,17 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="true")
+	@ConditionalOnProperty(name="service.mock", havingValue="false")
 	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService) {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using path finder service");
 		return new PathFinderAdapter(voronoiService);
 	}
 
 	//MOCK
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="false")
+	@ConditionalOnProperty(name="service.mock", havingValue="true")
 	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock path finder service");
 		return new PathFinderMockAdapter(pathFinderMockService);
 	}
 }

@@ -1,7 +1,7 @@
 package com.warehouse.terminal;
 
-import com.warehouse.terminal.event.DeviceLogEvent;
+import com.warehouse.terminal.event.AgentEvent;
 
 public interface DeviceEventPublisher {
-    void send(final DeviceLogEvent deviceLogEvent);
+    void send(final AgentEvent agentEvent);
 }

@@ -2,7 +2,6 @@ package com.warehouse.deliveryreturn.domain.vo;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.*;
-import com.warehouse.delivery.domain.vo.ReturnToken;
 
 import lombok.Builder;
 

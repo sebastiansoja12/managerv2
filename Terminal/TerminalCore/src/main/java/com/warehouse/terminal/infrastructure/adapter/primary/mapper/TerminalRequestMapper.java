@@ -1,5 +1,6 @@
 package com.warehouse.terminal.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.commonassets.identificator.UserId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -16,13 +17,16 @@ import com.warehouse.terminal.request.*;
 @Mapper
 public interface TerminalRequestMapper {
 
-    DevicePairRequest map(final DevicePairRequestDto terminalPairRequest);
+    default DevicePairRequest map(final DevicePairRequestDto terminalPairRequest) {
+        final UserId userId = new UserId(terminalPairRequest.userId().value());
+        final DeviceId deviceId = new DeviceId(terminalPairRequest.terminalId().value());
+        return new DevicePairRequest(deviceId, userId);
+    }
 
     default TerminalIdDto map(final DeviceId deviceId) {
         return new TerminalIdDto(deviceId != null ? deviceId.getValue() : null);
     }
 
-    @Mapping(target = "username", source = "username.value")
     @Mapping(target = "version", source = "version.value")
     @Mapping(target = "departmentCode", source = "departmentCode.value")
     TerminalAddRequest map(final TerminalAddRequestDto terminalAddRequest);

@@ -1,16 +1,17 @@
 package com.warehouse.terminal.domain.model.request;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.dto.DeviceTypeDto;
 import com.warehouse.terminal.request.TerminalAddRequestDto;
 
 public class TerminalAddRequest {
-    private String username;
+    private Username username;
     private String version;
     private String departmentCode;
     private DeviceType deviceType;
 
-	public TerminalAddRequest(final String username, final String version, final String departmentCode,
+	public TerminalAddRequest(final Username username, final String version, final String departmentCode,
 			final DeviceType deviceType) {
         this.username = username;
         this.version = version;
@@ -18,11 +19,11 @@ public class TerminalAddRequest {
         this.deviceType = deviceType;
     }
 
-    public String getUsername() {
+    public Username getUsername() {
         return username;
     }
 
-    public void setUsername(final String username) {
+    public void setUsername(final Username username) {
         this.username = username;
     }
 
@@ -51,7 +52,7 @@ public class TerminalAddRequest {
     }
 
     public static TerminalAddRequest from(final TerminalAddRequestDto terminalAddRequest) {
-        return new TerminalAddRequest(terminalAddRequest.username().value(),
+        return new TerminalAddRequest(new Username(terminalAddRequest.username().value()),
                 terminalAddRequest.version().value(), terminalAddRequest.departmentCode().value(),
                 determineDeviceType(terminalAddRequest.deviceType()));
     }

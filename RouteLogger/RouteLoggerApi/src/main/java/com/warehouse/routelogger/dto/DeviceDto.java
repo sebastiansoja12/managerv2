@@ -3,18 +3,18 @@ package com.warehouse.routelogger.dto;
 public class DeviceDto {
     private final DeviceIdDto deviceId;
     private final DepartmentCodeDto departmentCode;
-    private final UserIdDto userId;
+    private final UsernameDto username;
     private final DeviceVersionDto deviceVersion;
     private final DeviceTypeDto deviceType;
 
     public DeviceDto(final DeviceIdDto deviceId,
                      final DepartmentCodeDto departmentCode,
-                     final UserIdDto userId,
+                     final UsernameDto username,
                      final DeviceVersionDto deviceVersion,
                      final DeviceTypeDto deviceType) {
         this.deviceId = deviceId;
         this.departmentCode = departmentCode;
-        this.userId = userId;
+        this.username = username;
         this.deviceVersion = deviceVersion;
         this.deviceType = deviceType;
     }
@@ -27,8 +27,8 @@ public class DeviceDto {
         return departmentCode;
     }
 
-    public UserIdDto getUserId() {
-        return userId;
+    public UsernameDto getUsername() {
+        return username;
     }
 
     public DeviceVersionDto getDeviceVersion() {
