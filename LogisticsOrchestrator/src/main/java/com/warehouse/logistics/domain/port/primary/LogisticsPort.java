@@ -2,10 +2,10 @@ package com.warehouse.logistics.domain.port.primary;
 
 import java.util.Set;
 
-import com.warehouse.logistics.domain.model.DeliveryRequest;
-import com.warehouse.logistics.domain.model.DeliveryResponse;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
 
 public interface LogisticsPort {
 
-    Set<DeliveryResponse> processDelivery(final Set<DeliveryRequest> deliveryRequest);
+    Set<LogisticsResponse> processDelivery(final Set<LogisticsRequest> logisticsRequest);
 }

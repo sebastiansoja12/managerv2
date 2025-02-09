@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
-import com.warehouse.logistics.domain.model.DeliveryRequest;
-import com.warehouse.logistics.domain.model.DeliveryResponse;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
 import com.warehouse.logistics.domain.model.Request;
 import com.warehouse.logistics.domain.model.Response;
 import com.warehouse.logistics.domain.port.primary.*;
@@ -25,6 +24,7 @@ import com.warehouse.logistics.infrastructure.adapter.primary.creator.DeliveryCr
 import com.warehouse.logistics.infrastructure.adapter.primary.dto.ErrorResponseDto;
 import com.warehouse.logistics.infrastructure.adapter.primary.exception.RestException;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.request.TerminalRequest;
 import com.warehouse.terminal.response.TerminalResponse;
@@ -101,11 +101,11 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
 
         final DeliveryCreator deliveryCreator = determineDeliveryCreator(request.getProcessType());
 
-        final Set<DeliveryRequest> deliveryRequests = deliveryCreator.create(request, response);
+        final Set<LogisticsRequest> logisticsRequests = deliveryCreator.create(request, response);
 
-        final Set<DeliveryResponse> deliveryResponses = this.logisticsPort.processDelivery(deliveryRequests);
+        final Set<LogisticsResponse> logisticsResponses = this.logisticsPort.processDelivery(logisticsRequests);
 
-        response.updateDeliveryResponse(deliveryResponses);
+        response.updateLogisticsResponse(logisticsResponses);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

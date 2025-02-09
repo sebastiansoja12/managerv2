@@ -6,16 +6,16 @@ import com.warehouse.logistics.domain.enumeration.DeliverySaveStatus;
 import com.warehouse.logistics.infrastructure.adapter.secondary.api.UpdateStatus;
 
 
-public class DeliveryResponse {
+public class LogisticsResponse {
     private DeliveryId deliveryId;
     private UpdateStatus updateStatus;
     private ShipmentId shipmentId;
     private DeliverySaveStatus deliverySaveStatus;
 
-    public DeliveryResponse(final DeliveryId deliveryId,
-                            final UpdateStatus updateStatus,
-                            final ShipmentId shipmentId,
-                            final DeliverySaveStatus deliverySaveStatus) {
+    public LogisticsResponse(final DeliveryId deliveryId,
+                             final UpdateStatus updateStatus,
+                             final ShipmentId shipmentId,
+                             final DeliverySaveStatus deliverySaveStatus) {
         this.deliveryId = deliveryId;
         this.updateStatus = updateStatus;
         this.shipmentId = shipmentId;

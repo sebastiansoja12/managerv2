@@ -7,7 +7,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
-import com.warehouse.logistics.domain.model.DeliveryRequest;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
 import com.warehouse.logistics.domain.model.Request;
 import com.warehouse.logistics.domain.model.Response;
 
@@ -21,7 +21,7 @@ public class DeliveryMissedCreator implements DeliveryCreator {
     }
 
     @Override
-    public Set<DeliveryRequest> create(final Request request, final Response response) {
+    public Set<LogisticsRequest> create(final Request request, final Response response) {
         return null;
     }
 }

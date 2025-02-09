@@ -1,8 +1,8 @@
 package com.warehouse.logistics.domain.port.secondary;
 
-import com.warehouse.logistics.domain.model.DeliveryRequest;
-import com.warehouse.logistics.domain.model.DeliveryResponse;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
 
 public interface LogisticsRepository {
-    DeliveryResponse create(final DeliveryRequest request);
+    LogisticsResponse create(final LogisticsRequest request);
 }

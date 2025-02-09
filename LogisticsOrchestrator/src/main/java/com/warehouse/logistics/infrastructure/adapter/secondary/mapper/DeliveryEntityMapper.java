@@ -8,14 +8,14 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.enumeration.DeliverySaveStatus;
-import com.warehouse.logistics.domain.model.DeliveryRequest;
-import com.warehouse.logistics.domain.model.DeliveryResponse;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
 import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DeliveryEntity;
 import com.warehouse.logistics.infrastructure.adapter.secondary.enumeration.Status;
 
 @Mapper
 public interface DeliveryEntityMapper {
-    default DeliveryEntity map(final DeliveryRequest delivery) {
+    default DeliveryEntity map(final LogisticsRequest delivery) {
         final DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setDeliveryStatus(map(delivery.getDeliveryStatus()));
         deliveryEntity.setCreated(LocalDateTime.now());
@@ -26,10 +26,10 @@ public interface DeliveryEntityMapper {
         return deliveryEntity;
     }
 
-    default DeliveryResponse map(final DeliveryEntity deliveryEntity) {
+    default LogisticsResponse map(final DeliveryEntity deliveryEntity) {
         final DeliveryId deliveryId = new DeliveryId(deliveryEntity.getId());
         final ShipmentId shipmentId = new ShipmentId(deliveryEntity.getParcelId());
-        return new DeliveryResponse(deliveryId, null, shipmentId, DeliverySaveStatus.SAVED);
+        return new LogisticsResponse(deliveryId, null, shipmentId, DeliverySaveStatus.SAVED);
     }
 
     Status map(final DeliveryStatus deliveryStatus);

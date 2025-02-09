@@ -1,11 +1,11 @@
 package com.warehouse.logistics.domain.vo;
 
-import com.warehouse.logistics.domain.model.DeliveryResponse;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
 
 public class DeviceResponse {
-    private final DeliveryResponse deliveryResponse;
+    private final LogisticsResponse logisticsResponse;
 
-    public DeviceResponse(final DeliveryResponse deliveryResponse) {
-        this.deliveryResponse = deliveryResponse;
+    public DeviceResponse(final LogisticsResponse logisticsResponse) {
+        this.logisticsResponse = logisticsResponse;
     }
 }

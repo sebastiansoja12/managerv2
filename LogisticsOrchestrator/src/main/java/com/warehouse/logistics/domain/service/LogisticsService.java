@@ -2,9 +2,9 @@ package com.warehouse.logistics.domain.service;
 
 import java.util.Set;
 
-import com.warehouse.logistics.domain.model.DeliveryRequest;
-import com.warehouse.logistics.domain.model.DeliveryResponse;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
 
 public interface LogisticsService {
-    Set<DeliveryResponse> save(final Set<DeliveryRequest> delivery);
+    Set<LogisticsResponse> save(final Set<LogisticsRequest> delivery);
 }

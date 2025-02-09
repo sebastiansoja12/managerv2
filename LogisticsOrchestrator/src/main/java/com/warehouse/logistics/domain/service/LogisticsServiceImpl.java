@@ -8,10 +8,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.logistics.domain.model.DeliveryRequest;
-import com.warehouse.logistics.domain.model.DeliveryResponse;
-import com.warehouse.logistics.domain.port.secondary.LogisticsRepository;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
 import com.warehouse.logistics.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.logistics.domain.port.secondary.LogisticsRepository;
 import com.warehouse.logistics.domain.vo.*;
 
 public class LogisticsServiceImpl implements LogisticsService {
@@ -27,13 +27,13 @@ public class LogisticsServiceImpl implements LogisticsService {
     }
 
     @Override
-    public Set<DeliveryResponse> save(final Set<DeliveryRequest> deliveryRequest) {
-		return deliveryRequest.stream()
+    public Set<LogisticsResponse> save(final Set<LogisticsRequest> logisticsRequests) {
+		return logisticsRequests.stream()
                 .map(logisticsRepository::create)
                 .collect(Collectors.toSet());
     }
 
-    private DeliveryTokenRequest buildTokenRequest(final Set<DeliveryRequest> deliveries) {
+    private DeliveryTokenRequest buildTokenRequest(final Set<LogisticsRequest> deliveries) {
         final List<DeliveryPackageRequest> deliveryPackageRequests = deliveries
                 .stream()
                 .map(this::createDeliveryPackageRequests)
@@ -44,23 +44,23 @@ public class LogisticsServiceImpl implements LogisticsService {
                 .build();
     }
 
-    private List<DeliveryPackageRequest> createDeliveryPackageRequests(DeliveryRequest delivery) {
+    private List<DeliveryPackageRequest> createDeliveryPackageRequests(LogisticsRequest delivery) {
         return List.of(createDeliveryPackageRequest(delivery));
     }
 
-    private DeliveryPackageRequest createDeliveryPackageRequest(DeliveryRequest delivery) {
+    private DeliveryPackageRequest createDeliveryPackageRequest(LogisticsRequest delivery) {
         return DeliveryPackageRequest.builder()
                 .delivery(buildDeliveryInformation(delivery))
                 .build();
     }
 
-    private DeliveryInformation buildDeliveryInformation(DeliveryRequest delivery) {
+    private DeliveryInformation buildDeliveryInformation(LogisticsRequest delivery) {
         return DeliveryInformation.builder()
                 .build();
     }
 
     private void assignTokenToDelivery(final Map<ShipmentId, SupplierSignature> supplierTokenResponseMap,
-			Set<DeliveryRequest> deliveries) {
+			Set<LogisticsRequest> deliveries) {
 		deliveries.forEach(delivery -> {
 			final SupplierSignature supplierSignature = supplierTokenResponseMap.get(delivery.getShipmentId());
 

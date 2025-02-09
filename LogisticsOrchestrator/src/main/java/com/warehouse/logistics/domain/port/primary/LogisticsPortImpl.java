@@ -2,8 +2,8 @@ package com.warehouse.logistics.domain.port.primary;
 
 import java.util.Set;
 
-import com.warehouse.logistics.domain.model.DeliveryRequest;
-import com.warehouse.logistics.domain.model.DeliveryResponse;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
 import com.warehouse.logistics.domain.port.secondary.RouteLogDeliveryStatusServicePort;
 import com.warehouse.logistics.domain.service.LogisticsService;
 
@@ -20,7 +20,7 @@ public class LogisticsPortImpl implements LogisticsPort {
     }
 
     @Override
-    public Set<DeliveryResponse> processDelivery(final Set<DeliveryRequest> deliveryRequests) {
-        return this.logisticsService.save(deliveryRequests);
+    public Set<LogisticsResponse> processDelivery(final Set<LogisticsRequest> logisticsRequests) {
+        return this.logisticsService.save(logisticsRequests);
     }
 }

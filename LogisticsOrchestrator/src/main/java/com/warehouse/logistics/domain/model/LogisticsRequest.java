@@ -14,7 +14,7 @@ import lombok.Builder;
 
 
 @Builder
-public class DeliveryRequest {
+public class LogisticsRequest {
     private ShipmentId shipmentId;
     private ShipmentId newShipmentId;
     private DepartmentCode departmentCode;
@@ -25,15 +25,15 @@ public class DeliveryRequest {
     private DeliveryToken deliveryToken;
     private RejectReason rejectReason;
 
-    public DeliveryRequest(final ShipmentId shipmentId,
-                           final ShipmentId newShipmentId,
-                           final DepartmentCode departmentCode,
-                           final SupplierCode supplierCode,
-                           final DeliveryStatus deliveryStatus,
-                           final ProcessType processType,
-                           final ReturnToken returnToken,
-                           final DeliveryToken deliveryToken,
-                           final RejectReason rejectReason) {
+    public LogisticsRequest(final ShipmentId shipmentId,
+                            final ShipmentId newShipmentId,
+                            final DepartmentCode departmentCode,
+                            final SupplierCode supplierCode,
+                            final DeliveryStatus deliveryStatus,
+                            final ProcessType processType,
+                            final ReturnToken returnToken,
+                            final DeliveryToken deliveryToken,
+                            final RejectReason rejectReason) {
         this.shipmentId = shipmentId;
         this.newShipmentId = newShipmentId;
         this.departmentCode = departmentCode;
@@ -121,9 +121,9 @@ public class DeliveryRequest {
         this.deliveryStatus = DeliveryStatus.DELIVERY;
     }
 
-    public static DeliveryRequest from(final ProcessType processType,
-                                       final DeliveryReturnResponseDetails returnResponseDetails) {
-        return new DeliveryRequest(returnResponseDetails.getShipmentId(), null, returnResponseDetails.getDepartmentCode(),
+    public static LogisticsRequest from(final ProcessType processType,
+                                        final DeliveryReturnResponseDetails returnResponseDetails) {
+        return new LogisticsRequest(returnResponseDetails.getShipmentId(), null, returnResponseDetails.getDepartmentCode(),
                 returnResponseDetails.getSupplierCode(), returnResponseDetails.getDeliveryStatus(),
                 processType, new ReturnToken(returnResponseDetails.getReturnToken().value()), null, null);
     }
