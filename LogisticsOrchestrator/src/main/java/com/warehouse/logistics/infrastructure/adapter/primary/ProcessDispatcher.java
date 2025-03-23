@@ -13,7 +13,7 @@ public class ProcessDispatcher {
 
     private final List<ProcessHandler> handlers;
 
-    public ProcessDispatcher(List<ProcessHandler> handlers) {
+    public ProcessDispatcher(final List<ProcessHandler> handlers) {
         this.handlers = handlers;
     }
 
