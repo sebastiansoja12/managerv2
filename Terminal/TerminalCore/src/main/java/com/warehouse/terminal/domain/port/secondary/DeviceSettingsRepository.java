@@ -5,5 +5,5 @@ import com.warehouse.terminal.domain.model.DeviceSettings;
 
 public interface DeviceSettingsRepository {
     DeviceSettings getDeviceSettings(final DeviceId deviceId);
-    void initializeDeviceSettings(final DeviceSettings deviceSettings);
+    void saveOrUpdate(final DeviceSettings deviceSettings);
 }

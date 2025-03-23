@@ -23,9 +23,10 @@ public class DeviceSettingsRepositoryImpl implements DeviceSettingsRepository {
     }
 
     @Override
-    public void initializeDeviceSettings(final DeviceSettings deviceSettings) {
-        final DeviceSettingsEntity settingsEntity = DeviceSettingsEntity.from(deviceSettings, deviceSettingsId());
-        this.repository.save(settingsEntity);
+    public void saveOrUpdate(final DeviceSettings deviceSettings) {
+        this.repository.findByDeviceId(deviceSettings.getDeviceId())
+                .map(settings -> DeviceSettingsEntity.from(deviceSettings, settings.getDeviceSettingsId()))
+                .orElseGet(() -> this.repository.save(DeviceSettingsEntity.from(deviceSettings, deviceSettingsId())));
     }
 
     private String deviceSettingsId() {
