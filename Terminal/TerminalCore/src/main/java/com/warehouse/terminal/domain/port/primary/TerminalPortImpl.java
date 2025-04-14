@@ -6,6 +6,7 @@ import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.exception.UserNotFoundException;
+import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.request.DeviceSettingsRequest;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
@@ -75,7 +76,10 @@ public class TerminalPortImpl implements TerminalPort {
 
     @Override
     public void updateSettings(final DeviceSettingsRequest request) {
-        this.terminalService.updateSettings(request);
+        final Device device = terminalService.findByDeviceId(request.getDeviceId());
+        if (device != null) {
+            this.terminalService.updateSettings(request);
+        }
     }
 
     @Override

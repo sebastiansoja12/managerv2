@@ -7,16 +7,22 @@ import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.Username;
+import com.warehouse.terminal.domain.model.DeviceSettings;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.request.DeviceSettingsRequest;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
+import com.warehouse.terminal.domain.port.secondary.DeviceSettingsRepository;
 
 public class TerminalServiceImpl implements TerminalService {
 
     private final DeviceRepository deviceRepository;
 
-	public TerminalServiceImpl(final DeviceRepository deviceRepository) {
+    private final DeviceSettingsRepository deviceSettingsRepository;
+
+	public TerminalServiceImpl(final DeviceRepository deviceRepository,
+            DeviceSettingsRepository deviceSettingsRepository) {
         this.deviceRepository = deviceRepository;
+        this.deviceSettingsRepository = deviceSettingsRepository;
     }
 
     @Override
@@ -58,7 +64,8 @@ public class TerminalServiceImpl implements TerminalService {
 
     @Override
     public void updateSettings(final DeviceSettingsRequest request) {
-
+        final DeviceSettings deviceSettings = DeviceSettings.from(request);
+        this.deviceSettingsRepository.saveOrUpdate(deviceSettings);
     }
 
     private DeviceId nextDeviceId() {

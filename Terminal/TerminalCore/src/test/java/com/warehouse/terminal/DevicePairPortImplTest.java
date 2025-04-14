@@ -46,13 +46,16 @@ public class DevicePairPortImplTest {
     @Mock
     private SupplierRepository supplierRepository;
 
+    @Mock
+    private DeviceSettingsRepository deviceSettingsRepository;
+
     private DevicePairPortImpl devicePairPort;
     
     @BeforeEach
     void setup() {
 		final TerminalValidatorService terminalValidatorService = new TerminalValidatorServiceImpl(
 				deviceVersionRepository, departmentRepository, userRepository, supplierRepository, deviceRepository);
-        final TerminalService terminalService = new TerminalServiceImpl(deviceRepository);
+        final TerminalService terminalService = new TerminalServiceImpl(deviceRepository, deviceSettingsRepository);
         final UserService userService = new UserServiceImpl(userRepository);
         final DevicePairService devicePairService = new DevicePairServiceImpl(devicePairRepository);
         final DeviceVersionService deviceVersionService = new DeviceVersionServiceImpl(deviceVersionRepository);

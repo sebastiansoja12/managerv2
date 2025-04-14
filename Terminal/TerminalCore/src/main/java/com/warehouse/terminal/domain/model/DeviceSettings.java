@@ -1,6 +1,7 @@
 package com.warehouse.terminal.domain.model;
 
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.terminal.domain.model.request.DeviceSettingsRequest;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceSettingsEntity;
 
 public class DeviceSettings {
@@ -61,5 +62,10 @@ public class DeviceSettings {
     public static DeviceSettings from(final DeviceSettingsEntity deviceSettingsEntity) {
         return new DeviceSettings(deviceSettingsEntity.getDeviceId(), deviceSettingsEntity.getCrossCourierDelivery(),
                 deviceSettingsEntity.getValidateResponsibleUser(), deviceSettingsEntity.getValidateDepartmentCode());
+    }
+
+    public static DeviceSettings from(final DeviceSettingsRequest request) {
+        return new DeviceSettings(request.getDeviceId(), request.getEnableCrossCourierDelivery(),
+                request.isValidateResponsibleUser(), request.isValidateDepartmentCode());
     }
 }
