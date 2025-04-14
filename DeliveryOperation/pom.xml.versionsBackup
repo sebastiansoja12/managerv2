@@ -5,17 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>PathFinder</artifactId>
-        <version>2025.2-SNAPSHOT</version>
+        <artifactId>warehouse</artifactId>
+        <version>2025.1-SNAPSHOT</version>
     </parent>
-    <packaging>jar</packaging>
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-    </dependencies>
-    <artifactId>PathFinderApi</artifactId>
+
+    <artifactId>DeliveryOperation</artifactId>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>DeliveryOperationApi</module>
+        <module>DeliveryOperationCore</module>
+    </modules>
 
 
 </project>

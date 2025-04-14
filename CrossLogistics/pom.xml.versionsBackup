@@ -5,17 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>PathFinder</artifactId>
-        <version>2025.2-SNAPSHOT</version>
+        <artifactId>warehouse</artifactId>
+        <version>2025.1-SNAPSHOT</version>
     </parent>
-    <packaging>jar</packaging>
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-    </dependencies>
-    <artifactId>PathFinderApi</artifactId>
 
+    <artifactId>CrossLogistics</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
 </project>
