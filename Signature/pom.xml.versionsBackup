@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.warehouse</groupId>
-    <version>2025.2-SNAPSHOT</version>
+    <version>2025.1-SNAPSHOT</version>
     <name>Signature</name>
     <description>Pom file signature service</description>
     <packaging>pom</packaging>
