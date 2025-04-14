@@ -98,7 +98,7 @@ public interface LogisticsRequestMapper {
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
-        return new DeliveryMissedRequestDto(deliveryMissedDetails, map(request.getDeviceInformation()));
+        return new DeliveryMissedRequestDto(null, deliveryMissedDetails, map(request.getDeviceInformation()));
     }
 
     DeliveryMissedDetailsDto map(final DeliveryMissedDetails deliveryMissedDetails);

@@ -1,15 +1,11 @@
 package com.warehouse.routelogger.infrastructure.adapter.secondary.api.dto;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.extern.jackson.Jacksonized;
+import com.warehouse.routelogger.dto.ProcessTypeDto;
+import com.warehouse.routelogger.dto.SupplierCodeDto;
 
-@Jacksonized
-@Value
-@Builder
-public class DeliveryRequestDto {
-    String depotCode;
-    String supplierCode;
-    Long parcelId;
-    String processType;
+
+public record DeliveryRequestDto(DepartmentCodeDto departmentCode,
+                                 SupplierCodeDto supplierCode,
+                                 ShipmentIdDto shipmentId,
+                                 ProcessTypeDto processType) {
 }

@@ -1,13 +1,14 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.deliverymissed.infrastructure.adapter.secondary.enumeration.Status;
+import java.time.LocalDateTime;
+
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -34,7 +35,7 @@ public class DeliveryMissedEntity {
     private String supplierCode;
 
     @Column(name = "delivery_status", nullable = false)
-    private Status deliveryStatus;
+    private DeliveryStatus deliveryStatus;
 
     @Column(name = "token", nullable = false)
     private String token;

@@ -12,7 +12,6 @@ import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsExcept
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
-import com.warehouse.deliveryreturn.domain.port.secondary.RouteLogReturnServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.vo.*;
@@ -28,14 +27,10 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private final ShipmentStatusControlServicePort shipmentStatusControlServicePort;
 
-    private final RouteLogReturnServicePort routeLogReturnServicePort;
-
     public DeliveryReturnPortImpl(final DeliveryReturnService deliveryReturnService,
-                                  final ShipmentStatusControlServicePort shipmentStatusControlServicePort,
-                                  final RouteLogReturnServicePort routeLogReturnServicePort) {
+                                  final ShipmentStatusControlServicePort shipmentStatusControlServicePort) {
         this.deliveryReturnService = deliveryReturnService;
         this.shipmentStatusControlServicePort = shipmentStatusControlServicePort;
-        this.routeLogReturnServicePort = routeLogReturnServicePort;
     }
 
     @Override
