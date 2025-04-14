@@ -1,17 +1,15 @@
 package com.warehouse.deliverymissed.configuration;
 
-import com.warehouse.deliverymissed.domain.port.secondary.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPort;
 import com.warehouse.deliverymissed.domain.port.primary.DeliveryMissedPortImpl;
-import com.warehouse.deliverymissed.domain.port.primary.TerminalRequestLoggerPort;
-import com.warehouse.deliverymissed.domain.port.primary.TerminalRequestLoggerPortImpl;
+import com.warehouse.deliverymissed.domain.port.secondary.*;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedServiceImpl;
+import com.warehouse.deliverymissed.domain.service.SuggestedActionDetermineService;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.*;
-import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
 
 @Configuration
@@ -19,9 +17,10 @@ public class DeliveryMissedConfiguration {
 
 	@Bean
 	public DeliveryMissedPort deliveryMissedPort(final DeliveryMissedService deliveryMissedService,
-												 final RouteLogMissedServicePort logMissedServicePort,
-												 final DeliveryInstructionServicePort deliveryInstructionServicePort) {
-		return new DeliveryMissedPortImpl(deliveryMissedService, logMissedServicePort, deliveryInstructionServicePort);
+												 final DeliveryInstructionServicePort deliveryInstructionServicePort,
+												 final SuggestedActionDetermineService suggestedActionDetermineService) {
+		return new DeliveryMissedPortImpl(deliveryMissedService, deliveryInstructionServicePort,
+				suggestedActionDetermineService);
 	}
 
 	@Bean
@@ -29,20 +28,10 @@ public class DeliveryMissedConfiguration {
 		return new DeliveryInstructionServiceAdapter();
 	}
 
-	@Bean("deliveryMissed.terminalRequestLoggerPort")
-	public TerminalRequestLoggerPort terminalRequestLoggerPort(RouteLogMissedServicePort routeLogMissedServicePort) {
-		return new TerminalRequestLoggerPortImpl(routeLogMissedServicePort);
-	}
-
-	@Bean
-	public RouteLogMissedServicePort routeLogMissedServicePort(RouteLogEventPublisher routeLogEventPublisher) {
-		return new RouteLogMissedServiceAdapter(routeLogEventPublisher);
-	}
-
 	@Bean
 	public DeliveryMissedService deliveryMissedService(DeliveryMissedRepository deliveryMissedRepository,
-			ShipmentUpdateServicePort shipmentUpdateServicePort) {
-		return new DeliveryMissedServiceImpl(deliveryMissedRepository, shipmentUpdateServicePort);
+			ShipmentUpdateServicePort shipmentUpdateServicePort, final DeliveryMissedDetailsRepository detailsRepository) {
+		return new DeliveryMissedServiceImpl(deliveryMissedRepository, shipmentUpdateServicePort, detailsRepository);
 	}
 
 	@Bean
@@ -51,8 +40,9 @@ public class DeliveryMissedConfiguration {
 	}
 
 	@Bean
-	public DeliveryMissedDetailsRepository deliveryMissedDetailsRepository() {
-		return new DeliveryMissedDetailsRepositoryImpl();
+	public DeliveryMissedDetailsRepository deliveryMissedDetailsRepository(
+			final DeliveryMissedDetailsReadRepository deliveryMissedDetailsReadRepository) {
+		return new DeliveryMissedDetailsRepositoryImpl(deliveryMissedDetailsReadRepository);
 	}
 
 	@Bean("deliveryMissed.parcelStatusProperties")

@@ -86,8 +86,9 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public TerminalService terminalService(final DeviceRepository deviceRepository) {
-        return new TerminalServiceImpl(deviceRepository);
+    public TerminalService terminalService(final DeviceRepository deviceRepository,
+            final DeviceSettingsRepository deviceSettingsRepository) {
+        return new TerminalServiceImpl(deviceRepository, deviceSettingsRepository);
     }
 
     @Bean

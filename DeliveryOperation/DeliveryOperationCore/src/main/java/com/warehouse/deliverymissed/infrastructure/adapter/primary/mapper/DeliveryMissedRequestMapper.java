@@ -6,10 +6,7 @@ import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.deliverymissed.domain.model.DeliveryMissedDetails;
 import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
@@ -27,8 +24,11 @@ public interface DeliveryMissedRequestMapper {
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toSet());
-        return new DeliveryMissedRequest(deliveryMissedDetails, map(deviceInformation));
+        final DeliveryId deliveryId = map(deliveryMissedRequest.getDeliveryId());
+        return new DeliveryMissedRequest(deliveryId, deliveryMissedDetails, map(deviceInformation));
     }
+
+    DeliveryId map(final DeliveryIdDto deliveryId);
 
     DeliveryMissedDetails map(final DeliveryMissedDetailsDto deliveryMissedDetailsDto);
 

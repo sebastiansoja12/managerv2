@@ -27,8 +27,8 @@ import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.domain.vo.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
-import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationPortImplTest {

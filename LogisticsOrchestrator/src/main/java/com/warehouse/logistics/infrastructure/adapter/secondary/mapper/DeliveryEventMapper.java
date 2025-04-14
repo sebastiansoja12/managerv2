@@ -7,6 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.google.common.collect.Lists;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.logistics.domain.vo.DepartmentCodeRequest;
 import com.warehouse.routelogger.dto.*;
@@ -18,8 +21,19 @@ import com.warehouse.terminal.request.TerminalRequest;
 @Mapper
 public interface DeliveryEventMapper {
 
-    @Mapping(target = "processType", constant = "MISS")
-    DeliveryRequestDto map(DeliveryMissed deliveryMissed);
+    default DeliveryRequestDto map(final DeliveryMissed deliveryMissed) {
+        final DepartmentCodeDto departmentCode = map(deliveryMissed.getDepartmentCode());
+        final ProcessTypeDto processType = ProcessTypeDto.MISS;
+        final ShipmentIdDto shipmentId = map(deliveryMissed.getShipmentId());
+        final SupplierCodeDto supplierCode = map(deliveryMissed.getSupplierCode());
+        return new DeliveryRequestDto(departmentCode, processType, shipmentId, supplierCode);
+    }
+
+    SupplierCodeDto map(final SupplierCode supplierCode);
+
+    ShipmentIdDto map(final ShipmentId shipmentId);
+
+    DepartmentCodeDto map(final DepartmentCode departmentCode);
 
     default DeviceDto map(final DeviceInformation deviceInformation) {
         final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().getValue());
@@ -66,13 +80,4 @@ public interface DeliveryEventMapper {
     }
 
     ProcessTypeDto map(final ProcessType processType);
-
-    @Mapping(target = "processType", constant = "MISS")
-    SupplierCodeRequestDto mapToSupplierCodeRequest(DeliveryMissed deliveryMissed);
-
-    @Mapping(target = "terminalId", source = "device.deviceId")
-    TerminalLogRequestDto mapToTerminalLogRequest(TerminalRequest terminalRequest);
-
-    @Mapping(target = "version", source = "device.version")
-    VersionLogRequestDto mapToVersionLogRequest(TerminalRequest terminalRequest);
 }

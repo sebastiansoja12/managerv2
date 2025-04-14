@@ -14,7 +14,6 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
-import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
 import com.warehouse.tools.returntoken.ReturnTokenProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
@@ -28,18 +27,12 @@ public class DeliveryReturnConfiguration {
 	public DeliveryReturnPort deliveryReturnPort(final DeliveryReturnRepository deliveryReturnRepository,
                                                  final ReturnTokenServicePort returnTokenServicePort,
                                                  final ShipmentStatusControlServicePort shipmentStatusControlServicePort,
-                                                 final ShipmentRepositoryServicePort shipmentRepositoryServicePort, MailServicePort mailServicePort,
-                                                 final RouteLogReturnServicePort routeLogReturnServicePort) {
+                                                 final ShipmentRepositoryServicePort shipmentRepositoryServicePort,
+                                                 final MailServicePort mailServicePort) {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
                 returnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
-		return new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort,
-				routeLogReturnServicePort);
+		return new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort);
 	}
-    
-    @Bean
-    public RouteLogReturnServicePort routeLogReturnServicePort(final RouteLogEventPublisher routeLogEventPublisher) {
-        return new RouteLogReturnServiceAdapter(routeLogEventPublisher);
-    }
 
     @Bean("deliveryReturn.mailServicePort")
     public MailServicePort mailServicePort(final NotificationEventPublisher eventPublisher) {

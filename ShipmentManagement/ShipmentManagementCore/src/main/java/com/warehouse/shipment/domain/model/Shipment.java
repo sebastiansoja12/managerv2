@@ -7,10 +7,10 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.VoronoiResponse;
 
 
 public class Shipment {
@@ -74,6 +74,9 @@ public class Shipment {
 		this.updatedAt = updatedAt;
 		this.locked = locked;
         this.signature = signature;
+        this.originCountry = Country.POLAND;
+        this.destinationCountry = Country.POLAND;
+        this.signatureRequired = signature != null;
     }
 
     public static Shipment from(final ShipmentRequest request) {
@@ -178,6 +181,30 @@ public class Shipment {
 
     public Signature getSignature() {
         return signature;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public DangerousGood getDangerousGood() {
+        return dangerousGood;
+    }
+
+    public Boolean getSignatureRequired() {
+        return signatureRequired;
+    }
+
+    public ShipmentPriority getShipmentPriority() {
+        return shipmentPriority;
+    }
+
+    public Country getOriginCountry() {
+        return originCountry;
+    }
+
+    public Country getDestinationCountry() {
+        return destinationCountry;
     }
 
     public void changeSignature(final Signature signature) {

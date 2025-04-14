@@ -6,16 +6,16 @@ import java.util.Set;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.logistics.domain.port.secondary.DeliveryTrackerLogServicePort;
 import com.warehouse.logistics.domain.vo.DepartmentCodeRequest;
-import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.logistics.infrastructure.adapter.secondary.mapper.DeliveryEventMapper;
-import com.warehouse.deliverymissed.domain.vo.DeliveryMissed;
 import com.warehouse.routelogger.RouteLogEvent;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.dto.ProcessTypeDto;
 import com.warehouse.routelogger.dto.ShipmentIdDto;
 import com.warehouse.routelogger.event.*;
+import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.request.TerminalRequest;
 
 import lombok.AllArgsConstructor;
@@ -89,7 +89,6 @@ public class DeliveryTrackerLogServiceAdapter implements DeliveryTrackerLogServi
 
     private SupplierCodeLogEvent buildSupplierCodeLogEvent(final DeliveryMissed deliveryMissed) {
         return SupplierCodeLogEvent.builder()
-                .supplierCodeRequest(eventMapper.mapToSupplierCodeRequest(deliveryMissed))
                 .build();
     }
 
@@ -101,13 +100,11 @@ public class DeliveryTrackerLogServiceAdapter implements DeliveryTrackerLogServi
 
     private TerminalLogEvent buildTerminalLogEvent(final TerminalRequest terminalRequest) {
         return TerminalLogEvent.builder()
-                .terminalLogRequest(eventMapper.mapToTerminalLogRequest(terminalRequest))
                 .build();
     }
 
     private VersionLogEvent buildVersionLogEvent(final TerminalRequest terminalRequest) {
         return VersionLogEvent.builder()
-                .versionLogRequest(eventMapper.mapToVersionLogRequest(terminalRequest))
                 .build();
     }
 
