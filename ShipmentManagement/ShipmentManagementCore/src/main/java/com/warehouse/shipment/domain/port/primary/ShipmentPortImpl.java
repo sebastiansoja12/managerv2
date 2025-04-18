@@ -63,7 +63,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public ShipmentResponse ship(final ShipmentRequest request) {
+    public ShipmentCreateResponse ship(final ShipmentCreateRequest request) {
 
         final Shipment shipment = Shipment.from(request);
 
@@ -95,7 +95,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final RouteProcess routeProcess = this.shipmentService.initializeRouteProcess(shipmentId);
 
-        return new ShipmentResponse(routeProcess.getProcessId().toString(), routeProcess.getShipmentId());
+        return new ShipmentCreateResponse(routeProcess.getProcessId().toString(), routeProcess.getShipmentId());
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeSenderTo(final ShipmentRequest request) {
+    public void changeSenderTo(final ShipmentCreateRequest request) {
         final Shipment shipment = Shipment.from(request);
         final Sender sender = Sender.from(shipment);
         final ShipmentId shipmentId = shipment.getShipmentId();
@@ -133,7 +133,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeRecipientTo(final ShipmentRequest request) {
+    public void changeRecipientTo(final ShipmentCreateRequest request) {
         final Shipment shipment = Shipment.from(request);
         final Recipient recipient = Recipient.from(shipment);
         final ShipmentId shipmentId = shipment.getShipmentId();
@@ -141,7 +141,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeShipmentTypeTo(final ShipmentRequest request) {
+    public void changeShipmentTypeTo(final ShipmentCreateRequest request) {
         final Shipment shipment = Shipment.from(request);
         final ShipmentType shipmentType = shipment.getShipmentType();
         final ShipmentId shipmentId = shipment.getShipmentId();

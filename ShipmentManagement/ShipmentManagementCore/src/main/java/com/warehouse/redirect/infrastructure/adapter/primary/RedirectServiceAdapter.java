@@ -1,9 +1,9 @@
 package com.warehouse.redirect.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.redirect.RedirectService;
+import com.warehouse.redirect.infrastructure.adapter.primary.api.RedirectService;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPort;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentIdDto;
 
 public class RedirectServiceAdapter implements RedirectService {
 

@@ -26,7 +26,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
-import com.warehouse.tracking.TrackingStatusEventPublisher;
+import com.warehouse.tracking.infrastructure.adapter.primary.api.TrackingStatusEventPublisher;
 import com.warehouse.voronoi.VoronoiService;
 
 import io.github.resilience4j.retry.RetryConfig;

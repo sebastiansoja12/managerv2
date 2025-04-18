@@ -5,7 +5,7 @@ import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.RerouteParcelRequest;
 import com.warehouse.reroute.domain.model.Token;
 import com.warehouse.reroute.domain.vo.ParcelId;
-import com.warehouse.reroute.infrastructure.api.dto.*;
+import com.warehouse.reroute.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

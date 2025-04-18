@@ -2,19 +2,19 @@ package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Money;
-import com.warehouse.shipment.infrastructure.api.dto.*;
+import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
 
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.vo.ShipmentResponse;
 import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
 
 @Mapper
 public interface ShipmentResponseMapper {
 
-    ShipmentResponse map(final ShipmentResponseDto responseDto);
+    ShipmentCreateResponse map(final ShipmentCreateResponseDto responseDto);
 
-    ShipmentResponseDto map(final ShipmentResponse response);
+    ShipmentCreateResponseDto map(final ShipmentCreateResponse response);
 
     ShipmentDto map(final Shipment shipment);
 

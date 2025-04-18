@@ -15,11 +15,6 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ShipmentManagementApi</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>DepartmentServiceCore</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -150,6 +145,10 @@
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
         </dependency>
     </dependencies>
 

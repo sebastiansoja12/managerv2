@@ -1,12 +1,12 @@
 package com.warehouse.tracking.configuration;
 
-import com.warehouse.redirect.RedirectService;
+import com.warehouse.redirect.infrastructure.adapter.primary.api.RedirectService;
 import com.warehouse.redirect.domain.port.primary.RedirectTokenPort;
-import com.warehouse.reroute.RerouteService;
+import com.warehouse.reroute.infrastructure.adapter.primary.api.RerouteService;
 import com.warehouse.redirect.infrastructure.adapter.primary.RedirectServiceAdapter;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
 import com.warehouse.reroute.infrastructure.adapter.primary.RerouteServiceAdapter;
-import com.warehouse.tracking.TrackingStatusEventPublisher;
+import com.warehouse.tracking.infrastructure.adapter.primary.api.TrackingStatusEventPublisher;
 import com.warehouse.tracking.infrastructure.adapter.secondary.TrackingStatusEventPublisherImpl;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;

@@ -4,16 +4,16 @@ import java.util.Objects;
 
 import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusRequestDto;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentRequestDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentUpdateRequestDto;
-import com.warehouse.shipment.infrastructure.api.dto.SignatureChangeRequestDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentIdDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentCreateRequestDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentUpdateRequestDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.SignatureChangeRequestDto;
 
 // TODO later
 public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
     @Override
-    public void validateBody(final ShipmentRequestDto shipmentRequest) {
+    public void validateBody(final ShipmentCreateRequestDto shipmentRequest) {
         validateRequest(shipmentRequest);
     }
 

@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,18 +10,15 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import com.warehouse.shipment.domain.vo.ShipmentRequest;
-import com.warehouse.shipment.domain.vo.ShipmentResponse;
+import com.warehouse.shipment.domain.vo.ShipmentCreateRequest;
+import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
 import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
 import com.warehouse.shipment.domain.vo.ShipmentUpdateRequest;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentResponseInformation;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusRequestDto;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.Status;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
-import com.warehouse.shipment.infrastructure.api.dto.*;
 
 @RestController
 @RequestMapping("/shipments")
@@ -44,11 +43,15 @@ public class ShipmentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody final ShipmentRequestDto shipmentRequest) {
+    @Counted(value = "controller.shipment.create")
+    @Timed(value = "controller.shipment.create")
+    public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestDto shipmentRequest) {
         shipmentRequestValidator.validateBody(shipmentRequest);
-        final ShipmentRequest request = requestMapper.map(shipmentRequest);
-        final ShipmentResponse shipmentResponse = shipmentPort.ship(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.map(shipmentResponse));
+        final ShipmentCreateRequest request = requestMapper.map(shipmentRequest);
+        final ShipmentCreateResponse shipmentCreateResponse = shipmentPort.ship(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(responseMapper.map(shipmentCreateResponse));
     }
 
     @GetMapping("/{value}")

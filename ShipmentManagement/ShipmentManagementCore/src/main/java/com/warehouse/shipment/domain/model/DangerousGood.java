@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.model;
 
+import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.identificator.ShipmentId;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class DangerousGood {
     private boolean corrosive;
     private boolean toxic;
     private String emergencyContact;
-    private String countryOfOrigin;
+    private Country countryOfOrigin;
     private String safetyDataSheet;
 
     public DangerousGood(final ShipmentId shipmentId, final String name, final String description,
@@ -27,7 +28,7 @@ public class DangerousGood {
                          final String storageRequirements, final String handlingInstructions, final double weight,
                          final String packaging, final boolean flammable, final boolean isCorrosive,
                          final boolean toxic, final String emergencyContact,
-                         final String countryOfOrigin, final String safetyDataSheet) {
+                         final Country countryOfOrigin, final String safetyDataSheet) {
         this.shipmentId = shipmentId;
         this.name = name;
         this.description = description;
@@ -101,7 +102,7 @@ public class DangerousGood {
         this.emergencyContact = emergencyContact;
     }
 
-    public void setCountryOfOrigin(final String countryOfOrigin) {
+    public void setCountryOfOrigin(final Country countryOfOrigin) {
         this.countryOfOrigin = countryOfOrigin;
     }
 
@@ -157,7 +158,7 @@ public class DangerousGood {
         return emergencyContact;
     }
 
-    public String getCountryOfOrigin() {
+    public Country getCountryOfOrigin() {
         return countryOfOrigin;
     }
 

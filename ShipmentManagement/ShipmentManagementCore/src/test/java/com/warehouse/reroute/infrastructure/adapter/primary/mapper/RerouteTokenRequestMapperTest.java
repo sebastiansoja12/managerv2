@@ -3,14 +3,13 @@ package com.warehouse.reroute.infrastructure.adapter.primary.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mapstruct.factory.Mappers.getMapper;
 
+import com.warehouse.reroute.infrastructure.adapter.primary.api.*;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.reroute.domain.model.Parcel;
 import com.warehouse.reroute.domain.model.RerouteParcelRequest;
 import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.Token;
-import com.warehouse.reroute.infrastructure.api.dto.*;
-
 
 
 public class RerouteTokenRequestMapperTest {
@@ -86,7 +85,7 @@ public class RerouteTokenRequestMapperTest {
         assertThat(parcelId.getValue()).isEqualTo(PARCEL_ID);
     }
 
-    private com.warehouse.reroute.infrastructure.api.dto.ParcelId parcelId() {
+    private ParcelId parcelId() {
         return ParcelId.builder().value(PARCEL_ID).build();
     }
 

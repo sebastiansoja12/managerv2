@@ -9,7 +9,7 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.vo.ShipmentRequest;
+import com.warehouse.shipment.domain.vo.ShipmentCreateRequest;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
 
 
@@ -79,7 +79,7 @@ public class Shipment {
         this.signatureRequired = signature != null;
     }
 
-    public static Shipment from(final ShipmentRequest request) {
+    public static Shipment from(final ShipmentCreateRequest request) {
         return request.getShipment();
     }
 
@@ -215,7 +215,6 @@ public class Shipment {
     public void prepareShipmentToCreate() {
         this.shipmentStatus = ShipmentStatus.CREATED;
         this.createdAt = LocalDateTime.now();
-        markAsModified();
     }
 
     public void prepareShipmentToReroute() {
