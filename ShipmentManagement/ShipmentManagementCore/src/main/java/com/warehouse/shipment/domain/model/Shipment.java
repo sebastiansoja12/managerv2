@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.model;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -9,6 +10,9 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
+import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
+import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
+import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.*;
 
 
@@ -81,6 +85,7 @@ public class Shipment {
         this.originCountry = Country.POLAND;
         this.destinationCountry = Country.POLAND;
         this.signatureRequired = signature != null;
+        DomainRegistry.publish(new ShipmentCreatedEvent(this.createSnapshot(), Instant.now()));
     }
     
     public Shipment(final Sender sender, 
@@ -94,6 +99,11 @@ public class Shipment {
         this.price = price;
         this.dangerousGood = dangerousGood;
         this.shipmentStatus = ShipmentStatus.CREATED;
+        DomainRegistry.publish(new ShipmentCreatedEvent(this.createSnapshot(), Instant.now()));
+    }
+
+    private ShipmentSnapshot createSnapshot() {
+        return null;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -281,7 +291,7 @@ public class Shipment {
     }
 
     public void prepareShipmentToDeliver() {
-        this.shipmentStatus = ShipmentStatus.DELIVERY;
+        changeShipmentStatus(ShipmentStatus.DELIVERY);
         markAsModified();
     }
 
@@ -332,7 +342,7 @@ public class Shipment {
 
     public void changeShipmentStatus(final ShipmentStatus shipmentStatus) {
         this.shipmentStatus = shipmentStatus;
-        markAsModified();
+        DomainRegistry.publish(new ShipmentStatusChangedEvent(createSnapshot(), Instant.now()));
     }
 
     public void notifyRelatedShipmentRedirected(final ShipmentId relatedShipmentId) {
@@ -378,7 +388,7 @@ public class Shipment {
     }
 
     public void notifyRelatedShipmentLocked() {
-        this.shipmentStatus = ShipmentStatus.SENT;
+        changeShipmentStatus(ShipmentStatus.SENT);
         this.shipmentType = ShipmentType.PARENT;
         this.shipmentRelatedId = null;
         unlockShipment();
@@ -386,22 +396,22 @@ public class Shipment {
     }
 
     public void notifyShipmentRerouted() {
-        this.shipmentStatus = ShipmentStatus.REROUTE;
+        changeShipmentStatus(ShipmentStatus.REROUTE);
         markAsModified();
     }
 
     public void notifyShipmentSent() {
-        this.shipmentStatus = ShipmentStatus.SENT;
+        changeShipmentStatus(ShipmentStatus.SENT);
         markAsModified();
     }
 
     public void notifyShipmentReturned() {
-        this.shipmentStatus = ShipmentStatus.RETURN;
+        changeShipmentStatus(ShipmentStatus.RETURN);
         markAsModified();
     }
 
     public void notifyShipmentDelivered() {
-        this.shipmentStatus = ShipmentStatus.DELIVERY;
+        changeShipmentStatus(ShipmentStatus.DELIVERY);
         markAsModified();
     }
 
