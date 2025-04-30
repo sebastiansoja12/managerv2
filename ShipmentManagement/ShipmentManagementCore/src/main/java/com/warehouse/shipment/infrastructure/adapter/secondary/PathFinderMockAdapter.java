@@ -1,14 +1,9 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Objects;
-
-import static com.warehouse.shipment.domain.exception.enumeration.ShipmentExceptionCodes.SHIPMENT_202;
 
 
 public class PathFinderMockAdapter implements PathFinderServicePort {
@@ -20,10 +15,8 @@ public class PathFinderMockAdapter implements PathFinderServicePort {
     }
 
     @Override
-    public VoronoiResponse determineDeliveryDepot(Address address) {
-        if (Objects.isNull(address) || StringUtils.isEmpty(address.getCity())) {
-            throw new DestinationDepartmentDeterminationException(SHIPMENT_202);
-        }
-        return pathFinderMockService.determineDeliveryDepot(address);
+    public void determineDeliveryDepot(final Shipment shipment, final Address address) {
+        final VoronoiResponse response = pathFinderMockService.determineDeliveryDepot(address);
+        shipment.changeDestinationDepartment(response.getValue());
     }
 }

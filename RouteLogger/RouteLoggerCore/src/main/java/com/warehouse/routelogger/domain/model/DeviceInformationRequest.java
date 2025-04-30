@@ -35,7 +35,7 @@ public class DeviceInformationRequest {
     public static DeviceInformationRequest from(final DeviceDto device, final ProcessTypeDto processType,
                                                 final ShipmentIdDto shipmentId) {
         final ShipmentId id = new ShipmentId(shipmentId.value());
-        final DeviceId deviceId = new DeviceId(id.value());
+        final DeviceId deviceId = new DeviceId(id.getValue());
         final Username username = new Username(device.getUsername().value());
         final DepartmentCode departmentCode = new DepartmentCode(device.getDepartmentCode().value());
         final DeviceType type = DeviceType.valueOf(device.getDeviceType().name());

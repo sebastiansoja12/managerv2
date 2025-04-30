@@ -3,7 +3,7 @@ package com.warehouse.shipment.domain.exception.enumeration;
 import lombok.Getter;
 
 @Getter
-public enum ShipmentExceptionCodes {
+public enum ShipmentErrorCode {
 
     SHIPMENT_201(401, "URL for payment has not been generated"),
     SHIPMENT_202(402, "Delivery department could not be determined"),
@@ -14,7 +14,7 @@ public enum ShipmentExceptionCodes {
 
     private final String message;
 
-    ShipmentExceptionCodes(int code, String message) {
+    ShipmentErrorCode(int code, String message) {
         this.code = code;
         this.message = message;
     }

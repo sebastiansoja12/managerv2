@@ -1,12 +1,18 @@
-package com.warehouse.shipment.domain.model;
+package com.warehouse.commonassets.model;
 
 import com.warehouse.commonassets.enumeration.Currency;
+import jakarta.persistence.Embeddable;
 
 import java.math.BigDecimal;
 
+@Embeddable
 public class Money {
     private BigDecimal amount;
     private Currency currency;
+
+    public Money() {
+
+    }
 
     public Money(final BigDecimal amount, final Currency currency) {
         this.amount = amount;

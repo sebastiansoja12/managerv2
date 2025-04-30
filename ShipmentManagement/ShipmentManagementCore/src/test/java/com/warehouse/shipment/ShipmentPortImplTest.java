@@ -1,6 +1,5 @@
 package com.warehouse.shipment;
 
-import static com.warehouse.shipment.DataTestCreator.createShipment;
 import static com.warehouse.shipment.DataTestCreator.shipmentId;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -20,13 +19,13 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
 import com.warehouse.shipment.domain.handler.*;
+import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
-import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
+import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 
@@ -54,6 +53,12 @@ class ShipmentPortImplTest {
     @Mock
     private TrackingStatusServicePort trackingStatusServicePort;
 
+    @Mock
+    private CountryDetermineServicePort countryDetermineServicePort;
+
+    @Mock
+    private PriceRepository priceRepository;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
@@ -66,20 +71,23 @@ class ShipmentPortImplTest {
     void setUp() {
         final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository, routeLogServicePort,
                 softwareConfigurationServicePort);
+        final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort);
+        final PriceService priceService = new PriceServiceImpl(priceRepository);
         final Logger logger = mock(Logger.class);
         shipmentStatusHandlers = Sets.newHashSet(Sets.newHashSet(
                 new ShipmentCreatedHandler(), new ShipmentRerouteHandler(shipmentService),
                 new ShipmentSentHandler(shipmentService), new ShipmentDeliveryHandler(shipmentService),
                 new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
         shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
-                mailServicePort, trackingStatusServicePort, shipmentStatusHandlers);
+                mailServicePort, trackingStatusServicePort, shipmentStatusHandlers, countryDetermineService,
+                priceService);
     }
 
     @Test
     void shouldShip() {
         // given
         final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         final VoronoiResponse voronoiResponse = new VoronoiResponse("KT1");
         final RouteProcess routeProcess = new RouteProcess(shipmentId, processId);
         final SoftwareConfiguration softwareConfiguration = new SoftwareConfiguration("id", "url");
@@ -94,7 +102,7 @@ class ShipmentPortImplTest {
 
         when(routeLogServicePort.initializeRouteProcess(any(), any())).thenReturn(routeProcess);
         // when
-        final ShipmentCreateResponse response = shipmentPort.ship(request);
+        final Result<ShipmentCreateResponse, ShipmentErrorCode> response = shipmentPort.ship(request);
         // then
         assertEquals(response, expectedToBeEqualTo(response));
     }
@@ -102,7 +110,7 @@ class ShipmentPortImplTest {
     @Test
     void shouldNotShipWhenRequestIsEmpty() {
         // given
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(null);
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then
@@ -113,7 +121,7 @@ class ShipmentPortImplTest {
     @Test
     void shouldThrowDestinationDepotDeterminationExceptionWhenCityIsNull() {
         // given
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         doReturn(null)
                 .when(pathFinderServicePort)
                 .determineDeliveryDepot(any(Address.class));
@@ -128,7 +136,7 @@ class ShipmentPortImplTest {
     @Test
     void shouldThrowDestinationDepotDeterminationExceptionWhenCityValueIsEmpty() {
         // given
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         final VoronoiResponse voronoiResponse = new VoronoiResponse("");
         doReturn(voronoiResponse)
                 .when(pathFinderServicePort)
@@ -146,7 +154,7 @@ class ShipmentPortImplTest {
         // given
         final ShipmentId shipmentId = shipmentId();
         final Shipment shipment = mock(Shipment.class);
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         doReturn(shipment)
                 .when(shipmentRepository)
                 .findById(shipmentId);
@@ -162,7 +170,7 @@ class ShipmentPortImplTest {
         // given
         final ShipmentId shipmentId = shipmentId();
         final Shipment shipment = mock(Shipment.class);
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         doReturn(shipment)
                 .when(shipmentRepository)
                 .findById(shipmentId);
@@ -178,7 +186,7 @@ class ShipmentPortImplTest {
         // given
         final ShipmentId shipmentId = shipmentId();
         final Shipment shipment = mock(Shipment.class);
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         doReturn(shipment)
                 .when(shipmentRepository)
                 .findById(shipmentId);
@@ -280,7 +288,7 @@ class ShipmentPortImplTest {
     void shouldNotChangeSenderToWhenShipmentWasNotFound() {
         // given
         final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
                 .when(shipmentRepository)
                 .findById(shipmentId);
@@ -295,7 +303,7 @@ class ShipmentPortImplTest {
     void shouldNotChangeRecipientToWhenShipmentWasNotFound() {
         // given
         final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
                 .when(shipmentRepository)
                 .findById(shipmentId);
@@ -310,7 +318,7 @@ class ShipmentPortImplTest {
     void shouldNotChangeShipmentTypeToWhenShipmentWasNotFound() {
         // given
         final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest(createShipment());
+        final ShipmentCreateRequest request = new ShipmentCreateRequest();
         doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
                 .when(shipmentRepository)
                 .findById(shipmentId);

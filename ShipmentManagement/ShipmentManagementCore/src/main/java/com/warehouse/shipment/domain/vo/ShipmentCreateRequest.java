@@ -1,8 +1,9 @@
 package com.warehouse.shipment.domain.vo;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.model.Money;
+import com.warehouse.commonassets.model.Money;
 
 
 public class ShipmentCreateRequest {
@@ -16,6 +17,11 @@ public class ShipmentCreateRequest {
 	private Money price;
 	
 	private DangerousGood dangerousGood;
+
+	@VisibleForTesting
+	public ShipmentCreateRequest() {
+
+	}
 
 	public ShipmentCreateRequest(final DangerousGood dangerousGood,
 								 final Money price,

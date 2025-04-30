@@ -1,12 +1,13 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
@@ -18,7 +19,11 @@ import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
+import com.warehouse.shipment.infrastructure.adapter.primary.validator.DangerousGoodValidator;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
+
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 
 @RestController
 @RequestMapping("/shipments")
@@ -28,16 +33,20 @@ public class ShipmentController {
     
     private final ShipmentRequestValidator shipmentRequestValidator;
 
+    private final DangerousGoodValidator dangerousGoodValidator;
+
     private final ShipmentRequestMapper requestMapper;
 
     private final ShipmentResponseMapper responseMapper;
 
 	public ShipmentController(final ShipmentPort shipmentPort,
                               final ShipmentRequestValidator shipmentRequestValidator,
-			                  final ShipmentRequestMapper requestMapper,
+                              final DangerousGoodValidator dangerousGoodValidator,
+                              final ShipmentRequestMapper requestMapper,
                               final ShipmentResponseMapper responseMapper) {
         this.shipmentPort = shipmentPort;
         this.shipmentRequestValidator = shipmentRequestValidator;
+        this.dangerousGoodValidator = dangerousGoodValidator;
         this.requestMapper = requestMapper;
         this.responseMapper = responseMapper;
     }
@@ -48,15 +57,23 @@ public class ShipmentController {
     public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestDto shipmentRequest) {
         shipmentRequestValidator.validateBody(shipmentRequest);
         final ShipmentCreateRequest request = requestMapper.map(shipmentRequest);
-        final ShipmentCreateResponse shipmentCreateResponse = shipmentPort.ship(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(responseMapper.map(shipmentCreateResponse));
+        final Result<ShipmentCreateResponse, ShipmentErrorCode> result = shipmentPort.ship(request);
+
+        final ResponseEntity<?> response;
+        if (result.isSuccess()) {
+            response = ResponseEntity
+                    .ok()
+                    .body(responseMapper.map(result.getSuccess()));
+        } else {
+            response = ResponseEntity
+                    .badRequest()
+                    .body(result.getFailure());
+        }
+        return response;
     }
 
-    @GetMapping("/{value}")
-    public ResponseEntity<?> get(@PathVariable final Long value) {
-        final ShipmentId shipmentId = new ShipmentId(value);
+    @GetMapping("/{shipmentId}")
+    public ResponseEntity<?> get(@PathVariable final ShipmentId shipmentId) {
         final Shipment shipment = shipmentPort.loadShipment(shipmentId);
         final ShipmentDto shipmentResponse = responseMapper.map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
@@ -66,8 +83,33 @@ public class ShipmentController {
     public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestDto shipmentUpdateRequest) {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
-        shipmentPort.update(request);
-        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
+        final Result<Void, ShipmentErrorCode> result = shipmentPort.update(request);
+
+        final ResponseEntity<?> response;
+        if (result.isSuccess()) {
+            response = ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            response = ResponseEntity.badRequest().body(result.getFailure());
+        }
+        return response;
+    }
+    
+	@PutMapping("/dangerous-good/{shipmentId}")
+	public ResponseEntity<?> addDangerousGood(
+			@RequestBody final DangerousGoodCreateRequestDto dangerousGoodCreateRequest,
+			@PathVariable final ShipmentId shipmentId) {
+        dangerousGoodValidator.validateDangerousGood(dangerousGoodCreateRequest);
+
+        final DangerousGoodCreateRequest request = DangerousGoodCreateRequest.from(dangerousGoodCreateRequest);
+        final Result<Void, ShipmentErrorCode> result = shipmentPort.addDangerousGood(shipmentId, request);
+
+        final ResponseEntity<?> response;
+        if (result.isSuccess()) {
+            response = ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            response = ResponseEntity.badRequest().body(result.getFailure());
+        }
+        return response;
     }
 
     @PutMapping("/status")

@@ -4,7 +4,7 @@ import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.model.Money;
+import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.model.Shipment;

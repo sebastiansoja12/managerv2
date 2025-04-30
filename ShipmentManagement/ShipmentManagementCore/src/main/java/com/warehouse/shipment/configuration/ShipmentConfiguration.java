@@ -14,10 +14,7 @@ import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
-import com.warehouse.shipment.domain.service.NotificationCreatorProviderImpl;
-import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
+import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
@@ -52,9 +49,12 @@ public class ShipmentConfiguration {
 									 final NotificationCreatorProvider notificationCreatorProvider,
 									 final MailServicePort mailServicePort,
 									 final TrackingStatusServicePort trackingStatusServicePort,
-									 final Set<ShipmentStatusHandler> shipmentStatusHandlers) {
+									 final Set<ShipmentStatusHandler> shipmentStatusHandlers,
+									 final CountryDetermineService countryDetermineService,
+									 final PriceService priceService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, mailServicePort, trackingStatusServicePort, shipmentStatusHandlers);
+				notificationCreatorProvider, mailServicePort, trackingStatusServicePort, shipmentStatusHandlers,
+				countryDetermineService, priceService);
 	}
 
 	@Bean

@@ -1,9 +1,10 @@
 package com.warehouse.shipment.domain.model;
 
+import java.util.List;
+
 import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.identificator.ShipmentId;
-
-import java.util.List;
+import com.warehouse.commonassets.model.Weight;
 
 public class DangerousGood {
 
@@ -11,10 +12,10 @@ public class DangerousGood {
     private String name;
     private String description;
     private String classificationCode;
-    private List<String> hazardSymbols;
+    private String hazardSymbols;
     private String storageRequirements;
     private String handlingInstructions;
-    private double weight;
+    private Weight weight;
     private String packaging;
     private boolean flammable;
     private boolean corrosive;
@@ -25,7 +26,7 @@ public class DangerousGood {
 
     public DangerousGood(final ShipmentId shipmentId, final String name, final String description,
                          final String classificationCode, final List<String> hazardSymbols,
-                         final String storageRequirements, final String handlingInstructions, final double weight,
+                         final String storageRequirements, final String handlingInstructions, final Weight weight,
                          final String packaging, final boolean flammable, final boolean isCorrosive,
                          final boolean toxic, final String emergencyContact,
                          final Country countryOfOrigin, final String safetyDataSheet) {
@@ -33,7 +34,7 @@ public class DangerousGood {
         this.name = name;
         this.description = description;
         this.classificationCode = classificationCode;
-        this.hazardSymbols = hazardSymbols;
+        this.hazardSymbols = String.join(" ", hazardSymbols);
         this.storageRequirements = storageRequirements;
         this.handlingInstructions = handlingInstructions;
         this.weight = weight;
@@ -45,6 +46,27 @@ public class DangerousGood {
         this.countryOfOrigin = countryOfOrigin;
         this.safetyDataSheet = safetyDataSheet;
     }
+
+    public static DangerousGood from(final DangerousGoodCreateRequest request) {
+        return new DangerousGood(
+                request.getShipmentId(),
+                request.getName(),
+                request.getDescription(),
+                request.getClassificationCode(),
+                request.getHazardSymbols(),
+                request.getStorageRequirements(),
+                request.getHandlingInstructions(),
+                request.getWeight(),
+                request.getPackaging(),
+                request.isFlammable(),
+                request.isCorrosive(),
+                request.isToxic(),
+                request.getEmergencyContact(),
+                request.getCountryOfOrigin(),
+                request.getSafetyDataSheet()
+        );
+    }
+
 
     public ShipmentId getShipmentId() {
         return shipmentId;
@@ -66,7 +88,7 @@ public class DangerousGood {
         this.classificationCode = classificationCode;
     }
 
-    public void setHazardSymbols(final List<String> hazardSymbols) {
+    public void setHazardSymbols(final String hazardSymbols) {
         this.hazardSymbols = hazardSymbols;
     }
 
@@ -78,7 +100,7 @@ public class DangerousGood {
         this.handlingInstructions = handlingInstructions;
     }
 
-    public void setWeight(final double weight) {
+    public void setWeight(final Weight weight) {
         this.weight = weight;
     }
 
@@ -122,7 +144,7 @@ public class DangerousGood {
         return classificationCode;
     }
 
-    public List<String> getHazardSymbols() {
+    public String getHazardSymbols() {
         return hazardSymbols;
     }
 
@@ -134,7 +156,7 @@ public class DangerousGood {
         return handlingInstructions;
     }
 
-    public double getWeight() {
+    public Weight getWeight() {
         return weight;
     }
 

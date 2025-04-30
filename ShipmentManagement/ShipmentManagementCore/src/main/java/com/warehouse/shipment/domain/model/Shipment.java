@@ -7,10 +7,9 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.vo.ShipmentCreateRequest;
-import com.warehouse.shipment.domain.vo.VoronoiResponse;
+import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
+import com.warehouse.shipment.domain.vo.*;
 
 
 public class Shipment {
@@ -51,6 +50,11 @@ public class Shipment {
 
     private Signature signature;
 
+
+    public Shipment() {
+        //
+    }
+
 	public Shipment(final ShipmentId shipmentId,
                     final Sender sender,
                     final Recipient recipient,
@@ -78,9 +82,46 @@ public class Shipment {
         this.destinationCountry = Country.POLAND;
         this.signatureRequired = signature != null;
     }
+    
+    public Shipment(final Sender sender, 
+                    final Recipient recipient,
+                    final ShipmentSize shipmentSize,
+                    final Money price,
+                    final DangerousGood dangerousGood) {
+        this.sender = sender;
+        this.recipient = recipient;
+        this.shipmentSize = shipmentSize;
+        this.price = price;
+        this.dangerousGood = dangerousGood;
+        this.shipmentStatus = ShipmentStatus.CREATED;
+    }
+
+    public Shipment(final ShipmentId shipmentId,
+                    final Sender sender,
+                    final Recipient recipient,
+                    final ShipmentUpdateType updateType) {
+        this.shipmentId = shipmentId;
+        this.sender = sender;
+        this.recipient = recipient;
+        this.shipmentStatus = determineShipmentStatus(updateType);
+    }
+
+    private ShipmentStatus determineShipmentStatus(final ShipmentUpdateType updateType) {
+        return switch (updateType) {
+            case REROUTE -> ShipmentStatus.REROUTE;
+            case REDIRECT -> ShipmentStatus.REDIRECT;
+        };
+    }
 
     public static Shipment from(final ShipmentCreateRequest request) {
-        return request.getShipment();
+		return new Shipment(request.getSender(), request.getRecipient(), request.getShipmentSize(), request.getPrice(),
+				request.getDangerousGood());
+    }
+
+    public static Shipment from(final ShipmentUpdateRequest request) {
+        final ShipmentId shipmentId = request.getShipmentId();
+        final ShipmentUpdate shipmentUpdate = request.getShipmentUpdate();
+        return new Shipment(shipmentId, shipmentUpdate.getSender(), shipmentUpdate.getRecipient(), request.getShipmentUpdateType());
     }
 
     public Sender getSender() {
@@ -364,6 +405,15 @@ public class Shipment {
         markAsModified();
     }
 
+    public void changeShipmentCountries(final ShipmentCountry shipmentCountry) {
+        this.originCountry = shipmentCountry.originCountry();
+        this.destinationCountry = shipmentCountry.destinationCountry();
+    }
+
+    public void changeDestinationDepartment(final String destination) {
+        this.destination = destination;
+    }
+
     private void unlockShipment() {
         this.locked = false;
     }
@@ -384,4 +434,7 @@ public class Shipment {
         );
     }
 
+    public boolean validateShipmentPrice() {
+        return this.price == null;
+    }
 }

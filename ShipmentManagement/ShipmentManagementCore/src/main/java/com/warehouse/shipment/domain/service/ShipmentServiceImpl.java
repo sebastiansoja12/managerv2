@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
@@ -64,9 +66,18 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public RouteProcess initializeRouteProcess(final ShipmentId shipmentId) {
+    public Result<RouteProcess, ShipmentErrorCode> initializeRouteProcess(final ShipmentId shipmentId) {
+        final Result<RouteProcess, ShipmentErrorCode> result;
 		final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
-        return this.routeLogServicePort.initializeRouteProcess(shipmentId, softwareConfiguration);
+        final RouteProcess routeProcess = this.routeLogServicePort.initializeRouteProcess(shipmentId, softwareConfiguration);
+
+        if (routeProcess != null) {
+            result = Result.success(routeProcess);
+        } else {
+            result = Result.failure(ShipmentErrorCode.SHIPMENT_202);
+        }
+
+        return result;
     }
 
     @Override

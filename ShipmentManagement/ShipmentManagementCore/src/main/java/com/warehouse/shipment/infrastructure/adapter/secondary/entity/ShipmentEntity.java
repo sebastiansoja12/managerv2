@@ -110,4 +110,8 @@ public class ShipmentEntity {
 
     @Column(name = "locked", nullable = false)
     private Boolean locked;
+
+    @OneToOne
+    @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id")
+    private DangerousGoodEntity dangerousGood;
 }

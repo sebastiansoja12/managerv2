@@ -1,10 +1,21 @@
 package com.warehouse.commonassets.identificator;
 
-import java.io.Serializable;
 import java.util.Objects;
 
+import jakarta.persistence.Embeddable;
 
-public record ShipmentId(Long value) implements Serializable {
+@Embeddable
+public class ShipmentId {
+
+	private Long value;
+
+	public ShipmentId(final Long value) {
+		this.value = value;
+	}
+
+	public ShipmentId() {
+
+	}
 
 	public Long getValue() {
 		return value;

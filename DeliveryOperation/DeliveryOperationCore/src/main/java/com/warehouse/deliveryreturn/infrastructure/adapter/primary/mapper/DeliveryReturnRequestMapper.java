@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.delivery.dto.DeviceIdDto;
 import com.warehouse.delivery.dto.DeviceInformationDto;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
@@ -29,8 +30,11 @@ public interface DeliveryReturnRequestMapper {
 
     @Mapping(target = "departmentCode.value", source = "departmentCode")
     @Mapping(target = "supplierCode.value", source = "supplierCode")
-    @Mapping(target = "shipmentId.value", source = "shipmentId")
     DeliveryReturnDetails map(final DeliveryReturnDetail deliveryReturnDetail);
+
+    default ShipmentId mapToShipmentId(final Long shipmentId) {
+        return new ShipmentId(shipmentId);
+    }
 
     @Mapping(target = "departmentCode.value", source = "departmentCode")
     DeviceInformation map(final Device device);

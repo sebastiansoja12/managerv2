@@ -1,36 +1,30 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.shipment.domain.model.SignatureChangeRequest;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.enumeration.UpdateType;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
+import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.*;
-
-import io.micrometer.common.util.StringUtils;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentRequestMapper {
 
     ShipmentCreateRequest map(final ShipmentCreateRequestDto requestDto);
 
-    ShipmentCreateRequestDto map(final ShipmentCreateRequest request);
-
     ShipmentId map(final ShipmentIdDto shipmentId);
 
     default ShipmentUpdateRequest map(final ShipmentUpdateRequestDto request) {
-        final ProcessType processType = processDeterminer(request.getToken());
         final ShipmentId shipmentId = map(request.getShipmentId());
         final Sender sender = mapToSender(request.getSender());
         final Recipient recipient = mapToRecipient(request.getRecipient());
 		final ShipmentUpdate shipmentUpdate = new ShipmentUpdate(sender, recipient,
 				request.getDestination(), request.getToken());
-        return new ShipmentUpdateRequest(shipmentId, shipmentUpdate, UpdateType.AUTO, processType,
+        return new ShipmentUpdateRequest(shipmentId, shipmentUpdate, UpdateType.AUTO, null,
                 map(request.getShipmentUpdateType()));
     }
 
@@ -39,20 +33,6 @@ public interface ShipmentRequestMapper {
     Sender mapToSender(final PersonDto person);
 
     Recipient mapToRecipient(final PersonDto person);
-
-    default ProcessType processDeterminer(final String token) {
-
-        if (StringUtils.isEmpty(token)) {
-            return ProcessType.CREATED;
-        }
-
-        return switch (token.length()) {
-            case 8 -> ProcessType.REDIRECT;
-            case 9 -> ProcessType.REROUTE;
-            case 4 -> ProcessType.ROUTE;
-            default -> throw new IllegalStateException("Unexpected value: " + token.length());
-        };
-    }
 
     ShipmentStatusRequest map(final ShipmentStatusRequestDto shipmentStatusRequest);
 

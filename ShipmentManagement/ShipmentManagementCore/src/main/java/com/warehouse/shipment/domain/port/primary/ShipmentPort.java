@@ -1,6 +1,9 @@
 package com.warehouse.shipment.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.ShipmentCreateRequest;
@@ -10,9 +13,9 @@ import com.warehouse.shipment.domain.vo.ShipmentUpdateRequest;
 
 public interface ShipmentPort {
 
-    ShipmentCreateResponse ship(final ShipmentCreateRequest request);
+    Result<ShipmentCreateResponse, ShipmentErrorCode> ship(final ShipmentCreateRequest request);
 
-    void update(final ShipmentUpdateRequest request);
+    Result<Void, ShipmentErrorCode> update(final ShipmentUpdateRequest request);
 
     void changeSenderTo(final ShipmentCreateRequest request);
 
@@ -28,4 +31,5 @@ public interface ShipmentPort {
 
     boolean existsShipment(final ShipmentId shipmentId);
 
+    Result<Void, ShipmentErrorCode> addDangerousGood(final ShipmentId shipmentId, final DangerousGoodCreateRequest request);
 }

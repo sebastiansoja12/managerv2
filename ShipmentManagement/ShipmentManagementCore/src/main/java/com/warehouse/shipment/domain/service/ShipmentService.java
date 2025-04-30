@@ -6,6 +6,8 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
@@ -59,7 +61,7 @@ public interface ShipmentService {
 
     boolean existsShipment(final ShipmentId shipmentId);
 
-    RouteProcess initializeRouteProcess(final ShipmentId shipmentId);
+    Result<RouteProcess, ShipmentErrorCode> initializeRouteProcess(final ShipmentId shipmentId);
 
     ShipmentId nextShipmentId();
 

@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.model.Money;
+import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
@@ -13,6 +13,10 @@ import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
 public interface ShipmentResponseMapper {
 
     ShipmentCreateResponse map(final ShipmentCreateResponseDto responseDto);
+
+    default ShipmentId map(final ShipmentIdDto shipmentId) {
+        return new ShipmentId(shipmentId.getValue());
+    }
 
     ShipmentCreateResponseDto map(final ShipmentCreateResponse response);
 
@@ -32,7 +36,7 @@ public interface ShipmentResponseMapper {
         if (shipmentId == null) {
             id = new ShipmentIdDto();
         } else {
-            id = new ShipmentIdDto(shipmentId.value());
+            id = new ShipmentIdDto(shipmentId.getValue());
         }
         return id;
     }

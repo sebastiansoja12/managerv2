@@ -7,7 +7,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 public record ShipmentIdDto(Long value) {
 
     public static ShipmentIdDto from(final ShipmentId shipmentId) {
-        return new ShipmentIdDto(shipmentId.value());
+        return new ShipmentIdDto(shipmentId.getValue());
     }
 
     @Override
