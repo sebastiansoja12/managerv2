@@ -1,13 +1,17 @@
 package com.warehouse.commonassets.model;
 
-import com.warehouse.commonassets.enumeration.Currency;
-import jakarta.persistence.Embeddable;
-
 import java.math.BigDecimal;
+
+import com.warehouse.commonassets.enumeration.Currency;
+
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Embeddable
 public class Money {
     private BigDecimal amount;
+    @Enumerated(EnumType.STRING)
     private Currency currency;
 
     public Money() {
@@ -17,6 +21,10 @@ public class Money {
     public Money(final BigDecimal amount, final Currency currency) {
         this.amount = amount;
         this.currency = currency;
+    }
+
+    public static Money from(final BigDecimal amount, final Currency currency) {
+        return new Money(amount, currency);
     }
 
     public BigDecimal getAmount() {

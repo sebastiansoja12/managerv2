@@ -10,8 +10,7 @@ import jakarta.persistence.*;
 public class PriceEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "price_seq")
-    @SequenceGenerator(name = "price_seq", sequenceName = "price_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)

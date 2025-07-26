@@ -2,8 +2,9 @@ package com.warehouse.shipment.domain.service;
 
 import org.springframework.stereotype.Service;
 
-import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.shipment.domain.port.secondary.PriceRepository;
+import com.warehouse.shipment.domain.vo.Price;
 
 @Service
 public class PriceServiceImpl implements PriceService {
@@ -15,7 +16,7 @@ public class PriceServiceImpl implements PriceService {
     }
 
     @Override
-    public void determineShipmentPrice(final Shipment shipment) {
-
+    public Price determineShipmentPrice(final ShipmentSize shipmentSize) {
+        return null;
     }
 }

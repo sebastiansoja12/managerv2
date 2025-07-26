@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import lombok.Builder;
 
 import static com.warehouse.shipment.domain.enumeration.PersonType.SENDER;
@@ -35,6 +36,17 @@ public class Sender implements Person {
 
     public static Sender from(final Shipment shipment) {
         return shipment.getSender();
+    }
+
+    public static Sender from(final ShipmentEntity entity) {
+        final String firstName = entity.getFirstName();
+        final String lastName = entity.getLastName();
+        final String email = entity.getSenderEmail();
+        final String telephoneNumber = entity.getSenderTelephone();
+        final String city = entity.getSenderCity();
+        final String postalCode = entity.getSenderPostalCode();
+        final String street = entity.getSenderStreet();
+        return new Sender(firstName, lastName, email, telephoneNumber, city, postalCode, street);
     }
 
     @Override

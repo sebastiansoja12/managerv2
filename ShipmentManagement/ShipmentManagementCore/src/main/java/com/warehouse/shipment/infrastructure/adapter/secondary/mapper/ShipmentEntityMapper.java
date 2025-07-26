@@ -35,6 +35,7 @@ public interface ShipmentEntityMapper {
                 .shipmentSize(shipment.getShipmentSize())
                 .shipmentStatus(shipment.getShipmentStatus())
                 .locked(shipment.isLocked())
+                .price(shipment.getPrice())
                 .build();
     }
 }

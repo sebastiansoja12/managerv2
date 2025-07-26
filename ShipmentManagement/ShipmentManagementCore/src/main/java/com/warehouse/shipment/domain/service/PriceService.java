@@ -1,7 +1,8 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.commonassets.enumeration.ShipmentSize;
+import com.warehouse.shipment.domain.vo.Price;
 
 public interface PriceService {
-    void determineShipmentPrice(final Shipment shipment);
+    Price determineShipmentPrice(final ShipmentSize shipmentSize);
 }

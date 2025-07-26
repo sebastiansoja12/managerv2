@@ -14,6 +14,7 @@ import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
 import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
 import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 
 
 public class Shipment {
@@ -87,6 +88,36 @@ public class Shipment {
         this.signatureRequired = signature != null;
         DomainRegistry.publish(new ShipmentCreatedEvent(this.createSnapshot(), Instant.now()));
     }
+
+    public Shipment(final ShipmentId shipmentId,
+                    final Sender sender,
+                    final Recipient recipient,
+                    final ShipmentSize shipmentSize,
+                    final ShipmentId shipmentRelatedId,
+                    final Country originCountry,
+                    final Country destinationCountry,
+                    final Money price,
+                    final Boolean locked,
+                    final String destination,
+                    final Signature signature) {
+        this.shipmentId = shipmentId;
+        this.sender = sender;
+        this.recipient = recipient;
+        this.shipmentSize = shipmentSize;
+        this.shipmentStatus = ShipmentStatus.CREATED;
+        this.shipmentRelatedId = shipmentRelatedId;
+        this.shipmentType = shipmentRelatedId != null ? ShipmentType.CHILD : ShipmentType.PARENT;
+        this.price = price;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.locked = locked;
+        this.signature = signature;
+        this.originCountry = originCountry;
+        this.destinationCountry = destinationCountry;
+        this.destination = destination;
+        this.signatureRequired = signature != null;
+        DomainRegistry.publish(new ShipmentCreatedEvent(this.createSnapshot(), Instant.now()));
+    }
     
     public Shipment(final Sender sender, 
                     final Recipient recipient,
@@ -132,6 +163,15 @@ public class Shipment {
         final ShipmentId shipmentId = request.getShipmentId();
         final ShipmentUpdate shipmentUpdate = request.getShipmentUpdate();
         return new Shipment(shipmentId, shipmentUpdate.getSender(), shipmentUpdate.getRecipient(), request.getShipmentUpdateType());
+    }
+
+    public static Shipment from(final ShipmentEntity shipmentEntity) {
+        final ShipmentId shipmentId = shipmentEntity.getShipmentId();
+        final Sender sender = Sender.from(shipmentEntity);
+        final Recipient recipient = Recipient.from(shipmentEntity);
+        return new Shipment(shipmentId, sender, recipient, shipmentEntity.getShipmentSize(), shipmentEntity.getShipmentStatus(),
+                shipmentEntity.getShipmentRelatedId(), null, shipmentEntity.getCreatedAt(),
+                shipmentEntity.getUpdatedAt(), shipmentEntity.getLocked(), null);
     }
 
     public Sender getSender() {
@@ -442,6 +482,34 @@ public class Shipment {
                 this.locked,
                 this.signature
         );
+    }
+
+    public void setDangerousGood(final DangerousGood dangerousGood) {
+        this.dangerousGood = dangerousGood;
+    }
+
+    public void setDestinationCountry(final Country destinationCountry) {
+        this.destinationCountry = destinationCountry;
+    }
+
+    public void setOriginCountry(final Country originCountry) {
+        this.originCountry = originCountry;
+    }
+
+    public void setShipmentPriority(final ShipmentPriority shipmentPriority) {
+        this.shipmentPriority = shipmentPriority;
+    }
+
+    public void setShipmentStatus(final ShipmentStatus shipmentStatus) {
+        this.shipmentStatus = shipmentStatus;
+    }
+
+    public void setSignature(final Signature signature) {
+        this.signature = signature;
+    }
+
+    public void setSignatureRequired(final Boolean signatureRequired) {
+        this.signatureRequired = signatureRequired;
     }
 
     public boolean validateShipmentPrice() {

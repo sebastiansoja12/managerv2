@@ -1,18 +1,23 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.validator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
+import com.warehouse.shipment.domain.service.PriceService;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.ShipmentValidationException;
 
 public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
+
+    private final PriceService priceService;
+
+    public ShipmentRequestValidatorImpl(final PriceService priceService) {
+        this.priceService = priceService;
+    }
 
     @Override
     public void validateBody(final ShipmentCreateRequestDto request) {
@@ -33,14 +38,22 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             validateShipmentStatus(request.shipmentSize(), errors);
         }
 
+        if (request.price() == null || request.price().getAmount() == null || request.price().getCurrency() == null) {
+            errors.add("Invalid price");
+        }
+
         if (!errors.isEmpty()) {
             throw new ShipmentValidationException(errors, HttpStatus.BAD_REQUEST);
         }
     }
 
+    private boolean validateShipmentPrice(final MoneyDto price) {
+        return false;
+    }
+
 
     private List<String> validatePerson(final PersonDto person) {
-        final List<String> errors = new ArrayList<>();
+        final Set<String> errors = new HashSet<>();
 
         if (StringUtils.isEmpty(person.getFirstName())) {
             errors.add("First name is required");
@@ -56,7 +69,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
         String telephone = person.getTelephoneNumber();
         if (StringUtils.isEmpty(telephone)) {
-            errors.add("Telephone number is required");
+            errors.add("Telephone number for sender/recipient is required");
         } else {
             if (telephone.length() != 9) {
                 errors.add("Telephone number must be exactly 9 digits");
@@ -78,7 +91,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.add("Postal code is required");
         }
 
-        return errors;
+        return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
     }
 
 

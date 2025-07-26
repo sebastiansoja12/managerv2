@@ -73,8 +73,8 @@ public class ShipmentController {
     }
 
     @GetMapping("/{shipmentId}")
-    public ResponseEntity<?> get(@PathVariable final ShipmentId shipmentId) {
-        final Shipment shipment = shipmentPort.loadShipment(shipmentId);
+    public ResponseEntity<?> get(@PathVariable final ShipmentIdDto shipmentId) {
+        final Shipment shipment = shipmentPort.loadShipment(new ShipmentId(shipmentId.getValue()));
         final ShipmentDto shipmentResponse = responseMapper.map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
@@ -128,8 +128,8 @@ public class ShipmentController {
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 
-    @GetMapping("/exists/{value}")
-    public ResponseEntity<?> existsShipment(final ShipmentIdDto shipmentId) {
+    @GetMapping("/exists/{shipmentId}")
+    public ResponseEntity<?> existsShipment(@PathVariable final ShipmentIdDto shipmentId) {
         shipmentRequestValidator.validateBody(shipmentId);
         final ShipmentId id = requestMapper.map(shipmentId);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentPort.existsShipment(id));

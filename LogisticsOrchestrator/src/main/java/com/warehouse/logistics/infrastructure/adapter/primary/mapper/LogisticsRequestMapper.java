@@ -16,6 +16,7 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.deliverymissed.dto.DeliveryMissedDetailsDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedRequestDto;
+import com.warehouse.deliveryreject.domain.vo.RejectReason;
 import com.warehouse.deliveryreject.dto.DeliveryRejectDetailsDto;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetailsDto;
@@ -24,7 +25,6 @@ import com.warehouse.logistics.domain.model.*;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryMissedDetail;
-import com.warehouse.terminal.model.DeliveryRejectDetail;
 import com.warehouse.terminal.model.DeliveryReturnDetail;
 import com.warehouse.terminal.request.TerminalRequest;
 
@@ -32,14 +32,18 @@ import com.warehouse.terminal.request.TerminalRequest;
 public interface LogisticsRequestMapper {
 
     @Mapping(target = "deviceInformation", ignore = true)
-    DeliveryRejectRequest map(com.warehouse.terminal.model.DeliveryRejectRequest deliveryRejectRequest);
-
-    @Mapping(target = "shipmentId.value", source = "shipmentId")
-    @Mapping(target = "departmentCode.value", source = "departmentCode")
-    @Mapping(target = "supplierCode.value", source = "supplierCode")
-    @Mapping(target = "deliveryStatus", source = "deliveryStatus")
-    @Mapping(target = "rejectReason.value", source = "rejectReason")
-    DeliveryRejectDetails map(final DeliveryRejectDetail deliveryRejectDetail);
+    default DeliveryRejectRequest map(com.warehouse.terminal.model.DeliveryRejectRequest deliveryRejectRequest) {
+        final List<DeliveryRejectDetails> deliveryRejectDetails = deliveryRejectRequest.getDeliveryRejectDetails()
+                .stream()
+                .map(detail -> new DeliveryRejectDetails(
+                        new ShipmentId(detail.getShipmentId()),
+                        new DepartmentCode(detail.getDepartmentCode()),
+                        new SupplierCode(detail.getSupplierCode()),
+                        DeliveryStatus.valueOf(detail.getDeliveryStatus()),
+                        new RejectReason(detail.getRejectReason())))
+                .toList();
+        return new DeliveryRejectRequest(deliveryRejectDetails, null);
+    }
 
     default Request map(final TerminalRequest terminalRequest) {
         final ProcessType processType = map(terminalRequest.getProcessType());
@@ -58,13 +62,17 @@ public interface LogisticsRequestMapper {
     @Mapping(target = "supplierCode.value", source = "supplierCode")
     @Mapping(target = "deliveryStatus", source = "deliveryStatus")
     @Mapping(target = "departmentCode.value", source = "departmentCode")
-    DeliveryReturnDetails map(final DeliveryReturnDetail deliveryReturnDetail);
+    default DeliveryReturnDetails map(final DeliveryReturnDetail deliveryReturnDetail) {
+        return null;
+    }
 
     @Mapping(target = "shipmentId.value", source = "shipmentId")
     @Mapping(target = "supplierCode.value", source = "supplierCode")
     @Mapping(target = "deliveryStatus", source = "deliveryStatus")
     @Mapping(target = "departmentCode.value", source = "departmentCode")
-    DeliveryMissedDetails map(final DeliveryMissedDetail deliveryMissedDetail);
+    default DeliveryMissedDetails map(final DeliveryMissedDetail deliveryMissedDetail) {
+        return null;
+    }
 
     ProcessType map(final com.warehouse.terminal.enumeration.ProcessType processType);
 

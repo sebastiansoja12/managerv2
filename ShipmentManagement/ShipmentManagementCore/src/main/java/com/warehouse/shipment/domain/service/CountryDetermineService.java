@@ -1,7 +1,10 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.vo.CountryDetermine;
+import com.warehouse.shipment.domain.vo.ShipmentCreateRequest;
 
 public interface CountryDetermineService {
-    void determineCountry(final Shipment shipment);
+    Result<CountryDetermine, ShipmentErrorCode> determineCountry(final ShipmentCreateRequest request);
 }

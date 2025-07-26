@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.model.Money;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -15,6 +17,10 @@ import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 public interface ShipmentRequestMapper {
 
     ShipmentCreateRequest map(final ShipmentCreateRequestDto requestDto);
+
+    default Money map(final MoneyDto money) {
+        return new Money(money.getAmount(), Currency.valueOf(money.getCurrency()));
+    }
 
     ShipmentId map(final ShipmentIdDto shipmentId);
 

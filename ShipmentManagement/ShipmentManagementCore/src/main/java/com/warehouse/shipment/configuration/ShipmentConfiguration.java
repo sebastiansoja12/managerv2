@@ -7,6 +7,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
@@ -21,6 +22,7 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
+import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerNotifier;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import com.warehouse.tracking.infrastructure.adapter.primary.api.TrackingStatusEventPublisher;
@@ -44,6 +46,27 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
+	public CountryServiceAvailabilityService countryServiceAvailabilityService() {
+		return new CountryServiceAvailabilityServiceImpl();
+	}
+
+	@Bean
+	public PriceRepository priceRepository(final PriceReadRepository repository) {
+		return new PriceRepositoryImpl(repository);
+	}
+
+	@Bean
+	public RouteTrackerNotifier routeTrackerNotifier() {
+		final RestClient restClient = RestClient.builder().build();
+		return new RouteTrackerNotifier(restClient);
+	}
+
+	@Bean
+	public CountryDetermineServicePort countryDetermineServicePort() {
+		return new CountryDetermineServiceAdapter();
+	}
+
+	@Bean
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
@@ -51,10 +74,11 @@ public class ShipmentConfiguration {
 									 final TrackingStatusServicePort trackingStatusServicePort,
 									 final Set<ShipmentStatusHandler> shipmentStatusHandlers,
 									 final CountryDetermineService countryDetermineService,
-									 final PriceService priceService) {
+									 final PriceService priceService,
+									 final CountryServiceAvailabilityService countryServiceAvailabilityService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, mailServicePort, trackingStatusServicePort, shipmentStatusHandlers,
-				countryDetermineService, priceService);
+				countryDetermineService, priceService, countryServiceAvailabilityService);
 	}
 
 	@Bean
@@ -140,8 +164,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentRequestValidator shipmentRequestValidator() {
-		return new ShipmentRequestValidatorImpl();
+	public ShipmentRequestValidator shipmentRequestValidator(final PriceService priceService) {
+		return new ShipmentRequestValidatorImpl(priceService);
 	}
 
 	@Bean(name = "shipment.shipmentService")
