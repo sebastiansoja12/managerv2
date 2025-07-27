@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.shipment.domain.vo.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +12,6 @@ import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import com.warehouse.shipment.domain.vo.ShipmentCreateRequest;
-import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
-import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
-import com.warehouse.shipment.domain.vo.ShipmentUpdateRequest;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
@@ -145,6 +142,17 @@ public class ShipmentController {
         shipmentRequestValidator.validateBody(shipmentId);
         final ShipmentId id = requestMapper.map(shipmentId);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentPort.existsShipment(id));
+    }
+
+    @PutMapping("/person")
+    @Counted(value = "controller.person.update")
+    @Timed(value = "controller.person.update")
+    public ResponseEntity<?> updateSender(@RequestBody final PersonDto personRequest,
+                                          @RequestParam("shipmentId") @PathVariable final ShipmentIdDto shipmentId,
+                                          @RequestParam("personType") final PersonType personType) {
+        final Person person = personType == PersonType.SENDER ? Sender.from(personRequest) : Recipient.from(personRequest);
+        this.shipmentPort.changePersonTo(person, new ShipmentId(shipmentId.getValue()));
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 
     @ExceptionHandler

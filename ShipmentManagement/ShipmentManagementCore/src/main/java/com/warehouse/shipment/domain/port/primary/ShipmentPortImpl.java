@@ -9,6 +9,7 @@ import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
 import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
@@ -167,6 +168,15 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Recipient recipient = Recipient.from(shipment);
         final ShipmentId shipmentId = shipment.getShipmentId();
         this.shipmentService.changeRecipientTo(shipmentId, recipient);
+    }
+
+    @Override
+    public void changePersonTo(final Person person, final ShipmentId shipmentId) {
+        if (person.getType() == PersonType.SENDER) {
+            this.shipmentService.changeSenderTo(shipmentId, (Sender) person);
+        } else if (person.getType() == PersonType.RECIPIENT) {
+            this.shipmentService.changeRecipientTo(shipmentId, (Recipient) person);
+        }
     }
 
     @Override

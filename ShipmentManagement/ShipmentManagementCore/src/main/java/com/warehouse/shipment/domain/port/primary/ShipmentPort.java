@@ -18,6 +18,8 @@ public interface ShipmentPort {
 
     void changeRecipientTo(final ShipmentCreateRequest request);
 
+    void changePersonTo(final Person person, final ShipmentId shipmentId);
+
     void changeShipmentTypeTo(final ShipmentCreateRequest request);
 
     void changeShipmentStatusTo(final ShipmentStatusRequest request);
