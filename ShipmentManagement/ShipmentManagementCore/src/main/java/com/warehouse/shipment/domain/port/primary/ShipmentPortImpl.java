@@ -15,6 +15,7 @@ import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.Logger;
+import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
 import com.warehouse.shipment.domain.service.*;
@@ -31,6 +32,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final NotificationCreatorProvider notificationCreatorProvider;
 
+    private final MailServicePort mailServicePort;
+
     private final TrackingStatusServicePort trackingStatusServicePort;
 
     private final Set<ShipmentStatusHandler> shipmentStatusHandlers;
@@ -45,6 +48,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
                             final NotificationCreatorProvider notificationCreatorProvider,
+                            final MailServicePort mailServicePort,
                             final TrackingStatusServicePort trackingStatusServicePort,
                             final Set<ShipmentStatusHandler> shipmentStatusHandlers,
                             final CountryDetermineService countryDetermineService,
@@ -54,6 +58,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
+        this.mailServicePort = mailServicePort;
         this.trackingStatusServicePort = trackingStatusServicePort;
         this.shipmentStatusHandlers = shipmentStatusHandlers;
         this.countryDetermineService = countryDetermineService;
@@ -75,21 +80,26 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final Country destinationCountry = request.getDestinationCountry();
 
-        final VoronoiResponse voronoiResponse = this.pathFinderServicePort.determineDeliveryDepartment(recipientAddress);
+		final Result<VoronoiResponse, ShipmentErrorCode> voronoiResponse = this.pathFinderServicePort
+				.determineDeliveryDepartment(recipientAddress);
+        
+        if (voronoiResponse.isFailure()) {
+            return Result.failure(voronoiResponse.getFailure());
+        }
 
         final Price shipmentPrice = determineShipmentPrice(request);
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
 		final Shipment shipment = new Shipment(shipmentId, sender, recipient, request.getShipmentSize(), null,
-				originCountry, destinationCountry, shipmentPrice.getMoney(), false, voronoiResponse.getValue(), null,
-                request.getShipmentPriority());
+				originCountry, destinationCountry, shipmentPrice.getMoney(), false,
+				voronoiResponse.getSuccess().getValue(), null, request.getShipmentPriority());
 
         this.shipmentService.createShipment(shipment);
 
         logCreatedShipment(shipment);
 
-        return Result.success();
+        return Result.success(new ShipmentCreateResponse(shipmentId));
     }
 
     private Price determineShipmentPrice(final ShipmentCreateRequest request) {

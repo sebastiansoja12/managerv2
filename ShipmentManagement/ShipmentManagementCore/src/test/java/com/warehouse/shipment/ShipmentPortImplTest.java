@@ -81,10 +81,10 @@ class ShipmentPortImplTest {
                 new ShipmentCreatedHandler(), new ShipmentRerouteHandler(shipmentService),
                 new ShipmentSentHandler(shipmentService), new ShipmentDeliveryHandler(shipmentService),
                 new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
-        shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
-                trackingStatusServicePort, shipmentStatusHandlers, countryDetermineService,
-                priceService, countryServiceAvailabilityService);
-    }
+		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
+				mailServicePort, trackingStatusServicePort, shipmentStatusHandlers, countryDetermineService,
+				priceService, countryServiceAvailabilityService);
+	}
 
     @Test
     void shouldShip() {

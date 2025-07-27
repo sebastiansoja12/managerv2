@@ -68,13 +68,14 @@ public class ShipmentConfiguration {
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
+									 final MailServicePort mailServicePort,
 									 final TrackingStatusServicePort trackingStatusServicePort,
 									 final Set<ShipmentStatusHandler> shipmentStatusHandlers,
 									 final CountryDetermineService countryDetermineService,
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, trackingStatusServicePort, shipmentStatusHandlers,
+				notificationCreatorProvider, mailServicePort, trackingStatusServicePort, shipmentStatusHandlers,
 				countryDetermineService, priceService, countryServiceAvailabilityService);
 	}
 
