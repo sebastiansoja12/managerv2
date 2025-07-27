@@ -12,10 +12,7 @@ import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.RouteProcess;
-import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
+import com.warehouse.shipment.domain.vo.*;
 
 public class ShipmentServiceImpl implements ShipmentService {
 
@@ -186,6 +183,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void notifyShipmentDelivered(ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentDelivered();
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
+    public void changeShipmentCountries(final ShipmentCountryRequest request) {
+        final Shipment shipment = this.shipmentRepository.findById(request.shipmentId());
+        shipment.updateCountries(request);
         this.shipmentRepository.createOrUpdate(shipment);
     }
 

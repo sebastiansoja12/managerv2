@@ -6,10 +6,7 @@ import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
-import com.warehouse.shipment.domain.vo.ShipmentCreateRequest;
-import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
-import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
-import com.warehouse.shipment.domain.vo.ShipmentUpdateRequest;
+import com.warehouse.shipment.domain.vo.*;
 
 public interface ShipmentPort {
 
@@ -26,6 +23,12 @@ public interface ShipmentPort {
     void changeShipmentStatusTo(final ShipmentStatusRequest request);
 
     void changeShipmentSignatureTo(final SignatureChangeRequest request);
+
+    void changeOriginCountryTo(final ShipmentCountryRequest request);
+
+    void changeDestinationCountryTo(final ShipmentCountryRequest request);
+
+    void changeShipmentCountries(final ShipmentCountryRequest request);
 
     Shipment loadShipment(final ShipmentId shipmentId);
 

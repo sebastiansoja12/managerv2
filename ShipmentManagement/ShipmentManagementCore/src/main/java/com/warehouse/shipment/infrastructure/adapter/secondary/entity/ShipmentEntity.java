@@ -140,7 +140,8 @@ public class ShipmentEntity {
 			final String recipientCity, final String recipientStreet, final String recipientPostalCode,
 			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
 			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
-			final LocalDateTime updatedAt, final Boolean locked, final Country originCountry, final Country destinationCountry) {
+			final LocalDateTime updatedAt, final Boolean locked, final Country originCountry, final Country destinationCountry, 
+            final Money price, final ShipmentPriority shipmentPriority) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;
         this.lastName = senderLastName;
@@ -165,6 +166,9 @@ public class ShipmentEntity {
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
         this.dangerousGood = null;
+        this.price = null;
+        this.shipmentPriority = shipmentPriority;
+        this.price = price;
     }
 
     public static ShipmentEntity from(final Shipment shipment) {
@@ -186,6 +190,7 @@ public class ShipmentEntity {
                 recipientPostalCode, shipment.getShipmentSize(), shipment.getDestination(), 
                 shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
                 shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
-                shipment.getOriginCountry(), shipment.getDestinationCountry());
+				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
+				shipment.getShipmentPriority());
     }
 }

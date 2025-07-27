@@ -543,4 +543,23 @@ public class Shipment {
     public boolean validateShipmentPrice() {
         return this.price == null;
     }
+
+    public void updateCountries(final ShipmentCountryRequest request) {
+        this.originCountry = request.originCountry();
+        this.destinationCountry = request.destinationCountry();
+        markAsModified();
+        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+    }
+
+    public void changeOriginCountry(final Country originCountry) {
+        this.originCountry = originCountry;
+        markAsModified();
+        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+    }
+
+    public void changeDestinationCountry(final Country destinationCountry) {
+        this.destinationCountry = destinationCountry;
+        markAsModified();
+        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+    }
 }

@@ -73,6 +73,8 @@ public class ShipmentController {
     }
 
     @GetMapping("/{shipmentId}")
+    @Counted(value = "controller.shipment.get")
+    @Timed(value = "controller.shipment.get")
     public ResponseEntity<?> get(@PathVariable final ShipmentIdDto shipmentId) {
         final Shipment shipment = shipmentPort.loadShipment(new ShipmentId(shipmentId.getValue()));
         final ShipmentDto shipmentResponse = responseMapper.map(shipment);
@@ -80,6 +82,8 @@ public class ShipmentController {
     }
 
     @PutMapping
+    @Counted(value = "controller.shipment.update")
+    @Timed(value = "controller.shipment.update")
     public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestDto shipmentUpdateRequest) {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
@@ -95,6 +99,8 @@ public class ShipmentController {
     }
     
 	@PutMapping("/dangerous-good/{shipmentId}")
+    @Counted(value = "controller.dangerousgood.add")
+    @Timed(value = "controller.dangerousgood.add")
 	public ResponseEntity<?> addDangerousGood(
 			@RequestBody final DangerousGoodCreateRequestDto dangerousGoodCreateRequest,
 			@PathVariable final ShipmentId shipmentId) {
@@ -113,6 +119,8 @@ public class ShipmentController {
     }
 
     @PutMapping("/status")
+    @Counted(value = "controller.shipment.status.update")
+    @Timed(value = "controller.shipment.status.update")
     public ResponseEntity<?> updateStatus(@RequestBody final ShipmentStatusRequestDto shipmentStatusRequest) {
         shipmentRequestValidator.validateBody(shipmentStatusRequest);
         final ShipmentStatusRequest request = requestMapper.map(shipmentStatusRequest);
@@ -121,6 +129,8 @@ public class ShipmentController {
     }
 
     @PutMapping("/signature")
+    @Counted(value = "controller.signature.add")
+    @Timed(value = "controller.signature.add")
     public ResponseEntity<?> changeSignature(@RequestBody final SignatureChangeRequestDto signatureChangeRequest) {
         shipmentRequestValidator.validateBody(signatureChangeRequest);
         final SignatureChangeRequest request = requestMapper.map(signatureChangeRequest);
@@ -129,6 +139,8 @@ public class ShipmentController {
     }
 
     @GetMapping("/exists/{shipmentId}")
+    @Counted(value = "controller.shipment.exist")
+    @Timed(value = "controller.shipment.exist")
     public ResponseEntity<?> existsShipment(@PathVariable final ShipmentIdDto shipmentId) {
         shipmentRequestValidator.validateBody(shipmentId);
         final ShipmentId id = requestMapper.map(shipmentId);

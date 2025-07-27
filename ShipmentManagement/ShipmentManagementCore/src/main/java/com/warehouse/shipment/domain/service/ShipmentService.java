@@ -1,11 +1,7 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.commonassets.enumeration.Country;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
@@ -14,6 +10,7 @@ import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 
 public interface ShipmentService {
 
@@ -54,6 +51,8 @@ public interface ShipmentService {
     void notifyShipmentReturned(final ShipmentId shipmentId);
 
     void notifyShipmentDelivered(final ShipmentId shipmentId);
+
+    void changeShipmentCountries(ShipmentCountryRequest request);
 
     Shipment find(final ShipmentId shipmentId);
 

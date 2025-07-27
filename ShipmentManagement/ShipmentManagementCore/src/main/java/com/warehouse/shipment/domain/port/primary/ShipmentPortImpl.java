@@ -184,6 +184,25 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public void changeOriginCountryTo(final ShipmentCountryRequest request) {
+        final ShipmentId shipmentId = request.shipmentId();
+        final Country originCountry = request.originCountry();
+        this.shipmentService.changeShipmentOriginCountryTo(shipmentId, originCountry);
+    }
+
+    @Override
+    public void changeDestinationCountryTo(final ShipmentCountryRequest request) {
+        final ShipmentId shipmentId = request.shipmentId();
+        final Country destinationCountry = request.destinationCountry();
+        this.shipmentService.changeShipmentDestinationCountryTo(shipmentId, destinationCountry);
+    }
+
+    @Override
+    public void changeShipmentCountries(final ShipmentCountryRequest request) {
+        this.shipmentService.changeShipmentCountries(request);
+    }
+
+    @Override
     public Shipment loadShipment(final ShipmentId shipmentId) {
         return this.shipmentService.find(shipmentId);
     }
