@@ -10,8 +10,7 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
-import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
-import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
+import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
@@ -65,28 +64,35 @@ public class Shipment {
                     final Recipient recipient,
                     final ShipmentSize shipmentSize,
                     final ShipmentStatus shipmentStatus,
+                    final ShipmentType shipmentType,
                     final ShipmentId shipmentRelatedId,
                     final Money price,
                     final LocalDateTime createdAt,
                     final LocalDateTime updatedAt,
                     final Boolean locked,
-                    final Signature signature) {
+                    final Country originCountry,
+                    final Country destinationCountry,
+                    final String destination,
+                    final Signature signature,
+                    final boolean signatureRequired,
+                    final ShipmentPriority shipmentPriority) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
 		this.shipmentSize = shipmentSize;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
-		this.shipmentType = shipmentRelatedId != null ? ShipmentType.CHILD : ShipmentType.PARENT;
+		this.shipmentType = shipmentType;
 		this.price = price;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.locked = locked;
+        this.originCountry = originCountry;
+        this.destinationCountry = destinationCountry;
+        this.destination = destination;
         this.signature = signature;
-        this.originCountry = Country.POLAND;
-        this.destinationCountry = Country.POLAND;
-        this.signatureRequired = signature != null;
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.createSnapshot(), Instant.now()));
+        this.signatureRequired = signatureRequired;
+        this.shipmentPriority = shipmentPriority;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -99,7 +105,8 @@ public class Shipment {
                     final Money price,
                     final Boolean locked,
                     final String destination,
-                    final Signature signature) {
+                    final Signature signature,
+                    final ShipmentPriority shipmentPriority) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
@@ -116,7 +123,8 @@ public class Shipment {
         this.destinationCountry = destinationCountry;
         this.destination = destination;
         this.signatureRequired = signature != null;
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.createSnapshot(), Instant.now()));
+        this.shipmentPriority = shipmentPriority;
+        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
     }
     
     public Shipment(final Sender sender, 
@@ -130,10 +138,10 @@ public class Shipment {
         this.price = price;
         this.dangerousGood = dangerousGood;
         this.shipmentStatus = ShipmentStatus.CREATED;
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.createSnapshot(), Instant.now()));
+        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
     }
 
-    private ShipmentSnapshot createSnapshot() {
+    private ShipmentSnapshot snapshot() {
         return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentStatus);
     }
 
@@ -145,6 +153,7 @@ public class Shipment {
         this.sender = sender;
         this.recipient = recipient;
         this.shipmentStatus = determineShipmentStatus(updateType);
+        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
     }
 
     private ShipmentStatus determineShipmentStatus(final ShipmentUpdateType updateType) {
@@ -169,10 +178,42 @@ public class Shipment {
         final ShipmentId shipmentId = shipmentEntity.getShipmentId();
         final Sender sender = Sender.from(shipmentEntity);
         final Recipient recipient = Recipient.from(shipmentEntity);
-        return new Shipment(shipmentId, sender, recipient, shipmentEntity.getShipmentSize(), shipmentEntity.getShipmentStatus(),
-                shipmentEntity.getShipmentRelatedId(), null, shipmentEntity.getCreatedAt(),
-                shipmentEntity.getUpdatedAt(), shipmentEntity.getLocked(), null);
+        final ShipmentSize shipmentSize = shipmentEntity.getShipmentSize();
+        final ShipmentStatus shipmentStatus = shipmentEntity.getShipmentStatus();
+        final ShipmentId shipmentRelatedId = shipmentEntity.getShipmentRelatedId();
+        final ShipmentType shipmentType = shipmentEntity.getShipmentType();
+        final Money price = shipmentEntity.getPrice();
+        final LocalDateTime createdAt = shipmentEntity.getCreatedAt();
+        final LocalDateTime updatedAt = shipmentEntity.getUpdatedAt();
+        final Boolean locked = shipmentEntity.getLocked();
+        final Country originCountry = shipmentEntity.getOriginCountry();
+        final Country destinationCountry = shipmentEntity.getDestinationCountry();
+        final String destination = shipmentEntity.getDestination();
+        final Signature signature = null;
+        final boolean signatureRequired = false;
+        final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
+
+        return new Shipment(
+                shipmentId,
+                sender,
+                recipient,
+                shipmentSize,
+                shipmentStatus,
+                shipmentType,
+                shipmentRelatedId,
+                price,
+                createdAt,
+                updatedAt,
+                locked,
+                originCountry,
+                destinationCountry,
+                destination,
+                signature,
+                signatureRequired,
+                shipmentPriority
+        );
     }
+
 
     public Sender getSender() {
         return sender;
@@ -319,6 +360,7 @@ public class Shipment {
         this.shipmentRelatedId = newRelatedShipmentId;
         markAsModified();
         lockShipment();
+        DomainRegistry.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void lockShipment() {
@@ -338,11 +380,13 @@ public class Shipment {
     public void changeSender(final Sender sender) {
         this.sender = sender;
         markAsModified();
+        DomainRegistry.publish(new ShipmentSenderChanged(snapshot(), Instant.now()));
     }
 
     public void changeRecipient(final Recipient recipient) {
         this.recipient = recipient;
         markAsModified();
+        DomainRegistry.publish(new ShipmentRecipientChanged(snapshot(), Instant.now()));
     }
 
     public void changeShipmentSize(final ShipmentSize shipmentSize) {
@@ -382,7 +426,7 @@ public class Shipment {
 
     public void changeShipmentStatus(final ShipmentStatus shipmentStatus) {
         this.shipmentStatus = shipmentStatus;
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(createSnapshot(), Instant.now()));
+        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyRelatedShipmentRedirected(final ShipmentId relatedShipmentId) {
@@ -466,22 +510,6 @@ public class Shipment {
 
     private void unlockShipment() {
         this.locked = false;
-    }
-
-    public Shipment snapshot() {
-        return new Shipment(
-                this.shipmentId,
-                this.sender,
-                this.recipient,
-                this.shipmentSize,
-                this.shipmentStatus,
-                this.shipmentRelatedId,
-                this.price,
-                this.createdAt,
-                this.updatedAt,
-                this.locked,
-                this.signature
-        );
     }
 
     public void setDangerousGood(final DangerousGood dangerousGood) {

@@ -12,10 +12,11 @@ public class ShipmentChangedEvent {
     private final ShipmentSnapshot snapshot;
 
     @NotNull
-    private Instant timestamp;
+    private final Instant timestamp;
 
     public ShipmentChangedEvent(final ShipmentSnapshot snapshot, final Instant timestamp) {
         this.snapshot = snapshot;
+        this.timestamp = timestamp;
     }
 
     public ShipmentSnapshot getSnapshot() {

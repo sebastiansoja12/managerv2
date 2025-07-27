@@ -15,7 +15,7 @@ public class PathFinderAdapter implements PathFinderServicePort {
     private final VoronoiService voronoiService;
 
     @Override
-    public VoronoiResponse determineDeliveryDepot(final Address address) {
+    public VoronoiResponse determineDeliveryDepartment(final Address address) {
         final VoronoiRequestDto voronoiRequest = new VoronoiRequestDto(
                 address.getCity(), address.getPostalCode()
         );

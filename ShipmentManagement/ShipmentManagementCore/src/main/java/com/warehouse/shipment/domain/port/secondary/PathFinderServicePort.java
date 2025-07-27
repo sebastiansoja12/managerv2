@@ -5,5 +5,5 @@ import com.warehouse.shipment.domain.vo.VoronoiResponse;
 
 public interface PathFinderServicePort {
 
-    VoronoiResponse determineDeliveryDepot(final Address address);
+    VoronoiResponse determineDeliveryDepartment(final Address address);
 }

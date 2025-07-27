@@ -97,7 +97,7 @@ class ShipmentPortImplTest {
 
         doReturn(voronoiResponse)
                 .when(pathFinderServicePort)
-                .determineDeliveryDepot(any(Address.class));
+                .determineDeliveryDepartment(any(Address.class));
 
         doReturn(softwareConfiguration)
                 .when(softwareConfigurationServicePort)
@@ -127,7 +127,7 @@ class ShipmentPortImplTest {
         final ShipmentCreateRequest request = new ShipmentCreateRequest();
         doReturn(null)
                 .when(pathFinderServicePort)
-                .determineDeliveryDepot(any(Address.class));
+                .determineDeliveryDepartment(any(Address.class));
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then
@@ -143,7 +143,7 @@ class ShipmentPortImplTest {
         final VoronoiResponse voronoiResponse = new VoronoiResponse("");
         doReturn(voronoiResponse)
                 .when(pathFinderServicePort)
-                .determineDeliveryDepot(any(Address.class));
+                .determineDeliveryDepartment(any(Address.class));
         // when
         final Executable executable = () -> shipmentPort.ship(request);
         // then

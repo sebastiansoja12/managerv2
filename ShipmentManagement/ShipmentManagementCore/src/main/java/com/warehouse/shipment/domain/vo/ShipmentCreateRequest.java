@@ -1,6 +1,7 @@
 package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.DangerousGood;
@@ -22,6 +23,8 @@ public class ShipmentCreateRequest {
 
 	private Country destinationCountry;
 
+	private ShipmentPriority shipmentPriority;
+
 	public ShipmentCreateRequest() {
 
 	}
@@ -32,7 +35,8 @@ public class ShipmentCreateRequest {
                                  final Sender sender,
                                  final ShipmentSize shipmentSize,
 								 final Country originCountry,
-                                 final Country destinationCountry) {
+                                 final Country destinationCountry,
+								 final ShipmentPriority shipmentPriority) {
 		this.dangerousGood = dangerousGood;
 		this.price = price;
 		this.recipient = recipient;
@@ -40,6 +44,7 @@ public class ShipmentCreateRequest {
 		this.shipmentSize = shipmentSize;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
+		this.shipmentPriority = shipmentPriority;
     }
 
 	public DangerousGood getDangerousGood() {
@@ -100,5 +105,13 @@ public class ShipmentCreateRequest {
 
 	public boolean isDangerousGood() {
 		return dangerousGood != null;
+	}
+
+	public ShipmentPriority getShipmentPriority() {
+		return shipmentPriority;
+	}
+
+	public void setShipmentPriority(final ShipmentPriority shipmentPriority) {
+		this.shipmentPriority = shipmentPriority;
 	}
 }

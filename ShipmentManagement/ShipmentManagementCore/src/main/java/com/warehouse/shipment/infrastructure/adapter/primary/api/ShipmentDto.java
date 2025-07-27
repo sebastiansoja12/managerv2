@@ -16,13 +16,16 @@ public class ShipmentDto {
     
     private final ShipmentIdDto shipmentRelatedId;
 
+    private final ShipmentPriorityDto shipmentPriority;
+
     private final MoneyDto price;
 
     private final Boolean locked;
 
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonDto sender, final PersonDto recipient,
                        final ShipmentSizeDto shipmentSize, final String destination, final ShipmentStatusDto shipmentStatus,
-                       final ShipmentIdDto shipmentRelatedId, final MoneyDto price, final Boolean locked) {
+                       final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
+                       final MoneyDto price, final Boolean locked) {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -30,6 +33,7 @@ public class ShipmentDto {
 		this.destination = destination;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
+        this.shipmentPriority = shipmentPriority;
 		this.price = price;
         this.locked = locked;
     }
@@ -72,5 +76,9 @@ public class ShipmentDto {
 
     public MoneyDto getPrice() {
         return price;
+    }
+
+    public ShipmentPriorityDto getShipmentPriority() {
+        return shipmentPriority;
     }
 }

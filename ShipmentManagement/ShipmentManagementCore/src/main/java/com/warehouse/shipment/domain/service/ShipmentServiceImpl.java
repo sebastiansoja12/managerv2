@@ -39,16 +39,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 	}
 
     @Override
-    public ShipmentId createCopy(final ShipmentId shipmentId) {
-        final ShipmentId newShipmentId = nextShipmentId();
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        final Shipment copiedShipment = shipment.snapshot();
-        copiedShipment.setShipmentId(newShipmentId);
-        this.shipmentRepository.createOrUpdate(copiedShipment);
-        return newShipmentId;
-    }
-
-    @Override
     public Shipment find(final ShipmentId shipmentId) {
         return this.shipmentRepository.findById(shipmentId);
     }

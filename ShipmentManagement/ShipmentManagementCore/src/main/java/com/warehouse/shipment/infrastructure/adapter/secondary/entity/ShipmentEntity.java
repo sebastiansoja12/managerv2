@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -113,6 +111,18 @@ public class ShipmentEntity {
     @Column(name = "locked", nullable = false)
     private Boolean locked;
 
+    @Column(name = "origin_country", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Country originCountry;
+
+    @Column(name = "destination_country", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Country destinationCountry;
+
+    @Column(name = "shipment_priority", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ShipmentPriority shipmentPriority;
+
     @OneToOne
     @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id")
     private DangerousGoodEntity dangerousGood;
@@ -130,7 +140,7 @@ public class ShipmentEntity {
 			final String recipientCity, final String recipientStreet, final String recipientPostalCode,
 			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
 			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
-			final LocalDateTime updatedAt, final Boolean locked) {
+			final LocalDateTime updatedAt, final Boolean locked, final Country originCountry, final Country destinationCountry) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;
         this.lastName = senderLastName;
@@ -152,6 +162,8 @@ public class ShipmentEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.locked = locked;
+        this.originCountry = originCountry;
+        this.destinationCountry = destinationCountry;
         this.dangerousGood = null;
     }
 
@@ -173,6 +185,7 @@ public class ShipmentEntity {
                 recipientFirstName, recipientLastName, recipientEmail, recipientCity, recipientStreet,
                 recipientPostalCode, shipment.getShipmentSize(), shipment.getDestination(), 
                 shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
-                shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked());
+                shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
+                shipment.getOriginCountry(), shipment.getDestinationCountry());
     }
 }

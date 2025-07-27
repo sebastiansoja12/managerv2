@@ -39,7 +39,7 @@ public class PathFinderAdapterTest {
                 .when(voronoiService)
                 .findFastestRoute(new VoronoiRequestDto(address.getCity(), "00-000"));
         // when
-        final VoronoiResponse voronoiResponse = pathFinderAdapter.determineDeliveryDepot(address);
+        final VoronoiResponse voronoiResponse = pathFinderAdapter.determineDeliveryDepartment(address);
         
         // then
         assertEquals(expectedToBe("KR1"), voronoiResponse.getValue());

@@ -2,10 +2,10 @@ package com.warehouse.shipment.domain.port.primary;
 
 import java.util.Set;
 
-import com.warehouse.commonassets.enumeration.Currency;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -75,28 +75,21 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final Country destinationCountry = request.getDestinationCountry();
 
-		// final Result<CountryDetermine, ShipmentErrorCode> countryResult = this.countryDetermineService.determineCountry(request);
-        
-        final VoronoiResponse voronoiResponse = this.pathFinderServicePort.determineDeliveryDepot(recipientAddress);
+        final VoronoiResponse voronoiResponse = this.pathFinderServicePort.determineDeliveryDepartment(recipientAddress);
 
         final Price shipmentPrice = determineShipmentPrice(request);
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
 		final Shipment shipment = new Shipment(shipmentId, sender, recipient, request.getShipmentSize(), null,
-				originCountry, destinationCountry, shipmentPrice.getMoney(), false, voronoiResponse.getValue(), null);
+				originCountry, destinationCountry, shipmentPrice.getMoney(), false, voronoiResponse.getValue(), null,
+                request.getShipmentPriority());
 
         this.shipmentService.createShipment(shipment);
 
         logCreatedShipment(shipment);
 
-        final Result<RouteProcess, ShipmentErrorCode> routeProcess = this.shipmentService.notifyShipmentCreated(shipmentId);
-
-        if (routeProcess.isFailure()) {
-            return Result.failure(routeProcess.getFailure());
-        }
-
-        return Result.success(ShipmentCreateResponse.from(routeProcess.getSuccess()));
+        return Result.success();
     }
 
     private Price determineShipmentPrice(final ShipmentCreateRequest request) {
@@ -212,7 +205,8 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     private void logCreatedShipment(final Shipment shipment) {
-        logger.info("Shipment {} has been created at {}", shipment.getShipmentId().getValue(), shipment.getCreatedAt());
+        logger.info("Shipment {} has been created at {} with priority {}", shipment.getShipmentId().getValue(), shipment.getCreatedAt(),
+                shipment.getShipmentPriority());
     }
 
 }

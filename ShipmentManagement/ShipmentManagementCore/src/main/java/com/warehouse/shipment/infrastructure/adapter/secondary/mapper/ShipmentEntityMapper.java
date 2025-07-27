@@ -36,6 +36,7 @@ public interface ShipmentEntityMapper {
                 .shipmentStatus(shipment.getShipmentStatus())
                 .locked(shipment.isLocked())
                 .price(shipment.getPrice())
+                .shipmentPriority(shipment.getShipmentPriority())
                 .build();
     }
 }

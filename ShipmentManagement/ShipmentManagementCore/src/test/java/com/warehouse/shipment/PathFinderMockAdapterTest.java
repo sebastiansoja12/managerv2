@@ -25,12 +25,12 @@ public class PathFinderMockAdapterTest {
     }
 
     @Test
-    void shouldDetermineDeliveryDepot() {
+    void shouldDetermineDeliveryDepartment() {
         // given
         final Address address = new Address("Katowice", "00-000", "Katowicka 1");
         final Shipment shipment = new Shipment();
         // when
-        mockAdapter.determineDeliveryDepot(address);
+        mockAdapter.determineDeliveryDepartment(address);
         // then
         assertEquals(expectedToBe("KT3"), shipment.getDestination());
     }

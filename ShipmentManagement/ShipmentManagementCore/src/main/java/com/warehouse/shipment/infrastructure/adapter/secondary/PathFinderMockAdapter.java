@@ -14,7 +14,7 @@ public class PathFinderMockAdapter implements PathFinderServicePort {
     }
 
     @Override
-    public VoronoiResponse determineDeliveryDepot(final Address address) {
+    public VoronoiResponse determineDeliveryDepartment(final Address address) {
         return pathFinderMockService.determineDeliveryDepot(address);
     }
 }
