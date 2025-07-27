@@ -147,7 +147,7 @@ public class ShipmentController {
     @PutMapping("/person")
     @Counted(value = "controller.person.update")
     @Timed(value = "controller.person.update")
-    public ResponseEntity<?> updateSender(@RequestBody final PersonDto personRequest,
+    public ResponseEntity<?> updatePerson(@RequestBody final PersonDto personRequest,
                                           @RequestParam("shipmentId") @PathVariable final ShipmentIdDto shipmentId,
                                           @RequestParam("personType") final PersonType personType) {
         final Person person = personType == PersonType.SENDER ? Sender.from(personRequest) : Recipient.from(personRequest);
