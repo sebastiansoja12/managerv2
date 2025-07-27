@@ -11,6 +11,10 @@ public record Price(BigDecimal price, Currency currency) {
         return new Price(priceEntity.getPrice().getAmount(), priceEntity.getPrice().getCurrency());
     }
 
+    public Price(final Money money) {
+        this(money.getAmount(), money.getCurrency());
+    }
+
     public static Price empty() {
         return new Price(BigDecimal.ZERO, Currency.PLN);
     }

@@ -42,4 +42,8 @@ public class Money {
     public void changeCurrency(final Currency currency) {
         this.currency = currency;
     }
+
+    public boolean isDefined() {
+        return amount != null && currency != null;
+    }
 }

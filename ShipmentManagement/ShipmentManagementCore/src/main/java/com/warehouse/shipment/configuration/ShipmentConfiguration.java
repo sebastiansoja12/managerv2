@@ -7,7 +7,6 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestClient;
 
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
@@ -22,7 +21,7 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerNotifier;
+import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import com.warehouse.tracking.infrastructure.adapter.primary.api.TrackingStatusEventPublisher;
@@ -56,9 +55,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public RouteTrackerNotifier routeTrackerNotifier() {
-		final RestClient restClient = RestClient.builder().build();
-		return new RouteTrackerNotifier(restClient);
+	public RouteTrackerHistoryNotifier routeTrackerNotifier() {
+		return new RouteTrackerHistoryNotifier();
 	}
 
 	@Bean
@@ -70,14 +68,13 @@ public class ShipmentConfiguration {
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
-									 final MailServicePort mailServicePort,
 									 final TrackingStatusServicePort trackingStatusServicePort,
 									 final Set<ShipmentStatusHandler> shipmentStatusHandlers,
 									 final CountryDetermineService countryDetermineService,
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, mailServicePort, trackingStatusServicePort, shipmentStatusHandlers,
+				notificationCreatorProvider, trackingStatusServicePort, shipmentStatusHandlers,
 				countryDetermineService, priceService, countryServiceAvailabilityService);
 	}
 

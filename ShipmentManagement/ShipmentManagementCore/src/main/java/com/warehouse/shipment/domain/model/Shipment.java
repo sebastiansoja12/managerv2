@@ -134,7 +134,7 @@ public class Shipment {
     }
 
     private ShipmentSnapshot createSnapshot() {
-        return null;
+        return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentStatus);
     }
 
     public Shipment(final ShipmentId shipmentId,

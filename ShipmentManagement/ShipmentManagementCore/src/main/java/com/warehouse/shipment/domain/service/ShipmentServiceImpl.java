@@ -66,10 +66,10 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public Result<RouteProcess, ShipmentErrorCode> initializeRouteProcess(final ShipmentId shipmentId) {
+    public Result<RouteProcess, ShipmentErrorCode> notifyShipmentCreated(final ShipmentId shipmentId) {
         final Result<RouteProcess, ShipmentErrorCode> result;
 		final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
-        final RouteProcess routeProcess = this.routeLogServicePort.initializeRouteProcess(shipmentId, softwareConfiguration);
+        final RouteProcess routeProcess = this.routeLogServicePort.notifyShipmentCreated(shipmentId, softwareConfiguration);
 
         if (routeProcess != null) {
             result = Result.success(routeProcess);

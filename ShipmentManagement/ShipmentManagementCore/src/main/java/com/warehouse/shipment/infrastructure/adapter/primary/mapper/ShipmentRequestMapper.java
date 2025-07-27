@@ -19,6 +19,9 @@ public interface ShipmentRequestMapper {
     ShipmentCreateRequest map(final ShipmentCreateRequestDto requestDto);
 
     default Money map(final MoneyDto money) {
+        if (money == null) {
+            return null;
+        }
         return new Money(money.getAmount(), Currency.valueOf(money.getCurrency()));
     }
 

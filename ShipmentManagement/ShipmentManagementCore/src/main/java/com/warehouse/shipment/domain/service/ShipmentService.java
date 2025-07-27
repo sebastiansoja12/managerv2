@@ -61,7 +61,7 @@ public interface ShipmentService {
 
     boolean existsShipment(final ShipmentId shipmentId);
 
-    Result<RouteProcess, ShipmentErrorCode> initializeRouteProcess(final ShipmentId shipmentId);
+    Result<RouteProcess, ShipmentErrorCode> notifyShipmentCreated(final ShipmentId shipmentId);
 
     ShipmentId nextShipmentId();
 

@@ -38,7 +38,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             validateShipmentStatus(request.shipmentSize(), errors);
         }
 
-        if (request.price() == null || request.price().getAmount() == null || request.price().getCurrency() == null) {
+        if (validateShipmentPrice(request.price())) {
             errors.add("Invalid price");
         }
 
@@ -48,9 +48,8 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     }
 
     private boolean validateShipmentPrice(final MoneyDto price) {
-        return false;
+        return price != null && price.getAmount() == null && price.getCurrency() == null;
     }
-
 
     private List<String> validatePerson(final PersonDto person) {
         final Set<String> errors = new HashSet<>();

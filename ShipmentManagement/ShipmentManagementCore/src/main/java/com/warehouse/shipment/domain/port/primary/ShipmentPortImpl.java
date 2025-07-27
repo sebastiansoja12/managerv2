@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.port.primary;
 
 import java.util.Set;
 
+import com.warehouse.commonassets.enumeration.Currency;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.Country;
@@ -14,7 +15,6 @@ import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.Logger;
-import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
 import com.warehouse.shipment.domain.service.*;
@@ -31,8 +31,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final NotificationCreatorProvider notificationCreatorProvider;
 
-    private final MailServicePort mailServicePort;
-
     private final TrackingStatusServicePort trackingStatusServicePort;
 
     private final Set<ShipmentStatusHandler> shipmentStatusHandlers;
@@ -47,7 +45,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
                             final NotificationCreatorProvider notificationCreatorProvider,
-                            final MailServicePort mailServicePort,
                             final TrackingStatusServicePort trackingStatusServicePort,
                             final Set<ShipmentStatusHandler> shipmentStatusHandlers,
                             final CountryDetermineService countryDetermineService,
@@ -57,7 +54,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
-		this.mailServicePort = mailServicePort;
         this.trackingStatusServicePort = trackingStatusServicePort;
         this.shipmentStatusHandlers = shipmentStatusHandlers;
         this.countryDetermineService = countryDetermineService;
@@ -83,18 +79,18 @@ public class ShipmentPortImpl implements ShipmentPort {
         
         final VoronoiResponse voronoiResponse = this.pathFinderServicePort.determineDeliveryDepot(recipientAddress);
 
-        final Price shipmentPrice = this.priceService.determineShipmentPrice(request.getShipmentSize());
+        final Price shipmentPrice = determineShipmentPrice(request);
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
 		final Shipment shipment = new Shipment(shipmentId, sender, recipient, request.getShipmentSize(), null,
-				originCountry, destinationCountry, request.getPrice(), false, voronoiResponse.getValue(), null);
+				originCountry, destinationCountry, shipmentPrice.getMoney(), false, voronoiResponse.getValue(), null);
 
         this.shipmentService.createShipment(shipment);
 
         logCreatedShipment(shipment);
 
-        final Result<RouteProcess, ShipmentErrorCode> routeProcess = this.shipmentService.initializeRouteProcess(shipmentId);
+        final Result<RouteProcess, ShipmentErrorCode> routeProcess = this.shipmentService.notifyShipmentCreated(shipmentId);
 
         if (routeProcess.isFailure()) {
             return Result.failure(routeProcess.getFailure());
@@ -103,13 +99,16 @@ public class ShipmentPortImpl implements ShipmentPort {
         return Result.success(ShipmentCreateResponse.from(routeProcess.getSuccess()));
     }
 
+    private Price determineShipmentPrice(final ShipmentCreateRequest request) {
+        return request.getPrice() == null || !request.getPrice().isDefined() ?
+                this.priceService.determineShipmentPrice(request.getShipmentSize(), Currency.PLN) : new Price(request.getPrice());
+    }
+
     @Override
     @Transactional
     public Result<Void, ShipmentErrorCode> update(final ShipmentUpdateRequest request) {
 
         final Shipment shipment = Shipment.from(request);
-
-        final Address address = Address.from(request.getRecipient());
 
         //this.pathFinderServicePort.determineDeliveryDepot(shipment, address);
 
@@ -213,7 +212,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     private void logCreatedShipment(final Shipment shipment) {
-        logger.info("Shipment {} has been created at {}", shipment.getShipmentId(), shipment.getCreatedAt());
+        logger.info("Shipment {} has been created at {}", shipment.getShipmentId().getValue(), shipment.getCreatedAt());
     }
 
 }

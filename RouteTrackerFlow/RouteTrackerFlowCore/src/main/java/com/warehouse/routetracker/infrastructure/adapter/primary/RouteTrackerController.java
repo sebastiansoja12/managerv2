@@ -3,7 +3,6 @@ package com.warehouse.routetracker.infrastructure.adapter.primary;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -13,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.configuration.common.RestException;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
+import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.vo.*;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentCreatedRequest;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn.DeliveryReturnRequestDto;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteRequestMapper;
@@ -40,10 +41,9 @@ public class RouteTrackerController {
         return new ResponseEntity<>(responseMapper.mapToLogRecord(routeLogRecord), HttpStatus.OK);
     }
 
-    @PostMapping("/initialize")
-    public ResponseEntity<?> initialize(@RequestBody final ShipmentIdDto id) {
-        final ShipmentId shipmentId = requestMapper.map(id);
-        final RouteProcess routeProcess = trackerLogPort.initializeRouteProcess(shipmentId);
+    @PostMapping("/shipments")
+    public ResponseEntity<?> initialize(@RequestBody final ShipmentCreatedRequest request) {
+        final RouteProcess routeProcess = trackerLogPort.initializeRouteProcess(new ShipmentId(request.shipmentId().value()));
         return new ResponseEntity<>(responseMapper.map(routeProcess), HttpStatus.OK);
 
     }

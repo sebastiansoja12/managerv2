@@ -82,7 +82,7 @@ class ShipmentPortImplTest {
                 new ShipmentSentHandler(shipmentService), new ShipmentDeliveryHandler(shipmentService),
                 new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
         shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
-                mailServicePort, trackingStatusServicePort, shipmentStatusHandlers, countryDetermineService,
+                trackingStatusServicePort, shipmentStatusHandlers, countryDetermineService,
                 priceService, countryServiceAvailabilityService);
     }
 
@@ -103,7 +103,7 @@ class ShipmentPortImplTest {
                 .when(softwareConfigurationServicePort)
                 .getSoftwareConfiguration();
 
-        when(routeLogServicePort.initializeRouteProcess(any(), any())).thenReturn(routeProcess);
+        when(routeLogServicePort.notifyShipmentCreated(any(), any())).thenReturn(routeProcess);
         // when
         final Result<ShipmentCreateResponse, ShipmentErrorCode> response = shipmentPort.ship(request);
         // then

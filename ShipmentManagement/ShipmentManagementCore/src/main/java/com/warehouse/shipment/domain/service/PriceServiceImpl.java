@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.service;
 
+import com.warehouse.commonassets.enumeration.Currency;
 import org.springframework.stereotype.Service;
 
 import com.warehouse.commonassets.enumeration.ShipmentSize;
@@ -16,7 +17,7 @@ public class PriceServiceImpl implements PriceService {
     }
 
     @Override
-    public Price determineShipmentPrice(final ShipmentSize shipmentSize) {
-        return null;
+    public Price determineShipmentPrice(final ShipmentSize shipmentSize, final Currency currency) {
+        return priceRepository.priceByShipmentSize(shipmentSize, currency);
     }
 }

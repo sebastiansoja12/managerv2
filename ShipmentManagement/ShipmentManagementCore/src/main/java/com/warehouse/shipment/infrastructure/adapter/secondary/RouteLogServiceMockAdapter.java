@@ -10,8 +10,8 @@ import java.util.UUID;
 public class RouteLogServiceMockAdapter implements RouteLogServicePort {
 
     @Override
-    public RouteProcess initializeRouteProcess(final ShipmentId shipmentId,
-                                               final SoftwareConfiguration softwareConfiguration) {
+    public RouteProcess notifyShipmentCreated(final ShipmentId shipmentId,
+                                              final SoftwareConfiguration softwareConfiguration) {
         return new RouteProcess(shipmentId, UUID.randomUUID());
     }
 }
