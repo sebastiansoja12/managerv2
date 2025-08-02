@@ -39,9 +39,6 @@ class ShipmentPortImplTest {
     private NotificationCreatorProvider notificationCreatorProvider;
 
     @Mock
-    private MailServicePort mailServicePort;
-
-    @Mock
     private RouteLogServicePort routeLogServicePort;
 
     @Mock
@@ -82,7 +79,7 @@ class ShipmentPortImplTest {
                 new ShipmentSentHandler(shipmentService), new ShipmentDeliveryHandler(shipmentService),
                 new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
-				mailServicePort, trackingStatusServicePort, shipmentStatusHandlers, countryDetermineService,
+				trackingStatusServicePort, shipmentStatusHandlers, countryDetermineService,
 				priceService, countryServiceAvailabilityService);
 	}
 

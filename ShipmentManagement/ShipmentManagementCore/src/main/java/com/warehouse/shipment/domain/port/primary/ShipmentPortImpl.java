@@ -14,9 +14,11 @@ import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
 import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.*;
+import com.warehouse.shipment.domain.model.DangerousGood;
+import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.port.secondary.Logger;
-import com.warehouse.shipment.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
 import com.warehouse.shipment.domain.service.*;
@@ -33,8 +35,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final NotificationCreatorProvider notificationCreatorProvider;
 
-    private final MailServicePort mailServicePort;
-
     private final TrackingStatusServicePort trackingStatusServicePort;
 
     private final Set<ShipmentStatusHandler> shipmentStatusHandlers;
@@ -49,7 +49,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
                             final NotificationCreatorProvider notificationCreatorProvider,
-                            final MailServicePort mailServicePort,
                             final TrackingStatusServicePort trackingStatusServicePort,
                             final Set<ShipmentStatusHandler> shipmentStatusHandlers,
                             final CountryDetermineService countryDetermineService,
@@ -59,7 +58,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
-        this.mailServicePort = mailServicePort;
         this.trackingStatusServicePort = trackingStatusServicePort;
         this.shipmentStatusHandlers = shipmentStatusHandlers;
         this.countryDetermineService = countryDetermineService;
@@ -230,17 +228,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public boolean existsShipment(final ShipmentId shipmentId) {
         return this.shipmentService.existsShipment(shipmentId);
-    }
-
-    private void logShipment(final Shipment shipment) {
-		logger.info("Detected service to create shipment with telephone number {0} and origin country {1} and destination country {2}",
-				shipment.getSender().getTelephoneNumber(),
-                shipment.getOriginCountry(),
-                shipment.getDestinationCountry());
-    }
-
-    private void logNotification(final Notification notification) {
-        logger.info("Email notification to {} has been sent", notification.getRecipient());
     }
 
     private void logCreatedShipment(final Shipment shipment) {

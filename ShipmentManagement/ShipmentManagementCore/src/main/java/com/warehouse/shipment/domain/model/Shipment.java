@@ -214,7 +214,6 @@ public class Shipment {
         );
     }
 
-
     public Sender getSender() {
         return sender;
     }
@@ -439,16 +438,7 @@ public class Shipment {
     public void changeCurrency(final Currency currency) {
         this.price.changeCurrency(currency);
         markAsModified();
-    }
-
-    public void changeShipmentOrigin(final Country originCountry) {
-        this.originCountry = originCountry;
-        markAsModified();
-    }
-
-    public void changeShipmentDestinationCountry(final Country destinationCountry) {
-        this.destinationCountry = destinationCountry;
-        markAsModified();
+        DomainRegistry.publish(new ShipmentCurrencyChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeSignatureRequired(final boolean signatureRequired) {
@@ -482,26 +472,25 @@ public class Shipment {
     public void notifyShipmentRerouted() {
         changeShipmentStatus(ShipmentStatus.REROUTE);
         markAsModified();
+        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentSent() {
         changeShipmentStatus(ShipmentStatus.SENT);
         markAsModified();
+        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentReturned() {
         changeShipmentStatus(ShipmentStatus.RETURN);
         markAsModified();
+        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentDelivered() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
         markAsModified();
-    }
-
-    public void changeShipmentCountries(final ShipmentCountry shipmentCountry) {
-        this.originCountry = shipmentCountry.originCountry();
-        this.destinationCountry = shipmentCountry.destinationCountry();
+        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void changeDestinationDepartment(final String destination) {

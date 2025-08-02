@@ -29,14 +29,6 @@ public class CountryDetermineServiceImpl implements CountryDetermineService {
         final LocationInfo locationInfo = LocationInfo.from(sender, recipient);
         final ShipmentCountry shipmentCountry = countryDetermineServicePort.determineCountry(locationInfo);
 
-        if (originCountry == null && destinationCountry == null) {
-            shipment.changeShipmentCountries(shipmentCountry);
-        } else if (originCountry != null && destinationCountry == null) {
-            shipment.changeShipmentDestinationCountry(shipmentCountry.destinationCountry());
-        } else if (originCountry == null) {
-            shipment.changeShipmentOrigin(shipmentCountry.originCountry());
-        }
-
         return null;
     }
 

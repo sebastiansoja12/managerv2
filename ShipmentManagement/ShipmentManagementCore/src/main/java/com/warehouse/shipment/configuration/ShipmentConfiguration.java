@@ -20,7 +20,6 @@ import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResp
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
@@ -68,14 +67,13 @@ public class ShipmentConfiguration {
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
-									 final MailServicePort mailServicePort,
 									 final TrackingStatusServicePort trackingStatusServicePort,
 									 final Set<ShipmentStatusHandler> shipmentStatusHandlers,
 									 final CountryDetermineService countryDetermineService,
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, mailServicePort, trackingStatusServicePort, shipmentStatusHandlers,
+				notificationCreatorProvider, trackingStatusServicePort, shipmentStatusHandlers,
 				countryDetermineService, priceService, countryServiceAvailabilityService);
 	}
 
@@ -176,12 +174,6 @@ public class ShipmentConfiguration {
 	@Bean("shipment.routeTrackerLogProperties")
 	public RouteTrackerLogProperties routeTrackerLogProperties() {
 		return new RouteTrackerLogProperties();
-	}
-	
-	@Bean(name = "shipment.mailServicePort")
-	public MailServicePort mailServicePort(final MailPort mailPort) {
-		final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
-		return new MailAdapter(mailPort, notificationMapper);
 	}
 
 	@Bean
