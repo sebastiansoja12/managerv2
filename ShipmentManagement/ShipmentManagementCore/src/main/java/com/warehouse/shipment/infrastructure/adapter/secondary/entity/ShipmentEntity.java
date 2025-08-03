@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.model.Shipment;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -26,9 +26,9 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 public class ShipmentEntity {
 
-    @Column(name = "id")
+    @Column(name = "shipment_id")
     @EmbeddedId
-    @AttributeOverride(name = "value", column = @Column(name = "id"))
+    @AttributeOverride(name = "value", column = @Column(name = "shipment_id"))
     private ShipmentId shipmentId;
 
     @Column(name = "first_name", nullable = false)
@@ -110,4 +110,95 @@ public class ShipmentEntity {
 
     @Column(name = "locked", nullable = false)
     private Boolean locked;
+
+    @Column(name = "origin_country", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Country originCountry;
+
+    @Column(name = "destination_country", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Country destinationCountry;
+
+    @Column(name = "shipment_priority", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ShipmentPriority shipmentPriority;
+
+    @OneToOne
+    @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id")
+    private DangerousGoodEntity dangerousGood;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "price_amount")),
+            @AttributeOverride(name = "currency", column = @Column(name = "price_currency"))
+    })
+    private Money price;
+
+    @OneToOne
+    @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id", insertable = false)
+    private SignatureEntity signature;
+
+	public ShipmentEntity(final ShipmentId shipmentId, final String senderFirstName, final String senderLastName,
+			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode, final String senderTelephone,
+			final String recipientFirstName, final String recipientLastName, final String recipientEmail,
+			final String recipientCity, final String recipientStreet, final String recipientPostalCode, final String recipientTelephone,
+			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
+			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
+			final LocalDateTime updatedAt, final Boolean locked, final Country originCountry, final Country destinationCountry, 
+            final Money price, final ShipmentPriority shipmentPriority) {
+        this.shipmentId = shipmentId;
+        this.firstName = senderFirstName;
+        this.lastName = senderLastName;
+        this.senderEmail = senderEmail;
+        this.senderCity = senderCity;
+        this.senderStreet = senderStreet;
+        this.senderPostalCode = senderPostalCode;
+        this.senderTelephone = senderTelephone;
+        this.recipientFirstName = recipientFirstName;
+        this.recipientLastName = recipientLastName;
+        this.recipientEmail = recipientEmail;
+        this.recipientCity = recipientCity;
+        this.recipientStreet = recipientStreet;
+        this.recipientPostalCode = recipientPostalCode;
+        this.recipientTelephone = recipientTelephone;
+        this.shipmentSize = shipmentSize;
+        this.destination = destination;
+        this.shipmentStatus = shipmentStatus;
+        this.shipmentType = shipmentType;
+        this.shipmentRelatedId = shipmentRelatedId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.locked = locked;
+        this.originCountry = originCountry;
+        this.destinationCountry = destinationCountry;
+        this.dangerousGood = null;
+        this.price = null;
+        this.shipmentPriority = shipmentPriority;
+        this.price = price;
+    }
+
+    public static ShipmentEntity from(final Shipment shipment) {
+        final String senderFirstName = shipment.getSender().getFirstName();
+        final String senderLastName = shipment.getSender().getLastName();
+        final String senderEmail = shipment.getSender().getEmail();
+        final String senderCity = shipment.getSender().getCity();
+        final String senderStreet = shipment.getSender().getStreet();
+        final String senderPostalCode = shipment.getSender().getPostalCode();
+        final String senderTelephoneNumber = shipment.getSender().getTelephoneNumber();
+        final String recipientFirstName = shipment.getRecipient().getFirstName();
+        final String recipientLastName = shipment.getRecipient().getLastName();
+        final String recipientEmail = shipment.getRecipient().getEmail();
+        final String recipientCity = shipment.getRecipient().getCity();
+        final String recipientStreet = shipment.getRecipient().getStreet();
+        final String recipientPostalCode = shipment.getRecipient().getPostalCode();
+        final String recipientTelephoneNumber = shipment.getRecipient().getTelephoneNumber();
+        return new ShipmentEntity(shipment.getShipmentId(), senderFirstName, senderLastName,
+                senderEmail, senderCity, senderStreet, senderPostalCode, senderTelephoneNumber,
+                recipientFirstName, recipientLastName, recipientEmail, recipientCity, recipientStreet,
+                recipientPostalCode, recipientTelephoneNumber, shipment.getShipmentSize(), shipment.getDestination(),
+                shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
+                shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
+				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
+				shipment.getShipmentPriority());
+    }
 }

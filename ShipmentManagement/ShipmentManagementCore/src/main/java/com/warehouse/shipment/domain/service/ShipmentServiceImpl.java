@@ -4,16 +4,15 @@ import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.RouteProcess;
-import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
+import com.warehouse.shipment.domain.vo.*;
 
 public class ShipmentServiceImpl implements ShipmentService {
 
@@ -37,16 +36,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 	}
 
     @Override
-    public ShipmentId createCopy(final ShipmentId shipmentId) {
-        final ShipmentId newShipmentId = nextShipmentId();
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        final Shipment copiedShipment = shipment.snapshot();
-        copiedShipment.setShipmentId(newShipmentId);
-        this.shipmentRepository.createOrUpdate(copiedShipment);
-        return newShipmentId;
-    }
-
-    @Override
     public Shipment find(final ShipmentId shipmentId) {
         return this.shipmentRepository.findById(shipmentId);
     }
@@ -64,9 +53,18 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public RouteProcess initializeRouteProcess(final ShipmentId shipmentId) {
+    public Result<RouteProcess, ShipmentErrorCode> notifyShipmentCreated(final ShipmentId shipmentId) {
+        final Result<RouteProcess, ShipmentErrorCode> result;
 		final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
-        return this.routeLogServicePort.initializeRouteProcess(shipmentId, softwareConfiguration);
+        final RouteProcess routeProcess = this.routeLogServicePort.notifyShipmentCreated(shipmentId, softwareConfiguration);
+
+        if (routeProcess != null) {
+            result = Result.success(routeProcess);
+        } else {
+            result = Result.failure(ShipmentErrorCode.SHIPMENT_202);
+        }
+
+        return result;
     }
 
     @Override
@@ -121,14 +119,14 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public void changeShipmentOriginCountryTo(final ShipmentId shipmentId, final Country originCountry) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.changeShipmentOrigin(originCountry);
+        shipment.changeOriginCountry(originCountry);
         this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
     public void changeShipmentDestinationCountryTo(final ShipmentId shipmentId, final Country destinationCountry) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.changeShipmentDestinationCountry(destinationCountry);
+        shipment.changeDestinationCountry(destinationCountry);
         this.shipmentRepository.createOrUpdate(shipment);
     }
 
@@ -185,6 +183,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void notifyShipmentDelivered(ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentDelivered();
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
+    public void changeShipmentCountries(final ShipmentCountryRequest request) {
+        final Shipment shipment = this.shipmentRepository.findById(request.shipmentId());
+        shipment.updateCountries(request);
         this.shipmentRepository.createOrUpdate(shipment);
     }
 

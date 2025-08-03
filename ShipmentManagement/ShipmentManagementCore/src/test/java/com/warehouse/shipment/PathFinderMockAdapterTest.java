@@ -1,15 +1,16 @@
 package com.warehouse.shipment;
 
-import com.warehouse.shipment.domain.vo.Address;
-import com.warehouse.shipment.domain.vo.VoronoiResponse;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockAdapter;
-import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.Address;
+import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockAdapter;
+import com.warehouse.shipment.infrastructure.adapter.secondary.PathFinderMockService;
 
 @ExtendWith(MockitoExtension.class)
 public class PathFinderMockAdapterTest {
@@ -24,13 +25,14 @@ public class PathFinderMockAdapterTest {
     }
 
     @Test
-    void shouldDetermineDeliveryDepot() {
+    void shouldDetermineDeliveryDepartment() {
         // given
         final Address address = new Address("Katowice", "00-000", "Katowicka 1");
+        final Shipment shipment = new Shipment();
         // when
-        final VoronoiResponse voronoiResponse = mockAdapter.determineDeliveryDepot(address);
+        mockAdapter.determineDeliveryDepartment(address);
         // then
-        assertEquals(expectedToBe("KT3"), voronoiResponse.getValue());
+        assertEquals(expectedToBe("KT3"), shipment.getDestination());
     }
 
     private <T> T expectedToBe(T t) {

@@ -1,7 +1,7 @@
 package com.warehouse.tracking.infrastructure.adapter.secondary;
 
-import com.warehouse.tracking.TrackingStatusEventPublisher;
-import com.warehouse.tracking.ShipmentStatusChanged;
+import com.warehouse.tracking.infrastructure.adapter.primary.api.TrackingStatusEventPublisher;
+import com.warehouse.tracking.infrastructure.adapter.primary.api.ShipmentStatusChanged;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dataset>
+    <price
+            id="1"
+            shipment_size="AVERAGE"
+            price_amount="10"
+            price_currency_code="EUR"
+    />
+
+    <price
+            id="2"
+            shipment_size="BIG"
+            price_amount="15"
+            price_currency_code="EUR"
+    />
+
+    <price
+            id="3"
+            shipment_size="MEDIUM"
+            price_amount="20"
+            price_currency_code="EUR"
+    />
+</dataset>

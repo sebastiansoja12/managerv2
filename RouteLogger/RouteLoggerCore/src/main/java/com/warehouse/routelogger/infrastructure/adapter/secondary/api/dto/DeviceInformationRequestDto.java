@@ -7,7 +7,7 @@ public record DeviceInformationRequestDto(ShipmentIdDto shipmentId,
                                           String processType) {
 
     public static DeviceInformationRequestDto from(final DeviceInformationRequest request) {
-        final ShipmentIdDto shipmentId = new ShipmentIdDto(request.getShipmentId().value());
+        final ShipmentIdDto shipmentId = new ShipmentIdDto(request.getShipmentId().getValue());
         final DeviceIdDto deviceId = new DeviceIdDto(request.getDeviceId().getValue());
         final DepartmentCodeDto departmentCode = new DepartmentCodeDto(request.getDepartmentCode().getValue());
         final DeviceTypeDto deviceType = DeviceTypeDto.valueOf(request.getDeviceType().name());

@@ -1,14 +1,15 @@
 package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.commonassets.enumeration.InsuranceType;
+import com.warehouse.commonassets.model.Money;
 
 public final class InsuranceAmount {
 
     private final InsuranceType insuranceType;
 
-    private final Double amount;
+    private final Money amount;
 
-    public InsuranceAmount(final InsuranceType insuranceType, final double amount) {
+    public InsuranceAmount(final InsuranceType insuranceType, final Money amount) {
         this.insuranceType = insuranceType;
         this.amount = amount;
     }
@@ -17,7 +18,7 @@ public final class InsuranceAmount {
         return insuranceType;
     }
 
-    public Double getAmount() {
+    public Money getAmount() {
         return amount;
     }
 

@@ -22,4 +22,5 @@ public class RouteTrackerLogProperties {
     private String username;
     private String delivery;
     private String terminalRequest;
+    private String shipment;
 }

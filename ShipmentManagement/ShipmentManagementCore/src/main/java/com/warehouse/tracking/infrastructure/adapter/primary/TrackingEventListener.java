@@ -5,11 +5,11 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.warehouse.redirect.RedirectService;
-import com.warehouse.reroute.RerouteService;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentStatusDto;
-import com.warehouse.tracking.ShipmentStatusChanged;
+import com.warehouse.redirect.infrastructure.adapter.primary.api.RedirectService;
+import com.warehouse.reroute.infrastructure.adapter.primary.api.RerouteService;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentIdDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentStatusDto;
+import com.warehouse.tracking.infrastructure.adapter.primary.api.ShipmentStatusChanged;
 
 import lombok.extern.slf4j.Slf4j;
 

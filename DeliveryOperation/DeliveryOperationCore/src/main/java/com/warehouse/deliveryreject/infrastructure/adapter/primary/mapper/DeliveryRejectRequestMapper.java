@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectDetails;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
@@ -25,6 +26,10 @@ public interface DeliveryRejectRequestMapper {
     }
 
     List<DeliveryRejectDetails> map(final List<DeliveryRejectDetailsDto> deliveryRejectDetails);
+
+    default ShipmentId map(final ShipmentIdDto shipmentId) {
+        return new ShipmentId(shipmentId.value());
+    }
 
     @Mapping(target = "username", source = "username.value")
     @Mapping(target = "version", source = "version.value")

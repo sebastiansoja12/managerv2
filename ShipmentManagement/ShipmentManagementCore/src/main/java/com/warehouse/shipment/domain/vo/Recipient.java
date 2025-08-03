@@ -2,6 +2,8 @@ package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.PersonDto;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import lombok.Builder;
 
 import static com.warehouse.shipment.domain.enumeration.PersonType.RECIPIENT;
@@ -31,6 +33,22 @@ public class Recipient implements Person {
     public static Recipient from(final Shipment shipment) {
         return shipment.getRecipient();
     }
+
+    public static Recipient from(final ShipmentEntity entity) {
+        final String firstName = entity.getRecipientFirstName();
+        final String lastName = entity.getRecipientLastName();
+        final String email = entity.getRecipientEmail();
+        final String telephoneNumber = entity.getRecipientTelephone();
+        final String city = entity.getRecipientCity();
+        final String postalCode = entity.getRecipientPostalCode();
+        final String street = entity.getRecipientStreet();
+        return new Recipient(firstName, lastName, email, telephoneNumber, city, postalCode, street);
+    }
+
+	public static Person from(final PersonDto request) {
+		return new Recipient(request.getFirstName(), request.getLastName(), request.getEmail(),
+				request.getTelephoneNumber(), request.getCity(), request.getPostalCode(), request.getStreet());
+	}
 
     @Override
     public String getFirstName() {

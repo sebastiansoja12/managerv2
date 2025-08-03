@@ -5,11 +5,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.returntoken.domain.vo.ReturnTokenResponse;
-import com.warehouse.returntoken.domain.vo.CrossCourierDelivery;
-import com.warehouse.returntoken.domain.vo.ReturnPackageResponse;
-import com.warehouse.returntoken.domain.vo.ReturnToken;
-import com.warehouse.returntoken.domain.vo.Supplier;
+import com.warehouse.returntoken.domain.vo.*;
 import com.warehouse.returntoken.infrastructure.adapter.primary.dto.*;
 
 @Mapper
@@ -38,6 +34,6 @@ public interface ReturnTokenResponseMapper {
     ReturnTokenDto map(final ReturnToken returnToken);
 
     default ShipmentIdDto map(final ShipmentId shipmentId) {
-        return new ShipmentIdDto(shipmentId.value());
+        return new ShipmentIdDto(shipmentId.getValue());
     }
 }

@@ -14,19 +14,16 @@ import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
-import com.warehouse.shipment.domain.service.NotificationCreatorProviderImpl;
-import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
+import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.NotificationMapper;
+import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
-import com.warehouse.tracking.TrackingStatusEventPublisher;
+import com.warehouse.tracking.infrastructure.adapter.primary.api.TrackingStatusEventPublisher;
 import com.warehouse.voronoi.VoronoiService;
 
 import io.github.resilience4j.retry.RetryConfig;
@@ -47,14 +44,56 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
+	public CountryServiceAvailabilityService countryServiceAvailabilityService() {
+		return new CountryServiceAvailabilityServiceImpl();
+	}
+
+	@Bean
+	public PriceRepository priceRepository(final PriceReadRepository repository) {
+		return new PriceRepositoryImpl(repository);
+	}
+
+	@Bean
+	public RouteTrackerHistoryNotifier routeTrackerNotifier() {
+		return new RouteTrackerHistoryNotifier();
+	}
+
+	@Bean
+	public CountryDetermineServicePort countryDetermineServicePort() {
+		return new CountryDetermineServiceAdapter();
+	}
+
+	@Bean
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
-									 final MailServicePort mailServicePort,
 									 final TrackingStatusServicePort trackingStatusServicePort,
-									 final Set<ShipmentStatusHandler> shipmentStatusHandlers) {
+									 final Set<ShipmentStatusHandler> shipmentStatusHandlers,
+									 final CountryDetermineService countryDetermineService,
+									 final PriceService priceService,
+									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
+									 final SignatureService signatureService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, mailServicePort, trackingStatusServicePort, shipmentStatusHandlers);
+				notificationCreatorProvider, trackingStatusServicePort, shipmentStatusHandlers,
+				countryDetermineService, priceService, countryServiceAvailabilityService, signatureService);
+	}
+
+	@Bean
+	public SignatureService signatureService(final SignatureRepository signatureRepository,
+											 final ShipmentRepository shipmentRepository) {
+		return new SignatureServiceImpl(signatureRepository, shipmentRepository);
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
+	public SignatureRepository signatureRepository(final SignatureReadRepository repository) {
+		return new SignatureRepositoryImpl(repository);
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	public SignatureRepository signatureMockRepository() {
+		return new SignatureMockRepositoryImpl();
 	}
 
 	@Bean
@@ -140,8 +179,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentRequestValidator shipmentRequestValidator() {
-		return new ShipmentRequestValidatorImpl();
+	public ShipmentRequestValidator shipmentRequestValidator(final PriceService priceService) {
+		return new ShipmentRequestValidatorImpl(priceService);
 	}
 
 	@Bean(name = "shipment.shipmentService")
@@ -154,12 +193,6 @@ public class ShipmentConfiguration {
 	@Bean("shipment.routeTrackerLogProperties")
 	public RouteTrackerLogProperties routeTrackerLogProperties() {
 		return new RouteTrackerLogProperties();
-	}
-	
-	@Bean(name = "shipment.mailServicePort")
-	public MailServicePort mailServicePort(final MailPort mailPort) {
-		final NotificationMapper notificationMapper = Mappers.getMapper(NotificationMapper.class);
-		return new MailAdapter(mailPort, notificationMapper);
 	}
 
 	@Bean

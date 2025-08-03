@@ -9,9 +9,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.dto.DeviceIdDto;
 import com.warehouse.delivery.dto.DeviceInformationDto;
+import com.warehouse.delivery.dto.ShipmentIdDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedResponseDto;
 import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponseDetails;
 import com.warehouse.deliveryreject.dto.DeliveryRejectResponseDetailsDto;
@@ -105,6 +107,10 @@ public interface LogisticsResponseMapper {
 
     DeliveryRejectResponseDetails map(final DeliveryRejectResponseDetailsDto deliveryRejectResponseDetailsDto);
 
+    default ShipmentId map(ShipmentIdDto shipmentId) {
+        return null;
+    }
+
     default Response mapDeliveryMissedResponse(final DeliveryMissedResponseDto deliveryMissedResponse) {
         return null;
     }
@@ -131,6 +137,8 @@ public interface LogisticsResponseMapper {
 
     @Mapping(target = "processId.value", source = "processId.processId")
     @Mapping(target = "shipmentId.value", source = "shipmentId.value")
-    DeliveryReturnResponseDetails map(final DeliveryReturnResponseDetailsDto deliveryReturnResponseDetailsDto);
+    default DeliveryReturnResponseDetails map(final DeliveryReturnResponseDetailsDto deliveryReturnResponseDetailsDto) {
+        return null;
+    }
 
 }

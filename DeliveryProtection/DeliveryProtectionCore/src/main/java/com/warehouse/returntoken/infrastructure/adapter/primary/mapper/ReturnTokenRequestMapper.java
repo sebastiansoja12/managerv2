@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.returntoken.domain.model.ReturnPackageRequest;
 import com.warehouse.returntoken.domain.vo.ReturnTokenRequest;
 import com.warehouse.returntoken.domain.vo.Supplier;
 import com.warehouse.returntoken.infrastructure.adapter.primary.dto.ReturnPackageRequestDto;
 import com.warehouse.returntoken.infrastructure.adapter.primary.dto.ReturnTokenRequestDto;
+import com.warehouse.returntoken.infrastructure.adapter.primary.dto.ShipmentIdDto;
 import com.warehouse.returntoken.infrastructure.adapter.primary.dto.SupplierDto;
 
 @Mapper
@@ -25,6 +27,10 @@ public interface ReturnTokenRequestMapper {
     }
 
     ReturnPackageRequest map(final ReturnPackageRequestDto returnPackageRequestDto);
+
+    default ShipmentId map(final ShipmentIdDto shipmentId) {
+        return new ShipmentId(shipmentId.getValue());
+    }
 
     default Supplier map(final SupplierDto supplier) {
         return new Supplier(new SupplierCode(supplier.getSupplierCode().value()));

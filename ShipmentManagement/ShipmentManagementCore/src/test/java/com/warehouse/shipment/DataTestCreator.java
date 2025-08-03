@@ -1,10 +1,8 @@
 package com.warehouse.shipment;
 
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.model.Money;
+import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -57,7 +55,7 @@ public class DataTestCreator {
     }
 
     static Shipment createShipment() {
-		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, null, money(), LocalDateTime.now(),
-				LocalDateTime.now(), false, null);
+		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, ShipmentType.PARENT, null, money(), LocalDateTime.now(),
+				LocalDateTime.now(), false, Country.ALBANIA, Country.ANDORRA, "KT1", null, false, ShipmentPriority.LOW);
     }
 }

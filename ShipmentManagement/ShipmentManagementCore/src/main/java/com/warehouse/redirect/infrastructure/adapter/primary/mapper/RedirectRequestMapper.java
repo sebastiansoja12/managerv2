@@ -6,8 +6,8 @@ import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.redirect.domain.model.RedirectRequest;
 import com.warehouse.redirect.domain.vo.RedirectParcelRequest;
-import com.warehouse.redirect.infrastructure.api.dto.RedirectParcelRequestDto;
-import com.warehouse.redirect.infrastructure.api.dto.RedirectRequestDto;
+import com.warehouse.redirect.infrastructure.adapter.primary.api.RedirectParcelRequestDto;
+import com.warehouse.redirect.infrastructure.adapter.primary.api.RedirectRequestDto;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RedirectRequestMapper {

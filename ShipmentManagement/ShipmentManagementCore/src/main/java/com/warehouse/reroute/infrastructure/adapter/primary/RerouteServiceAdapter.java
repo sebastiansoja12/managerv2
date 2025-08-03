@@ -1,9 +1,9 @@
 package com.warehouse.reroute.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.reroute.RerouteService;
+import com.warehouse.reroute.infrastructure.adapter.primary.api.RerouteService;
 import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
-import com.warehouse.shipment.infrastructure.api.dto.ShipmentIdDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentIdDto;
 
 public class RerouteServiceAdapter implements RerouteService {
 

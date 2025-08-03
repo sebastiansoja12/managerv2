@@ -22,5 +22,8 @@ public interface ShipmentModelMapper {
     @Mapping(target = "recipient.city", source = "recipientCity")
     @Mapping(target = "recipient.postalCode", source = "recipientPostalCode")
     @Mapping(target = "recipient.street", source = "recipientStreet")
+    @Mapping(target = "shipmentStatus", source = "shipmentStatus")
+    @Mapping(target = "shipmentPriority", source = "shipmentPriority")
+    @Mapping(target = "dangerousGood", ignore = true)
     Shipment map(final ShipmentEntity parcel);
 }

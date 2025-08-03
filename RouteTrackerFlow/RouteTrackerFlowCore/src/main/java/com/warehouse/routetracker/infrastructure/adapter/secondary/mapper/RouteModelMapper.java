@@ -2,11 +2,13 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
@@ -33,5 +35,7 @@ public interface RouteModelMapper {
 
     @Mapping(target = "processId", source = "id")
     @Mapping(target = "shipmentId.value", source = "parcelId")
-    RouteProcess map(RouteLogRecordEntity entity);
+    default RouteProcess map(RouteLogRecordEntity entity) {
+        return new RouteProcess(new ShipmentId(entity.getParcelId()), UUID.fromString(entity.getId()));
+    }
 }
