@@ -10,14 +10,12 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.PersonType;
+import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
 import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
-import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.SignatureChangeRequest;
+import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
@@ -45,6 +43,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final CountryServiceAvailabilityService countryServiceAvailabilityService;
 
+    private final SignatureService signatureService;
+
 	public ShipmentPortImpl(final ShipmentService shipmentService,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
@@ -53,7 +53,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final Set<ShipmentStatusHandler> shipmentStatusHandlers,
                             final CountryDetermineService countryDetermineService,
                             final PriceService priceService,
-                            final CountryServiceAvailabilityService countryServiceAvailabilityService) {
+                            final CountryServiceAvailabilityService countryServiceAvailabilityService,
+                            final SignatureService signatureService) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -63,6 +64,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.countryDetermineService = countryDetermineService;
         this.priceService = priceService;
         this.countryServiceAvailabilityService = countryServiceAvailabilityService;
+        this.signatureService = signatureService;
     }
 
     @Override
@@ -197,8 +199,9 @@ public class ShipmentPortImpl implements ShipmentPort {
 	}
 
     @Override
-    public void changeShipmentSignatureTo(final SignatureChangeRequest request) {
-        // change signature in service
+    public void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod) {
+        final Signature signature = Signature.from(request, signatureMethod);
+        this.signatureService.createSignature(signature);
     }
 
     @Override

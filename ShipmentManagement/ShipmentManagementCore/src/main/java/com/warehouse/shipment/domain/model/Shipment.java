@@ -189,8 +189,8 @@ public class Shipment {
         final Country originCountry = shipmentEntity.getOriginCountry();
         final Country destinationCountry = shipmentEntity.getDestinationCountry();
         final String destination = shipmentEntity.getDestination();
-        final Signature signature = null;
-        final boolean signatureRequired = false;
+        final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
+        final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
 
         return new Shipment(

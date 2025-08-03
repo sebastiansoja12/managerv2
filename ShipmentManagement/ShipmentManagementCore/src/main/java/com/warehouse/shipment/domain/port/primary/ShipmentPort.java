@@ -1,6 +1,7 @@
 package com.warehouse.shipment.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
@@ -24,7 +25,7 @@ public interface ShipmentPort {
 
     void changeShipmentStatusTo(final ShipmentStatusRequest request);
 
-    void changeShipmentSignatureTo(final SignatureChangeRequest request);
+    void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod);
 
     void changeOriginCountryTo(final ShipmentCountryRequest request);
 

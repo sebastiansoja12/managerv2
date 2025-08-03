@@ -59,6 +59,9 @@ class ShipmentPortImplTest {
     @Mock
     private CountryServiceAvailabilityService countryServiceAvailabilityService;
 
+    @Mock
+    private SignatureService signatureService;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
@@ -80,7 +83,7 @@ class ShipmentPortImplTest {
                 new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
 				trackingStatusServicePort, shipmentStatusHandlers, countryDetermineService,
-				priceService, countryServiceAvailabilityService);
+				priceService, countryServiceAvailabilityService, signatureService);
 	}
 
     @Test

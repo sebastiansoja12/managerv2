@@ -22,10 +22,13 @@ public class ShipmentDto {
 
     private final Boolean locked;
 
+    private final SignatureDto signature;
+
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonDto sender, final PersonDto recipient,
                        final ShipmentSizeDto shipmentSize, final String destination, final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
-                       final MoneyDto price, final Boolean locked) {
+                       final MoneyDto price, final Boolean locked,
+                       final SignatureDto signature) {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -36,6 +39,7 @@ public class ShipmentDto {
         this.shipmentPriority = shipmentPriority;
 		this.price = price;
         this.locked = locked;
+        this.signature = signature;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -80,5 +84,9 @@ public class ShipmentDto {
 
     public ShipmentPriorityDto getShipmentPriority() {
         return shipmentPriority;
+    }
+
+    public SignatureDto getSignature() {
+        return signature;
     }
 }

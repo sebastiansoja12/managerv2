@@ -71,10 +71,29 @@ public class ShipmentConfiguration {
 									 final Set<ShipmentStatusHandler> shipmentStatusHandlers,
 									 final CountryDetermineService countryDetermineService,
 									 final PriceService priceService,
-									 final CountryServiceAvailabilityService countryServiceAvailabilityService) {
+									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
+									 final SignatureService signatureService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, trackingStatusServicePort, shipmentStatusHandlers,
-				countryDetermineService, priceService, countryServiceAvailabilityService);
+				countryDetermineService, priceService, countryServiceAvailabilityService, signatureService);
+	}
+
+	@Bean
+	public SignatureService signatureService(final SignatureRepository signatureRepository,
+											 final ShipmentRepository shipmentRepository) {
+		return new SignatureServiceImpl(signatureRepository, shipmentRepository);
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
+	public SignatureRepository signatureRepository(final SignatureReadRepository repository) {
+		return new SignatureRepositoryImpl(repository);
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	public SignatureRepository signatureMockRepository() {
+		return new SignatureMockRepositoryImpl();
 	}
 
 	@Bean

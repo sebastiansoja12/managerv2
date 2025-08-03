@@ -134,10 +134,14 @@ public class ShipmentEntity {
     })
     private Money price;
 
+    @OneToOne
+    @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id", insertable = false)
+    private SignatureEntity signature;
+
 	public ShipmentEntity(final ShipmentId shipmentId, final String senderFirstName, final String senderLastName,
-			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode,
+			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode, final String senderTelephone,
 			final String recipientFirstName, final String recipientLastName, final String recipientEmail,
-			final String recipientCity, final String recipientStreet, final String recipientPostalCode,
+			final String recipientCity, final String recipientStreet, final String recipientPostalCode, final String recipientTelephone,
 			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
 			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
 			final LocalDateTime updatedAt, final Boolean locked, final Country originCountry, final Country destinationCountry, 
@@ -149,12 +153,14 @@ public class ShipmentEntity {
         this.senderCity = senderCity;
         this.senderStreet = senderStreet;
         this.senderPostalCode = senderPostalCode;
+        this.senderTelephone = senderTelephone;
         this.recipientFirstName = recipientFirstName;
         this.recipientLastName = recipientLastName;
         this.recipientEmail = recipientEmail;
         this.recipientCity = recipientCity;
         this.recipientStreet = recipientStreet;
         this.recipientPostalCode = recipientPostalCode;
+        this.recipientTelephone = recipientTelephone;
         this.shipmentSize = shipmentSize;
         this.destination = destination;
         this.shipmentStatus = shipmentStatus;
@@ -178,16 +184,18 @@ public class ShipmentEntity {
         final String senderCity = shipment.getSender().getCity();
         final String senderStreet = shipment.getSender().getStreet();
         final String senderPostalCode = shipment.getSender().getPostalCode();
+        final String senderTelephoneNumber = shipment.getSender().getTelephoneNumber();
         final String recipientFirstName = shipment.getRecipient().getFirstName();
         final String recipientLastName = shipment.getRecipient().getLastName();
         final String recipientEmail = shipment.getRecipient().getEmail();
         final String recipientCity = shipment.getRecipient().getCity();
         final String recipientStreet = shipment.getRecipient().getStreet();
         final String recipientPostalCode = shipment.getRecipient().getPostalCode();
+        final String recipientTelephoneNumber = shipment.getRecipient().getTelephoneNumber();
         return new ShipmentEntity(shipment.getShipmentId(), senderFirstName, senderLastName,
-                senderEmail, senderCity, senderStreet, senderPostalCode,
+                senderEmail, senderCity, senderStreet, senderPostalCode, senderTelephoneNumber,
                 recipientFirstName, recipientLastName, recipientEmail, recipientCity, recipientStreet,
-                recipientPostalCode, shipment.getShipmentSize(), shipment.getDestination(), 
+                recipientPostalCode, recipientTelephoneNumber, shipment.getShipmentSize(), shipment.getDestination(),
                 shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
                 shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
 				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),

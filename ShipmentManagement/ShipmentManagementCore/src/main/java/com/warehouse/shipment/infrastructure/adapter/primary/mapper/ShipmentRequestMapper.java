@@ -45,5 +45,9 @@ public interface ShipmentRequestMapper {
 
     ShipmentStatusRequest map(final ShipmentStatusRequestDto shipmentStatusRequest);
 
-    SignatureChangeRequest map(final SignatureChangeRequestDto signatureChangeRequest);
+    default SignatureChangeRequest map(final SignatureChangeRequestDto signatureChangeRequest) {
+        final ShipmentId shipmentId = new ShipmentId(signatureChangeRequest.shipmentId().getValue());
+        return new SignatureChangeRequest(shipmentId, signatureChangeRequest.signature(), signatureChangeRequest.signerName(),
+                signatureChangeRequest.documentReference());
+    }
 }

@@ -10,6 +10,7 @@ import com.warehouse.shipment.domain.service.PriceService;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.ShipmentValidationException;
+import com.warehouse.shipment.infrastructure.adapter.primary.exception.SignatureValidationException;
 
 public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
@@ -112,7 +113,12 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
     @Override
     public void validateBody(final SignatureChangeRequestDto signatureChangeRequest) {
+        final List<String> errors = new ArrayList<>();
+        errors.addAll(validateSignature(signatureChangeRequest.signature()));
 
+        if (!errors.isEmpty()) {
+            throw new SignatureValidationException(errors, HttpStatus.BAD_REQUEST);
+        }
     }
 
     private void validateShipmentStatus(final ShipmentSizeDto shipmentSize, final List<String> errors) {
@@ -133,5 +139,15 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
         if (Objects.isNull(shipmentId.getValue())) {
             throw new EmptyRequestException("Value cannot be null");
         }
+    }
+
+    private static List<String> validateSignature(final String signature) {
+        final List<String> errors = new ArrayList<>();
+
+        if (StringUtils.isEmpty(signature)) {
+            errors.add("Signature cannot be empty");
+        }
+
+        return errors.isEmpty() ? Collections.emptyList() : errors;
     }
 }
