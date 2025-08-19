@@ -44,8 +44,13 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public CountryServiceAvailabilityService countryServiceAvailabilityService() {
-		return new CountryServiceAvailabilityServiceImpl();
+	public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
+		return new DepartmentRepositoryImpl(repository);
+	}
+
+	@Bean
+	public CountryServiceAvailabilityService countryServiceAvailabilityService(final DepartmentRepository departmentRepository) {
+		return new CountryServiceAvailabilityServiceImpl(departmentRepository);
 	}
 
 	@Bean

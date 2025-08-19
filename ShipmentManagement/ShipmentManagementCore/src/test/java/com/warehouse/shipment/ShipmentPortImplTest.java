@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.util.Set;
 import java.util.UUID;
 
+import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

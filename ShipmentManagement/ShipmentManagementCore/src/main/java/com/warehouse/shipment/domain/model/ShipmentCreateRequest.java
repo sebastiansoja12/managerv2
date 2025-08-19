@@ -1,10 +1,11 @@
-package com.warehouse.shipment.domain.vo;
+package com.warehouse.shipment.domain.model;
 
 import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.DangerousGood;
+import com.warehouse.shipment.domain.vo.Recipient;
+import com.warehouse.shipment.domain.vo.Sender;
 
 
 public class ShipmentCreateRequest {

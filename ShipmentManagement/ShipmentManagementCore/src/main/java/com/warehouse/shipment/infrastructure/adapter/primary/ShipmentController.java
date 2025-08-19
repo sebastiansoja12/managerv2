@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
+import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

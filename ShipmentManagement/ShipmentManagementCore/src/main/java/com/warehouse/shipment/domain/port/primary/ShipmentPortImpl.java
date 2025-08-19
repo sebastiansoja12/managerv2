@@ -71,15 +71,23 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Transactional
     public Result<ShipmentCreateResponse, ShipmentErrorCode> ship(final ShipmentCreateRequest request) {
 
+        final Country originCountry = request.getOriginCountry();
+
+        final Country destinationCountry = request.getDestinationCountry();
+
+        final boolean originCountryAvailable = countryServiceAvailabilityService.isCountryAvailable(originCountry);
+
+        final boolean destinationCountryAvailable = countryServiceAvailabilityService.isCountryAvailable(destinationCountry);
+
+        if (!originCountryAvailable || !destinationCountryAvailable) {
+            return Result.failure(ShipmentErrorCode.SHIPMENT_201);
+        }
+
         final Address recipientAddress = Address.from(request.getSender());
         
         final Sender sender = request.getSender();
         
         final Recipient recipient = request.getRecipient();
-        
-        final Country originCountry = request.getOriginCountry();
-
-        final Country destinationCountry = request.getDestinationCountry();
 
 		final Result<VoronoiResponse, ShipmentErrorCode> voronoiResponse = this.pathFinderServicePort
 				.determineDeliveryDepartment(recipientAddress);

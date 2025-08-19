@@ -6,6 +6,7 @@ import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.*;
 

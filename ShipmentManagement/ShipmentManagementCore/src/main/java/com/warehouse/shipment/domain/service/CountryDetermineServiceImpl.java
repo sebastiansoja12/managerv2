@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.service;
 
 import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import com.warehouse.shipment.domain.vo.*;
 import org.springframework.stereotype.Service;
 
