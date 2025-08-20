@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -59,7 +59,7 @@ public class ShipmentController {
     public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestDto shipmentRequest) {
         shipmentRequestValidator.validateBody(shipmentRequest);
         final ShipmentCreateRequest request = requestMapper.map(shipmentRequest);
-        final Result<ShipmentCreateResponse, ShipmentErrorCode> result = shipmentPort.ship(request);
+        final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
 
         final ResponseEntity<?> response;
         if (result.isSuccess()) {
@@ -69,7 +69,7 @@ public class ShipmentController {
         } else {
             response = ResponseEntity
                     .badRequest()
-                    .body(result.getFailure());
+                    .body(result.getFailure().getMessage());
         }
         return response;
     }
@@ -89,7 +89,7 @@ public class ShipmentController {
     public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestDto shipmentUpdateRequest) {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
-        final Result<Void, ShipmentErrorCode> result = shipmentPort.update(request);
+        final Result<Void, ErrorCode> result = shipmentPort.update(request);
 
         final ResponseEntity<?> response;
         if (result.isSuccess()) {
@@ -109,7 +109,7 @@ public class ShipmentController {
         dangerousGoodValidator.validateDangerousGood(dangerousGoodCreateRequest);
 
         final DangerousGoodCreateRequest request = DangerousGoodCreateRequest.from(dangerousGoodCreateRequest);
-        final Result<Void, ShipmentErrorCode> result = shipmentPort.addDangerousGood(shipmentId, request);
+        final Result<Void, ErrorCode> result = shipmentPort.addDangerousGood(shipmentId, request);
 
         final ResponseEntity<?> response;
         if (result.isSuccess()) {

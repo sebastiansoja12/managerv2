@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import jakarta.persistence.*;
 
@@ -37,13 +38,17 @@ public class DepartmentEntity {
 
     @Column(name = "active", nullable = false)
     private Boolean active;
+
+    @Column(name = "country_code", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CountryCode countryCode;
     
     public DepartmentEntity() {
     }
 
 	public DepartmentEntity(final Boolean active, final String city, final Country country,
 			final DepartmentCode departmentCode, final String nip, final String openingHours, final String postalCode,
-			final String street, final String telephoneNumber) {
+			final String street, final String telephoneNumber, final CountryCode countryCode) {
         this.active = active;
         this.city = city;
         this.country = country;
@@ -53,6 +58,7 @@ public class DepartmentEntity {
         this.postalCode = postalCode;
         this.street = street;
         this.telephoneNumber = telephoneNumber;
+        this.countryCode = countryCode;
     }
 
     public Boolean isActive() {
@@ -89,5 +95,9 @@ public class DepartmentEntity {
 
     public String getTelephoneNumber() {
         return telephoneNumber;
+    }
+
+    public CountryCode getCountryCode() {
+        return countryCode;
     }
 }

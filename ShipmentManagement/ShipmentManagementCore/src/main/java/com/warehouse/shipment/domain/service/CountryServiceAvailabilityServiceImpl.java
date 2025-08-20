@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.domain.port.secondary.DepartmentRepository;
 
 public class CountryServiceAvailabilityServiceImpl implements CountryServiceAvailabilityService {
@@ -12,7 +12,7 @@ public class CountryServiceAvailabilityServiceImpl implements CountryServiceAvai
     }
 
     @Override
-    public boolean isCountryAvailable(final Country country) {
-        return departmentRepository.existsAnyByCountry(country);
+    public boolean isCountryAvailable(final CountryCode countryCode) {
+        return departmentRepository.existsAnyByCountryCode(countryCode);
     }
 }

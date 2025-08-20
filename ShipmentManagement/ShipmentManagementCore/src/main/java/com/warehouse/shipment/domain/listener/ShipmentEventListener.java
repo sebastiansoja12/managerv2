@@ -5,7 +5,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.RouteProcess;
@@ -30,7 +30,7 @@ public class ShipmentEventListener {
     @EventListener
     public void handle(final ShipmentCreatedEvent event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
-		final Result<RouteProcess, ShipmentErrorCode> routeProcess = this.shipmentService
+		final Result<RouteProcess, ErrorCode> routeProcess = this.shipmentService
 				.notifyShipmentCreated(snapshot.shipmentId());
 		this.routeTrackerHistoryNotifier.notifyShipmentRoute(new ShipmentHistoryTracker(snapshot.shipmentId(),
 				snapshot.shipmentStatus(), routeProcess.isFailure() ? routeProcess.getFailure().getMessage() : null,

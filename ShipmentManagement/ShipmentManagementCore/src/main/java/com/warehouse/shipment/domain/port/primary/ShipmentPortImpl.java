@@ -4,14 +4,11 @@ import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.warehouse.commonassets.enumeration.Country;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.helper.Result;
@@ -69,18 +66,20 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     @Transactional
-    public Result<ShipmentCreateResponse, ShipmentErrorCode> ship(final ShipmentCreateRequest request) {
+    public Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateRequest request) {
 
-        final Country originCountry = request.getOriginCountry();
+        final CountryCode issuerCountryCode = request.getIssuerCountryCode();
 
-        final Country destinationCountry = request.getDestinationCountry();
+        final CountryCode receiverCountryCode = request.getReceiverCountryCode();
 
-        final boolean originCountryAvailable = countryServiceAvailabilityService.isCountryAvailable(originCountry);
+        final boolean originCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(issuerCountryCode);
 
-        final boolean destinationCountryAvailable = countryServiceAvailabilityService.isCountryAvailable(destinationCountry);
+        final boolean destinationCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(receiverCountryCode);
 
-        if (!originCountryAvailable || !destinationCountryAvailable) {
-            return Result.failure(ShipmentErrorCode.SHIPMENT_201);
+        if (!originCountryAvailable) {
+            return Result.failure(ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
+        } else if (!destinationCountryAvailable) {
+            return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
         }
 
         final Address recipientAddress = Address.from(request.getSender());
@@ -89,7 +88,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         
         final Recipient recipient = request.getRecipient();
 
-		final Result<VoronoiResponse, ShipmentErrorCode> voronoiResponse = this.pathFinderServicePort
+		final Result<VoronoiResponse, ErrorCode> voronoiResponse = this.pathFinderServicePort
 				.determineDeliveryDepartment(recipientAddress);
         
         if (voronoiResponse.isFailure()) {
@@ -100,8 +99,12 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
+        final Country issuerCountry = this.countryDetermineService.determineCountryByCode(issuerCountryCode);
+
+        final Country receiverCountry = this.countryDetermineService.determineCountryByCode(receiverCountryCode);
+
 		final Shipment shipment = new Shipment(shipmentId, sender, recipient, request.getShipmentSize(), null,
-				originCountry, destinationCountry, shipmentPrice.getMoney(), false,
+                issuerCountry, receiverCountry, shipmentPrice.getMoney(), false,
 				voronoiResponse.getSuccess().getValue(), null, request.getShipmentPriority());
 
         this.shipmentService.createShipment(shipment);
@@ -118,7 +121,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     @Transactional
-    public Result<Void, ShipmentErrorCode> update(final ShipmentUpdateRequest request) {
+    public Result<Void, ErrorCode> update(final ShipmentUpdateRequest request) {
 
         final Shipment shipment = Shipment.from(request);
 
@@ -142,16 +145,16 @@ public class ShipmentPortImpl implements ShipmentPort {
             }
 
             default -> {
-                return Result.failure(ShipmentErrorCode.SHIPMENT_202);
+                return Result.failure(ErrorCode.SHIPMENT_202);
             }
         }
         return Result.success();
     }
 
     @Override
-    public Result<Void, ShipmentErrorCode> addDangerousGood(final ShipmentId shipmentId, final DangerousGoodCreateRequest request) {
+    public Result<Void, ErrorCode> addDangerousGood(final ShipmentId shipmentId, final DangerousGoodCreateRequest request) {
         if (!existsShipment(shipmentId)) {
-            return Result.failure(ShipmentErrorCode.SHIPMENT_202);
+            return Result.failure(ErrorCode.SHIPMENT_202);
         }
 
         final DangerousGood dangerousGood = DangerousGood.from(request);

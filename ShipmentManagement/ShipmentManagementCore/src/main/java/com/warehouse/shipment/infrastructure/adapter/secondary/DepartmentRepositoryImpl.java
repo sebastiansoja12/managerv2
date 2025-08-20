@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.domain.port.secondary.DepartmentRepository;
 
 public class DepartmentRepositoryImpl implements DepartmentRepository {
@@ -11,8 +11,9 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
         this.repository = repository;
     }
 
+
     @Override
-    public boolean existsAnyByCountry(final Country country) {
-        return repository.existsAnyByCountry(country);
+    public boolean existsAnyByCountryCode(final CountryCode countryCode) {
+        return repository.existsAnyByCountryCode(countryCode);
     }
 }

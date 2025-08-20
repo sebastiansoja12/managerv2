@@ -11,5 +11,6 @@
            telephone_number="123"
            opening_hours="8-22"
            active="true"
+           country_code="PL"
     />
 </dataset>

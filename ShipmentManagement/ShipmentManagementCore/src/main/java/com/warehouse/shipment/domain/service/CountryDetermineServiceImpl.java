@@ -1,8 +1,10 @@
 package com.warehouse.shipment.domain.service;
 
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
+import com.warehouse.shipment.domain.port.secondary.CountryRepository;
 import com.warehouse.shipment.domain.vo.*;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +18,13 @@ public class CountryDetermineServiceImpl implements CountryDetermineService {
 
     private final CountryDetermineServicePort countryDetermineServicePort;
 
-    public CountryDetermineServiceImpl(final CountryDetermineServicePort countryDetermineServicePort) {
-        this.countryDetermineServicePort = countryDetermineServicePort;
-    }
+    private final CountryRepository countryRepository;
 
+    public CountryDetermineServiceImpl(final CountryDetermineServicePort countryDetermineServicePort,
+                                       final CountryRepository countryRepository) {
+        this.countryDetermineServicePort = countryDetermineServicePort;
+        this.countryRepository = countryRepository;
+    }
 
     public CountryDetermine determineCountry(final Shipment shipment) {
         final Country originCountry = shipment.getOriginCountry();
@@ -34,9 +39,14 @@ public class CountryDetermineServiceImpl implements CountryDetermineService {
     }
 
     @Override
-    public Result<CountryDetermine, ShipmentErrorCode> determineCountry(final ShipmentCreateRequest request) {
+    public Result<CountryDetermine, ErrorCode> determineCountry(final ShipmentCreateRequest request) {
         final LocationInfo locationInfo = LocationInfo.from(request.getSender(), request.getRecipient());
         final ShipmentCountry shipmentCountry = countryDetermineServicePort.determineCountry(locationInfo);
         return Result.success();
+    }
+
+    @Override
+    public Country determineCountryByCode(final CountryCode countryCode) {
+        return countryRepository.getCountryNameByCode(countryCode);
     }
 }

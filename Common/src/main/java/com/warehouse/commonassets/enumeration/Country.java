@@ -1,5 +1,8 @@
 package com.warehouse.commonassets.enumeration;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public enum Country {
     ALBANIA,
     ANDORRA,
@@ -51,7 +54,8 @@ public enum Country {
     TURKEY,
     UKRAINE,
     UNITED_KINGDOM,
-    VATICAN_CITY;
+    VATICAN_CITY,
+    UNDEFINED;
 
     public String getCountryName() {
         return this.name().replace("_", " ");

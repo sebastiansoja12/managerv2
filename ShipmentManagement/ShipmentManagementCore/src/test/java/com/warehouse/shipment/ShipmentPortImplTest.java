@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 import java.util.Set;
 import java.util.UUID;
 
-import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +19,11 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.*;
@@ -63,6 +63,9 @@ class ShipmentPortImplTest {
     @Mock
     private SignatureService signatureService;
 
+    @Mock
+    private CountryRepository countryRepository;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
@@ -75,7 +78,7 @@ class ShipmentPortImplTest {
     void setUp() {
         final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository, routeLogServicePort,
                 softwareConfigurationServicePort);
-        final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort);
+        final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort, countryRepository);
         final PriceService priceService = new PriceServiceImpl(priceRepository);
         final Logger logger = mock(Logger.class);
         shipmentStatusHandlers = Sets.newHashSet(Sets.newHashSet(
@@ -106,7 +109,7 @@ class ShipmentPortImplTest {
 
         when(routeLogServicePort.notifyShipmentCreated(any(), any())).thenReturn(routeProcess);
         // when
-        final Result<ShipmentCreateResponse, ShipmentErrorCode> response = shipmentPort.ship(request);
+        final Result<ShipmentCreateResponse, ErrorCode> response = shipmentPort.ship(request);
         // then
         assertEquals(response, expectedToBeEqualTo(response));
     }

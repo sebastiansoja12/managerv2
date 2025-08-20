@@ -1,6 +1,6 @@
 package com.warehouse.shipment.domain.model;
 
-import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.model.Money;
@@ -20,9 +20,9 @@ public class ShipmentCreateRequest {
 	
 	private DangerousGood dangerousGood;
 
-	private Country originCountry;
+	private CountryCode issuerCountryCode;
 
-	private Country destinationCountry;
+	private CountryCode receiverCountryCode;
 
 	private ShipmentPriority shipmentPriority;
 
@@ -35,16 +35,16 @@ public class ShipmentCreateRequest {
                                  final Recipient recipient,
                                  final Sender sender,
                                  final ShipmentSize shipmentSize,
-								 final Country originCountry,
-                                 final Country destinationCountry,
+								 final CountryCode issuerCountryCode,
+                                 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority) {
 		this.dangerousGood = dangerousGood;
 		this.price = price;
 		this.recipient = recipient;
 		this.sender = sender;
 		this.shipmentSize = shipmentSize;
-        this.originCountry = originCountry;
-        this.destinationCountry = destinationCountry;
+        this.issuerCountryCode = issuerCountryCode;
+        this.receiverCountryCode = receiverCountryCode;
 		this.shipmentPriority = shipmentPriority;
     }
 
@@ -88,20 +88,20 @@ public class ShipmentCreateRequest {
 		this.shipmentSize = shipmentSize;
 	}
 
-	public Country getOriginCountry() {
-		return originCountry;
+	public CountryCode getIssuerCountryCode() {
+		return issuerCountryCode;
 	}
 
-	public void setOriginCountry(final Country originCountry) {
-		this.originCountry = originCountry;
+	public void setIssuerCountryCode(final CountryCode issuerCountryCode) {
+		this.issuerCountryCode = issuerCountryCode;
 	}
 
-	public Country getDestinationCountry() {
-		return destinationCountry;
+	public CountryCode getReceiverCountryCode() {
+		return receiverCountryCode;
 	}
 
-	public void setDestinationCountry(final Country destinationCountry) {
-		this.destinationCountry = destinationCountry;
+	public void setReceiverCountryCode(final CountryCode receiverCountryCode) {
+		this.receiverCountryCode = receiverCountryCode;
 	}
 
 	public boolean isDangerousGood() {

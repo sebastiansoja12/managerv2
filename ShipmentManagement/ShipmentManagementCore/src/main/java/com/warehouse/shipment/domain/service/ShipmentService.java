@@ -2,7 +2,7 @@ package com.warehouse.shipment.domain.service;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -58,7 +58,7 @@ public interface ShipmentService {
 
     boolean existsShipment(final ShipmentId shipmentId);
 
-    Result<RouteProcess, ShipmentErrorCode> notifyShipmentCreated(final ShipmentId shipmentId);
+    Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId);
 
     ShipmentId nextShipmentId();
 
