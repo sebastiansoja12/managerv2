@@ -82,6 +82,12 @@ public class ShipmentConfiguration {
 				notificationCreatorProvider, trackingStatusServicePort, shipmentStatusHandlers,
 				countryDetermineService, priceService, countryServiceAvailabilityService, signatureService);
 	}
+	
+	@Bean
+	public RouteTrackerService routeTrackerService(final RouteLogServicePort routeLogServicePort,
+			final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
+		return new RouteTrackerServiceImpl(routeLogServicePort, softwareConfigurationServicePort);
+	}
 
 	@Bean
 	public CountryRepository countryRepository(final CountryReadRepository repository) {

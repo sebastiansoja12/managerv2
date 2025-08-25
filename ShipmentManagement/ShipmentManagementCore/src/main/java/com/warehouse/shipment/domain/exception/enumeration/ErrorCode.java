@@ -11,7 +11,8 @@ public enum ErrorCode {
     SHIPMENT_204(404, "Shipment not found in request"),
 
     ORIGIN_DEPARTMENT_NOT_AVAILABLE(400, "Origin department is not available"),
-    DESTINATION_DEPARTMENT_NOT_AVAILABLE(400, "Destination department is not available");
+    DESTINATION_DEPARTMENT_NOT_AVAILABLE(400, "Destination department is not available"),
+    ROUTE_TRACKER_SERVICE_NOT_AVAILABLE(400, "Route tracker service is not available");
 
     private final int code;
 

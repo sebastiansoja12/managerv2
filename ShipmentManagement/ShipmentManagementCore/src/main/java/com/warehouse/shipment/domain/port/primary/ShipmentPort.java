@@ -22,7 +22,7 @@ public interface ShipmentPort {
 
     void changePersonTo(final Person person, final ShipmentId shipmentId);
 
-    void changeShipmentTypeTo(final ShipmentCreateRequest request);
+    void changeShipmentTypeTo(final ChangeShipmentTypeRequest request);
 
     void changeShipmentStatusTo(final ShipmentStatusRequest request);
 

@@ -36,7 +36,7 @@ public class DeliveryReturnResponseDetails {
     }
 
     public static DeliveryReturnResponseDetails from(final DeliveryReturn deliveryReturn, final UpdateStatus updateStatus) {
-        final ProcessId id = deliveryReturn.getProcessId() == null ? null : new ProcessId(deliveryReturn.getProcessId().toString());
+        final ProcessId id = deliveryReturn.getProcessId() == null ? null : new ProcessId(deliveryReturn.getProcessId());
         final ShipmentId shipmentIdentificator = new ShipmentId(deliveryReturn.getShipmentId());
         final DeliveryStatus status = DeliveryStatus.valueOf(deliveryReturn.getDeliveryStatus());
         final ReturnToken token = new ReturnToken(deliveryReturn.getToken());

@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import org.springframework.data.repository.query.Param;
@@ -159,6 +160,16 @@ public class ShipmentController {
                                           @RequestParam("personType") final PersonType personType) {
         final Person person = personType == PersonType.SENDER ? Sender.from(personRequest) : Recipient.from(personRequest);
         this.shipmentPort.changePersonTo(person, new ShipmentId(shipmentId.getValue()));
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
+    }
+    
+    @PutMapping("/shipment-type")
+    @Counted(value = "controller.shipment.type.update")
+    @Timed(value = "controller.shipment.type.update")
+	public ResponseEntity<?> changeShipmentType(@RequestParam("shipmentType") final ShipmentType shipmentType,
+                                                @RequestParam("shipmentId") @PathVariable final String shipmentId) {
+        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(new ShipmentId(Long.parseLong(shipmentId)), shipmentType);
+        this.shipmentPort.changeShipmentTypeTo(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 

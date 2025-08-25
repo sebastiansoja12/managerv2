@@ -50,7 +50,7 @@ public interface RouteLogToEntityMapper {
         if (ObjectUtils.isNotEmpty(id)) {
             return UserEntity.builder()
                     .id(id)
-                    .username(routeLogRecord.getUsername())
+                    .username("s-soja")
                     .build();
         }
         return null;

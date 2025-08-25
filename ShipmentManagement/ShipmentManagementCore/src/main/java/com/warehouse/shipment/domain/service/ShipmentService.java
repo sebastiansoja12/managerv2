@@ -2,13 +2,10 @@ package com.warehouse.shipment.domain.service;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
-import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 
@@ -22,7 +19,7 @@ public interface ShipmentService {
 
     void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient);
 
-    void changeShipmentTypeTo(final ShipmentId shipmentId, final ShipmentType shipmentType);
+    void changeShipmentTypeTo(final ShipmentId shipmentId, final ShipmentType shipmentType, final ShipmentId relatedShipmentId);
 
     void changeShipmentStatusTo(final ShipmentId shipmentId, final ShipmentStatus shipmentStatus);
 
@@ -57,8 +54,6 @@ public interface ShipmentService {
     Shipment find(final ShipmentId shipmentId);
 
     boolean existsShipment(final ShipmentId shipmentId);
-
-    Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId);
 
     ShipmentId nextShipmentId();
 

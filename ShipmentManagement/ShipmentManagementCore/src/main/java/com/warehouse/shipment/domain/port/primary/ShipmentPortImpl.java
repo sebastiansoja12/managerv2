@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
@@ -191,11 +192,28 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeShipmentTypeTo(final ShipmentCreateRequest request) {
-        final Shipment shipment = Shipment.from(request);
-        final ShipmentType shipmentType = shipment.getShipmentType();
-        final ShipmentId shipmentId = shipment.getShipmentId();
-        this.shipmentService.changeShipmentTypeTo(shipmentId, shipmentType);
+    public void changeShipmentTypeTo(final ChangeShipmentTypeRequest request) {
+        final Shipment shipment = this.shipmentService.find(request.shipmentId());
+        if (shipment.getShipmentType() == request.shipmentType()) {
+            throw new RestException(400, "Cannot override shipment type");
+        }
+
+        final Shipment newShipment;
+        if (shipment.getShipmentType().equals(ShipmentType.CHILD)) {
+            newShipment = Shipment.createNewParent(shipment, ShipmentType.PARENT, this.shipmentService.nextShipmentId());
+            this.shipmentService.createShipment(newShipment);
+            shipment.changeShipmentRelatedId(newShipment.getShipmentId());
+            this.shipmentService.createShipment(shipment);
+        } else {
+            newShipment = Shipment.createNewChild(shipment, ShipmentType.CHILD, this.shipmentService.nextShipmentId(), shipment.getShipmentId());
+            this.shipmentService.createShipment(newShipment);
+            shipment.changeShipmentRelatedId(newShipment.getShipmentId());
+            this.shipmentService.createShipment(shipment);
+            this.shipmentService.changeShipmentTypeTo(request.shipmentId(), request.shipmentType(), newShipment.getShipmentId());
+        }
+        final ShipmentType shipmentType = request.shipmentType();
+        final ShipmentId shipmentId = request.shipmentId();
+        //this.shipmentService.changeShipmentTypeTo(shipmentId, shipmentType);
     }
 
 	@Override

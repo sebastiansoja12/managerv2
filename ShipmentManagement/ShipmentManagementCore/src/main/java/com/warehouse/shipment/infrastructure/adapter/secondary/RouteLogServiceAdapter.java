@@ -1,15 +1,21 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
+import java.net.URI;
 import java.util.function.Supplier;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.shipment.domain.vo.Person;
+import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
+import com.warehouse.shipment.infrastructure.adapter.secondary.api.PersonChangedRequest;
+import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteLogRecord;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteProcessDto;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.ShipmentCreatedRequest;
 
@@ -42,7 +48,7 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
     @Override
 	public RouteProcess notifyShipmentCreated(final ShipmentId shipmentId,
                                               final SoftwareConfiguration softwareConfiguration) {
-        final RestClient restClient = RestClient.builder().baseUrl(softwareConfiguration.getUrl()).build();
+        final RestClient restClient = buildRestClient(softwareConfiguration);
         final Supplier<ResponseEntity<RouteProcessDto>> retryableSupplier = Retry
                 .decorateSupplier(retry, () -> sendRouteProcessRequest(restClient, 
                         shipmentId, softwareConfiguration.getValue()));
@@ -57,6 +63,39 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
         log.info("Successfully registered route {} for shipment {}", process.getBody().getProcessId(),
                 shipmentId.getValue());
 
-        return RouteProcess.from(shipmentId, process.getBody().getProcessId());
+        return RouteProcess.from(shipmentId, new ProcessId(process.getBody().getProcessId()), "", "");
+    }
+
+    @Override
+	public RouteProcess notifyRecipientChanged(final ShipmentId shipmentId, final Recipient recipient,
+			final SoftwareConfiguration softwareConfiguration) {
+        return null;
+    }
+
+    @Override
+	public RouteProcess notifyPersonChanged(final ShipmentId shipmentId, final Person person,
+			final SoftwareConfiguration softwareConfiguration) {
+        final PersonChangedRequest request = new PersonChangedRequest(shipmentId, person);
+
+        final RestClient restClient = buildRestClient(softwareConfiguration);
+
+        final ResponseEntity<RouteLogRecord> responseEntity = restClient
+                .put()
+                .uri(URI.create(
+                        softwareConfiguration.getValue()
+                                + "/persons?personType=" + person.getType().name()
+                ))
+                .body(request)
+                .header("X-API-KEY", softwareConfiguration.getApiKey())
+                .retrieve()
+                .toEntity(RouteLogRecord.class);
+
+        return RouteProcess.from(responseEntity, shipmentId);
+    }
+
+    private RestClient buildRestClient(final SoftwareConfiguration softwareConfiguration) {
+        return RestClient.builder()
+                .baseUrl(softwareConfiguration.getUrl() + "/persons")
+                .build();
     }
 }

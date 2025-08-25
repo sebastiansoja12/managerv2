@@ -26,6 +26,9 @@ public interface ShipmentResponseMapper {
     ShipmentDto map(final Shipment shipment);
 
     default SignatureDto map(final Signature signature) {
+        if (signature == null) {
+            return null;
+        }
         return new SignatureDto(signature.getSignerName(), signature.getSignedAt(), signature.getSignatureMethod().name(),
                 map(signature.getSignature()));
     }

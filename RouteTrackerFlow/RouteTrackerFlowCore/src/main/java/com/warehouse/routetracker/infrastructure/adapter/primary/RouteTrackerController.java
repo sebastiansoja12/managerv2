@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.configuration.common.RestException;
+import com.warehouse.routetracker.domain.helper.Result;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
+import com.warehouse.routetracker.domain.model.Person;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.vo.*;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.PersonChangeRequest;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentCreatedRequest;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn.DeliveryReturnRequestDto;
@@ -137,6 +140,21 @@ public class RouteTrackerController {
         final ShipmentId shipmentId = new ShipmentId(parcelId);
         final RouteLogRecord routeLogRecord = trackerLogPort.find(shipmentId);
         return new ResponseEntity<>(responseMapper.map(routeLogRecord), HttpStatus.OK);
+    }
+
+    @PutMapping("/shipments/persons")
+    public ResponseEntity<?> updatePerson(@RequestBody final PersonChangeRequest request,
+                                          @RequestParam("personType") final String personType) {
+        final Result<RouteLogRecord, Exception> result =
+				this.trackerLogPort.changePerson(request.shipmentId(),
+						Person.from(request, Person.PersonType.valueOf(personType)));
+        if (result.isFailure()) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new RouteLogRecordDto(null, new ShipmentIdDto(request.shipmentId().getValue()), null,
+                            new ReturnCodeDto(HttpStatus.NOT_FOUND.toString()), new FaultDescriptionDto(result.getFailure().getMessage())
+            ));
+        }
+        return ResponseEntity.ok(responseMapper.map(result.getSuccess()));
     }
 
     @ExceptionHandler(RestException.class)

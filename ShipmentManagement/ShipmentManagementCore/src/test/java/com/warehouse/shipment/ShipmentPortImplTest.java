@@ -16,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
@@ -96,7 +98,7 @@ class ShipmentPortImplTest {
         final ShipmentId shipmentId = shipmentId();
         final ShipmentCreateRequest request = new ShipmentCreateRequest();
         final VoronoiResponse voronoiResponse = new VoronoiResponse("KT1");
-        final RouteProcess routeProcess = new RouteProcess(shipmentId, processId);
+        final RouteProcess routeProcess = new RouteProcess(shipmentId, new ProcessId(processId), "", "");
         final SoftwareConfiguration softwareConfiguration = new SoftwareConfiguration("id", "url");
 
         doReturn(voronoiResponse)
@@ -193,7 +195,7 @@ class ShipmentPortImplTest {
         // given
         final ShipmentId shipmentId = shipmentId();
         final Shipment shipment = mock(Shipment.class);
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
+        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(shipmentId, ShipmentType.PARENT);
         doReturn(shipment)
                 .when(shipmentRepository)
                 .findById(shipmentId);
@@ -325,7 +327,7 @@ class ShipmentPortImplTest {
     void shouldNotChangeShipmentTypeToWhenShipmentWasNotFound() {
         // given
         final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
+        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(shipmentId, ShipmentType.PARENT);
         doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
                 .when(shipmentRepository)
                 .findById(shipmentId);

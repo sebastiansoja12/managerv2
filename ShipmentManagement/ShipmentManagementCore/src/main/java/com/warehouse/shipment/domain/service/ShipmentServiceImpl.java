@@ -4,15 +4,15 @@ import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
-import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.Recipient;
+import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 
 public class ShipmentServiceImpl implements ShipmentService {
 
@@ -53,21 +53,6 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId) {
-        final Result<RouteProcess, ErrorCode> result;
-		final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
-        final RouteProcess routeProcess = this.routeLogServicePort.notifyShipmentCreated(shipmentId, softwareConfiguration);
-
-        if (routeProcess != null) {
-            result = Result.success(routeProcess);
-        } else {
-            result = Result.failure(ErrorCode.SHIPMENT_202);
-        }
-
-        return result;
-    }
-
-    @Override
     public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeSender(sender);
@@ -82,9 +67,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void changeShipmentTypeTo(final ShipmentId shipmentId, final ShipmentType shipmentType) {
+    public void changeShipmentTypeTo(final ShipmentId shipmentId, final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.changeShipmentType(shipmentType);
+        if (relatedShipmentId == null) {
+            shipment.changeShipmentType(shipmentType);
+        } else {
+            shipment.changeShipmentTypeWithRelatedId(shipmentType, relatedShipmentId);
+        }
         this.shipmentRepository.createOrUpdate(shipment);
     }
 
