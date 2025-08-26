@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.port.primary;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -249,6 +250,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public void changeShipmentCountries(final ShipmentCountryRequest request) {
+        validateShipmentNotInStatus(request.shipmentId());
         final boolean issuerCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(request.issuerCountry());
         final boolean receiverCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(request.receiverCountry());
 
@@ -275,6 +277,21 @@ public class ShipmentPortImpl implements ShipmentPort {
     private void logCreatedShipment(final Shipment shipment) {
         logger.info("Shipment {} has been created at {} with priority {}", shipment.getShipmentId().getValue(), shipment.getCreatedAt(),
                 shipment.getShipmentPriority());
+    }
+
+    private void validateShipmentNotInStatus(final ShipmentId shipmentId) {
+		final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT, ShipmentStatus.REROUTE,
+				ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
+        final Shipment shipment = loadShipment(shipmentId);
+        if (shipmentStatuses.contains(shipment.getShipmentStatus())) {
+            throw new RestException(400, "Cannot modify shipment issuer or receiver country");
+        }
+        if (shipment.getShipmentRelatedId() != null) {
+            final Shipment relatedShipment = loadShipment(shipment.getShipmentRelatedId());
+            if (shipmentStatuses.contains(relatedShipment.getShipmentStatus())) {
+                throw new RestException(400, "Cannot modify parent shipment issuer or receiver country");
+            }
+        }
     }
 
 }
