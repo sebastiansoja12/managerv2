@@ -106,16 +106,16 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void changeShipmentOriginCountryTo(final ShipmentId shipmentId, final Country originCountry) {
+    public void changeShipmentIssuerCountryTo(final ShipmentId shipmentId, final Country originCountry) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.changeOriginCountry(originCountry);
+        shipment.changeIssuerCountry(originCountry);
         this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
-    public void changeShipmentDestinationCountryTo(final ShipmentId shipmentId, final Country destinationCountry) {
+    public void changeShipmentReceiverCountryTo(final ShipmentId shipmentId, final Country destinationCountry) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.changeDestinationCountry(destinationCountry);
+        shipment.changeReceiverCountry(destinationCountry);
         this.shipmentRepository.createOrUpdate(shipment);
     }
 

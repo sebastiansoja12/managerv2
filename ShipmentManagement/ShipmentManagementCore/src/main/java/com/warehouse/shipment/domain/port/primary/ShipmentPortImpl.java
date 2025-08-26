@@ -234,22 +234,32 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeOriginCountryTo(final ShipmentCountryRequest request) {
+    public void changeIssuerCountryTo(final ShipmentCountryRequest request) {
         final ShipmentId shipmentId = request.shipmentId();
-        final Country originCountry = request.originCountry();
-        this.shipmentService.changeShipmentOriginCountryTo(shipmentId, originCountry);
+        final Country originCountry = this.countryDetermineService.determineCountryByCode(request.issuerCountry());
+        this.shipmentService.changeShipmentIssuerCountryTo(shipmentId, originCountry);
     }
 
     @Override
-    public void changeDestinationCountryTo(final ShipmentCountryRequest request) {
+    public void changeReceiverCountryTo(final ShipmentCountryRequest request) {
         final ShipmentId shipmentId = request.shipmentId();
-        final Country destinationCountry = request.destinationCountry();
-        this.shipmentService.changeShipmentDestinationCountryTo(shipmentId, destinationCountry);
+        final Country destinationCountry = this.countryDetermineService.determineCountryByCode(request.receiverCountry());
+        this.shipmentService.changeShipmentReceiverCountryTo(shipmentId, destinationCountry);
     }
 
     @Override
     public void changeShipmentCountries(final ShipmentCountryRequest request) {
-        this.shipmentService.changeShipmentCountries(request);
+        final boolean issuerCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(request.issuerCountry());
+        final boolean receiverCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(request.receiverCountry());
+
+        if (issuerCountryAvailable) {
+            final Country country = this.countryDetermineService.determineCountryByCode(request.issuerCountry());
+            this.shipmentService.changeShipmentIssuerCountryTo(request.shipmentId(), country);
+        }
+        if (receiverCountryAvailable) {
+            final Country country = this.countryDetermineService.determineCountryByCode(request.receiverCountry());
+            this.shipmentService.changeShipmentReceiverCountryTo(request.shipmentId(), country);
+        }
     }
 
     @Override

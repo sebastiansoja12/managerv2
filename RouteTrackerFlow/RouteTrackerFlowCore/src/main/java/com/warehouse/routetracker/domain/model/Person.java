@@ -31,8 +31,9 @@ public class Person {
     }
 
     public static Person from(final PersonChangeRequest request, final PersonType personType) {
-        return new Person(request.firstName(), request.lastName(), request.email(), request.telephoneNumber(), request.city(),
-                request.postalCode(), request.street(), personType);
+        final com.warehouse.routetracker.infrastructure.adapter.primary.api.Person person = request.person();
+        return new Person(person.firstName(), person.lastName(), person.email(), person.telephoneNumber(), person.city(),
+                person.postalCode(), person.street(), personType);
     }
 
     public String getCity() {

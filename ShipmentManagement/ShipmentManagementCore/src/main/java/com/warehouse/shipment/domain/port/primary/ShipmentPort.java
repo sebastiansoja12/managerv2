@@ -28,9 +28,9 @@ public interface ShipmentPort {
 
     void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod);
 
-    void changeOriginCountryTo(final ShipmentCountryRequest request);
+    void changeIssuerCountryTo(final ShipmentCountryRequest request);
 
-    void changeDestinationCountryTo(final ShipmentCountryRequest request);
+    void changeReceiverCountryTo(final ShipmentCountryRequest request);
 
     void changeShipmentCountries(final ShipmentCountryRequest request);
 

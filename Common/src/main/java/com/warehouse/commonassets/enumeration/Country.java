@@ -1,8 +1,5 @@
 package com.warehouse.commonassets.enumeration;
 
-import jakarta.persistence.Embeddable;
-
-@Embeddable
 public enum Country {
     ALBANIA,
     ANDORRA,

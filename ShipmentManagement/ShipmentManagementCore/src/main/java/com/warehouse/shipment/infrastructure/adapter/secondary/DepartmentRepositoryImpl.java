@@ -11,7 +11,6 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
         this.repository = repository;
     }
 
-
     @Override
     public boolean existsAnyByCountryCode(final CountryCode countryCode) {
         return repository.existsAnyByCountryCode(countryCode);
