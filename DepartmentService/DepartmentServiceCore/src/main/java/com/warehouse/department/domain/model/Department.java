@@ -1,5 +1,7 @@
 package com.warehouse.department.domain.model;
 
+import com.warehouse.commonassets.enumeration.CountryCode;
+
 public class Department {
 
     private String city;
@@ -20,11 +22,13 @@ public class Department {
 
     private Boolean active;
 
+    private CountryCode countryCode;
+
     public Department() {
     }
 
     public Department(String city, String street, String country, String departmentCode, String postalCode, String nip, String telephoneNumber, String openingHours,
-                      final Boolean active) {
+                      final Boolean active, final CountryCode countryCode) {
         this.city = city;
         this.street = street;
         this.country = country;
@@ -34,6 +38,7 @@ public class Department {
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.active = active;
+        this.countryCode = countryCode;
     }
 
     public String getCity() {
@@ -110,5 +115,13 @@ public class Department {
 
     public void setActive(final Boolean active) {
         this.active = active;
+    }
+
+    public CountryCode getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(final CountryCode countryCode) {
+        this.countryCode = countryCode;
     }
 }

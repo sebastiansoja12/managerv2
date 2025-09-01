@@ -1,16 +1,21 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import com.warehouse.shipment.domain.enumeration.SignatureMethod;
+import static com.warehouse.shipment.infrastructure.adapter.primary.validator.SignatureValidator.validateSignatureMethod;
+
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.enumeration.SignatureMethod;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.vo.*;
@@ -23,8 +28,6 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
-
-import static com.warehouse.shipment.infrastructure.adapter.primary.validator.SignatureValidator.validateSignatureMethod;
 
 @RestController
 @RequestMapping("/shipments")
@@ -58,7 +61,7 @@ public class ShipmentController {
     public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestDto shipmentRequest) {
         shipmentRequestValidator.validateBody(shipmentRequest);
         final ShipmentCreateRequest request = requestMapper.map(shipmentRequest);
-        final Result<ShipmentCreateResponse, ShipmentErrorCode> result = shipmentPort.ship(request);
+        final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
 
         final ResponseEntity<?> response;
         if (result.isSuccess()) {
@@ -68,7 +71,7 @@ public class ShipmentController {
         } else {
             response = ResponseEntity
                     .badRequest()
-                    .body(result.getFailure());
+                    .body(result.getFailure().getMessage());
         }
         return response;
     }
@@ -88,7 +91,7 @@ public class ShipmentController {
     public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestDto shipmentUpdateRequest) {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
-        final Result<Void, ShipmentErrorCode> result = shipmentPort.update(request);
+        final Result<Void, ErrorCode> result = shipmentPort.update(request);
 
         final ResponseEntity<?> response;
         if (result.isSuccess()) {
@@ -108,7 +111,7 @@ public class ShipmentController {
         dangerousGoodValidator.validateDangerousGood(dangerousGoodCreateRequest);
 
         final DangerousGoodCreateRequest request = DangerousGoodCreateRequest.from(dangerousGoodCreateRequest);
-        final Result<Void, ShipmentErrorCode> result = shipmentPort.addDangerousGood(shipmentId, request);
+        final Result<Void, ErrorCode> result = shipmentPort.addDangerousGood(shipmentId, request);
 
         final ResponseEntity<?> response;
         if (result.isSuccess()) {
@@ -158,6 +161,28 @@ public class ShipmentController {
                                           @RequestParam("personType") final PersonType personType) {
         final Person person = personType == PersonType.SENDER ? Sender.from(personRequest) : Recipient.from(personRequest);
         this.shipmentPort.changePersonTo(person, new ShipmentId(shipmentId.getValue()));
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
+    }
+
+    @PutMapping("/countries")
+    @Counted(value = "controller.country.update")
+    @Timed(value = "controller.country.update")
+    public ResponseEntity<?> updatePerson(@RequestBody final CountryRequest countryRequest,
+                                          @RequestParam("shipmentId") final Long shipmentId) {
+        final ShipmentId id = new ShipmentId(shipmentId);
+		final ShipmentCountryRequest request = new ShipmentCountryRequest(id,
+				CountryCode.valueOf(countryRequest.issuerCountryCode()), CountryCode.valueOf(countryRequest.receiverCountryCode()));
+        this.shipmentPort.changeShipmentCountries(request);
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
+    }
+    
+    @PutMapping("/shipment-type")
+    @Counted(value = "controller.shipment.type.update")
+    @Timed(value = "controller.shipment.type.update")
+	public ResponseEntity<?> changeShipmentType(@RequestParam("shipmentType") final ShipmentType shipmentType,
+                                                @RequestParam("shipmentId") @PathVariable final String shipmentId) {
+        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(new ShipmentId(Long.parseLong(shipmentId)), shipmentType);
+        this.shipmentPort.changeShipmentTypeTo(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 

@@ -22,4 +22,9 @@ public class SoftwareConfiguration {
     public String getUrl() {
         return url;
     }
+
+    // TODO
+    public String getApiKey() {
+        return "api-key";
+    }
 }

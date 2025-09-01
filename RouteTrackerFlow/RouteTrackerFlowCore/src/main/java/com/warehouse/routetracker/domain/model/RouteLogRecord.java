@@ -1,14 +1,14 @@
 package com.warehouse.routetracker.domain.model;
 
 
+import java.util.UUID;
+
 import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
-import lombok.*;
 
-import java.util.Set;
-import java.util.UUID;
+import lombok.*;
 
 @Builder
 @EqualsAndHashCode
@@ -90,5 +90,23 @@ public class RouteLogRecord {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(request.getProcessType());
         routeLogRecordDetail.updateDeviceInformation(request);
+    }
+
+    public void changePerson(final Person person) {
+        final String description = "%s changed to %s, %s";
+		final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
+                .getRouteLogRecordDetailSet().stream()
+                .findFirst()
+                .orElseThrow();
+        getRouteLogRecordDetails()
+                .getRouteLogRecordDetailSet()
+                .add(RouteLogRecordDetail.builder()
+						.description(String.format(description, person.getPersonType(), person.getFirstName(),
+								person.getLastName()))
+                        .processType(routeLogRecordDetail.getProcessType())
+                        .parcelStatus(routeLogRecordDetail.getParcelStatus())
+                        .username("s-soja")
+                        .build());
+        
     }
 }

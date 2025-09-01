@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.SignatureEntity;
 
 @Mapper
 public interface ShipmentEntityMapper {
@@ -37,6 +38,7 @@ public interface ShipmentEntityMapper {
                 .locked(shipment.isLocked())
                 .price(shipment.getPrice())
                 .shipmentPriority(shipment.getShipmentPriority())
+                .signature(SignatureEntity.from(shipment.getSignature()))
                 .build();
     }
 }

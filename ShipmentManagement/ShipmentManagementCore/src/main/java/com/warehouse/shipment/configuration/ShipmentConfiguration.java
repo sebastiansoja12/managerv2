@@ -43,9 +43,14 @@ public class ShipmentConfiguration {
 		return new NotificationCreatorProviderImpl();
 	}
 
+	@Bean(name = "shipment.departmentRepository")
+	public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
+		return new DepartmentRepositoryImpl(repository);
+	}
+
 	@Bean
-	public CountryServiceAvailabilityService countryServiceAvailabilityService() {
-		return new CountryServiceAvailabilityServiceImpl();
+	public CountryServiceAvailabilityService countryServiceAvailabilityService(final DepartmentRepository departmentRepository) {
+		return new CountryServiceAvailabilityServiceImpl(departmentRepository);
 	}
 
 	@Bean
@@ -76,6 +81,17 @@ public class ShipmentConfiguration {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, trackingStatusServicePort, shipmentStatusHandlers,
 				countryDetermineService, priceService, countryServiceAvailabilityService, signatureService);
+	}
+	
+	@Bean
+	public RouteTrackerService routeTrackerService(final RouteLogServicePort routeLogServicePort,
+			final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
+		return new RouteTrackerServiceImpl(routeLogServicePort, softwareConfigurationServicePort);
+	}
+
+	@Bean
+	public CountryRepository countryRepository(final CountryReadRepository repository) {
+		return new CountryRepositoryImpl(repository);
 	}
 
 	@Bean

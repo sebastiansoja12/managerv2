@@ -50,9 +50,9 @@ create table parcel
     first_name            varchar(255) not null,
     last_name             varchar(255) not null,
     locked                bit          not null,
-    parcel_related_id   bigint       null,
-    parcel_size           tinyint      not null,
-    type                  tinyint      not null,
+    parcel_related_id     bigint       null,
+    parcel_size           varchar(20)     not null,
+    type                  varchar(7)      not null,
     recipient_city        varchar(255) not null,
     recipient_email       varchar(255) not null,
     recipient_first_name  varchar(255) not null,
@@ -65,11 +65,8 @@ create table parcel
     sender_postal_code    varchar(255) not null,
     sender_street         varchar(255) not null,
     sender_telephone      varchar(255) not null,
-    status                tinyint      not null,
-    updated_at            datetime(6)  not null,
-    check (`parcel_size` between 0 and 6),
-    check (`type` between 0 and 1),
-    check (`status` between 0 and 5)
+    status                varchar(10)      not null,
+    updated_at            datetime(6)  not null
 );
 
 create table supplier

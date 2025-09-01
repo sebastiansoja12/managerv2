@@ -1,5 +1,6 @@
 package com.warehouse.auth.domain.service;
 
+import com.warehouse.auth.domain.model.FullNameRequest;
 import org.springframework.stereotype.Service;
 
 import com.warehouse.auth.domain.model.RefreshToken;
@@ -22,13 +23,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final RefreshTokenGenerator refreshTokenGenerator;
 
     @Override
-    public RegisterResponse register(User user) {
+    public RegisterResponse register(final User user) {
         final UserResponse userResponse = userRepository.saveUser(user);
         return new RegisterResponse(userResponse);
     }
 
     @Override
-    public LoginResponse login(User user) {
+    public LoginResponse login(final User user) {
 		final RefreshToken refreshToken = RefreshToken.builder()
                 .username(user.getUsername())
                 .expired(false)
@@ -40,17 +41,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public User findUser(String username) {
+    public User findUser(final String username) {
         return userRepository.findByUsername(username);
     }
 
     @Override
-    public void logout(UserLogout userLogout) {
+    public void logout(final UserLogout userLogout) {
         refreshTokenRepository.delete(userLogout.getRefreshToken());
     }
 
     @Override
     public UserId nextUserId() {
         return new UserId((System.currentTimeMillis() % 900000) + 100000);
+    }
+
+    @Override
+    public void changeFullName(final FullNameRequest request) {
+        final User user = this.userRepository.findByUsername(request.getUsername());
+        user.changeFullName(request);
+        this.userRepository.saveUser(user);
     }
 }

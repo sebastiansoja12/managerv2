@@ -1,8 +1,6 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.primary.mapper;
 
 
-import java.util.UUID;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -28,7 +26,7 @@ public interface DeliveryReturnResponseMapper {
 
     default DeliveryReturnResponseDetailsDto map(final DeliveryReturnResponseDetails deliveryReturnResponseDetails) {
         final ProcessIdDto processId = deliveryReturnResponseDetails.getProcessId() == null ? null :
-                new ProcessIdDto(UUID.fromString(deliveryReturnResponseDetails.getProcessId().getValue()),
+                new ProcessIdDto(deliveryReturnResponseDetails.getProcessId().getValue(),
                 map(deliveryReturnResponseDetails.getShipmentId()));
         final DeliveryStatusDto deliveryStatus = map(deliveryReturnResponseDetails.getDeliveryStatus());
         final ReturnTokenDto returnToken = map((deliveryReturnResponseDetails.getReturnToken()));

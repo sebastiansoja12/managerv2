@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
@@ -60,6 +62,7 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
     }
 
     @Override
+    @Transactional
     public void update(RouteLogRecord routeLogRecord) {
         final RouteLogRecordEntity routeLogRecordEntity = logToEntityMapper.map(routeLogRecord);
         this.routeLogRecordReadRepository.save(routeLogRecordEntity);

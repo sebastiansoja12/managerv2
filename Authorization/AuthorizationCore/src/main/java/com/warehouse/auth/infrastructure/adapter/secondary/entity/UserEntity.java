@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 
 import jakarta.persistence.*;
@@ -45,9 +46,12 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @Column(name = "depot_code", nullable = false)
-    private String depotCode;
+    @Column(name = "department_code", nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "department_code"))
+    private DepartmentCode departmentCode;
 
+    @Column(name = "api_key", nullable = false)
+    private String apiKey;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

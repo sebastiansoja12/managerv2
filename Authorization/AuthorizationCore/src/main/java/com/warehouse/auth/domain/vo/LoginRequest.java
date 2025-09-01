@@ -1,10 +1,12 @@
 package com.warehouse.auth.domain.vo;
 
 
-import lombok.Value;
+import com.warehouse.auth.infrastructure.adapter.primary.dto.LoginRequestDto;
 
-@Value
-public class LoginRequest {
-	String username;
-	String password;
+
+public record LoginRequest(String username, String password) {
+
+	public static LoginRequest from(final LoginRequestDto loginRequest) {
+		return new LoginRequest(loginRequest.username(), loginRequest.password());
+	}
 }

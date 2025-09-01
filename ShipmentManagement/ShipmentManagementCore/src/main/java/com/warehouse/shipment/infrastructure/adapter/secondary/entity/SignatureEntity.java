@@ -51,6 +51,9 @@ public class SignatureEntity {
     }
     
     public static SignatureEntity from(final Signature signature) {
+        if (signature == null)
+            return null;
+
 		return new SignatureEntity(signature.getSignerName(), signature.getSignedAt(), signature.getSignatureMethod(),
 				signature.getDocumentReference(), signature.getShipmentId(), signature.getSignature());
     }

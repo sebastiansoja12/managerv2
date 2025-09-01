@@ -29,6 +29,7 @@ import com.warehouse.auth.domain.vo.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationPortImplTest {
@@ -52,6 +53,9 @@ public class AuthenticationPortImplTest {
     @Mock
     private JwtProvider jwtProvider;
 
+    @Mock
+    private DepartmentService departmentService;
+
     private JwtService jwtService;
 
     private AuthenticationPortImpl authenticationPort;
@@ -68,28 +72,30 @@ public class AuthenticationPortImplTest {
 				refreshTokenRepository, refreshTokenGenerator);
         jwtService = new JwtServiceImpl(jwtProvider);
         authenticationPort = new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager,
-				jwtService, logger);
+				jwtService, logger, departmentService);
 	}
 
     @Test
     void shouldSignUpUser() {
         // given
         final RegisterRequest request = buildRegisterRequest();
-        // build user response after signing
+
         final UserResponse userResponse = UserResponse.builder()
-                .depotCode("TST")
+                .departmentCode(new DepartmentCode("TST"))
                 .username("s-soja")
                 .nonLocked(true)
                 .enabled(true)
                 .nonExpired(true)
                 .build();
 
+        when(jwtProvider.getSecretKey()).thenReturn(SECRET_KEY);
+        when(departmentService.existsByDepartmentCode(any(DepartmentCode.class))).thenReturn(true);
         when(userRepository.saveUser(any(User.class))).thenReturn(userResponse);
         // when
         final RegisterResponse registerResponse = authenticationPort.signup(request);
         // then
         assertAll(
-                () -> assertThat(registerResponse.getUserRegisterResponse()).isNotNull()
+                () -> assertThat(registerResponse.userResponse()).isNotNull()
         );
     }
 
@@ -98,15 +104,8 @@ public class AuthenticationPortImplTest {
         // given
         final LoginRequest loginRequest = new LoginRequest("s-soja", "test");
 
-        final User userDetails = User.builder()
-                .username("s-soja")
-                .firstName("Sebastian")
-                .lastName("Soja")
-                .depotCode("TST")
-                .email("sebastian5152@wp.pl")
-                .password("test")
-                .role(Role.USER)
-                .build();
+		final User userDetails = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+				new DepartmentCode("TST"), "");
 
         doReturn(userDetails)
                 .when(userRepository)
@@ -145,24 +144,12 @@ public class AuthenticationPortImplTest {
         assertEquals(expectedToBe("User was not found"), exception.getMessage());
     }
 
-
     @Test
-    void shouldThrowAuthenticationErrorException() {
-        // given
-        final RegisterRequest request = null;
-        // when
-        final Executable executable = () -> authenticationPort.signup(request);
-        // then
-        final AuthenticationErrorException exception = assertThrows(AuthenticationErrorException.class, executable);
-        assertEquals("Request is not correct", exception.getMessage());
-    }
-
-    @Test
-    void shouldNotSaveWhenUsernameFieldMissing() {
+    void shouldNotSaveWhenDepartmentDoesNotExist() {
         // given
         final RegisterRequest request = new RegisterRequest(
-                "test@test.pl",
-                null,
+                new DepartmentCode("TST"),
+                "email",
                 "password",
                 "Test",
                 "Test",
@@ -173,7 +160,7 @@ public class AuthenticationPortImplTest {
         final Executable executable = () -> authenticationPort.signup(request);
         // then
         final AuthenticationErrorException exception = assertThrows(AuthenticationErrorException.class, executable);
-        assertEquals("Username cannot be empty", exception.getMessage());
+        assertEquals("Department with code DepartmentCode[value=TST] does not exist", exception.getMessage());
     }
 
     @Test
@@ -194,8 +181,8 @@ public class AuthenticationPortImplTest {
 
     private RegisterRequest buildRegisterRequest() {
         return new RegisterRequest(
-                "test@test.pl",
-                "s-soja",
+                new DepartmentCode("TST"),
+                "email",
                 "password",
                 "Test",
                 "Test",

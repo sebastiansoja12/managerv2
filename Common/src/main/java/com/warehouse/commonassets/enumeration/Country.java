@@ -51,7 +51,8 @@ public enum Country {
     TURKEY,
     UKRAINE,
     UNITED_KINGDOM,
-    VATICAN_CITY;
+    VATICAN_CITY,
+    UNDEFINED;
 
     public String getCountryName() {
         return this.name().replace("_", " ");

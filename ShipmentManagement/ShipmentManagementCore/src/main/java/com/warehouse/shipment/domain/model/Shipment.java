@@ -141,6 +141,25 @@ public class Shipment {
         DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
     }
 
+	public static Shipment createNewParent(final Shipment shipment, final ShipmentType shipmentType,
+			final ShipmentId shipmentId) {
+        shipment.shipmentType = shipmentType;
+        shipment.shipmentId = shipmentId;
+        shipment.shipmentStatus = ShipmentStatus.CREATED;
+        DomainRegistry.publish(new ShipmentCreatedEvent(shipment.snapshot(), Instant.now()));
+        return shipment;
+    }
+
+	public static Shipment createNewChild(final Shipment shipment, final ShipmentType shipmentType,
+			final ShipmentId shipmentId, final ShipmentId shipmentRelatedId) {
+        shipment.shipmentType = shipmentType;
+        shipment.shipmentId = shipmentId;
+        shipment.shipmentRelatedId = shipmentRelatedId;
+        shipment.locked = true;
+        DomainRegistry.publish(new ShipmentCreatedEvent(shipment.snapshot(), Instant.now()));
+        return shipment;
+    }
+
     private ShipmentSnapshot snapshot() {
         return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentStatus);
     }
@@ -534,21 +553,47 @@ public class Shipment {
     }
 
     public void updateCountries(final ShipmentCountryRequest request) {
-        this.originCountry = request.originCountry();
-        this.destinationCountry = request.destinationCountry();
         markAsModified();
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
-    public void changeOriginCountry(final Country originCountry) {
+    public void changeIssuerCountry(final Country originCountry) {
         this.originCountry = originCountry;
         markAsModified();
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
-    public void changeDestinationCountry(final Country destinationCountry) {
+    public void changeReceiverCountry(final Country destinationCountry) {
         this.destinationCountry = destinationCountry;
         markAsModified();
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+    }
+
+    public Shipment copy() {
+        return new Shipment(
+                shipmentId,
+                sender,
+                recipient,
+                shipmentSize,
+                shipmentStatus,
+                shipmentType,
+                shipmentRelatedId,
+                price,
+                createdAt,
+                updatedAt,
+                locked,
+                originCountry,
+                destinationCountry,
+                destination,
+                signature,
+                signatureRequired,
+                shipmentPriority
+        );
+    }
+
+    public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
+        this.shipmentType = shipmentType;
+        this.shipmentRelatedId = relatedShipmentId;
+        markAsModified();
     }
 }

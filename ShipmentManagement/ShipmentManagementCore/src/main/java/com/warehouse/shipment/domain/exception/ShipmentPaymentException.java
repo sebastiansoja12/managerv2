@@ -1,11 +1,11 @@
 package com.warehouse.shipment.domain.exception;
 
 import com.warehouse.exceptionhandler.exception.RestException;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 
 public class ShipmentPaymentException extends RestException {
 
-    public ShipmentPaymentException(ShipmentErrorCode code) {
+    public ShipmentPaymentException(ErrorCode code) {
         super(code.getCode(), code.getMessage());
     }
 }

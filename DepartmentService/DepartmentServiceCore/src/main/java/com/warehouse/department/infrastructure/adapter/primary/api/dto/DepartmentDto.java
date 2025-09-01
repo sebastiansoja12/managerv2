@@ -22,4 +22,6 @@ public class DepartmentDto {
     String openingHours;
 
     Boolean active;
+
+    String countryCode;
 }

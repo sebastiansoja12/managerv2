@@ -1,13 +1,14 @@
 package com.warehouse.commonassets.identificator;
 
-public class ProcessId {
-    private String value;
+import java.util.UUID;
 
-    public ProcessId(final String value) {
+public record ProcessId(UUID value) {
+
+    public ProcessId(final UUID value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public UUID getValue() {
         return value;
     }
 }

@@ -86,15 +86,18 @@ public class ShipmentEntity {
     private String recipientPostalCode;
 
     @Column(name = "parcel_size", nullable = false)
+    @Enumerated(EnumType.STRING)
     private ShipmentSize shipmentSize;
 
     @Column(name = "destination", nullable = false)
     private String destination;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private ShipmentStatus shipmentStatus;
 
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private ShipmentType shipmentType;
 
     @Column(name = "shipment_related_id")

@@ -1,9 +1,7 @@
 package com.warehouse.department.infrastructure.adapter.secondary.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.warehouse.commonassets.enumeration.CountryCode;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,5 +42,9 @@ public class DepartmentEntity {
 
     @Column(name = "active", nullable = false)
     private Boolean active;
+
+    @Column(name = "country_code", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CountryCode countryCode;
 
 }

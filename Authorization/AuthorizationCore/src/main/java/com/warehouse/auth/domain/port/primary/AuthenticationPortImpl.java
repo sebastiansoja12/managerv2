@@ -1,24 +1,28 @@
 package com.warehouse.auth.domain.port.primary;
 
-import com.warehouse.auth.domain.vo.AuthenticationResponse;
-import com.warehouse.auth.domain.vo.LoginRequest;
-import com.warehouse.auth.domain.vo.RegisterResponse;
-import com.warehouse.auth.domain.vo.UserLogout;
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.domain.model.*;
+import com.warehouse.auth.domain.model.RefreshTokenRequest;
+import com.warehouse.auth.domain.model.RegisterRequest;
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.service.AuthenticationService;
+import com.warehouse.auth.domain.service.DepartmentService;
 import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.vo.AuthenticationResponse;
+import com.warehouse.auth.domain.vo.LoginRequest;
+import com.warehouse.auth.domain.vo.RegisterResponse;
+import com.warehouse.auth.domain.vo.UserLogout;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.UserId;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
+
 @Slf4j
 public class AuthenticationPortImpl implements AuthenticationPort {
 
@@ -32,10 +36,26 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final Logger logger;
 
-    @Override
-    public AuthenticationResponse login(LoginRequest loginRequest) {
+    private final DepartmentService departmentService;
 
-        final User user = findUser(loginRequest.getUsername());
+    public AuthenticationPortImpl(final AuthenticationService authenticationService,
+                                  final PasswordEncoder passwordEncoder,
+                                  final AuthenticationManager authenticationManager,
+                                  final JwtService jwtService,
+                                  final Logger logger,
+                                  final DepartmentService departmentService) {
+        this.authenticationService = authenticationService;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.logger = logger;
+        this.departmentService = departmentService;
+    }
+
+    @Override
+    public AuthenticationResponse login(final LoginRequest loginRequest) {
+
+        final User user = findUser(loginRequest.username());
 
         final String authenticationToken = jwtService.generateToken(user);
 
@@ -45,31 +65,45 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     @Override
-    public RegisterResponse signup(RegisterRequest request) {
+    public RegisterResponse signup(final RegisterRequest request) {
 
-        handleRequest(request);
+        final UserId userId = this.authenticationService.nextUserId();
 
-        final var user = User.builder()
-                .userId(authenticationService.nextUserId())
-                .username(request.getUsername())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(mapRole(request.getRole()))
-                .depotCode(request.getDepotCode())
-                .build();
+        final String username = request.getUsername();
+
+        final String password = this.passwordEncoder.encode(request.getPassword());
+
+        final String email = request.getEmail();
+
+        final String firstName = request.getFirstName();
+
+        final String lastName = request.getLastName();
+
+        final Role role = mapRole(request.getRole());
+
+        final DepartmentCode departmentCode = request.getDepartmentCode();
+
+        validateDepartmentCode(departmentCode);
+
+        final String apiKey = jwtService.generateToken(firstName, username, role);
+
+        final User user = new User(userId, username, password, email, firstName, lastName, role, departmentCode, apiKey);
 
         return authenticationService.register(user);
     }
 
     @Override
-    public User findUser(String username) {
+    public User findUser(final String username) {
         return authenticationService.findUser(username);
     }
 
     @Override
-    public void logout(RefreshTokenRequest refreshTokenRequest) {
+    public void updateFullName(final FullNameRequest request) {
+        this.authenticationService.changeFullName(request);
+    }
+
+    @Override
+    public void logout(final RefreshTokenRequest refreshTokenRequest) {
 
         final UserLogout userLogout = UserLogout.builder()
                 .refreshToken(refreshTokenRequest.getRefreshToken())
@@ -81,7 +115,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         logLogoutInformation(refreshTokenRequest.getUsername());
     }
 
-    private Role mapRole(String value) {
+    private Role mapRole(final String value) {
         final String role = value.toUpperCase();
         return switch (role) {
             case "ADMIN" -> Role.ADMIN;
@@ -91,15 +125,13 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         };
     }
 
-    private void logLogoutInformation(String username) {
+    private void logLogoutInformation(final String username) {
         logger.info("User {} has been successfully logged out", username);
     }
 
-    private void handleRequest(RegisterRequest request) {
-        if (ObjectUtils.isEmpty(request)) {
-            throw new AuthenticationErrorException("Request is not correct");
+    private void validateDepartmentCode(final DepartmentCode departmentCode) {
+        if (!departmentService.existsByDepartmentCode(departmentCode)) {
+            throw new AuthenticationErrorException("Department with code " + departmentCode + " does not exist");
         }
     }
-
-
 }

@@ -4,24 +4,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.auth.domain.vo.LoginResponse;
 import com.warehouse.auth.domain.model.RefreshToken;
-import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.AuthenticationServiceImpl;
 import com.warehouse.auth.domain.service.RefreshTokenGenerator;
+import com.warehouse.auth.domain.vo.LoginResponse;
+import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.vo.UserResponse;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationServiceTest {
@@ -46,22 +47,15 @@ public class AuthenticationServiceTest {
     @Test
     void shouldRegister() {
         // given
-        final User user = User.builder()
-                .username("s-soja")
-                .depotCode("TST")
-                .email("test@test.pl")
-                .firstName("test")
-                .lastName("test")
-                .password("password")
-                .role(Role.ADMIN)
-                .build();
+        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+                new DepartmentCode("TST"), "");
 
         final UserResponse userResponse = UserResponse.builder()
                 .nonLocked(false)
                 .enabled(true)
                 .nonExpired(false)
                 .username("s-soja")
-                .depotCode("TST")
+                .departmentCode(new DepartmentCode("TST"))
                 .build();
 
         doReturn(userResponse)
@@ -70,21 +64,14 @@ public class AuthenticationServiceTest {
         // when
         final RegisterResponse registerResponse = authenticationService.register(user);
         // then
-        assertThat(registerResponse.getUserRegisterResponse().getUsername()).isNotNull();
+        assertThat(registerResponse.userResponse().username()).isNotNull();
     }
 
     @Test
     void shouldLogin() {
         // given
-        final User user = User.builder()
-                .username("s-soja")
-                .depotCode("TST")
-                .email("test@test.pl")
-                .firstName("test")
-                .lastName("test")
-                .password("password")
-                .role(Role.ADMIN)
-                .build();
+        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+                new DepartmentCode("TST"), "");
 
         final RefreshToken refreshToken = RefreshToken.builder()
                 .username(user.getUsername())

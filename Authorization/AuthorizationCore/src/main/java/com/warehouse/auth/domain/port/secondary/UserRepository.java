@@ -8,4 +8,6 @@ public interface UserRepository {
     UserResponse saveUser(User user);
 
     User findByUsername(String username);
+
+    User findByApiKey(final String apiKey);
 }

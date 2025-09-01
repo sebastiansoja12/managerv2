@@ -42,6 +42,6 @@ public class UserEntity {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @Column(name = "depot_code", nullable = false)
+    @Column(name = "department_code", nullable = false)
     private String depotCode;
 }

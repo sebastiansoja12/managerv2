@@ -5,10 +5,8 @@ import java.util.List;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
-import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
-import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
-import com.warehouse.routetracker.domain.model.FaultDescription;
-import com.warehouse.routetracker.domain.model.RouteLogRecord;
+import com.warehouse.routetracker.domain.helper.Result;
+import com.warehouse.routetracker.domain.model.*;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.service.JsonToStringService;
 import com.warehouse.routetracker.domain.service.JsonToStringServiceImpl;
@@ -122,6 +120,20 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
         routeLogRecord.updateDeviceInformation(request);
         this.repository.update(routeLogRecord);
+    }
+
+    @Override
+    public Result<RouteLogRecord, Exception> changePerson(final ShipmentId shipmentId, final Person person) {
+        final RouteLogRecord routeLogRecord;
+        try {
+            routeLogRecord = this.repository.find(shipmentId);
+            routeLogRecord.changePerson(person);
+            this.repository.update(routeLogRecord);
+        } catch (final Exception e) {
+            return Result.failure(e);
+        }
+
+        return Result.success(routeLogRecord);
     }
 
     @Override

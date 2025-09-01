@@ -16,13 +16,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
-import com.warehouse.shipment.domain.exception.enumeration.ShipmentErrorCode;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.*;
@@ -62,6 +65,9 @@ class ShipmentPortImplTest {
     @Mock
     private SignatureService signatureService;
 
+    @Mock
+    private CountryRepository countryRepository;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
@@ -74,7 +80,7 @@ class ShipmentPortImplTest {
     void setUp() {
         final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository, routeLogServicePort,
                 softwareConfigurationServicePort);
-        final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort);
+        final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort, countryRepository);
         final PriceService priceService = new PriceServiceImpl(priceRepository);
         final Logger logger = mock(Logger.class);
         shipmentStatusHandlers = Sets.newHashSet(Sets.newHashSet(
@@ -92,7 +98,7 @@ class ShipmentPortImplTest {
         final ShipmentId shipmentId = shipmentId();
         final ShipmentCreateRequest request = new ShipmentCreateRequest();
         final VoronoiResponse voronoiResponse = new VoronoiResponse("KT1");
-        final RouteProcess routeProcess = new RouteProcess(shipmentId, processId);
+        final RouteProcess routeProcess = new RouteProcess(shipmentId, new ProcessId(processId), "", "");
         final SoftwareConfiguration softwareConfiguration = new SoftwareConfiguration("id", "url");
 
         doReturn(voronoiResponse)
@@ -105,7 +111,7 @@ class ShipmentPortImplTest {
 
         when(routeLogServicePort.notifyShipmentCreated(any(), any())).thenReturn(routeProcess);
         // when
-        final Result<ShipmentCreateResponse, ShipmentErrorCode> response = shipmentPort.ship(request);
+        final Result<ShipmentCreateResponse, ErrorCode> response = shipmentPort.ship(request);
         // then
         assertEquals(response, expectedToBeEqualTo(response));
     }
@@ -189,7 +195,7 @@ class ShipmentPortImplTest {
         // given
         final ShipmentId shipmentId = shipmentId();
         final Shipment shipment = mock(Shipment.class);
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
+        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(shipmentId, ShipmentType.PARENT);
         doReturn(shipment)
                 .when(shipmentRepository)
                 .findById(shipmentId);
@@ -321,7 +327,7 @@ class ShipmentPortImplTest {
     void shouldNotChangeShipmentTypeToWhenShipmentWasNotFound() {
         // given
         final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
+        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(shipmentId, ShipmentType.PARENT);
         doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
                 .when(shipmentRepository)
                 .findById(shipmentId);

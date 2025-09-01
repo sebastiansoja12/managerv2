@@ -9,6 +9,7 @@
             last_name = "Soja"
             email = "sebastian5152@wp.pl"
             role = "1"
-            depot_code = "TST"
+            department_code = "TST"
+            api_key="abc"
     />
 </dataset>
