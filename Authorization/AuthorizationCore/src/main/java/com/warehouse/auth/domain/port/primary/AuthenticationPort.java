@@ -13,5 +13,7 @@ public interface AuthenticationPort {
 
     User findUser(String username);
 
+    void updateFullName(final FullNameRequest request);
+
     void logout(RefreshTokenRequest refreshTokenRequest);
 }

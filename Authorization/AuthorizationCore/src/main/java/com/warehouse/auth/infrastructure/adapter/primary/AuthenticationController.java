@@ -1,8 +1,10 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import com.warehouse.auth.domain.service.ApiKeyService;
 import com.warehouse.auth.domain.vo.AuthenticationResponse;
 import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.domain.vo.RegisterResponse;
+import com.warehouse.auth.infrastructure.adapter.primary.dto.FullNameRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,33 +27,48 @@ public class AuthenticationController {
 
     private final AuthenticationPort authenticationPort;
 
+    private final ApiKeyService apiKeyService;
+
     private final AuthenticationRequestMapper requestMapper;
 
     private final AuthenticationResponseMapper responseMapper;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest) {
-        final LoginRequest request = requestMapper.map(loginRequest);
+    public ResponseEntity<?> login(@RequestBody final LoginRequestDto loginRequest) {
+        final LoginRequest request = LoginRequest.from(loginRequest);
         final AuthenticationResponse response = authenticationPort.login(request);
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody RegisterRequestDto registerRequest) {
-        final RegisterRequest request = requestMapper.map(registerRequest);
+    public ResponseEntity<?> signup(
+            @RequestHeader("X-API-KEY") final String apiKey,
+            @RequestBody final RegisterRequestDto registerRequest) {
+        apiKeyService.validateApiKey(apiKey);
+        final RegisterRequest request = RegisterRequest.from(registerRequest);
         final RegisterResponse registerResponse = authenticationPort.signup(request);
         return new ResponseEntity<>(responseMapper.map(registerResponse), HttpStatus.OK);
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequest) {
+    public ResponseEntity<?> logout(@Valid @RequestBody final RefreshTokenRequestDto refreshTokenRequest) {
         final RefreshTokenRequest request = requestMapper.map(refreshTokenRequest);
         authenticationPort.logout(request);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/{username}")
-    public ResponseEntity<?> findUserByUsername(@PathVariable String username) {
+    public ResponseEntity<?> findUserByUsername(@PathVariable final String username) {
         final User user = authenticationPort.findUser(username);
         return new ResponseEntity<>(responseMapper.map(user), HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updateUser(@Valid @RequestBody final FullNameRequest fullNameRequest) {
+        final com.warehouse.auth.domain.model.FullNameRequest request = new com.warehouse.auth.domain.model.FullNameRequest(
+                fullNameRequest.firstName(), fullNameRequest.lastName(), fullNameRequest.username(), null
+        );
+        this.authenticationPort.updateFullName(request);
+        return ResponseEntity.ok().build();
     }
 }

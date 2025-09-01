@@ -43,9 +43,10 @@ public class AuthConfiguration  {
     
 	@Bean
 	public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
-			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService) {
+			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService,
+                                                 final DepartmentService departmentService) {
 		return new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager, jwtService,
-				LOGGER_FACTORY.getLogger(Authentication.class));
+				LOGGER_FACTORY.getLogger(Authentication.class), departmentService);
 	}
 
     @Bean

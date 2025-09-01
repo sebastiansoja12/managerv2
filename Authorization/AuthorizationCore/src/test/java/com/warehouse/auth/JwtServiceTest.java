@@ -3,7 +3,6 @@ package com.warehouse.auth;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +14,8 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.JwtServiceImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.common.util.StringUtils;
@@ -40,14 +41,8 @@ public class JwtServiceTest {
     @Test
     void shouldGenerateToken() {
         // given
-        final User user = User.builder()
-                .depotCode("TST")
-                .email("test@test.pl")
-                .firstName("Test")
-                .lastName("Test")
-                .role(Role.ADMIN)
-                .username("test")
-                .build();
+        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+                new DepartmentCode("TST"), "");
 
         doReturn(EXPIRATION)
                 .when(jwtProvider)
@@ -67,20 +62,13 @@ public class JwtServiceTest {
     @Test
     void shouldCheckIfTokenIsValid() {
         // given
-        final User user = User.builder()
-                .depotCode("TST")
-                .email("test@test.pl")
-                .firstName("Test")
-                .lastName("Test")
-                .role(Role.ADMIN)
-                .username("test")
-                .build();
+        final User user = new User(null, "test", "test", "Test", "Test", "test@test.pl", Role.ADMIN,
+                new DepartmentCode("TST"), "");
 
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
                 .getSecretKey();
 
-        // create token
         final String jwtToken = "eyJhbGciOiJIUzI1NiJ9" +
                 ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDg2Mzc2LCJleHAiOjkyNDkzMzU2NDAwfQ" +
                 ".CqWbN5YR41WobyySEKZGbWFrUFpIFSCb4TwQt5DzlLM";
@@ -95,20 +83,13 @@ public class JwtServiceTest {
     @Test
     void shouldTokenBeInvalid() {
         // given
-        final User user = User.builder()
-                .depotCode("TST")
-                .email("test@test.pl")
-                .firstName("Test")
-                .lastName("Test")
-                .role(Role.ADMIN)
-                .username("fake")
-                .build();
+        final User user = new User(null, "test", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+                new DepartmentCode("TST"), "");
 
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
                 .getSecretKey();
 
-        // create nonvalid jwttoken
         final String jwtToken = "eyJhbGciOiJIUzI1NiJ9" +
                 ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDgzMjk2LCJleHAiOjE2ODg0ODQ3MzZ9" +
                 ".8Ms_0WQZRMl-uyOfASWGvujzVhmgesOjIuqEXd0vAjo";
@@ -126,7 +107,6 @@ public class JwtServiceTest {
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
                 .getSecretKey();
-        // create token
         final String jwtToken = "eyJhbGciOiJIUzI1NiJ9" +
                 ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDg2Mzc2LCJleHAiOjkyNDkzMzU2NDAwfQ" +
                 ".CqWbN5YR41WobyySEKZGbWFrUFpIFSCb4TwQt5DzlLM";

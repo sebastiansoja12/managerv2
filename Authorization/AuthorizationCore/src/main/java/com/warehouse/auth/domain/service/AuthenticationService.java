@@ -1,5 +1,6 @@
 package com.warehouse.auth.domain.service;
 
+import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.vo.LoginResponse;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.model.User;
@@ -17,4 +18,6 @@ public interface AuthenticationService {
     void logout(UserLogout userLogout);
 
     UserId nextUserId();
+
+    void changeFullName(final FullNameRequest request);
 }

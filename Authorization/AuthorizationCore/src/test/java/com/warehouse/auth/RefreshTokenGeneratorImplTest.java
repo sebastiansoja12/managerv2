@@ -2,13 +2,14 @@ package com.warehouse.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.RefreshTokenGeneratorImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 
 public class RefreshTokenGeneratorImplTest {
 
@@ -23,15 +24,8 @@ public class RefreshTokenGeneratorImplTest {
     @Test
     void shouldGenerateRandomToken() {
         // given
-        final User user = User.builder()
-                .username("s-soja")
-                .firstName("Sebastian")
-                .lastName("Soja")
-                .depotCode("TST")
-                .email("sebastian5152@wp.pl")
-                .password("test")
-                .role(Role.USER)
-                .build();
+        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+                new DepartmentCode("TST"), "");
         // when
         final String token = refreshTokenGenerator.generateToken(user);
         // then

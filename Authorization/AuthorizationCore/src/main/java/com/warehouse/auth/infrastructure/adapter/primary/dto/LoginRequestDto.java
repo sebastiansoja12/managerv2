@@ -1,13 +1,5 @@
 package com.warehouse.auth.infrastructure.adapter.primary.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public record LoginRequestDto(String username, String password) {
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class LoginRequestDto {
-    private String username;
-    private String password;
 }

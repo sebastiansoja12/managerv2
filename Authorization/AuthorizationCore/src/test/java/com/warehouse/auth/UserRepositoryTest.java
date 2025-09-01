@@ -3,7 +3,6 @@ package com.warehouse.auth;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,8 +15,10 @@ import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRep
 import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationRepositoryImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapperImpl;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 
 @ExtendWith(MockitoExtension.class)
 public class UserRepositoryTest {
@@ -40,15 +41,8 @@ public class UserRepositoryTest {
     @Test
     void shouldSaveUser() {
         // given
-        final User user = User.builder()
-                .username("s-soja")
-                .depotCode("TST")
-                .email("test@test.pl")
-                .firstName("test")
-                .lastName("test")
-                .password("password")
-                .role(Role.ADMIN)
-                .build();
+        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+                new DepartmentCode("TST"), "");
         // when
         userRepository.saveUser(user);
         // then

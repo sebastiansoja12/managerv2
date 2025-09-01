@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -19,7 +20,6 @@ import lombok.NonNull;
 
 @AllArgsConstructor
 public class JwtServiceImpl implements JwtService {
-
 
     @NonNull
     private final JwtProvider jwtProvider;
@@ -48,6 +48,22 @@ public class JwtServiceImpl implements JwtService {
         claimsMap.put("role", user.getRole());
         final Long expiration = jwtProvider.getExpiration();
         return generateToken(claimsMap, user, expiration);
+    }
+
+    @Override
+    public String generateToken(final String firstName, final String username, final Role role) {
+        final Map<String, Object> claimsMap = new HashMap<>();
+        claimsMap.put("firstName", firstName);
+        claimsMap.put("role", role);
+        final Long expiration = jwtProvider.getExpiration();
+        return Jwts
+                .builder()
+                .setClaims(claimsMap)
+                .setSubject(username)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.forSigningKey(getSigningKey()))
+                .compact();
     }
 
     @Override

@@ -1,14 +1,16 @@
 package com.warehouse.auth.domain.vo;
 
-import lombok.Builder;
-import lombok.Value;
+import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 
-@Value
+import lombok.Builder;
+
 @Builder
-public class UserResponse {
-    String username;
-    String depotCode;
-    boolean nonExpired;
-    boolean enabled;
-    boolean nonLocked;
+public record UserResponse(String username, DepartmentCode departmentCode, boolean nonExpired, boolean enabled,
+		boolean nonLocked) {
+
+	public static UserResponse from(final UserEntity user) {
+		return new UserResponse(user.getUsername(), user.getDepartmentCode(), user.isAccountNonExpired(),
+				user.isEnabled(), user.isAccountNonLocked());
+	}
 }

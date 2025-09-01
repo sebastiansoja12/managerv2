@@ -11,4 +11,6 @@ import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 public interface AuthenticationReadRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByUsername(String username);
+
+    Optional<UserEntity> findByApiKey(final String apiKey);
 }

@@ -24,6 +24,12 @@ public class SoftwareConfigurationDocument {
 
 	private String value;
 
+	private UserConfigurationDocument userConfiguration;
+
+	private DepartmentConfigurationDocument departmentConfiguration;
+
+	private EnvironmentSoftwareConfigurationDocument environmentSoftwareConfiguration;
+
 	public void updateDocument(SoftwareProperty softwareProperty) {
 		this.category = softwareProperty.getCategory();
 		this.name = softwareProperty.getName();
