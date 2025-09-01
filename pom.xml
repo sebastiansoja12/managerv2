@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.warehouse</groupId>
 	<artifactId>warehouse</artifactId>
-	<version>2025.2-SNAPSHOT</version>
+	<version>2025.3-SNAPSHOT</version>
 	<name>warehouse</name>
 	<description>Pom file for all modules</description>
 	<packaging>pom</packaging>
