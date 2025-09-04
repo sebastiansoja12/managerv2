@@ -39,6 +39,7 @@
 		<module>MessageProvider</module>
         <module>LogisticsOrchestrator</module>
         <module>CrossLogistics</module>
+        <module>Gateway</module>
     </modules>
 
 	<properties>
