@@ -51,6 +51,8 @@ public interface ShipmentService {
 
     void changeShipmentCountries(ShipmentCountryRequest request);
 
+    void lockShipment(final ShipmentId shipmentId);
+
     Shipment find(final ShipmentId shipmentId);
 
     boolean existsShipment(final ShipmentId shipmentId);

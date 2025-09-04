@@ -183,6 +183,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
+    public void lockShipment(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.lockShipment();
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
     public ShipmentId nextShipmentId() {
         final long randomUUIDBits = UUID.randomUUID().getLeastSignificantBits();
         return new ShipmentId(Math.abs(randomUUIDBits));

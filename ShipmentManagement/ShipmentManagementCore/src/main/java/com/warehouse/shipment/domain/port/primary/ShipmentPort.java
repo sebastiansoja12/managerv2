@@ -38,5 +38,5 @@ public interface ShipmentPort {
 
     boolean existsShipment(final ShipmentId shipmentId);
 
-    Result<Void, ErrorCode> addDangerousGood(final ShipmentId shipmentId, final DangerousGoodCreateRequest request);
+    Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateRequest request);
 }

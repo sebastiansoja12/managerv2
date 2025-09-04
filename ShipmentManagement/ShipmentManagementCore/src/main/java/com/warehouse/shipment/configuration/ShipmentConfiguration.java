@@ -69,6 +69,11 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
+	public ReturningServicePort returningServicePort() {
+		return new ReturningServiceAdapter();
+	}
+
+	@Bean
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,

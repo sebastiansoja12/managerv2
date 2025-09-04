@@ -154,7 +154,8 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public Result<Void, ErrorCode> addDangerousGood(final ShipmentId shipmentId, final DangerousGoodCreateRequest request) {
+    public Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateRequest request) {
+        final ShipmentId shipmentId = request.getShipmentId();
         if (!existsShipment(shipmentId)) {
             return Result.failure(ErrorCode.SHIPMENT_202);
         }
@@ -198,23 +199,21 @@ public class ShipmentPortImpl implements ShipmentPort {
         if (shipment.getShipmentType() == request.shipmentType()) {
             throw new RestException(400, "Cannot override shipment type");
         }
+        
+        
+		if (request.shipmentType() == ShipmentType.CHILD) {
+			final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
-        final Shipment newShipment;
-        if (shipment.getShipmentType().equals(ShipmentType.CHILD)) {
-            newShipment = Shipment.createNewParent(shipment, ShipmentType.PARENT, this.shipmentService.nextShipmentId());
-            this.shipmentService.createShipment(newShipment);
-            shipment.changeShipmentRelatedId(newShipment.getShipmentId());
-            this.shipmentService.createShipment(shipment);
-        } else {
-            newShipment = Shipment.createNewChild(shipment, ShipmentType.CHILD, this.shipmentService.nextShipmentId(), shipment.getShipmentId());
-            this.shipmentService.createShipment(newShipment);
-            shipment.changeShipmentRelatedId(newShipment.getShipmentId());
-            this.shipmentService.createShipment(shipment);
-            this.shipmentService.changeShipmentTypeTo(request.shipmentId(), request.shipmentType(), newShipment.getShipmentId());
-        }
-        final ShipmentType shipmentType = request.shipmentType();
-        final ShipmentId shipmentId = request.shipmentId();
-        //this.shipmentService.changeShipmentTypeTo(shipmentId, shipmentType);
+			final Shipment newShipment = new Shipment(shipmentId, shipment.getSender(), shipment.getRecipient(),
+					shipment.getShipmentSize(), shipment.getShipmentId(), shipment.getOriginCountry(),
+					shipment.getDestinationCountry(), shipment.getPrice(), shipment.isLocked(),
+					shipment.getDestination(), shipment.getSignature(), shipment.getShipmentPriority());
+			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, shipmentId);
+			this.shipmentService.createShipment(newShipment);
+		} else {
+			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, null);
+			this.shipmentService.lockShipment(shipment.getShipmentRelatedId());
+		}
     }
 
 	@Override

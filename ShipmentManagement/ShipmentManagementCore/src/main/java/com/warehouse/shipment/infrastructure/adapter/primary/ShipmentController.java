@@ -102,16 +102,15 @@ public class ShipmentController {
         return response;
     }
     
-	@PutMapping("/dangerous-good/{shipmentId}")
+	@PutMapping("/dangerous-good")
     @Counted(value = "controller.dangerousgood.add")
     @Timed(value = "controller.dangerousgood.add")
 	public ResponseEntity<?> addDangerousGood(
-			@RequestBody final DangerousGoodCreateRequestDto dangerousGoodCreateRequest,
-			@PathVariable final ShipmentId shipmentId) {
+			@RequestBody final DangerousGoodCreateRequestDto dangerousGoodCreateRequest) {
         dangerousGoodValidator.validateDangerousGood(dangerousGoodCreateRequest);
 
         final DangerousGoodCreateRequest request = DangerousGoodCreateRequest.from(dangerousGoodCreateRequest);
-        final Result<Void, ErrorCode> result = shipmentPort.addDangerousGood(shipmentId, request);
+        final Result<Void, ErrorCode> result = shipmentPort.addDangerousGood(request);
 
         final ResponseEntity<?> response;
         if (result.isSuccess()) {

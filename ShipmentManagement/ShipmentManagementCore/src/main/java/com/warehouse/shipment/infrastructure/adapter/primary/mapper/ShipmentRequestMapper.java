@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import org.mapstruct.Mapper;
@@ -44,7 +45,9 @@ public interface ShipmentRequestMapper {
 
     Recipient mapToRecipient(final PersonDto person);
 
-    ShipmentStatusRequest map(final ShipmentStatusRequestDto shipmentStatusRequest);
+    default ShipmentStatusRequest map(final ShipmentStatusRequestDto shipmentStatusRequest) {
+        return new ShipmentStatusRequest(new ShipmentId(shipmentStatusRequest.shipmentId().getValue()), ShipmentStatus.valueOf(shipmentStatusRequest.shipmentStatus().name()));
+    }
 
     default SignatureChangeRequest map(final SignatureChangeRequestDto signatureChangeRequest) {
         final ShipmentId shipmentId = new ShipmentId(signatureChangeRequest.shipmentId().getValue());

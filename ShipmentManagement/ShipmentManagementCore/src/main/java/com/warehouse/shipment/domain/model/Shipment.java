@@ -2,7 +2,6 @@ package com.warehouse.shipment.domain.model;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -383,6 +382,7 @@ public class Shipment {
 
     public void lockShipment() {
         this.locked = true;
+        markAsModified();
     }
 
     public void prepareShipmentToSend() {
@@ -435,10 +435,9 @@ public class Shipment {
     }
 
     public void changeShipmentType(final ShipmentType shipmentType) {
-        if (Objects.isNull(this.shipmentRelatedId)) {
-            throw new RuntimeException("Shipment type cannot be changed");
-        }
         this.shipmentType = shipmentType;
+        this.shipmentRelatedId = null;
+        this.locked = false;
         markAsModified();
     }
 
@@ -594,6 +593,12 @@ public class Shipment {
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = relatedShipmentId;
+        this.locked = true;
         markAsModified();
+    }
+
+    public void lockShipmentWithShipmentType(final ShipmentType shipmentType) {
+        this.shipmentType = shipmentType;
+        lockShipment();
     }
 }
