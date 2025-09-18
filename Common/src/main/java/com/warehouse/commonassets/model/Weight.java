@@ -1,13 +1,17 @@
 package com.warehouse.commonassets.model;
 
-import com.warehouse.commonassets.enumeration.WeightUnit;
-import jakarta.persistence.Embeddable;
-
 import java.math.BigDecimal;
+
+import com.warehouse.commonassets.enumeration.WeightUnit;
+
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Embeddable
 public class Weight {
     private BigDecimal weight;
+    @Enumerated(EnumType.STRING)
     private WeightUnit unit;
 
     public Weight() {

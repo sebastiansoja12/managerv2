@@ -1,5 +1,6 @@
-package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
+package com.warehouse.dangerousgood.infrastructure.adapter.secondary.entity;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.warehouse.commonassets.enumeration.Country;
@@ -8,16 +9,15 @@ import com.warehouse.commonassets.model.Weight;
 import com.warehouse.dangerousgood.domain.enumeration.ClassificationCode;
 import com.warehouse.dangerousgood.domain.enumeration.Packaging;
 import com.warehouse.dangerousgood.domain.enumeration.StorageRequirement;
-import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.vo.DangerousGoodId;
+import com.warehouse.dangerousgood.domain.model.DangerousGood;
+import com.warehouse.dangerousgood.domain.vo.DangerousGoodId;
 
 import jakarta.persistence.*;
 
 
-@Entity(name = "shipment.DangerousGoodEntity")
+@Entity(name = "dangerousGood.DangerousGoodEntity")
 @Table(name = "dangerous_good")
 public class DangerousGoodEntity {
-
 
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "dangerous_good_id", nullable = false))
@@ -65,18 +65,16 @@ public class DangerousGoodEntity {
     @Column(name = "safety_data_sheet", nullable = false)
     private String safetyDataSheet;
 
-    public DangerousGoodEntity(final DangerousGoodId dangerousGoodId) {
-        this.dangerousGoodId = dangerousGoodId;
-    }
-
     public DangerousGoodEntity() {
     }
 
-	public DangerousGoodEntity(final DangerousGoodId dangerousGoodId, final ShipmentId shipmentId, final String name,
-			final String description, final ClassificationCode classificationCode, final List<String> hazardSymbols,
-			final StorageRequirement storageRequirements, final String handlingInstructions, final Weight weight,
-			final Packaging packaging, final boolean flammable, final boolean isCorrosive, final boolean toxic,
-			final String emergencyContact, final Country countryOfOrigin, final String safetyDataSheet) {
+    public DangerousGoodEntity(final DangerousGoodId dangerousGoodId,
+                               final ShipmentId shipmentId, final String name, final String description,
+                               final ClassificationCode classificationCode, final List<String> hazardSymbols,
+                               final StorageRequirement storageRequirements, final String handlingInstructions, final Weight weight,
+                               final Packaging packaging, final boolean flammable, final boolean isCorrosive,
+                               final boolean toxic, final String emergencyContact,
+                               final Country countryOfOrigin, final String safetyDataSheet) {
         this.dangerousGoodId = dangerousGoodId;
         this.shipmentId = shipmentId;
         this.name = name;
@@ -95,9 +93,16 @@ public class DangerousGoodEntity {
         this.safetyDataSheet = safetyDataSheet;
     }
 
-    public static DangerousGoodEntity from(final DangerousGood dangerousGood) {
-        return new DangerousGoodEntity(dangerousGood.getDangerousGoodId());
-    }
+	public static DangerousGoodEntity from(final DangerousGood dangerousGood) {
+		return new DangerousGoodEntity(dangerousGood.getDangerousGoodId(),
+                dangerousGood.getShipmentId(), dangerousGood.getName(),
+				dangerousGood.getDescription(), dangerousGood.getClassificationCode(),
+				Collections.singletonList(dangerousGood.getHazardSymbols()), dangerousGood.getStorageRequirement(),
+				dangerousGood.getHandlingInstructions(), dangerousGood.getWeight(), dangerousGood.getPackaging(),
+				dangerousGood.isFlammable(), dangerousGood.isCorrosive(), dangerousGood.isToxic(),
+				dangerousGood.getEmergencyContact(), dangerousGood.getCountryOfOrigin(),
+				dangerousGood.getSafetyDataSheet());
+	}
 
     public DangerousGoodId getDangerousGoodId() {
         return dangerousGoodId;

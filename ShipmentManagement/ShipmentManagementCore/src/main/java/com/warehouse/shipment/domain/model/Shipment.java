@@ -74,7 +74,8 @@ public class Shipment {
                     final String destination,
                     final Signature signature,
                     final boolean signatureRequired,
-                    final ShipmentPriority shipmentPriority) {
+                    final ShipmentPriority shipmentPriority,
+                    final DangerousGood dangerousGood) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -92,6 +93,7 @@ public class Shipment {
         this.signature = signature;
         this.signatureRequired = signatureRequired;
         this.shipmentPriority = shipmentPriority;
+        this.dangerousGood = dangerousGood;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -210,6 +212,7 @@ public class Shipment {
         final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
         final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
+        final DangerousGood dangerousGood = shipmentEntity.getDangerousGood() != null ? DangerousGood.from(shipmentEntity.getDangerousGood()) : null;
 
         return new Shipment(
                 shipmentId,
@@ -228,7 +231,8 @@ public class Shipment {
                 destination,
                 signature,
                 signatureRequired,
-                shipmentPriority
+                shipmentPriority,
+                dangerousGood
         );
     }
 
@@ -480,11 +484,11 @@ public class Shipment {
     }
 
     public void notifyRelatedShipmentLocked() {
-        changeShipmentStatus(ShipmentStatus.SENT);
         this.shipmentType = ShipmentType.PARENT;
         this.shipmentRelatedId = null;
         unlockShipment();
         markAsModified();
+        DomainRegistry.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentRerouted() {
@@ -586,7 +590,8 @@ public class Shipment {
                 destination,
                 signature,
                 signatureRequired,
-                shipmentPriority
+                shipmentPriority,
+                dangerousGood
         );
     }
 

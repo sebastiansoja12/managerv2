@@ -44,6 +44,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final SignatureService signatureService;
 
+    private final ShipmentStateValidatorService shipmentStateValidatorService = new ShipmentStateValidatorServiceImpl();
+
 	public ShipmentPortImpl(final ShipmentService shipmentService,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
@@ -160,10 +162,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(ErrorCode.SHIPMENT_202);
         }
 
-        final DangerousGood dangerousGood = DangerousGood.from(request);
-
-
-
+        this.shipmentService.changeDangerousGoodTo(shipmentId, DangerousGood.from(request));
 
         return Result.success();
     }
@@ -196,11 +195,17 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public void changeShipmentTypeTo(final ChangeShipmentTypeRequest request) {
         final Shipment shipment = this.shipmentService.find(request.shipmentId());
+
         if (shipment.getShipmentType() == request.shipmentType()) {
-            throw new RestException(400, "Cannot override shipment type");
+            throw new RestException(400, "Shipment type cannot be changed to the same type");
         }
-        
-        
+
+        final Result<Void, String> validateShipment = this.shipmentStateValidatorService.validateShipmentState(shipment);
+
+        if (validateShipment.isFailure()) {
+            throw new RestException(400, validateShipment.getFailure());
+        }
+
 		if (request.shipmentType() == ShipmentType.CHILD) {
 			final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 

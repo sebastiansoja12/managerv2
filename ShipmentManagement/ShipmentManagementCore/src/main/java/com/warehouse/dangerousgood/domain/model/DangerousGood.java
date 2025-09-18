@@ -1,13 +1,19 @@
-package com.warehouse.shipment.domain.model;
+package com.warehouse.dangerousgood.domain.model;
 
-import java.util.Collections;
+import java.time.Instant;
 import java.util.List;
 
 import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
-import com.warehouse.shipment.domain.vo.DangerousGoodId;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.DangerousGoodEntity;
+import com.warehouse.dangerousgood.domain.enumeration.ClassificationCode;
+import com.warehouse.dangerousgood.domain.enumeration.Packaging;
+import com.warehouse.dangerousgood.domain.enumeration.StorageRequirement;
+import com.warehouse.dangerousgood.domain.event.GoodPackagingChanged;
+import com.warehouse.dangerousgood.domain.event.GoodWeightChanged;
+import com.warehouse.dangerousgood.domain.registry.DomainRegistry;
+import com.warehouse.dangerousgood.domain.vo.DangerousGoodId;
+import com.warehouse.dangerousgood.domain.vo.GoodSnapshot;
 
 public class DangerousGood {
 
@@ -15,31 +21,36 @@ public class DangerousGood {
     private ShipmentId shipmentId;
     private String name;
     private String description;
-    private String classificationCode;
+    private ClassificationCode classificationCode;
     private String hazardSymbols;
-    private String storageRequirements;
+    private StorageRequirement storageRequirement;
     private String handlingInstructions;
     private Weight weight;
-    private String packaging;
+    private Packaging packaging;
     private boolean flammable;
     private boolean corrosive;
     private boolean toxic;
     private String emergencyContact;
     private Country countryOfOrigin;
     private String safetyDataSheet;
+    private Instant createdAt;
+    private Instant modifiedAt;
+
+    public DangerousGood() {
+    }
 
 	public DangerousGood(final DangerousGoodId dangerousGoodId, final ShipmentId shipmentId, final String name,
-			final String description, final String classificationCode, final List<String> hazardSymbols,
-			final String storageRequirements, final String handlingInstructions, final Weight weight,
-			final String packaging, final boolean flammable, final boolean isCorrosive, final boolean toxic,
-			final String emergencyContact, final Country countryOfOrigin, final String safetyDataSheet) {
+                         final String description, final ClassificationCode classificationCode, final List<String> hazardSymbols,
+                         final StorageRequirement storageRequirement, final String handlingInstructions, final Weight weight,
+                         final Packaging packaging, final boolean flammable, final boolean isCorrosive, final boolean toxic,
+                         final String emergencyContact, final Country countryOfOrigin, final String safetyDataSheet) {
         this.dangerousGoodId = dangerousGoodId;
         this.shipmentId = shipmentId;
         this.name = name;
         this.description = description;
         this.classificationCode = classificationCode;
         this.hazardSymbols = String.join(" ", hazardSymbols);
-        this.storageRequirements = storageRequirements;
+        this.storageRequirement = storageRequirement;
         this.handlingInstructions = handlingInstructions;
         this.weight = weight;
         this.packaging = packaging;
@@ -49,53 +60,16 @@ public class DangerousGood {
         this.emergencyContact = emergencyContact;
         this.countryOfOrigin = countryOfOrigin;
         this.safetyDataSheet = safetyDataSheet;
+        this.createdAt = Instant.now();
+        this.modifiedAt = Instant.now();
     }
-
-    public static DangerousGood from(final DangerousGoodCreateRequest request) {
-        return new DangerousGood(
-                request.getDangerousGoodId(),
-                request.getShipmentId(),
-                request.getName(),
-                request.getDescription(),
-                request.getClassificationCode(),
-                request.getHazardSymbols(),
-                request.getStorageRequirements(),
-                request.getHandlingInstructions(),
-                request.getWeight(),
-                request.getPackaging(),
-                request.isFlammable(),
-                request.isCorrosive(),
-                request.isToxic(),
-                request.getEmergencyContact(),
-                request.getCountryOfOrigin(),
-                request.getSafetyDataSheet()
-        );
-    }
-
-    public static DangerousGood from(final DangerousGoodEntity entity) {
-        return new DangerousGood(
-                entity.getDangerousGoodId(),
-                entity.getShipmentId(),
-                entity.getName(),
-                entity.getDescription(),
-                entity.getClassificationCode().name(),
-                Collections.singletonList(entity.getHazardSymbols()),
-                entity.getStorageRequirements().name(),
-                entity.getHandlingInstructions(),
-                entity.getWeight(),
-                entity.getPackaging().name(),
-                entity.isFlammable(),
-                entity.isCorrosive(),
-                entity.isToxic(),
-                entity.getEmergencyContact(),
-                entity.getCountryOfOrigin(),
-                entity.getSafetyDataSheet()
-        );
-    }
-
 
     public DangerousGoodId getDangerousGoodId() {
         return dangerousGoodId;
+    }
+
+    public void setDangerousGoodId(final DangerousGoodId dangerousGoodId) {
+        this.dangerousGoodId = dangerousGoodId;
     }
 
     public ShipmentId getShipmentId() {
@@ -114,7 +88,7 @@ public class DangerousGood {
         this.description = description;
     }
 
-    public void setClassificationCode(final String classificationCode) {
+    public void setClassificationCode(final ClassificationCode classificationCode) {
         this.classificationCode = classificationCode;
     }
 
@@ -122,8 +96,8 @@ public class DangerousGood {
         this.hazardSymbols = hazardSymbols;
     }
 
-    public void setStorageRequirements(final String storageRequirements) {
-        this.storageRequirements = storageRequirements;
+    public void setStorageRequirement(final StorageRequirement storageRequirement) {
+        this.storageRequirement = storageRequirement;
     }
 
     public void setHandlingInstructions(final String handlingInstructions) {
@@ -134,7 +108,7 @@ public class DangerousGood {
         this.weight = weight;
     }
 
-    public void setPackaging(final String packaging) {
+    public void setPackaging(final Packaging packaging) {
         this.packaging = packaging;
     }
 
@@ -170,7 +144,7 @@ public class DangerousGood {
         return description;
     }
 
-    public String getClassificationCode() {
+    public ClassificationCode getClassificationCode() {
         return classificationCode;
     }
 
@@ -178,8 +152,8 @@ public class DangerousGood {
         return hazardSymbols;
     }
 
-    public String getStorageRequirements() {
-        return storageRequirements;
+    public StorageRequirement getStorageRequirement() {
+        return storageRequirement;
     }
 
     public String getHandlingInstructions() {
@@ -190,7 +164,7 @@ public class DangerousGood {
         return weight;
     }
 
-    public String getPackaging() {
+    public Packaging getPackaging() {
         return packaging;
     }
 
@@ -216,6 +190,52 @@ public class DangerousGood {
 
     public String getSafetyDataSheet() {
         return safetyDataSheet;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(final Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getModifiedAt() {
+        return modifiedAt;
+    }
+
+    public void setModifiedAt(final Instant modifiedAt) {
+        this.modifiedAt = modifiedAt;
+    }
+
+    public void changeWeight(final Weight weight) {
+        this.weight = weight;
+        markAsModified();
+        DomainRegistry.publish(new GoodWeightChanged(this.snapshot(), this.modifiedAt));
+    }
+
+    public void changePackaging(final Packaging packaging) {
+        this.packaging = packaging;
+        markAsModified();
+        DomainRegistry.publish(new GoodPackagingChanged(this.snapshot(), this.modifiedAt));
+    }
+
+    public void changeFlammable(final boolean flammable) {
+        this.flammable = flammable;
+    }
+
+    private void markAsModified() {
+        this.modifiedAt = Instant.now();
+    }
+    
+    private GoodSnapshot snapshot() {
+		return new GoodSnapshot(dangerousGoodId, shipmentId, name, description, classificationCode, hazardSymbols,
+				storageRequirement, handlingInstructions, weight, packaging, flammable, corrosive, toxic,
+				emergencyContact, countryOfOrigin, safetyDataSheet);
+    }
+
+    public GoodSnapshot toSnapshot() {
+        return snapshot();
     }
 }
 
