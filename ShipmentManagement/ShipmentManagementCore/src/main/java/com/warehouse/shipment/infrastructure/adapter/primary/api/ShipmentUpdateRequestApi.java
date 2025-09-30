@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
-public final class ShipmentUpdateRequestDto {
+public final class ShipmentUpdateRequestApi {
 	private final ShipmentIdDto shipmentId;
 	private final PersonDto sender;
 	private final PersonDto recipient;
@@ -8,11 +8,11 @@ public final class ShipmentUpdateRequestDto {
     private final String token;
 	private final ShipmentUpdateTypeDto shipmentUpdateType;
 
-	public ShipmentUpdateRequestDto(final ShipmentIdDto shipmentId,
-                                    final PersonDto sender,
-                                    final PersonDto recipient,
-                                    final String destination,
-                                    final String token,
+	public ShipmentUpdateRequestApi(final ShipmentIdDto shipmentId,
+									final PersonDto sender,
+									final PersonDto recipient,
+									final String destination,
+									final String token,
 									final ShipmentUpdateTypeDto shipmentUpdateType) {
 		this.shipmentId = shipmentId;
 		this.sender = sender;

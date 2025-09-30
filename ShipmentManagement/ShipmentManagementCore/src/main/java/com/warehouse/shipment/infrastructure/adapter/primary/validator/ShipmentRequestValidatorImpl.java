@@ -96,7 +96,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
 
     @Override
-    public void validateBody(final ShipmentUpdateRequestDto shipmentRequest) {
+    public void validateBody(final ShipmentUpdateRequestApi shipmentRequest) {
         validateRequest(shipmentRequest);
     }
 

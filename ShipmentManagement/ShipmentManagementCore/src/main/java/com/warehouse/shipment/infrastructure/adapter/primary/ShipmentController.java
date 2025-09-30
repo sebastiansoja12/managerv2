@@ -88,7 +88,7 @@ public class ShipmentController {
     @PutMapping
     @Counted(value = "controller.shipment.update")
     @Timed(value = "controller.shipment.update")
-    public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestDto shipmentUpdateRequest) {
+    public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestApi shipmentUpdateRequest) {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
         final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
         final Result<Void, ErrorCode> result = shipmentPort.update(request);

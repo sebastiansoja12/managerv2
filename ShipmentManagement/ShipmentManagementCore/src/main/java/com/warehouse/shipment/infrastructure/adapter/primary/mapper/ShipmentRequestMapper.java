@@ -29,7 +29,7 @@ public interface ShipmentRequestMapper {
 
     ShipmentId map(final ShipmentIdDto shipmentId);
 
-    default ShipmentUpdateRequest map(final ShipmentUpdateRequestDto request) {
+    default ShipmentUpdateRequest map(final ShipmentUpdateRequestApi request) {
         final ShipmentId shipmentId = map(request.getShipmentId());
         final Sender sender = mapToSender(request.getSender());
         final Recipient recipient = mapToRecipient(request.getRecipient());
