@@ -102,7 +102,7 @@ public class ShipmentController {
         return response;
     }
     
-	@PutMapping("/dangerous-good")
+	// disabled
     @Counted(value = "controller.dangerousgood.add")
     @Timed(value = "controller.dangerousgood.add")
 	public ResponseEntity<?> addDangerousGood(

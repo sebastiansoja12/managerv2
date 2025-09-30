@@ -9,9 +9,11 @@ import com.warehouse.dangerousgood.domain.enumeration.ClassificationCode;
 import com.warehouse.dangerousgood.domain.enumeration.Packaging;
 import com.warehouse.dangerousgood.domain.enumeration.StorageRequirement;
 import com.warehouse.dangerousgood.domain.model.DangerousGood;
+import com.warehouse.dangerousgood.domain.model.DangerousGoodChangeWeightRequest;
 import com.warehouse.dangerousgood.domain.model.DangerousGoodCreateRequest;
 import com.warehouse.dangerousgood.domain.service.DangerousGoodService;
 import com.warehouse.dangerousgood.domain.service.ShipmentService;
+import com.warehouse.dangerousgood.domain.validator.ClassificationCodeValidator;
 import com.warehouse.dangerousgood.domain.validator.NameRequirementValidator;
 import com.warehouse.dangerousgood.domain.vo.DangerousGoodId;
 import com.warehouse.dangerousgood.domain.vo.Shipment;
@@ -31,6 +33,7 @@ public class DangerousGoodPortImpl implements DangerousGoodPort {
     @Override
     public void createDangerousGood(final DangerousGoodCreateRequest request) {
         NameRequirementValidator.validateName(request.getName());
+        ClassificationCodeValidator.validateClassificationCode(request.getClassificationCode());
 
         final DangerousGoodId dangerousGoodId = this.dangerousGoodService.nextDangerousGoodId();
         final Shipment shipment = this.shipmentService.findById(request.getShipmentId());
@@ -61,6 +64,15 @@ public class DangerousGoodPortImpl implements DangerousGoodPort {
 
         this.dangerousGoodService.createDangerousGood(dangerousGood);
 
+    }
+
+    @Override
+    public void updateDangerousGoodWeight(final DangerousGoodChangeWeightRequest request) {
+        final Shipment shipment = this.shipmentService.findById(request.getShipmentId());
+        if (shipment == null) {
+            throw new IllegalArgumentException("Shipment not found");
+        }
+        this.dangerousGoodService.updateWeight(request.getDangerousGoodId(), request.getWeight());
     }
 
     private List<String> cleanHazardSymbols(final List<String> hazardSymbols) {

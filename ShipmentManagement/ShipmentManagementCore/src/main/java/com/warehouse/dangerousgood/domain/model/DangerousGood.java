@@ -14,6 +14,7 @@ import com.warehouse.dangerousgood.domain.event.GoodWeightChanged;
 import com.warehouse.dangerousgood.domain.registry.DomainRegistry;
 import com.warehouse.dangerousgood.domain.vo.DangerousGoodId;
 import com.warehouse.dangerousgood.domain.vo.GoodSnapshot;
+import com.warehouse.dangerousgood.infrastructure.adapter.secondary.entity.DangerousGoodEntity;
 
 public class DangerousGood {
 
@@ -236,6 +237,18 @@ public class DangerousGood {
 
     public GoodSnapshot toSnapshot() {
         return snapshot();
+    }
+
+    public static DangerousGood from(final DangerousGoodEntity dangerousGoodEntity) {
+        return new DangerousGood(dangerousGoodEntity.getDangerousGoodId(),
+                dangerousGoodEntity.getShipmentId(), dangerousGoodEntity.getName(),
+                dangerousGoodEntity.getDescription(), dangerousGoodEntity.getClassificationCode(),
+                List.of(dangerousGoodEntity.getHazardSymbols().split(",")),
+                dangerousGoodEntity.getStorageRequirements(), dangerousGoodEntity.getHandlingInstructions(),
+                dangerousGoodEntity.getWeight(), dangerousGoodEntity.getPackaging(),
+                dangerousGoodEntity.isFlammable(), dangerousGoodEntity.isCorrosive(),
+                dangerousGoodEntity.isToxic(), dangerousGoodEntity.getEmergencyContact(),
+                dangerousGoodEntity.getCountryOfOrigin(), dangerousGoodEntity.getSafetyDataSheet());
     }
 }
 
