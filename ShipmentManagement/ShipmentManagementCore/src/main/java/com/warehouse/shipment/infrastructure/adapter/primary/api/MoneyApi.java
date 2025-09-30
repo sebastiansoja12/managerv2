@@ -2,13 +2,13 @@ package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
 import java.math.BigDecimal;
 
-public class MoneyDto {
+public class MoneyApi {
     private BigDecimal amount;
     private String currency;
 
-    public MoneyDto() {}
+    public MoneyApi() {}
 
-    public MoneyDto(final BigDecimal amount, final String currency) {
+    public MoneyApi(final BigDecimal amount, final String currency) {
         this.amount = amount;
         this.currency = currency;
     }

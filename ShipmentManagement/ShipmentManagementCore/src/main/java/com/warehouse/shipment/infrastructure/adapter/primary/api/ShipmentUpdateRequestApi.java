@@ -2,18 +2,18 @@ package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
 public final class ShipmentUpdateRequestApi {
 	private final ShipmentIdDto shipmentId;
-	private final PersonDto sender;
-	private final PersonDto recipient;
+	private final PersonApi sender;
+	private final PersonApi recipient;
 	private final String destination;
     private final String token;
-	private final ShipmentUpdateTypeDto shipmentUpdateType;
+	private final ShipmentUpdateTypeApi shipmentUpdateType;
 
 	public ShipmentUpdateRequestApi(final ShipmentIdDto shipmentId,
-									final PersonDto sender,
-									final PersonDto recipient,
+									final PersonApi sender,
+									final PersonApi recipient,
 									final String destination,
 									final String token,
-									final ShipmentUpdateTypeDto shipmentUpdateType) {
+									final ShipmentUpdateTypeApi shipmentUpdateType) {
 		this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -22,7 +22,7 @@ public final class ShipmentUpdateRequestApi {
         this.shipmentUpdateType = shipmentUpdateType;
     }
 
-	public ShipmentUpdateTypeDto getShipmentUpdateType() {
+	public ShipmentUpdateTypeApi getShipmentUpdateType() {
 		return shipmentUpdateType;
 	}
 
@@ -34,11 +34,11 @@ public final class ShipmentUpdateRequestApi {
 		return shipmentId;
 	}
 
-	public PersonDto getSender() {
+	public PersonApi getSender() {
 		return sender;
 	}
 
-	public PersonDto getRecipient() {
+	public PersonApi getRecipient() {
 		return recipient;
 	}
 

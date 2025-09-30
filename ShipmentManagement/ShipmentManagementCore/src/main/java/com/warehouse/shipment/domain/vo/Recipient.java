@@ -2,7 +2,7 @@ package com.warehouse.shipment.domain.vo;
 
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.PersonDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.PersonApi;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import lombok.Builder;
 
@@ -45,7 +45,7 @@ public class Recipient implements Person {
         return new Recipient(firstName, lastName, email, telephoneNumber, city, postalCode, street);
     }
 
-	public static Person from(final PersonDto request) {
+	public static Person from(final PersonApi request) {
 		return new Recipient(request.getFirstName(), request.getLastName(), request.getEmail(),
 				request.getTelephoneNumber(), request.getCity(), request.getPostalCode(), request.getStreet());
 	}

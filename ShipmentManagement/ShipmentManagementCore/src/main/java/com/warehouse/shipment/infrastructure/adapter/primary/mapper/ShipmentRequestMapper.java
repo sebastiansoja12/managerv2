@@ -18,9 +18,9 @@ import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentRequestMapper {
 
-    ShipmentCreateRequest map(final ShipmentCreateRequestDto requestDto);
+    ShipmentCreateRequest map(final ShipmentCreateRequestApi requestDto);
 
-    default Money map(final MoneyDto money) {
+    default Money map(final MoneyApi money) {
         if (money == null) {
             return null;
         }
@@ -39,17 +39,17 @@ public interface ShipmentRequestMapper {
                 map(request.getShipmentUpdateType()));
     }
 
-    ShipmentUpdateType map(final ShipmentUpdateTypeDto shipmentUpdateType);
+    ShipmentUpdateType map(final ShipmentUpdateTypeApi shipmentUpdateType);
     
-    Sender mapToSender(final PersonDto person);
+    Sender mapToSender(final PersonApi person);
 
-    Recipient mapToRecipient(final PersonDto person);
+    Recipient mapToRecipient(final PersonApi person);
 
-    default ShipmentStatusRequest map(final ShipmentStatusRequestDto shipmentStatusRequest) {
+    default ShipmentStatusRequest map(final ShipmentStatusRequestApi shipmentStatusRequest) {
         return new ShipmentStatusRequest(new ShipmentId(shipmentStatusRequest.shipmentId().getValue()), ShipmentStatus.valueOf(shipmentStatusRequest.shipmentStatus().name()));
     }
 
-    default SignatureChangeRequest map(final SignatureChangeRequestDto signatureChangeRequest) {
+    default SignatureChangeRequest map(final SignatureChangeRequestApi signatureChangeRequest) {
         final ShipmentId shipmentId = new ShipmentId(signatureChangeRequest.shipmentId().getValue());
         return new SignatureChangeRequest(shipmentId, signatureChangeRequest.signature(), signatureChangeRequest.signerName(),
                 signatureChangeRequest.documentReference());

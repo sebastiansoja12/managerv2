@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
-public enum CountryCodeDto {
+public enum CountryCodeApi {
     AL,
     AD,
     AM,

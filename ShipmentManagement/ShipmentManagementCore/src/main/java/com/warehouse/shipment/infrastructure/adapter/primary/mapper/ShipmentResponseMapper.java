@@ -44,8 +44,8 @@ public interface ShipmentResponseMapper {
         return bytes != null ? new String(bytes, StandardCharsets.UTF_8) : null;
     }
 
-	default MoneyDto map(final Money amount) {
-		return new MoneyDto(amount.getAmount(), amount.getCurrency().name());
+	default MoneyApi map(final Money amount) {
+		return new MoneyApi(amount.getAmount(), amount.getCurrency().name());
 	}
 
     ShipmentUpdateResponseDto map(final ShipmentUpdateResponse response);

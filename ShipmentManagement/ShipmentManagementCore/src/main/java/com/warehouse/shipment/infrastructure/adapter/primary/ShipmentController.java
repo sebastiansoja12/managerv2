@@ -58,7 +58,7 @@ public class ShipmentController {
     @PostMapping
     @Counted(value = "controller.shipment.create")
     @Timed(value = "controller.shipment.create")
-    public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestDto shipmentRequest) {
+    public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestApi shipmentRequest) {
         shipmentRequestValidator.validateBody(shipmentRequest);
         final ShipmentCreateRequest request = requestMapper.map(shipmentRequest);
         final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
@@ -106,7 +106,7 @@ public class ShipmentController {
     @Counted(value = "controller.dangerousgood.add")
     @Timed(value = "controller.dangerousgood.add")
 	public ResponseEntity<?> addDangerousGood(
-			@RequestBody final DangerousGoodCreateRequestDto dangerousGoodCreateRequest) {
+			@RequestBody final DangerousGoodCreateRequestApi dangerousGoodCreateRequest) {
         dangerousGoodValidator.validateDangerousGood(dangerousGoodCreateRequest);
 
         final DangerousGoodCreateRequest request = DangerousGoodCreateRequest.from(dangerousGoodCreateRequest);
@@ -124,7 +124,7 @@ public class ShipmentController {
     @PutMapping("/status")
     @Counted(value = "controller.shipment.status.update")
     @Timed(value = "controller.shipment.status.update")
-    public ResponseEntity<?> updateStatus(@RequestBody final ShipmentStatusRequestDto shipmentStatusRequest) {
+    public ResponseEntity<?> updateStatus(@RequestBody final ShipmentStatusRequestApi shipmentStatusRequest) {
         shipmentRequestValidator.validateBody(shipmentStatusRequest);
         final ShipmentStatusRequest request = requestMapper.map(shipmentStatusRequest);
         shipmentPort.changeShipmentStatusTo(request);
@@ -134,7 +134,7 @@ public class ShipmentController {
     @PutMapping("/signature")
     @Counted(value = "controller.signature.add")
     @Timed(value = "controller.signature.add")
-    public ResponseEntity<?> changeSignature(@RequestBody final SignatureChangeRequestDto signatureChangeRequest,
+    public ResponseEntity<?> changeSignature(@RequestBody final SignatureChangeRequestApi signatureChangeRequest,
                                              @Param("signatureMethod") final String signatureMethod) {
         validateSignatureMethod(signatureMethod);
         shipmentRequestValidator.validateBody(signatureChangeRequest);
@@ -155,7 +155,7 @@ public class ShipmentController {
     @PutMapping("/person")
     @Counted(value = "controller.person.update")
     @Timed(value = "controller.person.update")
-    public ResponseEntity<?> updatePerson(@RequestBody final PersonDto personRequest,
+    public ResponseEntity<?> updatePerson(@RequestBody final PersonApi personRequest,
                                           @RequestParam("shipmentId") @PathVariable final ShipmentIdDto shipmentId,
                                           @RequestParam("personType") final PersonType personType) {
         final Person person = personType == PersonType.SENDER ? Sender.from(personRequest) : Recipient.from(personRequest);
@@ -166,11 +166,11 @@ public class ShipmentController {
     @PutMapping("/countries")
     @Counted(value = "controller.country.update")
     @Timed(value = "controller.country.update")
-    public ResponseEntity<?> updatePerson(@RequestBody final CountryRequest countryRequest,
+    public ResponseEntity<?> updatePerson(@RequestBody final CountryRequestApi countryRequestApi,
                                           @RequestParam("shipmentId") final Long shipmentId) {
         final ShipmentId id = new ShipmentId(shipmentId);
 		final ShipmentCountryRequest request = new ShipmentCountryRequest(id,
-				CountryCode.valueOf(countryRequest.issuerCountryCode()), CountryCode.valueOf(countryRequest.receiverCountryCode()));
+				CountryCode.valueOf(countryRequestApi.issuerCountryCode()), CountryCode.valueOf(countryRequestApi.receiverCountryCode()));
         this.shipmentPort.changeShipmentCountries(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }

@@ -4,7 +4,7 @@ import com.warehouse.commonassets.enumeration.Country;
 
 import java.util.List;
 
-public record DangerousGoodCreateRequestDto(ShipmentIdDto shipmentId,
+public record DangerousGoodCreateRequestApi(ShipmentIdDto shipmentId,
                                             String name, String description, String classificationCode,
                                             List<String> hazardSymbols, String storageRequirements,
                                             String handlingInstructions, WeightDto weight,
