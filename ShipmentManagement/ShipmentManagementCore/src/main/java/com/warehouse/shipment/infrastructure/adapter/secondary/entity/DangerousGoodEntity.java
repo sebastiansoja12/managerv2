@@ -96,6 +96,9 @@ public class DangerousGoodEntity {
     }
 
     public static DangerousGoodEntity from(final DangerousGood dangerousGood) {
+        if (dangerousGood == null) {
+            return null;
+        }
         return new DangerousGoodEntity(dangerousGood.getDangerousGoodId());
     }
 

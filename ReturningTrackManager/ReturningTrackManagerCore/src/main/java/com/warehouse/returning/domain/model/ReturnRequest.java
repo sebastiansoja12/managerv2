@@ -1,87 +1,58 @@
 package com.warehouse.returning.domain.model;
 
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.returning.domain.vo.UserId;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 
-import lombok.Builder;
-import lombok.Data;
 
-@Data
-@Builder
 public class ReturnRequest {
     private List<ReturnPackageRequest> requests;
-    private String depotCode;
-    private String username;
+    private DepartmentCode issuerDepartmentCode;
+    private UserId issuerUserId;
 
-    public boolean isReturnTokenNotAvailable() {
-		return requests.stream()
-                .anyMatch(ReturnPackageRequest::isReturnNotTokenAvailable);
+    public ReturnRequest() {
     }
 
-    public void assignDepotToReturnPackages() {
-        requests = requests.stream()
-                .peek(returnPackageRequest -> returnPackageRequest.updateDepot(depotCode))
-                .collect(Collectors.toList());
-    }
-
-    public void assignUserToReturnPackages() {
-        requests = requests.stream()
-                .peek(returnPackageRequest -> returnPackageRequest.updateUser(username))
-                .collect(Collectors.toList());
-    }
-
-    public boolean isUserMissing() {
-        return StringUtils.isEmpty(username);
-    }
-
-    public boolean isDepotCodeMissing() {
-        return StringUtils.isEmpty(depotCode);
-    }
-
-    public void filterProcessingReturns() {
-        requests = requests.stream()
-                .filter(ReturnPackageRequest::isProcessing)
-                .peek(ReturnPackageRequest::completeReturn)
-                .collect(Collectors.toList());
-    }
-
-    public void filterCreatedReturns() {
-        requests = requests.stream()
-                .filter(ReturnPackageRequest::isCreated)
-                .peek(ReturnPackageRequest::processReturn)
-                .collect(Collectors.toList());
-    }
-
-    public void revertCancelledParcels(List<ReturnPackageRequest> requests) {
+    public ReturnRequest(final DepartmentCode issuerDepartmentCode, final UserId issuerUserId,
+                         final List<ReturnPackageRequest> requests) {
+        this.issuerDepartmentCode = issuerDepartmentCode;
+        this.issuerUserId = issuerUserId;
         this.requests = requests;
     }
 
-    public boolean isCancelled() {
-        return requests.stream().anyMatch(ReturnPackageRequest::isCancelled);
+    public static ReturnRequest from(final ReturnRequestApi returnApiRequest) {
+        final DepartmentCode departmentCode = DepartmentCode.of(returnApiRequest.departmentCode());
+        final UserId userId = UserId.of(returnApiRequest.userId());
+        final List<ReturnPackageRequest> returnPackageRequests = returnApiRequest.requests()
+                .stream()
+                .map(ReturnPackageRequest::from)
+                .toList();
+        return new ReturnRequest(departmentCode, userId, returnPackageRequests);
     }
 
-    public boolean isProcessing() {
-        return checkStatus(ReturnPackageRequest::isProcessing);
+    public DepartmentCode getIssuerDepartmentCode() {
+        return issuerDepartmentCode;
     }
 
-    public boolean isCreated() {
-        return checkStatus(ReturnPackageRequest::isCreated);
+    public void setIssuerDepartmentCode(final DepartmentCode issuerDepartmentCode) {
+        this.issuerDepartmentCode = issuerDepartmentCode;
     }
 
-    public boolean isCompleted() {
-        return checkStatus(ReturnPackageRequest::isCompleted);
+    public UserId getIssuerUserId() {
+        return issuerUserId;
     }
 
-    private boolean checkStatus(Predicate<ReturnPackageRequest> condition) {
-        return requests.stream().anyMatch(condition);
+    public void setIssuerUserId(final UserId issuerUserId) {
+        this.issuerUserId = issuerUserId;
     }
 
-    public void filterCancelledReturns() {
-        requests = requests.stream()
-                .filter(ReturnPackageRequest::isCancelled)
-                .collect(Collectors.toList());
+    public List<ReturnPackageRequest> getRequests() {
+        return requests;
+    }
+
+    public void setRequests(final List<ReturnPackageRequest> requests) {
+        this.requests = requests;
     }
 }

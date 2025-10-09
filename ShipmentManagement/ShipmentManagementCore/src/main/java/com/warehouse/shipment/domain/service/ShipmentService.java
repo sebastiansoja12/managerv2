@@ -4,7 +4,6 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
@@ -12,8 +11,6 @@ import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 public interface ShipmentService {
 
     void createShipment(final Shipment shipment);
-
-    void updateShipment(final ShipmentUpdate shipmentUpdate, final ShipmentId shipmentId);
 
     void changeSenderTo(final ShipmentId shipmentId, final Sender sender);
 

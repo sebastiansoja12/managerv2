@@ -1,23 +1,22 @@
 package com.warehouse.returning.infrastructure.adapter.primary;
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
-
-import com.warehouse.returning.domain.port.primary.ReturnPort;
-import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
-import com.warehouse.returning.infrastructure.adapter.primary.mapper.ReturnResponseMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.warehouse.returning.infrastructure.adapter.primary.mapper.ResponseMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import com.warehouse.returning.domain.model.ReturnRequest;
+import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.vo.ReturnId;
 import com.warehouse.returning.domain.vo.ReturnModel;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 import com.warehouse.returning.infrastructure.adapter.primary.api.DeleteReturnResponse;
-import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturningRequestDto;
-import com.warehouse.returning.infrastructure.adapter.primary.mapper.ReturnRequestMapper;
+import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @RestController
@@ -28,31 +27,32 @@ public class ReturnController {
 
     private final ReturnPort returnPort;
 
-    private final ReturnRequestMapper requestMapper = getMapper(ReturnRequestMapper.class);
-
-    private final ReturnResponseMapper responseMapper = getMapper(ReturnResponseMapper.class);
-
-
     @PostMapping
-    public ResponseEntity<?> process(@RequestBody ReturningRequestDto returningRequest) {
-        
-		log.info("Detected request for returning from user: {} from depot: {}",
-				returningRequest.getUsername().getValue(), returningRequest.getDepotCode().getValue());
+    public ResponseEntity<?> process(
+            @RequestHeader("X-API-KEY") final String apiKey,
+            @RequestBody final ReturnRequestApi returnApiRequest) {
 
-        final ReturnRequest request = requestMapper.map(returningRequest);
+        // TODO
+        if (StringUtils.isEmpty(apiKey)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+		log.info("Detected request for returning from user: {} from department: {}",
+				returnApiRequest.userId().value(), returnApiRequest.departmentCode().value());
+
+        final ReturnRequest request = ReturnRequest.from(returnApiRequest);
         
         
-        final ReturnResponse response = returnPort.process(request);
+        final ReturnResponse response = this.returnPort.process(request);
         
-        
-        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+        return ResponseEntity.ok().body(ResponseMapper.toResponseApi(response));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable Long id) {
         final ReturnId returnId = new ReturnId(id);
         final ReturnModel returnModel = returnPort.getReturn(returnId);
-        return new ResponseEntity<>(responseMapper.map(returnModel), HttpStatus.OK);
+        return new ResponseEntity<>(returnModel, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

@@ -17,7 +17,6 @@ import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.*;
 
@@ -31,8 +30,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     private final PathFinderServicePort pathFinderServicePort;
 
     private final NotificationCreatorProvider notificationCreatorProvider;
-
-    private final TrackingStatusServicePort trackingStatusServicePort;
 
     private final Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
@@ -50,7 +47,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
                             final NotificationCreatorProvider notificationCreatorProvider,
-                            final TrackingStatusServicePort trackingStatusServicePort,
                             final Set<ShipmentStatusHandler> shipmentStatusHandlers,
                             final CountryDetermineService countryDetermineService,
                             final PriceService priceService,
@@ -60,7 +56,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
-        this.trackingStatusServicePort = trackingStatusServicePort;
         this.shipmentStatusHandlers = shipmentStatusHandlers;
         this.countryDetermineService = countryDetermineService;
         this.priceService = priceService;
@@ -140,12 +135,10 @@ public class ShipmentPortImpl implements ShipmentPort {
             case REDIRECT -> {
                 this.shipmentService.changeRecipientTo(shipmentId, recipient);
                 this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, this.shipmentService.nextShipmentId());
-                this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REDIRECT);
             }
             case REROUTE -> {
                 this.shipmentService.changeRecipientTo(shipmentId, recipient);
                 this.shipmentService.changeSenderTo(shipmentId, sender);
-                this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REROUTE);
             }
 
             default -> {
@@ -165,6 +158,11 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentService.changeDangerousGoodTo(shipmentId, DangerousGood.from(request));
 
         return Result.success();
+    }
+
+    @Override
+    public void processShipmentReturn(final ShipmentReturnRequest request) {
+        this.shipmentService.notifyShipmentReturned(request.getShipmentId());
     }
 
     @Override
@@ -223,8 +221,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
 	@Override
 	public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
-		final ShipmentStatus status = request.getShipmentStatus();
-		final ShipmentId shipmentId = request.getShipmentId();
+		final ShipmentStatus status = request.shipmentStatus();
+		final ShipmentId shipmentId = request.shipmentId();
         shipmentStatusHandlers.stream()
                 .filter(shipmentStatusHandler -> shipmentStatusHandler.canHandle(status))
                 .findAny()

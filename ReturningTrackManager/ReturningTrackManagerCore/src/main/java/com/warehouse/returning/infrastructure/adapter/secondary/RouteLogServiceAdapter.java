@@ -1,28 +1,24 @@
 package com.warehouse.returning.infrastructure.adapter.secondary;
 
-import com.warehouse.returning.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.returning.domain.vo.ProcessReturn;
-import com.warehouse.returning.infrastructure.adapter.secondary.api.ReturnTrackRequestDto;
-import com.warehouse.returning.infrastructure.adapter.secondary.mapper.RouteLogRequestMapper;
-import com.warehouse.returning.infrastructure.adapter.secondary.properties.Addressing;
-import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestGatewaySupport;
 
-import static org.mapstruct.factory.Mappers.getMapper;
+import com.warehouse.returning.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.returning.domain.vo.ProcessReturn;
+import com.warehouse.returning.infrastructure.adapter.secondary.api.ReturnTrackRequestDto;
+import com.warehouse.returning.infrastructure.adapter.secondary.properties.Addressing;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 
-// TODO - to be moved to ZebraIntegration module
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteLogServicePort {
 
     private final RouteTrackerLogProperties routeTrackerLogProperties;
 
     private final RestClient restClient;
-
-    private final RouteLogRequestMapper requestMapper = getMapper(RouteLogRequestMapper.class);
 
     public RouteLogServiceAdapter(RouteTrackerLogProperties routeTrackerLogProperties) {
         this.routeTrackerLogProperties = routeTrackerLogProperties;
@@ -32,7 +28,7 @@ public class RouteLogServiceAdapter extends RestGatewaySupport implements RouteL
     @Override
     public void logReturn(ProcessReturn processReturn, String depotCode, String username) {
         final RouteLogServiceConfiguration configuration = new RouteLogServiceConfiguration(routeTrackerLogProperties);
-        final ReturnTrackRequestDto request = requestMapper.map(processReturn, depotCode, username);
+        final ReturnTrackRequestDto request = null;
         logReturn(configuration, request);
     }
 

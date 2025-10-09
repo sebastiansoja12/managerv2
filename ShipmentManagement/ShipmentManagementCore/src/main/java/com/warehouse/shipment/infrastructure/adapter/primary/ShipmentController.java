@@ -13,10 +13,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
-import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
-import com.warehouse.shipment.domain.model.SignatureChangeRequest;
+import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
@@ -100,6 +97,15 @@ public class ShipmentController {
             response = ResponseEntity.badRequest().body(result.getFailure());
         }
         return response;
+    }
+
+    @PutMapping("/returns")
+    @Counted(value = "controller.shipment.return")
+    @Timed(value = "controller.shipment.return")
+    public ResponseEntity<?> returnShipment(@RequestBody final ShipmentReturnRequestApi shipmentReturnRequest) {
+        final ShipmentReturnRequest request = ShipmentReturnRequest.from(shipmentReturnRequest);
+        this.shipmentPort.processShipmentReturn(request);
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
     
 	// disabled

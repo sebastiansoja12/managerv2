@@ -14,6 +14,6 @@ public class ReturnModelDto {
     ReturnStatusDto returnStatus;
     ReturnTokenDto returnToken;
     SupplierCodeDto supplierCode;
-    DepotCodeDto depotCode;
-    UsernameDto username;
+    DepartmentCodeApi depotCode;
+    UsernameApi username;
 }

@@ -23,7 +23,6 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
-import com.warehouse.tracking.infrastructure.adapter.primary.api.TrackingStatusEventPublisher;
 import com.warehouse.voronoi.VoronoiService;
 
 import io.github.resilience4j.retry.RetryConfig;
@@ -77,15 +76,14 @@ public class ShipmentConfiguration {
 	public ShipmentPort shipmentPort(final ShipmentService service,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final NotificationCreatorProvider notificationCreatorProvider,
-									 final TrackingStatusServicePort trackingStatusServicePort,
 									 final Set<ShipmentStatusHandler> shipmentStatusHandlers,
 									 final CountryDetermineService countryDetermineService,
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
 									 final SignatureService signatureService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				notificationCreatorProvider, trackingStatusServicePort, shipmentStatusHandlers,
-				countryDetermineService, priceService, countryServiceAvailabilityService, signatureService);
+				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
+				countryServiceAvailabilityService, signatureService);
 	}
 	
 	@Bean
@@ -176,12 +174,6 @@ public class ShipmentConfiguration {
 	public ShipmentRepository shipmentMockRepository() {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment mock repository");
 		return new ShipmentRepositoryMockImpl();
-	}
-	
-	@Bean("shipment.rerouteTokenServicePort")
-	public TrackingStatusServicePort rerouteTokenServicePort(
-			final TrackingStatusEventPublisher trackingStatusEventPublisher) {
-		return new TrackingStatusServiceAdapter(trackingStatusEventPublisher);
 	}
 
 	@Bean
