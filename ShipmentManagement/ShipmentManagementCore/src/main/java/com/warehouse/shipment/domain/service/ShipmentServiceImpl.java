@@ -168,6 +168,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
+    public void notifyReturnCanceled(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.notifyShipmentReturnCanceled();
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
     public void changeShipmentCountries(final ShipmentCountryRequest request) {
         final Shipment shipment = this.shipmentRepository.findById(request.shipmentId());
         shipment.updateCountries(request);

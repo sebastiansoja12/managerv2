@@ -6,5 +6,5 @@ import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.domain.vo.ReturnPackageSnapshot;
 
 public interface ShipmentNotifyClientPort {
-    Result<ResponseStatus, ErrorCode> notifyReturnCreated(final ReturnPackageSnapshot snapshot);
+    Result<ResponseStatus, ErrorCode> notifyReturnChanged(final ReturnPackageSnapshot snapshot);
 }

@@ -3,6 +3,7 @@ package com.warehouse.returning.domain.port.primary;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.vo.ReturnId;
 import com.warehouse.returning.domain.vo.ReturnModel;
+import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 
 public interface ReturnPort {
@@ -10,5 +11,5 @@ public interface ReturnPort {
 
     ReturnModel getReturn(ReturnId returnId);
 
-    void delete(ReturnId returnId);
+    void delete(final ReturnPackageId returnPackageId);
 }

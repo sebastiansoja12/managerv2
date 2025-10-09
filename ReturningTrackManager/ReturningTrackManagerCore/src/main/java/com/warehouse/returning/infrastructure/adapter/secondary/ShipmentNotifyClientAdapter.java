@@ -28,7 +28,7 @@ public class ShipmentNotifyClientAdapter implements ShipmentNotifyClientPort {
     }
 
     @Override
-    public Result<ResponseStatus, ErrorCode> notifyReturnCreated(final ReturnPackageSnapshot snapshot) {
+    public Result<ResponseStatus, ErrorCode> notifyReturnChanged(final ReturnPackageSnapshot snapshot) {
         final ShipmentReturnRequestApi request = RequestMapper.toShipmentReturnRequestApi(snapshot);
         final ResponseEntity<Void> responseEntity = restClient.put()
                 .uri("/v2/api/shipments/returns")

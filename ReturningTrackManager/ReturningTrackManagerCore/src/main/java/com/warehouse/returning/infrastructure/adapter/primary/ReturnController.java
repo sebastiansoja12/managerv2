@@ -1,5 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.primary;
 
+import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.ResponseMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -57,8 +58,8 @@ public class ReturnController {
 
     @DeleteMapping("/{id}")
     public DeleteReturnResponse delete(@PathVariable Long id) {
-        final ReturnId returnId = new ReturnId(id);
-        returnPort.delete(returnId);
+        final ReturnPackageId returnPackageId = new ReturnPackageId(id);
+        returnPort.delete(returnPackageId);
         return new DeleteReturnResponse(ResponseStatus.OK);
     }
 }

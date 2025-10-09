@@ -15,7 +15,7 @@ public class ReturnPackageToModelMapper {
                 .shipmentId(new ShipmentId(entity.getShipmentId().getValue()))
                 .reason(entity.getReason())
                 .returnStatus(ReturnStatusMapper.toModelStatus(entity.getReturnStatus()))
-                .returnToken(new ReturnToken(entity.getReturnToken().getValue()))
+                .returnToken(entity.getReturnToken() != null ? new ReturnToken(entity.getReturnToken().getValue()) : null)
                 .assignedDepartmentCode(new com.warehouse.returning.domain.vo.DepartmentCode(entity.getAssignedDepartmentCode().getValue()))
                 .returnedDepartmentCode(new com.warehouse.returning.domain.vo.DepartmentCode(entity.getReturnedDepartmentCode().getValue()))
                 .assignedTo(new com.warehouse.returning.domain.vo.UserId(entity.getAssignedTo().getValue()))

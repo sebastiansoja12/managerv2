@@ -515,6 +515,12 @@ public class Shipment {
         DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
+    public void notifyShipmentReturnCanceled() {
+        changeShipmentStatus(ShipmentStatus.DELIVERY);
+        markAsModified();
+        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
+    }
+
     public void changeDestinationDepartment(final String destination) {
         this.destination = destination;
     }

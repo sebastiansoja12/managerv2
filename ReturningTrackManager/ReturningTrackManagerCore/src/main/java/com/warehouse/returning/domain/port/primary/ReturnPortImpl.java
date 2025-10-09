@@ -51,7 +51,7 @@ public class ReturnPortImpl implements ReturnPort {
     }
 
     @Override
-    public void delete(ReturnId returnId) {
-        returnService.deleteReturn(null);
+    public void delete(final ReturnPackageId returnPackageId) {
+        returnService.deleteReturn(returnPackageId);
     }
 }

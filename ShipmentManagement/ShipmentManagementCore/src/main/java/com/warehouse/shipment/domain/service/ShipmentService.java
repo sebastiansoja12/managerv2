@@ -46,6 +46,8 @@ public interface ShipmentService {
 
     void notifyShipmentDelivered(final ShipmentId shipmentId);
 
+    void notifyReturnCanceled(final ShipmentId shipmentId);
+
     void changeShipmentCountries(ShipmentCountryRequest request);
 
     void lockShipment(final ShipmentId shipmentId);

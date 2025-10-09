@@ -9,6 +9,7 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.PersonType;
+import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
@@ -162,7 +163,12 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public void processShipmentReturn(final ShipmentReturnRequest request) {
-        this.shipmentService.notifyShipmentReturned(request.getShipmentId());
+        final ReturnStatus returnStatus = request.getReturnStatus();
+        final ShipmentId shipmentId = request.getShipmentId();
+        switch (returnStatus) {
+            case CREATED ->  this.shipmentService.notifyShipmentReturned(shipmentId);
+            case CANCELLED -> this.shipmentService.notifyReturnCanceled(shipmentId);
+        }
     }
 
     @Override
