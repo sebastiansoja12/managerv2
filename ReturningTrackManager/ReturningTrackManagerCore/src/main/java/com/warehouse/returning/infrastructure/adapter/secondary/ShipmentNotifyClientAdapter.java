@@ -31,6 +31,7 @@ public class ShipmentNotifyClientAdapter implements ShipmentNotifyClientPort {
                 .uri("/v2/api/shipments/returns")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
+                .headers(httpHeaders -> httpHeaders.set("Authorization", "Bearer "))
                 .retrieve()
                 .toBodilessEntity();
 
