@@ -61,6 +61,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             final String requestUri = request.getRequestURI();
             final String className = this.getClass().getSimpleName();
             final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            final String method = request.getMethod();
 
             try {
                 try (MDC.MDCCloseable c1 = MDC.putCloseable("tenant", tenant);
@@ -68,7 +69,8 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                      MDC.MDCCloseable c3 = MDC.putCloseable("ip", clientIp);
                      MDC.MDCCloseable c4 = MDC.putCloseable("uri", requestUri);
                      MDC.MDCCloseable c5 = MDC.putCloseable("class", className);
-                     MDC.MDCCloseable c6 = MDC.putCloseable("time", timestamp)) {
+                     MDC.MDCCloseable c6 = MDC.putCloseable("time", timestamp);
+                     MDC.MDCCloseable c7 = MDC.putCloseable("method", method)) {
 
                     log.info("Incoming request from user={} tenant={} uri={} ip={}",
                             user, tenant, requestUri, clientIp);

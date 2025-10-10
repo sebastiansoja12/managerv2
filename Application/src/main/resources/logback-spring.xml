@@ -4,7 +4,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %clr(%5p){ERROR=red, WARN=yellow, INFO=blue, DEBUG=blue, TRACE=magenta} [TENANT=%X{tenant:-N/A}] USER=%X{user:-N/A} IP=%X{ip:-N/A} URI=%X{uri:-N/A} CLASS=%X{class:-N/A} TIME=%X{time:-N/A}] %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %clr(%5p){ERROR=red, WARN=yellow, INFO=blue, DEBUG=blue, TRACE=magenta} [TENANT=%X{tenant:-N/A}] USER=%X{user:-N/A} IP=%X{ip:-N/A} URI=%X{uri:-N/A} CLASS=%X{class:-N/A} TIME=%X{time:-N/A} METHOD=%X{method:-N/A} %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
