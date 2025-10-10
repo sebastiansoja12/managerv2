@@ -26,19 +26,22 @@ import com.warehouse.returning.infrastructure.adapter.primary.mapper.ResponseMap
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.BusinessException;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
 @RestController
 @RequestMapping("/returns")
-@RequiredArgsConstructor
 @Slf4j
 public class ReturnController {
 
     private final ReturnPort returnPort;
 
     private final ApiKeyService apiKeyService;
+
+    public ReturnController(final ReturnPort returnPort, final ApiKeyService apiKeyService) {
+        this.returnPort = returnPort;
+        this.apiKeyService = apiKeyService;
+    }
 
     @PostMapping
     public ResponseEntity<?> process(
