@@ -1,8 +1,10 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
@@ -23,7 +25,12 @@ public interface ShipmentResponseMapper {
 
     ShipmentCreateResponseDto map(final ShipmentCreateResponse response);
 
+    @Mapping(target = "dangerousGood.weight.value", source = "dangerousGood.weight.weight")
     ShipmentDto map(final Shipment shipment);
+
+    default List<String> map(String value) {
+        return List.of(value);
+    }
 
     default SignatureDto map(final Signature signature) {
         if (signature == null) {
@@ -37,8 +44,8 @@ public interface ShipmentResponseMapper {
         return bytes != null ? new String(bytes, StandardCharsets.UTF_8) : null;
     }
 
-	default MoneyDto map(final Money amount) {
-		return new MoneyDto(amount.getAmount(), amount.getCurrency().name());
+	default MoneyApi map(final Money amount) {
+		return new MoneyApi(amount.getAmount(), amount.getCurrency().name());
 	}
 
     ShipmentUpdateResponseDto map(final ShipmentUpdateResponse response);

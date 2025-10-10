@@ -1,12 +1,5 @@
 package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
-import lombok.*;
-import lombok.extern.jackson.Jacksonized;
+public record ShipmentIdDto(Long value) {
 
-
-@Value
-@Builder
-@Jacksonized
-public class ShipmentIdDto {
-    Long value;
 }

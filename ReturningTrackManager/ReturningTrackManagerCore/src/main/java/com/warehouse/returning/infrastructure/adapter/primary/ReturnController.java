@@ -1,64 +1,127 @@
 package com.warehouse.returning.infrastructure.adapter.primary;
 
-import static org.mapstruct.factory.Mappers.getMapper;
+import java.util.Map;
 
-
-import com.warehouse.returning.domain.port.primary.ReturnPort;
-import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
-import com.warehouse.returning.infrastructure.adapter.primary.mapper.ReturnResponseMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.warehouse.exceptionhandler.exception.RestException;
+import com.warehouse.returning.domain.exception.JwtDecodingException;
+import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
-import com.warehouse.returning.domain.vo.ReturnId;
-import com.warehouse.returning.domain.vo.ReturnModel;
+import com.warehouse.returning.domain.port.primary.ReturnPort;
+import com.warehouse.returning.domain.service.ApiKeyService;
+import com.warehouse.returning.domain.vo.ChangeReasonCodeRequest;
+import com.warehouse.returning.domain.vo.DecodedApiTenant;
+import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnResponse;
+import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReasonCodeRequestApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.DeleteReturnResponse;
-import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturningRequestDto;
-import com.warehouse.returning.infrastructure.adapter.primary.mapper.ReturnRequestMapper;
+import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnResponseApi;
+import com.warehouse.returning.infrastructure.adapter.primary.mapper.RequestMapper;
+import com.warehouse.returning.infrastructure.adapter.primary.mapper.ResponseMapper;
+import com.warehouse.returning.infrastructure.adapter.secondary.exception.BusinessException;
+
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 
 @RestController
 @RequestMapping("/returns")
-@RequiredArgsConstructor
 @Slf4j
 public class ReturnController {
 
     private final ReturnPort returnPort;
 
-    private final ReturnRequestMapper requestMapper = getMapper(ReturnRequestMapper.class);
+    private final ApiKeyService apiKeyService;
 
-    private final ReturnResponseMapper responseMapper = getMapper(ReturnResponseMapper.class);
-
-
-    @PostMapping
-    public ResponseEntity<?> process(@RequestBody ReturningRequestDto returningRequest) {
-        
-		log.info("Detected request for returning from user: {} from depot: {}",
-				returningRequest.getUsername().getValue(), returningRequest.getDepotCode().getValue());
-
-        final ReturnRequest request = requestMapper.map(returningRequest);
-        
-        
-        final ReturnResponse response = returnPort.process(request);
-        
-        
-        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+    public ReturnController(final ReturnPort returnPort, final ApiKeyService apiKeyService) {
+        this.returnPort = returnPort;
+        this.apiKeyService = apiKeyService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable Long id) {
-        final ReturnId returnId = new ReturnId(id);
-        final ReturnModel returnModel = returnPort.getReturn(returnId);
-        return new ResponseEntity<>(responseMapper.map(returnModel), HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity<?> process(
+            @RequestHeader(value = "Authorization") final String authorizationHeader,
+            @RequestBody @Valid final ReturnRequestApi returnApiRequest) {
+
+        log.info("Received return request: {}", returnApiRequest.toString());
+
+        ResponseEntity<?> responseEntity;
+
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                log.warn("Missing or invalid Authorization header");
+                responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Missing or invalid Authorization header"));
+            } else {
+                final String token = authorizationHeader.substring(7);
+                final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
+
+                log.info("Processing return request from user: {}", decodedApiTenant.userId().value());
+
+                final ReturnRequest request = RequestMapper.map(returnApiRequest, decodedApiTenant);
+
+                if (request.getRequests().isEmpty()) {
+                    log.warn("Invalid return request: no items");
+                    responseEntity = ResponseEntity.badRequest()
+                            .body(Map.of("error", "Invalid request: no items to return"));
+                } else {
+                    final ReturnResponse response = this.returnPort.process(request);
+                    final ReturnResponseApi responseApi = ResponseMapper.toResponseApi(response);
+
+                    log.info("Return request processed successfully for user: {}", decodedApiTenant.userId().value());
+                    responseEntity = ResponseEntity.ok(responseApi);
+                }
+            }
+        } catch (final JwtDecodingException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid or expired token"));
+        } catch (final BusinessException e) {
+            log.error("Business error while processing return request: {}", e.getMessage());
+            responseEntity = ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (final Exception e) {
+            log.error("Unexpected error during return processing", e);
+            responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Internal server error"));
+        }
+
+        return responseEntity;
+    }
+
+
+    @PutMapping("/reason-code")
+    public ResponseEntity<?> updateReasonCode(@RequestBody final ChangeReasonCodeRequestApi changeReasonCodeRequest) {
+        final ChangeReasonCodeRequest request = RequestMapper.map(changeReasonCodeRequest);
+        this.returnPort.changeReasonCode(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{returnPackageId}")
+    public ResponseEntity<?> get(@PathVariable final Long returnPackageId) {
+        final ReturnPackageId returnId = new ReturnPackageId(returnPackageId);
+        final ReturnPackage returnModel = returnPort.getReturn(returnId);
+        return new ResponseEntity<>(returnModel, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public DeleteReturnResponse delete(@PathVariable Long id) {
-        final ReturnId returnId = new ReturnId(id);
-        returnPort.delete(returnId);
+        final ReturnPackageId returnPackageId = new ReturnPackageId(id);
+        returnPort.delete(returnPackageId);
         return new DeleteReturnResponse(ResponseStatus.OK);
     }
+
+
+    @ExceptionHandler(RestException.class)
+    public ResponseEntity<String> handleRestException(final RestException ex) {
+        return ResponseEntity
+                .status(ex.getCode())
+                .body(ex.getMessage());
+    }
+
 }

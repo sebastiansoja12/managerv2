@@ -35,4 +35,8 @@ public class ShipmentId {
 	public int hashCode() {
 		return Objects.hashCode(value);
 	}
+
+	public String toString() {
+		return "[" + value + "]";
+	}
 }

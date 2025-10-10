@@ -1,13 +1,17 @@
 package com.warehouse.shipment.domain.model;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
+import com.warehouse.shipment.domain.vo.DangerousGoodId;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.DangerousGoodEntity;
 
 public class DangerousGood {
 
+    private DangerousGoodId dangerousGoodId;
     private ShipmentId shipmentId;
     private String name;
     private String description;
@@ -24,12 +28,12 @@ public class DangerousGood {
     private Country countryOfOrigin;
     private String safetyDataSheet;
 
-    public DangerousGood(final ShipmentId shipmentId, final String name, final String description,
-                         final String classificationCode, final List<String> hazardSymbols,
-                         final String storageRequirements, final String handlingInstructions, final Weight weight,
-                         final String packaging, final boolean flammable, final boolean isCorrosive,
-                         final boolean toxic, final String emergencyContact,
-                         final Country countryOfOrigin, final String safetyDataSheet) {
+	public DangerousGood(final DangerousGoodId dangerousGoodId, final ShipmentId shipmentId, final String name,
+			final String description, final String classificationCode, final List<String> hazardSymbols,
+			final String storageRequirements, final String handlingInstructions, final Weight weight,
+			final String packaging, final boolean flammable, final boolean isCorrosive, final boolean toxic,
+			final String emergencyContact, final Country countryOfOrigin, final String safetyDataSheet) {
+        this.dangerousGoodId = dangerousGoodId;
         this.shipmentId = shipmentId;
         this.name = name;
         this.description = description;
@@ -49,6 +53,7 @@ public class DangerousGood {
 
     public static DangerousGood from(final DangerousGoodCreateRequest request) {
         return new DangerousGood(
+                request.getDangerousGoodId(),
                 request.getShipmentId(),
                 request.getName(),
                 request.getDescription(),
@@ -67,6 +72,31 @@ public class DangerousGood {
         );
     }
 
+    public static DangerousGood from(final DangerousGoodEntity entity) {
+        return new DangerousGood(
+                entity.getDangerousGoodId(),
+                entity.getShipmentId(),
+                entity.getName(),
+                entity.getDescription(),
+                entity.getClassificationCode().name(),
+                Collections.singletonList(entity.getHazardSymbols()),
+                entity.getStorageRequirements().name(),
+                entity.getHandlingInstructions(),
+                entity.getWeight(),
+                entity.getPackaging().name(),
+                entity.isFlammable(),
+                entity.isCorrosive(),
+                entity.isToxic(),
+                entity.getEmergencyContact(),
+                entity.getCountryOfOrigin(),
+                entity.getSafetyDataSheet()
+        );
+    }
+
+
+    public DangerousGoodId getDangerousGoodId() {
+        return dangerousGoodId;
+    }
 
     public ShipmentId getShipmentId() {
         return shipmentId;

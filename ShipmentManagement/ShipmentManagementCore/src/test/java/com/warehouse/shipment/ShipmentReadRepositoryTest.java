@@ -28,7 +28,6 @@ import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
-import com.warehouse.tracking.infrastructure.adapter.primary.api.TrackingStatusEventPublisher;
 import com.warehouse.voronoi.VoronoiService;
 
 @ExtendWith(SpringExtension.class)
@@ -46,9 +45,6 @@ public class ShipmentReadRepositoryTest {
 
         @MockBean
         public MailService mailService;
-
-        @MockBean
-        public TrackingStatusEventPublisher trackingStatusEventPublisher;
 
         @MockBean
         public ShipmentRepository shipmentRepository;

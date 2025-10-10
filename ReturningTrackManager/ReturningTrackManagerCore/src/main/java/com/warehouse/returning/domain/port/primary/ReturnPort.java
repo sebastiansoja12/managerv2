@@ -1,14 +1,15 @@
 package com.warehouse.returning.domain.port.primary;
 
+import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
-import com.warehouse.returning.domain.vo.ReturnId;
-import com.warehouse.returning.domain.vo.ReturnModel;
-import com.warehouse.returning.domain.vo.ReturnResponse;
+import com.warehouse.returning.domain.vo.*;
 
 public interface ReturnPort {
-    ReturnResponse process(ReturnRequest request);
+    ReturnResponse process(final ReturnRequest request);
 
-    ReturnModel getReturn(ReturnId returnId);
+    void changeReasonCode(final ChangeReasonCodeRequest request);
 
-    void delete(ReturnId returnId);
+    ReturnPackage getReturn(final ReturnPackageId returnId);
+
+    void delete(final ReturnPackageId returnPackageId);
 }

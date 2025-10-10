@@ -21,7 +21,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     }
 
     @Override
-    public void validateBody(final ShipmentCreateRequestDto request) {
+    public void validateBody(final ShipmentCreateRequestApi request) {
         validateRequest(request);
 
         final List<String> errors = new ArrayList<>();
@@ -48,11 +48,11 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
         }
     }
 
-    private boolean validateShipmentPrice(final MoneyDto price) {
+    private boolean validateShipmentPrice(final MoneyApi price) {
         return price != null && price.getAmount() == null && price.getCurrency() == null;
     }
 
-    private List<String> validatePerson(final PersonDto person) {
+    private List<String> validatePerson(final PersonApi person) {
         final Set<String> errors = new HashSet<>();
 
         if (StringUtils.isEmpty(person.getFirstName())) {
@@ -96,7 +96,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
 
     @Override
-    public void validateBody(final ShipmentUpdateRequestDto shipmentRequest) {
+    public void validateBody(final ShipmentUpdateRequestApi shipmentRequest) {
         validateRequest(shipmentRequest);
     }
 
@@ -107,12 +107,12 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     }
 
     @Override
-    public void validateBody(final ShipmentStatusRequestDto shipmentStatusRequest) {
+    public void validateBody(final ShipmentStatusRequestApi shipmentStatusRequest) {
 
     }
 
     @Override
-    public void validateBody(final SignatureChangeRequestDto signatureChangeRequest) {
+    public void validateBody(final SignatureChangeRequestApi signatureChangeRequest) {
         final List<String> errors = new ArrayList<>();
         errors.addAll(validateShipment(signatureChangeRequest.shipmentId()));
         errors.addAll(validateSignerName(signatureChangeRequest.signerName()));

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>ReturningTrackManager</artifactId>
-        <version>2025.2-SNAPSHOT</version>
+        <version>2025.3-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
 
@@ -124,6 +124,14 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
         </dependency>
     </dependencies>
 

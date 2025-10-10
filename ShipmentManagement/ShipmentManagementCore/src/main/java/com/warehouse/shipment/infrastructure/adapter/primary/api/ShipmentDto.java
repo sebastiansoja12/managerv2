@@ -4,9 +4,9 @@ public class ShipmentDto {
     
     private final ShipmentIdDto shipmentId;
 
-    private final PersonDto sender;
+    private final PersonApi sender;
 
-    private final PersonDto recipient;
+    private final PersonApi recipient;
 
     private final ShipmentSizeDto shipmentSize;
 
@@ -18,17 +18,19 @@ public class ShipmentDto {
 
     private final ShipmentPriorityDto shipmentPriority;
 
-    private final MoneyDto price;
+    private final MoneyApi price;
 
     private final Boolean locked;
 
     private final SignatureDto signature;
 
-	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonDto sender, final PersonDto recipient,
+    private final DangerousGoodApi dangerousGood;
+
+	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
                        final ShipmentSizeDto shipmentSize, final String destination, final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
-                       final MoneyDto price, final Boolean locked,
-                       final SignatureDto signature) {
+                       final MoneyApi price, final Boolean locked,
+                       final SignatureDto signature, final DangerousGoodApi dangerousGood) {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -40,17 +42,18 @@ public class ShipmentDto {
 		this.price = price;
         this.locked = locked;
         this.signature = signature;
+        this.dangerousGood = dangerousGood;
     }
 
     public ShipmentIdDto getShipmentId() {
         return shipmentId;
     }
 
-    public PersonDto getSender() {
+    public PersonApi getSender() {
         return sender;
     }
 
-    public PersonDto getRecipient() {
+    public PersonApi getRecipient() {
         return recipient;
     }
 
@@ -78,7 +81,7 @@ public class ShipmentDto {
         return shipmentRelatedId;
     }
 
-    public MoneyDto getPrice() {
+    public MoneyApi getPrice() {
         return price;
     }
 
@@ -88,5 +91,9 @@ public class ShipmentDto {
 
     public SignatureDto getSignature() {
         return signature;
+    }
+
+    public DangerousGoodApi getDangerousGood() {
+        return dangerousGood;
     }
 }

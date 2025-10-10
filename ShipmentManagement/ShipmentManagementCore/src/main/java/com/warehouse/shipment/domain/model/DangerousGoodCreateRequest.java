@@ -1,15 +1,17 @@
 package com.warehouse.shipment.domain.model;
 
+import java.util.List;
+
 import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.enumeration.WeightUnit;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.DangerousGoodCreateRequestDto;
-
-import java.util.List;
+import com.warehouse.shipment.domain.vo.DangerousGoodId;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.DangerousGoodCreateRequestApi;
 
 public class DangerousGoodCreateRequest {
 
+    private DangerousGoodId dangerousGoodId;
     private ShipmentId shipmentId;
     private String name;
     private String description;
@@ -26,7 +28,9 @@ public class DangerousGoodCreateRequest {
     private Country countryOfOrigin;
     private String safetyDataSheet;
 
-    public DangerousGoodCreateRequest(final ShipmentId shipmentId,
+    public DangerousGoodCreateRequest(
+                                      final DangerousGoodId dangerousGoodId,
+                                      final ShipmentId shipmentId,
                                       final String name,
                                       final String description,
                                       final String classificationCode,
@@ -40,7 +44,9 @@ public class DangerousGoodCreateRequest {
                                       final boolean toxic,
                                       final String emergencyContact,
                                       final Country countryOfOrigin,
-                                      final String safetyDataSheet) {
+                                      final String safetyDataSheet
+    ) {
+        this.dangerousGoodId = dangerousGoodId;
         this.shipmentId = shipmentId;
         this.name = name;
         this.description = description;
@@ -59,11 +65,12 @@ public class DangerousGoodCreateRequest {
     }
 
 
-    public static DangerousGoodCreateRequest from(final DangerousGoodCreateRequestDto request) {
+    public static DangerousGoodCreateRequest from(final DangerousGoodCreateRequestApi request) {
         final ShipmentId shipmentId = new ShipmentId(request.shipmentId().getValue());
         final Weight weight = new Weight(request.weight().value(), WeightUnit.valueOf(request.weight().unit()));
 
         return new DangerousGoodCreateRequest(
+                null,
                 shipmentId,
                 request.name(),
                 request.description(),
@@ -83,6 +90,9 @@ public class DangerousGoodCreateRequest {
     }
 
 
+    public DangerousGoodId getDangerousGoodId() {
+        return dangerousGoodId;
+    }
 
     public String getClassificationCode() {
         return classificationCode;

@@ -5,15 +5,25 @@ import java.util.List;
 import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
+import com.warehouse.dangerousgood.domain.enumeration.ClassificationCode;
+import com.warehouse.dangerousgood.domain.enumeration.Packaging;
+import com.warehouse.dangerousgood.domain.enumeration.StorageRequirement;
+import com.warehouse.shipment.domain.model.DangerousGood;
+import com.warehouse.shipment.domain.vo.DangerousGoodId;
 
 import jakarta.persistence.*;
 
 
-@Entity
+@Entity(name = "shipment.DangerousGoodEntity")
 @Table(name = "dangerous_good")
 public class DangerousGoodEntity {
 
-    @Id
+
+    @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "dangerous_good_id", nullable = false))
+    private DangerousGoodId dangerousGoodId;
+
+    @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "shipment_id", nullable = false))
     private ShipmentId shipmentId;
     @Column(name = "name", nullable = false)
@@ -22,11 +32,13 @@ public class DangerousGoodEntity {
     @Column(name = "description", nullable = false)
     private String description;
     @Column(name = "classification_code", nullable = false)
-    private String classificationCode;
+    @Enumerated(EnumType.STRING)
+    private ClassificationCode classificationCode;
     @Column(name = "hazard_symbols", nullable = false)
     private String hazardSymbols;
     @Column(name = "storage_requirements", nullable = false)
-    private String storageRequirements;
+    @Enumerated(EnumType.STRING)
+    private StorageRequirement storageRequirements;
     @Column(name = "handling_instructions", nullable = false)
     private String handlingInstructions;
 
@@ -37,10 +49,11 @@ public class DangerousGoodEntity {
     })
     private Weight weight;
     @Column(name = "packaging", nullable = false)
-    private String packaging;
+    @Enumerated(EnumType.STRING)
+    private Packaging packaging;
     @Column(name = "flammable", nullable = false)
     private boolean flammable;
-    @Column(name = "corosive", nullable = false)
+    @Column(name = "corrosive", nullable = false)
     private boolean corrosive;
     @Column(name = "toxic", nullable = false)
     private boolean toxic;
@@ -52,15 +65,19 @@ public class DangerousGoodEntity {
     @Column(name = "safety_data_sheet", nullable = false)
     private String safetyDataSheet;
 
+    public DangerousGoodEntity(final DangerousGoodId dangerousGoodId) {
+        this.dangerousGoodId = dangerousGoodId;
+    }
+
     public DangerousGoodEntity() {
     }
 
-    public DangerousGoodEntity(final ShipmentId shipmentId, final String name, final String description,
-                               final String classificationCode, final List<String> hazardSymbols,
-                               final String storageRequirements, final String handlingInstructions, final Weight weight,
-                               final String packaging, final boolean flammable, final boolean isCorrosive,
-                               final boolean toxic, final String emergencyContact,
-                               final Country countryOfOrigin, final String safetyDataSheet) {
+	public DangerousGoodEntity(final DangerousGoodId dangerousGoodId, final ShipmentId shipmentId, final String name,
+			final String description, final ClassificationCode classificationCode, final List<String> hazardSymbols,
+			final StorageRequirement storageRequirements, final String handlingInstructions, final Weight weight,
+			final Packaging packaging, final boolean flammable, final boolean isCorrosive, final boolean toxic,
+			final String emergencyContact, final Country countryOfOrigin, final String safetyDataSheet) {
+        this.dangerousGoodId = dangerousGoodId;
         this.shipmentId = shipmentId;
         this.name = name;
         this.description = description;
@@ -78,7 +95,18 @@ public class DangerousGoodEntity {
         this.safetyDataSheet = safetyDataSheet;
     }
 
-    public String getClassificationCode() {
+    public static DangerousGoodEntity from(final DangerousGood dangerousGood) {
+        if (dangerousGood == null) {
+            return null;
+        }
+        return new DangerousGoodEntity(dangerousGood.getDangerousGoodId());
+    }
+
+    public DangerousGoodId getDangerousGoodId() {
+        return dangerousGoodId;
+    }
+
+    public ClassificationCode getClassificationCode() {
         return classificationCode;
     }
 
@@ -114,7 +142,7 @@ public class DangerousGoodEntity {
         return name;
     }
 
-    public String getPackaging() {
+    public Packaging getPackaging() {
         return packaging;
     }
 
@@ -126,7 +154,7 @@ public class DangerousGoodEntity {
         return shipmentId;
     }
 
-    public String getStorageRequirements() {
+    public StorageRequirement getStorageRequirements() {
         return storageRequirements;
     }
 

@@ -1,21 +1,21 @@
 package com.warehouse.returning.domain.service;
 
-import java.util.List;
-
-import com.warehouse.returning.domain.model.ReturnPackageRequest;
-import com.warehouse.returning.domain.model.ReturnRequest;
-import com.warehouse.returning.domain.vo.ProcessReturn;
-import com.warehouse.returning.domain.vo.ReturnId;
-import com.warehouse.returning.domain.vo.ReturnModel;
+import com.warehouse.returning.domain.enumeration.ReasonCode;
+import com.warehouse.returning.domain.model.ReturnPackage;
+import com.warehouse.returning.domain.vo.ReturnPackageId;
+import com.warehouse.returning.domain.vo.ShipmentId;
 
 public interface ReturnService {
-    List<ProcessReturn> processReturn(ReturnRequest request);
 
-    List<ProcessReturn> updateReturn(ReturnRequest request);
+    ReturnPackage getReturn(final ReturnPackageId returnId);
 
-    ReturnPackageRequest unlockReturn(ReturnPackageRequest request);
+    boolean existsForShipment(final ShipmentId shipmentId);
 
-    ReturnModel getReturn(ReturnId returnId);
+    void deleteReturn(final ReturnPackageId returnPackageId);
 
-    void deleteReturn(ReturnId returnId);
+    void changeReasonCode(final ReturnPackageId returnPackageId, final ReasonCode reasonCode);
+
+    ReturnPackageId nextReturnPackageId();
+
+    void saveOrUpdate(final ReturnPackage returnPackage);
 }

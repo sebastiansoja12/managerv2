@@ -2,7 +2,6 @@ package com.warehouse.shipment.domain.model;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -75,7 +74,8 @@ public class Shipment {
                     final String destination,
                     final Signature signature,
                     final boolean signatureRequired,
-                    final ShipmentPriority shipmentPriority) {
+                    final ShipmentPriority shipmentPriority,
+                    final DangerousGood dangerousGood) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -93,6 +93,7 @@ public class Shipment {
         this.signature = signature;
         this.signatureRequired = signatureRequired;
         this.shipmentPriority = shipmentPriority;
+        this.dangerousGood = dangerousGood;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -211,6 +212,7 @@ public class Shipment {
         final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
         final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
+        final DangerousGood dangerousGood = shipmentEntity.getDangerousGood() != null ? DangerousGood.from(shipmentEntity.getDangerousGood()) : null;
 
         return new Shipment(
                 shipmentId,
@@ -229,7 +231,8 @@ public class Shipment {
                 destination,
                 signature,
                 signatureRequired,
-                shipmentPriority
+                shipmentPriority,
+                dangerousGood
         );
     }
 
@@ -383,6 +386,7 @@ public class Shipment {
 
     public void lockShipment() {
         this.locked = true;
+        markAsModified();
     }
 
     public void prepareShipmentToSend() {
@@ -435,10 +439,9 @@ public class Shipment {
     }
 
     public void changeShipmentType(final ShipmentType shipmentType) {
-        if (Objects.isNull(this.shipmentRelatedId)) {
-            throw new RuntimeException("Shipment type cannot be changed");
-        }
         this.shipmentType = shipmentType;
+        this.shipmentRelatedId = null;
+        this.locked = false;
         markAsModified();
     }
 
@@ -481,11 +484,11 @@ public class Shipment {
     }
 
     public void notifyRelatedShipmentLocked() {
-        changeShipmentStatus(ShipmentStatus.SENT);
         this.shipmentType = ShipmentType.PARENT;
         this.shipmentRelatedId = null;
         unlockShipment();
         markAsModified();
+        DomainRegistry.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentRerouted() {
@@ -507,6 +510,12 @@ public class Shipment {
     }
 
     public void notifyShipmentDelivered() {
+        changeShipmentStatus(ShipmentStatus.DELIVERY);
+        markAsModified();
+        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
+    }
+
+    public void notifyShipmentReturnCanceled() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
         markAsModified();
         DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
@@ -587,13 +596,20 @@ public class Shipment {
                 destination,
                 signature,
                 signatureRequired,
-                shipmentPriority
+                shipmentPriority,
+                dangerousGood
         );
     }
 
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = relatedShipmentId;
+        this.locked = true;
         markAsModified();
+    }
+
+    public void lockShipmentWithShipmentType(final ShipmentType shipmentType) {
+        this.shipmentType = shipmentType;
+        lockShipment();
     }
 }

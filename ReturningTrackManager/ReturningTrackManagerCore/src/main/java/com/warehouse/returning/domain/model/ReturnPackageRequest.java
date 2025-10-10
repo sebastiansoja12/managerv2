@@ -1,75 +1,75 @@
 package com.warehouse.returning.domain.model;
 
-import static com.warehouse.returning.domain.model.ReturnStatus.*;
+import com.warehouse.returning.domain.enumeration.ReasonCode;
+import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.returning.domain.vo.ShipmentId;
+import com.warehouse.returning.domain.vo.UserId;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnPackageRequestApi;
 
-import org.apache.commons.lang3.StringUtils;
-
-import lombok.Builder;
-import lombok.Data;
-
-import java.util.Objects;
-
-@Data
-@Builder
 public class ReturnPackageRequest {
-    private Parcel parcel;
+    private ShipmentId shipmentId;
     private String reason;
-    private ReturnStatus returnStatus;
-    private String returnToken;
-    private String supplierCode;
-    private String depotCode;
-    private String username;
+    private DepartmentCode departmentCode;
+    private UserId userId;
+    private ReasonCode reasonCode;
 
-    public void processReturn(String reason) {
+	public ReturnPackageRequest(final DepartmentCode departmentCode,
+                                final String reason,
+                                final ShipmentId shipmentId,
+                                final UserId userId,
+                                final ReasonCode reasonCode) {
+        this.departmentCode = departmentCode;
         this.reason = reason;
-        this.returnStatus = PROCESSING;
+        this.shipmentId = shipmentId;
+        this.userId = userId;
+        this.reasonCode = reasonCode;
     }
 
-    public void processReturn() {
-        this.returnStatus = PROCESSING;
+    public static ReturnPackageRequest from(final ReturnPackageRequestApi returnPackageRequest) {
+        final DepartmentCode departmentCode = DepartmentCode.of(returnPackageRequest.departmentCode());
+        final UserId userId = UserId.of(returnPackageRequest.userId());
+        final ShipmentId shipmentId = ShipmentId.of(returnPackageRequest.shipmentId());
+		return new ReturnPackageRequest(departmentCode, returnPackageRequest.reason(), shipmentId, userId,
+				ReasonCode.valueOf(returnPackageRequest.reasonCode().value()));
     }
 
-    public void completeReturn() {
-        this.returnStatus = COMPLETED;
+    public DepartmentCode getDepartmentCode() {
+        return departmentCode;
     }
 
-    public void updateDepot(String depotCode) {
-        this.depotCode = depotCode;
+    public void setDepartmentCode(final DepartmentCode departmentCode) {
+        this.departmentCode = departmentCode;
     }
 
-    public boolean isCancelled() {
-        return CANCELLED.equals(returnStatus);
+    public String getReason() {
+        return reason;
     }
 
-    public boolean isProcessing() {
-        return PROCESSING.equals(returnStatus);
+    public void setReason(final String reason) {
+        this.reason = reason;
     }
 
-    public boolean isCompleted() {
-        return COMPLETED.equals(returnStatus);
+    public ShipmentId getShipmentId() {
+        return shipmentId;
     }
 
-    public void updateUser(String username) {
-        this.username = username;
+    public void setShipmentId(final ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
     }
 
-    public boolean isReturnNotTokenAvailable() {
-        return StringUtils.isEmpty(returnToken);
+    public UserId getUserId() {
+        return userId;
     }
 
-    public boolean isCreated() {
-        return CREATED.equals(returnStatus);
+    public void setUserId(final UserId userId) {
+        this.userId = userId;
     }
 
-    public Long getParcelId() {
-        if (Objects.nonNull(parcel)) {
-            return parcel.getId();
-        }
-        return null;
+    public ReasonCode getReasonCode() {
+        return reasonCode;
     }
 
-    public ReturnPackageRequest updateReturnStatus(ReturnStatus returnStatus) {
-        this.returnStatus = returnStatus;
-        return this;
+    public void setReasonCode(final ReasonCode reasonCode) {
+        this.reasonCode = reasonCode;
     }
 }

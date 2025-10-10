@@ -6,7 +6,6 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
@@ -38,13 +37,6 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public Shipment find(final ShipmentId shipmentId) {
         return this.shipmentRepository.findById(shipmentId);
-    }
-
-    @Override
-    public void updateShipment(final ShipmentUpdate shipmentUpdate, final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.update(shipmentUpdate);
-        this.shipmentRepository.createOrUpdate(shipment);
     }
 
     @Override
@@ -176,9 +168,23 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
+    public void notifyReturnCanceled(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.notifyShipmentReturnCanceled();
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
     public void changeShipmentCountries(final ShipmentCountryRequest request) {
         final Shipment shipment = this.shipmentRepository.findById(request.shipmentId());
         shipment.updateCountries(request);
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
+    public void lockShipment(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.lockShipment();
         this.shipmentRepository.createOrUpdate(shipment);
     }
 

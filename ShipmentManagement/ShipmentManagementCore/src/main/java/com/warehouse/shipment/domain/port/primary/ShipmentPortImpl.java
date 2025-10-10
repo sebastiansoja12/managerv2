@@ -9,6 +9,7 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.PersonType;
+import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
@@ -17,7 +18,6 @@ import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.port.secondary.TrackingStatusServicePort;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.*;
 
@@ -32,8 +32,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final NotificationCreatorProvider notificationCreatorProvider;
 
-    private final TrackingStatusServicePort trackingStatusServicePort;
-
     private final Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private final CountryDetermineService countryDetermineService;
@@ -44,11 +42,12 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final SignatureService signatureService;
 
+    private final ShipmentStateValidatorService shipmentStateValidatorService = new ShipmentStateValidatorServiceImpl();
+
 	public ShipmentPortImpl(final ShipmentService shipmentService,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
                             final NotificationCreatorProvider notificationCreatorProvider,
-                            final TrackingStatusServicePort trackingStatusServicePort,
                             final Set<ShipmentStatusHandler> shipmentStatusHandlers,
                             final CountryDetermineService countryDetermineService,
                             final PriceService priceService,
@@ -58,7 +57,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
 		this.notificationCreatorProvider = notificationCreatorProvider;
-        this.trackingStatusServicePort = trackingStatusServicePort;
         this.shipmentStatusHandlers = shipmentStatusHandlers;
         this.countryDetermineService = countryDetermineService;
         this.priceService = priceService;
@@ -138,12 +136,10 @@ public class ShipmentPortImpl implements ShipmentPort {
             case REDIRECT -> {
                 this.shipmentService.changeRecipientTo(shipmentId, recipient);
                 this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, this.shipmentService.nextShipmentId());
-                this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REDIRECT);
             }
             case REROUTE -> {
                 this.shipmentService.changeRecipientTo(shipmentId, recipient);
                 this.shipmentService.changeSenderTo(shipmentId, sender);
-                this.trackingStatusServicePort.notifyShipmentStatusChanged(shipmentId, ShipmentStatus.REROUTE);
             }
 
             default -> {
@@ -154,17 +150,25 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public Result<Void, ErrorCode> addDangerousGood(final ShipmentId shipmentId, final DangerousGoodCreateRequest request) {
+    public Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateRequest request) {
+        final ShipmentId shipmentId = request.getShipmentId();
         if (!existsShipment(shipmentId)) {
             return Result.failure(ErrorCode.SHIPMENT_202);
         }
 
-        final DangerousGood dangerousGood = DangerousGood.from(request);
-
-
-
+        this.shipmentService.changeDangerousGoodTo(shipmentId, DangerousGood.from(request));
 
         return Result.success();
+    }
+
+    @Override
+    public void processShipmentReturn(final ShipmentReturnRequest request) {
+        final ReturnStatus returnStatus = request.getReturnStatus();
+        final ShipmentId shipmentId = request.getShipmentId();
+        switch (returnStatus) {
+            case CREATED ->  this.shipmentService.notifyShipmentReturned(shipmentId);
+            case CANCELLED -> this.shipmentService.notifyReturnCanceled(shipmentId);
+        }
     }
 
     @Override
@@ -195,32 +199,36 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public void changeShipmentTypeTo(final ChangeShipmentTypeRequest request) {
         final Shipment shipment = this.shipmentService.find(request.shipmentId());
+
         if (shipment.getShipmentType() == request.shipmentType()) {
-            throw new RestException(400, "Cannot override shipment type");
+            throw new RestException(400, "Shipment type cannot be changed to the same type");
         }
 
-        final Shipment newShipment;
-        if (shipment.getShipmentType().equals(ShipmentType.CHILD)) {
-            newShipment = Shipment.createNewParent(shipment, ShipmentType.PARENT, this.shipmentService.nextShipmentId());
-            this.shipmentService.createShipment(newShipment);
-            shipment.changeShipmentRelatedId(newShipment.getShipmentId());
-            this.shipmentService.createShipment(shipment);
-        } else {
-            newShipment = Shipment.createNewChild(shipment, ShipmentType.CHILD, this.shipmentService.nextShipmentId(), shipment.getShipmentId());
-            this.shipmentService.createShipment(newShipment);
-            shipment.changeShipmentRelatedId(newShipment.getShipmentId());
-            this.shipmentService.createShipment(shipment);
-            this.shipmentService.changeShipmentTypeTo(request.shipmentId(), request.shipmentType(), newShipment.getShipmentId());
+        final Result<Void, String> validateShipment = this.shipmentStateValidatorService.validateShipmentState(shipment);
+
+        if (validateShipment.isFailure()) {
+            throw new RestException(400, validateShipment.getFailure());
         }
-        final ShipmentType shipmentType = request.shipmentType();
-        final ShipmentId shipmentId = request.shipmentId();
-        //this.shipmentService.changeShipmentTypeTo(shipmentId, shipmentType);
+
+		if (request.shipmentType() == ShipmentType.CHILD) {
+			final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
+
+			final Shipment newShipment = new Shipment(shipmentId, shipment.getSender(), shipment.getRecipient(),
+					shipment.getShipmentSize(), shipment.getShipmentId(), shipment.getOriginCountry(),
+					shipment.getDestinationCountry(), shipment.getPrice(), shipment.isLocked(),
+					shipment.getDestination(), shipment.getSignature(), shipment.getShipmentPriority());
+			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, shipmentId);
+			this.shipmentService.createShipment(newShipment);
+		} else {
+			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, null);
+			this.shipmentService.lockShipment(shipment.getShipmentRelatedId());
+		}
     }
 
 	@Override
 	public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
-		final ShipmentStatus status = request.getShipmentStatus();
-		final ShipmentId shipmentId = request.getShipmentId();
+		final ShipmentStatus status = request.shipmentStatus();
+		final ShipmentId shipmentId = request.shipmentId();
         shipmentStatusHandlers.stream()
                 .filter(shipmentStatusHandler -> shipmentStatusHandler.canHandle(status))
                 .findAny()

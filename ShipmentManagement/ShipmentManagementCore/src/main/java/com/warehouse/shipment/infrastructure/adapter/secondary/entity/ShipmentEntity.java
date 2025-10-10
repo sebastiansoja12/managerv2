@@ -127,7 +127,7 @@ public class ShipmentEntity {
     private ShipmentPriority shipmentPriority;
 
     @OneToOne
-    @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id")
+    @JoinColumn(name = "dangerous_good_id", referencedColumnName = "dangerous_good_id")
     private DangerousGoodEntity dangerousGood;
 
     @Embedded
@@ -148,7 +148,7 @@ public class ShipmentEntity {
 			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
 			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
 			final LocalDateTime updatedAt, final Boolean locked, final Country originCountry, final Country destinationCountry, 
-            final Money price, final ShipmentPriority shipmentPriority) {
+            final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;
         this.lastName = senderLastName;
@@ -174,10 +174,9 @@ public class ShipmentEntity {
         this.locked = locked;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
-        this.dangerousGood = null;
-        this.price = null;
         this.shipmentPriority = shipmentPriority;
         this.price = price;
+        this.dangerousGood = dangerousGood;
     }
 
     public static ShipmentEntity from(final Shipment shipment) {
@@ -195,6 +194,7 @@ public class ShipmentEntity {
         final String recipientStreet = shipment.getRecipient().getStreet();
         final String recipientPostalCode = shipment.getRecipient().getPostalCode();
         final String recipientTelephoneNumber = shipment.getRecipient().getTelephoneNumber();
+        final DangerousGoodEntity dangerousGoodEntity = DangerousGoodEntity.from(shipment.getDangerousGood());
         return new ShipmentEntity(shipment.getShipmentId(), senderFirstName, senderLastName,
                 senderEmail, senderCity, senderStreet, senderPostalCode, senderTelephoneNumber,
                 recipientFirstName, recipientLastName, recipientEmail, recipientCity, recipientStreet,
@@ -202,6 +202,6 @@ public class ShipmentEntity {
                 shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
                 shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
 				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
-				shipment.getShipmentPriority());
+				shipment.getShipmentPriority(), dangerousGoodEntity);
     }
 }

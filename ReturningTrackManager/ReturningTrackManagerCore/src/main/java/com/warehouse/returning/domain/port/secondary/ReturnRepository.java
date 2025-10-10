@@ -1,20 +1,14 @@
 package com.warehouse.returning.domain.port.secondary;
 
-import com.warehouse.returning.domain.model.ReturnPackageRequest;
-import com.warehouse.returning.domain.model.ReturnStatus;
-import com.warehouse.returning.domain.vo.ProcessReturn;
-import com.warehouse.returning.domain.vo.ReturnId;
-import com.warehouse.returning.domain.vo.ReturnModel;
+import com.warehouse.returning.domain.model.ReturnPackage;
+import com.warehouse.returning.domain.vo.ReturnPackageId;
+import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId;
 
 public interface ReturnRepository {
 
-    ProcessReturn save(ReturnPackageRequest returnPackage);
+    ReturnPackage findById(final ReturnPackageId returnPackageId);
 
-    ProcessReturn update(ReturnPackageRequest returnPackage);
+    void createOrUpdate(final ReturnPackage returnPackage);
 
-    ReturnModel get(ReturnId returnId);
-
-    ReturnStatus unlockReturn(Long parcelId, String returnToken);
-
-    void delete(ReturnId returnId);
+    boolean existsForShipment(final ShipmentId shipmentId);
 }

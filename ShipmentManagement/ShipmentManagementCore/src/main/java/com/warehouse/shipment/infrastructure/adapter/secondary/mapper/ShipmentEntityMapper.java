@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.mapstruct.Mapper;
 
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.DangerousGoodEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.SignatureEntity;
 
@@ -39,6 +40,7 @@ public interface ShipmentEntityMapper {
                 .price(shipment.getPrice())
                 .shipmentPriority(shipment.getShipmentPriority())
                 .signature(SignatureEntity.from(shipment.getSignature()))
+                .dangerousGood(DangerousGoodEntity.from(shipment.getDangerousGood()))
                 .build();
     }
 }
