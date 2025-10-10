@@ -12,6 +12,7 @@ import com.warehouse.returning.domain.service.ApiKeyService;
 import com.warehouse.returning.domain.vo.DecodedApiTenant;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,18 @@ public class TenantMdcFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(final HttpServletRequest request,
                                     final HttpServletResponse response,
-                                    final FilterChain filterChain) throws IOException {
+                                    final FilterChain filterChain) throws IOException, ServletException {
+
+
+        final String uri = request.getRequestURI();
+
+        if (uri.startsWith("/v2/api/swagger-ui")
+                || uri.startsWith("/v2/api/v3/api-docs")
+                || uri.startsWith("/v2/api/swagger-resources")
+                || uri.startsWith("/v2/api/webjars")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authorization = request.getHeader("Authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
