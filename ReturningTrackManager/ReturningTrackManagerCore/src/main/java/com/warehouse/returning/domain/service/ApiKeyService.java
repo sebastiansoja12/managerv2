@@ -1,27 +1,51 @@
 package com.warehouse.returning.domain.service;
 
+import java.security.Key;
+
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+
+import com.warehouse.exceptionhandler.exception.RestException;
+import com.warehouse.returning.domain.provider.JwtProvider;
+import com.warehouse.returning.domain.vo.DecodedApiTenant;
+import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.returning.domain.vo.UserId;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 
 @Service
 public class ApiKeyService {
 
-    public String extractTenantFromApiKey(final String apiKey) {
-        if (StringUtils.isEmpty(apiKey)) {
-            throw new IllegalArgumentException("API key is missing");
-        }
+    private final JwtProvider jwtProvider;
 
-        final String[] parts = apiKey.split(":");
-        if (parts.length != 2) {
-            throw new IllegalArgumentException("Invalid API key format");
-        }
+    public ApiKeyService(final JwtProvider jwtProvider) {
+        this.jwtProvider = jwtProvider;
+    }
 
-        final String tenantCode = parts[0].trim();
-        if (tenantCode.isEmpty()) {
-            throw new IllegalArgumentException("Tenant code missing in API key");
-        }
+    public DecodedApiTenant decodeJwt(final String token) {
+        try {
+            final Claims claims = Jwts
+                    .parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
-        return tenantCode;
+            final UserId userId = new UserId(claims.get("userId", Long.class));
+            final DepartmentCode departmentCode = new DepartmentCode(claims.get("tenant", String.class));
+
+            return new DecodedApiTenant(userId, departmentCode);
+        } catch (SignatureException | IllegalArgumentException e) {
+            throw new RestException(401, "Invalid or expired JWT token");
+        }
+    }
+
+    private Key getSigningKey() {
+        final byte[] keyBytes = Decoders.BASE64.decode(jwtProvider.getSecretKey());
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
 

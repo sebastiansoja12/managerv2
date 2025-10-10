@@ -85,7 +85,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         validateDepartmentCode(departmentCode);
 
-        final String apiKey = jwtService.generateToken(firstName, username, role);
+        final String apiKey = jwtService.generateToken(firstName, username, role, departmentCode);
 
         final User user = new User(userId, username, password, email, firstName, lastName, role, departmentCode, apiKey);
 

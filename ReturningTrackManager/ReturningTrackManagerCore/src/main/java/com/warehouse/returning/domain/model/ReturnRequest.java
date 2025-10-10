@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.warehouse.returning.domain.vo.DepartmentCode;
 import com.warehouse.returning.domain.vo.UserId;
-import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 
 
 public class ReturnRequest {
@@ -20,16 +19,6 @@ public class ReturnRequest {
         this.issuerDepartmentCode = issuerDepartmentCode;
         this.issuerUserId = issuerUserId;
         this.requests = requests;
-    }
-
-    public static ReturnRequest from(final ReturnRequestApi returnApiRequest) {
-        final DepartmentCode departmentCode = DepartmentCode.of(returnApiRequest.departmentCode());
-        final UserId userId = UserId.of(returnApiRequest.userId());
-        final List<ReturnPackageRequest> returnPackageRequests = returnApiRequest.requests()
-                .stream()
-                .map(ReturnPackageRequest::from)
-                .toList();
-        return new ReturnRequest(departmentCode, userId, returnPackageRequests);
     }
 
     public DepartmentCode getIssuerDepartmentCode() {

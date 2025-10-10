@@ -9,6 +9,7 @@ import java.util.function.Function;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -46,15 +47,20 @@ public class JwtServiceImpl implements JwtService {
         final Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("firstName", user.getFirstName());
         claimsMap.put("role", user.getRole());
+        claimsMap.put("username", user.getUsername());
+        claimsMap.put("userId", user.getUserId().value());
+        claimsMap.put("tenant", user.getDepartmentCode().getValue());
         final Long expiration = jwtProvider.getExpiration();
         return generateToken(claimsMap, user, expiration);
     }
 
     @Override
-    public String generateToken(final String firstName, final String username, final Role role) {
+    public String generateToken(final String firstName, final String username, final Role role, final DepartmentCode departmentCode) {
         final Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("firstName", firstName);
         claimsMap.put("role", role);
+        claimsMap.put("username", username);
+        claimsMap.put("tenant", departmentCode);
         final Long expiration = jwtProvider.getExpiration();
         return Jwts
                 .builder()

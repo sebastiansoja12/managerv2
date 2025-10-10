@@ -7,7 +7,5 @@ import lombok.Builder;
 
 @Builder
 public record ReturnRequestApi(
-        List<ReturnPackageRequestApi> requests,
-        DepartmentCodeApi departmentCode,
-        UserIdApi userId
+        List<ReturnPackageRequestApi> requests
 ) {}
