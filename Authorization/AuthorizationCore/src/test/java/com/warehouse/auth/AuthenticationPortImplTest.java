@@ -30,6 +30,7 @@ import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.UserId;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationPortImplTest {
@@ -104,7 +105,7 @@ public class AuthenticationPortImplTest {
         // given
         final LoginRequest loginRequest = new LoginRequest("s-soja", "test");
 
-		final User userDetails = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+		final User userDetails = new User(new UserId(1L), "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
 				new DepartmentCode("TST"), "");
 
         doReturn(userDetails)

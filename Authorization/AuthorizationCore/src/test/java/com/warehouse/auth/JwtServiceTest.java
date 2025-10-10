@@ -16,6 +16,7 @@ import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.JwtServiceImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.UserId;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.common.util.StringUtils;
@@ -41,7 +42,7 @@ public class JwtServiceTest {
     @Test
     void shouldGenerateToken() {
         // given
-        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+        final User user = new User(new UserId(1L), "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
                 new DepartmentCode("TST"), "");
 
         doReturn(EXPIRATION)
