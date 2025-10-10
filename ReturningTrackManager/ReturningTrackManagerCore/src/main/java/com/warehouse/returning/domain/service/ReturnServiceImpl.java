@@ -2,12 +2,11 @@ package com.warehouse.returning.domain.service;
 
 import java.util.UUID;
 
+import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.model.ReturnPackage;
-import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
-import com.warehouse.returning.domain.vo.ReturnId;
-import com.warehouse.returning.domain.vo.ReturnModel;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
+import com.warehouse.returning.domain.vo.ShipmentId;
 
 public class ReturnServiceImpl implements ReturnService {
 
@@ -17,20 +16,29 @@ public class ReturnServiceImpl implements ReturnService {
         this.returnRepository = returnRepository;
     }
 
-	@Override
-	public ReturnPackageRequest unlockReturn(ReturnPackageRequest request) {
-		return null;
-	}
+    @Override
+    public ReturnPackage getReturn(final ReturnPackageId returnId) {
+        return this.returnRepository.findById(returnId);
+    }
 
     @Override
-    public ReturnModel getReturn(ReturnId returnId) {
-        return null;
+    public boolean existsForShipment(final ShipmentId shipmentId) {
+		return returnRepository.existsForShipment(
+				new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
+						shipmentId.value()));
     }
 
     @Override
     public void deleteReturn(final ReturnPackageId returnPackageId) {
         final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
         returnPackage.markAsDeleted();
+        this.saveOrUpdate(returnPackage);
+    }
+
+    @Override
+    public void changeReasonCode(final ReturnPackageId returnPackageId, final ReasonCode reasonCode) {
+        final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
+        returnPackage.changeReasonCode(reasonCode);
         this.saveOrUpdate(returnPackage);
     }
 

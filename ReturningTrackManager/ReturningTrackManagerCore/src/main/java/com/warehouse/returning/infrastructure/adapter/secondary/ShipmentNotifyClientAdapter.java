@@ -18,12 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ShipmentNotifyClientAdapter implements ShipmentNotifyClientPort {
 
-    private final ShipmentProperties properties;
-
     private final RestClient restClient;
 
     public ShipmentNotifyClientAdapter(final ShipmentProperties properties) {
-        this.properties = properties;
         this.restClient = RestClient.builder().baseUrl(properties.getUrl()).build();
     }
 

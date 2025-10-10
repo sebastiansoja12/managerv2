@@ -1,7 +1,6 @@
 package com.warehouse.returning.configuration;
 
 
-import com.warehouse.tools.shipment.ShipmentProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,19 +11,20 @@ import com.warehouse.returning.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.returning.domain.port.secondary.ShipmentNotifyClientPort;
 import com.warehouse.returning.domain.service.ReturnService;
 import com.warehouse.returning.domain.service.ReturnServiceImpl;
+import com.warehouse.returning.domain.service.ReturnTokenGeneratorServiceImpl;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadRepository;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturningRepositoryImpl;
 import com.warehouse.returning.infrastructure.adapter.secondary.RouteLogServiceAdapter;
 import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyClientAdapter;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
+import com.warehouse.tools.shipment.ShipmentProperties;
 
 @Configuration
 public class ReturningConfiguration {
 
     @Bean
-    public ReturnPort returnPort(final RouteLogServicePort routeLogServicePort,
-                                 final ReturnService returnService) {
-        return new ReturnPortImpl(returnService, routeLogServicePort);
+    public ReturnPort returnPort(final ReturnService returnService) {
+        return new ReturnPortImpl(returnService, new ReturnTokenGeneratorServiceImpl());
     }
 
     @Bean

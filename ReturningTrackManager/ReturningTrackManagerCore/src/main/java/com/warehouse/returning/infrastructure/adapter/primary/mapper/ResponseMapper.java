@@ -6,7 +6,12 @@ import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnIdDt
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnResponseApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ShipmentIdDto;
 
-public class ResponseMapper {
+public abstract class ResponseMapper {
+
+	public ResponseMapper() {
+
+	}
+
 	public static ReturnResponseApi toResponseApi(final ReturnResponse res) {
 		return new ReturnResponseApi(res.processReturn().stream()
 				.map(processReturn -> new ProcessReturnDto(new ShipmentIdDto(processReturn.shipmentId().value()),

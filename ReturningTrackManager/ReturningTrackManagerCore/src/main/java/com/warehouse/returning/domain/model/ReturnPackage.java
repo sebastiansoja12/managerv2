@@ -5,6 +5,7 @@ import java.time.Instant;
 
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.event.ReturnPackageCanceled;
+import com.warehouse.returning.domain.event.ReturnPackageCompleted;
 import com.warehouse.returning.domain.event.ReturnPackageCreated;
 import com.warehouse.returning.domain.registry.DomainRegistry;
 import com.warehouse.returning.domain.vo.*;
@@ -127,6 +128,12 @@ public class ReturnPackage {
         DomainRegistry.publish(new ReturnPackageCanceled(this.toSnapshot(), Instant.now()));
     }
 
+    public void markAsCompleted() {
+        changeReturnStatus(ReturnStatus.COMPLETED);
+        markAsModified();
+        DomainRegistry.publish(new ReturnPackageCompleted(this.toSnapshot(), Instant.now()));
+    }
+
     private void changeReturnStatus(final ReturnStatus returnStatus) {
         this.returnStatus = returnStatus;
     }
@@ -173,6 +180,11 @@ public class ReturnPackage {
 
     public static ReturnPackageBuilder builder() {
         return new ReturnPackageBuilder();
+    }
+
+    public void changeReasonCode(final ReasonCode reasonCode) {
+        this.reasonCode = reasonCode;
+        markAsModified();
     }
 
     public static class ReturnPackageBuilder {
