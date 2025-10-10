@@ -44,25 +44,37 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
 
             final String tenant = decodedApiTenant.departmentCode().value();
-            final String user = decodedApiTenant.userId().toString();
+            final String user = decodedApiTenant.userId().value().toString();
             final String clientIp = request.getRemoteAddr();
             final String requestUri = request.getRequestURI();
             final String className = this.getClass().getSimpleName();
             final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
-			MDC.put("tenant", tenant);
-			MDC.put("user", user);
-			MDC.put("ip", clientIp);
-			MDC.put("uri", requestUri);
-			MDC.put("class", className);
-			MDC.put("time", timestamp);
+            try {
+                try (MDC.MDCCloseable c1 = MDC.putCloseable("tenant", tenant);
+                     MDC.MDCCloseable c2 = MDC.putCloseable("user", user);
+                     MDC.MDCCloseable c3 = MDC.putCloseable("ip", clientIp);
+                     MDC.MDCCloseable c4 = MDC.putCloseable("uri", requestUri);
+                     MDC.MDCCloseable c5 = MDC.putCloseable("class", className);
+                     MDC.MDCCloseable c6 = MDC.putCloseable("time", timestamp)) {
 
-			log.info("Incoming request from user={} tenant={} uri={} ip={}", user, tenant, requestUri, clientIp);
+                    log.info("Incoming request from user={} tenant={} uri={} ip={}",
+                            user, tenant, requestUri, clientIp);
 
-			filterChain.doFilter(request, response);
+                    filterChain.doFilter(request, response);
 
-			log.info("====Request completed successfully====");
-            
+                } catch (final Exception e) {
+                    log.error("Error while processing MDC context: {}", e.getMessage(), e);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("Internal server error");
+                }
+            } catch (final Exception e) {
+                log.error("Unexpected error in filter: {}", e.getMessage(), e);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("Internal server error");
+            } finally {
+                MDC.clear();
+            }
 
         } catch (final IllegalArgumentException e) {
             log.warn("Unauthorized request: {}", e.getMessage());
