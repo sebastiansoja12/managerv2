@@ -106,7 +106,7 @@ public class ReturnController {
     public ResponseEntity<?> get(@PathVariable final Long returnPackageId) {
         final ReturnPackageId returnId = new ReturnPackageId(returnPackageId);
         final ReturnPackage returnModel = returnPort.getReturn(returnId);
-        return new ResponseEntity<>(returnModel, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMapper.toResponseApi(returnModel), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
