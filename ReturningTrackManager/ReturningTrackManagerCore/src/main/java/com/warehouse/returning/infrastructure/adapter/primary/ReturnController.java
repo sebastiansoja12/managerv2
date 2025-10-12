@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.returning.domain.helper.Result;
+import com.warehouse.returning.domain.model.ChangeReturnStatusRequest;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
@@ -17,6 +18,7 @@ import com.warehouse.returning.domain.vo.DecodedApiTenant;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReasonCodeRequestApi;
+import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReturnStatusApiRequest;
 import com.warehouse.returning.infrastructure.adapter.primary.api.DeleteReturnResponse;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
@@ -108,6 +110,19 @@ public class ReturnController {
 
         final ChangeReasonCodeRequest request = RequestMapper.map(changeReasonCodeRequest);
         this.returnPort.changeReasonCode(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/complete")
+    public ResponseEntity<?> completeReturn(@RequestBody final ChangeReturnStatusApiRequest changeReturnStatusRequest) {
+        final Result validationResult = this.getValidator(changeReturnStatusRequest.getClassName())
+                .validateBody(changeReturnStatusRequest);
+        if (validationResult.isFailure()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
+        }
+
+        final ChangeReturnStatusRequest request = RequestMapper.map(changeReturnStatusRequest);
+        this.returnPort.complete(request.getReturnPackageId());
         return ResponseEntity.ok().build();
     }
 

@@ -9,6 +9,8 @@ public interface ReturnPort {
 
     void changeReasonCode(final ChangeReasonCodeRequest request);
 
+    void complete(final ReturnPackageId returnPackageId);
+
     ReturnPackage getReturn(final ReturnPackageId returnId);
 
     void delete(final ReturnPackageId returnPackageId);

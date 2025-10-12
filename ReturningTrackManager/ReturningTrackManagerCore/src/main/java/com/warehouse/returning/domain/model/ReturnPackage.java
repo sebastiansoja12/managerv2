@@ -7,6 +7,7 @@ import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.event.ReturnPackageCanceled;
 import com.warehouse.returning.domain.event.ReturnPackageCompleted;
 import com.warehouse.returning.domain.event.ReturnPackageCreated;
+import com.warehouse.returning.domain.exception.StatusChangeException;
 import com.warehouse.returning.domain.registry.DomainRegistry;
 import com.warehouse.returning.domain.vo.*;
 
@@ -129,6 +130,11 @@ public class ReturnPackage {
     }
 
     public void markAsCompleted() {
+        if (this.returnStatus == ReturnStatus.CANCELLED) {
+            throw new StatusChangeException("Return package is already cancelled, cannot override status");
+        } else if (this.returnStatus == ReturnStatus.COMPLETED) {
+            throw new StatusChangeException("Return package is already completed, cannot override status");
+        }
         changeReturnStatus(ReturnStatus.COMPLETED);
         markAsModified();
         DomainRegistry.publish(new ReturnPackageCompleted(this.toSnapshot(), Instant.now()));
