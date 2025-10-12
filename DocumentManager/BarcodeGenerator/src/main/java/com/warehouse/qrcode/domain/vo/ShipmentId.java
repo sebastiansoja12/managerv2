@@ -1,4 +1,19 @@
 package com.warehouse.qrcode.domain.vo;
 
-public record ShipmentId(Long value) {
+import jakarta.persistence.Embeddable;
+
+@Embeddable
+public class ShipmentId {
+    private Long value;
+
+    public ShipmentId() {
+    }
+
+    public ShipmentId(final Long value) {
+        this.value = value;
+    }
+
+    public Long getValue() {
+        return value;
+    }
 }

@@ -11,7 +11,7 @@
             role="2"
             department_code="TST"
     />
-    <parcel
+    <shipment
             id="100"
             first_name="test"
             last_name="test"
@@ -36,7 +36,7 @@
             locked = "false"
     />
 
-    <parcel
+    <shipment
             id="101"
             first_name="test"
             last_name="test"

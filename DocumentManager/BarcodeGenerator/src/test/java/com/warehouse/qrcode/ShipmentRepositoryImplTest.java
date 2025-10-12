@@ -16,9 +16,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.qrcode.domain.model.Parcel;
-import com.warehouse.qrcode.domain.port.secondary.ParcelRepository;
-import com.warehouse.qrcode.infrastructure.adapter.secondary.exception.ParcelNotFoundException;
+import com.warehouse.qrcode.domain.model.Shipment;
+import com.warehouse.qrcode.domain.port.secondary.ShipmentRepository;
+import com.warehouse.qrcode.domain.vo.ShipmentId;
+import com.warehouse.qrcode.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -26,25 +27,21 @@ import com.warehouse.qrcode.infrastructure.adapter.secondary.exception.ParcelNot
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DatabaseSetup("/dataset/shipment.xml")
-public class ParcelRepositoryImplTest {
+public class ShipmentRepositoryImplTest {
 
     @Autowired
-    private ParcelRepository parcelRepository;
+    private ShipmentRepository shipmentRepository;
 
     @Test
     void shouldFindParcelById() {
-        // when
-        final Parcel parcel = parcelRepository.find(1L);
-        // then
-        assertNotNull(parcel);
+        final Shipment shipment = shipmentRepository.find(new ShipmentId(1L));
+        assertNotNull(shipment);
     }
 
     @Test
     void shouldNotFindParcelById() {
-        // when
-        final Executable executable = () -> parcelRepository.find(2L);
-        // then
-        final ParcelNotFoundException exception = assertThrows(ParcelNotFoundException.class, executable);
-        assertEquals("Parcel 2 was not found", exception.getMessage());
+        final Executable executable = () -> shipmentRepository.find(new ShipmentId(2L));
+        final ShipmentNotFoundException exception = assertThrows(ShipmentNotFoundException.class, executable);
+        assertEquals("Shipment 2 was not found", exception.getMessage());
     }
 }

@@ -1,6 +1,6 @@
--- Sample data for the 'parcel' table
+-- Sample data for the 'shipment' table
 
--- Inserting data for the 'parcel' table
+-- Inserting data for the 'shipment' table
 INSERT INTO SHIPMENT (id, first_name, last_name, recipient_city, recipient_email, recipient_first_name,
                     recipient_last_name, recipient_postal_code, recipient_street, recipient_telephone,
                     sender_city, sender_email, sender_postal_code, sender_street, sender_telephone,

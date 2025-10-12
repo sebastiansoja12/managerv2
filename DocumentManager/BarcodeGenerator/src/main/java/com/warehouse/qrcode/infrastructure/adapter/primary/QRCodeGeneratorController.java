@@ -1,6 +1,7 @@
 package com.warehouse.qrcode.infrastructure.adapter.primary;
 
 import com.warehouse.qrcode.domain.port.primary.QrCodePort;
+import com.warehouse.qrcode.domain.vo.ShipmentId;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,8 @@ public class QRCodeGeneratorController {
     private final QrCodePort qrCodePort;
 
     @GetMapping("/{id}")
-    public void exportParcelByIdToPdf(HttpServletResponse response, @PathVariable Long id) throws Exception {
-        qrCodePort.exportParcelToPdfById(response, id);
+    public void exportShipmentByIdToPdf(HttpServletResponse response, @PathVariable Long id) throws Exception {
+        final ShipmentId shipmentId = new ShipmentId(id);
+        qrCodePort.exportShipment(response, shipmentId);
     }
 }

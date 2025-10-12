@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <dataset>
-    <parcel
+    <shipment
             id = "1"
             first_name="test"
             last_name="test"
@@ -23,7 +23,7 @@
             type="0"
     />
 
-    <parcel
+    <shipment
             id = "2"
             first_name="test"
             last_name="test"
@@ -44,7 +44,7 @@
             parcelStatus="0"
             type="0"
     />
-    <parcel
+    <shipment
             id = "3"
             first_name="test"
             last_name="test"

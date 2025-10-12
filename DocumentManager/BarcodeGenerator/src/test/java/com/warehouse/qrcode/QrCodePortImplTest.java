@@ -9,47 +9,45 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.warehouse.qrcode.domain.model.Parcel;
+import com.warehouse.qrcode.domain.model.Shipment;
 import com.warehouse.qrcode.domain.port.primary.QrCodePortImpl;
-import com.warehouse.qrcode.domain.port.secondary.ParcelRepository;
+import com.warehouse.qrcode.domain.port.secondary.ShipmentRepository;
 import com.warehouse.qrcode.domain.service.BarcodeGeneratorService;
 import com.warehouse.qrcode.domain.service.BarcodeGeneratorServiceImpl;
-import com.warehouse.qrcode.domain.service.ParcelExportServiceImpl;
+import com.warehouse.qrcode.domain.service.ShipmentExportServiceImpl;
+import com.warehouse.qrcode.domain.vo.ShipmentId;
 
 @ExtendWith(MockitoExtension.class)
 public class QrCodePortImplTest {
 
     @Mock
-    private ParcelRepository parcelRepository;
+    private ShipmentRepository shipmentRepository;
 
     private QrCodePortImpl qrCodePort;
 
     @BeforeEach
     void setup() {
-        final ParcelExportServiceImpl parcelExportService = new ParcelExportServiceImpl(parcelRepository);
+        final ShipmentExportServiceImpl parcelExportService = new ShipmentExportServiceImpl(shipmentRepository);
         final BarcodeGeneratorService barcodeGeneratorService = new BarcodeGeneratorServiceImpl();
         qrCodePort = new QrCodePortImpl(parcelExportService, barcodeGeneratorService);
     }
 
     @Test
     void shouldExportQrCode() throws Exception {
-        // given
-        final Long parcelId = 1L;
-        final Parcel parcel = buildParcel();
+        final ShipmentId shipmentId = new ShipmentId(1L);
+        final Shipment shipment = buildShipment();
         final MockHttpServletResponse response = new MockHttpServletResponse();
 
-        doReturn(parcel)
-                .when(parcelRepository)
-                .find(parcelId);
+        doReturn(shipment)
+                .when(shipmentRepository)
+                .find(shipmentId);
 
-        // when
-        qrCodePort.exportParcelToPdfById(response, parcelId);
-        // then
-        verify(parcelRepository, atLeast(1)).find(parcelId);
+        qrCodePort.exportShipment(response, shipmentId);
+        verify(shipmentRepository, atLeast(1)).find(shipmentId);
     }
 
-    private Parcel buildParcel() {
-        return Parcel.builder()
+    private Shipment buildShipment() {
+        return Shipment.builder()
                 .id(1L)
                 .build();
     }

@@ -24,7 +24,7 @@
             email="test@test.pl"
     />
 
-    <parcel
+    <shipment
             id = "100001"
             first_name="test"
             last_name="test"
@@ -49,7 +49,7 @@
             locked = "false"
     />
 
-    <parcel
+    <shipment
             id = "100002"
             first_name="test"
             last_name="test"
@@ -74,7 +74,7 @@
             locked = "false"
     />
 
-    <parcel
+    <shipment
             id = "100003"
             first_name="test"
             last_name="test"

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <dataset>
-    <parcel
-            id = "1"
+    <shipment
+            shipment_id = "1"
             first_name="test"
             last_name="test"
             sender_telephone="12345"
