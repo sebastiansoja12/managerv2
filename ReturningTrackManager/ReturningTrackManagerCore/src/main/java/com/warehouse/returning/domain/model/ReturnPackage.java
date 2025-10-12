@@ -124,6 +124,9 @@ public class ReturnPackage {
     }
 
     public void markAsDeleted() {
+        if (this.returnStatus == ReturnStatus.COMPLETED) {
+            throw new StatusChangeException("Return package is already completed, cannot override status");
+        }
         changeReturnStatus(ReturnStatus.CANCELLED);
         markAsModified();
         DomainRegistry.publish(new ReturnPackageCanceled(this.toSnapshot(), Instant.now()));
