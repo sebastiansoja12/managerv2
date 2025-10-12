@@ -1,6 +1,7 @@
 package com.warehouse.returning.configuration;
 
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,6 +15,7 @@ import com.warehouse.returning.domain.service.ReturnTokenGeneratorServiceImpl;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadRepository;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturningRepositoryImpl;
 import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyClientAdapter;
+import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyClientMockAdapter;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
 
@@ -41,7 +43,14 @@ public class ReturningConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "returning.notify.mock", havingValue = "false")
     public ShipmentNotifyClientPort shipmentNotifyClientPort(final ShipmentProperties shipmentProperties) {
         return new ShipmentNotifyClientAdapter(shipmentProperties);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "returning.notify.mock", havingValue = "true")
+    public ShipmentNotifyClientPort shipmentNotifyClientMockAdapter() {
+        return new ShipmentNotifyClientMockAdapter();
     }
 }

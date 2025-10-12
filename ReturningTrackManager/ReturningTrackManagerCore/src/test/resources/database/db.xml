@@ -1,37 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <dataset>
-    <parcel
-            id = "100001"
-            first_name="test"
-            last_name="test"
-            sender_telephone="123"
-            sender_email="sender@test.pl"
-            sender_city="test"
-            sender_street="test"
-            sender_postal_code="00-000"
-            recipient_email="recipient@test.pl"
-            recipient_first_name="test"
-            recipient_last_name="test"
-            recipient_telephone="123"
-            recipient_city="test"
-            recipient_street="test"
-            recipient_postal_code="00-000"
-            parcel_size="3"
-            destination="KT1"
-            parcelStatus="0"
-            type="0"
-    />
-    <depot
-            country="Poland"
-            depot_code="KT1"
-            city="Gliwice"
-            street="test"/>
-
-    <depot
-            country="Poland"
-            depot_code="KT2"
-            city="Katowice"
-            street="test"/>
 
 </dataset>
