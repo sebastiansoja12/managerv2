@@ -70,11 +70,12 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                 final String user = decodedApiTenant.userId().value().toString();
                 final String clientIp = request.getRemoteAddr();
                 final String requestUri = request.getRequestURI();
+                final String requestMethod = request.getMethod();
 
                 MDC.put("tenant", tenant);
                 MDC.put("user", user);
 
-                log.info("Incoming request from user={} tenant={} uri={} ip={}", user, tenant, requestUri, clientIp);
+                log.info("Incoming {} request", requestMethod);
 
             } catch (IllegalArgumentException e) {
                 log.warn("Unauthorized request", e);
