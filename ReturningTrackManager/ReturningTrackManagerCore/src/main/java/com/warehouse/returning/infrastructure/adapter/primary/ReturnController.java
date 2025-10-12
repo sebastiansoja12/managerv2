@@ -1,5 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.primary;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -7,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.exceptionhandler.exception.RestException;
-import com.warehouse.returning.domain.exception.JwtDecodingException;
+import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
@@ -23,8 +24,10 @@ import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequ
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnResponseApi;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.ResponseMapper;
+import com.warehouse.returning.infrastructure.adapter.primary.validator.RequestValidator;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.BusinessException;
 
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,10 +39,15 @@ public class ReturnController {
 
     private final ReturnPort returnPort;
 
+    private final RequestValidator requestValidator;
+
     private final ApiKeyService apiKeyService;
 
-    public ReturnController(final ReturnPort returnPort, final ApiKeyService apiKeyService) {
+    public ReturnController(final ReturnPort returnPort,
+                            final RequestValidator requestValidator,
+                            final ApiKeyService apiKeyService) {
         this.returnPort = returnPort;
+        this.requestValidator = requestValidator;
         this.apiKeyService = apiKeyService;
     }
 
@@ -49,6 +57,12 @@ public class ReturnController {
             @RequestBody @Valid final ReturnRequestApi returnApiRequest) {
 
         log.info("Received return request: {}", returnApiRequest.toString());
+
+        final Result<Void, List<String>> validationResult = this.requestValidator.validateBody(returnApiRequest);
+
+        if (validationResult.isFailure()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
+        }
 
         ResponseEntity<?> responseEntity;
 
@@ -77,7 +91,7 @@ public class ReturnController {
                     responseEntity = ResponseEntity.ok(responseApi);
                 }
             }
-        } catch (final JwtDecodingException e) {
+        } catch (final SignatureException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
             responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid or expired token"));
