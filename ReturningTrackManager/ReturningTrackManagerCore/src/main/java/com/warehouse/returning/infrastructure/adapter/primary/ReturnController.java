@@ -1,7 +1,7 @@
 package com.warehouse.returning.infrastructure.adapter.primary;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,15 +39,15 @@ public class ReturnController {
 
     private final ReturnPort returnPort;
 
-    private final RequestValidator requestValidator;
+    private final Set<RequestValidator> requestValidators;
 
     private final ApiKeyService apiKeyService;
 
     public ReturnController(final ReturnPort returnPort,
-                            final RequestValidator requestValidator,
+                            final Set<RequestValidator> requestValidators,
                             final ApiKeyService apiKeyService) {
         this.returnPort = returnPort;
-        this.requestValidator = requestValidator;
+        this.requestValidators = requestValidators;
         this.apiKeyService = apiKeyService;
     }
 
@@ -58,7 +58,7 @@ public class ReturnController {
 
         log.info("Received return request: {}", returnApiRequest.toString());
 
-        final Result<Void, List<String>> validationResult = this.requestValidator.validateBody(returnApiRequest);
+        final Result validationResult = this.getValidator(returnApiRequest.getClassName()).validateBody(returnApiRequest);
 
         if (validationResult.isFailure()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
@@ -101,6 +101,12 @@ public class ReturnController {
 
     @PutMapping("/reason-code")
     public ResponseEntity<?> updateReasonCode(@RequestBody final ChangeReasonCodeRequestApi changeReasonCodeRequest) {
+        log.info("Received reason code change request: {}", changeReasonCodeRequest.toString());
+        final Result validationResult = this.getValidator(changeReasonCodeRequest.getClassName()).validateBody(changeReasonCodeRequest);
+        if (validationResult.isFailure()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
+        }
+
         final ChangeReasonCodeRequest request = RequestMapper.map(changeReasonCodeRequest);
         this.returnPort.changeReasonCode(request);
         return ResponseEntity.ok().build();
@@ -126,6 +132,13 @@ public class ReturnController {
         return ResponseEntity
                 .status(ex.getCode())
                 .body(ex.getMessage());
+    }
+
+    private RequestValidator getValidator(final String validatorName) {
+        return this.requestValidators.stream()
+                .filter(validator -> validator.getResourceName().equals(validatorName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Validator not found: " + validatorName));
     }
 
 }

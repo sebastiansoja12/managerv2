@@ -9,8 +9,8 @@ import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnPackageRequestApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 
-@Component
-public class ReturnRequestApiValidator extends RequestValidator {
+@Component("returnRequestApiValidator")
+public class ReturnRequestApiValidator extends RequestValidator<ReturnRequestApi> {
 
     @Override
     public Result<Void, List<String>> validateBody(final ReturnRequestApi request) {
@@ -48,5 +48,10 @@ public class ReturnRequestApiValidator extends RequestValidator {
                 }
             }
         });
+    }
+
+    @Override
+    public String getResourceName() {
+        return ReturnRequestApi.class.getSimpleName();
     }
 }

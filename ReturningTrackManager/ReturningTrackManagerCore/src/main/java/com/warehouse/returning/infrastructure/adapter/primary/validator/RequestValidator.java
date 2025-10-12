@@ -3,8 +3,8 @@ package com.warehouse.returning.infrastructure.adapter.primary.validator;
 import java.util.List;
 
 import com.warehouse.returning.domain.helper.Result;
-import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 
-public abstract class RequestValidator {
-    public abstract Result<Void, List<String>> validateBody(final ReturnRequestApi request);
+public abstract class RequestValidator<T> {
+    public abstract Result<Void, List<String>> validateBody(final T t);
+    public abstract String getResourceName();
 }

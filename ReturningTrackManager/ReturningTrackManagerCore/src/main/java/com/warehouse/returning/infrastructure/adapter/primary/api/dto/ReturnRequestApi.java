@@ -17,4 +17,8 @@ public record ReturnRequestApi(
                 "requests=" + requests.toString() +
                 '}';
     }
+
+    public String getClassName() {
+        return this.getClass().getSimpleName();
+    }
 }
