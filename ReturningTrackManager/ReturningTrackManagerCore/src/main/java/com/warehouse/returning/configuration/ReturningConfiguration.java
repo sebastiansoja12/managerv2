@@ -7,14 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.port.primary.ReturnPortImpl;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
-import com.warehouse.returning.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.returning.domain.port.secondary.ShipmentNotifyClientPort;
 import com.warehouse.returning.domain.service.ReturnService;
 import com.warehouse.returning.domain.service.ReturnServiceImpl;
 import com.warehouse.returning.domain.service.ReturnTokenGeneratorServiceImpl;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadRepository;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturningRepositoryImpl;
-import com.warehouse.returning.infrastructure.adapter.secondary.RouteLogServiceAdapter;
 import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyClientAdapter;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
@@ -36,11 +34,6 @@ public class ReturningConfiguration {
     public RouteTrackerLogProperties routeTrackerLogProperties() {
         return new RouteTrackerLogProperties();
     }
-
-	@Bean("returning.routeLogServicePort")
-	public RouteLogServicePort routeLogServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {
-		return new RouteLogServiceAdapter(routeTrackerLogProperties);
-	}
 
     @Bean
 	public ReturnRepository returnRepository(ReturnReadRepository repository) {
