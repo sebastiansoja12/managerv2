@@ -1,5 +1,6 @@
 package com.warehouse.returning.configuration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
@@ -93,6 +94,12 @@ class ReturnRequestApiValidatorTest {
 		assertEquals(
 				"[Shipment id must be provided, Reason must be provided, Department code must be provided, User id must be provided, Reason code must be provided]",
 				result.getFailure().toString());
+    }
+
+    @Test
+    void shouldReturnResourceNameCorrectly() {
+        final String resourceName = validator.getResourceName();
+        assertThat(resourceName).isEqualTo("ReturnRequestApi");
     }
 
     private ReturnPackageRequestApi getReturnPackageRequest(final ShipmentIdApi shipmentId, final String reason,
