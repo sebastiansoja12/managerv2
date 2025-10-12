@@ -3,6 +3,7 @@ package com.warehouse.returning.infrastructure.adapter.primary.validator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.returning.domain.helper.Result;
@@ -29,16 +30,16 @@ public class ReturnRequestApiValidator extends RequestValidator<ReturnRequestApi
             if (request.shipmentId() == null || request.shipmentId().value() == null) {
                 errors.add("Shipment id must be provided");
             }
-            if (request.reason() == null) {
+            if (StringUtils.isEmpty(request.reason())) {
                 errors.add("Reason must be provided");
             }
-            if (request.departmentCode() == null || request.departmentCode().value() == null) {
+            if (request.departmentCode() == null || StringUtils.isEmpty(request.departmentCode().value())) {
                 errors.add("Department code must be provided");
             }
             if (request.userId() == null || request.userId().value() == null) {
                 errors.add("User id must be provided");
             }
-            if (request.reasonCode() == null || request.reasonCode().value() == null) {
+            if (request.reasonCode() == null || StringUtils.isEmpty(request.reasonCode().value())) {
                 errors.add("Reason code must be provided");
             } else {
                 try {

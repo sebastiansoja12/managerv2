@@ -41,7 +41,7 @@ import com.warehouse.returning.infrastructure.adapter.secondary.exception.Return
 @ContextConfiguration(classes = ReturningTestConfiguration.class)
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ReturnIntegrationTest {
+class ReturnIntegrationTest {
     
     @Autowired
     private ReturnPortImpl returnPort;
