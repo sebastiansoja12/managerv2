@@ -1,5 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.secondary;
 
+import com.warehouse.returning.configuration.JwtContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
@@ -31,7 +32,7 @@ public class ShipmentNotifyClientAdapter implements ShipmentNotifyClientPort {
                 .uri("/v2/api/shipments/returns")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(httpHeaders -> httpHeaders.set("Authorization", "Bearer "))
+                .headers(httpHeaders -> httpHeaders.set("Authorization", "Bearer " + JwtContext.getToken()))
                 .retrieve()
                 .toBodilessEntity();
 

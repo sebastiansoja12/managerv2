@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
@@ -127,8 +126,8 @@ public class ReturnController {
     }
 
 
-    @ExceptionHandler(RestException.class)
-    public ResponseEntity<String> handleRestException(final RestException ex) {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<String> handleRestException(final BusinessException ex) {
         return ResponseEntity
                 .status(ex.getCode())
                 .body(ex.getMessage());

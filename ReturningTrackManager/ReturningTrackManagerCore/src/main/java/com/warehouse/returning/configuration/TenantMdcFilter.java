@@ -64,6 +64,8 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
             final String token = authorization.substring(7);
 
+            JwtContext.setToken(authorization.replace("Bearer ", ""));
+
             try {
                 final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
                 final String tenant = decodedApiTenant.departmentCode().value();
@@ -97,6 +99,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
         } finally {
             MDC.clear();
+            JwtContext.clear();
         }
     }
 }
