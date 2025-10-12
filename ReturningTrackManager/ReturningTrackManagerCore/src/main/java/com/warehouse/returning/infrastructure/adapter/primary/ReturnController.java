@@ -142,6 +142,7 @@ public class ReturnController {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<String> handleRestException(final BusinessException ex) {
+        log.error("Business exception occurred: {}", ex.getMessage());
         return ResponseEntity
                 .status(ex.getCode())
                 .body(ex.getMessage());
