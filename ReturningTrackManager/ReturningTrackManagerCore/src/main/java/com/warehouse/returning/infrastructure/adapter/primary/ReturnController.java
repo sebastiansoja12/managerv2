@@ -64,33 +64,23 @@ public class ReturnController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
         }
 
+        final String token = authorizationHeader.substring(7);
+        final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
+        
         ResponseEntity<?> responseEntity;
 
-        try {
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                log.warn("Missing or invalid Authorization header");
-                responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Missing or invalid Authorization header"));
-            } else {
-                final String token = authorizationHeader.substring(7);
-                final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
+		try {
 
-                log.info("Processing return request from user: {}", decodedApiTenant.userId().value());
+			log.info("Processing return request from user: {}", decodedApiTenant.userId().value());
 
-                final ReturnRequest request = RequestMapper.map(returnApiRequest, decodedApiTenant);
+			final ReturnRequest request = RequestMapper.map(returnApiRequest, decodedApiTenant);
 
-                if (request.getRequests().isEmpty()) {
-                    log.warn("Invalid return request: no items");
-                    responseEntity = ResponseEntity.badRequest()
-                            .body(Map.of("error", "Invalid request: no items to return"));
-                } else {
-                    final ReturnResponse response = this.returnPort.process(request);
-                    final ReturnResponseApi responseApi = ResponseMapper.toResponseApi(response);
+			final ReturnResponse response = this.returnPort.process(request);
+			final ReturnResponseApi responseApi = ResponseMapper.toResponseApi(response);
 
-                    log.info("Return request processed successfully for user: {}", decodedApiTenant.userId().value());
-                    responseEntity = ResponseEntity.ok(responseApi);
-                }
-            }
+			log.info("Return request processed successfully for user: {}", decodedApiTenant.userId().value());
+			responseEntity = ResponseEntity.ok(responseApi);
+
         } catch (final SignatureException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
             responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED)

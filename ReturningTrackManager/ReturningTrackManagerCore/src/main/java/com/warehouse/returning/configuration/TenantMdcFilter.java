@@ -68,8 +68,6 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                 final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
                 final String tenant = decodedApiTenant.departmentCode().value();
                 final String user = decodedApiTenant.userId().value().toString();
-                final String clientIp = request.getRemoteAddr();
-                final String requestUri = request.getRequestURI();
                 final String requestMethod = request.getMethod();
 
                 MDC.put("tenant", tenant);
