@@ -24,7 +24,6 @@ import com.warehouse.department.infrastructure.adapter.primary.validator.Request
 
 @RestController
 @RequestMapping("/departments")
-
 public class DepartmentController {
 
     private final DepartmentPort departmentPort;
