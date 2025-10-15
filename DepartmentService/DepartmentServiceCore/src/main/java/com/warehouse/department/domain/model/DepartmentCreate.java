@@ -25,21 +25,27 @@ public class DepartmentCreate {
     
     private DepartmentType departmentType;
 
-	public DepartmentCreate(final String city, final String country,
-			final CountryCode countryCode, final DepartmentCode departmentCode, final String nip,
-			final String openingHours, final String postalCode, final String street, final String telephoneNumber,
-			final DepartmentType departmentType) {
-		this.city = city;
-		this.country = country;
-		this.countryCode = countryCode;
-		this.departmentCode = departmentCode;
-		this.nip = nip;
-		this.openingHours = openingHours;
-		this.postalCode = postalCode;
-		this.street = street;
-		this.telephoneNumber = telephoneNumber;
-		this.departmentType = departmentType;
-	}
+    public DepartmentCreate(final DepartmentCode departmentCode,
+                            final String city,
+                            final String street,
+                            final String country,
+                            final String postalCode,
+                            final String nip,
+                            final String telephoneNumber,
+                            final String openingHours,
+                            final CountryCode countryCode,
+                            final DepartmentType departmentType) {
+        this.departmentCode = departmentCode;
+        this.city = city;
+        this.street = street;
+        this.country = country;
+        this.postalCode = postalCode;
+        this.nip = nip;
+        this.telephoneNumber = telephoneNumber;
+        this.openingHours = openingHours;
+        this.countryCode = countryCode;
+        this.departmentType = departmentType;
+    }
 
     public String getCity() {
         return city;

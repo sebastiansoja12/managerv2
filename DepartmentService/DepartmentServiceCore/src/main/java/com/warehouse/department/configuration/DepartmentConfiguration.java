@@ -14,13 +14,13 @@ import com.warehouse.department.infrastructure.adapter.secondary.DepartmentRepos
 @Configuration
 public class DepartmentConfiguration {
 
-
     @Bean(name = "department.departmentRepository")
-    public DepartmentRepository depotRepository(final DepartmentReadRepository repository) {
+    public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
         return new DepartmentRepositoryImpl(repository);
     }
+
     @Bean
-    public DepartmentPort depotPort(final DepartmentRepository departmentRepository, final DepartmentService departmentService) {
+    public DepartmentPort departmentPort(final DepartmentRepository departmentRepository, final DepartmentService departmentService) {
         return new DepartmentPortImpl(departmentRepository, departmentService);
     }
 

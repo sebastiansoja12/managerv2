@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.department.domain.exception.RestException;
 import com.warehouse.department.domain.helper.Result;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
@@ -18,6 +19,7 @@ import com.warehouse.department.infrastructure.adapter.primary.api.dto.Departmen
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentDto;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateStreetRequestDto;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.RequestMapper;
+import com.warehouse.department.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.department.infrastructure.adapter.primary.validator.RequestValidator;
 
 @RestController
@@ -36,16 +38,21 @@ public class DepartmentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> add(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
+    public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
 		final Result result = this.getValidator(departmentCreateApiRequest.getResourceName())
 				.validateBody(departmentCreateApiRequest);
+
+        if (result.isFailure()) {
+            return ResponseEntity.badRequest().body(result.getFailure());
+        }
+
         final DepartmentCreateRequest request = RequestMapper.map(departmentCreateApiRequest);
 
         try {
             final DepartmentCreateResponse response = this.departmentPort.createDepartments(request);
-            return ResponseEntity.ok().body(HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok().body(ResponseMapper.mapToCreateApiResponse(response));
+        } catch (final RestException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
