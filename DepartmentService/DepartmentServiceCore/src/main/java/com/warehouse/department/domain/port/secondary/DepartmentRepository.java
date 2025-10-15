@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface DepartmentRepository {
 
-    void save(final Department department);
+    void createOrUpdate(final Department department);
 
-    void saveAll(final List<Department> departments);
+    void createOrUpdateAll(final List<Department> departments);
 
     Department findByCode(final DepartmentCode departmentCode);
 

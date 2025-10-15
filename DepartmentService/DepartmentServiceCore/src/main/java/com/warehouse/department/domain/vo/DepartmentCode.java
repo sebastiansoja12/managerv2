@@ -9,6 +9,10 @@ public class DepartmentCode {
         this.value = value;
     }
 
+    public static DepartmentCode of(final com.warehouse.commonassets.identificator.DepartmentCode departmentCode) {
+        return new DepartmentCode(departmentCode.getValue());
+    }
+
     public String getValue() {
         return value;
     }

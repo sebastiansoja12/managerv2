@@ -1,47 +1,50 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
-import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.domain.vo.DepartmentCode;
-import com.warehouse.department.domain.port.secondary.DepartmentRepository;
-import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
-import com.warehouse.department.infrastructure.adapter.secondary.exception.DepotNotFoundException;
-import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepotMapper;
-import lombok.AllArgsConstructor;
+import java.util.List;
+
 import org.springframework.cache.annotation.Cacheable;
 
-import java.util.List;
-import java.util.Optional;
+import com.warehouse.department.domain.model.Department;
+import com.warehouse.department.domain.port.secondary.DepartmentRepository;
+import com.warehouse.department.domain.vo.DepartmentCode;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
+import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepartmentToEntityMapper;
+import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepartmentToModelMapper;
 
-@AllArgsConstructor
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
     private final DepartmentReadRepository repository;
 
-    private final DepotMapper depotMapper;
+    public DepartmentRepositoryImpl(final DepartmentReadRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     @Cacheable("departmentCodeCache")
-    public Department findByCode(DepartmentCode departmentCode) {
-        final Optional<DepartmentEntity> depot = repository.findByDepartmentCode(departmentCode.getValue());
-        return depot.map(depotMapper::map).orElseThrow(() -> new DepotNotFoundException("Department was not found"));
+    public Department findByCode(final DepartmentCode departmentCode) {
+		final DepartmentEntity department = repository
+				.findByDepartmentCode(
+						new com.warehouse.commonassets.identificator.DepartmentCode(departmentCode.getValue()))
+				.orElse(null);
+        return DepartmentToModelMapper.map(department);
     }
 
     @Override
     @Cacheable("departmentsCache")
     public List<Department> findAll() {
-        final List<DepartmentEntity> depots = repository.findAll();
-        return depotMapper.map(depots);
+        final List<DepartmentEntity> departments = repository.findAll();
+        return departments.stream().map(DepartmentToModelMapper::map).toList();
     }
 
     @Override
-    public void save(final Department department) {
-        final DepartmentEntity departmentEntity = depotMapper.map(department);
-        repository.save(departmentEntity);
+    public void createOrUpdate(final Department department) {
+        final DepartmentEntity departmentEntity = DepartmentToEntityMapper.map(department);
+        this.repository.save(departmentEntity);
     }
 
     @Override
-    public void saveAll(final List<Department> departments) {
-        final List<DepartmentEntity> depotEntities = depotMapper.mapToDepotEntityList(departments);
-        repository.saveAll(depotEntities);
+    public void createOrUpdateAll(final List<Department> deps) {
+        final List<DepartmentEntity> departments = deps.stream().map(DepartmentToEntityMapper::map).toList();
+        this.repository.saveAll(departments);
     }
 }

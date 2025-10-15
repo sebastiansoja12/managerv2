@@ -12,7 +12,7 @@ import com.warehouse.reroute.domain.model.RerouteRequest;
 import com.warehouse.reroute.domain.model.Token;
 
 
-public class RerouteTokenRequestMapperTest {
+public class RerouteTokenRequestValidatorTest {
 
 
     private final RerouteTokenRequestMapper requestMapper = getMapper(RerouteTokenRequestMapper.class);

@@ -1,64 +1,87 @@
 package com.warehouse.department.infrastructure.adapter.primary;
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.department.domain.helper.Result;
 import com.warehouse.department.domain.model.Department;
+import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.vo.DepartmentCode;
+import com.warehouse.department.domain.vo.DepartmentCreateResponse;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentDto;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCodeDto;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateStreetRequestDto;
-import com.warehouse.department.infrastructure.adapter.primary.mapper.DepotRequestMapper;
-import com.warehouse.department.infrastructure.adapter.primary.mapper.DepotResponseMapper;
-
-import lombok.AllArgsConstructor;
+import com.warehouse.department.infrastructure.adapter.primary.mapper.RequestMapper;
+import com.warehouse.department.infrastructure.adapter.primary.validator.RequestValidator;
 
 @RestController
 @RequestMapping("/departments")
-@AllArgsConstructor
+
 public class DepartmentController {
 
     private final DepartmentPort departmentPort;
 
-    private final DepotRequestMapper requestMapper = getMapper(DepotRequestMapper.class);
+    private final Set<RequestValidator> requestValidators;
 
-    private final DepotResponseMapper responseMapper = getMapper(DepotResponseMapper.class);
-
+    public DepartmentController(final DepartmentPort departmentPort,
+                                final Set<RequestValidator> requestValidators) {
+        this.departmentPort = departmentPort;
+        this.requestValidators = requestValidators;
+    }
 
     @PostMapping
+    public ResponseEntity<?> add(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
+		final Result result = this.getValidator(departmentCreateApiRequest.getResourceName())
+				.validateBody(departmentCreateApiRequest);
+        final DepartmentCreateRequest request = RequestMapper.map(departmentCreateApiRequest);
+
+        try {
+            final DepartmentCreateResponse response = this.departmentPort.createDepartments(request);
+            return ResponseEntity.ok().body(HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     public ResponseEntity<?> add(@RequestBody List<DepartmentDto> depotList) {
-        final List<Department> departments = requestMapper.map(depotList);
+        final List<Department> departments = null;
         departmentPort.addDepartments(departments);
         return ResponseEntity.ok().body(HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<?> updateStreet(@RequestBody final UpdateStreetRequestDto updateStreetRequest) {
-        final UpdateStreetRequest request = requestMapper.map(updateStreetRequest);
+        final UpdateStreetRequest request = null;
         departmentPort.updateStreet(request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/departmentCode/{value}")
-    public ResponseEntity<?> viewByDepartmentCode(DepartmentCodeDto code) {
-        final DepartmentCode departmentCode = requestMapper.map(code);
+    public ResponseEntity<?> viewByDepartmentCode(@PathVariable String value) {
+        final DepartmentCode departmentCode = new DepartmentCode(value);
         final Department department = departmentPort.findByDepartmentCode(departmentCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(responseMapper.map(department));
+                .body(department);
     }
 
     @GetMapping
     public ResponseEntity<?> allDepartments() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(responseMapper.map(departmentPort.findAll()));
+                .body(null);
+    }
+    
+    private RequestValidator getValidator(final String resourceName) {
+        return requestValidators.stream()
+                .filter(validator -> validator.getResourceName().equals(resourceName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Validator for resource " + resourceName + " not found"));
     }
 }
