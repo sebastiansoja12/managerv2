@@ -6,7 +6,7 @@ import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.DepartmentCreateResponse;
-import com.warehouse.department.domain.vo.UpdateStreetRequest;
+import com.warehouse.department.domain.vo.UpdateAddressRequest;
 
 public interface DepartmentPort {
 
@@ -18,5 +18,5 @@ public interface DepartmentPort {
 
     DepartmentCreateResponse createDepartments(final DepartmentCreateRequest request);
 
-    void updateStreet(UpdateStreetRequest request);
+    void changeAddress(final UpdateAddressRequest request);
 }

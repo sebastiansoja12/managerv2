@@ -25,8 +25,6 @@ public class Department {
 
     private Boolean active;
 
-    private CountryCode countryCode;
-
     private DepartmentType departmentType;
 
     private Instant createdAt;
@@ -40,13 +38,12 @@ public class Department {
                       final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
                       final Boolean active, final CountryCode countryCode, final DepartmentType departmentType, 
                       final Instant createdAt, final Instant updatedAt) {
-        this.address = new Address(city, street, country, postalCode);
+        this.address = new Address(city, street, country, postalCode, countryCode);
         this.departmentCode = departmentCode;
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.active = active;
-        this.countryCode = countryCode;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.departmentType = departmentType;
@@ -55,13 +52,12 @@ public class Department {
     public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
                      final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
                      final Boolean active, final CountryCode countryCode, final DepartmentType departmentType) {
-        this.address = new Address(city, street, country, postalCode);
+        this.address = new Address(city, street, country, postalCode, countryCode);
         this.departmentCode = departmentCode;
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.active = active;
-        this.countryCode = countryCode;
         this.departmentType = departmentType;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
@@ -78,11 +74,10 @@ public class Department {
 					department.getCountryCode(), DepartmentType.valueOf(department.getDepartmentType().name()),
 					department.getCreatedAt(), department.getUpdatedAt());
 		}
-
 	}
 
     private DepartmentSnapshot snapshot() {
-		return new DepartmentSnapshot(departmentCode, address, nip, telephoneNumber, openingHours, active, countryCode);
+		return new DepartmentSnapshot(departmentCode, address, nip, telephoneNumber, openingHours, active);
     }
 
     public String getCity() {
@@ -143,11 +138,7 @@ public class Department {
     }
 
     public CountryCode getCountryCode() {
-        return countryCode;
-    }
-
-    public void setCountryCode(final CountryCode countryCode) {
-        this.countryCode = countryCode;
+        return address.countryCode();
     }
 
     public Instant getUpdatedAt() {
@@ -178,7 +169,15 @@ public class Department {
         return address;
     }
 
-    public void updateStreet(final String street) {
-        this.address = new Address(this.address.city(), street, this.address.country(), this.address.postalCode());
+    public void changeAddress(final Address address) {
+        final Address current = this.address;
+
+        this.address = new Address(
+                address.city() != null ? address.city() : current.city(),
+                address.street() != null ? address.street() : current.street(),
+                address.country() != null ? address.country() : current.country(),
+                address.postalCode() != null ? address.postalCode() : current.postalCode(),
+                address.countryCode() != null ? address.countryCode() : current.countryCode()
+        );
     }
 }

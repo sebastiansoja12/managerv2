@@ -87,7 +87,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         MDC.put("tenant", "N/A");
         MDC.put("user", "N/A");
         MDC.put("username", "N/A");
-        MDC.put("uri", request.getRequestURI());
+        MDC.put("uri", request.getRequestURL().toString());
         MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         MDC.put("method", request.getMethod());
     }

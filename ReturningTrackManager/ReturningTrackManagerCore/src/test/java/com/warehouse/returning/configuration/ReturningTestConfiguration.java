@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.warehouse.returning.domain.provider.JwtProvider;
 import com.warehouse.returning.domain.service.ApiKeyService;
-import com.warehouse.tools.shipment.ShipmentProperties;
 
 @ComponentScan(basePackages = { "com.warehouse.returning" })
 @EntityScan(basePackages = { "com.warehouse.returning" })

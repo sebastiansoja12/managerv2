@@ -11,9 +11,10 @@ import com.warehouse.department.domain.model.DepartmentCreate;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.service.DepartmentService;
+import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.DepartmentCreateResponse;
-import com.warehouse.department.domain.vo.UpdateStreetRequest;
+import com.warehouse.department.domain.vo.UpdateAddressRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -88,9 +89,13 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public void updateStreet(final UpdateStreetRequest request) {
-        final Department department = this.departmentRepository.findByCode(request.departmentCode());
-        department.updateStreet(request.street());
-        this.departmentRepository.createOrUpdate(department);
+    public void changeAddress(final UpdateAddressRequest request) {
+        validateAddress(request.address());
+
+        this.departmentService.changeAddress(request.departmentCode(), request.address());
+    }
+
+    private void validateAddress(final Address address) {
+
     }
 }

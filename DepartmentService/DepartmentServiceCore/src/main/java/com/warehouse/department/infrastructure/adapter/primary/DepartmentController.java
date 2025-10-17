@@ -1,6 +1,5 @@
 package com.warehouse.department.infrastructure.adapter.primary;
 
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -14,10 +13,9 @@ import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.DepartmentCreateResponse;
-import com.warehouse.department.domain.vo.UpdateStreetRequest;
+import com.warehouse.department.domain.vo.UpdateAddressRequest;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentDto;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateStreetRequestDto;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateAddressApiRequest;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.department.infrastructure.adapter.primary.validator.RequestValidator;
@@ -56,33 +54,27 @@ public class DepartmentController {
         }
     }
 
-    public ResponseEntity<?> add(@RequestBody List<DepartmentDto> depotList) {
-        final List<Department> departments = null;
-        departmentPort.addDepartments(departments);
-        return ResponseEntity.ok().body(HttpStatus.OK);
-    }
-
     @PutMapping
-    public ResponseEntity<?> updateStreet(@RequestBody final UpdateStreetRequestDto updateStreetRequest) {
-        final UpdateStreetRequest request = null;
-        departmentPort.updateStreet(request);
+    public ResponseEntity<?> updateAddress(@RequestBody final UpdateAddressApiRequest updateAddressApiRequest) {
+        final UpdateAddressRequest request = RequestMapper.map(updateAddressApiRequest);
+        this.departmentPort.changeAddress(request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/departmentCode/{value}")
-    public ResponseEntity<?> viewByDepartmentCode(@PathVariable String value) {
+    @GetMapping("/{value}")
+    public ResponseEntity<?> viewByDepartmentCode(@PathVariable final String value) {
         final DepartmentCode departmentCode = new DepartmentCode(value);
         final Department department = departmentPort.findByDepartmentCode(departmentCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(department);
+                .body(ResponseMapper.map(department));
     }
 
     @GetMapping
     public ResponseEntity<?> allDepartments() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(null);
+                .body(this.departmentPort.findAll().stream().map(ResponseMapper::map).toList());
     }
     
     private RequestValidator getValidator(final String resourceName) {

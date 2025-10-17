@@ -1,6 +1,7 @@
 package com.warehouse.returning.domain.exception;
 
-import com.warehouse.exceptionhandler.exception.RestException;
+
+import com.warehouse.returning.infrastructure.adapter.secondary.exception.RestException;
 
 public class StatusChangeException extends RestException {
 

@@ -2,6 +2,7 @@ package com.warehouse.department.domain.service;
 
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
+import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
 
 public class DepartmentServiceImpl implements DepartmentService {
@@ -20,5 +21,12 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
         return departmentRepository.findByCode(departmentCode);
+    }
+
+    @Override
+    public void changeAddress(final DepartmentCode departmentCode, final Address address) {
+        final Department department = this.departmentRepository.findByCode(departmentCode);
+        department.changeAddress(address);
+        this.departmentRepository.createOrUpdate(department);
     }
 }
