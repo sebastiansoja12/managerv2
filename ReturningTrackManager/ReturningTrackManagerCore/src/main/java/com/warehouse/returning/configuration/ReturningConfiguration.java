@@ -16,8 +16,7 @@ import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadReposi
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturningRepositoryImpl;
 import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyClientAdapter;
 import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyClientMockAdapter;
-import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import com.warehouse.tools.shipment.ShipmentProperties;
+
 
 @Configuration
 public class ReturningConfiguration {
