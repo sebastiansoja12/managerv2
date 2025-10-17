@@ -61,6 +61,11 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                     : authenticateWithJwt(request, response);
 
             if (tenantInfo == null) {
+                log.warn("Authentication failed for URI: {}", uri);
+                if (!response.isCommitted()) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Authentication failed");
+                }
                 return;
             }
 
