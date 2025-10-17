@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.slf4j.MDC;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-@Order(Ordered.HIGHEST_PRECEDENCE)
 public class TenantMdcFilter extends OncePerRequestFilter {
 
     private final ApiKeyService apiKeyService;
