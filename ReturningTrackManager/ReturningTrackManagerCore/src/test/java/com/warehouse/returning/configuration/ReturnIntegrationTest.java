@@ -8,25 +8,19 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.exception.StatusChangeException;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
-import com.warehouse.returning.domain.port.primary.ReturnPortImpl;
+import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.*;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadRepository;
@@ -36,15 +30,13 @@ import com.warehouse.returning.infrastructure.adapter.secondary.entity.enumerati
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ReturnId;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.ReturnPackageNotFoundException;
 
-@ExtendWith(SpringExtension.class)
-@DataJpaTest
-@ContextConfiguration(classes = ReturningTestConfiguration.class)
-@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+
+@SpringBootTest
+@Transactional
 class ReturnIntegrationTest {
     
     @Autowired
-    private ReturnPortImpl returnPort;
+    private ReturnPort returnPort;
 
     @Autowired
     private ReturnReadRepository repository;
