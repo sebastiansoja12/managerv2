@@ -15,6 +15,9 @@ import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.DepartmentCreateResponse;
 import com.warehouse.department.domain.vo.UpdateStreetRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class DepartmentPortImpl implements DepartmentPort {
 
     private final DepartmentRepository departmentRepository;
@@ -68,6 +71,7 @@ public class DepartmentPortImpl implements DepartmentPort {
     private void validateRequest(final List<DepartmentCreate> departments) {
         departments.forEach(dep -> {
             if (dep.getDepartmentType() == DepartmentType.HEADQUARTERS) {
+                log.error("Department type HEADQUARTERS is not allowed");
                 throw new ForbiddenDepartmentTypeException("Forbidden department type: " + dep.getDepartmentType());
             }
         });
@@ -78,7 +82,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 			final Department department = this.departmentService.findByDepartmentCode(dep.getDepartmentCode());
 			if (department != null) {
 				throw new IllegalArgumentException(
-						"Department with code " + dep.getDepartmentCode() + " already exists");
+						"Department with code " + dep.getDepartmentCode().getValue() + " already exists");
 			}
 		});
     }

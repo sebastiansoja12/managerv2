@@ -37,9 +37,8 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
         MDC.put("tenant", "N/A");
         MDC.put("user", "N/A");
-        MDC.put("ip", request.getRemoteAddr());
+        MDC.put("username", "N/A");
         MDC.put("uri", request.getRequestURI());
-        MDC.put("class", this.getClass().getSimpleName());
         MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         MDC.put("method", request.getMethod());
 
@@ -70,10 +69,12 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                 final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
                 final String tenant = decodedApiTenant.departmentCode().value();
                 final String user = decodedApiTenant.userId().value().toString();
+                final String username = decodedApiTenant.username();
                 final String requestMethod = request.getMethod();
 
                 MDC.put("tenant", tenant);
                 MDC.put("user", user);
+                MDC.put("username", username);
 
                 log.info("Incoming {} request", requestMethod);
 

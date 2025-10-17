@@ -36,8 +36,9 @@ public class ApiKeyService {
 
             final UserId userId = new UserId(claims.get("userId", Long.class));
             final DepartmentCode departmentCode = new DepartmentCode(claims.get("tenant", String.class));
+            final String issuer = claims.get("username", String.class);
 
-            return new DecodedApiTenant(userId, departmentCode);
+            return new DecodedApiTenant(userId, departmentCode, issuer);
         } catch (SignatureException | IllegalArgumentException e) {
             throw new RestException(401, "Invalid or expired JWT token");
         }

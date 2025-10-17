@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import com.warehouse.department.domain.helper.Result;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
 
-@Component("departmentCreateApiRequestValidator")
+@Component(value = "departmentCreateApiRequestValidator")
 public abstract class DepartmentCreateApiRequestValidator extends RequestValidator<DepartmentCreateApiRequest> {
 
     @Override

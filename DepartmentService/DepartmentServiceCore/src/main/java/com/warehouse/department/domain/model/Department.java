@@ -63,6 +63,8 @@ public class Department {
         this.active = active;
         this.countryCode = countryCode;
         this.departmentType = departmentType;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         DomainRegistry.publish(new DepartmentCreated(this.snapshot(), Instant.now()));
     }
 
