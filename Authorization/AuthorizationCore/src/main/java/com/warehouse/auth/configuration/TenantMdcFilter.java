@@ -108,7 +108,6 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                                                  final HttpServletResponse response) throws IOException, java.io.IOException {
 
         final String auth = request.getHeader("Authorization");
-        final DecodedApiTenant decodedApiTenant;
         if (auth == null || !auth.startsWith("Bearer ")) {
             unauthorized(response, "Missing or invalid Authorization header");
             return null;
