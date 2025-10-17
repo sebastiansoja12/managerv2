@@ -32,74 +32,72 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                                     final HttpServletResponse response,
                                     final FilterChain filterChain) throws IOException, ServletException {
 
-
-        final String uri = request.getRequestURI();
-
-        if (uri.startsWith("/v2/api/swagger-ui")
-                || uri.startsWith("/v2/api/v3/api-docs")
-                || uri.startsWith("/v2/api/swagger-resources")
-                || uri.startsWith("/v2/api/webjars")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        final String authorization = request.getHeader("Authorization");
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Missing or invalid Authorization header");
-            return;
-        }
-
-        final String token = authorization.substring(7);
+        MDC.put("tenant", "N/A");
+        MDC.put("user", "N/A");
+        MDC.put("username", "N/A");
+        MDC.put("uri", request.getRequestURL().toString());
+        MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        MDC.put("method", request.getMethod());
 
         try {
-            final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
+            final String uri = request.getRequestURI();
 
-            final String tenant = decodedApiTenant.departmentCode().value();
-            final String user = decodedApiTenant.userId().value().toString();
-            final String clientIp = request.getRemoteAddr();
-            final String requestUri = request.getRequestURI();
-            final String className = this.getClass().getSimpleName();
-            final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            final String method = request.getMethod();
-
-            try {
-                try (MDC.MDCCloseable c1 = MDC.putCloseable("tenant", tenant);
-                     MDC.MDCCloseable c2 = MDC.putCloseable("user", user);
-                     MDC.MDCCloseable c3 = MDC.putCloseable("ip", clientIp);
-                     MDC.MDCCloseable c4 = MDC.putCloseable("uri", requestUri);
-                     MDC.MDCCloseable c5 = MDC.putCloseable("class", className);
-                     MDC.MDCCloseable c6 = MDC.putCloseable("time", timestamp);
-                     MDC.MDCCloseable c7 = MDC.putCloseable("method", method)) {
-
-                    log.info("Incoming request from user={} tenant={} uri={} ip={}",
-                            user, tenant, requestUri, clientIp);
-
-                    filterChain.doFilter(request, response);
-
-                } catch (final Exception e) {
-                    log.error("Error while processing MDC context: {}", e.getMessage(), e);
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    response.getWriter().write("Internal server error");
-                }
-            } catch (final Exception e) {
-                log.error("Unexpected error in filter: {}", e.getMessage(), e);
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("Internal server error");
-            } finally {
-                MDC.clear();
+            if (uri.startsWith("/v2/api/swagger-ui")
+                    || uri.startsWith("/v2/api/v3/api-docs")
+                    || uri.startsWith("/v2/api/swagger-resources")
+                    || uri.startsWith("/v2/api/webjars")
+                    || uri.startsWith("/v2/api/auth/login")) {
+                filterChain.doFilter(request, response);
+                return;
             }
 
-        } catch (final IllegalArgumentException e) {
-            log.warn("Unauthorized request: {}", e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(e.getMessage());
-        } catch (final Exception e) {
-            log.error("Unexpected error in filter: {}", e.getMessage(), e);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Internal server error");
+            final String authorization = request.getHeader("Authorization");
+            if (authorization == null || !authorization.startsWith("Bearer ")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Missing or invalid Authorization header");
+                return;
+            }
+
+            final String token = authorization.substring(7);
+
+            JwtContext.setToken(authorization.replace("Bearer ", ""));
+
+            try {
+                final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
+                final String tenant = decodedApiTenant.departmentCode().value();
+                final String user = decodedApiTenant.userId().value().toString();
+                final String username = decodedApiTenant.username();
+                final String requestMethod = request.getMethod();
+
+                MDC.put("tenant", tenant);
+                MDC.put("user", user);
+                MDC.put("username", username);
+
+                log.info("Incoming {} request", requestMethod);
+
+            } catch (IllegalArgumentException e) {
+                log.warn("Unauthorized request", e);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write(e.getMessage());
+                return;
+            } catch (Exception e) {
+                log.error("Failed to decode JWT", e);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("Internal server error");
+                return;
+            }
+
+            try {
+                filterChain.doFilter(request, response);
+            } catch (Exception e) {
+                log.error("Error during request processing", e);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("Internal server error");
+            }
+
+        } finally {
+            MDC.clear();
+            JwtContext.clear();
         }
     }
-
 }
-

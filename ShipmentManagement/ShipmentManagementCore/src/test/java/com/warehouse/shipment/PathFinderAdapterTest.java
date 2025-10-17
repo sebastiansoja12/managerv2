@@ -25,7 +25,7 @@ public class PathFinderAdapterTest {
 //    @Test
 //    void shouldDetermineNewDeliveryDepot() {
 //        // given
-//        final Address address = new Address("Kraków", "Krakowska", "00-000");
+//        final DepartmentAddress address = new DepartmentAddress("Kraków", "Krakowska", "00-000");
 //
 //        doReturn(new VoronoiResponseDto("KR1", null))
 //                .when(voronoiService)

@@ -29,7 +29,6 @@
 		<module>ExceptionHandler</module>
 		<module>DeliveryProtection</module>
         <module>Terminal</module>
-        <module>ReturningTrackManager</module>
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>
         <module>E2E</module>

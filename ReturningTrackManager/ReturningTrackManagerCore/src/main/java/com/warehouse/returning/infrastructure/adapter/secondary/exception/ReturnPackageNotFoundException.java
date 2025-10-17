@@ -1,8 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.exception;
 
-import com.warehouse.exceptionhandler.exception.RestException;
-
-public class ReturnPackageNotFoundException extends RestException {
+public class ReturnPackageNotFoundException extends BusinessException {
     private final static int code = 404;
     private final static String exMessage = "Return package not found";
     public ReturnPackageNotFoundException() {

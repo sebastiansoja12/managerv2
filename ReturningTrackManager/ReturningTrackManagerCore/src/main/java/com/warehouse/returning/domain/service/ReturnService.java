@@ -18,4 +18,6 @@ public interface ReturnService {
     ReturnPackageId nextReturnPackageId();
 
     void saveOrUpdate(final ReturnPackage returnPackage);
+
+    void completeReturn(final ReturnPackageId returnPackageId);
 }

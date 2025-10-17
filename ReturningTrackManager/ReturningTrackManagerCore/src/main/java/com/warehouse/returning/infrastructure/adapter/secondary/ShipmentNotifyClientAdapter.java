@@ -4,6 +4,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
+import com.warehouse.returning.configuration.JwtContext;
+import com.warehouse.returning.configuration.ShipmentProperties;
 import com.warehouse.returning.domain.enumeration.ErrorCode;
 import com.warehouse.returning.domain.enumeration.ResponseStatus;
 import com.warehouse.returning.domain.helper.Result;
@@ -11,7 +13,6 @@ import com.warehouse.returning.domain.port.secondary.ShipmentNotifyClientPort;
 import com.warehouse.returning.domain.vo.ReturnPackageSnapshot;
 import com.warehouse.returning.infrastructure.adapter.secondary.api.ShipmentReturnRequestApi;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.RequestMapper;
-import com.warehouse.tools.shipment.ShipmentProperties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +32,7 @@ public class ShipmentNotifyClientAdapter implements ShipmentNotifyClientPort {
                 .uri("/v2/api/shipments/returns")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(httpHeaders -> httpHeaders.set("Authorization", "Bearer "))
+                .headers(httpHeaders -> httpHeaders.set("Authorization", "Bearer " + JwtContext.getToken()))
                 .retrieve()
                 .toBodilessEntity();
 

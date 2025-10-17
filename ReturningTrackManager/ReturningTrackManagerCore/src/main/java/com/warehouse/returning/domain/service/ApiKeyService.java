@@ -4,11 +4,11 @@ import java.security.Key;
 
 import org.springframework.stereotype.Service;
 
-import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.returning.domain.provider.JwtProvider;
 import com.warehouse.returning.domain.vo.DecodedApiTenant;
 import com.warehouse.returning.domain.vo.DepartmentCode;
 import com.warehouse.returning.domain.vo.UserId;
+import com.warehouse.returning.infrastructure.adapter.secondary.exception.RestException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -36,8 +36,9 @@ public class ApiKeyService {
 
             final UserId userId = new UserId(claims.get("userId", Long.class));
             final DepartmentCode departmentCode = new DepartmentCode(claims.get("tenant", String.class));
+            final String issuer = claims.get("username", String.class);
 
-            return new DecodedApiTenant(userId, departmentCode);
+            return new DecodedApiTenant(userId, departmentCode, issuer);
         } catch (SignatureException | IllegalArgumentException e) {
             throw new RestException(401, "Invalid or expired JWT token");
         }

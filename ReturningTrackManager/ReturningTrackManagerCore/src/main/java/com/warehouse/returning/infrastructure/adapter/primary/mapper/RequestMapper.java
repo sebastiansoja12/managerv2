@@ -1,10 +1,13 @@
 package com.warehouse.returning.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.returning.domain.enumeration.ReasonCode;
+import com.warehouse.returning.domain.model.ChangeReturnStatusRequest;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
+import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.vo.*;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReasonCodeRequestApi;
+import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReturnStatusApiRequest;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 
 import java.util.List;
@@ -28,6 +31,11 @@ public abstract class RequestMapper {
                 .map(ReturnPackageRequest::from)
                 .toList();
         return new ReturnRequest(departmentCode, userId, returnPackageRequests);
+    }
+
+    public static ChangeReturnStatusRequest map(final ChangeReturnStatusApiRequest request) {
+        return new ChangeReturnStatusRequest(new ReturnPackageId(request.returnPackageId().value()),
+                ReturnStatus.valueOf(request.returnStatus()));
     }
 }
 

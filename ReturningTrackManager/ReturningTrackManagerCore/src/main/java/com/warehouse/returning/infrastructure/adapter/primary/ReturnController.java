@@ -1,13 +1,14 @@
 package com.warehouse.returning.infrastructure.adapter.primary;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.exceptionhandler.exception.RestException;
-import com.warehouse.returning.domain.exception.JwtDecodingException;
+import com.warehouse.returning.domain.helper.Result;
+import com.warehouse.returning.domain.model.ChangeReturnStatusRequest;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
@@ -17,14 +18,17 @@ import com.warehouse.returning.domain.vo.DecodedApiTenant;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReasonCodeRequestApi;
+import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReturnStatusApiRequest;
 import com.warehouse.returning.infrastructure.adapter.primary.api.DeleteReturnResponse;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnResponseApi;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.ResponseMapper;
+import com.warehouse.returning.infrastructure.adapter.primary.validator.RequestValidator;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.BusinessException;
 
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,10 +40,15 @@ public class ReturnController {
 
     private final ReturnPort returnPort;
 
+    private final Set<RequestValidator> requestValidators;
+
     private final ApiKeyService apiKeyService;
 
-    public ReturnController(final ReturnPort returnPort, final ApiKeyService apiKeyService) {
+    public ReturnController(final ReturnPort returnPort,
+                            final Set<RequestValidator> requestValidators,
+                            final ApiKeyService apiKeyService) {
         this.returnPort = returnPort;
+        this.requestValidators = requestValidators;
         this.apiKeyService = apiKeyService;
     }
 
@@ -50,34 +59,30 @@ public class ReturnController {
 
         log.info("Received return request: {}", returnApiRequest.toString());
 
+        final Result validationResult = this.getValidator(returnApiRequest.getClassName()).validateBody(returnApiRequest);
+
+        if (validationResult.isFailure()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
+        }
+
+        final String token = authorizationHeader.substring(7);
+        final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
+        
         ResponseEntity<?> responseEntity;
 
-        try {
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                log.warn("Missing or invalid Authorization header");
-                responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Missing or invalid Authorization header"));
-            } else {
-                final String token = authorizationHeader.substring(7);
-                final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
+		try {
 
-                log.info("Processing return request from user: {}", decodedApiTenant.userId().value());
+			log.info("Processing return request from user: {}", decodedApiTenant.userId().value());
 
-                final ReturnRequest request = RequestMapper.map(returnApiRequest, decodedApiTenant);
+			final ReturnRequest request = RequestMapper.map(returnApiRequest, decodedApiTenant);
 
-                if (request.getRequests().isEmpty()) {
-                    log.warn("Invalid return request: no items");
-                    responseEntity = ResponseEntity.badRequest()
-                            .body(Map.of("error", "Invalid request: no items to return"));
-                } else {
-                    final ReturnResponse response = this.returnPort.process(request);
-                    final ReturnResponseApi responseApi = ResponseMapper.toResponseApi(response);
+			final ReturnResponse response = this.returnPort.process(request);
+			final ReturnResponseApi responseApi = ResponseMapper.toResponseApi(response);
 
-                    log.info("Return request processed successfully for user: {}", decodedApiTenant.userId().value());
-                    responseEntity = ResponseEntity.ok(responseApi);
-                }
-            }
-        } catch (final JwtDecodingException e) {
+			log.info("Return request processed successfully for user: {}", decodedApiTenant.userId().value());
+			responseEntity = ResponseEntity.ok(responseApi);
+
+        } catch (final SignatureException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
             responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid or expired token"));
@@ -97,8 +102,27 @@ public class ReturnController {
 
     @PutMapping("/reason-code")
     public ResponseEntity<?> updateReasonCode(@RequestBody final ChangeReasonCodeRequestApi changeReasonCodeRequest) {
+        log.info("Received reason code change request: {}", changeReasonCodeRequest.toString());
+        final Result validationResult = this.getValidator(changeReasonCodeRequest.getClassName()).validateBody(changeReasonCodeRequest);
+        if (validationResult.isFailure()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
+        }
+
         final ChangeReasonCodeRequest request = RequestMapper.map(changeReasonCodeRequest);
         this.returnPort.changeReasonCode(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/complete")
+    public ResponseEntity<?> completeReturn(@RequestBody final ChangeReturnStatusApiRequest changeReturnStatusRequest) {
+        final Result validationResult = this.getValidator(changeReturnStatusRequest.getClassName())
+                .validateBody(changeReturnStatusRequest);
+        if (validationResult.isFailure()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
+        }
+
+        final ChangeReturnStatusRequest request = RequestMapper.map(changeReturnStatusRequest);
+        this.returnPort.complete(request.getReturnPackageId());
         return ResponseEntity.ok().build();
     }
 
@@ -106,7 +130,7 @@ public class ReturnController {
     public ResponseEntity<?> get(@PathVariable final Long returnPackageId) {
         final ReturnPackageId returnId = new ReturnPackageId(returnPackageId);
         final ReturnPackage returnModel = returnPort.getReturn(returnId);
-        return new ResponseEntity<>(returnModel, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMapper.toResponseApi(returnModel), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -116,12 +140,19 @@ public class ReturnController {
         return new DeleteReturnResponse(ResponseStatus.OK);
     }
 
-
-    @ExceptionHandler(RestException.class)
-    public ResponseEntity<String> handleRestException(final RestException ex) {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<String> handleRestException(final BusinessException ex) {
+        log.error("Business exception occurred: {}", ex.getMessage());
         return ResponseEntity
                 .status(ex.getCode())
                 .body(ex.getMessage());
+    }
+
+    private RequestValidator getValidator(final String validatorName) {
+        return this.requestValidators.stream()
+                .filter(validator -> validator.getResourceName().equals(validatorName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Validator not found: " + validatorName));
     }
 
 }

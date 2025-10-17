@@ -5,7 +5,7 @@ import lombok.Value;
 @Value
 public class DepartmentDto {
 
-    DepartmentCodeDto departmentCode;
+    DepartmentCodeApi departmentCode;
 
     String city;
 

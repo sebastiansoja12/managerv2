@@ -98,6 +98,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     @Override
+    public void createAdminUser(final RegisterRequest registerRequest) {
+
+    }
+
+    @Override
     public void updateFullName(final FullNameRequest request) {
         this.authenticationService.changeFullName(request);
     }

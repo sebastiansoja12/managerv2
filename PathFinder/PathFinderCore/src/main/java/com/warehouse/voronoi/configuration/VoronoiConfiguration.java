@@ -1,6 +1,5 @@
 package com.warehouse.voronoi.configuration;
 
-import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,7 +17,6 @@ import com.warehouse.voronoi.domain.service.UrlReaderServiceImpl;
 import com.warehouse.voronoi.infrastructure.adapter.primary.VoronoiServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.DepotServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.VoronoiAdapter;
-import com.warehouse.voronoi.infrastructure.adapter.secondary.mapper.DepotResponseMapper;
 
 @Configuration
 public class VoronoiConfiguration {
@@ -36,7 +34,7 @@ public class VoronoiConfiguration {
 
     @Bean
     public DepotServicePort depotServicePort(DepartmentPort departmentPort) {
-        return new DepotServiceAdapter(departmentPort, Mappers.getMapper(DepotResponseMapper.class));
+        return new DepotServiceAdapter(departmentPort);
     }
 
 	@Bean

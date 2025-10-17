@@ -1,18 +1,21 @@
 package com.warehouse.department.domain.model;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.department.domain.enumeration.DepartmentType;
+import com.warehouse.department.domain.event.DepartmentCreated;
+import com.warehouse.department.domain.registry.DomainRegistry;
+import com.warehouse.department.domain.vo.Address;
+import com.warehouse.department.domain.vo.DepartmentCode;
+import com.warehouse.department.domain.vo.DepartmentSnapshot;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
+
+import java.time.Instant;
 
 public class Department {
 
-    private String city;
+    private DepartmentCode departmentCode;
 
-    private String street;
-
-    private String country;
-
-    private String departmentCode;
-
-    private String postalCode;
+    private Address address;
 
     private String nip;
 
@@ -22,63 +25,84 @@ public class Department {
 
     private Boolean active;
 
-    private CountryCode countryCode;
+    private DepartmentType departmentType;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
 
     public Department() {
     }
 
-    public Department(String city, String street, String country, String departmentCode, String postalCode, String nip, String telephoneNumber, String openingHours,
-                      final Boolean active, final CountryCode countryCode) {
-        this.city = city;
-        this.street = street;
-        this.country = country;
+    public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
+                      final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
+                      final Boolean active, final CountryCode countryCode, final DepartmentType departmentType, 
+                      final Instant createdAt, final Instant updatedAt) {
+        this.address = new Address(city, street, country, postalCode, countryCode);
         this.departmentCode = departmentCode;
-        this.postalCode = postalCode;
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.active = active;
-        this.countryCode = countryCode;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.departmentType = departmentType;
+    }
+
+    public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
+                     final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
+                     final Boolean active, final CountryCode countryCode, final DepartmentType departmentType) {
+        this.address = new Address(city, street, country, postalCode, countryCode);
+        this.departmentCode = departmentCode;
+        this.nip = nip;
+        this.telephoneNumber = telephoneNumber;
+        this.openingHours = openingHours;
+        this.active = active;
+        this.departmentType = departmentType;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        DomainRegistry.publish(new DepartmentCreated(this.snapshot(), Instant.now()));
+    }
+
+	public static Department from(final DepartmentEntity department) {
+		if (department == null) {
+			return null;
+		} else {
+			return new Department(new DepartmentCode(department.getDepartmentCode().getValue()), department.getCity(),
+					department.getStreet(), department.getCountry(), department.getPostalCode(), department.getNip(),
+					department.getTelephoneNumber(), department.getOpeningHours(), department.isActive(),
+					department.getCountryCode(), DepartmentType.valueOf(department.getDepartmentType().name()),
+					department.getCreatedAt(), department.getUpdatedAt());
+		}
+	}
+
+    private DepartmentSnapshot snapshot() {
+		return new DepartmentSnapshot(departmentCode, address, nip, telephoneNumber, openingHours, active);
     }
 
     public String getCity() {
-        return city;
+        return address.city();
     }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
 
     public String getStreet() {
-        return street;
-    }
-
-    public void updateStreet(String street) {
-        this.street = street;
+        return address.street();
     }
 
     public String getCountry() {
-        return country;
+        return address.country();
     }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getDepartmentCode() {
+    public DepartmentCode getDepartmentCode() {
         return departmentCode;
     }
 
-    public void setDepartmentCode(String departmentCode) {
+    public void setDepartmentCode(final DepartmentCode departmentCode) {
         this.departmentCode = departmentCode;
     }
 
     public String getPostalCode() {
-        return postalCode;
-    }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
+        return address.postalCode();
     }
 
     public String getNip() {
@@ -105,10 +129,6 @@ public class Department {
         this.openingHours = openingHours;
     }
 
-    public void setStreet(final String street) {
-        this.street = street;
-    }
-
     public Boolean getActive() {
         return active;
     }
@@ -118,10 +138,46 @@ public class Department {
     }
 
     public CountryCode getCountryCode() {
-        return countryCode;
+        return address.countryCode();
     }
 
-    public void setCountryCode(final CountryCode countryCode) {
-        this.countryCode = countryCode;
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(final Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public DepartmentType getDepartmentType() {
+        return departmentType;
+    }
+
+    public void setDepartmentType(final DepartmentType departmentType) {
+        this.departmentType = departmentType;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(final Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void changeAddress(final Address address) {
+        final Address current = this.address;
+
+        this.address = new Address(
+                address.city() != null ? address.city() : current.city(),
+                address.street() != null ? address.street() : current.street(),
+                address.country() != null ? address.country() : current.country(),
+                address.postalCode() != null ? address.postalCode() : current.postalCode(),
+                address.countryCode() != null ? address.countryCode() : current.countryCode()
+        );
     }
 }

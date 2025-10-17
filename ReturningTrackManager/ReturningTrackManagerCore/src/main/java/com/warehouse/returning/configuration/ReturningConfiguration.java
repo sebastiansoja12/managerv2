@@ -1,23 +1,22 @@
 package com.warehouse.returning.configuration;
 
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.port.primary.ReturnPortImpl;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
-import com.warehouse.returning.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.returning.domain.port.secondary.ShipmentNotifyClientPort;
 import com.warehouse.returning.domain.service.ReturnService;
 import com.warehouse.returning.domain.service.ReturnServiceImpl;
 import com.warehouse.returning.domain.service.ReturnTokenGeneratorServiceImpl;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturnReadRepository;
 import com.warehouse.returning.infrastructure.adapter.secondary.ReturningRepositoryImpl;
-import com.warehouse.returning.infrastructure.adapter.secondary.RouteLogServiceAdapter;
 import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyClientAdapter;
-import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import com.warehouse.tools.shipment.ShipmentProperties;
+import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyClientMockAdapter;
+
 
 @Configuration
 public class ReturningConfiguration {
@@ -37,18 +36,20 @@ public class ReturningConfiguration {
         return new RouteTrackerLogProperties();
     }
 
-	@Bean("returning.routeLogServicePort")
-	public RouteLogServicePort routeLogServicePort(RouteTrackerLogProperties routeTrackerLogProperties) {
-		return new RouteLogServiceAdapter(routeTrackerLogProperties);
-	}
-
     @Bean
 	public ReturnRepository returnRepository(ReturnReadRepository repository) {
         return new ReturningRepositoryImpl(repository);
     }
 
     @Bean
+    @ConditionalOnProperty(name = "returning.notify.mock", havingValue = "false")
     public ShipmentNotifyClientPort shipmentNotifyClientPort(final ShipmentProperties shipmentProperties) {
         return new ShipmentNotifyClientAdapter(shipmentProperties);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "returning.notify.mock", havingValue = "true")
+    public ShipmentNotifyClientPort shipmentNotifyClientMockAdapter() {
+        return new ShipmentNotifyClientMockAdapter();
     }
 }

@@ -51,4 +51,11 @@ public class ReturnServiceImpl implements ReturnService {
     public void saveOrUpdate(final ReturnPackage returnPackage) {
         this.returnRepository.createOrUpdate(returnPackage);
     }
+
+    @Override
+    public void completeReturn(final ReturnPackageId returnPackageId) {
+        final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
+        returnPackage.markAsCompleted();
+        this.saveOrUpdate(returnPackage);
+    }
 }

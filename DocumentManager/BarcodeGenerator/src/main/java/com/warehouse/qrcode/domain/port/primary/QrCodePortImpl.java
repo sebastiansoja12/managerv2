@@ -4,9 +4,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import com.lowagie.text.Image;
-
 import com.warehouse.qrcode.domain.service.BarcodeGeneratorService;
-import com.warehouse.qrcode.domain.service.ParcelExportService;
+import com.warehouse.qrcode.domain.service.ShipmentExportService;
+import com.warehouse.qrcode.domain.vo.ShipmentId;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class QrCodePortImpl implements QrCodePort {
 
-    private final ParcelExportService parcelExportService;
+    private final ShipmentExportService shipmentExportService;
 
     private final BarcodeGeneratorService generatorService;
 
@@ -27,15 +28,14 @@ public class QrCodePortImpl implements QrCodePort {
 
 
     @Override
-    public void exportParcelToPdfById(HttpServletResponse response, Long id) throws Exception {
-        log.info("Request label generate has been recorded for parcel: {}", id);
+    public void exportShipment(final HttpServletResponse response, final ShipmentId shipmentId) throws Exception {
+        log.info("Request label generate has been recorded for shipment: {}", shipmentId.getValue());
         response.setContentType("application/pdf");
         final String currentDateTime = dateFormatter.format(new java.util.Date());
-        final String fileName = id + "_" + currentDateTime + ".pdf";
+        final String fileName = shipmentId.getValue() + "_" + currentDateTime + ".pdf";
         response.setHeader(headerKey, String.format(headerValue, fileName));
-        final Image image = generatorService.generateQRCodeImage(id);
-        parcelExportService.exportToPdf(response, id, image);
+        final Image image = generatorService.generateQRCodeImage(shipmentId.getValue());
+        shipmentExportService.exportToPdf(response, shipmentId, image);
         log.info("Label has been successfully generated with name: {}", fileName);
-
     }
 }
