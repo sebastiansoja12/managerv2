@@ -10,7 +10,7 @@ public abstract class DepartmentToEntityMapper {
 	public static DepartmentEntity map(final Department department) {
 		return new DepartmentEntity(new DepartmentCode(department.getDepartmentCode().getValue()), department.getCity(),
 				department.getStreet(), department.getCountry(), department.getPostalCode(), department.getNip(),
-				department.getTelephoneNumber(), department.getOpeningHours(), department.getActive(),
+				department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(), department.getActive(),
 				department.getCountryCode(), DepartmentType.valueOf(department.getDepartmentType().name()),
 				department.getCreatedAt(), department.getUpdatedAt());
 	}

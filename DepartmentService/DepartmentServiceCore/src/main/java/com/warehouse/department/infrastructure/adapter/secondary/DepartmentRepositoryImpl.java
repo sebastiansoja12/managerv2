@@ -41,10 +41,4 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
         final DepartmentEntity departmentEntity = DepartmentToEntityMapper.map(department);
         this.repository.save(departmentEntity);
     }
-
-    @Override
-    public void createOrUpdateAll(final List<Department> deps) {
-        final List<DepartmentEntity> departments = deps.stream().map(DepartmentToEntityMapper::map).toList();
-        this.repository.saveAll(departments);
-    }
 }

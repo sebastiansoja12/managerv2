@@ -1,16 +1,11 @@
 package com.warehouse.auth.domain.port.primary;
 
+import com.warehouse.auth.domain.model.*;
+import com.warehouse.auth.domain.service.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.domain.model.RefreshTokenRequest;
-import com.warehouse.auth.domain.model.RegisterRequest;
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.model.FullNameRequest;
-import com.warehouse.auth.domain.service.AuthenticationService;
-import com.warehouse.auth.domain.service.DepartmentService;
-import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.vo.AuthenticationResponse;
 import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.domain.vo.RegisterResponse;
@@ -98,8 +93,29 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     @Override
-    public void createAdminUser(final RegisterRequest registerRequest) {
+    public void createAdminUser(final AdminCreateRequest request) {
 
+        final UserId userId = this.authenticationService.nextUserId();
+
+        final String username = RandomUsernameService.generateUsername(6, 15, true);
+
+        final String password = this.passwordEncoder.encode(RandomPasswordService.generatePassword(10, true, true, true));
+
+        final String email = request.getEmail();
+
+        final String firstName = "ADMIN";
+
+        final String lastName = "ADMIN";
+
+        final Role role = Role.ADMIN;
+
+        final DepartmentCode departmentCode = request.getDepartmentCode();
+
+        validateDepartmentCode(departmentCode);
+
+        final User user = new User(userId, username, password, firstName, lastName, email, role, departmentCode, null);
+
+        authenticationService.register(user);
     }
 
     @Override

@@ -22,6 +22,8 @@ public class Department {
     private String telephoneNumber;
 
     private String openingHours;
+    
+    private String email;
 
     private Boolean active;
 
@@ -34,29 +36,32 @@ public class Department {
     public Department() {
     }
 
-    public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
-                      final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
-                      final Boolean active, final CountryCode countryCode, final DepartmentType departmentType, 
-                      final Instant createdAt, final Instant updatedAt) {
-        this.address = new Address(city, street, country, postalCode, countryCode);
+	public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
+			final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
+			final String email, final Boolean active, final CountryCode countryCode,
+			final DepartmentType departmentType, final Instant createdAt, final Instant updatedAt) {
+		this.address = new Address(city, street, country, postalCode, countryCode);
         this.departmentCode = departmentCode;
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
+        this.email = email;
         this.active = active;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.departmentType = departmentType;
     }
 
-    public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
-                     final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
-                     final Boolean active, final CountryCode countryCode, final DepartmentType departmentType) {
-        this.address = new Address(city, street, country, postalCode, countryCode);
+	public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
+			final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
+			final String email, final Boolean active, final CountryCode countryCode,
+			final DepartmentType departmentType) {
+		this.address = new Address(city, street, country, postalCode, countryCode);
         this.departmentCode = departmentCode;
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
+        this.email = email;
         this.active = active;
         this.departmentType = departmentType;
         this.createdAt = Instant.now();
@@ -70,20 +75,20 @@ public class Department {
 		} else {
 			return new Department(new DepartmentCode(department.getDepartmentCode().getValue()), department.getCity(),
 					department.getStreet(), department.getCountry(), department.getPostalCode(), department.getNip(),
-					department.getTelephoneNumber(), department.getOpeningHours(), department.isActive(),
-					department.getCountryCode(), DepartmentType.valueOf(department.getDepartmentType().name()),
-					department.getCreatedAt(), department.getUpdatedAt());
+					department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
+					department.isActive(), department.getCountryCode(),
+					DepartmentType.valueOf(department.getDepartmentType().name()), department.getCreatedAt(),
+					department.getUpdatedAt());
 		}
 	}
 
-    private DepartmentSnapshot snapshot() {
-		return new DepartmentSnapshot(departmentCode, address, nip, telephoneNumber, openingHours, active);
+    public DepartmentSnapshot snapshot() {
+		return new DepartmentSnapshot(departmentCode, address, nip, telephoneNumber, openingHours, email, active);
     }
 
     public String getCity() {
         return address.city();
     }
-
 
     public String getStreet() {
         return address.street();
@@ -169,6 +174,14 @@ public class Department {
         return address;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
+    }
+
     public void changeAddress(final Address address) {
         final Address current = this.address;
 
@@ -179,5 +192,9 @@ public class Department {
                 address.postalCode() != null ? address.postalCode() : current.postalCode(),
                 address.countryCode() != null ? address.countryCode() : current.countryCode()
         );
+    }
+
+    public DepartmentSnapshot toSnapshot() {
+        return null;
     }
 }

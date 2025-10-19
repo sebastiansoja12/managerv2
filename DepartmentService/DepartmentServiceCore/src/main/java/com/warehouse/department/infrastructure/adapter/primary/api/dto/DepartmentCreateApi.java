@@ -8,6 +8,7 @@ public record DepartmentCreateApi(DepartmentCodeApi departmentCode,
                                   String nip,
                                   String telephoneNumber,
                                   String openingHours,
+                                  String email,
                                   String countryCode,
                                   String departmentType) {
 }

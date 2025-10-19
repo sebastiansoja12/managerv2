@@ -14,8 +14,6 @@ public interface DepartmentPort {
 
     List<Department> findAll();
 
-    void addDepartments(List<Department> departments);
-
     DepartmentCreateResponse createDepartments(final DepartmentCreateRequest request);
 
     void changeAddress(final UpdateAddressRequest request);

@@ -10,12 +10,14 @@ import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreate;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
+import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.department.domain.service.DepartmentService;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.DepartmentCreateResponse;
 import com.warehouse.department.domain.vo.UpdateAddressRequest;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,10 +27,14 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     private final DepartmentService departmentService;
 
+    private final TenantAdminProvisioningPort tenantAdminProvisioningPort;
+
     public DepartmentPortImpl(final DepartmentRepository departmentRepository,
-                              final DepartmentService departmentService) {
+                              final DepartmentService departmentService,
+                              final TenantAdminProvisioningPort tenantAdminProvisioningPort) {
         this.departmentRepository = departmentRepository;
         this.departmentService = departmentService;
+        this.tenantAdminProvisioningPort = tenantAdminProvisioningPort;
     }
 
     @Override
@@ -42,29 +48,29 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public void addDepartments(final List<Department> departments) {
-        this.departmentRepository.createOrUpdateAll(departments);
-    }
-
-    @Override
+    @Transactional
     public DepartmentCreateResponse createDepartments(final DepartmentCreateRequest request) {
 
         validateRequest(request.getDepartments());
 
         checkIfDepartmentWithGivenCodeAlreadyExists(request.getDepartments());
 
-        final Map<DepartmentCode, Boolean> createdDepartments = new HashMap<>();
+        final Map<Department, Boolean> createdDepartments = new HashMap<>();
         for (final DepartmentCreate departmentCreate : request.getDepartments()) {
             final DepartmentCode departmentCode = departmentCreate.getDepartmentCode();
 			final Department department = new Department(departmentCode, departmentCreate.getCity(),
 					departmentCreate.getStreet(), departmentCreate.getCountry(), departmentCreate.getPostalCode(),
 					departmentCreate.getNip(), departmentCreate.getTelephoneNumber(),
-					departmentCreate.getOpeningHours(), true,
+					departmentCreate.getOpeningHours(), departmentCreate.getEmail(), true,
 					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
             this.departmentService.createDepartment(department);
 
-            createdDepartments.put(departmentCode, true);
+            createdDepartments.put(department, true);
 		}
+
+        createdDepartments.forEach((key, value) -> tenantAdminProvisioningPort.createInitialAdminUser(
+                key.snapshot()
+        ));
 
         return new DepartmentCreateResponse(createdDepartments);
     }

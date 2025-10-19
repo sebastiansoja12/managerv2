@@ -6,6 +6,7 @@ public record DepartmentSnapshot(
         String nip,
         String telephoneNumber,
         String openingHours,
+        String email,
         Boolean active
 ) {
 }

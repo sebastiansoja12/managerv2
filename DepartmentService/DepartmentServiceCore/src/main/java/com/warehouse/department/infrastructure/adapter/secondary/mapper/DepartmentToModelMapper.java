@@ -13,7 +13,7 @@ public abstract class DepartmentToModelMapper {
         } else {
             return new Department(new DepartmentCode(department.getDepartmentCode().getValue()), department.getCity(),
                     department.getStreet(), department.getCountry(), department.getPostalCode(), department.getNip(),
-                    department.getTelephoneNumber(), department.getOpeningHours(), department.isActive(),
+                    department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(), department.isActive(),
                     department.getCountryCode(), DepartmentType.valueOf(department.getDepartmentType().name()),
                     department.getCreatedAt(), department.getUpdatedAt());
         }

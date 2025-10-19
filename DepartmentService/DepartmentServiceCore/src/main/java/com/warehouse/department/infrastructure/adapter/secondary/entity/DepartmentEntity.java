@@ -39,6 +39,9 @@ public class DepartmentEntity {
     @Column(name = "opening_hours", nullable = false)
     private String openingHours;
 
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
+
     @Column(name = "active", nullable = false)
     private Boolean active;
 
@@ -67,6 +70,7 @@ public class DepartmentEntity {
                             final String nip,
                             final String telephoneNumber,
                             final String openingHours,
+                            final String email,
                             final Boolean active,
                             final CountryCode countryCode,
                             final DepartmentType departmentType,
@@ -80,6 +84,7 @@ public class DepartmentEntity {
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
+        this.email = email;
         this.active = active;
         this.countryCode = countryCode;
         this.departmentType = departmentType;
@@ -137,5 +142,9 @@ public class DepartmentEntity {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

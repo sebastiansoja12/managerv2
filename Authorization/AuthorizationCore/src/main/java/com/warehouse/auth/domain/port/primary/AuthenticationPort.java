@@ -13,7 +13,7 @@ public interface AuthenticationPort {
 
     User findUser(String username);
 
-    void createAdminUser(final RegisterRequest registerRequest);
+    void createAdminUser(final AdminCreateRequest adminCreateRequest);
 
     void updateFullName(final FullNameRequest request);
 

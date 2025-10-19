@@ -25,7 +25,7 @@ public abstract class RequestMapper {
 		return deps.stream()
 				.map(dep -> new DepartmentCreate(new DepartmentCode(dep.departmentCode().value()), dep.city(),
 						dep.street(), dep.country(), dep.postalCode(), dep.nip(), dep.telephoneNumber(),
-						dep.openingHours(), CountryCode.valueOf(dep.countryCode()),
+						dep.openingHours(), dep.email(), CountryCode.valueOf(dep.countryCode()),
 						DepartmentType.valueOf(dep.departmentType())))
 				.toList();
 	}

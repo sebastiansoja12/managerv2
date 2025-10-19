@@ -9,8 +9,6 @@ public interface DepartmentRepository {
 
     void createOrUpdate(final Department department);
 
-    void createOrUpdateAll(final List<Department> departments);
-
     Department findByCode(final DepartmentCode departmentCode);
 
     List<Department> findAll();

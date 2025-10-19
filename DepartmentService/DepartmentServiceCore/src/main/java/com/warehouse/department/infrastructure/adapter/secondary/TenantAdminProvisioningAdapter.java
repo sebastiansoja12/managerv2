@@ -19,6 +19,7 @@ public class TenantAdminProvisioningAdapter implements TenantAdminProvisioningPo
     public void createInitialAdminUser(final DepartmentSnapshot snapshot) {
         final DepartmentCode departmentCode = new DepartmentCode(snapshot.departmentCode().getValue());
         final String telephoneNumber = snapshot.telephoneNumber();
-        this.applicationEventPublisher.publishEvent(new AdminUserCommand(departmentCode, telephoneNumber, null));
+        final String email = snapshot.email();
+        this.applicationEventPublisher.publishEvent(new AdminUserCommand(departmentCode, telephoneNumber, email));
     }
 }

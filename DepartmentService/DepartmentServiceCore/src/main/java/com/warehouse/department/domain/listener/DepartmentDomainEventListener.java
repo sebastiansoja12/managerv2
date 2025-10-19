@@ -24,6 +24,6 @@ public class DepartmentDomainEventListener {
     @EventListener
     public void handle(final DepartmentCreated event) {
         final DepartmentSnapshot snapshot = event.getSnapshot();
-        this.tenantAdminProvisioningPort.createInitialAdminUser(snapshot);
+        //this.tenantAdminProvisioningPort.createInitialAdminUser(snapshot);
     }
 }

@@ -21,6 +21,8 @@ public class DepartmentCreate {
 
     private String openingHours;
 
+    private String email;
+
     private CountryCode countryCode;
     
     private DepartmentType departmentType;
@@ -33,6 +35,7 @@ public class DepartmentCreate {
                             final String nip,
                             final String telephoneNumber,
                             final String openingHours,
+                            final String email,
                             final CountryCode countryCode,
                             final DepartmentType departmentType) {
         this.departmentCode = departmentCode;
@@ -43,6 +46,7 @@ public class DepartmentCreate {
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
+        this.email = email;
         this.countryCode = countryCode;
         this.departmentType = departmentType;
     }
@@ -125,5 +129,13 @@ public class DepartmentCreate {
 
     public void setDepartmentType(final DepartmentType departmentType) {
         this.departmentType = departmentType;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
     }
 }

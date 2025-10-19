@@ -23,8 +23,9 @@ public class DepartmentConfiguration {
     }
 
     @Bean
-    public DepartmentPort departmentPort(final DepartmentRepository departmentRepository, final DepartmentService departmentService) {
-        return new DepartmentPortImpl(departmentRepository, departmentService);
+    public DepartmentPort departmentPort(final DepartmentRepository departmentRepository, final DepartmentService departmentService,
+                                         final TenantAdminProvisioningPort tenantAdminProvisioningPort) {
+        return new DepartmentPortImpl(departmentRepository, departmentService, tenantAdminProvisioningPort);
     }
 
     @Bean
