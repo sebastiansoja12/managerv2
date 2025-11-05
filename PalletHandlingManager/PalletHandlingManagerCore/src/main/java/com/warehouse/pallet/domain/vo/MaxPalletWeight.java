@@ -2,18 +2,19 @@ package com.warehouse.pallet.domain.vo;
 
 import com.warehouse.pallet.domain.enumeration.Unit;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class MaxPalletWeight {
-    private final Double value;
+    private final BigDecimal value;
     private final Unit unit;
 
-    public MaxPalletWeight(final Double value, final Unit unit) {
+    public MaxPalletWeight(final BigDecimal value, final Unit unit) {
         this.value = value;
         this.unit = unit;
     }
 
-    public Double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 

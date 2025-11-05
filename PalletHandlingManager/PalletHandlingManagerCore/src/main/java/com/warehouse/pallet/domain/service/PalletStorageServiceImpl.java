@@ -15,6 +15,7 @@ import com.warehouse.pallet.domain.vo.Dimension;
 import com.warehouse.pallet.domain.vo.SealNumber;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -119,7 +120,7 @@ public class PalletStorageServiceImpl implements PalletStorageService {
     }
 
     @Override
-    public void changeMaxPalletWeight(final PalletId palletId, final Double maxPalletWeight) {
+    public void changeMaxPalletWeight(final PalletId palletId, final BigDecimal maxPalletWeight) {
         final Pallet pallet = this.palletRepository.findById(palletId);
         pallet.changeMaxPalletWeight(maxPalletWeight);
         this.palletRepository.createOrUpdate(pallet);

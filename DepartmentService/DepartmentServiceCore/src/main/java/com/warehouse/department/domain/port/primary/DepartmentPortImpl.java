@@ -102,6 +102,6 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     private void validateAddress(final Address address) {
-
+        address.validate();
     }
 }

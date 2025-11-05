@@ -7,7 +7,6 @@ import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.DepartmentSnapshot;
-import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 
 import java.time.Instant;
 
@@ -68,19 +67,6 @@ public class Department {
         this.updatedAt = Instant.now();
         DomainRegistry.publish(new DepartmentCreated(this.snapshot(), Instant.now()));
     }
-
-	public static Department from(final DepartmentEntity department) {
-		if (department == null) {
-			return null;
-		} else {
-			return new Department(new DepartmentCode(department.getDepartmentCode().getValue()), department.getCity(),
-					department.getStreet(), department.getCountry(), department.getPostalCode(), department.getNip(),
-					department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
-					department.isActive(), department.getCountryCode(),
-					DepartmentType.valueOf(department.getDepartmentType().name()), department.getCreatedAt(),
-					department.getUpdatedAt());
-		}
-	}
 
     public DepartmentSnapshot snapshot() {
 		return new DepartmentSnapshot(departmentCode, address, nip, telephoneNumber, openingHours, email, active);
@@ -192,9 +178,5 @@ public class Department {
                 address.postalCode() != null ? address.postalCode() : current.postalCode(),
                 address.countryCode() != null ? address.countryCode() : current.countryCode()
         );
-    }
-
-    public DepartmentSnapshot toSnapshot() {
-        return null;
     }
 }

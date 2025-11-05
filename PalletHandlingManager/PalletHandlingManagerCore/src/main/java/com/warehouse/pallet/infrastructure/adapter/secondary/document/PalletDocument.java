@@ -11,6 +11,7 @@ import com.warehouse.pallet.domain.model.Weight;
 import com.warehouse.pallet.domain.vo.Dimension;
 import com.warehouse.pallet.domain.vo.MaxPalletWeight;
 import com.warehouse.pallet.domain.vo.SealNumber;
+import com.warehouse.pallet.infrastructure.adapter.secondary.enumeration.PalletType;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -24,30 +25,31 @@ public class PalletDocument {
 
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "pallet_id"))
-    private PalletId palletId;
-    private Set<ShipmentId> shipmentIds;
-    private DepartmentCode originDepartment;
-    private DepartmentCode destinationDepartment;
-    private Instant created;
-    private Instant modified;
-    private PalletStatus palletStatus;
-    private StorageStatus storageStatus;
-    private DriverDocument driver;
-    private Weight palletWeight;
-    private Dimension dimension;
-    private PalletHandlingPriority palletHandlingPriority;
-    private SealNumber sealNumber;
-    private Boolean refrigerated;
-    private MaxPalletWeight maxPalletWeight;
+    private final PalletId palletId;
+    private final Set<ShipmentId> shipmentIds;
+    private final DepartmentCode originDepartment;
+    private final DepartmentCode destinationDepartment;
+    private final Instant created;
+    private final Instant modified;
+    private final PalletStatus palletStatus;
+    private final StorageStatus storageStatus;
+    private final DriverDocument driver;
+    private final Weight palletWeight;
+    private final Dimension dimension;
+    private final PalletHandlingPriority palletHandlingPriority;
+    private final PalletType palletType;
+    private final SealNumber sealNumber;
+    private final Boolean refrigerated;
+    private final MaxPalletWeight maxPalletWeight;
 
-    public static PalletDocument from(final Pallet pallet) {
-        return new PalletDocument(pallet.getPalletId(), pallet.getShipmentIds(),
-                pallet.getOriginDepartment(), pallet.getDestinationDepartment(),
-                pallet.getCreated(), pallet.getModified(), pallet.getPalletStatus(),
-                pallet.getStorageStatus(), DriverDocument.from(pallet.getDriver()), pallet.getPalletWeight(),
-                pallet.getDimension(), pallet.getPalletHandlingPriority(), pallet.getSealNumber(),
-                pallet.isRefrigerated(), pallet.getMaxPalletWeight());
-    }
+	public static PalletDocument from(final Pallet pallet) {
+		return new PalletDocument(pallet.getPalletId(), pallet.getShipmentIds(), pallet.getOriginDepartment(),
+				pallet.getDestinationDepartment(), pallet.getCreated(), pallet.getModified(), pallet.getPalletStatus(),
+				pallet.getStorageStatus(), DriverDocument.from(pallet.getDriver()), pallet.getPalletWeight(),
+				pallet.getDimension(), pallet.getPalletHandlingPriority(),
+				PalletType.valueOf(pallet.getPalletType().name()), pallet.getSealNumber(), pallet.isRefrigerated(),
+				pallet.getMaxPalletWeight());
+	}
 
     public PalletDocument(final PalletId palletId,
                           final Set<ShipmentId> shipmentIds,
@@ -61,6 +63,7 @@ public class PalletDocument {
                           final Weight palletWeight,
                           final Dimension dimension,
                           final PalletHandlingPriority palletHandlingPriority,
+                          final PalletType palletType,
                           final SealNumber sealNumber,
                           final Boolean refrigerated,
                           final MaxPalletWeight maxPalletWeight) {
@@ -76,128 +79,73 @@ public class PalletDocument {
         this.palletWeight = palletWeight;
         this.dimension = dimension;
         this.palletHandlingPriority = palletHandlingPriority;
+        this.palletType = palletType;
         this.sealNumber = sealNumber;
         this.refrigerated = refrigerated;
         this.maxPalletWeight = maxPalletWeight;
-    }
-
-    public PalletId getPalletId() {
-        return palletId;
-    }
-
-    public void setPalletId(final PalletId palletId) {
-        this.palletId = palletId;
-    }
-
-    public Set<ShipmentId> getShipmentIds() {
-        return shipmentIds;
-    }
-
-    public void setShipmentIds(final Set<ShipmentId> shipmentIds) {
-        this.shipmentIds = shipmentIds;
-    }
-
-    public DepartmentCode getOriginDepartment() {
-        return originDepartment;
-    }
-
-    public void setOriginDepartment(final DepartmentCode originDepartment) {
-        this.originDepartment = originDepartment;
-    }
-
-    public DepartmentCode getDestinationDepartment() {
-        return destinationDepartment;
-    }
-
-    public void setDestinationDepartment(final DepartmentCode destinationDepartment) {
-        this.destinationDepartment = destinationDepartment;
     }
 
     public Instant getCreated() {
         return created;
     }
 
-    public void setCreated(final Instant created) {
-        this.created = created;
-    }
-
-    public Instant getModified() {
-        return modified;
-    }
-
-    public void setModified(final Instant modified) {
-        this.modified = modified;
-    }
-
-    public PalletStatus getPalletStatus() {
-        return palletStatus;
-    }
-
-    public void setPalletStatus(final PalletStatus palletStatus) {
-        this.palletStatus = palletStatus;
-    }
-
-    public StorageStatus getStorageStatus() {
-        return storageStatus;
-    }
-
-    public void setStorageStatus(final StorageStatus storageStatus) {
-        this.storageStatus = storageStatus;
-    }
-
-    public DriverDocument getDriver() {
-        return driver;
-    }
-
-    public void setDriver(final DriverDocument driver) {
-        this.driver = driver;
-    }
-
-    public Weight getPalletWeight() {
-        return palletWeight;
-    }
-
-    public void setPalletWeight(final Weight palletWeight) {
-        this.palletWeight = palletWeight;
+    public DepartmentCode getDestinationDepartment() {
+        return destinationDepartment;
     }
 
     public Dimension getDimension() {
         return dimension;
     }
 
-    public void setDimension(final Dimension dimension) {
-        this.dimension = dimension;
-    }
-
-    public PalletHandlingPriority getPalletHandlingPriority() {
-        return palletHandlingPriority;
-    }
-
-    public void setPalletHandlingPriority(final PalletHandlingPriority palletHandlingPriority) {
-        this.palletHandlingPriority = palletHandlingPriority;
-    }
-
-    public SealNumber getSealNumber() {
-        return sealNumber;
-    }
-
-    public void setSealNumber(final SealNumber sealNumber) {
-        this.sealNumber = sealNumber;
-    }
-
-    public Boolean isRefrigerated() {
-        return refrigerated;
-    }
-
-    public void setRefrigerated(final Boolean refrigerated) {
-        this.refrigerated = refrigerated;
+    public DriverDocument getDriver() {
+        return driver;
     }
 
     public MaxPalletWeight getMaxPalletWeight() {
         return maxPalletWeight;
     }
 
-    public void setMaxPalletWeight(final MaxPalletWeight maxPalletWeight) {
-        this.maxPalletWeight = maxPalletWeight;
+    public Instant getModified() {
+        return modified;
+    }
+
+    public DepartmentCode getOriginDepartment() {
+        return originDepartment;
+    }
+
+    public PalletHandlingPriority getPalletHandlingPriority() {
+        return palletHandlingPriority;
+    }
+
+    public PalletId getPalletId() {
+        return palletId;
+    }
+
+    public PalletStatus getPalletStatus() {
+        return palletStatus;
+    }
+
+    public PalletType getPalletType() {
+        return palletType;
+    }
+
+    public Weight getPalletWeight() {
+        return palletWeight;
+    }
+
+    public Boolean isRefrigerated() {
+        return refrigerated;
+    }
+
+    public SealNumber getSealNumber() {
+        return sealNumber;
+    }
+
+    public Set<ShipmentId> getShipmentIds() {
+        return shipmentIds;
+    }
+
+    public StorageStatus getStorageStatus() {
+        return storageStatus;
     }
 }

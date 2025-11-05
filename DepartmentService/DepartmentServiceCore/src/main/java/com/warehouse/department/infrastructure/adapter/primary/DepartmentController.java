@@ -1,13 +1,7 @@
 package com.warehouse.department.infrastructure.adapter.primary;
 
-import java.util.Set;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import com.warehouse.department.domain.exception.RestException;
+import com.warehouse.department.domain.helper.Result;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
@@ -19,6 +13,12 @@ import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateAdd
 import com.warehouse.department.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.department.infrastructure.adapter.primary.validator.RequestValidator;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/departments")
@@ -37,12 +37,12 @@ public class DepartmentController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
-//		final Result result = this.getValidator(departmentCreateApiRequest.getResourceName())
-//				.validateBody(departmentCreateApiRequest);
-//
-//        if (result.isFailure()) {
-//            return ResponseEntity.badRequest().body(result.getFailure());
-//        }
+		final Result result = this.getValidator(departmentCreateApiRequest.getResourceName())
+				.validateBody(departmentCreateApiRequest);
+
+        if (result.isFailure()) {
+            return ResponseEntity.badRequest().body(result.getFailure());
+        }
 
         final DepartmentCreateRequest request = RequestMapper.map(departmentCreateApiRequest);
 
