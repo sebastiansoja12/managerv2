@@ -2,15 +2,17 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: mysql-container
     environment:
-      MYSQL_ROOT_PASSWORD:
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: dev
       MYSQL_USER: root
-      MYSQL_PASSWORD:
+      MYSQL_PASSWORD: rootpassword
     ports:
       - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
     networks:
       - my_network
 
@@ -19,27 +21,73 @@ services:
     container_name: warehouse
     ports:
       - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
     networks:
       - my_network
 
-  ManagerApplication:
+  manager-application:
     image: your-8080-app-image:latest
-    container_name: ManagerApp
+    container_name: manager-app
     ports:
       - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dev
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      SPRING_DATA_MONGODB_URI: mongodb://warehouse:27017/dev
+    depends_on:
+      - mysql
+      - mongodb
+    networks:
+      - my_network
+
+  software-configuration:
+    image: your-8081-app-image:latest
+    container_name: spring-boot-app-8081-container
+    ports:
+      - "8081:8081"
     depends_on:
       - mysql
     networks:
       - my_network
 
-  SoftwareConfiguration:
-    image: your-8081-app-image:latest
-    container_name: spring-boot-app-8081-container
+  returning-manager:
+    image: your-8070-app-image:latest
+    container_name: returning-manager
     ports:
-      - "8081:8081"
+      - "8070:8070"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dev
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      SPRING_DATA_MONGODB_URI: mongodb://warehouse:27017/dev
+    depends_on:
+      - mysql
+      - mongodb
+    networks:
+      - my_network
+
+  route-tracker:
+    image: your-8082-app-image:latest
+    container_name: route-tracker
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dev
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      SPRING_DATA_MONGODB_URI: mongodb://warehouse:27017/dev
+    depends_on:
+      - mysql
+      - mongodb
     networks:
       - my_network
 
 networks:
   my_network:
     driver: bridge
+
+volumes:
+  mysql_data:
+  mongo_data:
