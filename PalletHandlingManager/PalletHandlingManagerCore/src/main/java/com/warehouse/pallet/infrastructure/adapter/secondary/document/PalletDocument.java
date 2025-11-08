@@ -12,9 +12,7 @@ import com.warehouse.pallet.domain.vo.Dimension;
 import com.warehouse.pallet.domain.vo.MaxPalletWeight;
 import com.warehouse.pallet.domain.vo.SealNumber;
 import com.warehouse.pallet.infrastructure.adapter.secondary.enumeration.PalletType;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
@@ -27,16 +25,22 @@ public class PalletDocument {
     @AttributeOverride(name = "value", column = @Column(name = "pallet_id"))
     private final PalletId palletId;
     private final Set<ShipmentId> shipmentIds;
+    @AttributeOverride(name = "value", column = @Column(name = "origin_department"))
     private final DepartmentCode originDepartment;
+    @AttributeOverride(name = "value", column = @Column(name = "destination_department"))
     private final DepartmentCode destinationDepartment;
     private final Instant created;
     private final Instant modified;
+    @Enumerated(EnumType.STRING)
     private final PalletStatus palletStatus;
+    @Enumerated(EnumType.STRING)
     private final StorageStatus storageStatus;
     private final DriverDocument driver;
     private final Weight palletWeight;
     private final Dimension dimension;
+    @Enumerated(EnumType.STRING)
     private final PalletHandlingPriority palletHandlingPriority;
+    @Enumerated(EnumType.STRING)
     private final PalletType palletType;
     private final SealNumber sealNumber;
     private final Boolean refrigerated;

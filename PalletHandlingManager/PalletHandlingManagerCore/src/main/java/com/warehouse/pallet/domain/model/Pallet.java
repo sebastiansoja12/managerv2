@@ -205,13 +205,23 @@ public class Pallet {
     }
 
     public void addShipment(final ShipmentId shipmentId) {
+        checkPalletLocked();
+
         this.getShipmentIds().add(shipmentId);
         modified();
     }
 
     public void removeShipment(final ShipmentId shipmentId) {
+        checkPalletLocked();
+
         this.getShipmentIds().remove(shipmentId);
         modified();
+    }
+
+    private void checkPalletLocked() {
+        if (this.storageStatus.equals(StorageStatus.LOCKED)) {
+            throw new IllegalStateException("Pallet is locked");
+        }
     }
 
     public void changePalletStatus(final PalletStatus palletStatus) {

@@ -1,18 +1,8 @@
 package com.warehouse.pallet.domain.vo;
 
 import java.util.Objects;
-import java.util.UUID;
 
-public class SealNumber {
-    private final UUID value;
-
-    public SealNumber(final UUID value) {
-        this.value = value;
-    }
-
-    public UUID getValue() {
-        return value;
-    }
+public record SealNumber(String value) {
 
     @Override
     public boolean equals(final Object o) {
@@ -21,8 +11,4 @@ public class SealNumber {
         return Objects.equals(value, that.value);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(value);
-    }
 }
