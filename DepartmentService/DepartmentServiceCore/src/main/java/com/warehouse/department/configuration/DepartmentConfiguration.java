@@ -6,6 +6,7 @@ import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.department.domain.service.DepartmentService;
 import com.warehouse.department.domain.service.DepartmentServiceImpl;
+import com.warehouse.department.domain.validator.Validator;
 import com.warehouse.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
 import com.warehouse.department.infrastructure.adapter.secondary.DepartmentReadRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.DepartmentRepositoryImpl;
@@ -29,9 +30,17 @@ public class DepartmentConfiguration {
     }
 
     @Bean
-    public DepartmentPort departmentPort(final DepartmentRepository departmentRepository, final DepartmentService departmentService,
-                                         final TenantAdminProvisioningPort tenantAdminProvisioningPort) {
-        return new DepartmentPortImpl(departmentRepository, departmentService, tenantAdminProvisioningPort);
+    public DepartmentPort departmentPort(final DepartmentRepository departmentRepository,
+                                         final DepartmentService departmentService,
+                                         final TenantAdminProvisioningPort tenantAdminProvisioningPort,
+                                         final Validator validator) {
+        return new DepartmentPortImpl(departmentRepository, departmentService, tenantAdminProvisioningPort, validator);
+    }
+
+    @Bean
+    public Validator validator() {
+        return new Validator() {
+        };
     }
 
     @Bean

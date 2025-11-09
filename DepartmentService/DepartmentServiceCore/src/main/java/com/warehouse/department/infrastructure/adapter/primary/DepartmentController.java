@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.RestException;
 import com.warehouse.department.domain.helper.Result;
 import com.warehouse.department.domain.model.Department;
@@ -69,6 +70,15 @@ public class DepartmentController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PutMapping("/department-type")
+    public ResponseEntity<?> changeDepartmentType(@RequestParam final String departmentType,
+                                                  @RequestParam final String departmentCode) {
+        final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
+        final DepartmentType type = DepartmentType.valueOf(departmentType);
+        this.departmentPort.changeDepartmentType(departmentCodeValue, type);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @PutMapping("/identification-numbers")
 	public ResponseEntity<?> updateIdentificationNumber(
 			@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
@@ -91,5 +101,10 @@ public class DepartmentController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(this.departmentPort.findAll().stream().map(ResponseMapper::map).toList());
+    }
+
+    @ExceptionHandler(RestException.class)
+    public ResponseEntity<?> handleRestException(final RestException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

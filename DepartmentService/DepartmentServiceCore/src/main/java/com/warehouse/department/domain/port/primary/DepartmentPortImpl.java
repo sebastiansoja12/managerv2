@@ -1,13 +1,13 @@
 package com.warehouse.department.domain.port.primary;
 
 import com.warehouse.department.domain.enumeration.DepartmentType;
-import com.warehouse.department.domain.exception.ForbiddenDepartmentTypeException;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreate;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.department.domain.service.DepartmentService;
+import com.warehouse.department.domain.validator.Validator;
 import com.warehouse.department.domain.vo.*;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +25,16 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     private final TenantAdminProvisioningPort tenantAdminProvisioningPort;
 
+    private final Validator validator;
+
     public DepartmentPortImpl(final DepartmentRepository departmentRepository,
                               final DepartmentService departmentService,
-                              final TenantAdminProvisioningPort tenantAdminProvisioningPort) {
+                              final TenantAdminProvisioningPort tenantAdminProvisioningPort,
+                              final Validator validator) {
         this.departmentRepository = departmentRepository;
         this.departmentService = departmentService;
         this.tenantAdminProvisioningPort = tenantAdminProvisioningPort;
+        this.validator = validator;
     }
 
     @Override
@@ -72,12 +76,7 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     private void validateRequest(final List<DepartmentCreate> departments) {
-        departments.forEach(dep -> {
-            if (dep.getDepartmentType() == DepartmentType.HEADQUARTERS) {
-                log.error("Department type HEADQUARTERS is not allowed");
-                throw new ForbiddenDepartmentTypeException("Forbidden department type: " + dep.getDepartmentType());
-            }
-        });
+        departments.forEach(dep -> validator.validateType(dep.getDepartmentType()));
     }
 
     private void checkIfDepartmentWithGivenCodeAlreadyExists(final List<DepartmentCreate> deps) {
@@ -120,8 +119,9 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public void changeDepartmentType(final DepartmentCode departmentCodeValue, final DepartmentType departmentType) {
-
+    public void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType) {
+        this.validator.validateType(departmentType);
+        this.departmentService.changeDepartmentType(departmentCode, departmentType);
     }
 
     private void validateAddress(final Address address) {

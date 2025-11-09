@@ -5,6 +5,8 @@ import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.event.DepartmentActivated;
 import com.warehouse.department.domain.event.DepartmentCreated;
 import com.warehouse.department.domain.event.DepartmentDeactivated;
+import com.warehouse.department.domain.event.DepartmentTypeChanged;
+import com.warehouse.department.domain.exception.ForbiddenDepartmentTypeException;
 import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
@@ -194,5 +196,16 @@ public class Department {
         this.active = false;
         markAsModified();
         DomainRegistry.publish(new DepartmentDeactivated(this.snapshot(), Instant.now()));
+    }
+
+    public void changeDepartmentType(final DepartmentType departmentType) {
+        if (this.departmentType == DepartmentType.HEADQUARTERS) {
+            throw new ForbiddenDepartmentTypeException("Department type HEADQUARTERS cannot be changed");
+        } else if (this.departmentType == DepartmentType.REMOTE_OFFICE) {
+            throw new ForbiddenDepartmentTypeException("Department type REMOTE_OFFICE cannot be changed");
+        }
+        this.departmentType = departmentType;
+        markAsModified();
+        DomainRegistry.publish(new DepartmentTypeChanged(this.snapshot(), Instant.now()));
     }
 }

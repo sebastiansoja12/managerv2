@@ -1,5 +1,6 @@
 package com.warehouse.department.domain.service;
 
+import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.vo.Address;
@@ -48,6 +49,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     public void deactivateDepartment(final DepartmentCode departmentCode) {
         final Department department = this.departmentRepository.findByCode(departmentCode);
         department.deactivate();
+        this.departmentRepository.createOrUpdate(department);
+    }
+
+    @Override
+    public void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType) {
+        final Department department = this.departmentRepository.findByCode(departmentCode);
+        department.changeDepartmentType(departmentType);
         this.departmentRepository.createOrUpdate(department);
     }
 }

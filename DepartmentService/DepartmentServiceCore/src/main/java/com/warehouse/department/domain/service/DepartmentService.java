@@ -1,5 +1,6 @@
 package com.warehouse.department.domain.service;
 
+import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
@@ -16,4 +17,6 @@ public interface DepartmentService {
     void activateDepartment(final DepartmentCode departmentCodeValue);
 
     void deactivateDepartment(final DepartmentCode departmentCode);
+
+    void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType);
 }
