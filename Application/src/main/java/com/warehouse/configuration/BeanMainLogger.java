@@ -23,7 +23,7 @@ public class BeanMainLogger implements CommandLineRunner {
         log.info("Application: {} starting", applicationContext.getApplicationName());
         final String[] beanNames = applicationContext.getBeanDefinitionNames();
         Arrays.stream(beanNames).forEach(beanName -> log.info("Bean initialized: {}", beanName));
-        log.warn("Successfully initialized {} beans", applicationContext.getBeanDefinitionCount());
+        log.info("Successfully initialized {} beans", applicationContext.getBeanDefinitionCount());
     }
 }
 
