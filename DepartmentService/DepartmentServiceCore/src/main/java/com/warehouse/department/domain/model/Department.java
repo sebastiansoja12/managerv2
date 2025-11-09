@@ -173,15 +173,8 @@ public class Department {
     }
 
     public void changeAddress(final Address address) {
-        final Address current = this.address;
-
-        this.address = new Address(
-                address.city() != null ? address.city() : current.city(),
-                address.street() != null ? address.street() : current.street(),
-                address.country() != null ? address.country() : current.country(),
-                address.postalCode() != null ? address.postalCode() : current.postalCode(),
-                address.countryCode() != null ? address.countryCode() : current.countryCode()
-        );
+        this.address = address;
+        markAsModified();
     }
 
     public void changeIdentificationNumber(final String newIdentificationNumber) {
