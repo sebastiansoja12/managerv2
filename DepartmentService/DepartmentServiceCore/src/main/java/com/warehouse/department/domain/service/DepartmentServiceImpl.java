@@ -29,4 +29,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.changeAddress(address);
         this.departmentRepository.createOrUpdate(department);
     }
+
+    @Override
+    public void changeIdentificationNumber(final DepartmentCode departmentCode, final String newIdentificationNumber) {
+        final Department department = this.departmentRepository.findByCode(departmentCode);
+        department.changeIdentificationNumber(newIdentificationNumber);
+        this.departmentRepository.createOrUpdate(department);
+    }
 }

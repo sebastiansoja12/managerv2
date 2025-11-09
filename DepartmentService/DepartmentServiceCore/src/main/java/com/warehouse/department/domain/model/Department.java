@@ -168,6 +168,10 @@ public class Department {
         this.email = email;
     }
 
+    private void markAsModified() {
+        this.updatedAt = Instant.now();
+    }
+
     public void changeAddress(final Address address) {
         final Address current = this.address;
 
@@ -178,5 +182,10 @@ public class Department {
                 address.postalCode() != null ? address.postalCode() : current.postalCode(),
                 address.countryCode() != null ? address.countryCode() : current.countryCode()
         );
+    }
+
+    public void changeIdentificationNumber(final String newIdentificationNumber) {
+        this.nip = newIdentificationNumber;
+        markAsModified();
     }
 }

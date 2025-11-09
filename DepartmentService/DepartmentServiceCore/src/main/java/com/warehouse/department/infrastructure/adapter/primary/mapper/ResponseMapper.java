@@ -1,15 +1,13 @@
 package com.warehouse.department.infrastructure.adapter.primary.mapper;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCreateResponse;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.AddressApi;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentApi;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCodeApi;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiResponse;
+import com.warehouse.department.domain.vo.IdentificationNumberChangeResponse;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ResponseMapper {
 
@@ -26,6 +24,11 @@ public abstract class ResponseMapper {
 		return new DepartmentApi(departmentCode, map(department.getAddress()), department.getNip(),
 				department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(), department.getActive(),
                 department.getDepartmentType().name(), department.getCreatedAt(), department.getUpdatedAt());
+    }
+
+    public static IdentificationNumberChangeApiResponse map(final IdentificationNumberChangeResponse response) {
+        return new IdentificationNumberChangeApiResponse(new DepartmentCodeApi(response.departmentCode().getValue()),
+                response.oldIdentificationNumber(), response.newIdentificationNumber());
     }
 
     private static AddressApi map(final Address address) {

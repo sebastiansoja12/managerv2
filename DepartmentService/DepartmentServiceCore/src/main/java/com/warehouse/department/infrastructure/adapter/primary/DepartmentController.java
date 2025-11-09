@@ -1,44 +1,44 @@
 package com.warehouse.department.infrastructure.adapter.primary;
 
-import com.warehouse.department.domain.exception.RestException;
-import com.warehouse.department.domain.helper.Result;
-import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.domain.model.DepartmentCreateRequest;
-import com.warehouse.department.domain.port.primary.DepartmentPort;
-import com.warehouse.department.domain.vo.DepartmentCode;
-import com.warehouse.department.domain.vo.DepartmentCreateResponse;
-import com.warehouse.department.domain.vo.UpdateAddressRequest;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateAddressApiRequest;
-import com.warehouse.department.infrastructure.adapter.primary.mapper.RequestMapper;
-import com.warehouse.department.infrastructure.adapter.primary.mapper.ResponseMapper;
-import com.warehouse.department.infrastructure.adapter.primary.validator.RequestValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import com.warehouse.department.domain.exception.RestException;
+import com.warehouse.department.domain.helper.Result;
+import com.warehouse.department.domain.model.Department;
+import com.warehouse.department.domain.model.DepartmentCreateRequest;
+import com.warehouse.department.domain.port.primary.DepartmentPort;
+import com.warehouse.department.domain.vo.*;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.IdentificationNumberChangeApiRequest;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateAddressApiRequest;
+import com.warehouse.department.infrastructure.adapter.primary.mapper.RequestMapper;
+import com.warehouse.department.infrastructure.adapter.primary.mapper.ResponseMapper;
+import com.warehouse.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/departments")
+@Slf4j
 public class DepartmentController {
 
     private final DepartmentPort departmentPort;
 
-    private final Set<RequestValidator> requestValidators;
+    private final DepartmentCreateApiDepartmentRequestValidator departmentRequestValidator;
 
     public DepartmentController(final DepartmentPort departmentPort,
-                                final Set<RequestValidator> requestValidators) {
+                                final DepartmentCreateApiDepartmentRequestValidator departmentRequestValidator) {
         this.departmentPort = departmentPort;
-        this.requestValidators = requestValidators;
+        this.departmentRequestValidator = departmentRequestValidator;
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
-		final Result result = this.getValidator(departmentCreateApiRequest.getResourceName())
-				.validateBody(departmentCreateApiRequest);
+		final Result result = this.departmentRequestValidator.validateBody(departmentCreateApiRequest);
 
         if (result.isFailure()) {
             return ResponseEntity.badRequest().body(result.getFailure());
@@ -61,6 +61,13 @@ public class DepartmentController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PutMapping("/identification-numbers")
+    public ResponseEntity<?> updateNip(@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
+        final IdentificationNumberChangeRequest request = RequestMapper.map(identificationNumberChangeRequest);
+        final IdentificationNumberChangeResponse response = this.departmentPort.changeIdentificationNumber(request);
+        return ResponseEntity.ok(ResponseMapper.map(response));
+    }
+
     @GetMapping("/{value}")
     public ResponseEntity<?> viewByDepartmentCode(@PathVariable final String value) {
         final DepartmentCode departmentCode = new DepartmentCode(value);
@@ -75,12 +82,5 @@ public class DepartmentController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(this.departmentPort.findAll().stream().map(ResponseMapper::map).toList());
-    }
-    
-    private RequestValidator getValidator(final String resourceName) {
-        return requestValidators.stream()
-                .filter(validator -> validator.getResourceName().equals(resourceName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Validator for resource " + resourceName + " not found"));
     }
 }

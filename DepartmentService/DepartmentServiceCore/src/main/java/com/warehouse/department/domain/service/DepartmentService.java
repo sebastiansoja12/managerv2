@@ -10,4 +10,6 @@ public interface DepartmentService {
     Department findByDepartmentCode(final DepartmentCode departmentCode);
 
     void changeAddress(final DepartmentCode departmentCode, final Address address);
+
+    void changeIdentificationNumber(final DepartmentCode departmentCode, final String newIdentificationNumber);
 }

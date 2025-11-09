@@ -1,9 +1,5 @@
 package com.warehouse.department.domain.port.primary;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.ForbiddenDepartmentTypeException;
 import com.warehouse.department.domain.model.Department;
@@ -12,13 +8,13 @@ import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.department.domain.service.DepartmentService;
-import com.warehouse.department.domain.vo.Address;
-import com.warehouse.department.domain.vo.DepartmentCode;
-import com.warehouse.department.domain.vo.DepartmentCreateResponse;
-import com.warehouse.department.domain.vo.UpdateAddressRequest;
-
+import com.warehouse.department.domain.vo.*;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class DepartmentPortImpl implements DepartmentPort {
@@ -99,6 +95,19 @@ public class DepartmentPortImpl implements DepartmentPort {
         validateAddress(request.address());
 
         this.departmentService.changeAddress(request.departmentCode(), request.address());
+    }
+
+    @Override
+    public IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeRequest request) {
+        final DepartmentCode departmentCode = request.departmentCode();
+        final Department department = this.departmentService.findByDepartmentCode(departmentCode);
+        final String oldIdentificationNumber = department.getNip();
+        final String newIdentificationNumber = request.identificationNumber();
+        final boolean identificationNumberChanged = !oldIdentificationNumber.equals(newIdentificationNumber);
+        if (identificationNumberChanged) {
+            this.departmentService.changeIdentificationNumber(departmentCode, newIdentificationNumber);
+        }
+        return new IdentificationNumberChangeResponse(departmentCode, oldIdentificationNumber, newIdentificationNumber);
     }
 
     private void validateAddress(final Address address) {

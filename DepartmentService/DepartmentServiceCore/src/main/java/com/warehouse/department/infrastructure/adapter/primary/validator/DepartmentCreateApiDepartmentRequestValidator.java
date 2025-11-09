@@ -1,14 +1,13 @@
 package com.warehouse.department.infrastructure.adapter.primary.validator;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.warehouse.department.domain.helper.Result;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component(value = "departmentCreateApiRequestValidator")
-public abstract class DepartmentCreateApiRequestValidator extends RequestValidator<DepartmentCreateApiRequest> {
+public abstract class DepartmentCreateApiDepartmentRequestValidator extends DepartmentRequestValidator<DepartmentCreateApiRequest> {
 
     @Override
     public Result<Void, List<String>> validateBody(final DepartmentCreateApiRequest request) {
@@ -17,6 +16,6 @@ public abstract class DepartmentCreateApiRequestValidator extends RequestValidat
 
     @Override
     public String getResourceName() {
-        return this.getClass().getSimpleName();
+        return DepartmentCreateApiRequest.class.getSimpleName();
     }
 }
