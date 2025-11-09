@@ -9,6 +9,7 @@ import com.warehouse.pallet.domain.vo.MaxPalletWeight;
 import com.warehouse.pallet.domain.vo.SealNumber;
 import com.warehouse.pallet.infrastructure.adapter.secondary.document.PalletDocument;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -81,6 +82,22 @@ public class Pallet {
                   final SealNumber sealNumber,
                   final Boolean refrigerated,
                   final MaxPalletWeight maxPalletWeight) {
+        Assert.notNull(palletId, "Pallet Id cannot be null");
+        Assert.notNull(shipmentIds, "Shipment Ids cannot be null");
+        Assert.notNull(originDepartment, "Origin Department cannot be null");
+        Assert.notNull(destinationDepartment, "Destination Department cannot be null");
+        Assert.notNull(created, "Created cannot be null");
+        Assert.notNull(modified, "Modified cannot be null");
+        Assert.notNull(palletStatus, "Pallet Status cannot be null");
+        Assert.notNull(storageStatus, "Storage Status cannot be null");
+        Assert.notNull(driver, "Driver cannot be null");
+        Assert.notNull(palletWeight, "Pallet Weight cannot be null");
+        Assert.notNull(dimension, "Dimension cannot be null");
+        Assert.notNull(palletHandlingPriority, "Pallet Handling Priority cannot be null");
+        Assert.notNull(palletType, "Pallet Type cannot be null");
+        Assert.notNull(sealNumber, "Seal Number cannot be null");
+        Assert.notNull(refrigerated, "Refrigerated cannot be null");
+        Assert.notNull(maxPalletWeight, "Max Pallet Weight cannot be null");
         this.palletId = palletId;
         this.shipmentIds = shipmentIds;
         this.originDepartment = originDepartment;
@@ -100,6 +117,7 @@ public class Pallet {
     }
 
     public Pallet(final PalletId palletId) {
+        Assert.notNull(palletId, "pallet id must not be null");
         this.palletId = palletId;
         this.shipmentIds = new HashSet<>();
         this.originDepartment = new DepartmentCode(StringUtils.EMPTY);
