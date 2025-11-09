@@ -61,8 +61,17 @@ public class DepartmentController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PutMapping("/active-departments")
+    public ResponseEntity<?> updateDepartmentActiveStatus(@RequestParam final Boolean active,
+                                                          @RequestParam final String departmentCode) {
+        final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
+        this.departmentPort.changeDepartmentActive(departmentCodeValue, active);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @PutMapping("/identification-numbers")
-    public ResponseEntity<?> updateNip(@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
+	public ResponseEntity<?> updateIdentificationNumber(
+			@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
         final IdentificationNumberChangeRequest request = RequestMapper.map(identificationNumberChangeRequest);
         final IdentificationNumberChangeResponse response = this.departmentPort.changeIdentificationNumber(request);
         return ResponseEntity.ok(ResponseMapper.map(response));

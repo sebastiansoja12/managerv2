@@ -36,4 +36,18 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.changeIdentificationNumber(newIdentificationNumber);
         this.departmentRepository.createOrUpdate(department);
     }
+
+    @Override
+    public void activateDepartment(final DepartmentCode departmentCode) {
+        final Department department = this.departmentRepository.findByCode(departmentCode);
+        department.activate();
+        this.departmentRepository.createOrUpdate(department);
+    }
+
+    @Override
+    public void deactivateDepartment(final DepartmentCode departmentCode) {
+        final Department department = this.departmentRepository.findByCode(departmentCode);
+        department.deactivate();
+        this.departmentRepository.createOrUpdate(department);
+    }
 }

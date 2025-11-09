@@ -12,4 +12,8 @@ public interface DepartmentService {
     void changeAddress(final DepartmentCode departmentCode, final Address address);
 
     void changeIdentificationNumber(final DepartmentCode departmentCode, final String newIdentificationNumber);
+
+    void activateDepartment(final DepartmentCode departmentCodeValue);
+
+    void deactivateDepartment(final DepartmentCode departmentCode);
 }

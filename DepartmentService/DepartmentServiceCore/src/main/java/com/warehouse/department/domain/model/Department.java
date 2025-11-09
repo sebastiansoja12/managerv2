@@ -2,7 +2,9 @@ package com.warehouse.department.domain.model;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.department.domain.enumeration.DepartmentType;
+import com.warehouse.department.domain.event.DepartmentActivated;
 import com.warehouse.department.domain.event.DepartmentCreated;
+import com.warehouse.department.domain.event.DepartmentDeactivated;
 import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
@@ -180,5 +182,17 @@ public class Department {
     public void changeIdentificationNumber(final String newIdentificationNumber) {
         this.nip = newIdentificationNumber;
         markAsModified();
+    }
+
+    public void activate() {
+        this.active = true;
+        markAsModified();
+        DomainRegistry.publish(new DepartmentActivated(this.snapshot(), Instant.now()));
+    }
+
+    public void deactivate() {
+        this.active = false;
+        markAsModified();
+        DomainRegistry.publish(new DepartmentDeactivated(this.snapshot(), Instant.now()));
     }
 }

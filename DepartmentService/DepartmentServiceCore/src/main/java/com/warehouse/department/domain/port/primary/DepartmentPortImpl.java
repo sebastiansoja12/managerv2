@@ -110,6 +110,20 @@ public class DepartmentPortImpl implements DepartmentPort {
         return new IdentificationNumberChangeResponse(departmentCode, oldIdentificationNumber, newIdentificationNumber);
     }
 
+    @Override
+    public void changeDepartmentActive(final DepartmentCode departmentCode, final Boolean active) {
+        if (active) {
+            this.departmentService.activateDepartment(departmentCode);
+        } else {
+            this.departmentService.deactivateDepartment(departmentCode);
+        }
+    }
+
+    @Override
+    public void changeDepartmentType(final DepartmentCode departmentCodeValue, final DepartmentType departmentType) {
+
+    }
+
     private void validateAddress(final Address address) {
         address.validate();
     }
