@@ -1,8 +1,16 @@
 package com.warehouse.auth.domain.filter;
 
 
-import java.io.IOException;
-
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
+import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.service.JwtService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,17 +19,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
-import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.service.JwtService;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @Component
@@ -56,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			if (jwtService.isTokenValid(jwt, user)) {
 				final SecurityContext context = SecurityContextHolder.createEmptyContext();
 				final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-						user, null, user.getAuthorities());
+						user.getUserId(), null, user.getAuthorities());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				context.setAuthentication(authToken);
 				SecurityContextHolder.setContext(context);

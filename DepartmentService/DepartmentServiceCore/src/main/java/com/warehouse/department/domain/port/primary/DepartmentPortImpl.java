@@ -1,6 +1,6 @@
 package com.warehouse.department.domain.port.primary;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreate;
@@ -113,11 +113,11 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     public void changeDepartmentActive(final DepartmentCode departmentCode, final Boolean active) {
-        final User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final UserId userId = (UserId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (active) {
-            this.departmentService.activateDepartment(departmentCode, user.getUserId());
+            this.departmentService.activateDepartment(departmentCode, userId);
         } else {
-            this.departmentService.deactivateDepartment(departmentCode, user.getUserId());
+            this.departmentService.deactivateDepartment(departmentCode, userId);
         }
     }
 
