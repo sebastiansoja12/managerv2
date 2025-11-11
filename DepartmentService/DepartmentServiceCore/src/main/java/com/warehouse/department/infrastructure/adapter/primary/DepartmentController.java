@@ -1,10 +1,5 @@
 package com.warehouse.department.infrastructure.adapter.primary;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.RestException;
 import com.warehouse.department.domain.helper.Result;
@@ -18,8 +13,14 @@ import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateAdd
 import com.warehouse.department.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.http.HttpStatus.NON_AUTHORITATIVE_INFORMATION;
 
 @RestController
 @RequestMapping("/departments")
@@ -110,5 +111,10 @@ public class DepartmentController {
     @ExceptionHandler(RestException.class)
     public ResponseEntity<?> handleRestException(final RestException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<?> handleRestException(final AuthorizationDeniedException e) {
+        return ResponseEntity.status(NON_AUTHORITATIVE_INFORMATION).body(e.getMessage());
     }
 }
