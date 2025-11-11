@@ -1,9 +1,6 @@
 package com.warehouse.department.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
-
-import com.warehouse.department.infrastructure.adapter.secondary.enumeration.DepartmentType;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -18,17 +15,13 @@ public class DepartmentEntity {
     @AttributeOverride(name = "value", column = @Column(name = "department_code"))
     private DepartmentCode departmentCode;
 
-    @Column(name = "city", nullable = false)
-    private String city;
-
-    @Column(name = "street", nullable = false)
-    private String street;
-
-    @Column(name = "country", nullable = false)
-    private String country;
-
-    @Column(name = "postal_code", nullable = false)
-    private String postalCode;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "city", column = @Column(name = "city", nullable = false)),
+            @AttributeOverride(name = "street", column = @Column(name = "street", nullable = false)),
+            @AttributeOverride(name = "postalCode", column = @Column(name = "postal_code", nullable = false))
+    })
+    private DepartmentAddress departmentAddress;
 
     @Column(name = "nip", nullable = false)
     private String nip;
@@ -45,13 +38,13 @@ public class DepartmentEntity {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @Column(name = "country_code", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private CountryCode countryCode;
-
     @Column(name = "department_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private DepartmentType departmentType;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -63,49 +56,31 @@ public class DepartmentEntity {
     }
 
     public DepartmentEntity(final DepartmentCode departmentCode,
-                            final String city,
-                            final String street,
-                            final String country,
-                            final String postalCode,
+                            final DepartmentAddress departmentAddress,
                             final String nip,
                             final String telephoneNumber,
                             final String openingHours,
                             final String email,
                             final Boolean active,
-                            final CountryCode countryCode,
                             final DepartmentType departmentType,
+                            final Status status,
                             final Instant createdAt,
                             final Instant updatedAt) {
         this.departmentCode = departmentCode;
-        this.city = city;
-        this.street = street;
-        this.country = country;
-        this.postalCode = postalCode;
+        this.departmentAddress = departmentAddress;
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.email = email;
         this.active = active;
-        this.countryCode = countryCode;
         this.departmentType = departmentType;
+        this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     public Boolean isActive() {
         return active;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public CountryCode getCountryCode() {
-        return countryCode;
     }
 
     public DepartmentCode getDepartmentCode() {
@@ -118,14 +93,6 @@ public class DepartmentEntity {
 
     public String getOpeningHours() {
         return openingHours;
-    }
-
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public String getStreet() {
-        return street;
     }
 
     public String getTelephoneNumber() {
@@ -146,5 +113,32 @@ public class DepartmentEntity {
 
     public String getEmail() {
         return email;
+    }
+
+    public DepartmentAddress getDepartmentAddress() {
+        return departmentAddress;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public enum DepartmentType {
+        HEADQUARTERS,
+        BRANCH,
+        WAREHOUSE,
+        SALES_OFFICE,
+        SERVICE_CENTER,
+        DISTRIBUTION,
+        SORTING_FACILITY,
+        REMOTE_OFFICE
+    }
+
+    public enum Status {
+        ACTIVE,
+        INACTIVE,
+        ARCHIVED,
+        DELETED,
+        SUSPENDED
     }
 }

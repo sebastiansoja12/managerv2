@@ -1,5 +1,6 @@
 package com.warehouse.department.domain.service;
 
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
@@ -14,9 +15,9 @@ public interface DepartmentService {
 
     void changeIdentificationNumber(final DepartmentCode departmentCode, final String newIdentificationNumber);
 
-    void activateDepartment(final DepartmentCode departmentCodeValue);
+    void activateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy);
 
-    void deactivateDepartment(final DepartmentCode departmentCode);
+    void deactivateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy);
 
     void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType);
 }

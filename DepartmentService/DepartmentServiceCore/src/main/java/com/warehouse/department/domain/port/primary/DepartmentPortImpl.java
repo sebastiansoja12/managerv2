@@ -1,5 +1,6 @@
 package com.warehouse.department.domain.port.primary;
 
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreate;
@@ -11,6 +12,7 @@ import com.warehouse.department.domain.validator.Validator;
 import com.warehouse.department.domain.vo.*;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +61,7 @@ public class DepartmentPortImpl implements DepartmentPort {
         for (final DepartmentCreate departmentCreate : request.getDepartments()) {
             final DepartmentCode departmentCode = departmentCreate.getDepartmentCode();
 			final Department department = new Department(departmentCode, departmentCreate.getCity(),
-					departmentCreate.getStreet(), departmentCreate.getCountry(), departmentCreate.getPostalCode(),
+					departmentCreate.getStreet(), departmentCreate.getPostalCode(),
 					departmentCreate.getNip(), departmentCreate.getTelephoneNumber(),
 					departmentCreate.getOpeningHours(), departmentCreate.getEmail(), true,
 					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
@@ -111,10 +113,11 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     public void changeDepartmentActive(final DepartmentCode departmentCode, final Boolean active) {
+        final User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (active) {
-            this.departmentService.activateDepartment(departmentCode);
+            this.departmentService.activateDepartment(departmentCode, user.getUserId());
         } else {
-            this.departmentService.deactivateDepartment(departmentCode);
+            this.departmentService.deactivateDepartment(departmentCode, user.getUserId());
         }
     }
 

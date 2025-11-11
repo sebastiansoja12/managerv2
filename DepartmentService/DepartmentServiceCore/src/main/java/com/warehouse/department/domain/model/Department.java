@@ -1,6 +1,7 @@
 package com.warehouse.department.domain.model;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.event.DepartmentActivated;
 import com.warehouse.department.domain.event.DepartmentCreated;
@@ -32,34 +33,40 @@ public class Department {
 
     private DepartmentType departmentType;
 
+    private Department.Status status;
+
     private Instant createdAt;
 
     private Instant updatedAt;
 
+    private UserId createdBy;
+
+    private UserId lastModifiedBy;
+
     public Department() {
     }
 
-	public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
-			final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
-			final String email, final Boolean active, final CountryCode countryCode,
-			final DepartmentType departmentType, final Instant createdAt, final Instant updatedAt) {
-		this.address = new Address(city, street, country, postalCode, countryCode);
-        this.departmentCode = departmentCode;
-        this.nip = nip;
-        this.telephoneNumber = telephoneNumber;
-        this.openingHours = openingHours;
-        this.email = email;
-        this.active = active;
+	public Department(final DepartmentCode departmentCode, final Address address, final String nip,
+			final String telephoneNumber, final String openingHours, final String email, final Boolean active,
+			final DepartmentType departmentType, final Status status, final Instant createdAt, final Instant updatedAt) {
+		this.address = address;
+		this.departmentCode = departmentCode;
+		this.nip = nip;
+		this.telephoneNumber = telephoneNumber;
+		this.openingHours = openingHours;
+		this.email = email;
+		this.active = active;
+		this.departmentType = departmentType;
+        this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.departmentType = departmentType;
     }
 
-	public Department(final DepartmentCode departmentCode, final String city, final String street, final String country,
+	public Department(final DepartmentCode departmentCode, final String city, final String street,
 			final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
 			final String email, final Boolean active, final CountryCode countryCode,
 			final DepartmentType departmentType) {
-		this.address = new Address(city, street, country, postalCode, countryCode);
+		this.address = new Address(city, street, postalCode, countryCode);
         this.departmentCode = departmentCode;
         this.nip = nip;
         this.telephoneNumber = telephoneNumber;
@@ -67,13 +74,22 @@ public class Department {
         this.email = email;
         this.active = active;
         this.departmentType = departmentType;
+        this.status = Status.ACTIVE;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
-        DomainRegistry.publish(new DepartmentCreated(this.snapshot(), Instant.now()));
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentCreated(this.snapshot(), Instant.now()));
     }
 
     public DepartmentSnapshot snapshot() {
 		return new DepartmentSnapshot(departmentCode, address, nip, telephoneNumber, openingHours, email, active);
+    }
+
+    public enum Status {
+        ACTIVE,
+        INACTIVE,
+        ARCHIVED,
+        DELETED,
+        SUSPENDED
     }
 
     public String getCity() {
@@ -82,10 +98,6 @@ public class Department {
 
     public String getStreet() {
         return address.street();
-    }
-
-    public String getCountry() {
-        return address.country();
     }
 
     public DepartmentCode getDepartmentCode() {
@@ -172,6 +184,34 @@ public class Department {
         this.email = email;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(final Status status) {
+        this.status = status;
+    }
+
+    public UserId getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(final UserId lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public UserId getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(final UserId createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setAddress(final Address address) {
+        this.address = address;
+    }
+
     private void markAsModified() {
         this.updatedAt = Instant.now();
     }
@@ -186,16 +226,41 @@ public class Department {
         markAsModified();
     }
 
-    public void activate() {
+    public void activate(final UserId modifiedBy) {
+        if (this.status == Status.DELETED) {
+            throw new IllegalStateException("Department cannot be activated because it is deleted");
+        }
+        this.status = Status.ACTIVE;
         this.active = true;
+        this.lastModifiedBy = modifiedBy;
         markAsModified();
-        DomainRegistry.publish(new DepartmentActivated(this.snapshot(), Instant.now()));
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentActivated(this.snapshot(), Instant.now()));
     }
 
-    public void deactivate() {
+    public void deactivate(final UserId modifiedBy) {
+        this.status = Status.INACTIVE;
         this.active = false;
+        this.lastModifiedBy = modifiedBy;
         markAsModified();
-        DomainRegistry.publish(new DepartmentDeactivated(this.snapshot(), Instant.now()));
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentDeactivated(this.snapshot(), Instant.now()));
+    }
+
+    public void markAsArchived() {
+        this.status = Status.ARCHIVED;
+        this.lastModifiedBy = lastModifiedBy;
+        markAsModified();
+    }
+
+    public void markAsDeleted() {
+        this.status = Status.DELETED;
+        this.lastModifiedBy = lastModifiedBy;
+        markAsModified();
+    }
+
+    public void markAsSuspended() {
+        this.status = Status.SUSPENDED;
+        this.lastModifiedBy = lastModifiedBy;
+        markAsModified();
     }
 
     public void changeDepartmentType(final DepartmentType departmentType) {

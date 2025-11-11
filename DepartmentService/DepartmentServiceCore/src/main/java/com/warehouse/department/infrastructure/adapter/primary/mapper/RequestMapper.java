@@ -22,7 +22,7 @@ public abstract class RequestMapper {
 	private static List<DepartmentCreate> map(final List<DepartmentCreateApi> deps) {
 		return deps.stream()
 				.map(dep -> new DepartmentCreate(new DepartmentCode(dep.departmentCode().value()), dep.city(),
-						dep.street(), dep.country(), dep.postalCode(), dep.nip(), dep.telephoneNumber(),
+						dep.street(), dep.postalCode(), dep.nip(), dep.telephoneNumber(),
 						dep.openingHours(), dep.email(), CountryCode.valueOf(dep.countryCode()),
 						DepartmentType.valueOf(dep.departmentType())))
 				.toList();
@@ -33,7 +33,7 @@ public abstract class RequestMapper {
 	}
 
 	private static Address map(final AddressApi address) {
-		return new Address(address.city(), address.street(), address.country(), address.postalCode(), CountryCode.valueOf(address.countryCode()));
+		return new Address(address.city(), address.street(), address.postalCode(), CountryCode.valueOf(address.countryCode()));
 	}
 
     public static IdentificationNumberChangeRequest map(final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {

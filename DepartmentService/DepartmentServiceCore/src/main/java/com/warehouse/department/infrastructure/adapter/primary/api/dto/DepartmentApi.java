@@ -10,6 +10,7 @@ public record DepartmentApi(DepartmentCodeApi departmentCode,
                             String email,
                             Boolean active,
                             String departmentType,
+                            String status,
                             Instant createdAt,
                             Instant updatedAt) {
 }

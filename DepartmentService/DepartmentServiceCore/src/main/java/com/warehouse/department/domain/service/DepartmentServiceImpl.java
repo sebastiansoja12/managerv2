@@ -1,5 +1,6 @@
 package com.warehouse.department.domain.service;
 
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
@@ -39,16 +40,16 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public void activateDepartment(final DepartmentCode departmentCode) {
+    public void activateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy) {
         final Department department = this.departmentRepository.findByCode(departmentCode);
-        department.activate();
+        department.activate(modifiedBy);
         this.departmentRepository.createOrUpdate(department);
     }
 
     @Override
-    public void deactivateDepartment(final DepartmentCode departmentCode) {
+    public void deactivateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy) {
         final Department department = this.departmentRepository.findByCode(departmentCode);
-        department.deactivate();
+        department.deactivate(modifiedBy);
         this.departmentRepository.createOrUpdate(department);
     }
 

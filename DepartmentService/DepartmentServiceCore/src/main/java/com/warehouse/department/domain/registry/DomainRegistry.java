@@ -1,17 +1,31 @@
 package com.warehouse.department.domain.registry;
 
+import com.warehouse.department.domain.service.DepartmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 
 @Component("department.domainRegistry")
-public final class DomainRegistry implements ApplicationEventPublisherAware {
+public final class DomainRegistry implements ApplicationEventPublisherAware, ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(DomainRegistry.class);
 
     private static volatile ApplicationEventPublisher eventPublisher;
+
+    private static ApplicationContext context;
+
+    public static DepartmentService departmentService() {
+        return context.getBean(DepartmentService.class);
+    }
+
+    public static ApplicationEventPublisher eventPublisher() {
+        return eventPublisher;
+    }
 
     @Override
     public void setApplicationEventPublisher(final ApplicationEventPublisher applicationEventPublisher) {
@@ -33,5 +47,10 @@ public final class DomainRegistry implements ApplicationEventPublisherAware {
 
         log.info("Publishing event of type: {}", event.getClass().getSimpleName());
         publisher.publishEvent(event);
+    }
+
+    @Override
+    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
+        context = applicationContext;
     }
 }

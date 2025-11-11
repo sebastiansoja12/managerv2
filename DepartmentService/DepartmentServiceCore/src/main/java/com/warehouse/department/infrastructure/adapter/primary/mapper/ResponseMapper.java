@@ -23,7 +23,7 @@ public abstract class ResponseMapper {
         final DepartmentCodeApi departmentCode = new DepartmentCodeApi(department.getDepartmentCode().getValue());
 		return new DepartmentApi(departmentCode, map(department.getAddress()), department.getNip(),
 				department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(), department.getActive(),
-                department.getDepartmentType().name(), department.getCreatedAt(), department.getUpdatedAt());
+                department.getDepartmentType().name(), department.getStatus().name(), department.getCreatedAt(), department.getUpdatedAt());
     }
 
     public static IdentificationNumberChangeApiResponse map(final IdentificationNumberChangeResponse response) {
@@ -32,6 +32,6 @@ public abstract class ResponseMapper {
     }
 
     private static AddressApi map(final Address address) {
-        return new AddressApi(address.city(), address.street(), address.country(), address.postalCode(), address.countryCode().name());
+        return new AddressApi(address.city(), address.street(), address.postalCode(), address.countryCode().name());
     }
 }

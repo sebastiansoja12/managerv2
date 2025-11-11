@@ -56,6 +56,7 @@ public class DepartmentController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateAddress(@RequestBody final UpdateAddressApiRequest updateAddressApiRequest) {
         final UpdateAddressRequest request = RequestMapper.map(updateAddressApiRequest);
         this.departmentPort.changeAddress(request);
@@ -63,6 +64,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/active-departments")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateDepartmentActiveStatus(@RequestParam final Boolean active,
                                                           @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
@@ -71,6 +73,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/department-type")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> changeDepartmentType(@RequestParam final String departmentType,
                                                   @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
@@ -80,7 +83,8 @@ public class DepartmentController {
     }
 
     @PutMapping("/identification-numbers")
-	public ResponseEntity<?> updateIdentificationNumber(
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateIdentificationNumber(
 			@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
         final IdentificationNumberChangeRequest request = RequestMapper.map(identificationNumberChangeRequest);
         final IdentificationNumberChangeResponse response = this.departmentPort.changeIdentificationNumber(request);
