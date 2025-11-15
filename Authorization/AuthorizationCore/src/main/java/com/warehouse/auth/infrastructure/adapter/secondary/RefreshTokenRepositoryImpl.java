@@ -1,16 +1,16 @@
 package com.warehouse.auth.infrastructure.adapter.secondary;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.RefreshTokenNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
-
+import com.warehouse.commonassets.identificator.UserId;
 import lombok.AllArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 
 @AllArgsConstructor
@@ -44,5 +44,13 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     @Override
     public void delete(LocalDateTime time) {
         repository.deleteAllExpiredSince(time);
+    }
+
+    // TODO
+    @Override
+    public RefreshToken findByUserId(final UserId userId) {
+        return RefreshToken.builder()
+                .token("token")
+                .build();
     }
 }

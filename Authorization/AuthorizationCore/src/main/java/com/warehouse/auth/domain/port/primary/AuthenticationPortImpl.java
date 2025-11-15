@@ -1,60 +1,58 @@
 package com.warehouse.auth.domain.port.primary;
 
-import com.warehouse.auth.domain.model.*;
-import com.warehouse.auth.domain.service.*;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.domain.vo.AuthenticationResponse;
-import com.warehouse.auth.domain.vo.LoginRequest;
-import com.warehouse.auth.domain.vo.RegisterResponse;
-import com.warehouse.auth.domain.vo.UserLogout;
+import com.warehouse.auth.domain.model.AdminCreateRequest;
+import com.warehouse.auth.domain.model.RefreshTokenRequest;
+import com.warehouse.auth.domain.model.RegisterRequest;
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.service.*;
+import com.warehouse.auth.domain.vo.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Set;
 
 
-@Slf4j
 public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final AuthenticationService authenticationService;
 
-    private final PasswordEncoder passwordEncoder;
-    
-    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
     private final JwtService jwtService;
 
     private final Logger logger;
 
+    private final PasswordEncoder passwordEncoder;
+
     private final DepartmentService departmentService;
 
     public AuthenticationPortImpl(final AuthenticationService authenticationService,
-                                  final PasswordEncoder passwordEncoder,
-                                  final AuthenticationManager authenticationManager,
+                                  final UserService userService,
                                   final JwtService jwtService,
                                   final Logger logger,
+                                  final PasswordEncoder passwordEncoder,
                                   final DepartmentService departmentService) {
         this.authenticationService = authenticationService;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
+        this.userService = userService;
         this.jwtService = jwtService;
         this.logger = logger;
+        this.passwordEncoder = passwordEncoder;
         this.departmentService = departmentService;
     }
 
     @Override
     public AuthenticationResponse login(final LoginRequest loginRequest) {
-
-        final User user = findUser(loginRequest.username());
+        final User user = userService.findUser(loginRequest.username());
 
         final String authenticationToken = jwtService.generateToken(user);
 
-        authenticationService.login(user);
+        authenticationService.login(
+                UsernamePasswordAuthentication.from(user)
+        );
 
         return new AuthenticationResponse(authenticationToken);
     }
@@ -62,7 +60,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     @Override
     public RegisterResponse signup(final RegisterRequest request) {
 
-        final UserId userId = this.authenticationService.nextUserId();
+        final UserId userId = this.userService.nextUserId();
 
         final String username = request.getUsername();
 
@@ -74,7 +72,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final String lastName = request.getLastName();
 
-        final Role role = mapRole(request.getRole());
+        final User.Role role = mapRole(request.getRole());
 
         final DepartmentCode departmentCode = request.getDepartmentCode();
 
@@ -82,20 +80,15 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final String apiKey = jwtService.generateToken(firstName, username, role, departmentCode);
 
-        final User user = new User(userId, username, password, email, firstName, lastName, role, departmentCode, apiKey);
+        final User user = new User(userId, username, password, email, firstName, lastName, role, departmentCode, apiKey, Set.of());
 
-        return authenticationService.register(user);
-    }
-
-    @Override
-    public User findUser(final String username) {
-        return authenticationService.findUser(username);
+        return userService.create(user);
     }
 
     @Override
     public void createAdminUser(final AdminCreateRequest request) {
 
-        final UserId userId = this.authenticationService.nextUserId();
+        final UserId userId = this.userService.nextUserId();
 
         final String username = RandomUsernameService.generateUsername(6, 15, true);
 
@@ -107,42 +100,41 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final String lastName = "ADMIN";
 
-        final Role role = Role.ADMIN;
-
         final DepartmentCode departmentCode = request.getDepartmentCode();
 
         validateDepartmentCode(departmentCode);
 
-        final User user = new User(userId, username, password, firstName, lastName, email, role, departmentCode, null);
+        final User user = User.createAdmin(userId, username, password, email, firstName, lastName, departmentCode, null);
 
-        authenticationService.register(user);
-    }
-
-    @Override
-    public void updateFullName(final FullNameRequest request) {
-        this.authenticationService.changeFullName(request);
+        userService.create(user);
     }
 
     @Override
     public void logout(final RefreshTokenRequest refreshTokenRequest) {
 
-        final UserLogout userLogout = UserLogout.builder()
-                .refreshToken(refreshTokenRequest.getRefreshToken())
-                .username(refreshTokenRequest.getUsername())
-                .build();
+        final User user = userService.findUser(refreshTokenRequest.getUsername());
 
-        authenticationService.logout(userLogout);
+        authenticationService.logout(
+                user.getUserId(), refreshTokenRequest.getRefreshToken()
+        );
+
+        SecurityContextHolder.clearContext();
 
         logLogoutInformation(refreshTokenRequest.getUsername());
     }
 
-    private Role mapRole(final String value) {
+    @Override
+    public void initiatePasswordReset(final String email) {
+        //
+    }
+
+    private User.Role mapRole(final String value) {
         final String role = value.toUpperCase();
         return switch (role) {
-            case "ADMIN" -> Role.ADMIN;
-            case "MANAGER" -> Role.MANAGER;
-            case "SUPPLIER" -> Role.SUPPLIER;
-            default -> Role.USER;
+            case "ADMIN" -> User.Role.ADMIN;
+            case "MANAGER" -> User.Role.MANAGER;
+            case "SUPPLIER" -> User.Role.SUPPLIER;
+            default -> User.Role.USER;
         };
     }
 

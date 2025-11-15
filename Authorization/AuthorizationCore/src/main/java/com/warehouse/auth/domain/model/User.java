@@ -1,17 +1,20 @@
 package com.warehouse.auth.domain.model;
 
-import java.util.Collection;
-
-import org.springframework.security.core.GrantedAuthority;
-
 import com.warehouse.auth.domain.event.UserCreatedEvent;
 import com.warehouse.auth.domain.event.UserFullNameChangedEvent;
+import com.warehouse.auth.domain.event.UserLoggedOutEvent;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.UserSnapshot;
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class User {
@@ -33,6 +36,14 @@ public class User {
     private DepartmentCode departmentCode;
 
     private String apiKey;
+
+    private Set<RolePermission> permissions;
+
+    private Boolean deleted;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
 
     public User() {
 
@@ -56,7 +67,33 @@ public class User {
         this.role = role;
         this.departmentCode = departmentCode;
         this.apiKey = apiKey;
-        DomainRegistry.publish(new UserCreatedEvent(this.snapshot()));
+        this.permissions = new HashSet<>();
+    }
+
+    public User(final UserId userId,
+                final String username,
+                final String password,
+                final String firstName,
+                final String lastName,
+                final String email,
+                final Role role,
+                final DepartmentCode departmentCode,
+                final String apiKey,
+                final Set<RolePermission> permissions) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.role = role;
+        this.departmentCode = departmentCode;
+        this.apiKey = apiKey;
+        this.permissions = permissions;
+        this.deleted = false;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        DomainRegistry.eventPublisher().publishEvent(new UserCreatedEvent(this.snapshot()));
     }
 
     public User(final UserId userId,
@@ -73,6 +110,19 @@ public class User {
         this.email = email;
         this.role = role;
         this.departmentCode = departmentCode;
+    }
+    
+    public static User createAdmin(
+                            final UserId userId,
+                            final String username,
+                            final String password,
+                            final String firstName,
+                            final String lastName,
+                            final String email,
+                            final DepartmentCode departmentCode,
+                            final String apiKey) {
+        final Set<RolePermission> adminPermissions = DomainRegistry.rolePermissionService().findAllAdminPermissions();
+        return new User(userId, username, password, firstName, lastName, email, Role.ADMIN, departmentCode, apiKey, adminPermissions);
     }
 
     public DepartmentCode getDepartmentCode() {
@@ -147,12 +197,31 @@ public class User {
         this.apiKey = apiKey;
     }
 
+    public void setPermissions(final Set<RolePermission> permissions) {
+        this.permissions = permissions;
+    }
+
+    public Set<RolePermission> getPermissions() {
+        if (permissions == null) {
+            this.permissions = new HashSet<>();
+        }
+        return permissions;
+    }
+
     private UserSnapshot snapshot() {
         return new UserSnapshot(userId, username, password, email, role, departmentCode.getValue());
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return role.getAuthorities();
+
+        final Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+
+        if (permissions != null) {
+            authorities.addAll(
+                    permissions.stream().map(p -> new SimpleGrantedAuthority(p.getPermission().name())).collect(Collectors.toSet()));
+        }
+
+        return authorities;
     }
 
     public void changeFullName(final FullNameRequest request) {
@@ -162,6 +231,67 @@ public class User {
         DomainRegistry.publish(new UserFullNameChangedEvent(this.snapshot()));
     }
 
+    public void changeRole(final Role role) {
+        this.role = role;
+        getPermissions().clear();
+        markAsModified();
+    }
+
+    public void addPermission(final String permission) {
+        final RolePermission rolePermission = DomainRegistry.rolePermissionService().findByName(permission);
+        getPermissions().add(rolePermission);
+        markAsModified();
+    }
+
+    private void markAsDeleted() {
+        this.deleted = true;
+    }
+
     private void markAsModified() {
+        this.updatedAt = Instant.now();
+    }
+
+    public boolean isAdmin() {
+        return role.equals(Role.ADMIN);
+    }
+
+    public void markAsLoggedOut() {
+        DomainRegistry.eventPublisher().publishEvent(new UserLoggedOutEvent(this.snapshot()));
+        markAsModified();
+    }
+
+    public enum Permission {
+
+        ROLE_ADMIN_READ("admin:read"),
+        ROLE_ADMIN_UPDATE("admin:update"),
+        ROLE_ADMIN_CREATE("admin:create"),
+        ROLE_ADMIN_DELETE("admin:delete"),
+
+        ROLE_MANAGER_READ("management:read"),
+        ROLE_MANAGER_UPDATE("management:update"),
+        ROLE_MANAGER_CREATE("management:create"),
+        ROLE_MANAGER_DELETE("management:delete"),
+
+        ROLE_SUPPLIER_READ("supplier:read"),
+        ROLE_SUPPLIER_UPDATE("supplier:update"),
+        ROLE_SUPPLIER_CREATE("supplier:create"),
+        ROLE_SUPPLIER_DELETE("supplier:delete");
+
+        private final String permission;
+
+        Permission(final String permission) {
+            this.permission = permission;
+        }
+
+        public String getPermission() {
+            return permission;
+        }
+    }
+
+    public enum Role {
+        USER,
+        ADMIN,
+        MANAGER,
+        SUPPLIER;
     }
 }

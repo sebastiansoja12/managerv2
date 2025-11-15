@@ -1,5 +1,17 @@
 package com.warehouse.auth.configuration;
 
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
 import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPort;
@@ -8,47 +20,50 @@ import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.JwtProvider;
-import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.*;
-import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
-import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
+import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactory;
+import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactoryImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.MailServiceAdapter;
+
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.factory.Mappers;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Configuration
 @RequiredArgsConstructor
 public class AuthConfiguration  {
 
-    private final AuthenticationReadRepository repository;
-
     private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
-    
-	@Bean
-	public AuthenticationPort authenticationPort(AuthenticationService authenticationService,
-			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtService jwtService,
-                                                 final DepartmentService departmentService) {
-		return new AuthenticationPortImpl(authenticationService, passwordEncoder, authenticationManager, jwtService,
-				LOGGER_FACTORY.getLogger(Authentication.class), departmentService);
-	}
 
+    private final AuthenticationReadRepository repository;
+    
+
+    @Bean
+    public AuthenticationPort authenticationPort(final AuthenticationService authenticationService,
+                                                 final UserService userService,
+                                                 final JwtService jwtService,
+                                                 final PasswordEncoder passwordEncoder,
+                                                 final DepartmentService departmentService) {
+		return new AuthenticationPortImpl(authenticationService, userService, jwtService,
+				LOGGER_FACTORY.getLogger(AuthenticationPort.class), passwordEncoder, departmentService);
+    }
+
+    @Bean
+    public AuthenticationService authenticationService(final RefreshTokenRepository refreshTokenRepository,
+                                                       final RefreshTokenGenerator refreshTokenGenerator,
+                                                       final UserRepository userRepository) {
+        return new AuthenticationServiceImpl(refreshTokenRepository, refreshTokenGenerator, userRepository);
+    }
+
+    @Bean
+    public RefreshTokenService refreshTokenService(final RefreshTokenRepository refreshTokenRepository) {
+        return new RefreshTokenServiceImpl(refreshTokenRepository);
+    }
+    
     @Bean
     public RefreshTokenPortObserverPort refreshTokenPortObserverPort(RefreshTokenRepository refreshTokenRepository) {
         return new RefreshTokenPortObserverPortImpl(refreshTokenRepository);
@@ -58,24 +73,7 @@ public class AuthConfiguration  {
     public JwtService jwtService(JwtProvider jwtProvider) {
         return new JwtServiceImpl(jwtProvider);
     }
-
-    @Bean
-    public RefreshTokenGenerator refreshTokenGenerator(RefreshTokenProvider refreshTokenProvider) {
-        return new RefreshTokenGeneratorImpl(refreshTokenProvider);
-    }
-
-	@Bean
-	public UserRepository userRepository(AuthenticationReadRepository repository) {
-		final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
-		return new AuthenticationRepositoryImpl(repository, userMapper);
-	}
-
-    @Bean
-    public RefreshTokenRepository refreshTokenRepository(RefreshTokenReadRepository repository) {
-        final RefreshTokenMapper refreshTokenMapper = Mappers.getMapper(RefreshTokenMapper.class);
-        return new RefreshTokenRepositoryImpl(repository, refreshTokenMapper);
-    }
-
+    
     @Bean
     public AuthenticationProvider authenticationProvider() {
         final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

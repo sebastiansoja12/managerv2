@@ -1,13 +1,11 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-
 import com.warehouse.auth.domain.model.AdminCreateRequest;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.infrastructure.adapter.primary.event.AdminUserCommand;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j

@@ -1,11 +1,5 @@
 package com.warehouse.auth.domain.vo;
 
-import lombok.Builder;
-import lombok.Value;
+public record UserLogout(String username, String refreshToken) {
 
-@Value
-@Builder
-public class UserLogout {
-    String username;
-    String refreshToken;
 }

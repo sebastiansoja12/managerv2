@@ -1,8 +1,13 @@
 package com.warehouse.auth;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doReturn;
-
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.service.JwtServiceImpl;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.UserId;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.micrometer.common.util.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,16 +15,8 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.provider.JwtProvider;
-import com.warehouse.auth.domain.service.JwtService;
-import com.warehouse.auth.domain.service.JwtServiceImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.UserId;
-
-import io.jsonwebtoken.ExpiredJwtException;
-import io.micrometer.common.util.StringUtils;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doReturn;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +39,7 @@ public class JwtServiceTest {
     @Test
     void shouldGenerateToken() {
         // given
-        final User user = new User(new UserId(1L), "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+        final User user = new User(new UserId(1L), "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
                 new DepartmentCode("TST"), "");
 
         doReturn(EXPIRATION)
@@ -63,7 +60,7 @@ public class JwtServiceTest {
     @Test
     void shouldCheckIfTokenIsValid() {
         // given
-        final User user = new User(null, "test", "test", "Test", "Test", "test@test.pl", Role.ADMIN,
+        final User user = new User(null, "test", "test", "Test", "Test", "test@test.pl", User.Role.ADMIN,
                 new DepartmentCode("TST"), "");
 
         doReturn(SECRET_KEY)
@@ -84,7 +81,7 @@ public class JwtServiceTest {
     @Test
     void shouldTokenBeInvalid() {
         // given
-        final User user = new User(null, "test", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+        final User user = new User(null, "test", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
                 new DepartmentCode("TST"), "");
 
         doReturn(SECRET_KEY)

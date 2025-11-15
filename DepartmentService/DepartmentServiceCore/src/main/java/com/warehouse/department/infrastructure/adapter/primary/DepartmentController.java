@@ -38,7 +38,7 @@ public class DepartmentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN_CREATE')")
     public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
 		final Result result = this.departmentRequestValidator.validateBody(departmentCreateApiRequest);
 
@@ -74,7 +74,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/department-type")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<?> changeDepartmentType(@RequestParam final String departmentType,
                                                   @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);

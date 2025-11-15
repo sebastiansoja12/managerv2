@@ -1,31 +1,29 @@
 package com.warehouse.auth;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-
+import com.warehouse.auth.domain.model.RefreshToken;
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
+import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.service.UserService;
+import com.warehouse.auth.domain.service.UserServiceImpl;
+import com.warehouse.auth.domain.service.RefreshTokenGenerator;
+import com.warehouse.auth.domain.vo.LoginResponse;
+import com.warehouse.auth.domain.vo.RegisterResponse;
+import com.warehouse.auth.domain.vo.Token;
+import com.warehouse.auth.domain.vo.UserResponse;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.auth.domain.model.RefreshToken;
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
-import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.service.AuthenticationService;
-import com.warehouse.auth.domain.service.AuthenticationServiceImpl;
-import com.warehouse.auth.domain.service.RefreshTokenGenerator;
-import com.warehouse.auth.domain.vo.LoginResponse;
-import com.warehouse.auth.domain.vo.RegisterResponse;
-import com.warehouse.auth.domain.vo.Token;
-import com.warehouse.auth.domain.vo.UserResponse;
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthenticationServiceTest {
+public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -36,18 +34,18 @@ public class AuthenticationServiceTest {
     @Mock
     private RefreshTokenGenerator refreshTokenGenerator;
 
-    private AuthenticationService authenticationService;
+    private UserService userService;
 
     @BeforeEach
     void setup() {
-        authenticationService = new AuthenticationServiceImpl(userRepository, refreshTokenRepository,
+        userService = new UserServiceImpl(userRepository, refreshTokenRepository,
                 refreshTokenGenerator);
     }
 
     @Test
-    void shouldRegister() {
+    void shouldCreate() {
         // given
-        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
                 new DepartmentCode("TST"), "");
 
         final UserResponse userResponse = UserResponse.builder()
@@ -60,9 +58,9 @@ public class AuthenticationServiceTest {
 
         doReturn(userResponse)
                 .when(userRepository)
-                .saveUser(user);
+                .createOrUpdate(user);
         // when
-        final RegisterResponse registerResponse = authenticationService.register(user);
+        final RegisterResponse registerResponse = userService.create(user);
         // then
         assertThat(registerResponse.userResponse().username()).isNotNull();
     }
@@ -70,7 +68,7 @@ public class AuthenticationServiceTest {
     @Test
     void shouldLogin() {
         // given
-        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", Role.USER,
+        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
                 new DepartmentCode("TST"), "");
 
         final RefreshToken refreshToken = RefreshToken.builder()
@@ -83,7 +81,7 @@ public class AuthenticationServiceTest {
                 .when(refreshTokenRepository)
                 .save(refreshToken);
         // when
-        final LoginResponse response = authenticationService.login(user);
+        final LoginResponse response = userService.login(user);
         // then
         assertEquals(expectedToBe("90b20782-8882-4f46-a14e-e0fa761fb7c8"), response.getRefreshToken().getValue());
     }

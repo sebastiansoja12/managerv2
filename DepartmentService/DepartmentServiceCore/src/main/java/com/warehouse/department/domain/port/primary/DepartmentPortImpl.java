@@ -2,6 +2,7 @@ package com.warehouse.department.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
+import com.warehouse.department.domain.exception.DepartmentAlreadyExistsException;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreate;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
@@ -85,7 +86,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 		deps.forEach(dep -> {
 			final Department department = this.departmentService.findByDepartmentCode(dep.getDepartmentCode());
 			if (department != null) {
-				throw new IllegalArgumentException(
+				throw new DepartmentAlreadyExistsException(
 						"Department with code " + dep.getDepartmentCode().getValue() + " already exists");
 			}
 		});

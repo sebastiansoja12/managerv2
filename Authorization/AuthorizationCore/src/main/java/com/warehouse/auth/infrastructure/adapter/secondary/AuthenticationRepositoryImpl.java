@@ -5,68 +5,40 @@ import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
-import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserMapper;
+import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToEntityMapper;
+import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToModelMapper;
+import com.warehouse.commonassets.identificator.UserId;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class AuthenticationRepositoryImpl implements UserRepository {
 
     private final AuthenticationReadRepository repository;
 
-    private final UserMapper userMapper;
+    public AuthenticationRepositoryImpl(final AuthenticationReadRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
-    public UserResponse saveUser(final User user) {
-        final UserEntity userEntity = UserEntity.builder()
-                .userId(user.getUserId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .password(user.getPassword())
-                .role(user.getRole())
-                .departmentCode(user.getDepartmentCode())
-                .apiKey(user.getApiKey())
-                .build();
+    public UserResponse createOrUpdate(final User user) {
+        final UserEntity userEntity = UserToEntityMapper.map(user);
 
-        repository.save(userEntity);
+        repository.saveAndFlush(userEntity);
 
         return UserResponse.from(userEntity);
     }
 
     @Override
     public User findByUsername(final String username) {
-        return repository.findByUsername(username).map(
-                entity -> {
-                    final User user = new User();
-                    user.setUserId(entity.getUserId());
-                    user.setUsername(entity.getUsername());
-                    user.setEmail(entity.getEmail());
-                    user.setFirstName(entity.getFirstName());
-                    user.setLastName(entity.getLastName());
-                    user.setPassword(entity.getPassword());
-                    user.setRole(entity.getRole());
-                    user.setDepartmentCode(entity.getDepartmentCode());
-                    return user;
-                }
-        ).orElseThrow(() -> new UserNotFoundException("User was not found"));
+        return repository.findByUsername(username).map(UserToModelMapper::map)
+                .orElseThrow(() -> new UserNotFoundException("User was not found"));
     }
 
     @Override
     public User findByApiKey(final String apiKey) {
-        return repository.findByApiKey(apiKey).map(entity -> {
-            final User user = new User();
-            user.setUserId(entity.getUserId());
-            user.setUsername(entity.getUsername());
-            user.setEmail(entity.getEmail());
-            user.setFirstName(entity.getFirstName());
-            user.setLastName(entity.getLastName());
-            user.setPassword(entity.getPassword());
-            user.setRole(entity.getRole());
-            user.setDepartmentCode(entity.getDepartmentCode());
-            user.setApiKey(entity.getApiKey());
-            return user;
-        }).orElseGet(() -> null);
+        return repository.findByApiKey(apiKey).map(UserToModelMapper::map).orElse(null);
+    }
+
+    @Override
+    public User findById(final UserId userId) {
+        return repository.findById(userId).map(UserToModelMapper::map).orElse(null);
     }
 }

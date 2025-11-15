@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import com.warehouse.auth.domain.filter.JwtAuthenticationFilter;
+import com.warehouse.auth.infrastructure.adapter.secondary.filter.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
