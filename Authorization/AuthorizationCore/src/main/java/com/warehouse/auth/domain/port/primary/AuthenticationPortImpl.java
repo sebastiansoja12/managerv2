@@ -48,13 +48,18 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     public AuthenticationResponse login(final LoginRequest loginRequest) {
         final User user = userService.findUser(loginRequest.username());
 
+        if (user == null) {
+            throw new AuthenticationErrorException("Invalid username or password");
+        } else if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
+            throw new AuthenticationErrorException("Invalid username or password");
+        }
+
         final String authenticationToken = jwtService.generateToken(user);
 
-        authenticationService.login(
-                UsernamePasswordAuthentication.from(user)
-        );
+        final LoginResponse loginResponse = authenticationService.login(
+                UsernamePasswordAuthentication.from(user));
 
-        return new AuthenticationResponse(authenticationToken);
+        return new AuthenticationResponse(authenticationToken, loginResponse);
     }
 
     @Override
