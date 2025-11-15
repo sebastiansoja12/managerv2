@@ -11,11 +11,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.auth.configuration.AuthTestConfiguration;
-import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.UserReadRepository;
 
 import java.util.Optional;
 
@@ -27,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DatabaseSetup("/dataset/user_repository.xml")
-public class AuthenticationReadRepositoryTest {
+public class UserReadRepositoryTest {
 
     @Autowired
-    private AuthenticationReadRepository repository;
+    private UserReadRepository repository;
 
     @Test
     void shouldFindByUsername() {

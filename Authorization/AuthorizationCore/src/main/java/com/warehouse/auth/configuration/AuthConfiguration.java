@@ -25,7 +25,7 @@ import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRe
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.UserReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactory;
 import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactoryImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.MailServiceAdapter;
@@ -39,7 +39,7 @@ public class AuthConfiguration  {
 
     private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
 
-    private final AuthenticationReadRepository repository;
+    private final UserReadRepository repository;
     
 
     @Bean

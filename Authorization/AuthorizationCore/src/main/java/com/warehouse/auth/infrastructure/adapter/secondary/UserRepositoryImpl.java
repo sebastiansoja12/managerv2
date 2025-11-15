@@ -9,11 +9,11 @@ import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToEntityMa
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToModelMapper;
 import com.warehouse.commonassets.identificator.UserId;
 
-public class AuthenticationRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl implements UserRepository {
 
-    private final AuthenticationReadRepository repository;
+    private final UserReadRepository repository;
 
-    public AuthenticationRepositoryImpl(final AuthenticationReadRepository repository) {
+    public UserRepositoryImpl(final UserReadRepository repository) {
         this.repository = repository;
     }
 

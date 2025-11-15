@@ -34,8 +34,8 @@ public class UserConfiguration {
     }
 
     @Bean
-    public UserRepository userRepository(AuthenticationReadRepository repository) {
-        return new AuthenticationRepositoryImpl(repository);
+    public UserRepository userRepository(UserReadRepository repository) {
+        return new UserRepositoryImpl(repository);
     }
 
     @Bean
