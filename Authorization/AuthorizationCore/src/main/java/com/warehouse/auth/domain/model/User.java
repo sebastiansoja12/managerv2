@@ -203,6 +203,30 @@ public class User {
         this.permissions = permissions;
     }
 
+    public void setCreatedAt(final Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setDeleted(final Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public void setUpdatedAt(final Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean isDeleted() {
+        return deleted;
+    }
+
+    public Instant createdAt() {
+        return createdAt;
+    }
+
+    public Instant updatedAt() {
+        return updatedAt;
+    }
+
     public Set<RolePermission> getPermissions() {
         if (permissions == null) {
             this.permissions = new HashSet<>();

@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,15 @@ public class UserEntity implements UserDetails {
     )
     private Set<RolePermissionEntity> permissions = new HashSet<>();
 
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 
@@ -100,6 +110,10 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Boolean isDeleted() {
+        return deleted;
     }
 
     @RequiredArgsConstructor

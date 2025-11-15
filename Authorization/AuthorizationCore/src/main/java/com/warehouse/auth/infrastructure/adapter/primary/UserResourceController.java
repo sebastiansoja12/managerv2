@@ -6,7 +6,9 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.service.ApiKeyService;
 import com.warehouse.auth.infrastructure.adapter.primary.dto.FullNameRequest;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.validator.RoleValidator;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 import com.warehouse.commonassets.identificator.UserId;
 import jakarta.validation.Valid;
 import org.springframework.data.repository.query.Param;
@@ -33,7 +35,7 @@ public class UserResourceController {
     @GetMapping("/{username}")
     public ResponseEntity<?> findUserByUsername(@PathVariable final String username) {
         final User user = userPort.findUser(username);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(ResponseMapper.map(user), HttpStatus.OK);
     }
 
     @PutMapping
@@ -73,5 +75,10 @@ public class UserResourceController {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> handleUserNotFoundException() {
+        return ResponseEntity.notFound().build();
     }
 }

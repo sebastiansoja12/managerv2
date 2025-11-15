@@ -16,6 +16,9 @@ public abstract class UserToEntityMapper {
                 .departmentCode(user.getDepartmentCode())
                 .apiKey(user.getApiKey())
                 .permissions(UserPermissionToEntityMapper.map(user.getPermissions()))
+                .deleted(user.isDeleted())
+                .createdAt(user.createdAt())
+                .updatedAt(user.updatedAt())
                 .build();
     }
 }
