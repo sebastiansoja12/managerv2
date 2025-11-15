@@ -65,8 +65,8 @@ public class AuthConfiguration  {
     }
     
     @Bean
-    public RefreshTokenPortObserverPort refreshTokenPortObserverPort(RefreshTokenRepository refreshTokenRepository) {
-        return new RefreshTokenPortObserverPortImpl(refreshTokenRepository);
+    public RefreshTokenPortObserverPort refreshTokenPortObserverPort(final RefreshTokenService refreshTokenService) {
+        return new RefreshTokenPortObserverPortImpl(refreshTokenService);
     }
 
     @Bean
