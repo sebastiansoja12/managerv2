@@ -8,6 +8,7 @@ import com.warehouse.auth.domain.vo.LoginResponse;
 import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.vo.UsernamePasswordAuthentication;
 import com.warehouse.commonassets.identificator.UserId;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -42,5 +43,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final User user = this.userRepository.findById(userId);
         user.markAsLoggedOut();
         this.userRepository.createOrUpdate(user);
+    }
+
+    @Override
+    public UserId currentUserId() {
+        return (UserId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

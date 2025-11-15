@@ -4,10 +4,10 @@ import com.warehouse.auth.domain.helper.Result;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.RolePermission;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.commonassets.identificator.UserId;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 
 @Slf4j
@@ -15,8 +15,12 @@ public class UserPortImpl implements UserPort {
 
     private final UserService userService;
 
-    public UserPortImpl(final UserService userService) {
+    private final AuthenticationService authenticationService;
+
+    public UserPortImpl(final UserService userService,
+                        final AuthenticationService authenticationService) {
         this.userService = userService;
+        this.authenticationService = authenticationService;
     }
 
     @Override
@@ -31,30 +35,29 @@ public class UserPortImpl implements UserPort {
 
     @Override
     public void changeRole(final UserId userId, final User.Role role) {
-        final User.Role role1 = User.Role.ADMIN;
-        //role1.setPermissions(Set.of(User.Permission.MANAGER_UPDATE));
+        this.userService.changeRole(userId, role);
     }
 
     @Override
-    public Result<Void, String> addPermission(final UserId userId, final String permission) {
+    public Result<Void, String> addPermission(final UserId userIdToModify, final String permission) {
 
-        final UserId currentlyLoggedUser = (UserId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final UserId currentlyLoggedUser = authenticationService.currentUserId();
 
-        if (userId.equals(currentlyLoggedUser)) {
+        if (userIdToModify.equals(currentlyLoggedUser)) {
             return Result.failure("You cannot add permission to yourself");
         }
 
         final RolePermission rolePermission = new RolePermission(User.Permission.valueOf(permission));
 
-        final User user = this.userService.findUserById(userId);
+        final User user = this.userService.findUserById(userIdToModify);
 
         if (rolePermission.isAdmin()) {
-            if (!user.isAdmin()) {
+            if (user != null && !user.isAdmin()) {
                 return Result.failure("Permission " + permission + " cannot be assigned to nonadmin user");
             }
         }
 
-        this.userService.addPermission(userId, permission);
+        this.userService.addPermission(userIdToModify, permission);
 
         return Result.success();
     }

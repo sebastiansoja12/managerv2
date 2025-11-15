@@ -8,4 +8,6 @@ public interface RolePermissionRepository {
     RolePermission findByName(final String name);
 
     Set<RolePermission> findAllAdminPermissions();
+
+    Set<RolePermission> findAllSupplierPermissions();
 }

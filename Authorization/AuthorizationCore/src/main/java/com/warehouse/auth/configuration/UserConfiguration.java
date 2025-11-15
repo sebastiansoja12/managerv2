@@ -6,6 +6,7 @@ import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.RolePermissionRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
+import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.RefreshTokenGenerator;
 import com.warehouse.auth.domain.service.RefreshTokenGeneratorImpl;
 import com.warehouse.auth.domain.service.UserService;
@@ -19,8 +20,8 @@ import org.springframework.context.annotation.Configuration;
 public class UserConfiguration {
 
     @Bean
-    public UserPort userPort(final UserService userService) {
-        return new UserPortImpl(userService);
+    public UserPort userPort(final UserService userService, final AuthenticationService authenticationService) {
+        return new UserPortImpl(userService, authenticationService);
     }
 
     @Bean

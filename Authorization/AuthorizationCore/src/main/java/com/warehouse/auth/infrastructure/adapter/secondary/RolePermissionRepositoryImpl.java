@@ -24,9 +24,19 @@ public class RolePermissionRepositoryImpl implements RolePermissionRepository {
 
     @Override
     public Set<RolePermission> findAllAdminPermissions() {
-		final Set<RolePermission> rolePermissions = rolePermissionReadRepository.findAll().stream().map(
-				role -> new RolePermission(new RolePermissionId(role.getId()), User.Permission.valueOf(role.getName())))
-				.collect(java.util.stream.Collectors.toSet());
+		final Set<RolePermission> rolePermissions = findAll();
         return rolePermissions.stream().filter(RolePermission::isAdmin).collect(java.util.stream.Collectors.toSet());
+    }
+
+    @Override
+    public Set<RolePermission> findAllSupplierPermissions() {
+        final Set<RolePermission> rolePermissions = findAll();
+        return rolePermissions.stream().filter(RolePermission::isSupplier).collect(java.util.stream.Collectors.toSet());
+    }
+
+    private Set<RolePermission> findAll() {
+        return rolePermissionReadRepository.findAll().stream().map(
+                        role -> new RolePermission(new RolePermissionId(role.getId()), User.Permission.valueOf(role.getName())))
+                .collect(java.util.stream.Collectors.toSet());
     }
 }

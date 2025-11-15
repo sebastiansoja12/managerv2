@@ -1,8 +1,10 @@
 package com.warehouse.auth.domain.model;
 
+import com.warehouse.auth.domain.event.UserChangedEvent;
 import com.warehouse.auth.domain.event.UserCreatedEvent;
 import com.warehouse.auth.domain.event.UserFullNameChangedEvent;
 import com.warehouse.auth.domain.event.UserLoggedOutEvent;
+import com.warehouse.auth.domain.exception.UserDeletedException;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.UserSnapshot;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -232,9 +234,25 @@ public class User {
     }
 
     public void changeRole(final Role role) {
+        if (deleted) {
+            throw new UserDeletedException("User is already deleted");
+        }
+
         this.role = role;
-        getPermissions().clear();
+        updatePermissionsForRole(role);
         markAsModified();
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(this.snapshot()));
+    }
+
+    private void updatePermissionsForRole(final Role role) {
+        getPermissions().clear();
+
+        switch (role) {
+            case ADMIN -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllAdminPermissions());
+            case SUPPLIER -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllSupplierPermissions());
+            case USER -> {}
+            default -> throw new IllegalStateException("Unexpected role: " + role);
+        }
     }
 
     public void addPermission(final String permission) {

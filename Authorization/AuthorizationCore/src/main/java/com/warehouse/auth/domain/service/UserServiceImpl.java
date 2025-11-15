@@ -1,11 +1,10 @@
 package com.warehouse.auth.domain.service;
 
 import com.warehouse.auth.domain.model.FullNameRequest;
-import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.vo.*;
+import com.warehouse.auth.domain.vo.RegisterResponse;
+import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.commonassets.identificator.UserId;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +12,9 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    
-    private final RefreshTokenRepository refreshTokenRepository;
 
-    private final RefreshTokenGenerator refreshTokenGenerator;
-
-    public UserServiceImpl(final UserRepository userRepository,
-                           final RefreshTokenRepository refreshTokenRepository,
-                           final RefreshTokenGenerator refreshTokenGenerator) {
+    public UserServiceImpl(final UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.refreshTokenGenerator = refreshTokenGenerator;
     }
 
     @Override
@@ -33,25 +24,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginResponse login(final User user) {
-		final RefreshToken refreshToken = RefreshToken.builder()
-                .username(user.getUsername())
-                .expired(false)
-                .revoked(false)
-                .token(refreshTokenGenerator.generateToken(user))
-                .build();
-		final Token token = refreshTokenRepository.save(refreshToken);
-		return new LoginResponse(token);
-    }
-
-    @Override
     public User findUser(final String username) {
         return userRepository.findByUsername(username);
-    }
-
-    @Override
-    public void logout(final UserLogout userLogout) {
-        refreshTokenRepository.delete(userLogout.refreshToken());
     }
 
     @Override

@@ -37,4 +37,8 @@ public class RolePermission {
     public boolean isAdmin() {
         return permission != null && permission.name().contains("ADMIN");
     }
+
+    public boolean isSupplier() {
+        return permission != null && permission.name().contains("SUPPLIER");
+    }
 }

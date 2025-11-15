@@ -7,4 +7,5 @@ import com.warehouse.commonassets.identificator.UserId;
 public interface AuthenticationService {
     LoginResponse login(final UsernamePasswordAuthentication usernamePasswordAuthentication);
     void logout(final UserId userId, final String token);
+    UserId currentUserId();
 }

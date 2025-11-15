@@ -24,4 +24,9 @@ public class RolePermissionServiceImpl implements RolePermissionService {
     public Set<RolePermission> findAllAdminPermissions() {
         return rolePermissionRepository.findAllAdminPermissions();
     }
+
+    @Override
+    public Set<RolePermission> findAllSupplierPermissions() {
+        return rolePermissionRepository.findAllSupplierPermissions();
+    }
 }
