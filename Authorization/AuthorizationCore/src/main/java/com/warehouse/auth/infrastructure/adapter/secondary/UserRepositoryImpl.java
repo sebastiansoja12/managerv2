@@ -11,7 +11,6 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserRepositoryImpl implements UserRepository {
 
@@ -52,6 +51,6 @@ public class UserRepositoryImpl implements UserRepository {
                 .filter(user -> !user.isDeleted())
                 .filter(user -> user.getDepartmentCode().equals(departmentCode))
                 .map(User::getUserId)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
