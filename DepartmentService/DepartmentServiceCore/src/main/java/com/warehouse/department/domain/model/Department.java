@@ -5,6 +5,7 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.event.*;
 import com.warehouse.department.domain.exception.ForbiddenDepartmentTypeException;
+import com.warehouse.department.domain.exception.WrongUserAssignedException;
 import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
@@ -313,8 +314,9 @@ public class Department {
     }
 
     public void changeAdminUserId(final UserId adminUserId) {
-        if (!adminUserId.isAdmin()) {
-            throw new ForbiddenDepartmentTypeException("Non admin user cannot be assigned as admin user for department");
+        final UserId currentUser = DomainRegistry.authenticationService().currentUser();
+        if (currentUser.equals(adminUserId) || !adminUserId.isAdmin()) {
+            throw new WrongUserAssignedException("User cannot be assigned as admin user for department");
         }
         this.adminUserId = adminUserId;
         markAsModified();
