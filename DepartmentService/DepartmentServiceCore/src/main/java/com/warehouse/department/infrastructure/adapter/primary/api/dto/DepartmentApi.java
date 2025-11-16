@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public record DepartmentApi(DepartmentCodeApi departmentCode,
                             AddressApi address,
-                            String nip,
+                            String taxId,
                             String telephoneNumber,
                             String openingHours,
                             String email,

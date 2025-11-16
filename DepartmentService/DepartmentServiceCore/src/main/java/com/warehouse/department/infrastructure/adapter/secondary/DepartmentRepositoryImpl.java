@@ -1,15 +1,14 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
-import java.util.List;
-
-import org.springframework.cache.annotation.Cacheable;
-
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepartmentToEntityMapper;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepartmentToModelMapper;
+import org.springframework.cache.annotation.Cacheable;
+
+import java.util.List;
 
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
@@ -20,12 +19,19 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     }
 
     @Override
-    @Cacheable("departmentCodeCache")
     public Department findByCode(final DepartmentCode departmentCode) {
 		final DepartmentEntity department = repository
 				.findByDepartmentCode(
 						new com.warehouse.commonassets.identificator.DepartmentCode(departmentCode.getValue()))
 				.orElse(null);
+        return DepartmentToModelMapper.map(department);
+    }
+
+    @Override
+    public Department findByReference(final DepartmentCode departmentCode) {
+        final DepartmentEntity department = repository
+                .getReferenceById(
+                        new com.warehouse.commonassets.identificator.DepartmentCode(departmentCode.getValue()));
         return DepartmentToModelMapper.map(department);
     }
 

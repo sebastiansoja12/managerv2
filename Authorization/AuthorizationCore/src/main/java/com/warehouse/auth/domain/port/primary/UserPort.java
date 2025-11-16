@@ -15,4 +15,6 @@ public interface UserPort {
     void changeRole(final UserId userId, final User.Role role);
 
     Result<Void, String> addPermission(final UserId userId, final String permission);
+
+    Result<Void, String> removePermission(final UserId userId, final String permission);
 }

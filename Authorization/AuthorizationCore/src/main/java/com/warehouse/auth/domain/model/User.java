@@ -285,6 +285,12 @@ public class User {
         markAsModified();
     }
 
+    public void removePermission(final String permission) {
+        final RolePermission rolePermission = DomainRegistry.rolePermissionService().findByName(permission);
+        getPermissions().remove(rolePermission);
+        markAsModified();
+    }
+
     private void markAsDeleted() {
         this.deleted = true;
     }

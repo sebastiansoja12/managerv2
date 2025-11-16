@@ -1,6 +1,7 @@
 package com.warehouse.department.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.UserId;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -23,8 +24,9 @@ public class DepartmentEntity {
     })
     private DepartmentAddress departmentAddress;
 
-    @Column(name = "nip", nullable = false)
-    private String nip;
+    @Column(name = "tax_id", nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "tax_id"))
+    private TaxId taxId;
 
     @Column(name = "telephone_number", nullable = false)
     private String telephoneNumber;
@@ -52,12 +54,24 @@ public class DepartmentEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "admin_user_id")
+    @AttributeOverride(name = "value", column = @Column(name = "admin_user_id"))
+    private UserId adminUserId;
+
+    @Column(name = "created_by", nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "created_by"))
+    private UserId createdBy;
+
+    @Column(name = "last_modified_by")
+    @AttributeOverride(name = "value", column = @Column(name = "last_modified_by"))
+    private UserId lastModifiedBy;
+
     public DepartmentEntity() {
     }
 
     public DepartmentEntity(final DepartmentCode departmentCode,
                             final DepartmentAddress departmentAddress,
-                            final String nip,
+                            final TaxId taxId,
                             final String telephoneNumber,
                             final String openingHours,
                             final String email,
@@ -65,10 +79,13 @@ public class DepartmentEntity {
                             final DepartmentType departmentType,
                             final Status status,
                             final Instant createdAt,
-                            final Instant updatedAt) {
+                            final Instant updatedAt,
+                            final UserId adminUserId,
+                            final UserId createdBy,
+                            final UserId lastModifiedBy) {
         this.departmentCode = departmentCode;
         this.departmentAddress = departmentAddress;
-        this.nip = nip;
+        this.taxId = taxId;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.email = email;
@@ -77,6 +94,9 @@ public class DepartmentEntity {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.adminUserId = adminUserId;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     public Boolean isActive() {
@@ -87,8 +107,8 @@ public class DepartmentEntity {
         return departmentCode;
     }
 
-    public String getNip() {
-        return nip;
+    public TaxId getTaxId() {
+        return taxId;
     }
 
     public String getOpeningHours() {
@@ -121,6 +141,18 @@ public class DepartmentEntity {
 
     public Status getStatus() {
         return status;
+    }
+
+    public UserId getAdminUserId() {
+        return adminUserId;
+    }
+
+    public UserId getCreatedBy() {
+        return createdBy;
+    }
+
+    public UserId getLastModifiedBy() {
+        return lastModifiedBy;
     }
 
     public enum DepartmentType {

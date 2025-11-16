@@ -5,6 +5,7 @@ import com.warehouse.auth.domain.event.UserLoggedOutEvent;
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.service.RefreshTokenService;
+import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.UserSnapshot;
 import com.warehouse.commonassets.identificator.UserId;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,14 @@ public class UserListener {
 
     private final RefreshTokenService refreshTokenService;
 
+    private final UserService userService;
+
     public UserListener(final MailServicePort mailServicePort,
-                        final RefreshTokenService refreshTokenService) {
+                        final RefreshTokenService refreshTokenService,
+                        final UserService userService) {
         this.mailServicePort = mailServicePort;
         this.refreshTokenService = refreshTokenService;
+        this.userService = userService;
     }
 
     @EventListener

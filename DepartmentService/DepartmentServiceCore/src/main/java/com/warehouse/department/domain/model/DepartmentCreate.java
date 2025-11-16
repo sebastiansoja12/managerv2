@@ -13,7 +13,7 @@ public class DepartmentCreate {
 
     private String postalCode;
 
-    private String nip;
+    private String taxId;
 
     private String telephoneNumber;
 
@@ -29,7 +29,7 @@ public class DepartmentCreate {
                             final String city,
                             final String street,
                             final String postalCode,
-                            final String nip,
+                            final String taxId,
                             final String telephoneNumber,
                             final String openingHours,
                             final String email,
@@ -39,7 +39,7 @@ public class DepartmentCreate {
         this.city = city;
         this.street = street;
         this.postalCode = postalCode;
-        this.nip = nip;
+        this.taxId = taxId;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.email = email;
@@ -71,12 +71,12 @@ public class DepartmentCreate {
         this.departmentCode = departmentCode;
     }
 
-    public String getNip() {
-        return nip;
+    public String getTaxId() {
+        return taxId;
     }
 
-    public void setNip(final String nip) {
-        this.nip = nip;
+    public void setTaxId(final String taxId) {
+        this.taxId = taxId;
     }
 
     public String getOpeningHours() {

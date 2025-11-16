@@ -61,4 +61,18 @@ public class UserPortImpl implements UserPort {
 
         return Result.success();
     }
+
+    @Override
+    public Result<Void, String> removePermission(final UserId userIdToModify, final String permission) {
+
+        final UserId currentlyLoggedUser = authenticationService.currentUserId();
+
+        if (userIdToModify.equals(currentlyLoggedUser)) {
+            return Result.failure("You cannot remove permission for yourself");
+        }
+
+        this.userService.removePermission(userIdToModify, permission);
+
+        return Result.success();
+    }
 }

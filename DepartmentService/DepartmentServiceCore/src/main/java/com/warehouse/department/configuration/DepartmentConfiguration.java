@@ -4,6 +4,8 @@ import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.port.primary.DepartmentPortImpl;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
+import com.warehouse.department.domain.service.AuthenticationService;
+import com.warehouse.department.domain.service.AuthenticationServiceImpl;
 import com.warehouse.department.domain.service.DepartmentService;
 import com.warehouse.department.domain.service.DepartmentServiceImpl;
 import com.warehouse.department.domain.validator.Validator;
@@ -11,7 +13,6 @@ import com.warehouse.department.infrastructure.adapter.primary.validator.Departm
 import com.warehouse.department.infrastructure.adapter.secondary.DepartmentReadRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.DepartmentRepositoryImpl;
 import com.warehouse.department.infrastructure.adapter.secondary.TenantAdminProvisioningAdapter;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,6 +38,11 @@ public class DepartmentConfiguration {
         return new DepartmentPortImpl(departmentRepository, departmentService, tenantAdminProvisioningPort, validator);
     }
 
+    @Bean(name = "department.authenticationService")
+    public AuthenticationService authenticationService() {
+        return new AuthenticationServiceImpl();
+    }
+
     @Bean
     public Validator validator() {
         return new Validator() {
@@ -49,7 +55,7 @@ public class DepartmentConfiguration {
     }
 
     @Bean
-    public TenantAdminProvisioningPort tenantAdminProvisioningPort(final ApplicationEventPublisher applicationEventPublisher) {
-        return new TenantAdminProvisioningAdapter(applicationEventPublisher);
+    public TenantAdminProvisioningPort tenantAdminProvisioningPort() {
+        return new TenantAdminProvisioningAdapter();
     }
 }

@@ -1,5 +1,6 @@
 package com.warehouse.department.domain.port.primary;
 
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
@@ -22,4 +23,6 @@ public interface DepartmentPort {
     void changeDepartmentActive(final DepartmentCode departmentCodeValue, final Boolean active);
 
     void changeDepartmentType(final DepartmentCode departmentCodeValue, final DepartmentType departmentType);
+
+    void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
 }

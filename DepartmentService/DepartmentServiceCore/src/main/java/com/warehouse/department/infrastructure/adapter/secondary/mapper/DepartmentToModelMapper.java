@@ -4,6 +4,7 @@ import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
+import com.warehouse.department.domain.vo.TaxId;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentAddress;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 
@@ -14,10 +15,11 @@ public abstract class DepartmentToModelMapper {
             return null;
         } else {
             return new Department(new DepartmentCode(department.getDepartmentCode().getValue()),
-                    map(department.getDepartmentAddress()), department.getNip(),
+                    map(department.getDepartmentAddress()), new TaxId(department.getTaxId().value()),
                     department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(), department.isActive(),
                     DepartmentType.valueOf(department.getDepartmentType().name()), Department.Status.valueOf(department.getStatus().name()),
-                    department.getCreatedAt(), department.getUpdatedAt());
+					department.getCreatedAt(), department.getUpdatedAt(), department.getAdminUserId(),
+					department.getCreatedBy(), department.getLastModifiedBy());
         }
     }
 

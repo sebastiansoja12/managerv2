@@ -5,16 +5,18 @@ import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentAddress;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.TaxId;
 
 public abstract class DepartmentToEntityMapper {
 
 	public static DepartmentEntity map(final Department department) {
-		return new DepartmentEntity(new DepartmentCode(department.getDepartmentCode().getValue()), 
-                map(department.getAddress()), department.getNip(),
-                department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(), department.getActive(),
+		return new DepartmentEntity(new DepartmentCode(department.getDepartmentCode().getValue()),
+				map(department.getAddress()), new TaxId(department.getTaxId().value()), department.getTelephoneNumber(),
+				department.getOpeningHours(), department.getEmail(), department.getActive(),
 				DepartmentEntity.DepartmentType.valueOf(department.getDepartmentType().name()),
-                DepartmentEntity.Status.valueOf(department.getStatus().name()),
-				department.getCreatedAt(), department.getUpdatedAt());
+				DepartmentEntity.Status.valueOf(department.getStatus().name()), department.getCreatedAt(),
+				department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
+				department.getLastModifiedBy());
 	}
     
     public static DepartmentAddress map(final Address address) {

@@ -22,9 +22,6 @@ public class DepartmentEntity {
     @Column(name = "postal_code", nullable = false)
     private String postalCode;
 
-    @Column(name = "nip", nullable = false)
-    private String nip;
-
     @Column(name = "telephone_number", nullable = false)
     private String telephoneNumber;
 
@@ -42,12 +39,11 @@ public class DepartmentEntity {
     }
 
 	public DepartmentEntity(final Boolean active, final String city,
-			final DepartmentCode departmentCode, final String nip, final String openingHours, final String postalCode,
+			final DepartmentCode departmentCode, final String openingHours, final String postalCode,
 			final String street, final String telephoneNumber, final CountryCode countryCode) {
         this.active = active;
         this.city = city;
         this.departmentCode = departmentCode;
-        this.nip = nip;
         this.openingHours = openingHours;
         this.postalCode = postalCode;
         this.street = street;
@@ -65,10 +61,6 @@ public class DepartmentEntity {
 
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
-    }
-
-    public String getNip() {
-        return nip;
     }
 
     public String getOpeningHours() {

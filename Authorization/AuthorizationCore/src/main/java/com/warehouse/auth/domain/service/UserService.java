@@ -7,9 +7,9 @@ import com.warehouse.commonassets.identificator.UserId;
 
 public interface UserService {
 
-    RegisterResponse create(User user);
+    RegisterResponse create(final User user);
 
-    User findUser(String username);
+    User findUser(final String username);
 
     UserId nextUserId();
 
@@ -18,6 +18,8 @@ public interface UserService {
     void changeRole(final UserId userId, final User.Role role);
 
     void addPermission(final UserId userId, final String permission);
+
+    void removePermission(final UserId userId, final String permission);
 
     User findUserById(final UserId userId);
 }

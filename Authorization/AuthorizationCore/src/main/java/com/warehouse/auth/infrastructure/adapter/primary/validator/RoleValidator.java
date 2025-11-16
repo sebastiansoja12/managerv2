@@ -22,4 +22,19 @@ public class RoleValidator {
 
         return errors.isEmpty() ? Result.success() : Result.failure(errors);
     }
+
+    public Result<Void, List<String>> validateRole(final String role) {
+        final List<String> errors = new ArrayList<>();
+        if (role == null || role.isBlank()) {
+            errors.add("Role name cannot be null or empty");
+        }
+
+        try {
+            User.Role.valueOf(role);
+        } catch (final IllegalArgumentException e) {
+            errors.add("Unknown role: " + role);
+        }
+
+        return errors.isEmpty() ? Result.success() : Result.failure(errors);
+    }
 }

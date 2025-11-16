@@ -1,5 +1,21 @@
 package com.warehouse.auth.configuration;
 
+import com.warehouse.auth.domain.port.primary.AuthenticationPort;
+import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
+import com.warehouse.auth.domain.port.secondary.MailServicePort;
+import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
+import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.domain.service.*;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactory;
+import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactoryImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.MailServiceAdapter;
+import com.warehouse.auth.infrastructure.adapter.secondary.UserReadRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,26 +27,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
-import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPort;
-import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPortImpl;
-import com.warehouse.auth.domain.port.secondary.MailServicePort;
-import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
-import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.provider.JwtProvider;
-import com.warehouse.auth.domain.service.*;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.UserReadRepository;
-import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactory;
-import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactoryImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.MailServiceAdapter;
-
-import lombok.RequiredArgsConstructor;
 
 
 @Configuration
@@ -57,16 +53,6 @@ public class AuthConfiguration  {
                                                        final RefreshTokenGenerator refreshTokenGenerator,
                                                        final UserRepository userRepository) {
         return new AuthenticationServiceImpl(refreshTokenRepository, refreshTokenGenerator, userRepository);
-    }
-
-    @Bean
-    public RefreshTokenService refreshTokenService(final RefreshTokenRepository refreshTokenRepository) {
-        return new RefreshTokenServiceImpl(refreshTokenRepository);
-    }
-    
-    @Bean
-    public RefreshTokenPortObserverPort refreshTokenPortObserverPort(final RefreshTokenService refreshTokenService) {
-        return new RefreshTokenPortObserverPortImpl(refreshTokenService);
     }
 
     @Bean

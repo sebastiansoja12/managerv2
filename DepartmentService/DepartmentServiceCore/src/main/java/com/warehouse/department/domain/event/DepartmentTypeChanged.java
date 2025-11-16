@@ -4,11 +4,12 @@ import com.warehouse.department.domain.vo.DepartmentSnapshot;
 
 import java.time.Instant;
 
-public class DepartmentTypeChanged implements DepartmentEvent {
+public class DepartmentTypeChanged extends DepartmentChanged implements DepartmentEvent {
     private final DepartmentSnapshot snapshot;
     private final Instant timestamp;
 
     public DepartmentTypeChanged(final DepartmentSnapshot snapshot, final Instant timestamp) {
+        super(snapshot, timestamp);
         this.snapshot = snapshot;
         this.timestamp = timestamp;
     }

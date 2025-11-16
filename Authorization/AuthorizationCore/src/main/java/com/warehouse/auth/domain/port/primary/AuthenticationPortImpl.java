@@ -91,7 +91,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     @Override
-    public void createAdminUser(final AdminCreateRequest request) {
+    public UserId createAdminUser(final AdminCreateRequest request) {
 
         final UserId userId = this.userService.nextUserId();
 
@@ -111,7 +111,9 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final User user = User.createAdmin(userId, username, password, email, firstName, lastName, departmentCode, null);
 
-        userService.create(user);
+        this.userService.create(user);
+
+        return userId;
     }
 
     @Override
@@ -119,7 +121,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final User user = userService.findUser(refreshTokenRequest.getUsername());
 
-        authenticationService.logout(
+        this.authenticationService.logout(
                 user.getUserId(), refreshTokenRequest.getRefreshToken()
         );
 
@@ -148,7 +150,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     private void validateDepartmentCode(final DepartmentCode departmentCode) {
-        if (!departmentService.existsByDepartmentCode(departmentCode)) {
+        if (!this.departmentService.existsByDepartmentCode(departmentCode)) {
             throw new AuthenticationErrorException("Department with code " + departmentCode + " does not exist");
         }
     }

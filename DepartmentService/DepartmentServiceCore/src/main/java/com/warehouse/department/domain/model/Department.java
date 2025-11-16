@@ -3,15 +3,13 @@ package com.warehouse.department.domain.model;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
-import com.warehouse.department.domain.event.DepartmentActivated;
-import com.warehouse.department.domain.event.DepartmentCreated;
-import com.warehouse.department.domain.event.DepartmentDeactivated;
-import com.warehouse.department.domain.event.DepartmentTypeChanged;
+import com.warehouse.department.domain.event.*;
 import com.warehouse.department.domain.exception.ForbiddenDepartmentTypeException;
 import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.DepartmentSnapshot;
+import com.warehouse.department.domain.vo.TaxId;
 
 import java.time.Instant;
 
@@ -21,7 +19,7 @@ public class Department {
 
     private Address address;
 
-    private String nip;
+    private TaxId taxId;
 
     private String telephoneNumber;
 
@@ -39,6 +37,8 @@ public class Department {
 
     private Instant updatedAt;
 
+    private UserId adminUserId;
+
     private UserId createdBy;
 
     private UserId lastModifiedBy;
@@ -46,29 +46,54 @@ public class Department {
     public Department() {
     }
 
-	public Department(final DepartmentCode departmentCode, final Address address, final String nip,
-			final String telephoneNumber, final String openingHours, final String email, final Boolean active,
-			final DepartmentType departmentType, final Status status, final Instant createdAt, final Instant updatedAt) {
-		this.address = address;
-		this.departmentCode = departmentCode;
-		this.nip = nip;
-		this.telephoneNumber = telephoneNumber;
-		this.openingHours = openingHours;
-		this.email = email;
-		this.active = active;
-		this.departmentType = departmentType;
+    public Department(
+            final DepartmentCode departmentCode,
+            final Address address,
+            final TaxId taxId,
+            final String telephoneNumber,
+            final String openingHours,
+            final String email,
+            final Boolean active,
+            final DepartmentType departmentType,
+            final Status status,
+            final Instant createdAt,
+            final Instant updatedAt,
+            final UserId adminUserId,
+            final UserId createdBy,
+            final UserId lastModifiedBy
+    ) {
+        this.address = address;
+        this.departmentCode = departmentCode;
+        this.taxId = taxId;
+        this.telephoneNumber = telephoneNumber;
+        this.openingHours = openingHours;
+        this.email = email;
+        this.active = active;
+        this.departmentType = departmentType;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.adminUserId = adminUserId;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
     }
 
-	public Department(final DepartmentCode departmentCode, final String city, final String street,
-			final String postalCode, final String nip, final String telephoneNumber, final String openingHours,
-			final String email, final Boolean active, final CountryCode countryCode,
-			final DepartmentType departmentType) {
-		this.address = new Address(city, street, postalCode, countryCode);
+    public Department(
+            final DepartmentCode departmentCode,
+            final String city,
+            final String street,
+            final String postalCode,
+            final TaxId taxId,
+            final String telephoneNumber,
+            final String openingHours,
+            final String email,
+            final Boolean active,
+            final CountryCode countryCode,
+            final DepartmentType departmentType
+    ) {
+        this.address = new Address(city, street, postalCode, countryCode);
         this.departmentCode = departmentCode;
-        this.nip = nip;
+        this.taxId = taxId;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.email = email;
@@ -77,11 +102,18 @@ public class Department {
         this.status = Status.ACTIVE;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentCreated(this.snapshot(), Instant.now()));
+        this.adminUserId = null;
+        this.createdBy = DomainRegistry.authenticationService().currentUser();
+        this.lastModifiedBy = null;
+        DomainRegistry.eventPublisher().publishEvent(
+                new DepartmentCreated(this.snapshot(), Instant.now())
+        );
     }
 
+
     public DepartmentSnapshot snapshot() {
-		return new DepartmentSnapshot(departmentCode, address, nip, telephoneNumber, openingHours, email, active);
+		return new DepartmentSnapshot(departmentCode, address, taxId, telephoneNumber, openingHours, email, active,
+				departmentType, status, createdAt, updatedAt, adminUserId, createdBy, lastModifiedBy);
     }
 
     public enum Status {
@@ -112,12 +144,12 @@ public class Department {
         return address.postalCode();
     }
 
-    public String getNip() {
-        return nip;
+    public TaxId getTaxId() {
+        return taxId;
     }
 
-    public void setNip(String nip) {
-        this.nip = nip;
+    public void setTaxId(final TaxId taxId) {
+        this.taxId = taxId;
     }
 
     public String getTelephoneNumber() {
@@ -212,6 +244,10 @@ public class Department {
         this.address = address;
     }
 
+    public UserId getAdminUserId() {
+        return adminUserId;
+    }
+
     private void markAsModified() {
         this.updatedAt = Instant.now();
     }
@@ -221,8 +257,8 @@ public class Department {
         markAsModified();
     }
 
-    public void changeIdentificationNumber(final String newIdentificationNumber) {
-        this.nip = newIdentificationNumber;
+    public void changeTaxId(final TaxId newTaxId) {
+        this.taxId = newTaxId;
         markAsModified();
     }
 
@@ -249,12 +285,14 @@ public class Department {
         this.status = Status.ARCHIVED;
         this.lastModifiedBy = lastModifiedBy;
         markAsModified();
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentArchived(this.snapshot(), Instant.now()));
     }
 
     public void markAsDeleted() {
         this.status = Status.DELETED;
         this.lastModifiedBy = lastModifiedBy;
         markAsModified();
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentDeleted(this.snapshot(), Instant.now()));
     }
 
     public void markAsSuspended() {
@@ -272,5 +310,13 @@ public class Department {
         this.departmentType = departmentType;
         markAsModified();
         DomainRegistry.publish(new DepartmentTypeChanged(this.snapshot(), Instant.now()));
+    }
+
+    public void changeAdminUserId(final UserId adminUserId) {
+        if (!adminUserId.isAdmin()) {
+            throw new ForbiddenDepartmentTypeException("Non admin user cannot be assigned as admin user for department");
+        }
+        this.adminUserId = adminUserId;
+        markAsModified();
     }
 }

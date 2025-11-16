@@ -33,7 +33,7 @@ public final class DomainRegistry implements ApplicationEventPublisherAware, App
         return context.getBean(AuthenticationService.class);
     }
 
-    public static ApplicationEventPublisher eventPublisher() {
+    public static synchronized ApplicationEventPublisher eventPublisher() {
         return eventPublisher;
     }
 

@@ -1,15 +1,14 @@
 package com.warehouse.auth.configuration;
 
+import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPort;
+import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPortImpl;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.port.primary.UserPortImpl;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.RolePermissionRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
-import com.warehouse.auth.domain.service.AuthenticationService;
-import com.warehouse.auth.domain.service.RefreshTokenGenerator;
-import com.warehouse.auth.domain.service.RefreshTokenGeneratorImpl;
-import com.warehouse.auth.domain.service.UserService;
+import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
 import org.mapstruct.factory.Mappers;
@@ -43,6 +42,16 @@ public class UserConfiguration {
     public RefreshTokenRepository refreshTokenRepository(RefreshTokenReadRepository repository) {
         final RefreshTokenMapper refreshTokenMapper = Mappers.getMapper(RefreshTokenMapper.class);
         return new RefreshTokenRepositoryImpl(repository, refreshTokenMapper);
+    }
+
+    @Bean
+    public RefreshTokenService refreshTokenService(final RefreshTokenRepository refreshTokenRepository) {
+        return new RefreshTokenServiceImpl(refreshTokenRepository);
+    }
+
+    @Bean
+    public RefreshTokenPortObserverPort refreshTokenPortObserverPort(final RefreshTokenService refreshTokenService) {
+        return new RefreshTokenPortObserverPortImpl(refreshTokenService);
     }
 
 }

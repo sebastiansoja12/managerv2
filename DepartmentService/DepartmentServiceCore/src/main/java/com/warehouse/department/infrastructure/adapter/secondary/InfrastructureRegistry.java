@@ -1,7 +1,5 @@
-package com.warehouse.department.domain.registry;
+package com.warehouse.department.infrastructure.adapter.secondary;
 
-import com.warehouse.department.domain.service.AuthenticationService;
-import com.warehouse.department.domain.service.DepartmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -11,22 +9,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 
-@Component("department.domainRegistry")
-public final class DomainRegistry implements ApplicationEventPublisherAware, ApplicationContextAware {
+@Component("department.infrastructureRegistry")
+public final class InfrastructureRegistry implements ApplicationEventPublisherAware, ApplicationContextAware {
 
-    private static final Logger log = LoggerFactory.getLogger(DomainRegistry.class);
+    private static final Logger log = LoggerFactory.getLogger(InfrastructureRegistry.class);
 
     private static volatile ApplicationEventPublisher eventPublisher;
 
     private static ApplicationContext context;
-
-    public static AuthenticationService authenticationService() {
-        return context.getBean(AuthenticationService.class);
-    }
-
-    public static DepartmentService departmentService() {
-        return context.getBean(DepartmentService.class);
-    }
 
     public static synchronized ApplicationEventPublisher eventPublisher() {
         return eventPublisher;
@@ -34,10 +24,10 @@ public final class DomainRegistry implements ApplicationEventPublisherAware, App
 
     @Override
     public void setApplicationEventPublisher(final ApplicationEventPublisher applicationEventPublisher) {
-        if (DomainRegistry.eventPublisher == null) {
-            synchronized (DomainRegistry.class) {
-                if (DomainRegistry.eventPublisher == null) {
-                    DomainRegistry.eventPublisher = applicationEventPublisher;
+        if (InfrastructureRegistry.eventPublisher == null) {
+            synchronized (InfrastructureRegistry.class) {
+                if (InfrastructureRegistry.eventPublisher == null) {
+                    InfrastructureRegistry.eventPublisher = applicationEventPublisher;
                     log.info("ApplicationEventPublisher initialized in DomainRegistry");
                 }
             }
@@ -45,7 +35,7 @@ public final class DomainRegistry implements ApplicationEventPublisherAware, App
     }
 
     public static <T> void publish(final T event) {
-        final ApplicationEventPublisher publisher = DomainRegistry.eventPublisher;
+        final ApplicationEventPublisher publisher = InfrastructureRegistry.eventPublisher;
         if (publisher == null) {
             throw new IllegalStateException("ApplicationEventPublisher not initialized yet");
         }

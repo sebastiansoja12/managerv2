@@ -6,7 +6,10 @@ import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
+import com.warehouse.department.domain.vo.TaxId;
+import org.springframework.stereotype.Service;
 
+@Service("department.departmentService")
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
@@ -33,9 +36,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public void changeIdentificationNumber(final DepartmentCode departmentCode, final String newIdentificationNumber) {
+    public void changeTaxId(final DepartmentCode departmentCode, final TaxId newTaxId) {
         final Department department = this.departmentRepository.findByCode(departmentCode);
-        department.changeIdentificationNumber(newIdentificationNumber);
+        department.changeTaxId(newTaxId);
         this.departmentRepository.createOrUpdate(department);
     }
 
@@ -57,6 +60,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     public void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType) {
         final Department department = this.departmentRepository.findByCode(departmentCode);
         department.changeDepartmentType(departmentType);
+        this.departmentRepository.createOrUpdate(department);
+    }
+
+    @Override
+    public void changeAdminUser(final DepartmentCode departmentCode, final UserId userId) {
+        final Department department = this.departmentRepository.findByCode(departmentCode);
+        department.changeAdminUserId(userId);
         this.departmentRepository.createOrUpdate(department);
     }
 }

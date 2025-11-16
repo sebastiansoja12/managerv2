@@ -55,6 +55,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void removePermission(final UserId userId, final String permission) {
+        final User user = this.userRepository.findById(userId);
+        user.removePermission(permission);
+        this.userRepository.createOrUpdate(user);
+    }
+
+    @Override
     public User findUserById(final UserId userId) {
         return this.userRepository.findById(userId);
     }
