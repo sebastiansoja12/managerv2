@@ -5,15 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>warehouse</artifactId>
+        <artifactId>CrossLogistics</artifactId>
         <version>2025.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>CrossLogistics</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>CrossLogisticsCore</module>
-    </modules>
+    <artifactId>CrossLogisticsCore</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
