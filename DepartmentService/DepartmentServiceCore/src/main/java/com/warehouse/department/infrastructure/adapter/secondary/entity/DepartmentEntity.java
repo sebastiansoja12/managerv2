@@ -3,12 +3,14 @@ package com.warehouse.department.infrastructure.adapter.secondary.entity;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.time.Instant;
 
 
 @Entity(name = "department.DepartmentEntity")
 @Table(name = "department")
+@Audited
 public class DepartmentEntity {
 
     @EmbeddedId
