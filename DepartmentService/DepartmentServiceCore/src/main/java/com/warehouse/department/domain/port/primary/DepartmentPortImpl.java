@@ -42,7 +42,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
-        return this.departmentRepository.findByCode(departmentCode);
+        return this.departmentRepository.findByDepartmentCode(departmentCode);
     }
 
     @Override
