@@ -128,7 +128,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     public void changeAdminUser(final DepartmentCode departmentCode, final UserId userId) {
-
+        this.departmentService.changeAdminUser(departmentCode, userId);
     }
 
     private void validateAddress(final Address address) {
