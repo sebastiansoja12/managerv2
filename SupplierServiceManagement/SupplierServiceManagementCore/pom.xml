@@ -5,15 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>warehouse</artifactId>
+        <artifactId>SupplierServiceManagement</artifactId>
         <version>2025.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>SupplierServiceManagement</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>SupplierServiceManagementCore</module>
-    </modules>
+    <artifactId>SupplierServiceManagementCore</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
