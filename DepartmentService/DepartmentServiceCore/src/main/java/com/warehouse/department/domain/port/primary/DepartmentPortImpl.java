@@ -131,6 +131,13 @@ public class DepartmentPortImpl implements DepartmentPort {
         this.departmentService.changeAdminUser(departmentCode, userId);
     }
 
+    @Override
+    public void changeStatus(final ChangeDepartmentStatusRequest request) {
+        final DepartmentCode departmentCode = request.departmentCode();
+        final Department.Status status = Department.Status.valueOf(request.status());
+        this.departmentService.changeStatus(departmentCode, status);
+    }
+
     private void validateAddress(final Address address) {
         address.validate();
     }

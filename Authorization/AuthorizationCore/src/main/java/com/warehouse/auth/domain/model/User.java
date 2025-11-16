@@ -291,8 +291,11 @@ public class User {
         markAsModified();
     }
 
-    private void markAsDeleted() {
+    public void markAsDeleted() {
         this.deleted = true;
+        this.apiKey = null;
+        getPermissions().clear();
+        markAsModified();
     }
 
     private void markAsModified() {

@@ -275,6 +275,7 @@ public class Department {
 
     public void markAsDeleted() {
         this.status = Status.DELETED;
+        this.adminUserId = null;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
         DomainRegistry.eventPublisher().publishEvent(new DepartmentDeleted(this.snapshot(), Instant.now()));

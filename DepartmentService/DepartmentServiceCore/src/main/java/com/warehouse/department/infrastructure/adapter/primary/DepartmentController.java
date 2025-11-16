@@ -7,6 +7,7 @@ import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.vo.*;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.ChangeDepartmentStatusApi;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.IdentificationNumberChangeApiRequest;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateAddressApiRequest;
@@ -90,6 +91,16 @@ public class DepartmentController {
         final IdentificationNumberChangeRequest request = RequestMapper.map(identificationNumberChangeRequest);
         final IdentificationNumberChangeResponse response = this.departmentPort.changeIdentificationNumber(request);
         return ResponseEntity.ok(ResponseMapper.map(response));
+    }
+
+    @PutMapping("/statuses")
+    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    public ResponseEntity<?> changeDepartmentStatus(
+            @RequestBody final ChangeDepartmentStatusApi departmentStatusRequest) {
+		final ChangeDepartmentStatusRequest request = new ChangeDepartmentStatusRequest(
+				new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status());
+        this.departmentPort.changeStatus(request);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{value}")

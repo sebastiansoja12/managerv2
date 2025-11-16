@@ -76,6 +76,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         switch (status) {
             case ARCHIVED -> department.markAsArchived();
             case SUSPENDED -> department.markAsSuspended();
+            case DELETED -> department.markAsDeleted();
             default -> throw new IllegalArgumentException("Unknown status: " + status);
         }
         this.departmentRepository.createOrUpdate(department);

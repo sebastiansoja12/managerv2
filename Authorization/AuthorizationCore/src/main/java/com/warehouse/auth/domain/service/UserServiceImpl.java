@@ -5,8 +5,11 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserResponse;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -64,5 +67,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(final UserId userId) {
         return this.userRepository.findById(userId);
+    }
+
+    @Override
+    public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
+        return this.userRepository.findAllActiveUsersByDepartmentCode(departmentCode);
+    }
+
+    @Override
+    public void deleteDataForUser(final UserId userId) {
+        final User user = this.userRepository.findById(userId);
+        user.markAsDeleted();
+        this.userRepository.createOrUpdate(user);
     }
 }

@@ -25,4 +25,6 @@ public interface DepartmentPort {
     void changeDepartmentType(final DepartmentCode departmentCodeValue, final DepartmentType departmentType);
 
     void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
+
+    void changeStatus(final ChangeDepartmentStatusRequest request);
 }
