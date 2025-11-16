@@ -13,7 +13,6 @@ public record DepartmentSnapshot(
         String telephoneNumber,
         String openingHours,
         String email,
-        Boolean active,
         DepartmentType departmentType,
         Department.Status status,
         Instant createdAt,

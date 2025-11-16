@@ -64,7 +64,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 			final Department department = new Department(departmentCode, departmentCreate.getCity(),
 					departmentCreate.getStreet(), departmentCreate.getPostalCode(),
 					new TaxId(departmentCreate.getTaxId()), departmentCreate.getTelephoneNumber(),
-					departmentCreate.getOpeningHours(), departmentCreate.getEmail(), true,
+					departmentCreate.getOpeningHours(), departmentCreate.getEmail(),
 					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
             this.departmentService.createDepartment(department);
 

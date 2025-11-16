@@ -28,8 +28,6 @@ public class Department {
     
     private String email;
 
-    private Boolean active;
-
     private DepartmentType departmentType;
 
     private Department.Status status;
@@ -54,7 +52,6 @@ public class Department {
             final String telephoneNumber,
             final String openingHours,
             final String email,
-            final Boolean active,
             final DepartmentType departmentType,
             final Status status,
             final Instant createdAt,
@@ -69,7 +66,6 @@ public class Department {
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.email = email;
-        this.active = active;
         this.departmentType = departmentType;
         this.status = status;
         this.createdAt = createdAt;
@@ -88,7 +84,6 @@ public class Department {
             final String telephoneNumber,
             final String openingHours,
             final String email,
-            final Boolean active,
             final CountryCode countryCode,
             final DepartmentType departmentType
     ) {
@@ -98,7 +93,6 @@ public class Department {
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.email = email;
-        this.active = active;
         this.departmentType = departmentType;
         this.status = Status.ACTIVE;
         this.createdAt = Instant.now();
@@ -113,7 +107,7 @@ public class Department {
 
 
     public DepartmentSnapshot snapshot() {
-		return new DepartmentSnapshot(departmentCode, address, taxId, telephoneNumber, openingHours, email, active,
+		return new DepartmentSnapshot(departmentCode, address, taxId, telephoneNumber, openingHours, email,
 				departmentType, status, createdAt, updatedAt, adminUserId, createdBy, lastModifiedBy);
     }
 
@@ -167,14 +161,6 @@ public class Department {
 
     public void setOpeningHours(String openingHours) {
         this.openingHours = openingHours;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(final Boolean active) {
-        this.active = active;
     }
 
     public CountryCode getCountryCode() {
@@ -268,7 +254,6 @@ public class Department {
             throw new IllegalStateException("Department cannot be activated because it is deleted");
         }
         this.status = Status.ACTIVE;
-        this.active = true;
         this.lastModifiedBy = modifiedBy;
         markAsModified();
         DomainRegistry.eventPublisher().publishEvent(new DepartmentActivated(this.snapshot(), Instant.now()));
@@ -276,7 +261,6 @@ public class Department {
 
     public void deactivate(final UserId modifiedBy) {
         this.status = Status.INACTIVE;
-        this.active = false;
         this.lastModifiedBy = modifiedBy;
         markAsModified();
         DomainRegistry.eventPublisher().publishEvent(new DepartmentDeactivated(this.snapshot(), Instant.now()));
@@ -284,22 +268,23 @@ public class Department {
 
     public void markAsArchived() {
         this.status = Status.ARCHIVED;
-        this.lastModifiedBy = lastModifiedBy;
+        this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
         DomainRegistry.eventPublisher().publishEvent(new DepartmentArchived(this.snapshot(), Instant.now()));
     }
 
     public void markAsDeleted() {
         this.status = Status.DELETED;
-        this.lastModifiedBy = lastModifiedBy;
+        this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
         DomainRegistry.eventPublisher().publishEvent(new DepartmentDeleted(this.snapshot(), Instant.now()));
     }
 
     public void markAsSuspended() {
         this.status = Status.SUSPENDED;
-        this.lastModifiedBy = lastModifiedBy;
+        this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentSuspended(this.snapshot(), Instant.now()));
     }
 
     public void changeDepartmentType(final DepartmentType departmentType) {

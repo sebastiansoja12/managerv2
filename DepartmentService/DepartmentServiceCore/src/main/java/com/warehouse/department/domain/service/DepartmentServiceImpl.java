@@ -69,4 +69,15 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.changeAdminUserId(userId);
         this.departmentRepository.createOrUpdate(department);
     }
+
+    @Override
+    public void changeStatus(final DepartmentCode departmentCode, final Department.Status status) {
+        final Department department = this.departmentRepository.findByCode(departmentCode);
+        switch (status) {
+            case ARCHIVED -> department.markAsArchived();
+            case SUSPENDED -> department.markAsSuspended();
+            default -> throw new IllegalArgumentException("Unknown status: " + status);
+        }
+        this.departmentRepository.createOrUpdate(department);
+    }
 }

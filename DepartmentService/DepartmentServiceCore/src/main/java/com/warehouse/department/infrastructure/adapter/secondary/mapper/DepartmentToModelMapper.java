@@ -15,11 +15,12 @@ public abstract class DepartmentToModelMapper {
             return null;
         } else {
             return new Department(new DepartmentCode(department.getDepartmentCode().getValue()),
-                    map(department.getDepartmentAddress()), new TaxId(department.getTaxId().value()),
-                    department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(), department.isActive(),
-                    DepartmentType.valueOf(department.getDepartmentType().name()), Department.Status.valueOf(department.getStatus().name()),
-					department.getCreatedAt(), department.getUpdatedAt(), department.getAdminUserId(),
-					department.getCreatedBy(), department.getLastModifiedBy());
+					map(department.getDepartmentAddress()), new TaxId(department.getTaxId().value()),
+					department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
+					DepartmentType.valueOf(department.getDepartmentType().name()),
+					Department.Status.valueOf(department.getStatus().name()), department.getCreatedAt(),
+					department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
+					department.getLastModifiedBy());
         }
     }
 

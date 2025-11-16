@@ -37,9 +37,6 @@ public class DepartmentEntity {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(name = "active", nullable = false)
-    private Boolean active;
-
     @Column(name = "department_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private DepartmentType departmentType;
@@ -75,7 +72,6 @@ public class DepartmentEntity {
                             final String telephoneNumber,
                             final String openingHours,
                             final String email,
-                            final Boolean active,
                             final DepartmentType departmentType,
                             final Status status,
                             final Instant createdAt,
@@ -89,7 +85,6 @@ public class DepartmentEntity {
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
         this.email = email;
-        this.active = active;
         this.departmentType = departmentType;
         this.status = status;
         this.createdAt = createdAt;
@@ -97,10 +92,6 @@ public class DepartmentEntity {
         this.adminUserId = adminUserId;
         this.createdBy = createdBy;
         this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public Boolean isActive() {
-        return active;
     }
 
     public DepartmentCode getDepartmentCode() {

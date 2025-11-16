@@ -22,7 +22,7 @@ public abstract class ResponseMapper {
     public static DepartmentApi map(final Department department) {
         final DepartmentCodeApi departmentCode = new DepartmentCodeApi(department.getDepartmentCode().getValue());
 		return new DepartmentApi(departmentCode, map(department.getAddress()), department.getTaxId().value(),
-				department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(), department.getActive(),
+				department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
                 department.getDepartmentType().name(), department.getStatus().name(), department.getCreatedAt(), department.getUpdatedAt());
     }
 

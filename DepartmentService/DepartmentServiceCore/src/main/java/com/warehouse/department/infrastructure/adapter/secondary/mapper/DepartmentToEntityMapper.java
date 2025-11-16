@@ -12,7 +12,7 @@ public abstract class DepartmentToEntityMapper {
 	public static DepartmentEntity map(final Department department) {
 		return new DepartmentEntity(new DepartmentCode(department.getDepartmentCode().getValue()),
 				map(department.getAddress()), new TaxId(department.getTaxId().value()), department.getTelephoneNumber(),
-				department.getOpeningHours(), department.getEmail(), department.getActive(),
+				department.getOpeningHours(), department.getEmail(),
 				DepartmentEntity.DepartmentType.valueOf(department.getDepartmentType().name()),
 				DepartmentEntity.Status.valueOf(department.getStatus().name()), department.getCreatedAt(),
 				department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),

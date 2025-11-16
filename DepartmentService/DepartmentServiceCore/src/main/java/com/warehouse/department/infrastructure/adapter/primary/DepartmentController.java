@@ -38,7 +38,7 @@ public class DepartmentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN_CREATE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
 		final Result result = this.departmentRequestValidator.validateBody(departmentCreateApiRequest);
 
@@ -57,7 +57,7 @@ public class DepartmentController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> updateAddress(@RequestBody final UpdateAddressApiRequest updateAddressApiRequest) {
         final UpdateAddressRequest request = RequestMapper.map(updateAddressApiRequest);
         this.departmentPort.changeAddress(request);
@@ -65,7 +65,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/active-departments")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> updateDepartmentActiveStatus(@RequestParam final Boolean active,
                                                           @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
@@ -74,7 +74,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/department-type")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> changeDepartmentType(@RequestParam final String departmentType,
                                                   @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
@@ -84,7 +84,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/identification-numbers")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> updateIdentificationNumber(
 			@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
         final IdentificationNumberChangeRequest request = RequestMapper.map(identificationNumberChangeRequest);

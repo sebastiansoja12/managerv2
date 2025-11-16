@@ -23,4 +23,6 @@ public interface DepartmentService {
     void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType);
 
     void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
+
+    void changeStatus(final DepartmentCode departmentCode, final Department.Status status);
 }

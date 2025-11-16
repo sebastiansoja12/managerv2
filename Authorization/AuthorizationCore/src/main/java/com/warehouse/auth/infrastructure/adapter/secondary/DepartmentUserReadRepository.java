@@ -9,7 +9,7 @@ public interface DepartmentUserReadRepository extends JpaRepository<DepartmentEn
 	@Query("""
 			    SELECT CASE WHEN COUNT(d) > 0 THEN TRUE ELSE FALSE END
 			    FROM user.DepartmentEntity d
-			    WHERE d.departmentCode = :departmentCode AND d.active = true
+			    WHERE d.departmentCode = :departmentCode AND d.status = 'ACTIVE'
 			""")
 	boolean existsByDepartmentCode(final String departmentCode);
 }
