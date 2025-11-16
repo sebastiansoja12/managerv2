@@ -9,10 +9,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity.Permission.*;
 
 @Data
 @Builder
@@ -119,69 +120,63 @@ public class UserEntity implements UserDetails {
     @RequiredArgsConstructor
     public enum Permission {
 
-        ADMIN_READ("admin:read"),
-        ADMIN_UPDATE("admin:update"),
-        ADMIN_CREATE("admin:create"),
-        ADMIN_DELETE("admin:delete"),
-        MANAGER_READ("management:read"),
-        MANAGER_UPDATE("management:update"),
-        MANAGER_CREATE("management:create"),
-        MANAGER_DELETE("management:delete"),
+        ROLE_ADMIN_READ("admin:read"),
+        ROLE_ADMIN_UPDATE("admin:update"),
+        ROLE_ADMIN_CREATE("admin:create"),
+        ROLE_ADMIN_DELETE("admin:delete"),
 
-        SUPPLIER_READ("supplier:read"),
-        SUPPLIER_UPDATE("supplier:update"),
-        SUPPLIER_CREATE("supplier:create"),
-        SUPPLIER_DELETE("supplier:delete");
+        ROLE_MANAGER_READ("management:read"),
+        ROLE_MANAGER_UPDATE("management:update"),
+        ROLE_MANAGER_CREATE("management:create"),
+        ROLE_MANAGER_DELETE("management:delete"),
+
+        ROLE_SUPPLIER_READ("supplier:read"),
+        ROLE_SUPPLIER_UPDATE("supplier:update"),
+        ROLE_SUPPLIER_CREATE("supplier:create"),
+        ROLE_SUPPLIER_DELETE("supplier:delete");
 
         @Getter
         private final String permission;
     }
 
+
     @RequiredArgsConstructor
     public enum Role {
 
         USER(Collections.emptySet()),
+
         ADMIN(
                 Set.of(
-                        ADMIN_READ,
-                        ADMIN_UPDATE,
-                        ADMIN_DELETE,
-                        ADMIN_CREATE,
-                        MANAGER_READ,
-                        MANAGER_UPDATE,
-                        MANAGER_DELETE,
-                        MANAGER_CREATE
+                        Permission.ROLE_ADMIN_READ,
+                        Permission.ROLE_ADMIN_UPDATE,
+                        Permission.ROLE_ADMIN_DELETE,
+                        Permission.ROLE_ADMIN_CREATE,
+                        Permission.ROLE_MANAGER_READ,
+                        Permission.ROLE_MANAGER_UPDATE,
+                        Permission.ROLE_MANAGER_DELETE,
+                        Permission.ROLE_MANAGER_CREATE
                 )
         ),
+
         MANAGER(
                 Set.of(
-                        MANAGER_READ,
-                        MANAGER_UPDATE,
-                        MANAGER_DELETE,
-                        MANAGER_CREATE
+                        Permission.ROLE_MANAGER_READ,
+                        Permission.ROLE_MANAGER_UPDATE,
+                        Permission.ROLE_MANAGER_DELETE,
+                        Permission.ROLE_MANAGER_CREATE
                 )
         ),
 
         SUPPLIER(
                 Set.of(
-                        SUPPLIER_READ,
-                        SUPPLIER_UPDATE,
-                        SUPPLIER_DELETE,
-                        SUPPLIER_CREATE)
+                        Permission.ROLE_SUPPLIER_READ,
+                        Permission.ROLE_SUPPLIER_UPDATE,
+                        Permission.ROLE_SUPPLIER_DELETE,
+                        Permission.ROLE_SUPPLIER_CREATE
+                )
         );
 
         @Getter
         private final Set<Permission> permissions;
-
-        public Set<SimpleGrantedAuthority> getAuthorities() {
-            final Set<SimpleGrantedAuthority> authorities = new HashSet<>(this.getAuthorities());
-
-            if (permissions != null) {
-                authorities.addAll(
-                        permissions.stream().map(p -> new SimpleGrantedAuthority(p.name())).collect(Collectors.toSet()));
-            }
-
-            return authorities;
-        }
     }
 }
