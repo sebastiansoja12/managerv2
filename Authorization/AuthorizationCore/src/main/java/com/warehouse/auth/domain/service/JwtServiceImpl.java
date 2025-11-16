@@ -1,16 +1,8 @@
 package com.warehouse.auth.domain.service;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
-import com.warehouse.auth.infrastructure.adapter.secondary.enumeration.Role;
 import com.warehouse.commonassets.identificator.DepartmentCode;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,6 +10,12 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @AllArgsConstructor
 public class JwtServiceImpl implements JwtService {
@@ -46,7 +44,6 @@ public class JwtServiceImpl implements JwtService {
     public String generateToken(User user) {
         final Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("firstName", user.getFirstName());
-        claimsMap.put("role", user.getRole());
         claimsMap.put("username", user.getUsername());
         claimsMap.put("userId", user.getUserId().value());
         claimsMap.put("tenant", user.getDepartmentCode().getValue());
@@ -55,10 +52,9 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateToken(final String firstName, final String username, final Role role, final DepartmentCode departmentCode) {
+    public String generateToken(final String firstName, final String username, final User.Role role, final DepartmentCode departmentCode) {
         final Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("firstName", firstName);
-        claimsMap.put("role", role);
         claimsMap.put("username", username);
         claimsMap.put("tenant", departmentCode);
         final Long expiration = jwtProvider.getExpiration();

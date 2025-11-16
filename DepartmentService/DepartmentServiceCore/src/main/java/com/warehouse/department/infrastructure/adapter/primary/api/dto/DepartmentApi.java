@@ -4,11 +4,12 @@ import java.time.Instant;
 
 public record DepartmentApi(DepartmentCodeApi departmentCode,
                             AddressApi address,
-                            String nip,
+                            String taxId,
                             String telephoneNumber,
                             String openingHours,
-                            Boolean active,
+                            String email,
                             String departmentType,
+                            String status,
                             Instant createdAt,
                             Instant updatedAt) {
 }

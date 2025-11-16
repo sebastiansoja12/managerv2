@@ -1,12 +1,12 @@
 package com.warehouse.department.domain.port.primary;
 
-import java.util.List;
-
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
-import com.warehouse.department.domain.vo.DepartmentCode;
-import com.warehouse.department.domain.vo.DepartmentCreateResponse;
-import com.warehouse.department.domain.vo.UpdateAddressRequest;
+import com.warehouse.department.domain.vo.*;
+
+import java.util.List;
 
 public interface DepartmentPort {
 
@@ -14,9 +14,15 @@ public interface DepartmentPort {
 
     List<Department> findAll();
 
-    void addDepartments(List<Department> departments);
-
     DepartmentCreateResponse createDepartments(final DepartmentCreateRequest request);
 
+    IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeRequest request);
+
     void changeAddress(final UpdateAddressRequest request);
+
+    void changeDepartmentActive(final DepartmentCode departmentCodeValue, final Boolean active);
+
+    void changeDepartmentType(final DepartmentCode departmentCodeValue, final DepartmentType departmentType);
+
+    void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
 }

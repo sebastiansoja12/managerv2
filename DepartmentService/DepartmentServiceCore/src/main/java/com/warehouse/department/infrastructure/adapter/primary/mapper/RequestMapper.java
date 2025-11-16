@@ -1,18 +1,16 @@
 package com.warehouse.department.infrastructure.adapter.primary.mapper;
 
-import java.util.List;
-
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.DepartmentCreate;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
+import com.warehouse.department.domain.vo.IdentificationNumberChangeRequest;
 import com.warehouse.department.domain.vo.UpdateAddressRequest;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.AddressApi;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApi;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateAddressApiRequest;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.*;
+
+import java.util.List;
 
 public abstract class RequestMapper {
 
@@ -24,8 +22,8 @@ public abstract class RequestMapper {
 	private static List<DepartmentCreate> map(final List<DepartmentCreateApi> deps) {
 		return deps.stream()
 				.map(dep -> new DepartmentCreate(new DepartmentCode(dep.departmentCode().value()), dep.city(),
-						dep.street(), dep.country(), dep.postalCode(), dep.nip(), dep.telephoneNumber(),
-						dep.openingHours(), CountryCode.valueOf(dep.countryCode()),
+						dep.street(), dep.postalCode(), dep.nip(), dep.telephoneNumber(),
+						dep.openingHours(), dep.email(), CountryCode.valueOf(dep.countryCode()),
 						DepartmentType.valueOf(dep.departmentType())))
 				.toList();
 	}
@@ -35,6 +33,12 @@ public abstract class RequestMapper {
 	}
 
 	private static Address map(final AddressApi address) {
-		return new Address(address.city(), address.street(), address.country(), address.postalCode(), CountryCode.valueOf(address.countryCode()));
+		return new Address(address.city(), address.street(), address.postalCode(), CountryCode.valueOf(address.countryCode()));
 	}
+
+    public static IdentificationNumberChangeRequest map(final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
+		return new IdentificationNumberChangeRequest(
+				new DepartmentCode(identificationNumberChangeRequest.departmentCode().value()),
+				identificationNumberChangeRequest.identificationNumber());
+    }
 }

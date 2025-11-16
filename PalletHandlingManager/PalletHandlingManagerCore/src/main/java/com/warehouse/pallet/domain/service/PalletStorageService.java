@@ -13,6 +13,8 @@ import com.warehouse.pallet.domain.model.Weight;
 import com.warehouse.pallet.domain.vo.Dimension;
 import com.warehouse.pallet.domain.vo.SealNumber;
 
+import java.math.BigDecimal;
+
 public interface PalletStorageService {
     PalletId nextPalletId();
     void createEmptyPallet(final PalletId palletId);
@@ -28,7 +30,7 @@ public interface PalletStorageService {
     void changePalletHandlingPriority(final PalletId palletId, final PalletHandlingPriority palletHandlingPriority);
     void changeSealNumber(final PalletId palletId, final SealNumber sealNumber);
     void changeRefrigerated(final PalletId palletId, final Boolean refrigerated);
-    void changeMaxPalletWeight(final PalletId palletId, final Double maxPalletWeight);
+    void changeMaxPalletWeight(final PalletId palletId, final BigDecimal maxPalletWeight);
     void changeWeight(final PalletId palletId, final Weight weight);
 
     Pallet find(final PalletId palletId);

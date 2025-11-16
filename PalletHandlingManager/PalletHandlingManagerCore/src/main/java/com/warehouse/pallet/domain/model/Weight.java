@@ -2,11 +2,13 @@ package com.warehouse.pallet.domain.model;
 
 import com.warehouse.pallet.domain.enumeration.Unit;
 
+import java.math.BigDecimal;
+
 public class Weight {
-    private Double value;
+    private BigDecimal value;
     private Unit unit;
 
-    public Weight(final Double value, final Unit unit) {
+    public Weight(final BigDecimal value, final Unit unit) {
         this.value = value;
         this.unit = unit;
     }
@@ -19,7 +21,11 @@ public class Weight {
         this.unit = unit;
     }
 
-    public void addWeight(final Double value) {
-        this.value += value;
+    public void setValue(final BigDecimal value) {
+        this.value = value;
+    }
+
+    public BigDecimal getValue() {
+        return value;
     }
 }

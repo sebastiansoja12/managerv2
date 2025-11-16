@@ -1,14 +1,9 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import java.time.LocalDateTime;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
-
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
@@ -16,6 +11,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -24,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "shipment")
 @Entity(name = "shipment.ShipmentEntity")
 @EntityListeners(AuditingEntityListener.class)
+@Audited
 public class ShipmentEntity {
 
     @Column(name = "shipment_id")

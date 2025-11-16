@@ -10,6 +10,10 @@
     </parent>
 
     <artifactId>SupplierServiceManagement</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>SupplierServiceManagementCore</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

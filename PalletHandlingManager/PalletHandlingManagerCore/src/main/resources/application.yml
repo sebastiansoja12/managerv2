@@ -1,0 +1,23 @@
+server:
+  port: 8071
+
+spring:
+  modulith:
+    packages: com.warehouse.pallet
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/warehouse
+      # host: localhost
+      # port: 27017
+      # database: your-database
+      # authentication-database: admin
+      # ssl: false
+      # uri: mongodb+srv://<username>:<password>@cluster.mongodb.net/<database>
+      # connection-minimum-idle: 10
+      # connection-pool-size: 100
+      # auto-index-creation: true  # U?ywaj ostro?nie w produkcji
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: TRACE

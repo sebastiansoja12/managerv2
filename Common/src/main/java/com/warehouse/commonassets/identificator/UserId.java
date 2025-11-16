@@ -25,4 +25,9 @@ public record UserId(Long value) {
 	public int hashCode() {
 		return Objects.hashCode(value);
 	}
+
+    // TODO
+    public boolean isAdmin() {
+        return this.value > 1000;
+    }
 }

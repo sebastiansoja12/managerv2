@@ -1,15 +1,16 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import java.time.Instant;
-
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.model.Signature;
-
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "signature")
+@Audited
 public class SignatureEntity {
 
     @Column(name = "signer_name", nullable = false)

@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.warehouse.auth.infrastructure.adapter.secondary.AuthenticationReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.UserReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
 import lombok.AllArgsConstructor;
@@ -21,12 +21,12 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final AuthenticationReadRepository authenticationReadRepository;
+    private final UserReadRepository userReadRepository;
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) {
-        final Optional<UserEntity> userOptional = authenticationReadRepository.
+        final Optional<UserEntity> userOptional = userReadRepository.
                 findByUsername(username);
 
         final UserEntity user = userOptional

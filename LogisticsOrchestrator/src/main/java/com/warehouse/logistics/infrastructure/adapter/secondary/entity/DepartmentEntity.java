@@ -28,9 +28,6 @@ public class DepartmentEntity {
     @Column(name = "street", nullable = false)
     private String street;
 
-    @Column(name = "country", nullable = false)
-    private String country;
-
     @Column(name = "active", nullable = false)
     private Boolean active;
 

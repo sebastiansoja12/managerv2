@@ -10,6 +10,10 @@
     </parent>
 
     <artifactId>CrossLogistics</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>CrossLogisticsCore</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

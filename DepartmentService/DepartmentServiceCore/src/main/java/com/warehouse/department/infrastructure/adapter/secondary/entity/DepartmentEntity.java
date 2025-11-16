@@ -1,16 +1,16 @@
 package com.warehouse.department.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
-
-import com.warehouse.department.infrastructure.adapter.secondary.enumeration.DepartmentType;
+import com.warehouse.commonassets.identificator.UserId;
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.time.Instant;
 
 
 @Entity(name = "department.DepartmentEntity")
 @Table(name = "department")
+@Audited
 public class DepartmentEntity {
 
     @EmbeddedId
@@ -18,20 +18,17 @@ public class DepartmentEntity {
     @AttributeOverride(name = "value", column = @Column(name = "department_code"))
     private DepartmentCode departmentCode;
 
-    @Column(name = "city", nullable = false)
-    private String city;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "city", column = @Column(name = "city", nullable = false)),
+            @AttributeOverride(name = "street", column = @Column(name = "street", nullable = false)),
+            @AttributeOverride(name = "postalCode", column = @Column(name = "postal_code", nullable = false))
+    })
+    private DepartmentAddress departmentAddress;
 
-    @Column(name = "street", nullable = false)
-    private String street;
-
-    @Column(name = "country", nullable = false)
-    private String country;
-
-    @Column(name = "postal_code", nullable = false)
-    private String postalCode;
-
-    @Column(name = "nip", nullable = false)
-    private String nip;
+    @Column(name = "tax_id", nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "tax_id"))
+    private TaxId taxId;
 
     @Column(name = "telephone_number", nullable = false)
     private String telephoneNumber;
@@ -39,16 +36,16 @@ public class DepartmentEntity {
     @Column(name = "opening_hours", nullable = false)
     private String openingHours;
 
-    @Column(name = "active", nullable = false)
-    private Boolean active;
-
-    @Column(name = "country_code", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private CountryCode countryCode;
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
 
     @Column(name = "department_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private DepartmentType departmentType;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -56,71 +53,59 @@ public class DepartmentEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "admin_user_id")
+    @AttributeOverride(name = "value", column = @Column(name = "admin_user_id"))
+    private UserId adminUserId;
+
+    @Column(name = "created_by", nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "created_by"))
+    private UserId createdBy;
+
+    @Column(name = "last_modified_by")
+    @AttributeOverride(name = "value", column = @Column(name = "last_modified_by"))
+    private UserId lastModifiedBy;
+
     public DepartmentEntity() {
     }
 
     public DepartmentEntity(final DepartmentCode departmentCode,
-                            final String city,
-                            final String street,
-                            final String country,
-                            final String postalCode,
-                            final String nip,
+                            final DepartmentAddress departmentAddress,
+                            final TaxId taxId,
                             final String telephoneNumber,
                             final String openingHours,
-                            final Boolean active,
-                            final CountryCode countryCode,
+                            final String email,
                             final DepartmentType departmentType,
+                            final Status status,
                             final Instant createdAt,
-                            final Instant updatedAt) {
+                            final Instant updatedAt,
+                            final UserId adminUserId,
+                            final UserId createdBy,
+                            final UserId lastModifiedBy) {
         this.departmentCode = departmentCode;
-        this.city = city;
-        this.street = street;
-        this.country = country;
-        this.postalCode = postalCode;
-        this.nip = nip;
+        this.departmentAddress = departmentAddress;
+        this.taxId = taxId;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
-        this.active = active;
-        this.countryCode = countryCode;
+        this.email = email;
         this.departmentType = departmentType;
+        this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public Boolean isActive() {
-        return active;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public CountryCode getCountryCode() {
-        return countryCode;
+        this.adminUserId = adminUserId;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
     }
 
-    public String getNip() {
-        return nip;
+    public TaxId getTaxId() {
+        return taxId;
     }
 
     public String getOpeningHours() {
         return openingHours;
-    }
-
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public String getStreet() {
-        return street;
     }
 
     public String getTelephoneNumber() {
@@ -137,5 +122,48 @@ public class DepartmentEntity {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public DepartmentAddress getDepartmentAddress() {
+        return departmentAddress;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public UserId getAdminUserId() {
+        return adminUserId;
+    }
+
+    public UserId getCreatedBy() {
+        return createdBy;
+    }
+
+    public UserId getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public enum DepartmentType {
+        HEADQUARTERS,
+        BRANCH,
+        WAREHOUSE,
+        SALES_OFFICE,
+        SERVICE_CENTER,
+        DISTRIBUTION,
+        SORTING_FACILITY,
+        REMOTE_OFFICE
+    }
+
+    public enum Status {
+        ACTIVE,
+        INACTIVE,
+        ARCHIVED,
+        DELETED,
+        SUSPENDED
     }
 }

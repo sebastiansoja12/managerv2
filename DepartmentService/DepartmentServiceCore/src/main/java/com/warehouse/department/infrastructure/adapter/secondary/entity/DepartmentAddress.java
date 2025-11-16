@@ -1,37 +1,25 @@
 package com.warehouse.department.infrastructure.adapter.secondary.entity;
 
 
-import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.CountryCode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
-public class DepartmentAddress {
-    private final String city;
-    private final String street;
-    private final Country country;
-    private final String postalCode;
+@Embeddable
+public record DepartmentAddress(
 
-    public DepartmentAddress(final String city,
-                             final Country country,
-                             final String postalCode,
-                             final String street) {
-        this.city = city;
-        this.country = country;
-        this.postalCode = postalCode;
-        this.street = street;
-    }
+		@Column(name = "city") String city,
 
-    public String getCity() {
-        return city;
-    }
+		@Column(name = "postal_code") String postalCode,
 
-    public Country getCountry() {
-        return country;
-    }
+		@Column(name = "street") String street,
 
-    public String getPostalCode() {
-        return postalCode;
-    }
+		@Enumerated(EnumType.STRING) @Column(name = "country_code") CountryCode countryCode
 
-    public String getStreet() {
-        return street;
-    }
+) {
+	public DepartmentAddress() {
+		this(null, null, null, null);
+	}
 }

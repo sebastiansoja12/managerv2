@@ -13,19 +13,19 @@ public class DepartmentEntity {
     @Column(name = "department_code", nullable = false, unique = true)
     private String departmentCode;
 
-    @Column(name = "active", nullable = false)
-    private boolean active;
+    @Column(name = "status", nullable = false)
+    private String status;
 
     public DepartmentEntity() {
     }
 
-    public DepartmentEntity(final boolean active, final String departmentCode) {
-        this.active = active;
+    public DepartmentEntity(final String status, final String departmentCode) {
+        this.status = status;
         this.departmentCode = departmentCode;
     }
 
     public boolean isActive() {
-        return active;
+        return status.equals("ACTIVE");
     }
 
     public String getDepartmentCode() {

@@ -1,12 +1,11 @@
 package com.warehouse.routetracker.configuration;
 
-import java.util.Arrays;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Arrays;
 
 @Component
 @Slf4j
@@ -23,7 +22,7 @@ public class BeanLogger implements CommandLineRunner {
         log.info("Application: {} starting", applicationContext.getApplicationName());
         final String[] beanNames = applicationContext.getBeanDefinitionNames();
         Arrays.stream(beanNames).forEach(beanName -> log.info("Bean initialized: {}", beanName));
-        log.warn("Successfully initialized {} beans", applicationContext.getBeanDefinitionCount());
+        log.info("Successfully initialized {} beans", applicationContext.getBeanDefinitionCount());
     }
 }
 

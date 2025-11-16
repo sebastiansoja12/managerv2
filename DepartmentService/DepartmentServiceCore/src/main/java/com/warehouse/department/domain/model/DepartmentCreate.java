@@ -11,15 +11,15 @@ public class DepartmentCreate {
 
     private String street;
 
-    private String country;
-
     private String postalCode;
 
-    private String nip;
+    private String taxId;
 
     private String telephoneNumber;
 
     private String openingHours;
+
+    private String email;
 
     private CountryCode countryCode;
     
@@ -28,21 +28,21 @@ public class DepartmentCreate {
     public DepartmentCreate(final DepartmentCode departmentCode,
                             final String city,
                             final String street,
-                            final String country,
                             final String postalCode,
-                            final String nip,
+                            final String taxId,
                             final String telephoneNumber,
                             final String openingHours,
+                            final String email,
                             final CountryCode countryCode,
                             final DepartmentType departmentType) {
         this.departmentCode = departmentCode;
         this.city = city;
         this.street = street;
-        this.country = country;
         this.postalCode = postalCode;
-        this.nip = nip;
+        this.taxId = taxId;
         this.telephoneNumber = telephoneNumber;
         this.openingHours = openingHours;
+        this.email = email;
         this.countryCode = countryCode;
         this.departmentType = departmentType;
     }
@@ -53,14 +53,6 @@ public class DepartmentCreate {
 
     public void setCity(final String city) {
         this.city = city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(final String country) {
-        this.country = country;
     }
 
     public CountryCode getCountryCode() {
@@ -79,12 +71,12 @@ public class DepartmentCreate {
         this.departmentCode = departmentCode;
     }
 
-    public String getNip() {
-        return nip;
+    public String getTaxId() {
+        return taxId;
     }
 
-    public void setNip(final String nip) {
-        this.nip = nip;
+    public void setTaxId(final String taxId) {
+        this.taxId = taxId;
     }
 
     public String getOpeningHours() {
@@ -125,5 +117,13 @@ public class DepartmentCreate {
 
     public void setDepartmentType(final DepartmentType departmentType) {
         this.departmentType = departmentType;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
     }
 }

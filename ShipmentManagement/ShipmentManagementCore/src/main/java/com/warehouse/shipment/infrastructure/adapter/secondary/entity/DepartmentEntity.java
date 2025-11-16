@@ -1,6 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import jakarta.persistence.*;
@@ -20,15 +19,8 @@ public class DepartmentEntity {
     @Column(name = "street", nullable = false)
     private String street;
 
-    @Column(name = "country", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Country country;
-
     @Column(name = "postal_code", nullable = false)
     private String postalCode;
-
-    @Column(name = "nip", nullable = false)
-    private String nip;
 
     @Column(name = "telephone_number", nullable = false)
     private String telephoneNumber;
@@ -46,14 +38,12 @@ public class DepartmentEntity {
     public DepartmentEntity() {
     }
 
-	public DepartmentEntity(final Boolean active, final String city, final Country country,
-			final DepartmentCode departmentCode, final String nip, final String openingHours, final String postalCode,
+	public DepartmentEntity(final Boolean active, final String city,
+			final DepartmentCode departmentCode, final String openingHours, final String postalCode,
 			final String street, final String telephoneNumber, final CountryCode countryCode) {
         this.active = active;
         this.city = city;
-        this.country = country;
         this.departmentCode = departmentCode;
-        this.nip = nip;
         this.openingHours = openingHours;
         this.postalCode = postalCode;
         this.street = street;
@@ -69,16 +59,8 @@ public class DepartmentEntity {
         return city;
     }
 
-    public Country getCountry() {
-        return country;
-    }
-
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
-    }
-
-    public String getNip() {
-        return nip;
     }
 
     public String getOpeningHours() {

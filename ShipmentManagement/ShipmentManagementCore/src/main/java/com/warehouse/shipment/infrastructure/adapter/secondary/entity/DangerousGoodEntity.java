@@ -1,7 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import java.util.List;
-
 import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
@@ -10,12 +8,15 @@ import com.warehouse.dangerousgood.domain.enumeration.Packaging;
 import com.warehouse.dangerousgood.domain.enumeration.StorageRequirement;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.vo.DangerousGoodId;
-
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
+
+import java.util.List;
 
 
 @Entity(name = "shipment.DangerousGoodEntity")
 @Table(name = "dangerous_good")
+@Audited
 public class DangerousGoodEntity {
 
 

@@ -3,7 +3,10 @@ package com.warehouse.auth.domain.service;
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 
+import com.warehouse.commonassets.identificator.UserId;
 import lombok.AllArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
@@ -13,5 +16,20 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public RefreshToken validateRefreshToken(String token) {
         return refreshTokenRepository.validateRefreshToken(token);
+    }
+
+    @Override
+    public void deleteRefreshToken(final UserId userId, final String token) {
+        refreshTokenRepository.delete(token);
+    }
+
+    @Override
+    public RefreshToken findTokenByUserId(final UserId userId) {
+        return refreshTokenRepository.findByUserId(userId);
+    }
+
+    @Override
+    public void delete(final LocalDateTime now) {
+        refreshTokenRepository.delete(now);
     }
 }
