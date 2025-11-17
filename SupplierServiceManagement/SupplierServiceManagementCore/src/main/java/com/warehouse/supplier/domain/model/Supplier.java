@@ -1,29 +1,51 @@
 package com.warehouse.supplier.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.warehouse.supplier.domain.enumeration.PackageType;
+import com.warehouse.supplier.domain.enumeration.SupplierStatus;
+import com.warehouse.supplier.domain.enumeration.UserStatus;
+import com.warehouse.supplier.domain.vo.*;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+import java.time.Instant;
+import java.util.Set;
+
+
 public class Supplier {
 
-    private String supplierCode;
+    private SupplierId supplierId;
+
+    private SupplierCode supplierCode;
 
     private String firstName;
 
     private String lastName;
 
-    private String telephone;
+    private String telephoneNumber;
 
-    private String departmentCode;
+    private DepartmentCode departmentCode;
 
-    private Boolean active;
+    private SupplierStatus status;
 
-    public void updateSupplierCode(String generate) {
-        this.supplierCode = supplierCode;
-    }
+    private UserStatus userStatus;
+
+    private VehicleId vehicleId;
+
+    private DeviceId deviceId;
+
+    private DangerousGoodCertification dangerousGoodCertification;
+
+    private DriverLicense driverLicense;
+
+    private DeliveryArea deliveryArea;
+
+    private Set<PackageType> supportedPackageTypes;
+
+    private String apiKey;
+
+    private Boolean termsAccepted;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+
 }
