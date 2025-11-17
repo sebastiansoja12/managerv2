@@ -138,6 +138,11 @@ public class DepartmentPortImpl implements DepartmentPort {
         this.departmentService.changeStatus(departmentCode, status);
     }
 
+    @Override
+    public void changeEmail(final DepartmentCode departmentCode, final String email) {
+        this.departmentService.changeEmail(departmentCode, email);
+    }
+
     private void validateAddress(final Address address) {
         address.validate();
     }

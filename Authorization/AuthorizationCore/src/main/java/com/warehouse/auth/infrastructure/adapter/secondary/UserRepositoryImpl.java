@@ -53,4 +53,9 @@ public class UserRepositoryImpl implements UserRepository {
                 .map(User::getUserId)
                 .toList();
     }
+
+    @Override
+    public User findByEmail(final String email) {
+        return repository.findByEmail(email).map(UserToModelMapper::map).orElse(null);
+    }
 }

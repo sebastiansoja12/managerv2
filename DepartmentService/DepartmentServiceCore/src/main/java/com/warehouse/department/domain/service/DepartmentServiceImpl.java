@@ -81,4 +81,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
         this.departmentRepository.createOrUpdate(department);
     }
+
+    @Override
+    public void changeEmail(final DepartmentCode departmentCode, final String email) {
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
+        department.changeEmail(email);
+        this.departmentRepository.createOrUpdate(department);
+    }
 }

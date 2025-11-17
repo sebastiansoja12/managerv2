@@ -1,11 +1,9 @@
 package com.warehouse.department.domain.listener;
 
+import com.warehouse.department.domain.event.*;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.warehouse.department.domain.event.DepartmentAdminChanged;
-import com.warehouse.department.domain.event.DepartmentCreated;
-import com.warehouse.department.domain.event.DepartmentDeleted;
 import com.warehouse.department.domain.port.secondary.UserClientServicePort;
 import com.warehouse.department.domain.service.DepartmentService;
 import com.warehouse.department.domain.vo.DepartmentSnapshot;
@@ -42,5 +40,11 @@ public class DepartmentDomainEventListener {
     public void handle(final DepartmentDeleted event) {
         final DepartmentSnapshot snapshot = event.getSnapshot();
         this.userClientServicePort.notifyUserDepartmentDeleted(snapshot);
+    }
+
+    @EventListener
+    public void handle(final DepartmentEmailChanged event) {
+        final DepartmentSnapshot snapshot = event.getSnapshot();
+        this.userClientServicePort.notifyUserDepartmentChanged(snapshot);
     }
 }

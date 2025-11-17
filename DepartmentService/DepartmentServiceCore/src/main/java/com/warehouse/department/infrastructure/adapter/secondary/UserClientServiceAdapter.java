@@ -1,5 +1,6 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
+import com.warehouse.auth.infrastructure.adapter.primary.event.DepartmentUserChanged;
 import com.warehouse.auth.infrastructure.adapter.primary.event.DepartmentUserDeleted;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.department.domain.port.secondary.UserClientServicePort;
@@ -14,5 +15,32 @@ public class UserClientServiceAdapter implements UserClientServicePort {
         log.info("Notifying user department deleted event for department {}", snapshot.departmentCode());
         InfrastructureRegistry.eventPublisher()
                 .publishEvent(new DepartmentUserDeleted(new DepartmentCode(snapshot.departmentCode().getValue())));
+    }
+
+    @Override
+    public void notifyUserDepartmentActivated(final DepartmentSnapshot snapshot) {
+
+    }
+
+    @Override
+    public void notifyUserDepartmentArchived(final DepartmentSnapshot snapshot) {
+
+    }
+
+    @Override
+    public void notifyUserDepartmentSuspended(final DepartmentSnapshot snapshot) {
+
+    }
+
+    @Override
+    public void notifyUserDepartmentChanged(final DepartmentSnapshot snapshot) {
+        log.info("Notifying user data changed for department: {}", snapshot.departmentCode());
+        InfrastructureRegistry.eventPublisher()
+                .publishEvent(new DepartmentUserChanged(
+                        new DepartmentCode(snapshot.departmentCode().getValue()),
+                        snapshot.adminUserId(),
+                        snapshot.telephoneNumber(),
+                        snapshot.email())
+                );
     }
 }

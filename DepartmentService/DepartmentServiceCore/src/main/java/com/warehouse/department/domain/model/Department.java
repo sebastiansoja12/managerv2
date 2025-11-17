@@ -307,4 +307,10 @@ public class Department {
         this.adminUserId = adminUserId;
         markAsModified();
     }
+
+    public void changeEmail(final String email) {
+        this.email = email;
+        markAsModified();
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentEmailChanged(this.snapshot(), Instant.now()));
+    }
 }

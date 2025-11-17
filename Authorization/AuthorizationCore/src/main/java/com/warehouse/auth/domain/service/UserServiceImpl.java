@@ -4,6 +4,7 @@ import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.vo.RegisterResponse;
+import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
@@ -70,6 +71,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findByEmail(final String email) {
+        return this.userRepository.findByEmail(email);
+    }
+
+    @Override
     public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
         return this.userRepository.findAllActiveUsersByDepartmentCode(departmentCode);
     }
@@ -78,6 +84,13 @@ public class UserServiceImpl implements UserService {
     public void deleteDataForUser(final UserId userId) {
         final User user = this.userRepository.findById(userId);
         user.markAsDeleted();
+        this.userRepository.createOrUpdate(user);
+    }
+
+    @Override
+    public void updateDefaultDepartmentUser(final UserDepartmentUpdateRequest request) {
+        final User user = this.userRepository.findById(request.userId());
+        user.updateUserInfo(request);
         this.userRepository.createOrUpdate(user);
     }
 }

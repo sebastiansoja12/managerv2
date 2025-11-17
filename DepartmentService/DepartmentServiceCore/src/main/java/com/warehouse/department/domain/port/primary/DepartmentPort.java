@@ -27,4 +27,6 @@ public interface DepartmentPort {
     void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
 
     void changeStatus(final ChangeDepartmentStatusRequest request);
+
+    void changeEmail(final DepartmentCode departmentCode, final String email);
 }

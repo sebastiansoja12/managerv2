@@ -6,6 +6,7 @@ import com.warehouse.auth.domain.event.UserFullNameChangedEvent;
 import com.warehouse.auth.domain.event.UserLoggedOutEvent;
 import com.warehouse.auth.domain.exception.UserDeletedException;
 import com.warehouse.auth.domain.registry.DomainRegistry;
+import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserSnapshot;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
@@ -309,6 +310,12 @@ public class User {
     public void markAsLoggedOut() {
         DomainRegistry.eventPublisher().publishEvent(new UserLoggedOutEvent(this.snapshot()));
         markAsModified();
+    }
+
+    public void updateUserInfo(final UserDepartmentUpdateRequest request) {
+        this.email = request.email();
+        markAsModified();
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(this.snapshot()));
     }
 
     public enum Permission {

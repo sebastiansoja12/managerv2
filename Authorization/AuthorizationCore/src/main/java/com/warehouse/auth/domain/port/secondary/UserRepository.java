@@ -18,4 +18,6 @@ public interface UserRepository {
     User findById(final UserId userId);
 
     List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode);
+
+    User findByEmail(final String email);
 }

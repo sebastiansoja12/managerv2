@@ -1,15 +1,19 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
 import com.warehouse.auth.domain.model.AdminCreateRequest;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
+import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.infrastructure.adapter.primary.event.AdminUserCommand;
+import com.warehouse.auth.infrastructure.adapter.primary.event.DepartmentUserChanged;
 import com.warehouse.auth.infrastructure.adapter.primary.event.DepartmentUserDeleted;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
@@ -27,12 +31,11 @@ public class AuthEventListener {
 
     @EventListener
     public void handle(final AdminUserCommand command) {
-        log.info("Admin user command: {}", command.toString());
         final AdminCreateRequest request = new AdminCreateRequest(command.getDepartmentCode(),
                 command.getEmail(), command.getTelephoneNumber());
         final UserId userId = this.authenticationPort.createAdminUser(request);
         command.getAdminCreatedId().accept(userId);
-        log.info("Admin user created");
+        log.info("Admin user created: {}", userId.getValue());
     }
 
     @EventListener
@@ -40,5 +43,14 @@ public class AuthEventListener {
         final DepartmentCode departmentCode = event.getDepartmentCode();
         this.userPort.deleteDataForDepartment(departmentCode);
         log.info("Department user deleted");
+    }
+
+    @EventListener
+    public void handle(final DepartmentUserChanged event) {
+        final DepartmentCode departmentCode = event.getDepartmentCode();
+		final UserDepartmentUpdateRequest request = new UserDepartmentUpdateRequest(departmentCode, event.getUserId(),
+				event.getTelephoneNumber(), event.getEmail());
+        this.userPort.changeAdminDepartmentInfo(request);
+        log.info("Department user updated");
     }
 }
