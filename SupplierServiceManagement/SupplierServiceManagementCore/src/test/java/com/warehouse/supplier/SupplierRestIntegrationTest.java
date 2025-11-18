@@ -4,7 +4,7 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.supplier.configuration.SupplierTestConfiguration;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.model.SupplierAddRequest;
+import com.warehouse.supplier.domain.model.SupplierCreateRequest;
 import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
@@ -58,7 +58,7 @@ public class SupplierRestIntegrationTest {
     @Test
     void shouldCreateSuppliers() {
         // given
-        final SupplierAddRequest request = buildSupplierAddRequest();
+        final SupplierCreateRequest request = buildSupplierAddRequest();
         // when
 		final List<SupplierAddResponse> supplierAddResponseList = supplyPort
 				.createMultipleSuppliers(List.of(request));
@@ -69,7 +69,7 @@ public class SupplierRestIntegrationTest {
     @Test
     void shouldCreateSuppliersWithGivenSupplierCode() {
         // given
-        final SupplierAddRequest request = SupplierAddRequest.builder()
+        final SupplierCreateRequest request = SupplierCreateRequest.builder()
                 .depotCode(depotCode)
                 .firstName(firstName)
                 .lastName(lastName)
@@ -160,8 +160,8 @@ public class SupplierRestIntegrationTest {
         assertTrue(supplier.isEmpty());
     }
 
-    private static SupplierAddRequest buildSupplierAddRequest() {
-        return SupplierAddRequest.builder()
+    private static SupplierCreateRequest buildSupplierAddRequest() {
+        return SupplierCreateRequest.builder()
                 .depotCode("KT1")
                 .firstName("Sebastian")
                 .lastName("Soja")

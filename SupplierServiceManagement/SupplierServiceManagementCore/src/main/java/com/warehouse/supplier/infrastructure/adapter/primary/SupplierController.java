@@ -1,22 +1,20 @@
 package com.warehouse.supplier.infrastructure.adapter.primary;
 
-import java.util.List;
-
-import org.mapstruct.factory.Mappers;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.model.SupplierAddRequest;
+import com.warehouse.supplier.domain.model.SupplierCreateRequest;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
 import com.warehouse.supplier.domain.vo.SupplierAddResponse;
 import com.warehouse.supplier.dto.SupplierAddRequestDto;
 import com.warehouse.supplier.dto.SupplierUpdateRequestDto;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierRequestMapper;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierResponseMapper;
-
 import lombok.AllArgsConstructor;
+import org.mapstruct.factory.Mappers;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/suppliers")
 @RestController
@@ -31,7 +29,7 @@ public class SupplierController {
 
     @PostMapping
     public ResponseEntity<?> addSupplier(@RequestBody List<SupplierAddRequestDto> supplier) {
-        final List<SupplierAddRequest> request = requestMapper.map(supplier);
+        final List<SupplierCreateRequest> request = requestMapper.map(supplier);
         final List<SupplierAddResponse> response = supplyPort.createMultipleSuppliers(request);
         return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
     }

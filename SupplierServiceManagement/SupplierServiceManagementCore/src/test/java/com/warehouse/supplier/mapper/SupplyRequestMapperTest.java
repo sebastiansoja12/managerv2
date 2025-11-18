@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.warehouse.supplier.domain.model.SupplierCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.supplier.domain.model.SupplierAddRequest;
 import com.warehouse.supplier.dto.SupplierAddRequestDto;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierRequestMapper;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierRequestMapperImpl;
@@ -31,7 +31,7 @@ public class SupplyRequestMapperTest {
                 .firstName("test")
                 .build();
         // when
-        final SupplierAddRequest request1 = requestMapper.map(requestDto);
+        final SupplierCreateRequest request1 = requestMapper.map(requestDto);
         // then
         assertThat(request1.getFirstName()).isEqualTo(requestDto.getFirstName());
     }
@@ -45,7 +45,7 @@ public class SupplyRequestMapperTest {
         final List<SupplierAddRequestDto> requests = new ArrayList<>();
         requests.add(request);
         // when
-        final List<SupplierAddRequest> suppliers = requestMapper.map(requests);
+        final List<SupplierCreateRequest> suppliers = requestMapper.map(requests);
         // then
         assertThat(suppliers.get(0).getFirstName()).isEqualTo(requests.get(0).getFirstName());
     }

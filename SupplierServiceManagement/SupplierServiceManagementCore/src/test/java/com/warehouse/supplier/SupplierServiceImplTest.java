@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.util.Collections;
 import java.util.List;
 
+import com.warehouse.supplier.domain.model.SupplierCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.model.SupplierAddRequest;
 import com.warehouse.supplier.domain.model.SupplierModelRequest;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.service.SupplierServiceImpl;
@@ -123,8 +123,8 @@ public class SupplierServiceImplTest {
         assertTrue(supplier.isEmpty());
     }
 
-    private static SupplierAddRequest buildSupplierAddRequest() {
-        return SupplierAddRequest.builder()
+    private static SupplierCreateRequest buildSupplierAddRequest() {
+        return SupplierCreateRequest.builder()
                 .depotCode("KT1")
                 .firstName("Sebastian")
                 .lastName("Soja")

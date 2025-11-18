@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class SupplierAddRequest {
+public class SupplierCreateRequest {
 
     private String firstName;
 

@@ -1,4 +1,12 @@
 package com.warehouse.supplier.domain.vo;
 
-public record DangerousGoodCertification() {
-}
+import java.time.Instant;
+
+public record DangerousGoodCertification(
+        String certificateNumber,
+        Instant issueDate,
+        Instant expiryDate,
+        String authority,
+        boolean valid
+) {}
+

@@ -39,7 +39,6 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
-    @Cacheable("suppliersCache")
     public List<Supplier> findAll() {
         final List<SupplierEntity> supplierEntities = supplierReadRepository.findAll();
         return supplierEntityMapper.map(supplierEntities);
@@ -56,14 +55,12 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
-    @Cacheable("suppliersDepartmentCodeCache")
     public List<Supplier> findByDepotCode(String depotCode) {
         final List<SupplierEntity> supplierEntities = supplierReadRepository.findByDepartment_DepartmentCode(depotCode);
         return supplierEntityMapper.map(supplierEntities);
     }
 
     @Override
-    @Cacheable("supplierCodeCache")
     public Supplier findByCode(String supplierCode) {
         final SupplierEntity supplierEntity = supplierReadRepository.findBySupplierCode(supplierCode).orElseThrow(
                 () -> new SupplierNotFoundException("Supplier was not found")
