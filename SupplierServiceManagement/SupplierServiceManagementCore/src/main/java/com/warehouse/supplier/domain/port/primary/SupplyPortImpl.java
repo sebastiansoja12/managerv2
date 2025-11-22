@@ -28,7 +28,7 @@ public class SupplyPortImpl implements SupplyPort {
 
     @Override
     public SupplierCreateResponse create(final SupplierCreateRequest supplierCreateRequest) {
-        final SupplierCode supplierCode = generatorService.generate(supplierCreateRequest.supplierCode());
+        final SupplierCode supplierCode = this.generatorService.generate(supplierCreateRequest.supplierCode());
         validateNotExists(supplierCode);
         final String firstName = supplierCreateRequest.firstName();
         final String lastName = supplierCreateRequest.lastName();

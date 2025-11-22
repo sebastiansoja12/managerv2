@@ -82,7 +82,7 @@ public class DevicePairPortImpl implements DevicePairPort {
         final Boolean userValid = this.userService.existsByUsername(terminal.getUsername())
                 && this.userService.existsByUserId(request.getUserId());
 
-        final DeviceVersion deviceVersion = new DeviceVersion(terminal.getVersion(), new DeviceId(terminal.getTerminalId().getValue()));
+        final DeviceVersion deviceVersion = new DeviceVersion(terminal.getVersion(), terminal.getTerminalId());
         final Boolean deviceUpToDate = !updateRequired(deviceId, deviceVersion);
         if (deviceUpToDate && userValid && terminal.isActive()) {
             this.devicePairService.pairDevice(terminal);
@@ -96,6 +96,6 @@ public class DevicePairPortImpl implements DevicePairPort {
 
     @Override
     public void unpair(final Terminal terminal) {
-        this.devicePairService.unpairDevice(new DeviceId(terminal.getTerminalId().getValue()));
+        this.devicePairService.unpairDevice(terminal.getTerminalId());
     }
 }
