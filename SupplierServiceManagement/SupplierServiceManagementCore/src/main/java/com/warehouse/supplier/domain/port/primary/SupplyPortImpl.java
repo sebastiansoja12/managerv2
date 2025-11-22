@@ -1,73 +1,60 @@
 package com.warehouse.supplier.domain.port.primary;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.warehouse.supplier.domain.model.SupplierCreateRequest;
-import org.apache.commons.lang3.StringUtils;
-
+import com.warehouse.commonassets.helper.Result;
+import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
-import com.warehouse.supplier.domain.vo.SupplierAddResponse;
+import com.warehouse.supplier.domain.service.SupplierValidatorService;
+import com.warehouse.supplier.domain.vo.SupplierCreateRequest;
+import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class SupplyPortImpl implements SupplyPort {
 
-    private final SupplierService service;
+    private final SupplierService supplierService;
 
     private final SupplierCodeGeneratorService generatorService;
 
-    @Override
-    public List<Supplier> findAllSuppliers() {
-        return service.findAll();
+    private final SupplierValidatorService validatorService;
+
+    public SupplyPortImpl(final SupplierService supplierService,
+                          final SupplierCodeGeneratorService generatorService,
+                          final SupplierValidatorService validatorService) {
+        this.supplierService = supplierService;
+        this.generatorService = generatorService;
+        this.validatorService = validatorService;
     }
 
     @Override
-    public List<SupplierAddResponse> createMultipleSuppliers(List<SupplierCreateRequest> supplierCreateRequests) {
-		final List<Supplier> suppliers = supplierCreateRequests.stream()
-                .map(this::buildSupplierFromRequest)
-                .toList();
+    public SupplierCreateResponse create(final SupplierCreateRequest supplierCreateRequest) {
+        final SupplierCode supplierCode = generatorService.generate(supplierCreateRequest.supplierCode());
+        validateNotExists(supplierCode);
+        final String firstName = supplierCreateRequest.firstName();
+        final String lastName = supplierCreateRequest.lastName();
+        final String telephoneNumber = supplierCreateRequest.telephoneNumber();
+        final SupplierId supplierId = this.supplierService.nextSupplierId();
+		final Supplier supplier = new Supplier(supplierId, supplierCode, firstName, lastName, telephoneNumber);
 
-		final List<Supplier> supplierList = service.createMultipleSuppliers(suppliers);
+        this.supplierService.create(supplier);
 
-        return supplierList
-                .stream()
-                .map(this::mapToAddResponse)
-                .collect(Collectors.toList());
+        return new SupplierCreateResponse(supplier.supplierCode());
+    }
+
+    private void validateNotExists(final SupplierCode supplierCode) {
+        final Result<Void, String> result = this.validatorService.validateSupplierCode(supplierCode);
+        if (result.isFailure()) {
+            throw new IllegalArgumentException(result.getFailure());
+        }
     }
 
     @Override
-    public Supplier updateSupplier(Supplier supplierUpdate) {
-        return service.update(supplierUpdate);
+    public Supplier getOneById(final SupplierId supplierId) {
+        return supplierService.findById(supplierId);
     }
 
     @Override
-    public List<Supplier> findSuppliersByDepotCode(String depotCode) {
-        return service.findSuppliersByDepotCode(depotCode);
-    }
-
-    @Override
-    public Supplier findSupplierByCode(String supplierCode) {
-        return service.findSupplierByCode(supplierCode);
-    }
-
-    private Supplier buildSupplierFromRequest(SupplierCreateRequest supplierRequest) {
-        return Supplier.builder()
-				.supplierCode(
-						StringUtils.isNotEmpty(supplierRequest.getSupplierCode()) ? supplierRequest.getSupplierCode()
-								: generatorService.generate())
-                .departmentCode(supplierRequest.getDepotCode())
-                .firstName(supplierRequest.getFirstName())
-                .lastName(supplierRequest.getLastName())
-                .telephone(supplierRequest.getTelephone())
-                .active(Boolean.TRUE)
-                .build();
-    }
-
-    private SupplierAddResponse mapToAddResponse(Supplier supplier) {
-        return new SupplierAddResponse(supplier);
+    public Supplier getOneByCode(final SupplierCode supplierCode) {
+        return supplierService.findByCode(supplierCode);
     }
 }

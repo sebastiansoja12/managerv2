@@ -1,35 +1,24 @@
 package com.warehouse.commonassets.identificator;
 
-import java.io.Serializable;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public record DepartmentCode(String value) implements Serializable {
+public class DepartmentCode implements ObjectValue<String> {
 
-	public static DepartmentCode empty() {
-		return new DepartmentCode(StringUtils.EMPTY);
-	}
+    @Column(name = "department_code")
+    private String value;
 
-	public String getValue() {
-		return value;
-	}
+    public DepartmentCode() {}
 
-	@Override
-	public boolean equals(final Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		final DepartmentCode that = (DepartmentCode) o;
-		return Objects.equals(value, that.value);
-	}
+    public DepartmentCode(final String value) {
+        this.value = value;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(value);
-	}
+    public String value() {return value;}
+    public String getValue() { return value; }
+    public void setValue(String value) { this.value = value; }
+
+    @Override
+    public String toString() { return value; }
 }

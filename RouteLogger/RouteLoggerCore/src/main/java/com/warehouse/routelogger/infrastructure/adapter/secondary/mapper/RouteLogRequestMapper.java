@@ -12,6 +12,8 @@ public interface RouteLogRequestMapper {
 
     DeliveryRequestDto map(AnyDeliveryRequest anyDeliveryRequest);
 
+    String map(Object value);
+
     TerminalRequestDto map(Request request);
 
     SupplierCodeRequestDto map(SupplierCodeRequest request);

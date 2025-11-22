@@ -1,5 +1,7 @@
 package com.warehouse.supplier.domain.service;
 
+import com.warehouse.commonassets.identificator.SupplierCode;
+
 public interface SupplierCodeGeneratorService {
-    String generate();
+    SupplierCode generate(final SupplierCode supplierCode);
 }

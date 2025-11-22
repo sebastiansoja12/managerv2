@@ -1,70 +1,46 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.cache.annotation.Cacheable;
-
+import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.repository.BaseRepository;
+import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.model.SupplierModelRequest;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
-import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
-import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.SupplierEntityMapper;
+import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.EntityToModelMapper;
+import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.ModelToEntityMapper;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class SupplierRepositoryImpl implements SupplierRepository {
 
-    private final SupplierEntityMapper supplierEntityMapper;
+    private final BaseRepository<SupplierEntity> supplierBaseRepository;
 
-    private final SupplierReadRepository supplierReadRepository;
-
-    @Override
-    public Supplier create(Supplier supplier) {
-        final SupplierEntity supplierEntity = supplierEntityMapper.map(supplier);
-        supplierReadRepository.save(supplierEntity);
-        return supplierEntityMapper.map(supplierEntity);
+    public SupplierRepositoryImpl(final BaseRepository<SupplierEntity> supplierBaseRepository) {
+        this.supplierBaseRepository = supplierBaseRepository;
     }
 
     @Override
-    public Supplier update(Supplier supplierUpdate) {
-		supplierReadRepository
-				.findBySupplierCode(supplierUpdate.getSupplierCode())
-				.orElseThrow(() -> new SupplierNotFoundException("Supplier was not found"));
-        final SupplierEntity supplierEntity = supplierEntityMapper.map(supplierUpdate);
-        supplierReadRepository.save(supplierEntity);
-        return supplierEntityMapper.map(supplierEntity);
+    public void createOrUpdate(final Supplier supplier) {
+        final SupplierEntity supplierEntity = ModelToEntityMapper.map(supplier);
+        this.supplierBaseRepository.create(supplierEntity);
     }
 
     @Override
-    public List<Supplier> findAll() {
-        final List<SupplierEntity> supplierEntities = supplierReadRepository.findAll();
-        return supplierEntityMapper.map(supplierEntities);
+    public Supplier findById(final SupplierId supplierId) {
+        final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class);
+        criteria.and("supplierId.value", supplierId);
+        return criteria
+                .getSingleResult()
+                .map(EntityToModelMapper::map)
+                .orElse(null);
     }
 
     @Override
-    public List<SupplierModelRequest> createMultipleSuppliers(List<Supplier> suppliers) {
-        final List<SupplierEntity> supplierEntities = supplierEntityMapper.mapToListEntity(suppliers);
-        supplierReadRepository.saveAll(supplierEntities);
-
-        return supplierEntities.stream()
-                .map(supplierEntityMapper::mapToModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Supplier> findByDepotCode(String depotCode) {
-        final List<SupplierEntity> supplierEntities = supplierReadRepository.findByDepartment_DepartmentCode(depotCode);
-        return supplierEntityMapper.map(supplierEntities);
-    }
-
-    @Override
-    public Supplier findByCode(String supplierCode) {
-        final SupplierEntity supplierEntity = supplierReadRepository.findBySupplierCode(supplierCode).orElseThrow(
-                () -> new SupplierNotFoundException("Supplier was not found")
-        );
-        return supplierEntityMapper.map(supplierEntity);
+    public Supplier findByCode(final SupplierCode supplierCode) {
+        final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class);
+        criteria.and("supplierCode.value", supplierCode);
+        return criteria
+                .getSingleResult()
+                .map(EntityToModelMapper::map)
+                .orElse(null);
     }
 }
