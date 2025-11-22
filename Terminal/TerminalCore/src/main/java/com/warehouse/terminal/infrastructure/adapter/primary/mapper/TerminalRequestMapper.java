@@ -24,7 +24,7 @@ public interface TerminalRequestMapper {
     }
 
     default TerminalIdDto map(final DeviceId deviceId) {
-        return new TerminalIdDto(deviceId != null ? deviceId.getValue() : null);
+        return new TerminalIdDto(deviceId != null ? deviceId.value() : null);
     }
 
     @Mapping(target = "version", source = "version.value")

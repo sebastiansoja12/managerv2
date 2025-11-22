@@ -1,11 +1,5 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import com.google.common.collect.Lists;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -17,6 +11,11 @@ import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.enumeration.ProcessType;
 import com.warehouse.terminal.model.*;
 import com.warehouse.terminal.request.TerminalRequest;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mapper
 public interface DeliveryEventMapper {
@@ -31,12 +30,14 @@ public interface DeliveryEventMapper {
 
     SupplierCodeDto map(final SupplierCode supplierCode);
 
+    String map(Object value);
+
     ShipmentIdDto map(final ShipmentId shipmentId);
 
     DepartmentCodeDto map(final DepartmentCode departmentCode);
 
     default DeviceDto map(final DeviceInformation deviceInformation) {
-        final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().getValue());
+        final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().value());
         final DepartmentCodeDto departmentCode = new DepartmentCodeDto(deviceInformation.getDepartmentCode().getValue());
         final UsernameDto username = new UsernameDto(deviceInformation.getUsername());
         final DeviceVersionDto deviceVersion = new DeviceVersionDto(deviceInformation.getVersion());

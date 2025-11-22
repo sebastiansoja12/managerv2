@@ -1,22 +1,20 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
-import java.util.function.Supplier;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClient;
-
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.model.SoftwareProperty;
 import com.warehouse.terminal.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.terminal.domain.vo.DeviceValidation;
 import com.warehouse.terminal.infrastructure.adapter.secondary.api.SoftwareConfigurationDto;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
-
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClient;
+
+import java.util.function.Supplier;
 
 @Slf4j
 public class SoftwareConfigurationServiceAdapter implements SoftwareConfigurationServicePort {
@@ -50,7 +48,7 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
                 .build();
 
         final SoftwareProperty softwareProperty = new SoftwareProperty(softwareConfigurationProperties.getEndpoint(),
-                deviceId.getValue().toString(),"");
+                deviceId.value().toString(),"");
 
         final Supplier<ResponseEntity<SoftwareConfigurationDto>> retryableSupplier = Retry
                 .decorateSupplier(retry, () -> getSoftwareConfiguration(restClient, softwareProperty));

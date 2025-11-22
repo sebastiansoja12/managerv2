@@ -1,13 +1,5 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.mapper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
@@ -31,6 +23,13 @@ import com.warehouse.terminal.model.DeliveryRejectResponseDetail;
 import com.warehouse.terminal.model.DeliveryReturnResponseDetail;
 import com.warehouse.terminal.response.DeviceUpToDate;
 import com.warehouse.terminal.response.TerminalResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface LogisticsResponseMapper {
@@ -45,7 +44,7 @@ public interface LogisticsResponseMapper {
     com.warehouse.terminal.model.DeliveryReturnResponse map(final DeliveryReturnResponse deliveryReturnResponse);
 
     default DeliveryReturnResponseDetail map(final DeliveryReturnResponseDetails deliveryReturnResponseDetails) {
-        final String supplierCode = deliveryReturnResponseDetails.getSupplierCode().getValue();
+        final String supplierCode = deliveryReturnResponseDetails.getSupplierCode().value();
         final String departmentCode = deliveryReturnResponseDetails.getDepartmentCode().getValue();
         final Long shipmentId = deliveryReturnResponseDetails.getShipmentId().getValue();
         final String deliveryStatus = deliveryReturnResponseDetails.getDeliveryStatus().name();
@@ -64,7 +63,7 @@ public interface LogisticsResponseMapper {
     default Device map(final DeviceInformation deviceInformation) {
         final String version = deviceInformation.getVersion();
         final String username = deviceInformation.getUsername();
-        final Long deviceId = deviceInformation.getDeviceId().getValue();
+        final Long deviceId = deviceInformation.getDeviceId().value();
         final String departmentCode = deviceInformation.getDepartmentCode().getValue();
         final String deviceUserType = deviceInformation.getDeviceUserType().toString();
         final String deviceType = deviceInformation.getDeviceType().toString();
@@ -81,6 +80,8 @@ public interface LogisticsResponseMapper {
     @Mapping(target = "deliveryStatus", source = "deliveryStatus")
     @Mapping(target = "rejectReason", source = "rejectReason.value")
     DeliveryRejectResponseDetail map(final DeliveryRejectResponseDetails deliveryRejectResponseDetails);
+
+    String map(Object value);
 
     @Mapping(target = "version", source = "version.value")
     @Mapping(target = "username", source = "username.value")

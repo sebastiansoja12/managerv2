@@ -1,19 +1,12 @@
 package com.warehouse.supplier.domain.service;
 
+import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.model.Supplier;
 
-import java.util.List;
-
 public interface SupplierService {
-    Supplier create(Supplier supplier);
-
-    List<Supplier> findAll();
-
-    Supplier update(Supplier supplier);
-
-    List<Supplier> createMultipleSuppliers(List<Supplier> suppliers);
-
-    List<Supplier> findSuppliersByDepotCode(String depotCode);
-
-    Supplier findSupplierByCode(String supplierCode);
+    void create(final Supplier supplier);
+    Supplier findById(final SupplierId supplierId);
+    Supplier findByCode(final SupplierCode supplierCode);
+    SupplierId nextSupplierId();
 }

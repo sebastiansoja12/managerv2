@@ -1,9 +1,12 @@
 package com.warehouse.supplier.domain.model;
 
+import com.google.common.collect.Sets;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.supplier.domain.enumeration.PackageType;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
-import com.warehouse.supplier.domain.vo.*;
+import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
+import com.warehouse.supplier.domain.vo.DriverLicense;
 
 import java.time.Instant;
 import java.util.Set;
@@ -47,5 +50,154 @@ public class Supplier {
 
     private Instant updatedAt;
 
+    private UserId createdUserId;
 
+    public Supplier() {
+    }
+
+    public Supplier(
+            final SupplierId supplierId,
+            final SupplierCode supplierCode,
+            final String firstName,
+            final String lastName,
+            final String telephoneNumber,
+            final DepartmentCode departmentCode,
+            final SupplierStatus status,
+            final UserStatus userStatus,
+            final VehicleId vehicleId,
+            final DeviceId deviceId,
+            final DangerousGoodCertification dangerousGoodCertification,
+            final DriverLicense driverLicense,
+            final DeliveryArea deliveryArea,
+            final Set<PackageType> supportedPackageTypes,
+            final String apiKey,
+            final Boolean termsAccepted,
+            final UserId createdUserId,
+            final Instant createdAt,
+            final Instant updatedAt
+    ) {
+        this.supplierId = supplierId;
+        this.supplierCode = supplierCode;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.telephoneNumber = telephoneNumber;
+        this.departmentCode = departmentCode;
+        this.status = status;
+        this.userStatus = userStatus;
+        this.vehicleId = vehicleId;
+        this.deviceId = deviceId;
+        this.dangerousGoodCertification = dangerousGoodCertification;
+        this.driverLicense = driverLicense;
+        this.deliveryArea = deliveryArea;
+        this.supportedPackageTypes = supportedPackageTypes;
+        this.apiKey = apiKey;
+        this.termsAccepted = termsAccepted;
+        this.createdUserId = createdUserId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public Supplier(
+            final SupplierId supplierId,
+            final SupplierCode supplierCode,
+            final String firstName,
+            final String lastName,
+            final String telephoneNumber
+    ) {
+        this.supplierId = supplierId;
+        this.supplierCode = supplierCode;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.telephoneNumber = telephoneNumber;
+        this.departmentCode = null;
+        this.status = SupplierStatus.INACTIVE;
+        this.userStatus = UserStatus.USER_NOT_CREATED;
+        this.vehicleId = null;
+        this.deviceId = null;
+        this.dangerousGoodCertification = null;
+        this.driverLicense = null;
+        this.deliveryArea = null;
+        this.supportedPackageTypes = Sets.newHashSet();
+        this.apiKey = null;
+        this.termsAccepted = false;
+        this.createdUserId = null;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public DangerousGoodCertification getDangerousGoodCertification() {
+        return dangerousGoodCertification;
+    }
+
+    public DeliveryArea getDeliveryArea() {
+        return deliveryArea;
+    }
+
+    public DepartmentCode getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public DeviceId getDeviceId() {
+        return deviceId;
+    }
+
+    public DriverLicense getDriverLicense() {
+        return driverLicense;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public SupplierStatus getStatus() {
+        return status;
+    }
+
+    public SupplierCode supplierCode() {
+        return supplierCode;
+    }
+
+    public SupplierId getSupplierId() {
+        return supplierId;
+    }
+
+    public Set<PackageType> getSupportedPackageTypes() {
+        return supportedPackageTypes;
+    }
+
+    public String getTelephoneNumber() {
+        return telephoneNumber;
+    }
+
+    public Boolean termsAccepted() {
+        return termsAccepted;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public UserStatus getUserStatus() {
+        return userStatus;
+    }
+
+    public VehicleId getVehicleId() {
+        return vehicleId;
+    }
+
+    public UserId createdUserId() {
+        return createdUserId;
+    }
 }

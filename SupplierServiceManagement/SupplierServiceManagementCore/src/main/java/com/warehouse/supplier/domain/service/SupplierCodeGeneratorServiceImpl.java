@@ -1,15 +1,17 @@
 package com.warehouse.supplier.domain.service;
 
+import com.warehouse.commonassets.identificator.SupplierCode;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Random;
 
-@AllArgsConstructor
+
 public class SupplierCodeGeneratorServiceImpl implements SupplierCodeGeneratorService {
 
     private final static Integer SUPPLIER_CODE_LENGTH = 6;
 
-    @Override
+    
     public String generate() {
         final StringBuilder builder = new StringBuilder();
         final Random r = new Random();
@@ -18,5 +20,17 @@ public class SupplierCodeGeneratorServiceImpl implements SupplierCodeGeneratorSe
             builder.append(c);
         }
         return builder.toString();
+    }
+
+    @Override
+    public SupplierCode generate(final SupplierCode supplierCode) {
+        final SupplierCode generatedSupplierCode;
+		if (supplierCode != null && StringUtils.isNotBlank(supplierCode.value())
+				&& supplierCode.value().length() == SUPPLIER_CODE_LENGTH) {
+            generatedSupplierCode = supplierCode;
+        } else {
+            generatedSupplierCode = new SupplierCode(generate());
+        }
+        return generatedSupplierCode;
     }
 }

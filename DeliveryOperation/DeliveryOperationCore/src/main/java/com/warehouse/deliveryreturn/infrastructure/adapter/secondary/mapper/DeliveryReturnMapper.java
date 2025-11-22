@@ -31,6 +31,8 @@ public interface DeliveryReturnMapper {
     // TODO
     DeliveryReturnEntity map(DeliveryReturnDetails deliveryReturnRequest);
 
+    String map(Object value);
+
 
     default LocalDateTime getLocalDateTime() {
         return LocalDateTime.now();

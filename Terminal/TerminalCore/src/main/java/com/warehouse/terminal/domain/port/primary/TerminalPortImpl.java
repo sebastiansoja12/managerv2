@@ -1,7 +1,5 @@
 package com.warehouse.terminal.domain.port.primary;
 
-import java.util.List;
-
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.Username;
@@ -17,8 +15,9 @@ import com.warehouse.terminal.domain.vo.DeviceTypeRequest;
 import com.warehouse.terminal.domain.vo.DeviceUserRequest;
 import com.warehouse.terminal.domain.vo.DeviceVersionRequest;
 import com.warehouse.terminal.domain.vo.User;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @Slf4j
 public class TerminalPortImpl implements TerminalPort {

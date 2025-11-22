@@ -97,6 +97,8 @@ public interface LogisticsRequestMapper {
 
     List<DeliveryRejectDetailsDto> mapToDeliveryRejectDetails(final List<DeliveryRejectDetails> deliveryRejectDetails);
 
+    String map(Object value);
+
     ProcessTypeDto map(final ProcessType processType);
 
     default DeliveryMissedRequestDto mapToDeliveryMissedRequest(final Request request) {

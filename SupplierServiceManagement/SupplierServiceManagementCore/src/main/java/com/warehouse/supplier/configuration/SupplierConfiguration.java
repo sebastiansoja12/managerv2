@@ -1,25 +1,36 @@
 package com.warehouse.supplier.configuration;
 
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
 import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
-import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
-import com.warehouse.supplier.domain.service.SupplierCodeGeneratorServiceImpl;
-import com.warehouse.supplier.domain.service.SupplierService;
-import com.warehouse.supplier.infrastructure.adapter.secondary.SupplierReadRepository;
+import com.warehouse.supplier.domain.service.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.SupplierRepositoryImpl;
-import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.SupplierEntityMapper;
+import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Configuration
 public class SupplierConfiguration {
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Bean
-    public SupplyPort supplyPort(SupplierService service, SupplierCodeGeneratorService generatorService) {
-        return new SupplyPortImpl(service, generatorService);
+    public SupplyPort supplyPort(final SupplierService service,
+                                 final SupplierCodeGeneratorService generatorService,
+                                 final SupplierValidatorService validatorService) {
+        return new SupplyPortImpl(service, generatorService, validatorService);
+    }
+
+    @Bean
+    public SupplierService supplierService(final SupplierRepository repository) {
+        return new SupplierServiceImpl(repository);
     }
 
     @Bean
@@ -28,8 +39,12 @@ public class SupplierConfiguration {
     }
 
     @Bean
-    public SupplierRepository supplierRepository(SupplierReadRepository supplierReadRepository) {
-        final SupplierEntityMapper supplierEntityMapper = Mappers.getMapper(SupplierEntityMapper.class);
-        return new SupplierRepositoryImpl(supplierEntityMapper, supplierReadRepository);
+    public SupplierRepository supplierRepository(@Qualifier("supplierBaseRepository") final BaseRepository<SupplierEntity> basePathRepository) {
+        return new SupplierRepositoryImpl(basePathRepository);
+    }
+
+    @Bean
+    public BaseRepository<SupplierEntity> supplierBaseRepository() {
+        return new BaseRepository<>(entityManager);
     }
 }

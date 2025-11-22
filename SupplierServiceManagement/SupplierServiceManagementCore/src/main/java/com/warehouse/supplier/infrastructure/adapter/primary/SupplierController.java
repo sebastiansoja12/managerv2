@@ -1,63 +1,47 @@
 package com.warehouse.supplier.infrastructure.adapter.primary;
 
-import java.util.List;
-
-import org.mapstruct.factory.Mappers;
+import com.warehouse.supplier.infrastructure.adapter.primary.mapper.ResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.model.SupplierAddRequest;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
-import com.warehouse.supplier.domain.vo.SupplierAddResponse;
-import com.warehouse.supplier.dto.SupplierAddRequestDto;
-import com.warehouse.supplier.dto.SupplierUpdateRequestDto;
-import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierRequestMapper;
-import com.warehouse.supplier.infrastructure.adapter.primary.mapper.SupplierResponseMapper;
-
-import lombok.AllArgsConstructor;
+import com.warehouse.supplier.domain.vo.SupplierCreateRequest;
+import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
+import com.warehouse.supplier.infrastructure.adapter.primary.dto.SupplierCreateApiRequest;
+import com.warehouse.supplier.infrastructure.adapter.primary.mapper.RequestMapper;
 
 @RequestMapping("/suppliers")
 @RestController
-@AllArgsConstructor
 public class SupplierController {
 
     private final SupplyPort supplyPort;
 
-    private final SupplierRequestMapper requestMapper = Mappers.getMapper(SupplierRequestMapper.class);
-
-    private final SupplierResponseMapper responseMapper = Mappers.getMapper(SupplierResponseMapper.class);
+    public SupplierController(final SupplyPort supplyPort) {
+        this.supplyPort = supplyPort;
+    }
 
     @PostMapping
-    public ResponseEntity<?> addSupplier(@RequestBody List<SupplierAddRequestDto> supplier) {
-        final List<SupplierAddRequest> request = requestMapper.map(supplier);
-        final List<SupplierAddResponse> response = supplyPort.createMultipleSuppliers(request);
-        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+    public ResponseEntity<?> create(@RequestBody final SupplierCreateApiRequest supplierCreateApiRequest) {
+        final SupplierCreateRequest request = RequestMapper.map(supplierCreateApiRequest);
+        final SupplierCreateResponse response = this.supplyPort.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMapper.map(response));
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateSupplier(@RequestBody SupplierUpdateRequestDto updateRequest) {
-        final Supplier request = requestMapper.map(updateRequest);
-        final Supplier response = supplyPort.updateSupplier(request);
-        return new ResponseEntity<>(responseMapper.map(response), HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOneById(@PathVariable final Long id) {
+        final SupplierId supplierId = new SupplierId(id);
+        final Supplier supplier = this.supplyPort.getOneById(supplierId);
+        return ResponseEntity.ok(ResponseMapper.map(supplier));
     }
 
-    @GetMapping
-    public ResponseEntity<?> getSuppliers() {
-        final List<Supplier> suppliers = supplyPort.findAllSuppliers();
-        return new ResponseEntity<>(responseMapper.mapToDto(suppliers), HttpStatus.OK);
-    }
-
-    @GetMapping("/supplierCode/{supplierCode}")
-    public ResponseEntity<?> getSupplierByCode(@PathVariable String supplierCode) {
-        final Supplier supplier = supplyPort.findSupplierByCode(supplierCode);
-        return new ResponseEntity<>(responseMapper.map(supplier), HttpStatus.OK);
-    }
-
-    @GetMapping("/depotCode/{depotCode}")
-    public ResponseEntity<?> getSuppliersByDepotCode(@PathVariable String depotCode) {
-        final List<Supplier> suppliers = supplyPort.findSuppliersByDepotCode(depotCode);
-        return new ResponseEntity<>(responseMapper.mapToDto(suppliers), HttpStatus.OK);
+    @GetMapping("/by-suppliercode/{code}")
+    public ResponseEntity<?> getOneByCode(@PathVariable final String code) {
+        final SupplierCode supplierCode = new SupplierCode(code);
+        final Supplier supplier = this.supplyPort.getOneByCode(supplierCode);
+        return ResponseEntity.ok(ResponseMapper.map(supplier));
     }
 }

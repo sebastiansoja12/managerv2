@@ -1,18 +1,16 @@
 package com.warehouse.voronoi.domain.service;
 
-import java.util.*;
-
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.Department;
 import com.warehouse.voronoi.domain.model.VoronoiRequest;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.*;
 
 @AllArgsConstructor
 @Slf4j
@@ -42,7 +40,7 @@ public class ComputeServiceImpl implements ComputeService {
 		final Coordinates coordinates = calculateCoordinatesForRequestCity(request.getCity());
 
 		if (Objects.isNull(coordinates)) {
-			return DepartmentCode.empty();
+			return new DepartmentCode("");
 		}
 
 		final List<Department> depotsWithCoordinates = calculateCoordinates(departments);
