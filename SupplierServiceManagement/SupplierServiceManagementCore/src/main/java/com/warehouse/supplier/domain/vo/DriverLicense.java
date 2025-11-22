@@ -8,9 +8,10 @@ import java.time.Instant;
 @Embeddable
 public record DriverLicense(
         @Column(name = "driver_license_number") String number,
-        @Column(name = "acquired_date") Instant acquiredDate
+        @Column(name = "acquired_date") Instant acquiredDate,
+        @Column(name = "driving_license_expiry_date") Instant drivingLicenseExpiryDate
 ) {
     public DriverLicense() {
-        this(null, null);
+        this(null, null, null);
     }
 }

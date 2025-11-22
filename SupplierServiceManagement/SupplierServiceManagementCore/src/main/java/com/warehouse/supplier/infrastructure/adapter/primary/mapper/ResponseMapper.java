@@ -54,6 +54,6 @@ public abstract class ResponseMapper {
 	}
 
 	public static DriverLicenseApi map(final DriverLicense driverLicense) {
-		return new DriverLicenseApi(driverLicense.number(), driverLicense.acquiredDate());
+		return new DriverLicenseApi(driverLicense.number(), driverLicense.acquiredDate(), driverLicense.drivingLicenseExpiryDate());
 	}
 }
