@@ -9,7 +9,6 @@ import com.warehouse.commonassets.repository.baseentity.BaseEntity;
 import com.warehouse.supplier.domain.enumeration.PackageType;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
-import com.warehouse.supplier.domain.vo.DriverLicense;
 import jakarta.persistence.*;
 
 import java.time.Instant;

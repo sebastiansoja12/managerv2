@@ -3,6 +3,7 @@ package com.warehouse.supplier.infrastructure.adapter.secondary.mapper;
 import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
+import com.warehouse.supplier.domain.vo.DriverLicense;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
 
 public class EntityToModelMapper {
@@ -23,7 +24,7 @@ public class EntityToModelMapper {
                 entity.getVehicleId(),
                 entity.getDeviceId(),
                 map(entity.getDangerousGoodCertification()),
-                entity.getDriverLicense(),
+                map(entity.getDriverLicense()),
                 map(entity.getDeliveryArea()),
                 entity.getSupportedPackageTypes(),
                 entity.getApiKey(),
@@ -43,11 +44,21 @@ public class EntityToModelMapper {
 				certification.expiryDate(), certification.authority(), certification.valid());
     }
     
-	public static DeliveryArea map(final com.warehouse.supplier.infrastructure.adapter.secondary.entity.DeliveryArea deliveryArea) {
-        if (deliveryArea == null) {
-            return null;
-        }
+	public static DeliveryArea map(
+			final com.warehouse.supplier.infrastructure.adapter.secondary.entity.DeliveryArea deliveryArea) {
+		if (deliveryArea == null) {
+			return null;
+		}
 		return new DeliveryArea(deliveryArea.areaName(), deliveryArea.city(), deliveryArea.district(),
 				deliveryArea.municipality(), deliveryArea.region(), deliveryArea.country(), deliveryArea.postalCodes());
+	}
+    
+	public static DriverLicense map(
+			final com.warehouse.supplier.infrastructure.adapter.secondary.entity.DriverLicense driverLicense) {
+		if (driverLicense == null) {
+			return null;
+		}
+		return new DriverLicense(driverLicense.number(), driverLicense.acquiredDate(),
+				driverLicense.drivingLicenseExpiryDate());
 	}
 }
