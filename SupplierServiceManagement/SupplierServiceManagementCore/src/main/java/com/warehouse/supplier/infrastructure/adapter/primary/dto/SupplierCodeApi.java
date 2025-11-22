@@ -1,4 +1,4 @@
 package com.warehouse.supplier.infrastructure.adapter.primary.dto;
 
-public record SupplierCodeApi() {
+public record SupplierCodeApi(String value) {
 }

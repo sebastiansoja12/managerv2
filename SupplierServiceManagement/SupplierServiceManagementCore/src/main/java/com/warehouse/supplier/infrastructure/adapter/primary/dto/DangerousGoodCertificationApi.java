@@ -1,4 +1,12 @@
 package com.warehouse.supplier.infrastructure.adapter.primary.dto;
 
-public record DangerousGoodCertificationApi() {
+import java.time.Instant;
+
+public record DangerousGoodCertificationApi(
+        String certificateNumber,
+        Instant issueDate,
+        Instant expiryDate,
+        String authority,
+        boolean valid
+) {
 }

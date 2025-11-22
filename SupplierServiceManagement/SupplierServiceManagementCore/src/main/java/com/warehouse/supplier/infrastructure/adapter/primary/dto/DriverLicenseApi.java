@@ -1,4 +1,7 @@
 package com.warehouse.supplier.infrastructure.adapter.primary.dto;
 
-public record DriverLicenseApi() {
+import java.time.Instant;
+
+public record DriverLicenseApi(String number,
+                               Instant acquiredDate) {
 }

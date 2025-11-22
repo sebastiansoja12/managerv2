@@ -72,6 +72,7 @@ public class Supplier {
             final Set<PackageType> supportedPackageTypes,
             final String apiKey,
             final Boolean termsAccepted,
+            final UserId createdUserId,
             final Instant createdAt,
             final Instant updatedAt
     ) {
@@ -91,6 +92,7 @@ public class Supplier {
         this.supportedPackageTypes = supportedPackageTypes;
         this.apiKey = apiKey;
         this.termsAccepted = termsAccepted;
+        this.createdUserId = createdUserId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

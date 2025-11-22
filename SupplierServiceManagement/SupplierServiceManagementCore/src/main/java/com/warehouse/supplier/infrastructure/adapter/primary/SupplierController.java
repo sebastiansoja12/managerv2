@@ -35,13 +35,13 @@ public class SupplierController {
     public ResponseEntity<?> getOneById(@PathVariable final Long id) {
         final SupplierId supplierId = new SupplierId(id);
         final Supplier supplier = this.supplyPort.getOneById(supplierId);
-        return ResponseEntity.ok(supplier);
+        return ResponseEntity.ok(ResponseMapper.map(supplier));
     }
 
     @GetMapping("/by-suppliercode/{code}")
     public ResponseEntity<?> getOneByCode(@PathVariable final String code) {
         final SupplierCode supplierCode = new SupplierCode(code);
         final Supplier supplier = this.supplyPort.getOneByCode(supplierCode);
-        return ResponseEntity.ok(supplier);
+        return ResponseEntity.ok(ResponseMapper.map(supplier));
     }
 }

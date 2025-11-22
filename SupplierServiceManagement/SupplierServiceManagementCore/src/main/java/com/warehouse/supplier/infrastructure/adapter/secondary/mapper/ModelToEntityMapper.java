@@ -1,6 +1,8 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.infrastructure.adapter.secondary.entity.DangerousGoodCertification;
+import com.warehouse.supplier.infrastructure.adapter.secondary.entity.DeliveryArea;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
 
 public class ModelToEntityMapper {
@@ -20,9 +22,9 @@ public class ModelToEntityMapper {
                 supplier.getUserStatus(),
                 supplier.getVehicleId(),
                 supplier.getDeviceId(),
-                null,
+                map(supplier.getDangerousGoodCertification()),
                 supplier.getDriverLicense(),
-                null,
+                map(supplier.getDeliveryArea()),
                 supplier.getSupportedPackageTypes(),
                 supplier.getApiKey(),
                 supplier.termsAccepted(),
@@ -30,6 +32,23 @@ public class ModelToEntityMapper {
                 supplier.getCreatedAt(),
                 supplier.getUpdatedAt()
         );
+    }
+
+    public static DangerousGoodCertification map(
+            final com.warehouse.supplier.domain.vo.DangerousGoodCertification certification) {
+        if (certification == null) {
+            return null;
+        }
+        return new DangerousGoodCertification(certification.certificateNumber(), certification.issueDate(),
+                certification.expiryDate(), certification.authority(), certification.valid());
+    }
+
+    public static DeliveryArea map(final com.warehouse.supplier.domain.model.DeliveryArea deliveryArea) {
+        if (deliveryArea == null) {
+            return null;
+        }
+        return new DeliveryArea(deliveryArea.getAreaName(), deliveryArea.getCity(), deliveryArea.getDistrict(),
+                deliveryArea.getMunicipality(), deliveryArea.getRegion(), deliveryArea.getCountry(), deliveryArea.getPostalCodes());
     }
 }
 

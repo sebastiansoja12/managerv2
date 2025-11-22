@@ -1,12 +1,9 @@
 package com.warehouse.supplier.domain.model;
 
-import com.warehouse.supplier.domain.vo.DeliveryAreaId;
-
 import java.util.Set;
 
 public class DeliveryArea {
 
-    private DeliveryAreaId deliveryAreaId;
     private String areaName;
     private String city;
     private String district;
@@ -14,18 +11,14 @@ public class DeliveryArea {
     private String region;
     private String country;
     private Set<String> postalCodes;
-    private boolean active;
 
-    public DeliveryArea(final DeliveryAreaId deliveryAreaId,
-                        final String areaName,
+    public DeliveryArea(final String areaName,
                         final String city,
                         final String district,
                         final String municipality,
                         final String region,
                         final String country,
-                        final Set<String> postalCodes,
-                        final boolean active) {
-        this.deliveryAreaId = deliveryAreaId;
+                        final Set<String> postalCodes) {
         this.areaName = areaName;
         this.city = city;
         this.district = district;
@@ -33,15 +26,10 @@ public class DeliveryArea {
         this.region = region;
         this.country = country;
         this.postalCodes = postalCodes;
-        this.active = active;
     }
 
     public final boolean coversPostalCode(final String postalCode) {
         return postalCodes != null && postalCodes.contains(postalCode);
-    }
-
-    public final DeliveryAreaId getDeliveryAreaId() {
-        return deliveryAreaId;
     }
 
     public final String getAreaName() {
@@ -98,14 +86,6 @@ public class DeliveryArea {
 
     public final void setPostalCodes(final Set<String> postalCodes) {
         this.postalCodes = postalCodes;
-    }
-
-    public final boolean isActive() {
-        return active;
-    }
-
-    public final void setActive(final boolean active) {
-        this.active = active;
     }
 }
 
