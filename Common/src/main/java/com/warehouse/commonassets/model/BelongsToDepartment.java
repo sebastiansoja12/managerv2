@@ -4,15 +4,17 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.MappedSuperclass;
+import org.hibernate.envers.Audited;
 
 @MappedSuperclass
-public class BelongsToDepartment implements DepartmentContext {
+@Audited
+public abstract class BelongsToDepartment implements DepartmentContext {
 
     @Embedded
     private DepartmentCode departmentCode;
 
     @Override
-    public DepartmentCode departmentCode() {
+    public DepartmentCode getDepartmentCode() {
         return departmentCode;
     }
 

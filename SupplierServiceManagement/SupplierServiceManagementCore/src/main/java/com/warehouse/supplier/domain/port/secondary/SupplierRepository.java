@@ -5,8 +5,8 @@ import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.model.Supplier;
 
 public interface SupplierRepository {
-
-    void createOrUpdate(final Supplier supplier);
+    void create(final Supplier supplier);
+    void update(final Supplier supplier);
     Supplier findById(final SupplierId supplierId);
     Supplier findByCode(final SupplierCode supplierCode);
 }

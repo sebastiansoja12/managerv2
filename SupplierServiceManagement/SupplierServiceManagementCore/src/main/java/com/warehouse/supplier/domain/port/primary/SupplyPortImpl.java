@@ -3,12 +3,17 @@ package com.warehouse.supplier.domain.port.primary;
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.supplier.domain.event.SupplierCreated;
+import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.registry.DomainContext;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
 import com.warehouse.supplier.domain.service.SupplierValidatorService;
 import com.warehouse.supplier.domain.vo.SupplierCreateRequest;
 import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
+
+import java.time.Instant;
 
 public class SupplyPortImpl implements SupplyPort {
 
@@ -38,14 +43,10 @@ public class SupplyPortImpl implements SupplyPort {
 
         this.supplierService.create(supplier);
 
-        return new SupplierCreateResponse(supplier.supplierCode());
-    }
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierCreated(supplier.snapshot(), Instant.now()));
 
-    private void validateNotExists(final SupplierCode supplierCode) {
-        final Result<Void, String> result = this.validatorService.validateSupplierCode(supplierCode);
-        if (result.isFailure()) {
-            throw new IllegalArgumentException(result.getFailure());
-        }
+        return new SupplierCreateResponse(supplier.supplierCode());
     }
 
     @Override
@@ -56,5 +57,12 @@ public class SupplyPortImpl implements SupplyPort {
     @Override
     public Supplier getOneByCode(final SupplierCode supplierCode) {
         return supplierService.findByCode(supplierCode);
+    }
+
+    private void validateNotExists(final SupplierCode supplierCode) {
+        final Result<Void, String> result = this.validatorService.validateSupplierCode(supplierCode);
+        if (result.isFailure()) {
+            throw new SupplierAlreadyExistsException(result.getFailure());
+        }
     }
 }

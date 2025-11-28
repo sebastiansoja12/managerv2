@@ -1,5 +1,9 @@
 package com.warehouse.supplier.domain.vo;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.supplier.domain.enumeration.PackageType;

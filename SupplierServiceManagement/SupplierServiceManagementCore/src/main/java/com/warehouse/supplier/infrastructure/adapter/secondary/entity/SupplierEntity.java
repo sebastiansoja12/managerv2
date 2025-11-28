@@ -1,21 +1,20 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.identificator.VehicleId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.repository.baseentity.BaseEntity;
 import com.warehouse.supplier.domain.enumeration.PackageType;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.time.Instant;
 import java.util.Set;
 
 @Entity
 @Table(name = "suppliers")
+@Audited
 public class SupplierEntity extends BaseEntity<SupplierId> {
 
     @EmbeddedId
@@ -25,6 +24,9 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "supplier_code"))
     private SupplierCode supplierCode;
+
+    @Embedded
+    private DepartmentCode departmentCode;
 
     @Column(name = "first_name")
     private String firstName;
@@ -88,6 +90,7 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
     public SupplierEntity(
             final SupplierId supplierId,
             final SupplierCode supplierCode,
+            final DepartmentCode departmentCode,
             final String firstName,
             final String lastName,
             final String telephoneNumber,
@@ -107,6 +110,7 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
     ) {
         this.supplierId = supplierId;
         this.supplierCode = supplierCode;
+        this.departmentCode = departmentCode;
         this.firstName = firstName;
         this.lastName = lastName;
         this.telephoneNumber = telephoneNumber;
@@ -201,6 +205,11 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
     @Override
     public SupplierId getId() {
         return supplierId;
+    }
+
+    @Override
+    public DepartmentCode getDepartmentCode() {
+        return departmentCode;
     }
 }
 

@@ -1,10 +1,12 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.envers.Audited;
 
 import java.util.Set;
 
 @Embeddable
+@Audited
 public record DeliveryArea(
 
         @Column(name = "area_name")

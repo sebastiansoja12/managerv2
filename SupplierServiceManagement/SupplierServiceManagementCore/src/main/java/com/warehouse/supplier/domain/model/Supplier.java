@@ -5,8 +5,12 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.supplier.domain.enumeration.PackageType;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
+import com.warehouse.supplier.domain.event.SupplierVehicleAssigned;
+import com.warehouse.supplier.domain.registry.DomainContext;
 import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
 import com.warehouse.supplier.domain.vo.DriverLicense;
+import com.warehouse.supplier.domain.vo.SupplierSnapshot;
+import org.apache.commons.lang3.Validate;
 
 import java.time.Instant;
 import java.util.Set;
@@ -104,6 +108,12 @@ public class Supplier {
             final String lastName,
             final String telephoneNumber
     ) {
+        Validate.notNull(supplierId, "SupplierId cannot be null");
+        Validate.notNull(supplierCode, "SupplierCode cannot be null");
+        Validate.notNull(firstName, "First name cannot be null");
+        Validate.notNull(lastName, "Last name cannot be null");
+        Validate.notNull(telephoneNumber, "Telephone number cannot be null");
+
         this.supplierId = supplierId;
         this.supplierCode = supplierCode;
         this.firstName = firstName;
@@ -122,6 +132,104 @@ public class Supplier {
         this.termsAccepted = false;
         this.createdUserId = null;
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+    
+	public SupplierSnapshot snapshot() {
+		return new SupplierSnapshot(supplierId, supplierCode, firstName, lastName, telephoneNumber, departmentCode,
+				status, userStatus, vehicleId, deviceId, dangerousGoodCertification, driverLicense, deliveryArea,
+				supportedPackageTypes, apiKey, termsAccepted, createdAt, updatedAt, createdUserId);
+	}
+
+    public void markAsActive() {
+        if (this.status == SupplierStatus.DELETED) {
+            throw new IllegalArgumentException("Cannot activate deleted supplier");
+        }
+        if (driverLicense == null) {
+            throw new IllegalArgumentException("Cannot activate supplier when driver license is null");
+        }
+        this.status = SupplierStatus.ACTIVE;
+    }
+
+    public void markAsInactive() {
+        if (this.status == SupplierStatus.DELETED) {
+            throw new IllegalArgumentException("Cannot deactivate deleted supplier");
+        }
+        this.status = SupplierStatus.INACTIVE;
+    }
+
+    public void markAsDeleted() {
+        this.status = SupplierStatus.DELETED;
+    }
+
+    public void markAsSuspended() {
+        this.status = SupplierStatus.SUSPENDED;
+    }
+
+    public void changeDriverLicense(final DriverLicense driverLicense) {
+        this.driverLicense = driverLicense;
+        markAsModified();
+    }
+
+    public void markUserCreated(final UserId createdUserId) {
+        this.userStatus = UserStatus.USER_CREATED;
+        this.createdUserId = createdUserId;
+        markAsModified();
+    }
+
+    public void markUserDeleted() {
+        this.userStatus = UserStatus.USER_NOT_CREATED;
+        this.createdUserId = null;
+        markAsModified();
+    }
+
+    public void changeTermsAccepted(final Boolean termsAccepted) {
+        this.termsAccepted = termsAccepted;
+        markAsModified();
+    }
+
+    public void changeApiKey(final String apiKey) {
+        this.apiKey = apiKey;
+        markAsModified();
+    }
+
+    public void changeDeliveryArea(final DeliveryArea deliveryArea) {
+        this.deliveryArea = deliveryArea;
+        markAsModified();
+    }
+
+    public void changeSupportedPackageTypes(final Set<PackageType> supportedPackageTypes) {
+        this.supportedPackageTypes = supportedPackageTypes;
+        markAsModified();
+    }
+
+    public void addSupportedPackageType(final PackageType packageType) {
+        getSupportedPackageTypes().add(packageType);
+        markAsModified();
+    }
+
+    public void removeSupportedPackageType(final PackageType packageType) {
+        getSupportedPackageTypes().remove(packageType);
+        markAsModified();
+    }
+
+    public void changeDangerousGoodCertification(final DangerousGoodCertification dangerousGoodCertification) {
+        this.dangerousGoodCertification = dangerousGoodCertification;
+        markAsModified();
+    }
+
+    public void assignVehicle(final VehicleId vehicleId) {
+        this.vehicleId = vehicleId;
+        markAsModified();
+        DomainContext.eventPublisher().publishEvent(new SupplierVehicleAssigned(snapshot(), Instant.now()));
+    }
+
+    public void changeDeviceId(final DeviceId deviceId) {
+        this.deviceId = deviceId;
+        markAsModified();
+    }
+
+    private void markAsModified() {
         this.updatedAt = Instant.now();
     }
 
@@ -174,6 +282,9 @@ public class Supplier {
     }
 
     public Set<PackageType> getSupportedPackageTypes() {
+        if (supportedPackageTypes == null) {
+            supportedPackageTypes = Sets.newHashSet();
+        }
         return supportedPackageTypes;
     }
 

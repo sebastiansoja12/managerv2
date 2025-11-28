@@ -16,6 +16,7 @@ public class ModelToEntityMapper {
         return new SupplierEntity(
                 supplier.getSupplierId(),
                 supplier.supplierCode(),
+                supplier.getDepartmentCode(),
                 supplier.getFirstName(),
                 supplier.getLastName(),
                 supplier.getTelephoneNumber(),

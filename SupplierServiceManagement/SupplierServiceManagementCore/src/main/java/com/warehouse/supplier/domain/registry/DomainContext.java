@@ -9,10 +9,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 
-@Component("supplier.domainRegistry")
-public final class DomainRegistry implements ApplicationEventPublisherAware, ApplicationContextAware {
+@Component("supplier.domainContext")
+public final class DomainContext implements ApplicationEventPublisherAware, ApplicationContextAware {
 
-    private static final Logger log = LoggerFactory.getLogger(DomainRegistry.class);
+    private static final Logger log = LoggerFactory.getLogger(DomainContext.class);
 
     private static volatile ApplicationEventPublisher eventPublisher;
 
@@ -24,18 +24,18 @@ public final class DomainRegistry implements ApplicationEventPublisherAware, App
 
     @Override
     public void setApplicationEventPublisher(final ApplicationEventPublisher applicationEventPublisher) {
-        if (DomainRegistry.eventPublisher == null) {
-            synchronized (DomainRegistry.class) {
-                if (DomainRegistry.eventPublisher == null) {
-                    DomainRegistry.eventPublisher = applicationEventPublisher;
-                    log.info("ApplicationEventPublisher initialized in DomainRegistry");
+        if (DomainContext.eventPublisher == null) {
+            synchronized (DomainContext.class) {
+                if (DomainContext.eventPublisher == null) {
+                    DomainContext.eventPublisher = applicationEventPublisher;
+                    log.info("ApplicationEventPublisher initialized in DomainContext");
                 }
             }
         }
     }
 
     public static <T> void publish(final T event) {
-        final ApplicationEventPublisher publisher = DomainRegistry.eventPublisher;
+        final ApplicationEventPublisher publisher = DomainContext.eventPublisher;
         if (publisher == null) {
             throw new IllegalStateException("ApplicationEventPublisher not initialized yet");
         }

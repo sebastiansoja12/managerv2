@@ -1,12 +1,10 @@
 package com.warehouse.supplier.domain.service;
 
 import com.warehouse.commonassets.helper.Result;
-import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
-import org.springframework.stereotype.Service;
-
-import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SupplierValidatorServiceImpl implements SupplierValidatorService {
@@ -15,11 +13,6 @@ public class SupplierValidatorServiceImpl implements SupplierValidatorService {
 
     public SupplierValidatorServiceImpl(final SupplierRepository supplierRepository) {
         this.supplierRepository = supplierRepository;
-    }
-
-    @Override
-    public boolean validateDepartmentExists(final DepartmentCode departmentCode) {
-        return false;
     }
 
     @Override

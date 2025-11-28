@@ -29,6 +29,16 @@ public class BaseRepository<T extends BelongsToDepartment> implements TenantFilt
     }
 
     @Override
+    public void update(final T object) {
+        this.entityManager.merge(object);
+    }
+
+    @Override
+    public void delete(final T object) {
+        this.entityManager.remove(object);
+    }
+
+    @Override
     public Criteria<T> createCriteria(final Class<T> clazz) {
         final Criteria<T> criteria = new Criteria<>(entityManager, clazz);
 		criteria.and(

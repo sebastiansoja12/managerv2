@@ -19,9 +19,15 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
-    public void createOrUpdate(final Supplier supplier) {
+    public void create(final Supplier supplier) {
         final SupplierEntity supplierEntity = ModelToEntityMapper.map(supplier);
         this.supplierBaseRepository.create(supplierEntity);
+    }
+
+    @Override
+    public void update(final Supplier supplier) {
+        final SupplierEntity supplierEntity = ModelToEntityMapper.map(supplier);
+        this.supplierBaseRepository.update(supplierEntity);
     }
 
     @Override

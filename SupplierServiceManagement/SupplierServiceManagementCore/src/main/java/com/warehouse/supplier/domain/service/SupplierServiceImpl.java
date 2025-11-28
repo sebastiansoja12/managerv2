@@ -2,8 +2,12 @@ package com.warehouse.supplier.domain.service;
 
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.supplier.domain.enumeration.PackageType;
+import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
+import com.warehouse.supplier.domain.vo.DriverLicense;
 
 import java.util.UUID;
 
@@ -18,7 +22,49 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public void create(final Supplier supplier) {
-        this.supplierRepository.createOrUpdate(supplier);
+        this.supplierRepository.create(supplier);
+    }
+
+    @Override
+    public void activate(final SupplierId supplierId) {
+        final Supplier supplier = this.findById(supplierId);
+        supplier.markAsActive();
+        this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void deactivate(final SupplierId supplierId) {
+        final Supplier supplier = this.findById(supplierId);
+        supplier.markAsInactive();
+        this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void updateDriverLicense(final SupplierId supplierId, final DriverLicense driverLicense) {
+        final Supplier supplier = this.findById(supplierId);
+        supplier.changeDriverLicense(driverLicense);
+        this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void updateUserCreated(final SupplierId supplierId, final UserId createdUserId) {
+        final Supplier supplier = this.findById(supplierId);
+        supplier.markUserCreated(createdUserId);
+        this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void updateDeliveryArea(final SupplierId supplierId, final DeliveryArea deliveryArea) {
+        final Supplier supplier = this.findById(supplierId);
+        supplier.changeDeliveryArea(deliveryArea);
+        this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void addSupportedPackageType(final SupplierId supplierId, final PackageType packageType) {
+        final Supplier supplier = this.findById(supplierId);
+        supplier.addSupportedPackageType(packageType);
+        this.supplierRepository.update(supplier);
     }
 
     @Override
