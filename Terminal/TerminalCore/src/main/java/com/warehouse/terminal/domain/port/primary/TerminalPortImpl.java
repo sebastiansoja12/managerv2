@@ -86,6 +86,11 @@ public class TerminalPortImpl implements TerminalPort {
         return this.terminalService.findAll();
     }
 
+    @Override
+    public Terminal getDevice(final DeviceId deviceId) {
+        return this.terminalService.findByDeviceId(deviceId);
+    }
+
     private void logTerminalCreate(final TerminalAddRequest request) {
         log.info("Creating terminal device for username {}", request.getUsername());
     }

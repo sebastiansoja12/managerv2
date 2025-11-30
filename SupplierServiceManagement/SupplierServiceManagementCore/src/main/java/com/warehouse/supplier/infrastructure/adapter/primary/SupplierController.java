@@ -6,6 +6,7 @@ import com.warehouse.supplier.domain.exception.DomainException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
 import com.warehouse.supplier.domain.vo.*;
+import com.warehouse.supplier.infrastructure.adapter.primary.dto.ChangeSupplierDeviceApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.ChangeSupportedPackageTypesApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.DriverLicenseApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.SupplierCreateApiRequest;
@@ -49,6 +50,15 @@ public class SupplierController {
 			@RequestBody final ChangeSupportedPackageTypesApiRequest changeSupportedPackageTypeRequest) {
         final ChangeSupportedPackageTypeRequest request = RequestMapper.map(changeSupportedPackageTypeRequest);
         this.supplyPort.addPackageType(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/devices")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    public ResponseEntity<?> updateDevice(
+            @RequestBody final ChangeSupplierDeviceApiRequest changeSupplierDeviceRequest) {
+        final ChangeSupplierDeviceRequest request = RequestMapper.map(changeSupplierDeviceRequest);
+        this.supplyPort.addDevice(request);
         return ResponseEntity.ok().build();
     }
 
