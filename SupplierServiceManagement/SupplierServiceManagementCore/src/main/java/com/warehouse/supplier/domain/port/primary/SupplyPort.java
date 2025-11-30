@@ -10,5 +10,6 @@ public interface SupplyPort {
     Supplier getOneById(final SupplierId supplierId);
     Supplier getOneByCode(final SupplierCode supplierCode);
     void addPackageType(final ChangeSupportedPackageTypeRequest request);
+    void addDevice(final ChangeSupplierDeviceRequest request);
     DriverLicenseResponse updateDriverLicense(final DriverLicenseRequest request);
 }

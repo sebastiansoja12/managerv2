@@ -1,12 +1,10 @@
 package com.warehouse.supplier.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.commonassets.enumeration.PackageType;
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.supplier.domain.vo.*;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.ChangeSupportedPackageTypesApiRequest;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.DriverLicenseApi;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.DriverLicenseApiRequest;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.SupplierCreateApiRequest;
+import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
 
 public abstract class RequestMapper {
 
@@ -26,5 +24,10 @@ public abstract class RequestMapper {
     public static ChangeSupportedPackageTypeRequest map(final ChangeSupportedPackageTypesApiRequest request) {
         return new ChangeSupportedPackageTypeRequest(new SupplierCode(request.supplierCode().value()),
                 PackageType.valueOf(request.packageType()));
+    }
+
+    public static ChangeSupplierDeviceRequest map(final ChangeSupplierDeviceApiRequest request) {
+        return new ChangeSupplierDeviceRequest(new SupplierCode(request.supplierCode().value()),
+                new DeviceId(request.deviceId().value()));
     }
 }

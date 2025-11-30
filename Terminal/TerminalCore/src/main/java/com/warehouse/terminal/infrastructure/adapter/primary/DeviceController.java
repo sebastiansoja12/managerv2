@@ -1,13 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.primary;
 
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.Terminal;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
 import com.warehouse.terminal.domain.port.primary.TerminalPort;
@@ -21,6 +15,12 @@ import com.warehouse.terminal.request.DeviceTypeRequestDto;
 import com.warehouse.terminal.request.DeviceUserRequestDto;
 import com.warehouse.terminal.request.DeviceVersionRequestDto;
 import com.warehouse.terminal.request.TerminalAddRequestDto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static org.mapstruct.factory.Mappers.getMapper;
 
 @RestController
 @RequestMapping("/devices")
@@ -64,6 +64,12 @@ public class DeviceController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getDevice(@PathVariable final Long id) {
+        final DeviceId deviceId = new DeviceId(id);
+        final Terminal device = this.terminalPort.getDevice(deviceId);
+        return ResponseEntity.ok(responseMapper.mapToDeviceResponse(device));
+    }
 
     @GetMapping
     public ResponseEntity<?> getAllDevices() {

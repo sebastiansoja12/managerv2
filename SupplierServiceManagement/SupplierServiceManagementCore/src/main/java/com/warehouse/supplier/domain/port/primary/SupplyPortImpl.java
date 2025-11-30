@@ -1,17 +1,20 @@
 package com.warehouse.supplier.domain.port.primary;
 
 import com.warehouse.commonassets.helper.Result;
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.event.SupplierCreated;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
 import com.warehouse.supplier.domain.registry.DomainContext;
 import com.warehouse.supplier.domain.service.DriverLicenseService;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
 import com.warehouse.supplier.domain.service.SupplierValidatorService;
 import com.warehouse.supplier.domain.vo.*;
+import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
 
 import java.time.Instant;
 
@@ -25,14 +28,18 @@ public class SupplyPortImpl implements SupplyPort {
 
     private final DriverLicenseService driverLicenseService;
 
+    private final DeviceServicePort deviceServicePort;
+
     public SupplyPortImpl(final SupplierService supplierService,
                           final SupplierCodeGeneratorService generatorService,
                           final SupplierValidatorService validatorService,
-                          final DriverLicenseService driverLicenseService) {
+                          final DriverLicenseService driverLicenseService,
+                          final DeviceServicePort deviceServicePort) {
         this.supplierService = supplierService;
         this.generatorService = generatorService;
         this.validatorService = validatorService;
         this.driverLicenseService = driverLicenseService;
+        this.deviceServicePort = deviceServicePort;
     }
 
     @Override
@@ -66,6 +73,20 @@ public class SupplyPortImpl implements SupplyPort {
     @Override
     public void addPackageType(final ChangeSupportedPackageTypeRequest request) {
         this.supplierService.addSupportedPackageType(request.supplierCode(), request.packageType());
+    }
+
+    @Override
+    public void addDevice(final ChangeSupplierDeviceRequest request) {
+        final DeviceId deviceId = request.deviceId();
+        final Result<Void, String> result = deviceServicePort.validateDevice(deviceId);
+        if (result.isFailure()) {
+            throw new IllegalArgumentException(result.getFailure());
+        }
+        final SupplierCode supplierCode = request.supplierCode();
+        if (supplierService.findByCode(supplierCode) == null) {
+            throw new SupplierNotFoundException(supplierCode.value());
+        }
+        this.supplierService.addDevice(supplierCode, deviceId);
     }
 
     @Override
