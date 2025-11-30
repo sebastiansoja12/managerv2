@@ -1,5 +1,6 @@
 package com.warehouse.supplier.domain.registry;
 
+import com.warehouse.supplier.domain.service.SupplierService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -20,6 +21,10 @@ public final class DomainContext implements ApplicationEventPublisherAware, Appl
 
     public static synchronized ApplicationEventPublisher eventPublisher() {
         return eventPublisher;
+    }
+
+    public static SupplierService service() {
+        return context.getBean(SupplierService.class);
     }
 
     @Override
