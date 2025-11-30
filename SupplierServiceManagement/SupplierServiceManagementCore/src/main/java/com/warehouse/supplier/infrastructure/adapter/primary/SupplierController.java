@@ -14,6 +14,7 @@ import com.warehouse.supplier.infrastructure.adapter.primary.mapper.ResponseMapp
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.InfrastructureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/suppliers")
@@ -27,6 +28,7 @@ public class SupplierController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> create(@RequestBody final SupplierCreateApiRequest supplierCreateApiRequest) {
         final SupplierCreateRequest request = RequestMapper.map(supplierCreateApiRequest);
         final SupplierCreateResponse response = this.supplyPort.create(request);
@@ -34,6 +36,7 @@ public class SupplierController {
     }
 
     @PutMapping("/driver-licenses")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> updateDriverLicense(@RequestBody final DriverLicenseApiRequest driverLicenseRequest) {
         final DriverLicenseRequest request = RequestMapper.map(driverLicenseRequest);
         final DriverLicenseResponse response = this.supplyPort.updateDriverLicense(request);
@@ -41,7 +44,8 @@ public class SupplierController {
     }
 
     @PutMapping("/supported-package-types")
-	public ResponseEntity<?> updatePackageTypes(
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    public ResponseEntity<?> updatePackageTypes(
 			@RequestBody final ChangeSupportedPackageTypesApiRequest changeSupportedPackageTypeRequest) {
         final ChangeSupportedPackageTypeRequest request = RequestMapper.map(changeSupportedPackageTypeRequest);
         this.supplyPort.addPackageType(request);
