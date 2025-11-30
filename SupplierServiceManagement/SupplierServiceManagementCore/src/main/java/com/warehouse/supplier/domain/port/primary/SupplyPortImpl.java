@@ -7,11 +7,11 @@ import com.warehouse.supplier.domain.event.SupplierCreated;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.registry.DomainContext;
+import com.warehouse.supplier.domain.service.DriverLicenseService;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
 import com.warehouse.supplier.domain.service.SupplierValidatorService;
-import com.warehouse.supplier.domain.vo.SupplierCreateRequest;
-import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
+import com.warehouse.supplier.domain.vo.*;
 
 import java.time.Instant;
 
@@ -23,12 +23,16 @@ public class SupplyPortImpl implements SupplyPort {
 
     private final SupplierValidatorService validatorService;
 
+    private final DriverLicenseService driverLicenseService;
+
     public SupplyPortImpl(final SupplierService supplierService,
                           final SupplierCodeGeneratorService generatorService,
-                          final SupplierValidatorService validatorService) {
+                          final SupplierValidatorService validatorService,
+                          final DriverLicenseService driverLicenseService) {
         this.supplierService = supplierService;
         this.generatorService = generatorService;
         this.validatorService = validatorService;
+        this.driverLicenseService = driverLicenseService;
     }
 
     @Override
@@ -57,6 +61,19 @@ public class SupplyPortImpl implements SupplyPort {
     @Override
     public Supplier getOneByCode(final SupplierCode supplierCode) {
         return supplierService.findByCode(supplierCode);
+    }
+
+    @Override
+    public DriverLicenseResponse updateDriverLicense(final DriverLicenseRequest request) {
+        final DriverLicense driverLicense = request.driverLicense();
+        final SupplierCode supplierCode = request.supplierCode();
+        final Result<Void, String> validationResult = this.driverLicenseService.validateDriverLicense(driverLicense);
+        if (validationResult.isSuccess()) {
+            this.supplierService.updateDriverLicense(supplierCode, driverLicense);
+            return DriverLicenseResponse.ok();
+        } else {
+            return DriverLicenseResponse.failure(validationResult.getFailure());
+        }
     }
 
     private void validateNotExists(final SupplierCode supplierCode) {

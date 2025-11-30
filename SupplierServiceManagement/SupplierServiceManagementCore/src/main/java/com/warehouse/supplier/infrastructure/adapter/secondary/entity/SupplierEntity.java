@@ -3,7 +3,7 @@ package com.warehouse.supplier.infrastructure.adapter.secondary.entity;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.repository.baseentity.BaseEntity;
-import com.warehouse.supplier.domain.enumeration.PackageType;
+import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
 import jakarta.persistence.*;

@@ -6,7 +6,7 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.VehicleId;
-import com.warehouse.supplier.domain.enumeration.PackageType;
+import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
 import com.warehouse.supplier.domain.model.DeliveryArea;

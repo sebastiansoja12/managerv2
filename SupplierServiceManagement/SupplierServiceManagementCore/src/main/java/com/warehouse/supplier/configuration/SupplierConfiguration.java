@@ -24,8 +24,14 @@ public class SupplierConfiguration {
     @Bean
     public SupplyPort supplyPort(final SupplierService service,
                                  final SupplierCodeGeneratorService generatorService,
-                                 final SupplierValidatorService validatorService) {
-        return new SupplyPortImpl(service, generatorService, validatorService);
+                                 final SupplierValidatorService validatorService,
+                                 final DriverLicenseService driverLicenseService) {
+        return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService);
+    }
+
+    @Bean
+    public DriverLicenseService driverLicenseService() {
+        return new DriverLicenseServiceImpl();
     }
 
     @Bean

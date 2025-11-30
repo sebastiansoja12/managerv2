@@ -4,6 +4,7 @@ import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
 import com.warehouse.supplier.domain.vo.DriverLicense;
+import com.warehouse.supplier.domain.vo.DriverLicenseResponse;
 import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
 
@@ -56,4 +57,8 @@ public abstract class ResponseMapper {
 	public static DriverLicenseApi map(final DriverLicense driverLicense) {
 		return new DriverLicenseApi(driverLicense.number(), driverLicense.acquiredDate(), driverLicense.drivingLicenseExpiryDate());
 	}
+
+    public static DriverLicenseApiResponse map(final DriverLicenseResponse response) {
+        return new DriverLicenseApiResponse(response.status().name(), response.message());
+    }
 }

@@ -2,7 +2,7 @@ package com.warehouse.supplier.domain.model;
 
 import com.google.common.collect.Sets;
 import com.warehouse.commonassets.identificator.*;
-import com.warehouse.supplier.domain.enumeration.PackageType;
+import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
 import com.warehouse.supplier.domain.event.SupplierVehicleAssigned;

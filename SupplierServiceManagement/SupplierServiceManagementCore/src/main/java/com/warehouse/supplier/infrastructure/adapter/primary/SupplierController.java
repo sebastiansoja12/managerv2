@@ -1,6 +1,5 @@
 package com.warehouse.supplier.infrastructure.adapter.primary;
 
-import com.warehouse.supplier.infrastructure.adapter.primary.mapper.ResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,10 +8,14 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
+import com.warehouse.supplier.domain.vo.DriverLicenseRequest;
+import com.warehouse.supplier.domain.vo.DriverLicenseResponse;
 import com.warehouse.supplier.domain.vo.SupplierCreateRequest;
 import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
+import com.warehouse.supplier.infrastructure.adapter.primary.dto.DriverLicenseApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.SupplierCreateApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.RequestMapper;
+import com.warehouse.supplier.infrastructure.adapter.primary.mapper.ResponseMapper;
 
 @RequestMapping("/suppliers")
 @RestController
@@ -29,6 +32,13 @@ public class SupplierController {
         final SupplierCreateRequest request = RequestMapper.map(supplierCreateApiRequest);
         final SupplierCreateResponse response = this.supplyPort.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMapper.map(response));
+    }
+
+    @PutMapping("/driver-licenses")
+    public ResponseEntity<?> updateDriverLicense(@RequestBody final DriverLicenseApiRequest driverLicenseRequest) {
+        final DriverLicenseRequest request = RequestMapper.map(driverLicenseRequest);
+        final DriverLicenseResponse response = this.supplyPort.updateDriverLicense(request);
+        return ResponseEntity.ok(ResponseMapper.map(response));
     }
 
     @GetMapping("/{id}")

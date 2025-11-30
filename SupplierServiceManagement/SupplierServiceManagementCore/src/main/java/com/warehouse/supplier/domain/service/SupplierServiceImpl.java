@@ -3,7 +3,7 @@ package com.warehouse.supplier.domain.service;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.supplier.domain.enumeration.PackageType;
+import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
@@ -40,8 +40,8 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public void updateDriverLicense(final SupplierId supplierId, final DriverLicense driverLicense) {
-        final Supplier supplier = this.findById(supplierId);
+    public void updateDriverLicense(final SupplierCode supplierCode, final DriverLicense driverLicense) {
+        final Supplier supplier = this.findByCode(supplierCode);
         supplier.changeDriverLicense(driverLicense);
         this.supplierRepository.update(supplier);
     }

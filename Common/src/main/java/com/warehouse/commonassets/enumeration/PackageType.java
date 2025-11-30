@@ -1,4 +1,4 @@
-package com.warehouse.supplier.domain.enumeration;
+package com.warehouse.commonassets.enumeration;
 
 public enum PackageType {
     SMALL,
