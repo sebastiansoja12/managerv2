@@ -62,8 +62,8 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public void addSupportedPackageType(final SupplierId supplierId, final PackageType packageType) {
-        final Supplier supplier = this.findById(supplierId);
+    public void addSupportedPackageType(final SupplierCode supplierCode, final PackageType packageType) {
+        final Supplier supplier = this.findByCode(supplierCode);
         supplier.addSupportedPackageType(packageType);
         this.supplierRepository.update(supplier);
     }

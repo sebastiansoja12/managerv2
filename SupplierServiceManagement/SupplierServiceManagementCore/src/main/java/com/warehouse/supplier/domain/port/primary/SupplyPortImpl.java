@@ -64,6 +64,11 @@ public class SupplyPortImpl implements SupplyPort {
     }
 
     @Override
+    public void addPackageType(final ChangeSupportedPackageTypeRequest request) {
+        this.supplierService.addSupportedPackageType(request.supplierCode(), request.packageType());
+    }
+
+    @Override
     public DriverLicenseResponse updateDriverLicense(final DriverLicenseRequest request) {
         final DriverLicense driverLicense = request.driverLicense();
         final SupplierCode supplierCode = request.supplierCode();

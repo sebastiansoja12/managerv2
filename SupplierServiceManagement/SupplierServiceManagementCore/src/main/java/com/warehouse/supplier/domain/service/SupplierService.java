@@ -16,7 +16,7 @@ public interface SupplierService {
     void updateDriverLicense(final SupplierCode supplierCode, final DriverLicense driverLicense);
     void updateUserCreated(final SupplierId supplierId, final UserId createdUserId);
     void updateDeliveryArea(final SupplierId supplierId, final DeliveryArea deliveryArea);
-    void addSupportedPackageType(final SupplierId supplierId, final PackageType packageType);
+    void addSupportedPackageType(final SupplierCode supplierCode, final PackageType packageType);
     void addDevice(final SupplierCode supplierCode, final DeviceId deviceId);
 
     Supplier findById(final SupplierId supplierId);

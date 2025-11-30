@@ -5,10 +5,8 @@ import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.exception.DomainException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
-import com.warehouse.supplier.domain.vo.DriverLicenseRequest;
-import com.warehouse.supplier.domain.vo.DriverLicenseResponse;
-import com.warehouse.supplier.domain.vo.SupplierCreateRequest;
-import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
+import com.warehouse.supplier.domain.vo.*;
+import com.warehouse.supplier.infrastructure.adapter.primary.dto.ChangeSupportedPackageTypesApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.DriverLicenseApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.SupplierCreateApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.RequestMapper;
@@ -40,6 +38,14 @@ public class SupplierController {
         final DriverLicenseRequest request = RequestMapper.map(driverLicenseRequest);
         final DriverLicenseResponse response = this.supplyPort.updateDriverLicense(request);
         return ResponseEntity.ok(ResponseMapper.map(response));
+    }
+
+    @PutMapping("/supported-package-types")
+	public ResponseEntity<?> updatePackageTypes(
+			@RequestBody final ChangeSupportedPackageTypesApiRequest changeSupportedPackageTypeRequest) {
+        final ChangeSupportedPackageTypeRequest request = RequestMapper.map(changeSupportedPackageTypeRequest);
+        this.supplyPort.addPackageType(request);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
