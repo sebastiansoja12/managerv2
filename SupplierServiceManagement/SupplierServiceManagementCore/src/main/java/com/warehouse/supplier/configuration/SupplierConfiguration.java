@@ -1,19 +1,19 @@
 package com.warehouse.supplier.configuration;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
 import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
+import com.warehouse.supplier.domain.port.secondary.MailServicePort;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.service.*;
+import com.warehouse.supplier.infrastructure.adapter.secondary.MailServiceAdapter;
 import com.warehouse.supplier.infrastructure.adapter.secondary.SupplierRepositoryImpl;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SupplierConfiguration {
@@ -52,5 +52,10 @@ public class SupplierConfiguration {
     @Bean
     public BaseRepository<SupplierEntity> supplierBaseRepository() {
         return new BaseRepository<>(entityManager);
+    }
+
+    @Bean("supplier.mailServicePort")
+    public MailServicePort mailServicePort() {
+        return new MailServiceAdapter();
     }
 }

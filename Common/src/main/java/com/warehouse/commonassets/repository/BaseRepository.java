@@ -29,6 +29,7 @@ public class BaseRepository<T extends BelongsToDepartment> implements TenantFilt
     }
 
     @Override
+    @Transactional
     public void update(final T object) {
         this.entityManager.merge(object);
     }
