@@ -1,11 +1,8 @@
 package com.warehouse.supplier.infrastructure.adapter.primary;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.supplier.domain.exception.DomainException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
 import com.warehouse.supplier.domain.vo.DriverLicenseRequest;
@@ -16,6 +13,10 @@ import com.warehouse.supplier.infrastructure.adapter.primary.dto.DriverLicenseAp
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.SupplierCreateApiRequest;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.ResponseMapper;
+import com.warehouse.supplier.infrastructure.adapter.secondary.exception.InfrastructureException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/suppliers")
 @RestController
@@ -53,5 +54,15 @@ public class SupplierController {
         final SupplierCode supplierCode = new SupplierCode(code);
         final Supplier supplier = this.supplyPort.getOneByCode(supplierCode);
         return ResponseEntity.ok(ResponseMapper.map(supplier));
+    }
+
+    @ExceptionHandler(DomainException.class)
+    public ResponseEntity<?> handleException(final DomainException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InfrastructureException.class)
+    public ResponseEntity<?> handleException(final InfrastructureException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

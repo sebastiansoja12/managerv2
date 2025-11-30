@@ -1,5 +1,6 @@
 package com.warehouse.supplier.domain.service;
 
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -64,6 +65,13 @@ public class SupplierServiceImpl implements SupplierService {
     public void addSupportedPackageType(final SupplierId supplierId, final PackageType packageType) {
         final Supplier supplier = this.findById(supplierId);
         supplier.addSupportedPackageType(packageType);
+        this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void addDevice(final SupplierCode supplierCode, final DeviceId deviceId) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.changeDeviceId(deviceId);
         this.supplierRepository.update(supplier);
     }
 

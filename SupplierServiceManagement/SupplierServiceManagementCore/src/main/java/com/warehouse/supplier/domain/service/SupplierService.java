@@ -1,5 +1,6 @@
 package com.warehouse.supplier.domain.service;
 
+import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -16,6 +17,7 @@ public interface SupplierService {
     void updateUserCreated(final SupplierId supplierId, final UserId createdUserId);
     void updateDeliveryArea(final SupplierId supplierId, final DeliveryArea deliveryArea);
     void addSupportedPackageType(final SupplierId supplierId, final PackageType packageType);
+    void addDevice(final SupplierCode supplierCode, final DeviceId deviceId);
 
     Supplier findById(final SupplierId supplierId);
     Supplier findByCode(final SupplierCode supplierCode);
