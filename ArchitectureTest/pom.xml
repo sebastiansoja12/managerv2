@@ -128,6 +128,26 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>PalletHandlingManagerCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>RouteTrackerFlowCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>SupplierServiceManagementCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>SoftwareConfigurationCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
             <scope>test</scope>
