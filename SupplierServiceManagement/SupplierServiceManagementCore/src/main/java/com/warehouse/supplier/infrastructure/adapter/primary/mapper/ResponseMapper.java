@@ -2,10 +2,7 @@ package com.warehouse.supplier.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
-import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
-import com.warehouse.supplier.domain.vo.DriverLicense;
-import com.warehouse.supplier.domain.vo.DriverLicenseResponse;
-import com.warehouse.supplier.domain.vo.SupplierCreateResponse;
+import com.warehouse.supplier.domain.vo.*;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
 
 public abstract class ResponseMapper {
@@ -60,5 +57,10 @@ public abstract class ResponseMapper {
 
     public static DriverLicenseApiResponse map(final DriverLicenseResponse response) {
         return new DriverLicenseApiResponse(response.status().name(), response.message());
+    }
+
+    public static SupplierUpdateApiResponse map(final SupplierUpdateResponse response) {
+        return new SupplierUpdateApiResponse(new SupplierCodeApi(response.supplierCode().value()),
+                String.valueOf(response.status()), response.message());
     }
 }

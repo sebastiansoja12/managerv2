@@ -1,6 +1,5 @@
 package com.warehouse.supplier.configuration;
 
-import com.warehouse.supplier.infrastructure.adapter.secondary.SupplierConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +10,9 @@ import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
 import com.warehouse.supplier.domain.port.secondary.MailServicePort;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
+import com.warehouse.supplier.domain.port.secondary.UserServicePort;
 import com.warehouse.supplier.domain.service.*;
-import com.warehouse.supplier.infrastructure.adapter.secondary.DeviceServiceAdapter;
-import com.warehouse.supplier.infrastructure.adapter.secondary.MailServiceAdapter;
-import com.warehouse.supplier.infrastructure.adapter.secondary.SupplierRepositoryImpl;
+import com.warehouse.supplier.infrastructure.adapter.secondary.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
 
 import jakarta.persistence.EntityManager;
@@ -33,6 +31,11 @@ public class SupplierConfiguration {
                                  final DriverLicenseService driverLicenseService,
                                  final DeviceServicePort deviceServicePort) {
         return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort);
+    }
+
+    @Bean("supplier.userServicePort")
+    public UserServicePort userServicePort() {
+        return new UserServiceAdapter();
     }
 
     @Bean

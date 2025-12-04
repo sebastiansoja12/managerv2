@@ -3,7 +3,9 @@ package com.warehouse.supplier.domain.service;
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
+import com.warehouse.supplier.domain.vo.SupplierUpdateRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,8 +13,12 @@ public class SupplierValidatorServiceImpl implements SupplierValidatorService {
 
     private final SupplierRepository supplierRepository;
 
-    public SupplierValidatorServiceImpl(final SupplierRepository supplierRepository) {
+    private final DeviceServicePort deviceServicePort;
+
+    public SupplierValidatorServiceImpl(final SupplierRepository supplierRepository,
+                                        final DeviceServicePort deviceServicePort) {
         this.supplierRepository = supplierRepository;
+        this.deviceServicePort = deviceServicePort;
     }
 
     @Override
@@ -66,5 +72,19 @@ public class SupplierValidatorServiceImpl implements SupplierValidatorService {
     @Override
     public boolean validateSupplierId(final SupplierId supplierId) {
         return false;
+    }
+
+    @Override
+    public Result<Void, String> validateSupplierForUpdate(final SupplierUpdateRequest supplierUpdateRequest) {
+        final Result<Void, String> result;
+        final Result<Void, String> deviceValidationResult = deviceServicePort.validateDevice(supplierUpdateRequest.deviceId());
+        if (supplierRepository.findByCode(supplierUpdateRequest.supplierCode()) == null) {
+            result = Result.failure("Supplier with code " + supplierUpdateRequest.supplierCode() + " not found");
+        } else if (deviceValidationResult.isFailure()) {
+            result = deviceValidationResult;
+        } else {
+            result = Result.success();
+        }
+        return result;
     }
 }

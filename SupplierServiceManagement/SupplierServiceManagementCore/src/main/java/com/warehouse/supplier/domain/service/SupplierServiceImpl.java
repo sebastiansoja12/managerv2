@@ -1,15 +1,19 @@
 package com.warehouse.supplier.domain.service;
 
+import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.enumeration.PackageType;
+import com.warehouse.supplier.domain.event.SupplierUpdated;
 import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
+import com.warehouse.supplier.domain.registry.DomainContext;
 import com.warehouse.supplier.domain.vo.DriverLicense;
+import com.warehouse.supplier.domain.vo.SupplierDto;
 
+import java.time.Instant;
 import java.util.UUID;
 
 
@@ -73,6 +77,16 @@ public class SupplierServiceImpl implements SupplierService {
         final Supplier supplier = this.findByCode(supplierCode);
         supplier.changeDeviceId(deviceId);
         this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void update(final SupplierCode supplierCode, final SupplierDto supp) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.updateData(supp);
+        this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher().publishEvent(
+                new SupplierUpdated(supplier.snapshot(), Instant.now())
+        );
     }
 
     @Override

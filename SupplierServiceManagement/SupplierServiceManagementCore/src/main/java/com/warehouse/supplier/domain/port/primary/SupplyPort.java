@@ -1,5 +1,6 @@
 package com.warehouse.supplier.domain.port.primary;
 
+import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.model.Supplier;
@@ -11,5 +12,6 @@ public interface SupplyPort {
     Supplier getOneByCode(final SupplierCode supplierCode);
     void addPackageType(final ChangeSupportedPackageTypeRequest request);
     void addDevice(final ChangeSupplierDeviceRequest request);
+    Result<Void, String> update(final SupplierUpdateRequest request);
     DriverLicenseResponse updateDriverLicense(final DriverLicenseRequest request);
 }

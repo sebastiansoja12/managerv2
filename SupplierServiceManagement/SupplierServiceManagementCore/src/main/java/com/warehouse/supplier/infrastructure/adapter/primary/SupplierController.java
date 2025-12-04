@@ -1,15 +1,13 @@
 package com.warehouse.supplier.infrastructure.adapter.primary;
 
+import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.exception.DomainException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPort;
 import com.warehouse.supplier.domain.vo.*;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.ChangeSupplierDeviceApiRequest;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.ChangeSupportedPackageTypesApiRequest;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.DriverLicenseApiRequest;
-import com.warehouse.supplier.infrastructure.adapter.primary.dto.SupplierCreateApiRequest;
+import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.supplier.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.InfrastructureException;
@@ -34,6 +32,21 @@ public class SupplierController {
         final SupplierCreateRequest request = RequestMapper.map(supplierCreateApiRequest);
         final SupplierCreateResponse response = this.supplyPort.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMapper.map(response));
+    }
+
+    @PutMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    public ResponseEntity<?> updateDriverLicense(@RequestBody final SupplierUpdateApiRequest supplierUpdateRequest) {
+        final SupplierUpdateRequest request = RequestMapper.map(supplierUpdateRequest);
+        final Result<Void, String> response = this.supplyPort.update(request);
+        final ResponseEntity<?> responseEntity;
+		if (response.isSuccess()) {
+			responseEntity = ResponseEntity.ok(ResponseMapper.map(SupplierUpdateResponse.ok(request.supplierCode())));
+		} else {
+			responseEntity = ResponseEntity.badRequest().body(ResponseMapper
+					.map(SupplierUpdateResponse.failure(request.supplierCode(), response.getFailure())));
+		}
+		return responseEntity;
     }
 
     @PutMapping("/driver-licenses")

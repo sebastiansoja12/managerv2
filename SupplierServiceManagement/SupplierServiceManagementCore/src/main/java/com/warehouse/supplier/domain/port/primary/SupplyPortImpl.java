@@ -54,8 +54,7 @@ public class SupplyPortImpl implements SupplyPort {
 
         this.supplierService.create(supplier);
 
-        DomainContext.eventPublisher()
-                .publishEvent(new SupplierCreated(supplier.snapshot(), Instant.now()));
+        DomainContext.publish(new SupplierCreated(supplier.snapshot(), Instant.now()));
 
         return new SupplierCreateResponse(supplier.supplierCode());
     }
@@ -87,6 +86,17 @@ public class SupplyPortImpl implements SupplyPort {
             throw new SupplierNotFoundException(supplierCode.value());
         }
         this.supplierService.addDevice(supplierCode, deviceId);
+    }
+
+    @Override
+    public Result<Void, String> update(final SupplierUpdateRequest request) {
+        final SupplierCode supplierCode = request.supplierCode();
+        final Result<Void, String> validationResult = this.validatorService.validateSupplierForUpdate(request);
+        if (validationResult.isFailure()) {
+            return Result.failure(validationResult.getFailure());
+        }
+        this.supplierService.update(supplierCode, SupplierDto.from(request));
+        return Result.success();
     }
 
     @Override

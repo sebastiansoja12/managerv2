@@ -1,14 +1,15 @@
 package com.warehouse.supplier.domain.model;
 
 import com.google.common.collect.Sets;
-import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.enumeration.PackageType;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
 import com.warehouse.supplier.domain.event.SupplierVehicleAssigned;
 import com.warehouse.supplier.domain.registry.DomainContext;
 import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
 import com.warehouse.supplier.domain.vo.DriverLicense;
+import com.warehouse.supplier.domain.vo.SupplierDto;
 import com.warehouse.supplier.domain.vo.SupplierSnapshot;
 import org.apache.commons.lang3.Validate;
 
@@ -228,6 +229,76 @@ public class Supplier {
         this.deviceId = deviceId;
         markAsModified();
     }
+
+    public void updateData(final SupplierDto supp) {
+        if (supp.deviceId() != null) {
+            changeDeviceId(supp.deviceId());
+        }
+
+        if (supp.driverLicense() != null) {
+            changeDriverLicense(supp.driverLicense());
+        }
+
+        if (supp.deliveryArea() != null) {
+            changeDeliveryArea(supp.deliveryArea());
+        }
+
+        if (supp.supportedPackageTypes() != null) {
+            changeSupportedPackageTypes(supp.supportedPackageTypes());
+        }
+
+        if (supp.dangerousGoodCertification() != null) {
+            changeDangerousGoodCertification(supp.dangerousGoodCertification());
+        }
+
+        if (supp.vehicleId() != null) {
+            assignVehicle(supp.vehicleId());
+        }
+
+        acceptTerms();
+
+        validateStateRequiredForActivation();
+        changeStatus(SupplierStatus.ACTIVE);
+        markAsModified();
+    }
+
+    private void acceptTerms() {
+        this.termsAccepted = true;
+        markAsModified();
+    }
+
+    private void validateStateRequiredForActivation() {
+        Validate.notNull(supplierId, "SupplierId cannot be null");
+        Validate.notNull(supplierCode, "SupplierCode cannot be null");
+
+        Validate.notNull(firstName, "First name cannot be null");
+        Validate.notNull(lastName, "Last name cannot be null");
+        Validate.notNull(telephoneNumber, "Telephone number cannot be null");
+
+        Validate.notNull(departmentCode, "DepartmentCode must be specified for activation");
+        Validate.notNull(vehicleId, "VehicleId must be specified for activation");
+        Validate.notNull(deviceId, "DeviceId must be specified for activation");
+        Validate.notNull(dangerousGoodCertification, "Dangerous good certification must be provided");
+        Validate.notNull(driverLicense, "Driver license must be provided");
+        Validate.notNull(deliveryArea, "Delivery area must be provided");
+
+        Validate.isTrue(!supportedPackageTypes.isEmpty(),
+                "Supported package types must contain at least one element");
+
+        Validate.isTrue(termsAccepted, "Terms must be accepted before activation");
+
+        Validate.notNull(createdAt, "CreatedAt cannot be null");
+        Validate.notNull(updatedAt, "UpdatedAt cannot be null");
+    }
+
+    private void changeStatus(final SupplierStatus supplierStatus) {
+        if (this.status == SupplierStatus.DELETED) {
+            throw new IllegalArgumentException("Cannot change status of deleted supplier");
+        }
+        this.status = supplierStatus;
+        markAsModified();
+    }
+
 
     private void markAsModified() {
         this.updatedAt = Instant.now();
