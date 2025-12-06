@@ -103,4 +103,11 @@ public class SupplierServiceImpl implements SupplierService {
     public SupplierId nextSupplierId() {
         return new SupplierId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
+
+    @Override
+    public void invalidateDriverLicense(final SupplierCode supplierCode) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.markDriverLicenseAsInvalid();
+        this.supplierRepository.update(supplier);
+    }
 }

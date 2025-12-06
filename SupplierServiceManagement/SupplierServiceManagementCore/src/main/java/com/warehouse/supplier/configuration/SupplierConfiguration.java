@@ -1,16 +1,12 @@
 package com.warehouse.supplier.configuration;
 
+import com.warehouse.supplier.domain.port.primary.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.commonassets.repository.BaseRepository;
-import com.warehouse.supplier.domain.port.primary.SupplyPort;
-import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
-import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
-import com.warehouse.supplier.domain.port.secondary.MailServicePort;
-import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
-import com.warehouse.supplier.domain.port.secondary.UserServicePort;
+import com.warehouse.supplier.domain.port.secondary.*;
 import com.warehouse.supplier.domain.service.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEntity;
@@ -31,6 +27,25 @@ public class SupplierConfiguration {
                                  final DriverLicenseService driverLicenseService,
                                  final DeviceServicePort deviceServicePort) {
         return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort);
+    }
+
+    @Bean
+    public DriverLicenseObserverPort driverLicenseObserverPort(
+            final DriverLicenseService driverLicenseService,
+            final SupplierNoDepartmentContextService supplierNoDepartmentContextService
+    ) {
+        return new DriverLicenseObserverPortImpl(driverLicenseService, supplierNoDepartmentContextService);
+    }
+
+    @Bean
+    public DangerousGoodObserverPort dangerousGoodObserverPort() {
+        return new DangerousGoodObserverPortImpl();
+    }
+
+    @Bean
+    public SupplierNoDepartmentContextRepository supplierNoDepartmentContextRepository(
+            final SupplierReadRepository supplierReadRepository) {
+        return new SupplierNoDepartmentContextRepositoryImpl(supplierReadRepository);
     }
 
     @Bean("supplier.userServicePort")

@@ -299,6 +299,12 @@ public class Supplier {
         markAsModified();
     }
 
+    public void markDriverLicenseAsInvalid() {
+        if (this.driverLicense != null) {
+            changeStatus(SupplierStatus.SUSPENDED);
+            this.driverLicense = null;
+        }
+    }
 
     private void markAsModified() {
         this.updatedAt = Instant.now();

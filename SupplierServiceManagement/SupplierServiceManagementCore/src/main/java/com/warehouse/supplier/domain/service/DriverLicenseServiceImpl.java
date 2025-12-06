@@ -9,7 +9,9 @@ public class DriverLicenseServiceImpl implements DriverLicenseService {
     @Override
     public Result<Void, String> validateDriverLicense(final DriverLicense driverLicense) {
         final Result<Void, String> result;
-        if (driverLicense.acquiredDate().isAfter(driverLicense.drivingLicenseExpiryDate())) {
+        if (driverLicense == null) {
+            result = Result.success();
+        } else if (driverLicense.acquiredDate().isAfter(driverLicense.drivingLicenseExpiryDate())) {
             result = Result.failure("Acquired date is after expiry date");
         }
         else if (driverLicense.number().length() < 14) {

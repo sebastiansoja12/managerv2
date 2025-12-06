@@ -89,6 +89,7 @@ public class SupplierController {
         return ResponseEntity.ok(ResponseMapper.map(supplier));
     }
 
+
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<?> handleException(final DomainException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());

@@ -24,4 +24,6 @@ public interface SupplierService {
     Supplier findById(final SupplierId supplierId);
     Supplier findByCode(final SupplierCode supplierCode);
     SupplierId nextSupplierId();
+
+    void invalidateDriverLicense(final SupplierCode supplierCode);
 }
