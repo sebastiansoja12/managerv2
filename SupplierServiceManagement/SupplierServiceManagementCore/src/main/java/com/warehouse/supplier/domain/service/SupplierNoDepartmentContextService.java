@@ -23,4 +23,9 @@ public class SupplierNoDepartmentContextService {
         supplier.markDriverLicenseAsInvalid();
         this.supplierNoDepartmentContextRepository.update(supplier);
     }
+
+    public void invalidateCertification(final Supplier supplier) {
+        supplier.markCertificationAsInvalid();
+        this.supplierNoDepartmentContextRepository.update(supplier);
+    }
 }

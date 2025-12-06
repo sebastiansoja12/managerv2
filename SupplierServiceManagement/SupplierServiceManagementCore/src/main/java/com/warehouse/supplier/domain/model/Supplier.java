@@ -306,6 +306,12 @@ public class Supplier {
         }
     }
 
+    public void markCertificationAsInvalid() {
+        if (this.dangerousGoodCertification != null) {
+            this.dangerousGoodCertification = null;
+        }
+    }
+
     private void markAsModified() {
         this.updatedAt = Instant.now();
     }

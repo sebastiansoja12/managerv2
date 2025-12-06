@@ -38,8 +38,8 @@ public class SupplierConfiguration {
     }
 
     @Bean
-    public DangerousGoodObserverPort dangerousGoodObserverPort() {
-        return new DangerousGoodObserverPortImpl();
+    public DangerousGoodObserverPort dangerousGoodObserverPort(final SupplierNoDepartmentContextService service) {
+        return new DangerousGoodObserverPortImpl(service);
     }
 
     @Bean

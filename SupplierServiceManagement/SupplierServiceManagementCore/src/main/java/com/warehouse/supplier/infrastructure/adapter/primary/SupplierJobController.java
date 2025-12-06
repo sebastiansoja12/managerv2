@@ -22,8 +22,14 @@ public class SupplierJobController {
     }
 
     @GetMapping("/driver-licenses")
-    public ResponseEntity<?> run() {
+    public ResponseEntity<?> runDriverLicenses() {
         this.driverLicenseObserverPort.run();
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/certifications")
+    public ResponseEntity<?> runCertifications() {
+        this.dangerousGoodObserverPort.run();
         return ResponseEntity.ok().build();
     }
 }
