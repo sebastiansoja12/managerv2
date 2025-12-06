@@ -275,6 +275,7 @@ public class Department {
 
     public void markAsDeleted() {
         this.status = Status.DELETED;
+        this.adminUserId = null;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
         DomainRegistry.eventPublisher().publishEvent(new DepartmentDeleted(this.snapshot(), Instant.now()));
@@ -305,5 +306,11 @@ public class Department {
         }
         this.adminUserId = adminUserId;
         markAsModified();
+    }
+
+    public void changeEmail(final String email) {
+        this.email = email;
+        markAsModified();
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentEmailChanged(this.snapshot(), Instant.now()));
     }
 }

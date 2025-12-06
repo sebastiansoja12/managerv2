@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<dataset>
+    <department
+            city="Test"
+            street="Test"
+            department_code="TST"
+    />
+
+    <supplier
+            supplier_code="abcdef"
+            first_name="test"
+            last_name="test"
+            telephone="123"
+            department_code="TST"
+            active="1"
+    />
+
+    <supplier
+            supplier_code="code"
+            first_name="test"
+            last_name="test"
+            telephone="123"
+            department_code="TST"
+            active="1"
+    />
+
+</dataset>

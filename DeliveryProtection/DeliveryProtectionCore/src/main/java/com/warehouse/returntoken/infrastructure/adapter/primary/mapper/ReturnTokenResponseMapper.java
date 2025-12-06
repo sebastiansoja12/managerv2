@@ -1,12 +1,11 @@
 package com.warehouse.returntoken.infrastructure.adapter.primary.mapper;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.returntoken.domain.vo.*;
 import com.warehouse.returntoken.infrastructure.adapter.primary.dto.*;
+import org.mapstruct.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface ReturnTokenResponseMapper {
@@ -30,6 +29,8 @@ public interface ReturnTokenResponseMapper {
     }
 
     CrossCourierDeliveryDto map(final CrossCourierDelivery crossCourierDelivery);
+
+    String map(Object value);
 
     ReturnTokenDto map(final ReturnToken returnToken);
 

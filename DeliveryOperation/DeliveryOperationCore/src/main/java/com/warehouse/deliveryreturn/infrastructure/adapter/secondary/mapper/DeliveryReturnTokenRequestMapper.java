@@ -1,11 +1,6 @@
 package com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper;
 
 
-import java.util.List;
-import java.util.UUID;
-
-import org.mapstruct.Mapper;
-
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
@@ -13,6 +8,10 @@ import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.vo.ReturnPackageRequest;
 import com.warehouse.deliveryreturn.domain.vo.Supplier;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.api.dto.*;
+import org.mapstruct.Mapper;
+
+import java.util.List;
+import java.util.UUID;
 
 @Mapper
 public interface DeliveryReturnTokenRequestMapper {
@@ -37,7 +36,7 @@ public interface DeliveryReturnTokenRequestMapper {
     }
 
     default SupplierCodeDto map(final SupplierCode supplierCode) {
-        return new SupplierCodeDto(supplierCode.getValue());
+        return new SupplierCodeDto(supplierCode.value());
     }
 
     default SupplierDto map(final Supplier supplier) {

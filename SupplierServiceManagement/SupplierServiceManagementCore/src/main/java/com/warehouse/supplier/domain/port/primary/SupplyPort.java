@@ -1,0 +1,17 @@
+package com.warehouse.supplier.domain.port.primary;
+
+import com.warehouse.commonassets.helper.Result;
+import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.vo.*;
+
+public interface SupplyPort {
+    SupplierCreateResponse create(final SupplierCreateRequest supplierCreateRequest);
+    Supplier getOneById(final SupplierId supplierId);
+    Supplier getOneByCode(final SupplierCode supplierCode);
+    void addPackageType(final ChangeSupportedPackageTypeRequest request);
+    void addDevice(final ChangeSupplierDeviceRequest request);
+    Result<Void, String> update(final SupplierUpdateRequest request);
+    DriverLicenseResponse updateDriverLicense(final DriverLicenseRequest request);
+}

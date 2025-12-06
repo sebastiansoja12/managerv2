@@ -1,9 +1,5 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary.mapper;
 
-import java.time.LocalDateTime;
-
-import org.mapstruct.Mapper;
-
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -12,6 +8,9 @@ import com.warehouse.logistics.domain.model.LogisticsRequest;
 import com.warehouse.logistics.domain.model.LogisticsResponse;
 import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DeliveryEntity;
 import com.warehouse.logistics.infrastructure.adapter.secondary.enumeration.Status;
+import org.mapstruct.Mapper;
+
+import java.time.LocalDateTime;
 
 @Mapper
 public interface DeliveryEntityMapper {
@@ -22,7 +21,7 @@ public interface DeliveryEntityMapper {
         deliveryEntity.setToken(delivery.getDeliveryToken() == null ? delivery.getReturnToken().toString() : delivery.getDeliveryToken().getValue());
         deliveryEntity.setParcelId(delivery.getShipmentId().getValue());
         deliveryEntity.setDepotCode(delivery.getDepartmentCode().getValue());
-        deliveryEntity.setSupplierCode(delivery.getSupplierCode().getValue());
+        deliveryEntity.setSupplierCode(delivery.getSupplierCode().value());
         return deliveryEntity;
     }
 

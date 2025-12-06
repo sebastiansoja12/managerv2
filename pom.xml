@@ -40,6 +40,8 @@
         <module>CrossLogistics</module>
         <module>Gateway</module>
         <module>SupplierServiceManagement</module>
+        <module>TransportAssets</module>
+        <module>DriverHub</module>
     </modules>
 
 	<properties>

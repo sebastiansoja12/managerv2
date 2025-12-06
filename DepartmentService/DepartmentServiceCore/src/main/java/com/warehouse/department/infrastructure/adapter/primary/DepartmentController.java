@@ -7,9 +7,7 @@ import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreateRequest;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.vo.*;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.DepartmentCreateApiRequest;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.IdentificationNumberChangeApiRequest;
-import com.warehouse.department.infrastructure.adapter.primary.api.dto.UpdateAddressApiRequest;
+import com.warehouse.department.infrastructure.adapter.primary.api.dto.*;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
@@ -90,6 +88,25 @@ public class DepartmentController {
         final IdentificationNumberChangeRequest request = RequestMapper.map(identificationNumberChangeRequest);
         final IdentificationNumberChangeResponse response = this.departmentPort.changeIdentificationNumber(request);
         return ResponseEntity.ok(ResponseMapper.map(response));
+    }
+
+    @PutMapping("/statuses")
+    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    public ResponseEntity<?> changeDepartmentStatus(
+            @RequestBody final ChangeDepartmentStatusApi departmentStatusRequest) {
+		final ChangeDepartmentStatusRequest request = new ChangeDepartmentStatusRequest(
+				new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status());
+        this.departmentPort.changeStatus(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/emails")
+    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    public ResponseEntity<?> changeDepartmentEmail(
+            @RequestBody final ChangeDepartmentEmailApiRequest changeDepartmentEmailRequest) {
+        final DepartmentCode departmentCode = new DepartmentCode(changeDepartmentEmailRequest.departmentCode().value());
+        this.departmentPort.changeEmail(departmentCode, changeDepartmentEmailRequest.email());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{value}")

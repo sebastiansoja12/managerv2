@@ -25,4 +25,6 @@ public interface DepartmentService {
     void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
 
     void changeStatus(final DepartmentCode departmentCode, final Department.Status status);
+
+    void changeEmail(final DepartmentCode departmentCode, final String email);
 }

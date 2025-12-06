@@ -25,59 +25,67 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
-        return departmentRepository.findByCode(departmentCode);
+        return departmentRepository.findByDepartmentCode(departmentCode);
     }
 
     @Override
     public void changeAddress(final DepartmentCode departmentCode, final Address address) {
-        final Department department = this.departmentRepository.findByCode(departmentCode);
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeAddress(address);
         this.departmentRepository.createOrUpdate(department);
     }
 
     @Override
     public void changeTaxId(final DepartmentCode departmentCode, final TaxId newTaxId) {
-        final Department department = this.departmentRepository.findByCode(departmentCode);
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeTaxId(newTaxId);
         this.departmentRepository.createOrUpdate(department);
     }
 
     @Override
     public void activateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy) {
-        final Department department = this.departmentRepository.findByCode(departmentCode);
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.activate(modifiedBy);
         this.departmentRepository.createOrUpdate(department);
     }
 
     @Override
     public void deactivateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy) {
-        final Department department = this.departmentRepository.findByCode(departmentCode);
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.deactivate(modifiedBy);
         this.departmentRepository.createOrUpdate(department);
     }
 
     @Override
     public void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType) {
-        final Department department = this.departmentRepository.findByCode(departmentCode);
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeDepartmentType(departmentType);
         this.departmentRepository.createOrUpdate(department);
     }
 
     @Override
     public void changeAdminUser(final DepartmentCode departmentCode, final UserId userId) {
-        final Department department = this.departmentRepository.findByCode(departmentCode);
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeAdminUserId(userId);
         this.departmentRepository.createOrUpdate(department);
     }
 
     @Override
     public void changeStatus(final DepartmentCode departmentCode, final Department.Status status) {
-        final Department department = this.departmentRepository.findByCode(departmentCode);
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         switch (status) {
             case ARCHIVED -> department.markAsArchived();
             case SUSPENDED -> department.markAsSuspended();
+            case DELETED -> department.markAsDeleted();
             default -> throw new IllegalArgumentException("Unknown status: " + status);
         }
+        this.departmentRepository.createOrUpdate(department);
+    }
+
+    @Override
+    public void changeEmail(final DepartmentCode departmentCode, final String email) {
+        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
+        department.changeEmail(email);
         this.departmentRepository.createOrUpdate(department);
     }
 }
