@@ -31,7 +31,7 @@ public class DriverLicenseObserverPortImpl implements DriverLicenseObserverPort 
         suppliers.forEach(supplier -> {
             final Result<Void, String> result = this.driverLicenseService.validateDriverLicense(supplier.getDriverLicense());
             if (result.isFailure()) {
-                log.warn("Suppliers driver license is invalid!", supplier.supplierCode().value());
+                log.warn("Suppliers {} driver license is invalid!", supplier.supplierCode().value());
                 this.supplierNoDepartmentContextService.invalidateDriverLicense(supplier);
             }
         });
