@@ -26,6 +26,7 @@ public class DriverLicenseObserverPortImpl implements DriverLicenseObserverPort 
     @Scheduled(cron = "${purge.cron.expression}")
     @Override
     public void run() {
+        log.info("===============  Checking driver licenses validity ===============");
         final List<Supplier> suppliers = this.supplierNoDepartmentContextService.findAll();
         suppliers.forEach(supplier -> {
             final Result<Void, String> result = this.driverLicenseService.validateDriverLicense(supplier.getDriverLicense());
@@ -34,5 +35,6 @@ public class DriverLicenseObserverPortImpl implements DriverLicenseObserverPort 
                 this.supplierNoDepartmentContextService.invalidateDriverLicense(supplier);
             }
         });
+        log.info("===============  Checking driver licenses validity finished ===============");
     }
 }
