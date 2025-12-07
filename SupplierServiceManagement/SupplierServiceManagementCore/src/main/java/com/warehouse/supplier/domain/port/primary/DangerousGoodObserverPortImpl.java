@@ -25,7 +25,7 @@ public class DangerousGoodObserverPortImpl implements DangerousGoodObserverPort 
         final List<Supplier> suppliers = this.supplierNoDepartmentContextService.findAll();
         suppliers.forEach(supplier -> {
             final DangerousGoodCertification dangerousGoodCertification = supplier.getDangerousGoodCertification();
-            if (dangerousGoodCertification.expiryDate().isAfter(Instant.now())) {
+            if (dangerousGoodCertification != null && dangerousGoodCertification.expiryDate().isAfter(Instant.now())) {
                 this.supplierNoDepartmentContextService.invalidateCertification(supplier);
             }
         });
