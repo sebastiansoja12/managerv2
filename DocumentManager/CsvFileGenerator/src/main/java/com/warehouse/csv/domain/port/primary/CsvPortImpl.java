@@ -1,16 +1,15 @@
 package com.warehouse.csv.domain.port.primary;
 
+import com.itextpdf.text.DocumentException;
+import com.warehouse.csv.domain.service.CsvExporterService;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import com.itextpdf.text.DocumentException;
-import com.warehouse.csv.domain.service.CsvExporterService;
-
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
@@ -31,7 +30,7 @@ public class CsvPortImpl implements CsvPort {
 
     @Override
     public void exportToCSV(HttpServletResponse response, Long id) throws DocumentException, IOException {
-        log.info("Request CSV file generate has been recorded for parcel: {}", id);
+        log.info("Request CSV file generate has been recorded for shipment: {}", id);
         response.setContentType("text/csv");
         final String currentDateTime = dateFormatter.format(new Date());
         response.setHeader(headerKey, String.format(headerValue, id, currentDateTime, CSV));
