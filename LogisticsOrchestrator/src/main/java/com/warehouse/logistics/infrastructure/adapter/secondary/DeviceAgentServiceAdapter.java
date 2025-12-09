@@ -22,7 +22,7 @@ public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
 
     @Override
     public void validateDevice(final DeviceInformation deviceInformation) {
-        final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().getValue());
+        final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().value());
         final DepartmentCodeDto departmentCode = new DepartmentCodeDto(deviceInformation.getDepartmentCode().getValue());
         final UsernameDto username = new UsernameDto(deviceInformation.getUsername());
         final VersionDto version = new VersionDto(deviceInformation.getVersion());
@@ -36,7 +36,7 @@ public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
 
     @Override
     public void updateDevice(final DeviceInformation deviceInformation) {
-        final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().getValue());
+        final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().value());
         final VersionDto version = new VersionDto(deviceInformation.getVersion());
         final DeviceUpdateRequestDto deviceUpdateRequest = new DeviceUpdateRequestDto(deviceId, version);
         deviceEventPublisher.send(new DeviceUpdateEvent(deviceUpdateRequest, Instant.now()));

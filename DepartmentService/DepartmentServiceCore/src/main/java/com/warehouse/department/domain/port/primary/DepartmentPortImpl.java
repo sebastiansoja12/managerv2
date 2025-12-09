@@ -42,7 +42,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
-        return this.departmentRepository.findByCode(departmentCode);
+        return this.departmentRepository.findByDepartmentCode(departmentCode);
     }
 
     @Override
@@ -129,6 +129,18 @@ public class DepartmentPortImpl implements DepartmentPort {
     @Override
     public void changeAdminUser(final DepartmentCode departmentCode, final UserId userId) {
         this.departmentService.changeAdminUser(departmentCode, userId);
+    }
+
+    @Override
+    public void changeStatus(final ChangeDepartmentStatusRequest request) {
+        final DepartmentCode departmentCode = request.departmentCode();
+        final Department.Status status = Department.Status.valueOf(request.status());
+        this.departmentService.changeStatus(departmentCode, status);
+    }
+
+    @Override
+    public void changeEmail(final DepartmentCode departmentCode, final String email) {
+        this.departmentService.changeEmail(departmentCode, email);
     }
 
     private void validateAddress(final Address address) {
