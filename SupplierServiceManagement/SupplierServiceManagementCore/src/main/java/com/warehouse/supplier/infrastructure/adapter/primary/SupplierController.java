@@ -36,7 +36,7 @@ public class SupplierController {
 
     @PutMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
-    public ResponseEntity<?> updateDriverLicense(@RequestBody final SupplierUpdateApiRequest supplierUpdateRequest) {
+    public ResponseEntity<?> updateSupplier(@RequestBody final SupplierUpdateApiRequest supplierUpdateRequest) {
         final SupplierUpdateRequest request = RequestMapper.map(supplierUpdateRequest);
         final Result<Void, String> response = this.supplyPort.update(request);
         final ResponseEntity<?> responseEntity;
@@ -47,6 +47,14 @@ public class SupplierController {
 					.map(SupplierUpdateResponse.failure(request.supplierCode(), response.getFailure())));
 		}
 		return responseEntity;
+    }
+
+    @PutMapping("/certifications")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    public ResponseEntity<?> updateCertification(@RequestBody final CertificationUpdateApiRequest certificationUpdateRequest) {
+        final CertificationUpdateRequest request = RequestMapper.map(certificationUpdateRequest);
+        final CertificationUpdateResponse response = this.supplyPort.updateCertification(request);
+        return ResponseEntity.ok(ResponseMapper.map(response));
     }
 
     @PutMapping("/driver-licenses")

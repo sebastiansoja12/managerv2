@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
+import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
 import com.warehouse.supplier.domain.vo.DriverLicense;
 import com.warehouse.supplier.domain.vo.SupplierDto;
 
@@ -26,4 +27,6 @@ public interface SupplierService {
     SupplierId nextSupplierId();
 
     void invalidateDriverLicense(final SupplierCode supplierCode);
+
+    void updateCertification(final SupplierCode supplierCode, final DangerousGoodCertification certification);
 }

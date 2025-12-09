@@ -112,6 +112,18 @@ public class SupplyPortImpl implements SupplyPort {
         }
     }
 
+    @Override
+    public CertificationUpdateResponse updateCertification(final CertificationUpdateRequest request) {
+        final SupplierCode supplierCode = request.supplierCode();
+        final DangerousGoodCertification certification = request.dangerousGoodCertification();
+        if (this.supplierService.findByCode(supplierCode) != null) {
+            return CertificationUpdateResponse.failure("Supplier with code " + supplierCode + " does not exist");
+        }
+
+        this.supplierService.updateCertification(supplierCode, certification);
+        return CertificationUpdateResponse.ok();
+    }
+
     private void validateNotExists(final SupplierCode supplierCode) {
         final Result<Void, String> result = this.validatorService.validateSupplierCode(supplierCode);
         if (result.isFailure()) {

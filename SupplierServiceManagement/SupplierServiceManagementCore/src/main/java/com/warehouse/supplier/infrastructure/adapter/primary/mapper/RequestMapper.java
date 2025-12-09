@@ -65,4 +65,13 @@ public abstract class RequestMapper {
                 dangerousGoodCertificationApi.issueDate(), dangerousGoodCertificationApi.expiryDate(),
                 dangerousGoodCertificationApi.authority(), dangerousGoodCertificationApi.valid());
     }
+
+    public static CertificationUpdateRequest map(final CertificationUpdateApiRequest certificationUpdateRequest) {
+        return new CertificationUpdateRequest(map(certificationUpdateRequest.supplierCode()),
+                map(certificationUpdateRequest.dangerousGoodCertification()));
+    }
+
+    private static SupplierCode map(final SupplierCodeApi supplierCode) {
+        return new SupplierCode(supplierCode.value());
+    }
 }

@@ -63,4 +63,8 @@ public abstract class ResponseMapper {
         return new SupplierUpdateApiResponse(new SupplierCodeApi(response.supplierCode().value()),
                 String.valueOf(response.status()), response.message());
     }
+
+    public static CertificationUpdateApiResponse map(final CertificationUpdateResponse response) {
+        return new CertificationUpdateApiResponse(response.status().name(), response.message());
+    }
 }

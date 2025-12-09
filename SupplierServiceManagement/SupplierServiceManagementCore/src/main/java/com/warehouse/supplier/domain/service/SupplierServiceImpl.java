@@ -10,6 +10,7 @@ import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.registry.DomainContext;
+import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
 import com.warehouse.supplier.domain.vo.DriverLicense;
 import com.warehouse.supplier.domain.vo.SupplierDto;
 
@@ -108,6 +109,13 @@ public class SupplierServiceImpl implements SupplierService {
     public void invalidateDriverLicense(final SupplierCode supplierCode) {
         final Supplier supplier = this.findByCode(supplierCode);
         supplier.markDriverLicenseAsInvalid();
+        this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void updateCertification(final SupplierCode supplierCode, final DangerousGoodCertification certification) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.changeDangerousGoodCertification(certification);
         this.supplierRepository.update(supplier);
     }
 }

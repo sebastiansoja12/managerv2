@@ -14,4 +14,5 @@ public interface SupplyPort {
     void addDevice(final ChangeSupplierDeviceRequest request);
     Result<Void, String> update(final SupplierUpdateRequest request);
     DriverLicenseResponse updateDriverLicense(final DriverLicenseRequest request);
+    CertificationUpdateResponse updateCertification(CertificationUpdateRequest request);
 }
