@@ -1,19 +1,4 @@
-package com.warehouse.returning.configuration;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.Instant;
-import java.util.List;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+package com.warehouse.returning;
 
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.exception.StatusChangeException;
@@ -29,6 +14,20 @@ import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnTok
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.enumeration.Status;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ReturnId;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.ReturnPackageNotFoundException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest

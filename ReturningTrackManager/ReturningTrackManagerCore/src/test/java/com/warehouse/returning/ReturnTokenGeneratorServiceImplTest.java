@@ -1,4 +1,4 @@
-package com.warehouse.returning.configuration;
+package com.warehouse.returning;
 
 import com.warehouse.returning.domain.service.ReturnTokenGeneratorServiceImpl;
 import com.warehouse.returning.domain.vo.DepartmentCode;

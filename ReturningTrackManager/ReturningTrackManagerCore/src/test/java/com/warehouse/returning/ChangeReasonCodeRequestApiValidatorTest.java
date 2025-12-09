@@ -1,15 +1,14 @@
-package com.warehouse.returning.configuration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
+package com.warehouse.returning;
 
 import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReasonCodeRequestApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ReturnPackageIdApi;
 import com.warehouse.returning.infrastructure.adapter.primary.validator.ChangeReasonCodeRequestApiValidator;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ChangeReasonCodeRequestApiValidatorTest {
 

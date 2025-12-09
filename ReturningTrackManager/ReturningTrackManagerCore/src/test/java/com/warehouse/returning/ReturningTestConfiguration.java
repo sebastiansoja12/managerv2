@@ -1,6 +1,7 @@
-package com.warehouse.returning.configuration;
+package com.warehouse.returning;
 
-
+import com.warehouse.returning.configuration.ShipmentProperties;
+import com.warehouse.returning.configuration.TenantMdcFilter;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

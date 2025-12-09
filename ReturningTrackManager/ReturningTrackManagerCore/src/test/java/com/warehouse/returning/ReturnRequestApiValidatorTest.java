@@ -1,4 +1,4 @@
-package com.warehouse.returning.configuration;
+package com.warehouse.returning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
