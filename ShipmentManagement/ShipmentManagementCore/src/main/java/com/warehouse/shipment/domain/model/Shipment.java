@@ -141,7 +141,6 @@ public class Shipment {
         this.price = price;
         this.dangerousGood = dangerousGood;
         this.shipmentStatus = ShipmentStatus.CREATED;
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
     }
 
     public ShipmentSnapshot snapshot() {
