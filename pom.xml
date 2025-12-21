@@ -42,6 +42,7 @@
         <module>SupplierServiceManagement</module>
         <module>TransportAssets</module>
         <module>DriverHub</module>
+        <module>ProcessLog</module>
     </modules>
 
 	<properties>
