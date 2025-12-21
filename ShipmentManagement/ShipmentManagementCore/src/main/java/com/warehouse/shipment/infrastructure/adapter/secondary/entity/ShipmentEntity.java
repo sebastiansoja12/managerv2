@@ -116,11 +116,11 @@ public class ShipmentEntity {
 
     @Column(name = "origin_country", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Country originCountry;
+    private CountryCode originCountry;
 
     @Column(name = "destination_country", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Country destinationCountry;
+    private CountryCode destinationCountry;
 
     @Column(name = "shipment_priority", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -147,7 +147,7 @@ public class ShipmentEntity {
 			final String recipientCity, final String recipientStreet, final String recipientPostalCode, final String recipientTelephone,
 			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
 			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
-			final LocalDateTime updatedAt, final Boolean locked, final Country originCountry, final Country destinationCountry, 
+			final LocalDateTime updatedAt, final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
             final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;

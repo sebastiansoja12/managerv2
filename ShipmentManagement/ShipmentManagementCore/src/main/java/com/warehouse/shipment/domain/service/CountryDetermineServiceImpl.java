@@ -27,8 +27,6 @@ public class CountryDetermineServiceImpl implements CountryDetermineService {
     }
 
     public CountryDetermine determineCountry(final Shipment shipment) {
-        final Country originCountry = shipment.getOriginCountry();
-        final Country destinationCountry = shipment.getDestinationCountry();
         final Sender sender = shipment.getSender();
         final Recipient recipient = shipment.getRecipient();
 

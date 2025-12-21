@@ -4,11 +4,7 @@ package com.warehouse.returning.domain.model;
 import java.time.Instant;
 
 import com.warehouse.returning.domain.enumeration.ReasonCode;
-import com.warehouse.returning.domain.event.ReturnPackageCanceled;
-import com.warehouse.returning.domain.event.ReturnPackageCompleted;
-import com.warehouse.returning.domain.event.ReturnPackageCreated;
 import com.warehouse.returning.domain.exception.StatusChangeException;
-import com.warehouse.returning.domain.registry.DomainRegistry;
 import com.warehouse.returning.domain.vo.*;
 
 public class ReturnPackage {
@@ -46,7 +42,6 @@ public class ReturnPackage {
         this.reasonCode = reasonCode;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
-        DomainRegistry.publish(new ReturnPackageCreated(this.toSnapshot(), Instant.now()));
     }
 
     public ReturnPackage(final ReturnPackageId returnPackageId,
@@ -129,7 +124,6 @@ public class ReturnPackage {
         }
         changeReturnStatus(ReturnStatus.CANCELLED);
         markAsModified();
-        DomainRegistry.publish(new ReturnPackageCanceled(this.toSnapshot(), Instant.now()));
     }
 
     public void markAsCompleted() {
@@ -140,7 +134,6 @@ public class ReturnPackage {
         }
         changeReturnStatus(ReturnStatus.COMPLETED);
         markAsModified();
-        DomainRegistry.publish(new ReturnPackageCompleted(this.toSnapshot(), Instant.now()));
     }
 
     private void changeReturnStatus(final ReturnStatus returnStatus) {

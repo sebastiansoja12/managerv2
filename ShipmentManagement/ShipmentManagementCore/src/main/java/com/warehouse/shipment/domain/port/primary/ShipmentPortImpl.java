@@ -5,7 +5,10 @@ import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.PersonType;
@@ -99,12 +102,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
-        final Country issuerCountry = this.countryDetermineService.determineCountryByCode(issuerCountryCode);
-
-        final Country receiverCountry = this.countryDetermineService.determineCountryByCode(receiverCountryCode);
-
 		final Shipment shipment = new Shipment(shipmentId, sender, recipient, request.getShipmentSize(), null,
-                issuerCountry, receiverCountry, shipmentPrice.getMoney(), false,
+                issuerCountryCode, receiverCountryCode, shipmentPrice.getMoney(), false,
 				voronoiResponse.getSuccess().getValue(), null, request.getShipmentPriority());
 
         this.shipmentService.createShipment(shipment);
@@ -220,7 +219,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 					shipment.getDestination(), shipment.getSignature(), shipment.getShipmentPriority());
 			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, shipmentId);
 			this.shipmentService.createShipment(newShipment);
-		} else {
+        } else {
 			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, null);
 			this.shipmentService.lockShipment(shipment.getShipmentRelatedId());
 		}
@@ -246,15 +245,13 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public void changeIssuerCountryTo(final ShipmentCountryRequest request) {
         final ShipmentId shipmentId = request.shipmentId();
-        final Country originCountry = this.countryDetermineService.determineCountryByCode(request.issuerCountry());
-        this.shipmentService.changeShipmentIssuerCountryTo(shipmentId, originCountry);
+        this.shipmentService.changeShipmentIssuerCountryTo(shipmentId, request.issuerCountry());
     }
 
     @Override
     public void changeReceiverCountryTo(final ShipmentCountryRequest request) {
         final ShipmentId shipmentId = request.shipmentId();
-        final Country destinationCountry = this.countryDetermineService.determineCountryByCode(request.receiverCountry());
-        this.shipmentService.changeShipmentReceiverCountryTo(shipmentId, destinationCountry);
+        this.shipmentService.changeShipmentReceiverCountryTo(shipmentId, request.receiverCountry());
     }
 
     @Override
@@ -264,11 +261,11 @@ public class ShipmentPortImpl implements ShipmentPort {
         final boolean receiverCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(request.receiverCountry());
 
         if (issuerCountryAvailable) {
-            final Country country = this.countryDetermineService.determineCountryByCode(request.issuerCountry());
+            final CountryCode country = request.issuerCountry();
             this.shipmentService.changeShipmentIssuerCountryTo(request.shipmentId(), country);
         }
         if (receiverCountryAvailable) {
-            final Country country = this.countryDetermineService.determineCountryByCode(request.receiverCountry());
+            final CountryCode country = request.receiverCountry();
             this.shipmentService.changeShipmentReceiverCountryTo(request.shipmentId(), country);
         }
     }

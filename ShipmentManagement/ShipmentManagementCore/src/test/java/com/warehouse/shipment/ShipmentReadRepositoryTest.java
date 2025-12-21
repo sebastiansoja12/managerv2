@@ -7,11 +7,13 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,9 +25,11 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.shipment.domain.listener.ShipmentEventListener;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.voronoi.VoronoiService;
@@ -57,6 +61,16 @@ public class ShipmentReadRepositoryTest {
 
         @MockBean
         public VoronoiService voronoiService;
+
+        @Bean
+        public ShipmentEventListener shipmentEventListener() {
+            return Mockito.mock(ShipmentEventListener.class);
+        }
+
+        @Bean
+        public ShipmentController shipmentController() {
+            return Mockito.mock(ShipmentController.class);
+        }
     }
 
     @Autowired

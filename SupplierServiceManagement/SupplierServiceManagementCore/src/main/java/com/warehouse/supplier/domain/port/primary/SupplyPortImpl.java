@@ -4,19 +4,15 @@ import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.supplier.domain.event.SupplierCreated;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
-import com.warehouse.supplier.domain.registry.DomainContext;
 import com.warehouse.supplier.domain.service.DriverLicenseService;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
 import com.warehouse.supplier.domain.service.SupplierValidatorService;
 import com.warehouse.supplier.domain.vo.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
-
-import java.time.Instant;
 
 public class SupplyPortImpl implements SupplyPort {
 
@@ -53,8 +49,6 @@ public class SupplyPortImpl implements SupplyPort {
 		final Supplier supplier = new Supplier(supplierId, supplierCode, firstName, lastName, telephoneNumber);
 
         this.supplierService.create(supplier);
-
-        DomainContext.publish(new SupplierCreated(supplier.snapshot(), Instant.now()));
 
         return new SupplierCreateResponse(supplier.supplierCode());
     }

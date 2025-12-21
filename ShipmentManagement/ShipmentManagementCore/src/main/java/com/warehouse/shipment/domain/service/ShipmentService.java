@@ -26,9 +26,9 @@ public interface ShipmentService {
 
     void changeCurrencyTo(final ShipmentId shipmentId, final Currency currency);
 
-    void changeShipmentIssuerCountryTo(final ShipmentId shipmentId, final Country originCountry);
+    void changeShipmentIssuerCountryTo(final ShipmentId shipmentId, final CountryCode originCountry);
 
-    void changeShipmentReceiverCountryTo(final ShipmentId shipmentId, final Country destinationCountry);
+    void changeShipmentReceiverCountryTo(final ShipmentId shipmentId, final CountryCode destinationCountry);
 
     void changeSignatureRequiredTo(final ShipmentId shipmentId, final boolean signatureRequired);
 

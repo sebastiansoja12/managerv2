@@ -1,20 +1,19 @@
 package com.warehouse.supplier.domain.model;
 
+import java.time.Instant;
+import java.util.Set;
+
+import org.apache.commons.lang3.Validate;
+
 import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.supplier.domain.enumeration.SupplierStatus;
 import com.warehouse.supplier.domain.enumeration.UserStatus;
-import com.warehouse.supplier.domain.event.SupplierVehicleAssigned;
-import com.warehouse.supplier.domain.registry.DomainContext;
 import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
 import com.warehouse.supplier.domain.vo.DriverLicense;
 import com.warehouse.supplier.domain.vo.SupplierDto;
 import com.warehouse.supplier.domain.vo.SupplierSnapshot;
-import org.apache.commons.lang3.Validate;
-
-import java.time.Instant;
-import java.util.Set;
 
 
 public class Supplier {
@@ -222,7 +221,6 @@ public class Supplier {
     public void assignVehicle(final VehicleId vehicleId) {
         this.vehicleId = vehicleId;
         markAsModified();
-        DomainContext.eventPublisher().publishEvent(new SupplierVehicleAssigned(snapshot(), Instant.now()));
     }
 
     public void changeDeviceId(final DeviceId deviceId) {

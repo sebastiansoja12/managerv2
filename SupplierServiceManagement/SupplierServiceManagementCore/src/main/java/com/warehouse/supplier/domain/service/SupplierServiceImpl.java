@@ -5,7 +5,7 @@ import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.supplier.domain.event.SupplierUpdated;
+import com.warehouse.supplier.domain.event.*;
 import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
@@ -29,6 +29,8 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public void create(final Supplier supplier) {
         this.supplierRepository.create(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierCreated(supplier.snapshot(), Instant.now()));
     }
 
     @Override
@@ -36,6 +38,8 @@ public class SupplierServiceImpl implements SupplierService {
         final Supplier supplier = this.findById(supplierId);
         supplier.markAsActive();
         this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierActivated(supplier.snapshot(), Instant.now()));
     }
 
     @Override
@@ -43,6 +47,8 @@ public class SupplierServiceImpl implements SupplierService {
         final Supplier supplier = this.findById(supplierId);
         supplier.markAsInactive();
         this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDeactivated(supplier.snapshot(), Instant.now()));
     }
 
     @Override
@@ -50,6 +56,8 @@ public class SupplierServiceImpl implements SupplierService {
         final Supplier supplier = this.findByCode(supplierCode);
         supplier.changeDriverLicense(driverLicense);
         this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDriverLicenseUpdated(supplier.snapshot(), Instant.now()));
     }
 
     @Override
@@ -64,6 +72,8 @@ public class SupplierServiceImpl implements SupplierService {
         final Supplier supplier = this.findById(supplierId);
         supplier.changeDeliveryArea(deliveryArea);
         this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDeliveryAreaChanged(supplier.snapshot(), Instant.now()));
     }
 
     @Override
@@ -78,6 +88,8 @@ public class SupplierServiceImpl implements SupplierService {
         final Supplier supplier = this.findByCode(supplierCode);
         supplier.changeDeviceId(deviceId);
         this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDeviceAssigned(supplier.snapshot(), Instant.now()));
     }
 
     @Override
@@ -110,6 +122,8 @@ public class SupplierServiceImpl implements SupplierService {
         final Supplier supplier = this.findByCode(supplierCode);
         supplier.markDriverLicenseAsInvalid();
         this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDeliveryAreaChanged(supplier.snapshot(), Instant.now()));
     }
 
     @Override
@@ -117,5 +131,7 @@ public class SupplierServiceImpl implements SupplierService {
         final Supplier supplier = this.findByCode(supplierCode);
         supplier.changeDangerousGoodCertification(certification);
         this.supplierRepository.update(supplier);
+		DomainContext.eventPublisher()
+				.publishEvent(new SupplierDangerousGoodCertificationChanged(supplier.snapshot(), Instant.now()));
     }
 }

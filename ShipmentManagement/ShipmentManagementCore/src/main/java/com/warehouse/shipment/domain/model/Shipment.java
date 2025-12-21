@@ -9,7 +9,10 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
-import com.warehouse.shipment.domain.event.*;
+import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
+import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
+import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
+import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
 import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
@@ -47,9 +50,9 @@ public class Shipment {
 
     private ShipmentPriority shipmentPriority;
 
-    private Country originCountry;
+    private CountryCode originCountry;
 
-    private Country destinationCountry;
+    private CountryCode destinationCountry;
 
     private Signature signature;
 
@@ -69,8 +72,8 @@ public class Shipment {
                     final LocalDateTime createdAt,
                     final LocalDateTime updatedAt,
                     final Boolean locked,
-                    final Country originCountry,
-                    final Country destinationCountry,
+                    final CountryCode originCountry,
+                    final CountryCode destinationCountry,
                     final String destination,
                     final Signature signature,
                     final boolean signatureRequired,
@@ -101,8 +104,8 @@ public class Shipment {
                     final Recipient recipient,
                     final ShipmentSize shipmentSize,
                     final ShipmentId shipmentRelatedId,
-                    final Country originCountry,
-                    final Country destinationCountry,
+                    final CountryCode originCountry,
+                    final CountryCode destinationCountry,
                     final Money price,
                     final Boolean locked,
                     final String destination,
@@ -125,7 +128,6 @@ public class Shipment {
         this.destination = destination;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
     }
     
     public Shipment(final Sender sender, 
@@ -142,7 +144,7 @@ public class Shipment {
         DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
     }
 
-    private ShipmentSnapshot snapshot() {
+    public ShipmentSnapshot snapshot() {
         return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentStatus);
     }
 
@@ -187,8 +189,8 @@ public class Shipment {
         final LocalDateTime createdAt = shipmentEntity.getCreatedAt();
         final LocalDateTime updatedAt = shipmentEntity.getUpdatedAt();
         final Boolean locked = shipmentEntity.getLocked();
-        final Country originCountry = shipmentEntity.getOriginCountry();
-        final Country destinationCountry = shipmentEntity.getDestinationCountry();
+        final CountryCode originCountry = shipmentEntity.getOriginCountry();
+        final CountryCode destinationCountry = shipmentEntity.getDestinationCountry();
         final String destination = shipmentEntity.getDestination();
         final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
         final boolean signatureRequired = signature != null;
@@ -333,11 +335,11 @@ public class Shipment {
         return shipmentPriority;
     }
 
-    public Country getOriginCountry() {
+    public CountryCode getOriginCountry() {
         return originCountry;
     }
 
-    public Country getDestinationCountry() {
+    public CountryCode getDestinationCountry() {
         return destinationCountry;
     }
 
@@ -383,13 +385,11 @@ public class Shipment {
     public void changeSender(final Sender sender) {
         this.sender = sender;
         markAsModified();
-        DomainRegistry.publish(new ShipmentSenderChanged(snapshot(), Instant.now()));
     }
 
     public void changeRecipient(final Recipient recipient) {
         this.recipient = recipient;
         markAsModified();
-        DomainRegistry.publish(new ShipmentRecipientChanged(snapshot(), Instant.now()));
     }
 
     public void changeShipmentSize(final ShipmentSize shipmentSize) {
@@ -441,7 +441,6 @@ public class Shipment {
     public void changeCurrency(final Currency currency) {
         this.price.changeCurrency(currency);
         markAsModified();
-        DomainRegistry.publish(new ShipmentCurrencyChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeSignatureRequired(final boolean signatureRequired) {
@@ -487,7 +486,6 @@ public class Shipment {
     public void notifyShipmentReturned() {
         changeShipmentStatus(ShipmentStatus.RETURN);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentDelivered() {
@@ -514,11 +512,11 @@ public class Shipment {
         this.dangerousGood = dangerousGood;
     }
 
-    public void setDestinationCountry(final Country destinationCountry) {
+    public void setDestinationCountry(final CountryCode destinationCountry) {
         this.destinationCountry = destinationCountry;
     }
 
-    public void setOriginCountry(final Country originCountry) {
+    public void setOriginCountry(final CountryCode originCountry) {
         this.originCountry = originCountry;
     }
 
@@ -547,13 +545,13 @@ public class Shipment {
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
-    public void changeIssuerCountry(final Country originCountry) {
+    public void changeIssuerCountry(final CountryCode originCountry) {
         this.originCountry = originCountry;
         markAsModified();
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
-    public void changeReceiverCountry(final Country destinationCountry) {
+    public void changeReceiverCountry(final CountryCode destinationCountry) {
         this.destinationCountry = destinationCountry;
         markAsModified();
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));

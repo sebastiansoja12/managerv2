@@ -1,13 +1,5 @@
 package com.warehouse.shipment.configuration;
 
-import java.time.Duration;
-import java.util.Set;
-
-import org.mapstruct.factory.Mappers;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.shipment.domain.handler.*;
@@ -21,11 +13,18 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
+import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import com.warehouse.voronoi.VoronoiService;
-
 import io.github.resilience4j.retry.RetryConfig;
+import org.mapstruct.factory.Mappers;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
+import java.util.Set;
 
 @Configuration
 public class ShipmentConfiguration {
@@ -68,8 +67,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ReturningServicePort returningServicePort() {
-		return new ReturningServiceAdapter();
+	public ReturningServicePort returningServicePort(final ReturnProperties returnProperties) {
+		return new ReturningServiceAdapter(returnProperties);
 	}
 
 	@Bean

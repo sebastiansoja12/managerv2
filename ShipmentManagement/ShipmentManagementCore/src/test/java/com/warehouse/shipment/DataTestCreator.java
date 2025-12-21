@@ -56,6 +56,6 @@ public class DataTestCreator {
 
     static Shipment createShipment() {
 		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, ShipmentType.PARENT, null, money(), LocalDateTime.now(),
-				LocalDateTime.now(), false, Country.ALBANIA, Country.ANDORRA, "KT1", null, false, ShipmentPriority.LOW, null);
+				LocalDateTime.now(), false, CountryCode.AL, CountryCode.AD, "KT1", null, false, ShipmentPriority.LOW, null);
     }
 }

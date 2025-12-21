@@ -1,10 +1,14 @@
 package com.warehouse.returning.domain.service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import com.warehouse.returning.domain.enumeration.ReasonCode;
+import com.warehouse.returning.domain.event.ReturnPackageCanceled;
+import com.warehouse.returning.domain.event.ReturnPackageCompleted;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
+import com.warehouse.returning.domain.registry.DomainRegistry;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ShipmentId;
 
@@ -33,6 +37,7 @@ public class ReturnServiceImpl implements ReturnService {
         final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
         returnPackage.markAsDeleted();
         this.saveOrUpdate(returnPackage);
+        DomainRegistry.publish(new ReturnPackageCanceled(returnPackage.toSnapshot(), Instant.now()));
     }
 
     @Override
@@ -57,5 +62,6 @@ public class ReturnServiceImpl implements ReturnService {
         final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
         returnPackage.markAsCompleted();
         this.saveOrUpdate(returnPackage);
+        DomainRegistry.publish(new ReturnPackageCompleted(returnPackage.toSnapshot(), Instant.now()));
     }
 }
