@@ -9,11 +9,11 @@
         <version>2025.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ProcessLog</artifactId>
+    <artifactId>ProcessHub</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>ProcessLogApi</module>
-        <module>ProcessLogCore</module>
+        <module>ProcessHubApi</module>
+        <module>ProcessHubCore</module>
     </modules>
 
     <properties>

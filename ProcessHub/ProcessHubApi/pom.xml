@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>ProcessLog</artifactId>
+        <artifactId>ProcessHub</artifactId>
         <version>2025.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ProcessLogApi</artifactId>
+    <artifactId>ProcessHubApi</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

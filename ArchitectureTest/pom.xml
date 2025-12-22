@@ -149,7 +149,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ProcessLogCore</artifactId>
+            <artifactId>ProcessHubCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
