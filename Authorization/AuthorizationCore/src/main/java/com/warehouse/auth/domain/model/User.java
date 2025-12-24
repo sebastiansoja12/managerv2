@@ -1,23 +1,21 @@
 package com.warehouse.auth.domain.model;
 
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import com.warehouse.auth.domain.event.UserChangedEvent;
-import com.warehouse.auth.domain.event.UserCreatedEvent;
-import com.warehouse.auth.domain.event.UserFullNameChangedEvent;
-import com.warehouse.auth.domain.event.UserLoggedOutEvent;
 import com.warehouse.auth.domain.exception.UserDeletedException;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserSnapshot;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.time.Instant;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 public class User {
@@ -96,7 +94,6 @@ public class User {
         this.deleted = false;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
-        DomainRegistry.eventPublisher().publishEvent(new UserCreatedEvent(this.snapshot()));
     }
 
     public User(final UserId userId,
@@ -235,7 +232,7 @@ public class User {
         return permissions;
     }
 
-    private UserSnapshot snapshot() {
+    public UserSnapshot snapshot() {
         return new UserSnapshot(userId, username, password, email, role, departmentCode.getValue());
     }
 
@@ -255,7 +252,6 @@ public class User {
         this.firstName = request.getFirstName();
         this.lastName = request.getLastName();
         markAsModified();
-        DomainRegistry.publish(new UserFullNameChangedEvent(this.snapshot()));
     }
 
     public void changeRole(final Role role) {
@@ -308,14 +304,12 @@ public class User {
     }
 
     public void markAsLoggedOut() {
-        DomainRegistry.eventPublisher().publishEvent(new UserLoggedOutEvent(this.snapshot()));
         markAsModified();
     }
 
     public void updateUserInfo(final UserDepartmentUpdateRequest request) {
         this.email = request.email();
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(this.snapshot()));
     }
 
     public enum Permission {

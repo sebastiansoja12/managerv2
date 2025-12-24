@@ -1,8 +1,10 @@
 package com.warehouse.auth.domain.service;
 
+import com.warehouse.auth.domain.event.*;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserResponse;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public RegisterResponse create(final User user) {
         final UserResponse userResponse = userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserCreatedEvent(user.snapshot()));
         return new RegisterResponse(userResponse);
     }
 
@@ -42,6 +45,7 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findByUsername(request.getUsername());
         user.changeFullName(request);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserFullNameChangedEvent(user.snapshot()));
     }
 
     @Override
@@ -49,6 +53,7 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findById(userId);
         user.changeRole(role);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserRoleChangedEvent(user.snapshot()));
     }
 
     @Override
@@ -56,6 +61,7 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findById(userId);
         user.addPermission(permission);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserRoleAddedEvent(user.snapshot()));
     }
 
     @Override
@@ -63,6 +69,7 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findById(userId);
         user.removePermission(permission);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserRoleRemovedEvent(user.snapshot()));
     }
 
     @Override
@@ -92,5 +99,6 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findById(request.userId());
         user.updateUserInfo(request);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
     }
 }

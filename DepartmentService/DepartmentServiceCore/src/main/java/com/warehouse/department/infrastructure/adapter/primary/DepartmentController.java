@@ -43,6 +43,7 @@ public class DepartmentController implements DepartmentApiService {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
 		final Result result = this.departmentRequestValidator.validateBody(departmentCreateApiRequest);
 
@@ -63,7 +64,8 @@ public class DepartmentController implements DepartmentApiService {
     @PutMapping
     @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> updateAddress(@RequestBody final UpdateAddressApiRequest updateAddressApiRequest) {
-        final UpdateAddressRequest request = RequestMapper.map(updateAddressApiRequest);
+
+        final UpdateAddressCommand request = RequestMapper.map(updateAddressApiRequest);
         this.departmentPort.changeAddress(request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -91,7 +93,7 @@ public class DepartmentController implements DepartmentApiService {
     @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> updateIdentificationNumber(
 			@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
-        final IdentificationNumberChangeRequest request = RequestMapper.map(identificationNumberChangeRequest);
+        final IdentificationNumberChangeCommand request = RequestMapper.map(identificationNumberChangeRequest);
         final IdentificationNumberChangeResponse response = this.departmentPort.changeIdentificationNumber(request);
         return ResponseEntity.ok(ResponseMapper.map(response));
     }
@@ -100,9 +102,9 @@ public class DepartmentController implements DepartmentApiService {
     @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> changeDepartmentStatus(
             @RequestBody final ChangeDepartmentStatusApi departmentStatusRequest) {
-		final ChangeDepartmentStatusRequest request = new ChangeDepartmentStatusRequest(
+		final ChangeDepartmentStatusCommand command = new ChangeDepartmentStatusCommand(
 				new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status());
-        this.departmentPort.changeStatus(request);
+        this.departmentPort.changeStatus(command);
         return ResponseEntity.ok().build();
     }
 

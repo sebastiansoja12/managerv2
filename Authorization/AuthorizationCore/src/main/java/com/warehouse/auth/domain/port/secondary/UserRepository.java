@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface UserRepository {
 
-    UserResponse createOrUpdate(User user);
+    UserResponse createOrUpdate(final User user);
 
-    User findByUsername(String username);
+    User findByUsername(final String username);
 
     User findByApiKey(final String apiKey);
 

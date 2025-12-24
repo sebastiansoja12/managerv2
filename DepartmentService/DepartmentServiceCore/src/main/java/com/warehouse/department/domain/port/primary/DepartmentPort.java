@@ -10,15 +10,15 @@ import java.util.List;
 
 public interface DepartmentPort {
 
-    Department findByDepartmentCode(DepartmentCode departmentCode);
+    Department findByDepartmentCode(final DepartmentCode departmentCode);
 
     List<Department> findAll();
 
-    DepartmentCreateResponse createDepartments(final DepartmentCreateCommand request);
+    DepartmentCreateResponse createDepartments(final DepartmentCreateCommand command);
 
-    IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeRequest request);
+    IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeCommand command);
 
-    void changeAddress(final UpdateAddressRequest request);
+    void changeAddress(final UpdateAddressCommand command);
 
     void changeDepartmentActive(final DepartmentCode departmentCodeValue, final Boolean active);
 
@@ -26,7 +26,7 @@ public interface DepartmentPort {
 
     void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
 
-    void changeStatus(final ChangeDepartmentStatusRequest request);
+    void changeStatus(final ChangeDepartmentStatusCommand command);
 
     void changeEmail(final DepartmentCode departmentCode, final String email);
 }

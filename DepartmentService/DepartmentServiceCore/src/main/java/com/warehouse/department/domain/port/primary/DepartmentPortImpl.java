@@ -57,14 +57,14 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     @Transactional
-    public DepartmentCreateResponse createDepartments(final DepartmentCreateCommand request) {
+    public DepartmentCreateResponse createDepartments(final DepartmentCreateCommand command) {
 
-        validateRequest(request.getDepartments());
+        validateRequest(command.getDepartments());
 
-        checkIfDepartmentWithGivenCodeAlreadyExists(request.getDepartments());
+        checkIfDepartmentWithGivenCodeAlreadyExists(command.getDepartments());
 
         final Map<Department, Boolean> createdDepartments = new HashMap<>();
-        for (final DepartmentCreate departmentCreate : request.getDepartments()) {
+        for (final DepartmentCreate departmentCreate : command.getDepartments()) {
             final DepartmentCode departmentCode = departmentCreate.getDepartmentCode();
 			final Department department = new Department(departmentCode, departmentCreate.getCity(),
 					departmentCreate.getStreet(), departmentCreate.getPostalCode(),
@@ -97,18 +97,18 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public void changeAddress(final UpdateAddressRequest request) {
-        validateAddress(request.address());
+    public void changeAddress(final UpdateAddressCommand command) {
+        validateAddress(command.address());
 
-        this.departmentService.changeAddress(request.departmentCode(), request.address());
+        this.departmentService.changeAddress(command.departmentCode(), command.address());
     }
 
     @Override
-    public IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeRequest request) {
-        final DepartmentCode departmentCode = request.departmentCode();
+    public IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeCommand command) {
+        final DepartmentCode departmentCode = command.departmentCode();
         final Department department = this.departmentService.findByDepartmentCode(departmentCode);
         final TaxId oldIdentificationNumber = department.getTaxId();
-        final TaxId newIdentificationNumber = new TaxId(request.identificationNumber());
+        final TaxId newIdentificationNumber = new TaxId(command.identificationNumber());
         final boolean identificationNumberChanged = !oldIdentificationNumber.equals(newIdentificationNumber);
         if (identificationNumberChanged) {
             this.departmentService.changeTaxId(departmentCode, newIdentificationNumber);
@@ -138,9 +138,9 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public void changeStatus(final ChangeDepartmentStatusRequest request) {
-        final DepartmentCode departmentCode = request.departmentCode();
-        final Department.Status status = Department.Status.valueOf(request.status());
+    public void changeStatus(final ChangeDepartmentStatusCommand command) {
+        final DepartmentCode departmentCode = command.departmentCode();
+        final Department.Status status = Department.Status.valueOf(command.status());
         this.departmentService.changeStatus(departmentCode, status);
     }
 
