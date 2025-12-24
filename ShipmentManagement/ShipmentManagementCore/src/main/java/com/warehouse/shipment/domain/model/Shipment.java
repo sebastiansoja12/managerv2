@@ -8,10 +8,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
 import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
-import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
 import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
 import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.*;
@@ -143,37 +141,15 @@ public class Shipment {
         this.shipmentStatus = ShipmentStatus.CREATED;
     }
 
-    public ShipmentSnapshot snapshot() {
-        return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentStatus);
-    }
+	public ShipmentSnapshot snapshot() {
+		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destination, shipmentStatus,
+				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
+				shipmentPriority, originCountry, destinationCountry, signature);
+	}
 
-    public Shipment(final ShipmentId shipmentId,
-                    final Sender sender,
-                    final Recipient recipient,
-                    final ShipmentUpdateType updateType) {
-        this.shipmentId = shipmentId;
-        this.sender = sender;
-        this.recipient = recipient;
-        this.shipmentStatus = determineShipmentStatus(updateType);
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
-    }
-
-    private ShipmentStatus determineShipmentStatus(final ShipmentUpdateType updateType) {
-        return switch (updateType) {
-            case REROUTE -> ShipmentStatus.REROUTE;
-            case REDIRECT -> ShipmentStatus.REDIRECT;
-        };
-    }
-
-    public static Shipment from(final ShipmentCreateRequest request) {
+    public static Shipment from(final ShipmentCreateCommand request) {
 		return new Shipment(request.getSender(), request.getRecipient(), request.getShipmentSize(), request.getPrice(),
 				request.getDangerousGood());
-    }
-
-    public static Shipment from(final ShipmentUpdateRequest request) {
-        final ShipmentId shipmentId = request.getShipmentId();
-        final ShipmentUpdate shipmentUpdate = request.getShipmentUpdate();
-        return new Shipment(shipmentId, shipmentUpdate.getSender(), shipmentUpdate.getRecipient(), request.getShipmentUpdateType());
     }
 
     public static Shipment from(final ShipmentEntity shipmentEntity) {
@@ -418,6 +394,24 @@ public class Shipment {
         markAsModified();
     }
 
+    public void update(final Sender sender, final Recipient recipient, final ShipmentStatus shipmentStatus,
+                       final ShipmentPriority shipmentPriority, final ShipmentSize shipmentSize,
+                       final Money price, final DangerousGood dangerousGood,
+                       final String destination, final Boolean signatureRequired) {
+        this.recipient = recipient;
+        this.sender = sender;
+        this.shipmentStatus = shipmentStatus;
+        this.shipmentPriority = shipmentPriority;
+        this.shipmentSize = shipmentSize;
+        this.price = price;
+        if (dangerousGood != null) {
+            this.dangerousGood = dangerousGood;
+        }
+        this.destination = destination;
+        this.signatureRequired = signatureRequired;
+        markAsModified();
+    }
+
     public void changeShipmentType(final ShipmentType shipmentType) {
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = null;
@@ -490,13 +484,11 @@ public class Shipment {
     public void notifyShipmentDelivered() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentReturnCanceled() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void changeDestinationDepartment(final String destination) {

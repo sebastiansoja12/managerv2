@@ -58,4 +58,5 @@ public interface ShipmentService {
 
     ShipmentId nextShipmentId();
 
+    void update(final Shipment shipment);
 }

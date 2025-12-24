@@ -2,12 +2,16 @@ package com.warehouse.department.domain.service;
 
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
+import com.warehouse.department.domain.event.DepartmentCreated;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
+import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.TaxId;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service("department.departmentService")
 public class DepartmentServiceImpl implements DepartmentService {
@@ -21,6 +25,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public void createDepartment(final Department department) {
         this.departmentRepository.createOrUpdate(department);
+        DomainRegistry.eventPublisher().publishEvent(
+                new DepartmentCreated(department.snapshot(), Instant.now())
+        );
     }
 
     @Override

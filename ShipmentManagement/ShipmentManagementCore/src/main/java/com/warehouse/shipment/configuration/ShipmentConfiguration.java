@@ -79,10 +79,12 @@ public class ShipmentConfiguration {
 									 final CountryDetermineService countryDetermineService,
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
-									 final SignatureService signatureService) {
+									 final SignatureService signatureService,
+									 final RouteLogServicePort routeLogServicePort,
+									 final ReturningServicePort returningServicePort) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
-				countryServiceAvailabilityService, signatureService);
+				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort);
 	}
 	
 	@Bean
@@ -208,7 +210,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="false")
+	@ConditionalOnProperty(name="services.mock", havingValue="false")
 	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using path finder service");
 		return new PathFinderAdapter(voronoiService);
@@ -216,7 +218,7 @@ public class ShipmentConfiguration {
 
 	//MOCK
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="true")
+	@ConditionalOnProperty(name="services.mock", havingValue="true")
 	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock path finder service");
 		return new PathFinderMockAdapter(pathFinderMockService);

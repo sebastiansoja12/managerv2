@@ -163,7 +163,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void notifyShipmentReturned(ShipmentId shipmentId) {
+    public void notifyShipmentReturned(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentReturned();
         this.shipmentRepository.createOrUpdate(shipment);
@@ -171,10 +171,11 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void notifyShipmentDelivered(ShipmentId shipmentId) {
+    public void notifyShipmentDelivered(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentDelivered();
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentDelivered(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -189,6 +190,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(request.shipmentId());
         shipment.updateCountries(request);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentCountriesChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -202,5 +204,11 @@ public class ShipmentServiceImpl implements ShipmentService {
     public ShipmentId nextShipmentId() {
         final long randomUUIDBits = UUID.randomUUID().getLeastSignificantBits();
         return new ShipmentId(Math.abs(randomUUIDBits));
+    }
+
+    @Override
+    public void update(final Shipment shipment) {
+        this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
     }
 }

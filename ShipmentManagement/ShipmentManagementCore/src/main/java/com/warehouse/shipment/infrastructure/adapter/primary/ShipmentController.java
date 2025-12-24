@@ -57,7 +57,7 @@ public class ShipmentController {
     @Timed(value = "controller.shipment.create")
     public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestApi shipmentRequest) {
         shipmentRequestValidator.validateBody(shipmentRequest);
-        final ShipmentCreateRequest request = requestMapper.map(shipmentRequest);
+        final ShipmentCreateCommand request = requestMapper.map(shipmentRequest);
         final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
 
         final ResponseEntity<?> response;
@@ -87,7 +87,7 @@ public class ShipmentController {
     @Timed(value = "controller.shipment.update")
     public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestApi shipmentUpdateRequest) {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
-        final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
+        final ShipmentUpdateCommand request = requestMapper.map(shipmentUpdateRequest);
         final Result<Void, ErrorCode> result = shipmentPort.update(request);
 
         final ResponseEntity<?> response;
@@ -103,7 +103,7 @@ public class ShipmentController {
     @Counted(value = "controller.shipment.return")
     @Timed(value = "controller.shipment.return")
     public ResponseEntity<?> returnShipment(@RequestBody final ShipmentReturnRequestApi shipmentReturnRequest) {
-        final ShipmentReturnRequest request = ShipmentReturnRequest.from(shipmentReturnRequest);
+        final ShipmentReturnCommand request = ShipmentReturnCommand.from(shipmentReturnRequest);
         this.shipmentPort.processShipmentReturn(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
@@ -115,7 +115,7 @@ public class ShipmentController {
 			@RequestBody final DangerousGoodCreateRequestApi dangerousGoodCreateRequest) {
         dangerousGoodValidator.validateDangerousGood(dangerousGoodCreateRequest);
 
-        final DangerousGoodCreateRequest request = DangerousGoodCreateRequest.from(dangerousGoodCreateRequest);
+        final DangerousGoodCreateCommand request = DangerousGoodCreateCommand.from(dangerousGoodCreateRequest);
         final Result<Void, ErrorCode> result = shipmentPort.addDangerousGood(request);
 
         final ResponseEntity<?> response;

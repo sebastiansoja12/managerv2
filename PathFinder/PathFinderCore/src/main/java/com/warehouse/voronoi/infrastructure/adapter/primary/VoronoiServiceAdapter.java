@@ -5,14 +5,16 @@ import com.warehouse.voronoi.VoronoiResponseDto;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.voronoi.domain.model.VoronoiRequest;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
-
 import com.warehouse.voronoi.domain.vo.VoronoiResponse;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
+
 public class VoronoiServiceAdapter implements VoronoiService {
 
     private final VoronoiPort voronoiPort;
+
+    public VoronoiServiceAdapter(final VoronoiPort voronoiPort) {
+        this.voronoiPort = voronoiPort;
+    }
 
     @Override
     public VoronoiResponseDto findFastestRoute(final VoronoiRequestDto voronoiRequest) {

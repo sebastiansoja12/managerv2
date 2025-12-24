@@ -5,11 +5,9 @@ import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.model.Money;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
@@ -21,6 +19,8 @@ import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.secondary.Logger;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
+import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
+import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.*;
 
@@ -47,6 +47,10 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ShipmentStateValidatorService shipmentStateValidatorService = new ShipmentStateValidatorServiceImpl();
 
+    private final RouteLogServicePort routeLogServicePort;
+
+    private final ReturningServicePort returningServicePort;
+
 	public ShipmentPortImpl(final ShipmentService shipmentService,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
@@ -55,7 +59,9 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final CountryDetermineService countryDetermineService,
                             final PriceService priceService,
                             final CountryServiceAvailabilityService countryServiceAvailabilityService,
-                            final SignatureService signatureService) {
+                            final SignatureService signatureService,
+                            final RouteLogServicePort routeLogServicePort,
+                            final ReturningServicePort returningServicePort) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -65,11 +71,13 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.priceService = priceService;
         this.countryServiceAvailabilityService = countryServiceAvailabilityService;
         this.signatureService = signatureService;
+        this.routeLogServicePort = routeLogServicePort;
+        this.returningServicePort = returningServicePort;
     }
 
     @Override
     @Transactional
-    public Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateRequest request) {
+    public Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand request) {
 
         final CountryCode issuerCountryCode = request.getIssuerCountryCode();
 
@@ -85,7 +93,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
         }
 
-        final Address recipientAddress = Address.from(request.getSender());
+        final Address recipientAddress = Address.from(request.getRecipient());
         
         final Sender sender = request.getSender();
         
@@ -113,57 +121,79 @@ public class ShipmentPortImpl implements ShipmentPort {
         return Result.success(new ShipmentCreateResponse(shipmentId));
     }
 
-    private Price determineShipmentPrice(final ShipmentCreateRequest request) {
+    private Price determineShipmentPrice(final ShipmentCreateCommand request) {
         return request.getPrice() == null || !request.getPrice().isDefined() ?
                 this.priceService.determineShipmentPrice(request.getShipmentSize(), Currency.PLN) : new Price(request.getPrice());
     }
 
     @Override
     @Transactional
-    public Result<Void, ErrorCode> update(final ShipmentUpdateRequest request) {
+    public Result<Void, ErrorCode> update(final ShipmentUpdateCommand command) {
 
-        final Shipment shipment = Shipment.from(request);
+        final ShipmentId shipmentId = command.getShipmentId();
 
-        //this.pathFinderServicePort.determineDeliveryDepot(shipment, address);
+        final Shipment shipment = this.shipmentService.find(shipmentId);
 
-        final ShipmentId shipmentId = request.getShipmentId();
-        final Sender sender = request.getSender();
-        final Recipient recipient = request.getRecipient();
-        final ShipmentStatus shipmentStatus = shipment.getShipmentStatus();
-
-        switch (shipmentStatus) {
-            case REDIRECT -> {
-                this.shipmentService.changeRecipientTo(shipmentId, recipient);
-                this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, this.shipmentService.nextShipmentId());
-            }
-            case REROUTE -> {
-                this.shipmentService.changeRecipientTo(shipmentId, recipient);
-                this.shipmentService.changeSenderTo(shipmentId, sender);
-            }
-
-            default -> {
-                return Result.failure(ErrorCode.SHIPMENT_202);
-            }
+        if (shipment == null) {
+            return Result.failure(ErrorCode.SHIPMENT_204);
         }
+
+        final ShipmentConfiguration configuration = command.getShipmentConfiguration();
+
+        if (configuration != null && !configuration.forceUpdate()) {
+            final Result<Void, String> resultValidation = shipmentStateValidatorService.validateShipmentState(shipment);
+        }
+
+        final String destination;
+        if (configuration != null && configuration.customRerouteDepartment()) {
+            destination = command.getDestination();
+        } else {
+            final Result<VoronoiResponse, ErrorCode> voronoiResult =
+                    this.pathFinderServicePort.determineDeliveryDepartment(Address.from(shipment.getRecipient()));
+            destination = voronoiResult.isSuccess() ? voronoiResult.getSuccess().getValue() : "NCS";
+        }
+
+        final Sender sender = command.getSender();
+        final Recipient recipient = command.getRecipient();
+        final ShipmentStatus shipmentStatus = command.getShipmentStatus();
+        final ShipmentPriority shipmentPriority = command.getShipmentPriority();
+        final Money price = command.getPrice();
+        final ShipmentSize shipmentSize = command.getShipmentSize();
+        final DangerousGood dangerousGood = command.getDangerousGood();
+        
+        
+		shipment.update(sender, recipient, shipmentStatus, shipmentPriority, shipmentSize, price, dangerousGood,
+                destination, false);
+
+        this.shipmentService.update(shipment);
+
+        if (configuration != null && configuration.publishInRouteTracker()) {
+            routeLogServicePort.notifyShipmentUpdated(shipment.snapshot());
+        }
+
+        if (configuration != null && configuration.publishInReturnManager()) {
+            returningServicePort.notifyShipmentUpdated(shipment.snapshot());
+        }
+
         return Result.success();
     }
 
     @Override
-    public Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateRequest request) {
-        final ShipmentId shipmentId = request.getShipmentId();
+    public Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateCommand command) {
+        final ShipmentId shipmentId = command.getShipmentId();
         if (!existsShipment(shipmentId)) {
             return Result.failure(ErrorCode.SHIPMENT_202);
         }
 
-        this.shipmentService.changeDangerousGoodTo(shipmentId, DangerousGood.from(request));
+        this.shipmentService.changeDangerousGoodTo(shipmentId, DangerousGood.from(command));
 
         return Result.success();
     }
 
     @Override
-    public void processShipmentReturn(final ShipmentReturnRequest request) {
-        final ReturnStatus returnStatus = request.getReturnStatus();
-        final ShipmentId shipmentId = request.getShipmentId();
+    public void processShipmentReturn(final ShipmentReturnCommand command) {
+        final ReturnStatus returnStatus = command.getReturnStatus();
+        final ShipmentId shipmentId = command.getShipmentId();
         switch (returnStatus) {
             case CREATED ->  this.shipmentService.notifyShipmentReturned(shipmentId);
             case COMPLETED -> this.shipmentService.lockShipment(shipmentId);
@@ -172,7 +202,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeSenderTo(final ShipmentCreateRequest request) {
+    public void changeSenderTo(final ShipmentCreateCommand request) {
         final Shipment shipment = Shipment.from(request);
         final Sender sender = request.getSender();
         final ShipmentId shipmentId = shipment.getShipmentId();
@@ -180,7 +210,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeRecipientTo(final ShipmentCreateRequest request) {
+    public void changeRecipientTo(final ShipmentCreateCommand request) {
         final Shipment shipment = Shipment.from(request);
         final Recipient recipient = Recipient.from(shipment);
         final ShipmentId shipmentId = shipment.getShipmentId();

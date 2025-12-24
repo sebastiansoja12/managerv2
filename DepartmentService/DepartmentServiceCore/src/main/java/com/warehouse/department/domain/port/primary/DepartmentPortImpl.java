@@ -65,7 +65,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 					departmentCreate.getStreet(), departmentCreate.getPostalCode(),
 					new TaxId(departmentCreate.getTaxId()), departmentCreate.getTelephoneNumber(),
 					departmentCreate.getOpeningHours(), departmentCreate.getEmail(),
-					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
+					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType(), null);
             this.departmentService.createDepartment(department);
 
             tenantAdminProvisioningPort.createInitialAdminUser(department.snapshot());

@@ -8,7 +8,7 @@ import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 
 
-public class ShipmentCreateRequest {
+public class ShipmentCreateCommand {
 
 	private Sender sender;
 
@@ -26,17 +26,17 @@ public class ShipmentCreateRequest {
 
 	private ShipmentPriority shipmentPriority;
 
-	public ShipmentCreateRequest() {
+	public ShipmentCreateCommand() {
 
 	}
 
-	public ShipmentCreateRequest(final DangerousGood dangerousGood,
-                                 final Money price,
-                                 final Recipient recipient,
-                                 final Sender sender,
-                                 final ShipmentSize shipmentSize,
+	public ShipmentCreateCommand(final DangerousGood dangerousGood,
+								 final Money price,
+								 final Recipient recipient,
+								 final Sender sender,
+								 final ShipmentSize shipmentSize,
 								 final CountryCode issuerCountryCode,
-                                 final CountryCode receiverCountryCode,
+								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority) {
 		this.dangerousGood = dangerousGood;
 		this.price = price;

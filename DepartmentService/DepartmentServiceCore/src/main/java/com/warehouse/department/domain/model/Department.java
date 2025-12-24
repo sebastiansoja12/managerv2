@@ -7,10 +7,7 @@ import com.warehouse.department.domain.event.*;
 import com.warehouse.department.domain.exception.ForbiddenDepartmentTypeException;
 import com.warehouse.department.domain.exception.WrongUserAssignedException;
 import com.warehouse.department.domain.registry.DomainRegistry;
-import com.warehouse.department.domain.vo.Address;
-import com.warehouse.department.domain.vo.DepartmentCode;
-import com.warehouse.department.domain.vo.DepartmentSnapshot;
-import com.warehouse.department.domain.vo.TaxId;
+import com.warehouse.department.domain.vo.*;
 
 import java.time.Instant;
 
@@ -31,6 +28,8 @@ public class Department {
     private DepartmentType departmentType;
 
     private Department.Status status;
+
+    private Coordinates coordinates;
 
     private Instant createdAt;
 
@@ -54,6 +53,7 @@ public class Department {
             final String email,
             final DepartmentType departmentType,
             final Status status,
+            final Coordinates coordinates,
             final Instant createdAt,
             final Instant updatedAt,
             final UserId adminUserId,
@@ -68,6 +68,7 @@ public class Department {
         this.email = email;
         this.departmentType = departmentType;
         this.status = status;
+        this.coordinates = coordinates;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.adminUserId = adminUserId;
@@ -85,7 +86,8 @@ public class Department {
             final String openingHours,
             final String email,
             final CountryCode countryCode,
-            final DepartmentType departmentType
+            final DepartmentType departmentType,
+            final Coordinates coordinates
     ) {
         this.address = new Address(city, street, postalCode, countryCode);
         this.departmentCode = departmentCode;
@@ -100,9 +102,7 @@ public class Department {
         this.adminUserId = null;
         this.createdBy = DomainRegistry.authenticationService().currentUser();
         this.lastModifiedBy = null;
-        DomainRegistry.eventPublisher().publishEvent(
-                new DepartmentCreated(this.snapshot(), Instant.now())
-        );
+        this.coordinates = coordinates;
     }
 
 
@@ -233,6 +233,18 @@ public class Department {
 
     public UserId getAdminUserId() {
         return adminUserId;
+    }
+
+    public void setAdminUserId(final UserId adminUserId) {
+        this.adminUserId = adminUserId;
+    }
+
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(final Coordinates coordinates) {
+        this.coordinates = coordinates;
     }
 
     private void markAsModified() {

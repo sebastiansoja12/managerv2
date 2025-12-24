@@ -9,12 +9,14 @@ import com.warehouse.voronoi.VoronoiRequestDto;
 import com.warehouse.voronoi.VoronoiResponseDto;
 import com.warehouse.voronoi.VoronoiService;
 
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 public class PathFinderAdapter implements PathFinderServicePort {
 
     private final VoronoiService voronoiService;
+
+    public PathFinderAdapter(final VoronoiService voronoiService) {
+        this.voronoiService = voronoiService;
+    }
 
     @Override
     public Result<VoronoiResponse, ErrorCode> determineDeliveryDepartment(final Address address) {

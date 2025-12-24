@@ -9,7 +9,7 @@ import com.warehouse.commonassets.model.Weight;
 import com.warehouse.shipment.domain.vo.DangerousGoodId;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.DangerousGoodCreateRequestApi;
 
-public class DangerousGoodCreateRequest {
+public class DangerousGoodCreateCommand {
 
     private DangerousGoodId dangerousGoodId;
     private ShipmentId shipmentId;
@@ -28,7 +28,7 @@ public class DangerousGoodCreateRequest {
     private Country countryOfOrigin;
     private String safetyDataSheet;
 
-    public DangerousGoodCreateRequest(
+    public DangerousGoodCreateCommand(
                                       final DangerousGoodId dangerousGoodId,
                                       final ShipmentId shipmentId,
                                       final String name,
@@ -65,11 +65,11 @@ public class DangerousGoodCreateRequest {
     }
 
 
-    public static DangerousGoodCreateRequest from(final DangerousGoodCreateRequestApi request) {
+    public static DangerousGoodCreateCommand from(final DangerousGoodCreateRequestApi request) {
         final ShipmentId shipmentId = new ShipmentId(request.shipmentId().getValue());
         final Weight weight = new Weight(request.weight().value(), WeightUnit.valueOf(request.weight().unit()));
 
-        return new DangerousGoodCreateRequest(
+        return new DangerousGoodCreateCommand(
                 null,
                 shipmentId,
                 request.name(),

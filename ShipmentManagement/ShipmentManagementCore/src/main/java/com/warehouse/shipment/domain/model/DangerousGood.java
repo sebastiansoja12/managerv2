@@ -51,7 +51,7 @@ public class DangerousGood {
         this.safetyDataSheet = safetyDataSheet;
     }
 
-    public static DangerousGood from(final DangerousGoodCreateRequest request) {
+    public static DangerousGood from(final DangerousGoodCreateCommand request) {
         return new DangerousGood(
                 request.getDangerousGoodId(),
                 request.getShipmentId(),

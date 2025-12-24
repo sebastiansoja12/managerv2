@@ -10,28 +10,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.department.domain.port.primary.DepartmentPort;
+import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.voronoi.domain.model.Department;
-import com.warehouse.voronoi.infrastructure.adapter.secondary.DepotServiceAdapter;
+import com.warehouse.voronoi.infrastructure.adapter.secondary.DepartmentServiceAdapter;
 
 @ExtendWith(MockitoExtension.class)
 public class DepartmentServiceAdapterTest {
 
 
     @Mock
-    private DepartmentPort departmentPort;
+    private DepartmentApiService departmentApiService;
 
-    private DepotServiceAdapter depotServiceAdapter;
+    private DepartmentServiceAdapter depotServiceAdapter;
 
     @BeforeEach
     void setup() {
-        depotServiceAdapter = new DepotServiceAdapter(departmentPort);
+        depotServiceAdapter = new DepartmentServiceAdapter(departmentApiService);
     }
 
     @Test
-    void shouldDownloadDepots() {
+    void shouldDownloadDepartments() {
         // when
-        final List<Department> departmentList = depotServiceAdapter.downloadDepots();
+        final List<Department> departmentList = depotServiceAdapter.downloadDepartments();
         // then
         assertThat(departmentList).isNotNull();
     }

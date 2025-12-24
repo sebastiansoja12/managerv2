@@ -6,7 +6,7 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentReturnRequestApi;
 
-public class ShipmentReturnRequest {
+public class ShipmentReturnCommand {
     private ShipmentId shipmentId;
     private String reason;
     private DepartmentCode departmentCode;
@@ -14,8 +14,8 @@ public class ShipmentReturnRequest {
     private ReturnStatus returnStatus;
 
 
-    public ShipmentReturnRequest(final DepartmentCode departmentCode, final UserId issuedBy, final String reason,
-			final ShipmentId shipmentId, final ReturnStatus returnStatus) {
+    public ShipmentReturnCommand(final DepartmentCode departmentCode, final UserId issuedBy, final String reason,
+                                 final ShipmentId shipmentId, final ReturnStatus returnStatus) {
         this.departmentCode = departmentCode;
         this.issuedBy = issuedBy;
         this.reason = reason;
@@ -23,8 +23,8 @@ public class ShipmentReturnRequest {
         this.returnStatus = returnStatus;
     }
 
-    public static ShipmentReturnRequest from(final ShipmentReturnRequestApi req) {
-		return new ShipmentReturnRequest(req.departmentCode(), req.issuedBy(), req.reason(),
+    public static ShipmentReturnCommand from(final ShipmentReturnRequestApi req) {
+		return new ShipmentReturnCommand(req.departmentCode(), req.issuedBy(), req.reason(),
 				new ShipmentId(req.shipmentId().getValue()), ReturnStatus.valueOf(req.returnStatus()));
     }
 

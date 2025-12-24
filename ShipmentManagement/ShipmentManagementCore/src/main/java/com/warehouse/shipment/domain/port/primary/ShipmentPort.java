@@ -5,17 +5,18 @@ import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
+import com.warehouse.shipment.domain.model.ShipmentUpdateCommand;
 import com.warehouse.shipment.domain.vo.*;
 
 public interface ShipmentPort {
 
-    Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateRequest request);
+    Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand request);
 
-    Result<Void, ErrorCode> update(final ShipmentUpdateRequest request);
+    Result<Void, ErrorCode> update(final ShipmentUpdateCommand request);
 
-    void changeSenderTo(final ShipmentCreateRequest request);
+    void changeSenderTo(final ShipmentCreateCommand request);
 
-    void changeRecipientTo(final ShipmentCreateRequest request);
+    void changeRecipientTo(final ShipmentCreateCommand request);
 
     void changePersonTo(final Person person, final ShipmentId shipmentId);
 
@@ -35,7 +36,7 @@ public interface ShipmentPort {
 
     boolean existsShipment(final ShipmentId shipmentId);
 
-    Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateRequest request);
+    Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateCommand request);
 
-    void processShipmentReturn(final ShipmentReturnRequest request);
+    void processShipmentReturn(final ShipmentReturnCommand request);
 }

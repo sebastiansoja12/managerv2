@@ -38,8 +38,8 @@ public class ComputerServiceTest {
         final VoronoiRequest requestCity = new VoronoiRequest("Lublin", null);
 
         final Coordinates coordinates = Coordinates.builder()
-                .lat(50)
-                .lon(50)
+                .lat(50.0)
+                .lon(50.0)
                 .build();
 
         doReturn(coordinates)

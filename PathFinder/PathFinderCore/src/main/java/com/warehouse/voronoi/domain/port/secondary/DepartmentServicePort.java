@@ -4,6 +4,6 @@ import com.warehouse.voronoi.domain.model.Department;
 
 import java.util.List;
 
-public interface DepotServicePort {
-    List<Department> downloadDepots();
+public interface DepartmentServicePort {
+    List<Department> downloadDepartments();
 }

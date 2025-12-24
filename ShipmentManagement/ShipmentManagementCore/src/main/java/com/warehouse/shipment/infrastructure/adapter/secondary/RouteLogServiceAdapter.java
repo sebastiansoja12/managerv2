@@ -11,10 +11,7 @@ import org.springframework.web.client.RestClient;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.shipment.domain.vo.Person;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.RouteProcess;
-import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
+import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.PersonChangedRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteLogRecord;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteProcessDto;
@@ -99,6 +96,11 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
                 .toEntity(RouteLogRecord.class);
 
         return RouteProcess.from(responseEntity, shipmentId);
+    }
+
+    @Override
+    public void notifyShipmentUpdated(final ShipmentSnapshot snapshot) {
+
     }
 
     private RestClient buildRestClient(final SoftwareConfiguration softwareConfiguration) {

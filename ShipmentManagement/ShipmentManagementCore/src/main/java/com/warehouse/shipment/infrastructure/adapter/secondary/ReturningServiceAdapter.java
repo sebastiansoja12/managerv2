@@ -39,4 +39,9 @@ public class ReturningServiceAdapter implements ReturningServicePort {
                 .retrieve()
                 .toEntity(Void.class);
     }
+
+    @Override
+    public void notifyShipmentUpdated(final ShipmentSnapshot snapshot) {
+
+    }
 }
