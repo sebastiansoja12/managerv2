@@ -8,7 +8,7 @@ import com.warehouse.supplier.domain.model.DeliveryArea;
 
 import java.util.Set;
 
-public record SupplierUpdateRequest(SupplierCode supplierCode, String firstName, String lastName,
+public record SupplierUpdateCommand(SupplierCode supplierCode, String firstName, String lastName,
                                     String telephoneNumber, VehicleId vehicleId, DeviceId deviceId,
                                     DangerousGoodCertification dangerousGoodCertification, DriverLicense driverLicense,
                                     DeliveryArea deliveryArea, Set<PackageType> supportedPackageTypes) {

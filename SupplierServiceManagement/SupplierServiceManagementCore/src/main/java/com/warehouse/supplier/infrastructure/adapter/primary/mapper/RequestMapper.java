@@ -13,30 +13,30 @@ import java.util.stream.Collectors;
 
 public abstract class RequestMapper {
 
-    public static SupplierCreateRequest map(final SupplierCreateApiRequest request) {
-        return new SupplierCreateRequest(request.supplierCode(), request.firstName(),
+    public static SupplierCreateCommand map(final SupplierCreateApiRequest request) {
+        return new SupplierCreateCommand(request.supplierCode(), request.firstName(),
                 request.lastName(), request.telephoneNumber());
     }
 
-    public static DriverLicenseRequest map(final DriverLicenseApiRequest request) {
-        return new DriverLicenseRequest(request.supplierCode(), map(request.driverLicense()));
+    public static DriverLicenseCommand map(final DriverLicenseApiRequest request) {
+        return new DriverLicenseCommand(request.supplierCode(), map(request.driverLicense()));
     }
 
     public static DriverLicense map(final DriverLicenseApi driverLicense) {
         return new DriverLicense(driverLicense.number(), driverLicense.acquiredDate(), driverLicense.drivingLicenseExpiryDate());
     }
 
-    public static ChangeSupportedPackageTypeRequest map(final ChangeSupportedPackageTypesApiRequest request) {
-        return new ChangeSupportedPackageTypeRequest(new SupplierCode(request.supplierCode().value()),
+    public static ChangeSupportedPackageTypeCommand map(final ChangeSupportedPackageTypesApiRequest request) {
+        return new ChangeSupportedPackageTypeCommand(new SupplierCode(request.supplierCode().value()),
                 PackageType.valueOf(request.packageType()));
     }
 
-    public static ChangeSupplierDeviceRequest map(final ChangeSupplierDeviceApiRequest request) {
-        return new ChangeSupplierDeviceRequest(new SupplierCode(request.supplierCode().value()),
+    public static ChangeSupplierDeviceCommand map(final ChangeSupplierDeviceApiRequest request) {
+        return new ChangeSupplierDeviceCommand(new SupplierCode(request.supplierCode().value()),
                 new DeviceId(request.deviceId().value()));
     }
 
-    public static SupplierUpdateRequest map(final SupplierUpdateApiRequest request) {
+    public static SupplierUpdateCommand map(final SupplierUpdateApiRequest request) {
         final SupplierCode supplierCode = new SupplierCode(request.supplierCode().value());
         final String firstName = request.firstName();
         final String lastName = request.lastName();
@@ -50,7 +50,7 @@ public abstract class RequestMapper {
                 .map(packageTypeApi -> PackageType.valueOf(packageTypeApi.name()))
                 .collect(Collectors.toSet());
 
-        return new SupplierUpdateRequest(supplierCode, firstName, lastName, telephoneNumber, vehicleId,
+        return new SupplierUpdateCommand(supplierCode, firstName, lastName, telephoneNumber, vehicleId,
                 deviceId, dangerousGoodCertification, driverLicense, deliveryArea, supportedPackageTypes);
     }
 
@@ -66,8 +66,8 @@ public abstract class RequestMapper {
                 dangerousGoodCertificationApi.authority(), dangerousGoodCertificationApi.valid());
     }
 
-    public static CertificationUpdateRequest map(final CertificationUpdateApiRequest certificationUpdateRequest) {
-        return new CertificationUpdateRequest(map(certificationUpdateRequest.supplierCode()),
+    public static CertificationUpdateCommand map(final CertificationUpdateApiRequest certificationUpdateRequest) {
+        return new CertificationUpdateCommand(map(certificationUpdateRequest.supplierCode()),
                 map(certificationUpdateRequest.dangerousGoodCertification()));
     }
 

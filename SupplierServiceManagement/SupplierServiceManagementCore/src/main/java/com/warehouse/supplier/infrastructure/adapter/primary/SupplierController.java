@@ -29,22 +29,22 @@ public class SupplierController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> create(@RequestBody final SupplierCreateApiRequest supplierCreateApiRequest) {
-        final SupplierCreateRequest request = RequestMapper.map(supplierCreateApiRequest);
-        final SupplierCreateResponse response = this.supplyPort.create(request);
+        final SupplierCreateCommand command = RequestMapper.map(supplierCreateApiRequest);
+        final SupplierCreateResponse response = this.supplyPort.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMapper.map(response));
     }
 
     @PutMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> updateSupplier(@RequestBody final SupplierUpdateApiRequest supplierUpdateRequest) {
-        final SupplierUpdateRequest request = RequestMapper.map(supplierUpdateRequest);
-        final Result<Void, String> response = this.supplyPort.update(request);
+        final SupplierUpdateCommand command = RequestMapper.map(supplierUpdateRequest);
+        final Result<Void, String> response = this.supplyPort.update(command);
         final ResponseEntity<?> responseEntity;
 		if (response.isSuccess()) {
-			responseEntity = ResponseEntity.ok(ResponseMapper.map(SupplierUpdateResponse.ok(request.supplierCode())));
+			responseEntity = ResponseEntity.ok(ResponseMapper.map(SupplierUpdateResponse.ok(command.supplierCode())));
 		} else {
 			responseEntity = ResponseEntity.badRequest().body(ResponseMapper
-					.map(SupplierUpdateResponse.failure(request.supplierCode(), response.getFailure())));
+					.map(SupplierUpdateResponse.failure(command.supplierCode(), response.getFailure())));
 		}
 		return responseEntity;
     }
@@ -52,16 +52,16 @@ public class SupplierController {
     @PutMapping("/certifications")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> updateCertification(@RequestBody final CertificationUpdateApiRequest certificationUpdateRequest) {
-        final CertificationUpdateRequest request = RequestMapper.map(certificationUpdateRequest);
-        final CertificationUpdateResponse response = this.supplyPort.updateCertification(request);
+        final CertificationUpdateCommand command = RequestMapper.map(certificationUpdateRequest);
+        final CertificationUpdateResponse response = this.supplyPort.updateCertification(command);
         return ResponseEntity.ok(ResponseMapper.map(response));
     }
 
     @PutMapping("/driver-licenses")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> updateDriverLicense(@RequestBody final DriverLicenseApiRequest driverLicenseRequest) {
-        final DriverLicenseRequest request = RequestMapper.map(driverLicenseRequest);
-        final DriverLicenseResponse response = this.supplyPort.updateDriverLicense(request);
+        final DriverLicenseCommand command = RequestMapper.map(driverLicenseRequest);
+        final DriverLicenseResponse response = this.supplyPort.updateDriverLicense(command);
         return ResponseEntity.ok(ResponseMapper.map(response));
     }
 
@@ -69,8 +69,8 @@ public class SupplierController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> updatePackageTypes(
 			@RequestBody final ChangeSupportedPackageTypesApiRequest changeSupportedPackageTypeRequest) {
-        final ChangeSupportedPackageTypeRequest request = RequestMapper.map(changeSupportedPackageTypeRequest);
-        this.supplyPort.addPackageType(request);
+        final ChangeSupportedPackageTypeCommand command = RequestMapper.map(changeSupportedPackageTypeRequest);
+        this.supplyPort.addPackageType(command);
         return ResponseEntity.ok().build();
     }
 
@@ -78,8 +78,8 @@ public class SupplierController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
     public ResponseEntity<?> updateDevice(
             @RequestBody final ChangeSupplierDeviceApiRequest changeSupplierDeviceRequest) {
-        final ChangeSupplierDeviceRequest request = RequestMapper.map(changeSupplierDeviceRequest);
-        this.supplyPort.addDevice(request);
+        final ChangeSupplierDeviceCommand command = RequestMapper.map(changeSupplierDeviceRequest);
+        this.supplyPort.addDevice(command);
         return ResponseEntity.ok().build();
     }
 

@@ -12,7 +12,7 @@ public record SupplierDto(String firstName, String lastName,
                           DangerousGoodCertification dangerousGoodCertification, DriverLicense driverLicense,
                           DeliveryArea deliveryArea, Set<PackageType> supportedPackageTypes) {
 
-    public static SupplierDto from(final SupplierUpdateRequest request) {
+    public static SupplierDto from(final SupplierUpdateCommand request) {
         return new SupplierDto(request.firstName(), request.lastName(), request.telephoneNumber(),
                 request.vehicleId(), request.deviceId(), request.dangerousGoodCertification(), request.driverLicense(),
                 request.deliveryArea(), request.supportedPackageTypes());

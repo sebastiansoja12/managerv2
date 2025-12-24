@@ -5,16 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>warehouse</artifactId>
+        <artifactId>LogisticsOrchestrator</artifactId>
         <version>2025.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>LogisticsOrchestrator</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>LogisticsOrchestratorApi</module>
-        <module>LogisticsOrchestratorCore</module>
-    </modules>
+    <artifactId>LogisticsOrchestratorCore</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -207,6 +208,5 @@
             </resource>
         </resources>
     </build>
-
 
 </project>

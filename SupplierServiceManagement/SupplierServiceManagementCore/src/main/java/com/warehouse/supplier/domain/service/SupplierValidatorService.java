@@ -3,7 +3,7 @@ package com.warehouse.supplier.domain.service;
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.supplier.domain.vo.SupplierUpdateRequest;
+import com.warehouse.supplier.domain.vo.SupplierUpdateCommand;
 
 public interface SupplierValidatorService {
     Result<Void, String> validateSupplierCode(final SupplierCode supplierCode);
@@ -16,5 +16,5 @@ public interface SupplierValidatorService {
     boolean validatePostalCode(final String postalCode);
     boolean validateCountry(final String country);
     boolean validateSupplierId(final SupplierId supplierId);
-    Result<Void, String> validateSupplierForUpdate(final SupplierUpdateRequest supplierUpdateRequest);
+    Result<Void, String> validateSupplierForUpdate(final SupplierUpdateCommand supplierUpdateCommand);
 }

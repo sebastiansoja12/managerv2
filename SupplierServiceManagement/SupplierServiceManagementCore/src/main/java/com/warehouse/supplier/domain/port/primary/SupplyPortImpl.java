@@ -39,12 +39,12 @@ public class SupplyPortImpl implements SupplyPort {
     }
 
     @Override
-    public SupplierCreateResponse create(final SupplierCreateRequest supplierCreateRequest) {
-        final SupplierCode supplierCode = this.generatorService.generate(supplierCreateRequest.supplierCode());
+    public SupplierCreateResponse create(final SupplierCreateCommand supplierCreateCommand) {
+        final SupplierCode supplierCode = this.generatorService.generate(supplierCreateCommand.supplierCode());
         validateNotExists(supplierCode);
-        final String firstName = supplierCreateRequest.firstName();
-        final String lastName = supplierCreateRequest.lastName();
-        final String telephoneNumber = supplierCreateRequest.telephoneNumber();
+        final String firstName = supplierCreateCommand.firstName();
+        final String lastName = supplierCreateCommand.lastName();
+        final String telephoneNumber = supplierCreateCommand.telephoneNumber();
         final SupplierId supplierId = this.supplierService.nextSupplierId();
 		final Supplier supplier = new Supplier(supplierId, supplierCode, firstName, lastName, telephoneNumber);
 
@@ -64,18 +64,18 @@ public class SupplyPortImpl implements SupplyPort {
     }
 
     @Override
-    public void addPackageType(final ChangeSupportedPackageTypeRequest request) {
-        this.supplierService.addSupportedPackageType(request.supplierCode(), request.packageType());
+    public void addPackageType(final ChangeSupportedPackageTypeCommand command) {
+        this.supplierService.addSupportedPackageType(command.supplierCode(), command.packageType());
     }
 
     @Override
-    public void addDevice(final ChangeSupplierDeviceRequest request) {
-        final DeviceId deviceId = request.deviceId();
+    public void addDevice(final ChangeSupplierDeviceCommand command) {
+        final DeviceId deviceId = command.deviceId();
         final Result<Void, String> result = deviceServicePort.validateDevice(deviceId);
         if (result.isFailure()) {
             throw new IllegalArgumentException(result.getFailure());
         }
-        final SupplierCode supplierCode = request.supplierCode();
+        final SupplierCode supplierCode = command.supplierCode();
         if (supplierService.findByCode(supplierCode) == null) {
             throw new SupplierNotFoundException(supplierCode.value());
         }
@@ -83,18 +83,18 @@ public class SupplyPortImpl implements SupplyPort {
     }
 
     @Override
-    public Result<Void, String> update(final SupplierUpdateRequest request) {
-        final SupplierCode supplierCode = request.supplierCode();
-        final Result<Void, String> validationResult = this.validatorService.validateSupplierForUpdate(request);
+    public Result<Void, String> update(final SupplierUpdateCommand command) {
+        final SupplierCode supplierCode = command.supplierCode();
+        final Result<Void, String> validationResult = this.validatorService.validateSupplierForUpdate(command);
         if (validationResult.isFailure()) {
             return Result.failure(validationResult.getFailure());
         }
-        this.supplierService.update(supplierCode, SupplierDto.from(request));
+        this.supplierService.update(supplierCode, SupplierDto.from(command));
         return Result.success();
     }
 
     @Override
-    public DriverLicenseResponse updateDriverLicense(final DriverLicenseRequest request) {
+    public DriverLicenseResponse updateDriverLicense(final DriverLicenseCommand request) {
         final DriverLicense driverLicense = request.driverLicense();
         final SupplierCode supplierCode = request.supplierCode();
         final Result<Void, String> validationResult = this.driverLicenseService.validateDriverLicense(driverLicense);
@@ -107,7 +107,7 @@ public class SupplyPortImpl implements SupplyPort {
     }
 
     @Override
-    public CertificationUpdateResponse updateCertification(final CertificationUpdateRequest request) {
+    public CertificationUpdateResponse updateCertification(final CertificationUpdateCommand request) {
         final SupplierCode supplierCode = request.supplierCode();
         final DangerousGoodCertification certification = request.dangerousGoodCertification();
         if (this.supplierService.findByCode(supplierCode) != null) {

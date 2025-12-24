@@ -5,7 +5,7 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
-import com.warehouse.supplier.domain.vo.SupplierUpdateRequest;
+import com.warehouse.supplier.domain.vo.SupplierUpdateCommand;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -75,11 +75,11 @@ public class SupplierValidatorServiceImpl implements SupplierValidatorService {
     }
 
     @Override
-    public Result<Void, String> validateSupplierForUpdate(final SupplierUpdateRequest supplierUpdateRequest) {
+    public Result<Void, String> validateSupplierForUpdate(final SupplierUpdateCommand supplierUpdateCommand) {
         final Result<Void, String> result;
-        final Result<Void, String> deviceValidationResult = deviceServicePort.validateDevice(supplierUpdateRequest.deviceId());
-        if (supplierRepository.findByCode(supplierUpdateRequest.supplierCode()) == null) {
-            result = Result.failure("Supplier with code " + supplierUpdateRequest.supplierCode() + " not found");
+        final Result<Void, String> deviceValidationResult = deviceServicePort.validateDevice(supplierUpdateCommand.deviceId());
+        if (supplierRepository.findByCode(supplierUpdateCommand.supplierCode()) == null) {
+            result = Result.failure("Supplier with code " + supplierUpdateCommand.supplierCode() + " not found");
         } else if (deviceValidationResult.isFailure()) {
             result = deviceValidationResult;
         } else {
