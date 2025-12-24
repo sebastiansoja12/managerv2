@@ -4,6 +4,7 @@ import static com.warehouse.voronoi.service.DepotInMemoryData.depots;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,7 @@ public class ComputerServiceTest {
     void shouldCompute() {
         // given
         final List<Department> depotsList = depots();
-        final VoronoiRequest requestCity = new VoronoiRequest("Lublin", null);
+        final VoronoiRequest requestCity = new VoronoiRequest("Lublin", null, Collections.emptyList());
 
         final Coordinates coordinates = Coordinates.builder()
                 .lat(50.0)
@@ -56,7 +57,7 @@ public class ComputerServiceTest {
     void shouldComputeWhenGivenCoordinatesAreSameAsDepots() {
         // given
         final List<Department> depotsList = depots();
-        final VoronoiRequest requestCity = new VoronoiRequest("Wroclaw", null);
+        final VoronoiRequest requestCity = new VoronoiRequest("Wroclaw", null, Collections.emptyList());
 
         final Coordinates coordinates = Coordinates.builder()
                 .lon(51.1271647)
@@ -77,7 +78,7 @@ public class ComputerServiceTest {
     void shouldReturnEmptyDepartmentCode() {
         // given
         final List<Department> depotsList = depots();
-        final VoronoiRequest requestCity = new VoronoiRequest("Wroclaw", null);
+        final VoronoiRequest requestCity = new VoronoiRequest("Wroclaw", null, Collections.emptyList());
 
         doReturn(null)
                 .when(voronoiServicePort)

@@ -1,5 +1,14 @@
 package com.warehouse.shipment.configuration;
 
+import java.time.Duration;
+import java.util.Set;
+
+import org.mapstruct.factory.Mappers;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.shipment.domain.handler.*;
@@ -17,14 +26,8 @@ import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import com.warehouse.voronoi.VoronoiService;
-import io.github.resilience4j.retry.RetryConfig;
-import org.mapstruct.factory.Mappers;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-import java.time.Duration;
-import java.util.Set;
+import io.github.resilience4j.retry.RetryConfig;
 
 @Configuration
 public class ShipmentConfiguration {
@@ -211,9 +214,10 @@ public class ShipmentConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name="services.mock", havingValue="false")
-	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService) {
+	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService,
+													   final DepartmentApiService departmentApiService) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using path finder service");
-		return new PathFinderAdapter(voronoiService);
+		return new PathFinderAdapter(voronoiService, departmentApiService);
 	}
 
 	//MOCK

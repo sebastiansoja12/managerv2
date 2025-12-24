@@ -5,7 +5,8 @@ import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.DepartmentAlreadyExistsException;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreate;
-import com.warehouse.department.domain.model.DepartmentCreateRequest;
+import com.warehouse.department.domain.model.DepartmentCreateCommand;
+import com.warehouse.department.domain.port.secondary.DepartmentCoordinatesServicePort;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.department.domain.registry.DomainRegistry;
@@ -30,14 +31,18 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     private final Validator validator;
 
+    private final DepartmentCoordinatesServicePort departmentCoordinatesServicePort;
+
     public DepartmentPortImpl(final DepartmentRepository departmentRepository,
                               final DepartmentService departmentService,
                               final TenantAdminProvisioningPort tenantAdminProvisioningPort,
-                              final Validator validator) {
+                              final Validator validator,
+                              final DepartmentCoordinatesServicePort departmentCoordinatesServicePort) {
         this.departmentRepository = departmentRepository;
         this.departmentService = departmentService;
         this.tenantAdminProvisioningPort = tenantAdminProvisioningPort;
         this.validator = validator;
+        this.departmentCoordinatesServicePort = departmentCoordinatesServicePort;
     }
 
     @Override
@@ -52,7 +57,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     @Transactional
-    public DepartmentCreateResponse createDepartments(final DepartmentCreateRequest request) {
+    public DepartmentCreateResponse createDepartments(final DepartmentCreateCommand request) {
 
         validateRequest(request.getDepartments());
 
@@ -65,7 +70,8 @@ public class DepartmentPortImpl implements DepartmentPort {
 					departmentCreate.getStreet(), departmentCreate.getPostalCode(),
 					new TaxId(departmentCreate.getTaxId()), departmentCreate.getTelephoneNumber(),
 					departmentCreate.getOpeningHours(), departmentCreate.getEmail(),
-					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType(), null);
+					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
+
             this.departmentService.createDepartment(department);
 
             tenantAdminProvisioningPort.createInitialAdminUser(department.snapshot());

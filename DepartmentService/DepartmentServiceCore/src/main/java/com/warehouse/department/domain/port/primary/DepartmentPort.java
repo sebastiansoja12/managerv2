@@ -3,7 +3,7 @@ package com.warehouse.department.domain.port.primary;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.domain.model.DepartmentCreateRequest;
+import com.warehouse.department.domain.model.DepartmentCreateCommand;
 import com.warehouse.department.domain.vo.*;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public interface DepartmentPort {
 
     List<Department> findAll();
 
-    DepartmentCreateResponse createDepartments(final DepartmentCreateRequest request);
+    DepartmentCreateResponse createDepartments(final DepartmentCreateCommand request);
 
     IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeRequest request);
 

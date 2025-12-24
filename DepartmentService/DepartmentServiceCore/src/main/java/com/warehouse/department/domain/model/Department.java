@@ -86,8 +86,7 @@ public class Department {
             final String openingHours,
             final String email,
             final CountryCode countryCode,
-            final DepartmentType departmentType,
-            final Coordinates coordinates
+            final DepartmentType departmentType
     ) {
         this.address = new Address(city, street, postalCode, countryCode);
         this.departmentCode = departmentCode;
@@ -102,13 +101,19 @@ public class Department {
         this.adminUserId = null;
         this.createdBy = DomainRegistry.authenticationService().currentUser();
         this.lastModifiedBy = null;
-        this.coordinates = coordinates;
+        this.coordinates = DomainRegistry.departmentCoordinatesServicePort()
+                .getCoordinates(getAddress());
     }
 
 
     public DepartmentSnapshot snapshot() {
 		return new DepartmentSnapshot(departmentCode, address, taxId, telephoneNumber, openingHours, email,
 				departmentType, status, createdAt, updatedAt, adminUserId, createdBy, lastModifiedBy);
+    }
+
+    public void changeCoordinates(final Coordinates coordinates) {
+        this.coordinates = coordinates;
+        markAsModified();
     }
 
     public enum Status {

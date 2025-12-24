@@ -17,7 +17,7 @@ import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.RestException;
 import com.warehouse.department.domain.helper.Result;
 import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.domain.model.DepartmentCreateRequest;
+import com.warehouse.department.domain.model.DepartmentCreateCommand;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.vo.*;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.*;
@@ -43,7 +43,6 @@ public class DepartmentController implements DepartmentApiService {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
     public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
 		final Result result = this.departmentRequestValidator.validateBody(departmentCreateApiRequest);
 
@@ -51,10 +50,10 @@ public class DepartmentController implements DepartmentApiService {
             return ResponseEntity.badRequest().body(result.getFailure());
         }
 
-        final DepartmentCreateRequest request = RequestMapper.map(departmentCreateApiRequest);
+        final DepartmentCreateCommand command = RequestMapper.map(departmentCreateApiRequest);
 
         try {
-            final DepartmentCreateResponse response = this.departmentPort.createDepartments(request);
+            final DepartmentCreateResponse response = this.departmentPort.createDepartments(command);
             return ResponseEntity.ok().body(ResponseMapper.mapToCreateApiResponse(response));
         } catch (final RestException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -136,7 +135,8 @@ public class DepartmentController implements DepartmentApiService {
     @Override
     public List<DepartmentDto> getAllDepartments() {
         return this.departmentPort.findAll().stream().map(dep -> new DepartmentDto(dep.getDepartmentCode().getValue(),
-                dep.getCity(), dep.getStreet(), dep.getCountryCode().name(), new CoordinatesDto(dep.getCoordinates().lat(), dep.getCoordinates().lon()))).toList();
+                dep.getCity(), dep.getStreet(), dep.getCountryCode().name(),
+                dep.getPostalCode(), new CoordinatesDto(dep.getCoordinates().lat(), dep.getCoordinates().lon()))).toList();
     }
 
     @ExceptionHandler(RestException.class)

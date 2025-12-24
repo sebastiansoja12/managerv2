@@ -3,7 +3,7 @@ package com.warehouse.department.infrastructure.adapter.primary.mapper;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.DepartmentCreate;
-import com.warehouse.department.domain.model.DepartmentCreateRequest;
+import com.warehouse.department.domain.model.DepartmentCreateCommand;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.IdentificationNumberChangeRequest;
@@ -14,9 +14,9 @@ import java.util.List;
 
 public abstract class RequestMapper {
 
-    public static DepartmentCreateRequest map(final DepartmentCreateApiRequest request) {
+    public static DepartmentCreateCommand map(final DepartmentCreateApiRequest request) {
         final List<DepartmentCreate> deps = map(request.departments());
-        return new DepartmentCreateRequest(deps);
+        return new DepartmentCreateCommand(deps);
     }
 
 	private static List<DepartmentCreate> map(final List<DepartmentCreateApi> deps) {
