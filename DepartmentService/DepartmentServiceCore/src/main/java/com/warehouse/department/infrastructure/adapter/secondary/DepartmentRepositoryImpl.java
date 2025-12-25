@@ -28,14 +28,6 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     }
 
     @Override
-    public Department findByReference(final DepartmentCode departmentCode) {
-        final DepartmentEntity department = repository
-                .getReferenceById(
-                        new com.warehouse.commonassets.identificator.DepartmentCode(departmentCode.getValue()));
-        return DepartmentToModelMapper.map(department);
-    }
-
-    @Override
     @Cacheable("departmentsCache")
     public List<Department> findAll() {
         final List<DepartmentEntity> departments = repository.findAll();

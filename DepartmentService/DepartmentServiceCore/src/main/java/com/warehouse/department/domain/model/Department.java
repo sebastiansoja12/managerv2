@@ -273,21 +273,18 @@ public class Department {
         this.status = Status.ACTIVE;
         this.lastModifiedBy = modifiedBy;
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentActivated(this.snapshot(), Instant.now()));
     }
 
     public void deactivate(final UserId modifiedBy) {
         this.status = Status.INACTIVE;
         this.lastModifiedBy = modifiedBy;
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentDeactivated(this.snapshot(), Instant.now()));
     }
 
     public void markAsArchived() {
         this.status = Status.ARCHIVED;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentArchived(this.snapshot(), Instant.now()));
     }
 
     public void markAsDeleted() {
@@ -295,14 +292,12 @@ public class Department {
         this.adminUserId = null;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentDeleted(this.snapshot(), Instant.now()));
     }
 
     public void markAsSuspended() {
         this.status = Status.SUSPENDED;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentSuspended(this.snapshot(), Instant.now()));
     }
 
     public void changeDepartmentType(final DepartmentType departmentType) {

@@ -1,17 +1,18 @@
 package com.warehouse.department.domain.service;
 
+import java.time.Instant;
+
+import org.springframework.stereotype.Service;
+
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
-import com.warehouse.department.domain.event.DepartmentCreated;
+import com.warehouse.department.domain.event.*;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.TaxId;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
 
 @Service("department.departmentService")
 public class DepartmentServiceImpl implements DepartmentService {
@@ -54,6 +55,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.activate(modifiedBy);
         this.departmentRepository.createOrUpdate(department);
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentActivated(department.snapshot(), Instant.now()));
     }
 
     @Override
@@ -61,6 +63,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.deactivate(modifiedBy);
         this.departmentRepository.createOrUpdate(department);
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentDeactivated(department.snapshot(), Instant.now()));
     }
 
     @Override
@@ -87,6 +90,8 @@ public class DepartmentServiceImpl implements DepartmentService {
             default -> throw new IllegalArgumentException("Unknown status: " + status);
         }
         this.departmentRepository.createOrUpdate(department);
+        final DepartmentEvent event = createDepartmentEvent(status, department);
+        DomainRegistry.eventPublisher().publishEvent(event);
     }
 
     @Override
@@ -94,5 +99,15 @@ public class DepartmentServiceImpl implements DepartmentService {
         final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeEmail(email);
         this.departmentRepository.createOrUpdate(department);
+    }
+
+    private DepartmentEvent createDepartmentEvent(final Department.Status status, final Department department) {
+        return switch (status) {
+            case ACTIVE -> new DepartmentActivated(department.snapshot(), Instant.now());
+            case INACTIVE -> new DepartmentDeactivated(department.snapshot(), Instant.now());
+            case ARCHIVED -> new DepartmentArchived(department.snapshot(), Instant.now());
+            case SUSPENDED -> new DepartmentSuspended(department.snapshot(), Instant.now());
+            case DELETED -> new DepartmentDeleted(department.snapshot(), Instant.now());
+        };
     }
 }

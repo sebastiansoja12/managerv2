@@ -11,8 +11,6 @@ public interface DepartmentRepository {
 
     Department findByDepartmentCode(final DepartmentCode departmentCode);
 
-    Department findByReference(final DepartmentCode departmentCode);
-
     List<Department> findAll();
 
 }
