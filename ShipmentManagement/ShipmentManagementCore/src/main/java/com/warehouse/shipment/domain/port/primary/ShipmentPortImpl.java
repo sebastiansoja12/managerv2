@@ -5,9 +5,11 @@ import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.model.Money;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
@@ -133,9 +135,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Transactional
     public Result<Void, ErrorCode> update(final ShipmentUpdateCommand command) {
 
-        final ShipmentId shipmentId = command.getShipmentId();
-
-        final Shipment shipment = this.shipmentService.find(shipmentId);
+        final Shipment shipment = shipmentService.find(command.getShipmentId());
 
         if (shipment == null) {
             return Result.failure(ErrorCode.SHIPMENT_204);
@@ -143,39 +143,47 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final ShipmentConfiguration configuration = command.getShipmentConfiguration();
 
-        if (configuration != null && !configuration.forceUpdate()) {
-            final Result<Void, String> resultValidation = shipmentStateValidatorService.validateShipmentState(shipment);
+        if (shouldValidateState(configuration)) {
+            final Result<Void, String> validation = shipmentStateValidatorService.validateShipmentState(shipment);
+            if (validation.isFailure()) {
+                return Result.failure(ErrorCode.SHIPMENT_203);
+            }
         }
 
-        final String destination;
-        if (configuration != null && configuration.customRerouteDepartment()) {
-            destination = command.getDestination();
-        } else {
-            final Result<VoronoiResponse, ErrorCode> voronoiResult =
-                    this.pathFinderServicePort.determineDeliveryDepartment(Address.from(shipment.getRecipient()));
-            destination = voronoiResult.isSuccess() ? voronoiResult.getSuccess().getValue() : "NCS";
+        final CountryCode issuerCountryCode = command.getIssuerCountryCode();
+
+        final CountryCode receiverCountryCode = command.getReceiverCountryCode();
+
+        final boolean originCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(issuerCountryCode);
+
+        final boolean destinationCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(receiverCountryCode);
+
+        if (!originCountryAvailable) {
+            return Result.failure(ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
+        } else if (!destinationCountryAvailable) {
+            return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
         }
 
-        final Sender sender = command.getSender();
-        final Recipient recipient = command.getRecipient();
-        final ShipmentStatus shipmentStatus = command.getShipmentStatus();
-        final ShipmentPriority shipmentPriority = command.getShipmentPriority();
-        final Money price = command.getPrice();
-        final ShipmentSize shipmentSize = command.getShipmentSize();
-        final DangerousGood dangerousGood = command.getDangerousGood();
-        
-		shipment.update(sender, recipient, shipmentStatus, shipmentPriority, shipmentSize, price, dangerousGood,
-                destination, false);
+        final String destination = resolveDestination(command, shipment, configuration);
 
-        this.shipmentService.update(shipment);
+        final Price shipmentPrice = command.getPrice() == null || !command.getPrice().isDefined() ?
+                this.priceService.determineShipmentPrice(command.getShipmentSize(), Currency.PLN) : new Price(command.getPrice());
 
-        if (configuration != null && configuration.publishInRouteTracker()) {
-            routeLogServicePort.notifyShipmentUpdated(shipment.snapshot());
-        }
+        shipment.update(
+                command.getSender(),
+                command.getRecipient(),
+                command.getShipmentStatus(),
+                command.getShipmentPriority(),
+                command.getShipmentSize(),
+                shipmentPrice.getMoney(),
+                command.getDangerousGood(),
+                destination,
+                false
+        );
 
-        if (configuration != null && configuration.publishInReturnManager()) {
-            returningServicePort.notifyShipmentUpdated(shipment.snapshot());
-        }
+        shipmentService.update(shipment);
+
+        publishIfNeeded(shipment.snapshot(), configuration);
 
         return Result.success();
     }
@@ -330,4 +338,33 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
     }
 
+    private boolean shouldValidateState(final ShipmentConfiguration configuration) {
+        return !configuration.forceUpdate();
+    }
+
+    private String resolveDestination(final ShipmentUpdateCommand command,
+                                      final Shipment shipment,
+                                      final ShipmentConfiguration configuration) {
+
+        if (configuration.customRerouteDepartment()) {
+            return command.getDestination();
+        }
+
+        final Result<VoronoiResponse, ErrorCode> voronoiResult =
+                this.pathFinderServicePort.determineDeliveryDepartment(Address.from(shipment.getRecipient()));
+
+        return voronoiResult.isSuccess()
+                ? voronoiResult.getSuccess().getValue()
+                : shipment.getDestination();
+    }
+
+    private void publishIfNeeded(final ShipmentSnapshot snapshot, final ShipmentConfiguration configuration) {
+		if (configuration.publishInRouteTracker()) {
+			this.routeLogServicePort.notifyShipmentUpdated(snapshot);
+		}
+
+		if (configuration.publishInReturnManager()) {
+			this.returningServicePort.notifyShipmentUpdated(snapshot);
+		}
+    }
 }

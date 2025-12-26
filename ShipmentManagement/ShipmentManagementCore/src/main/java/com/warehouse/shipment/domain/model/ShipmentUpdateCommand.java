@@ -1,5 +1,7 @@
 package com.warehouse.shipment.domain.model;
 
+import java.util.Objects;
+
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
@@ -10,6 +12,9 @@ import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
 
+import lombok.Builder;
+
+@Builder
 public class ShipmentUpdateCommand {
     
     private ShipmentId shipmentId;
@@ -140,7 +145,10 @@ public class ShipmentUpdateCommand {
     }
 
     public ShipmentConfiguration getShipmentConfiguration() {
-        return shipmentConfiguration;
+        return Objects.requireNonNullElse(
+                shipmentConfiguration,
+                ShipmentConfiguration.defaults()
+        );
     }
 
     public void setShipmentConfiguration(final ShipmentConfiguration shipmentConfiguration) {
@@ -157,5 +165,9 @@ public class ShipmentUpdateCommand {
 
     public String getDestination() {
         return destination;
+    }
+
+    public void setDestination(final String destination) {
+        this.destination = destination;
     }
 }

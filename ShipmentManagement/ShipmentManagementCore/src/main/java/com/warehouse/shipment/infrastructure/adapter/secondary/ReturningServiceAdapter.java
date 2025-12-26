@@ -42,6 +42,17 @@ public class ReturningServiceAdapter implements ReturningServicePort {
 
     @Override
     public void notifyShipmentUpdated(final ShipmentSnapshot snapshot) {
-
+        log.info("Updating shipment in return manager {}", snapshot.shipmentId().toString());
+        final ReturnRequestApi request = OutputRequestMapper.map(snapshot);
+        restClient
+                .post()
+                .uri("/v2/api/returns")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(h -> h.setBearerAuth(
+                        SecurityContextHolder.getContext().getAuthentication().getCredentials().toString()
+                ))
+                .body(request)
+                .retrieve()
+                .toEntity(Void.class);
     }
 }
