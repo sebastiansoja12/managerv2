@@ -1,6 +1,7 @@
 package com.warehouse.shipment.domain.service;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -59,4 +60,6 @@ public interface ShipmentService {
     ShipmentId nextShipmentId();
 
     void update(final Shipment shipment);
+
+    void changeRouteProcessId(final ProcessId processId, final ShipmentId shipmentId);
 }

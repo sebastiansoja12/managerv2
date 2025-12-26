@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
@@ -54,6 +56,9 @@ public class Shipment {
 
     private Signature signature;
 
+    private ExternalId<String> externalRouteId;
+
+    private ExternalId<String> externalReturnId;
 
     public Shipment() {
         //
@@ -491,6 +496,13 @@ public class Shipment {
         markAsModified();
     }
 
+    public void notifyShipmentReturnCreated(final ExternalId<String> externalRouteId,
+                                            final ExternalId<String> externalReturnId) {
+        this.externalRouteId = externalRouteId;
+        this.externalReturnId = externalReturnId;
+        markAsModified();
+    }
+
     public void changeDestinationDepartment(final String destination) {
         this.destination = destination;
     }
@@ -581,5 +593,9 @@ public class Shipment {
     public void lockShipmentWithShipmentType(final ShipmentType shipmentType) {
         this.shipmentType = shipmentType;
         lockShipment();
+    }
+
+    public void assignRouteProcessId(final ProcessId processId) {
+        markAsModified();
     }
 }

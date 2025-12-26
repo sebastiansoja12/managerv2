@@ -217,6 +217,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public void changePersonTo(final Person person, final ShipmentId shipmentId) {
+        validateShipmentNotInStatus(shipmentId);
         if (person.getType() == PersonType.SENDER) {
             this.shipmentService.changeSenderTo(shipmentId, (Sender) person);
         } else if (person.getType() == PersonType.RECIPIENT) {

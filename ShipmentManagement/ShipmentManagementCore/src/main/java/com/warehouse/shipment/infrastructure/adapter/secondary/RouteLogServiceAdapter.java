@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.commonassets.identificator.ProcessId;
@@ -52,13 +51,7 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
                 .decorateSupplier(retry, () -> sendRouteProcessRequest(restClient, 
                         shipmentId, softwareConfiguration.getValue()));
 
-        final ResponseEntity<RouteProcessDto> process;
-
-        try {
-            process = retryableSupplier.get();
-        } catch (final HttpClientErrorException e) {
-            return RouteProcess.from(shipmentId, null, e.getMessage(), e.getResponseBodyAsString());
-        }
+        final ResponseEntity<RouteProcessDto> process = retryableSupplier.get();
 
         if (!process.getStatusCode().is2xxSuccessful() || process.getBody() == null) {
             log.error("Error while registering route for shipment {}", shipmentId.getValue());

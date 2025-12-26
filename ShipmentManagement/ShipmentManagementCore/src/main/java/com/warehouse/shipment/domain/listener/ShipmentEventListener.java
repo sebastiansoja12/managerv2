@@ -47,6 +47,9 @@ public class ShipmentEventListener {
         final Result<RouteProcess, ErrorCode> routeProcess = this.routeTrackerService
                 .notifyShipmentCreated(snapshot.shipmentId());
 
+        this.shipmentService.changeRouteProcessId(routeProcess.getSuccess().getProcessId(),
+                snapshot.shipmentId());
+
 		this.routeTrackerHistoryNotifier.notifyShipmentRoute(new ShipmentHistoryTracker(snapshot.shipmentId(),
 				snapshot.shipmentStatus(), routeProcess.isFailure() ? routeProcess.getFailure().getMessage() : null,
 				routeProcess.isFailure() ? String.valueOf(routeProcess.getFailure().getCode()) : null,

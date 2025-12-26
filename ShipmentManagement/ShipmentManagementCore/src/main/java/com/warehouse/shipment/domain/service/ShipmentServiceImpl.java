@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.model.DangerousGood;
@@ -210,5 +211,12 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void update(final Shipment shipment) {
         this.shipmentRepository.createOrUpdate(shipment);
         DomainRegistry.eventPublisher().publishEvent(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public void changeRouteProcessId(final ProcessId processId, final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.assignRouteProcessId(processId);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 }
