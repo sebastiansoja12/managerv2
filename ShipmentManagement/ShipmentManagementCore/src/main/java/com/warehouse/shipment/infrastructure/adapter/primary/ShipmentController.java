@@ -18,6 +18,7 @@ import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
+import com.warehouse.shipment.infrastructure.adapter.primary.exception.ShipmentValidationException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.DangerousGoodValidator;
@@ -194,5 +195,10 @@ public class ShipmentController {
     @ExceptionHandler
     public ResponseEntity<?> handleException(final EmptyRequestException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
+    }
+
+    @ExceptionHandler(ShipmentValidationException.class)
+    public ResponseEntity<?> handleException(final ShipmentValidationException exception) {
+        return ResponseEntity.status(exception.getCode()).body(exception.getValidationErrors());
     }
 }
