@@ -160,7 +160,10 @@ public class DepartmentController implements DepartmentApiService {
     @GetMapping("/coordinates")
     @Override
     public List<DepartmentDto> getAllDepartments() {
-        return this.departmentPort.findAll().stream().map(dep -> new DepartmentDto(dep.getDepartmentCode().getValue(),
+        return this.departmentPort.findAll()
+                .stream()
+                .filter(dep -> dep.getDepartmentType().equals(DepartmentType.WAREHOUSE))
+                .map(dep -> new DepartmentDto(dep.getDepartmentCode().getValue(),
                 dep.getCity(), dep.getStreet(), dep.getCountryCode().name(),
                 dep.getPostalCode(), new CoordinatesDto(dep.getCoordinates().lat(), dep.getCoordinates().lon()))).toList();
     }
