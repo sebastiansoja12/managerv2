@@ -162,10 +162,13 @@ public class DepartmentController implements DepartmentApiService {
     public List<DepartmentDto> getAllDepartments() {
         return this.departmentPort.findAll()
                 .stream()
-                .filter(dep -> dep.getDepartmentType().equals(DepartmentType.WAREHOUSE))
+                .filter(dep ->
+                        dep.getDepartmentType().equals(DepartmentType.BRANCH)
+                                || dep.getDepartmentType().equals(DepartmentType.WAREHOUSE))
                 .map(dep -> new DepartmentDto(dep.getDepartmentCode().getValue(),
                 dep.getCity(), dep.getStreet(), dep.getCountryCode().name(),
-                dep.getPostalCode(), new CoordinatesDto(dep.getCoordinates().lat(), dep.getCoordinates().lon()))).toList();
+                dep.getPostalCode(), new CoordinatesDto(dep.getCoordinates().lat(), dep.getCoordinates().lon())))
+                .toList();
     }
 
     public DepartmentRequestValidator getValidator(final String resourceName) {
