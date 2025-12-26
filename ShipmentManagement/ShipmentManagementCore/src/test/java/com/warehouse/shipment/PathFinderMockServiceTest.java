@@ -13,21 +13,15 @@ public class PathFinderMockServiceTest {
 
     @Test
     void shouldDetermineDeliveryDepot() {
-        // given
         final Address address = new Address("Katowice", "00-000", "Katowicka 1");
-        // when
         final VoronoiResponse voronoiResponse = mockService.determineDeliveryDepot(address);
-        // then
         assertEquals(expectedToBe("KT3"), voronoiResponse.getValue());
     }
 
     @Test
     void shouldDetermineAnyDeliveryDepotWhenOneIsNotExpected() {
-        // given
         final Address address = new Address("Los Angeles", "00-000", "Katowicka 1");
-        // when
         final VoronoiResponse voronoiResponse = mockService.determineDeliveryDepot(address);
-        // then
         assertEquals(expectedToBe("NCS"), voronoiResponse.getValue());
     }
 

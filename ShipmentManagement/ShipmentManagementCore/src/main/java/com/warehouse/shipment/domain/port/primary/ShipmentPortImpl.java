@@ -51,6 +51,9 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ReturningServicePort returningServicePort;
 
+    private final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT, ShipmentStatus.REROUTE,
+            ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
+
 	public ShipmentPortImpl(final ShipmentService shipmentService,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
@@ -93,13 +96,13 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
         }
 
-        final Address recipientAddress = Address.from(request.getRecipient());
-        
         final Sender sender = request.getSender();
         
         final Recipient recipient = request.getRecipient();
 
-		final Result<VoronoiResponse, ErrorCode> voronoiResponse = this.pathFinderServicePort
+        final Address recipientAddress = Address.from(recipient);
+
+        final Result<VoronoiResponse, ErrorCode> voronoiResponse = this.pathFinderServicePort
 				.determineDeliveryDepartment(recipientAddress);
         
         if (voronoiResponse.isFailure()) {
@@ -161,7 +164,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ShipmentSize shipmentSize = command.getShipmentSize();
         final DangerousGood dangerousGood = command.getDangerousGood();
         
-        
 		shipment.update(sender, recipient, shipmentStatus, shipmentPriority, shipmentSize, price, dangerousGood,
                 destination, false);
 
@@ -202,18 +204,14 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeSenderTo(final ShipmentCreateCommand request) {
-        final Shipment shipment = Shipment.from(request);
-        final Sender sender = request.getSender();
-        final ShipmentId shipmentId = shipment.getShipmentId();
+    public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
+        validateShipmentNotInStatus(shipmentId);
         this.shipmentService.changeSenderTo(shipmentId, sender);
     }
 
     @Override
-    public void changeRecipientTo(final ShipmentCreateCommand request) {
-        final Shipment shipment = Shipment.from(request);
-        final Recipient recipient = Recipient.from(shipment);
-        final ShipmentId shipmentId = shipment.getShipmentId();
+    public void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient) {
+        validateShipmentNotInStatus(shipmentId);
         this.shipmentService.changeRecipientTo(shipmentId, recipient);
     }
 
@@ -316,16 +314,17 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     private void validateShipmentNotInStatus(final ShipmentId shipmentId) {
-		final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT, ShipmentStatus.REROUTE,
-				ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
         final Shipment shipment = loadShipment(shipmentId);
+        if (shipment == null) {
+            throw new RestException(404, "Shipment not found");
+        }
         if (shipmentStatuses.contains(shipment.getShipmentStatus())) {
             throw new RestException(400, "Cannot modify shipment issuer or receiver country");
         }
         if (shipment.getShipmentRelatedId() != null) {
             final Shipment relatedShipment = loadShipment(shipment.getShipmentRelatedId());
             if (shipmentStatuses.contains(relatedShipment.getShipmentStatus())) {
-                throw new RestException(400, "Cannot modify parent shipment issuer or receiver country");
+                throw new RestException(400, "Cannot modify parent shipment");
             }
         }
     }

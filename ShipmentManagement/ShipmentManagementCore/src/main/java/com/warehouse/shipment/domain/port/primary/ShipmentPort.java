@@ -14,9 +14,9 @@ public interface ShipmentPort {
 
     Result<Void, ErrorCode> update(final ShipmentUpdateCommand request);
 
-    void changeSenderTo(final ShipmentCreateCommand request);
+    void changeSenderTo(final ShipmentId shipmentId, final Sender sender);
 
-    void changeRecipientTo(final ShipmentCreateCommand request);
+    void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient);
 
     void changePersonTo(final Person person, final ShipmentId shipmentId);
 
