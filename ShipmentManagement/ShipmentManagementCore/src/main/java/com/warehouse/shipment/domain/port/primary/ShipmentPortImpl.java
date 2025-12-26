@@ -5,11 +5,9 @@ import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.model.Money;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
@@ -85,89 +83,81 @@ public class ShipmentPortImpl implements ShipmentPort {
     public Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand request) {
 
         final CountryCode issuerCountryCode = request.getIssuerCountryCode();
-
         final CountryCode receiverCountryCode = request.getReceiverCountryCode();
 
-        final boolean originCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(issuerCountryCode);
-
-        final boolean destinationCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(receiverCountryCode);
-
-        if (!originCountryAvailable) {
-            return Result.failure(ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
-        } else if (!destinationCountryAvailable) {
-            return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
+        final Result<Void, ErrorCode> countryValidation =
+                validateCountries(issuerCountryCode, receiverCountryCode);
+        if (countryValidation.isFailure()) {
+            return Result.failure(countryValidation.getFailure());
         }
 
         final Sender sender = request.getSender();
-        
         final Recipient recipient = request.getRecipient();
-
         final Address recipientAddress = Address.from(recipient);
 
-        final Result<VoronoiResponse, ErrorCode> voronoiResponse = this.pathFinderServicePort
-				.determineDeliveryDepartment(recipientAddress);
-        
+        final Result<VoronoiResponse, ErrorCode> voronoiResponse =
+                this.pathFinderServicePort.determineDeliveryDepartment(recipientAddress);
         if (voronoiResponse.isFailure()) {
             return Result.failure(voronoiResponse.getFailure());
         }
 
-        final Price shipmentPrice = determineShipmentPrice(request);
+        final Price shipmentPrice =
+                resolveShipmentPrice(request.getPrice(), request.getShipmentSize());
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
-		final Shipment shipment = new Shipment(shipmentId, sender, recipient, request.getShipmentSize(), null,
-                issuerCountryCode, receiverCountryCode, shipmentPrice.getMoney(), false,
-				voronoiResponse.getSuccess().getValue(), null, request.getShipmentPriority());
+        final Shipment shipment = new Shipment(
+                shipmentId,
+                sender,
+                recipient,
+                request.getShipmentSize(),
+                null,
+                issuerCountryCode,
+                receiverCountryCode,
+                shipmentPrice.getMoney(),
+                false,
+                voronoiResponse.getSuccess().getValue(),
+                null,
+                request.getShipmentPriority()
+        );
 
         this.shipmentService.createShipment(shipment);
-
         logCreatedShipment(shipment);
 
         return Result.success(new ShipmentCreateResponse(shipmentId));
-    }
-
-    private Price determineShipmentPrice(final ShipmentCreateCommand request) {
-        return request.getPrice() == null || !request.getPrice().isDefined() ?
-                this.priceService.determineShipmentPrice(request.getShipmentSize(), Currency.PLN) : new Price(request.getPrice());
     }
 
     @Override
     @Transactional
     public Result<Void, ErrorCode> update(final ShipmentUpdateCommand command) {
 
-        final Shipment shipment = shipmentService.find(command.getShipmentId());
-
+        final Shipment shipment = this.shipmentService.find(command.getShipmentId());
         if (shipment == null) {
             return Result.failure(ErrorCode.SHIPMENT_204);
         }
 
         final ShipmentConfiguration configuration = command.getShipmentConfiguration();
-
         if (shouldValidateState(configuration)) {
-            final Result<Void, String> validation = shipmentStateValidatorService.validateShipmentState(shipment);
+            final Result<Void, String> validation =
+                    this.shipmentStateValidatorService.validateShipmentState(shipment);
             if (validation.isFailure()) {
                 return Result.failure(ErrorCode.SHIPMENT_203);
             }
         }
 
         final CountryCode issuerCountryCode = command.getIssuerCountryCode();
-
         final CountryCode receiverCountryCode = command.getReceiverCountryCode();
 
-        final boolean originCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(issuerCountryCode);
-
-        final boolean destinationCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(receiverCountryCode);
-
-        if (!originCountryAvailable) {
-            return Result.failure(ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
-        } else if (!destinationCountryAvailable) {
-            return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
+        final Result<Void, ErrorCode> countryValidation =
+                validateCountries(issuerCountryCode, receiverCountryCode);
+        if (countryValidation.isFailure()) {
+            return Result.failure(countryValidation.getFailure());
         }
 
         final String destination = resolveDestination(command, shipment, configuration);
 
-        final Price shipmentPrice = command.getPrice() == null || !command.getPrice().isDefined() ?
-                this.priceService.determineShipmentPrice(command.getShipmentSize(), Currency.PLN) : new Price(command.getPrice());
+        final Price shipmentPrice =
+                resolveShipmentPrice(command.getPrice(), command.getShipmentSize());
 
         shipment.update(
                 command.getSender(),
@@ -181,11 +171,30 @@ public class ShipmentPortImpl implements ShipmentPort {
                 false
         );
 
-        shipmentService.update(shipment);
-
+        this.shipmentService.update(shipment);
         publishIfNeeded(shipment.snapshot(), configuration);
 
         return Result.success();
+    }
+
+    private Result<Void, ErrorCode> validateCountries(
+            final CountryCode issuerCountryCode, final CountryCode receiverCountryCode) {
+
+        if (!this.countryServiceAvailabilityService.isCountryAvailable(issuerCountryCode)) {
+            return Result.failure(ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
+        }
+
+        if (!this.countryServiceAvailabilityService.isCountryAvailable(receiverCountryCode)) {
+            return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
+        }
+
+        return Result.success();
+    }
+
+    private Price resolveShipmentPrice(final Money price, final ShipmentSize shipmentSize) {
+        return price == null || !price.isDefined()
+                ? this.priceService.determineShipmentPrice(shipmentSize, Currency.PLN)
+                : new Price(price);
     }
 
     @Override
