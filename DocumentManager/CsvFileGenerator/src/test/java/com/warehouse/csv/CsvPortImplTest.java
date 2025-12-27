@@ -47,7 +47,7 @@ public class CsvPortImplTest {
 
     private ParcelCsv buildParcel() {
         return ParcelCsv.builder()
-                .id(1L)
+                .shipmentId(1L)
                 .build();
     }
 }
