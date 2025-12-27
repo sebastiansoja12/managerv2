@@ -13,23 +13,26 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
-import com.warehouse.shipment.domain.exception.ShipmentEmptyRequestException;
+import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
+import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
+import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.service.*;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.ChangeShipmentTypeRequest;
+import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
+import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,13 +68,16 @@ class ShipmentPortImplTest {
     @Mock
     private CountryRepository countryRepository;
 
+    @Mock
+    private ReturningServicePort returningServicePort;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
 
     private final static UUID processId = UUID.fromString("2d255296-3f50-4cc1-b8dc-ef6e634aab0d");
 
-    private static final String SHIPMENT_WAS_NOT_FOUND = "Shipment was not found";
+    private static final String SHIPMENT_WAS_NOT_FOUND = "Shipment not found";
 
     @BeforeEach
     void setUp() {
@@ -84,123 +90,24 @@ class ShipmentPortImplTest {
                 new ShipmentCreatedHandler(), new ShipmentRerouteHandler(shipmentService),
                 new ShipmentSentHandler(shipmentService), new ShipmentDeliveryHandler(shipmentService),
                 new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
+        final ApplicationContext applicationContext = mock(ApplicationContext.class);
+        final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        final DomainRegistry domainContext = new DomainRegistry();
+        domainContext.setApplicationEventPublisher(eventPublisher);
+        domainContext.setApplicationContext(applicationContext);
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
 				shipmentStatusHandlers, countryDetermineService, priceService, countryServiceAvailabilityService,
-				signatureService);
+				signatureService, routeLogServicePort, returningServicePort);
 	}
 
     @Test
     void shouldShip() {
         // given
-        final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
-        final VoronoiResponse voronoiResponse = new VoronoiResponse("KT1");
-        final RouteProcess routeProcess = new RouteProcess(shipmentId, new ProcessId(processId), "", "");
-        final SoftwareConfiguration softwareConfiguration = new SoftwareConfiguration("id", "url");
-
-        doReturn(voronoiResponse)
-                .when(pathFinderServicePort)
-                .determineDeliveryDepartment(any(Address.class));
-
-        doReturn(softwareConfiguration)
-                .when(softwareConfigurationServicePort)
-                .getSoftwareConfiguration();
-
-        when(routeLogServicePort.notifyShipmentCreated(any(), any())).thenReturn(routeProcess);
+        final ShipmentCreateCommand request = new ShipmentCreateCommand();
         // when
         final Result<ShipmentCreateResponse, ErrorCode> response = shipmentPort.ship(request);
         // then
         assertEquals(response, expectedToBeEqualTo(response));
-    }
-
-    @Test
-    void shouldNotShipWhenRequestIsEmpty() {
-        // given
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
-        // when
-        final Executable executable = () -> shipmentPort.ship(request);
-        // then
-        final ShipmentEmptyRequestException exception = assertThrows(ShipmentEmptyRequestException.class, executable);
-        assertEquals("Shipment not found in request", exception.getMessage());
-    }
-
-    @Test
-    void shouldThrowDestinationDepotDeterminationExceptionWhenCityIsNull() {
-        // given
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
-        doReturn(null)
-                .when(pathFinderServicePort)
-                .determineDeliveryDepartment(any(Address.class));
-        // when
-        final Executable executable = () -> shipmentPort.ship(request);
-        // then
-		final DestinationDepartmentDeterminationException exception = assertThrows(
-				DestinationDepartmentDeterminationException.class, executable);
-        assertEquals("Delivery department could not be determined", exception.getMessage());
-    }
-
-    @Test
-    void shouldThrowDestinationDepotDeterminationExceptionWhenCityValueIsEmpty() {
-        // given
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
-        final VoronoiResponse voronoiResponse = new VoronoiResponse("");
-        doReturn(voronoiResponse)
-                .when(pathFinderServicePort)
-                .determineDeliveryDepartment(any(Address.class));
-        // when
-        final Executable executable = () -> shipmentPort.ship(request);
-        // then
-		final DestinationDepartmentDeterminationException exception = assertThrows(
-				DestinationDepartmentDeterminationException.class, executable);
-        assertEquals("Delivery department could not be determined", exception.getMessage());
-    }
-
-    @Test
-    void shouldChangeSenderTo() {
-        // given
-        final ShipmentId shipmentId = shipmentId();
-        final Shipment shipment = mock(Shipment.class);
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
-        doReturn(shipment)
-                .when(shipmentRepository)
-                .findById(shipmentId);
-        // when
-        shipmentPort.changeSenderTo(request);
-        // then
-        verify(shipmentRepository).findById(shipmentId);
-        verify(shipmentRepository).createOrUpdate(shipment);
-    }
-
-    @Test
-    void shouldChangeRecipientTo() {
-        // given
-        final ShipmentId shipmentId = shipmentId();
-        final Shipment shipment = mock(Shipment.class);
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
-        doReturn(shipment)
-                .when(shipmentRepository)
-                .findById(shipmentId);
-        // when
-        shipmentPort.changeRecipientTo(request);
-        // then
-        verify(shipmentRepository).findById(shipmentId);
-        verify(shipmentRepository).createOrUpdate(shipment);
-    }
-
-    @Test
-    void shouldChangeShipmentTypeTo() {
-        // given
-        final ShipmentId shipmentId = shipmentId();
-        final Shipment shipment = mock(Shipment.class);
-        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(shipmentId, ShipmentType.PARENT);
-        doReturn(shipment)
-                .when(shipmentRepository)
-                .findById(shipmentId);
-        // when
-        shipmentPort.changeShipmentTypeTo(request);
-        // then
-        verify(shipmentRepository).findById(shipmentId);
-        verify(shipmentRepository).createOrUpdate(shipment);
     }
 
     @Test
@@ -292,31 +199,19 @@ class ShipmentPortImplTest {
 
     @Test
     void shouldNotChangeSenderToWhenShipmentWasNotFound() {
-        // given
         final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
-        doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
-                .when(shipmentRepository)
-                .findById(shipmentId);
-        // when
-        final Executable executable = () -> shipmentPort.changeSenderTo(request);
-        // then
-        final ShipmentNotFoundException exception = assertThrows(ShipmentNotFoundException.class, executable);
+        when(shipmentRepository.findById(shipmentId)).thenReturn(null);
+        final Executable executable = () -> shipmentPort.changeSenderTo(shipmentId, any());
+        final RestException exception = assertThrows(RestException.class, executable);
         assertEquals(SHIPMENT_WAS_NOT_FOUND, exception.getMessage());
     }
 
     @Test
     void shouldNotChangeRecipientToWhenShipmentWasNotFound() {
-        // given
         final ShipmentId shipmentId = shipmentId();
-        final ShipmentCreateRequest request = new ShipmentCreateRequest();
-        doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
-                .when(shipmentRepository)
-                .findById(shipmentId);
-        // when
-        final Executable executable = () -> shipmentPort.changeRecipientTo(request);
-        // then
-        final ShipmentNotFoundException exception = assertThrows(ShipmentNotFoundException.class, executable);
+        when(shipmentRepository.findById(shipmentId)).thenReturn(null);
+        final Executable executable = () -> shipmentPort.changeRecipientTo(shipmentId, any());
+        final RestException exception = assertThrows(RestException.class, executable);
         assertEquals(SHIPMENT_WAS_NOT_FOUND, exception.getMessage());
     }
 

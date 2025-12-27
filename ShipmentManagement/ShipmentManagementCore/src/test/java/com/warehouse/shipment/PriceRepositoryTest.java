@@ -1,9 +1,10 @@
 package com.warehouse.shipment;
 
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.shipment.domain.vo.Price;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -16,12 +17,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.shipment.domain.port.secondary.PriceRepository;
-
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.warehouse.shipment.domain.vo.Price;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest

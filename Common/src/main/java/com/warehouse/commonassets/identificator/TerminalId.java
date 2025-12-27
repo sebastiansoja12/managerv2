@@ -6,7 +6,6 @@ public class TerminalId extends DeviceId implements Serializable {
     private final Long value;
 
     public TerminalId(final Long value) {
-        super(value);
         this.value = value;
     }
 

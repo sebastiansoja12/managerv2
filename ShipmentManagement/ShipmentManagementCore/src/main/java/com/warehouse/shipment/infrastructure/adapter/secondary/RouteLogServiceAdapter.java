@@ -5,15 +5,15 @@ import java.util.function.Supplier;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
+import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.shipment.domain.vo.Person;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.RouteProcess;
-import com.warehouse.shipment.domain.vo.SoftwareConfiguration;
+import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.PersonChangedRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteLogRecord;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteProcessDto;
@@ -45,26 +45,36 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
                 .toEntity(RouteProcessDto.class);
     }
 
+    // TODO
     @Override
-	public RouteProcess notifyShipmentCreated(final ShipmentId shipmentId,
-                                              final SoftwareConfiguration softwareConfiguration) {
-        final RestClient restClient = buildRestClient(softwareConfiguration);
-        final Supplier<ResponseEntity<RouteProcessDto>> retryableSupplier = Retry
-                .decorateSupplier(retry, () -> sendRouteProcessRequest(restClient, 
-                        shipmentId, softwareConfiguration.getValue()));
+    public Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId,
+                                                                 final SoftwareConfiguration softwareConfiguration) {
+        try {
+            final RestClient restClient = RestClient.builder()
+                    .baseUrl(softwareConfiguration.getUrl())
+                    .build();
 
-        final ResponseEntity<RouteProcessDto> process = retryableSupplier.get();
+            final Supplier<ResponseEntity<RouteProcessDto>> retryableSupplier = Retry
+                    .decorateSupplier(retry, () -> sendRouteProcessRequest(restClient,
+                            shipmentId, softwareConfiguration.getValue()));
 
-        if (!process.getStatusCode().is2xxSuccessful() || process.getBody() == null) {
-            log.error("Error while registering route for shipment {}", shipmentId.getValue());
-            throw new RuntimeException("Error while registering route for shipment");
+            final ResponseEntity<RouteProcessDto> process = retryableSupplier.get();
+
+            if (!process.getStatusCode().is2xxSuccessful() || process.getBody() == null) {
+                log.error("Error while registering route for shipment {}", shipmentId.getValue());
+                return Result.failure(ErrorCode.ROUTE_TRACKER_SERVICE_ERROR);
+            }
+
+            log.info("Successfully registered route {} for shipment {}", process.getBody().getProcessId(),
+                    shipmentId.getValue());
+            return Result.success(RouteProcess.from(shipmentId, new ProcessId(process.getBody().getProcessId()), "", ""));
+        } catch (final ResourceAccessException e) {
+            log.error("ResourceAccessException while registering route for shipment {}: {}",
+                    shipmentId.getValue(), e.getMessage());
+            return Result.failure(ErrorCode.ROUTE_TRACKER_SERVICE_NOT_AVAILABLE);
         }
-
-        log.info("Successfully registered route {} for shipment {}", process.getBody().getProcessId(),
-                shipmentId.getValue());
-
-        return RouteProcess.from(shipmentId, new ProcessId(process.getBody().getProcessId()), "", "");
     }
+
 
     @Override
 	public RouteProcess notifyRecipientChanged(final ShipmentId shipmentId, final Recipient recipient,
@@ -91,6 +101,11 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
                 .toEntity(RouteLogRecord.class);
 
         return RouteProcess.from(responseEntity, shipmentId);
+    }
+
+    @Override
+    public void notifyShipmentUpdated(final ShipmentSnapshot snapshot) {
+
     }
 
     private RestClient buildRestClient(final SoftwareConfiguration softwareConfiguration) {

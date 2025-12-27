@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import com.warehouse.shipment.domain.model.DangerousGoodCreateRequest;
+import com.warehouse.shipment.domain.model.DangerousGoodCreateCommand;
 import com.warehouse.shipment.domain.vo.DangerousGoodId;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ public class ShipmentEventListener {
     @EventListener
     public void handle(final DangerousGoodCreated event) {
         final GoodSnapshot goodSnapshot = event.getSnapshot();
-		final DangerousGoodCreateRequest request = new DangerousGoodCreateRequest(
+		final DangerousGoodCreateCommand request = new DangerousGoodCreateCommand(
 				new DangerousGoodId(goodSnapshot.dangerousGoodId().value()), goodSnapshot.shipmentId(),
 				goodSnapshot.name(), goodSnapshot.description(), goodSnapshot.classificationCode().name(),
 				Collections.singletonList(goodSnapshot.hazardSymbols()), goodSnapshot.storageRequirement().name(),

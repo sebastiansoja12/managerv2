@@ -1,14 +1,20 @@
 package com.warehouse.shipment.domain.service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.ReasonCode;
+import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
+import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
@@ -32,7 +38,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
 	public void createShipment(final Shipment shipment) {
         this.shipmentRepository.createOrUpdate(shipment);
-	}
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentCreatedEvent(shipment.snapshot(), Instant.now()));
+    }
 
     @Override
     public Shipment find(final ShipmentId shipmentId) {
@@ -49,6 +56,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeSender(sender);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentSenderChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -56,6 +64,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeRecipient(recipient);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentRecipientChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -95,20 +104,23 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeCurrency(currency);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentCurrencyChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
-    public void changeShipmentIssuerCountryTo(final ShipmentId shipmentId, final Country originCountry) {
+    public void changeShipmentIssuerCountryTo(final ShipmentId shipmentId, final CountryCode originCountry) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeIssuerCountry(originCountry);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentCountriesChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
-    public void changeShipmentReceiverCountryTo(final ShipmentId shipmentId, final Country destinationCountry) {
+    public void changeShipmentReceiverCountryTo(final ShipmentId shipmentId, final CountryCode destinationCountry) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeReceiverCountry(destinationCountry);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentCountriesChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -154,17 +166,28 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void notifyShipmentReturned(ShipmentId shipmentId) {
+    public void notifyShipmentReturned(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentReturned();
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentReturned(shipment.snapshot(), Instant.now()));
     }
 
     @Override
-    public void notifyShipmentDelivered(ShipmentId shipmentId) {
+    public void notifyShipmentReturned(final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.notifyShipmentReturned();
+        this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentReturnCreated(shipment.snapshot(),
+                reasonCode, reason, Instant.now()));
+    }
+
+    @Override
+    public void notifyShipmentDelivered(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentDelivered();
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentDelivered(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -179,6 +202,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(request.shipmentId());
         shipment.updateCountries(request);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentCountriesChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -186,11 +210,32 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.lockShipment();
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentLocked(shipment.snapshot(), Instant.now()));
     }
 
     @Override
     public ShipmentId nextShipmentId() {
         final long randomUUIDBits = UUID.randomUUID().getLeastSignificantBits();
         return new ShipmentId(Math.abs(randomUUIDBits));
+    }
+
+    @Override
+    public void update(final Shipment shipment) {
+        this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public void changeRouteProcessId(final ProcessId processId, final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.assignRouteProcessId(processId);
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
+    public void assignExternalReturnId(final ShipmentId shipmentId, final ReturnId returnId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.assignReturnId(returnId);
+        this.shipmentRepository.createOrUpdate(shipment);
     }
 }

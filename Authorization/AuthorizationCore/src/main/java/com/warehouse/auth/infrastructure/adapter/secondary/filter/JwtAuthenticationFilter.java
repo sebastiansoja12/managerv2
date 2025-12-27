@@ -4,13 +4,13 @@ package com.warehouse.auth.infrastructure.adapter.secondary.filter;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.UserService;
+import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -48,8 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			if (jwtService.isTokenValid(jwt, user)) {
 				final SecurityContext context = SecurityContextHolder.createEmptyContext();
-				final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-						user.getUserId(), null, user.getAuthorities());
+				final UsernameTenantPasswordAuthenticationToken authToken = new UsernameTenantPasswordAuthenticationToken(
+						user.getUserId(), user.getDepartmentCode(), jwt, user.getAuthorities());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				context.setAuthentication(authToken);
 				SecurityContextHolder.setContext(context);

@@ -19,6 +19,7 @@ public abstract class UserToModelMapper {
         user.setCreatedAt(entity.getCreatedAt());
         user.setUpdatedAt(entity.getUpdatedAt());
         user.setDeleted(entity.isDeleted());
+        user.setApiKey(entity.getApiKey());
         return user;
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.shipment.domain.handler.*;
@@ -21,6 +22,7 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
+import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import com.warehouse.voronoi.VoronoiService;
@@ -68,8 +70,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ReturningServicePort returningServicePort() {
-		return new ReturningServiceAdapter();
+	public ReturningServicePort returningServicePort(final ReturnProperties returnProperties) {
+		return new ReturningServiceAdapter(returnProperties);
 	}
 
 	@Bean
@@ -80,10 +82,12 @@ public class ShipmentConfiguration {
 									 final CountryDetermineService countryDetermineService,
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
-									 final SignatureService signatureService) {
+									 final SignatureService signatureService,
+									 final RouteLogServicePort routeLogServicePort,
+									 final ReturningServicePort returningServicePort) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
-				countryServiceAvailabilityService, signatureService);
+				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort);
 	}
 	
 	@Bean
@@ -209,15 +213,16 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="false")
-	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService) {
+	@ConditionalOnProperty(name="services.mock", havingValue="false")
+	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService,
+													   final DepartmentApiService departmentApiService) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using path finder service");
-		return new PathFinderAdapter(voronoiService);
+		return new PathFinderAdapter(voronoiService, departmentApiService);
 	}
 
 	//MOCK
 	@Bean
-	@ConditionalOnProperty(name="service.mock", havingValue="true")
+	@ConditionalOnProperty(name="services.mock", havingValue="true")
 	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock path finder service");
 		return new PathFinderMockAdapter(pathFinderMockService);

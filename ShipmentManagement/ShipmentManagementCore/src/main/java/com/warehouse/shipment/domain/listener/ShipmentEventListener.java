@@ -1,20 +1,27 @@
 package com.warehouse.shipment.domain.listener;
 
 import java.time.Instant;
+import java.util.Map;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
-import com.warehouse.shipment.domain.event.ShipmentRecipientChanged;
-import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
+import com.warehouse.commonassets.identificator.ReturnId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.ReasonCode;
+import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.domain.service.RouteTrackerService;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.domain.vo.ShipmentHistoryTracker;
+import com.warehouse.shipment.domain.vo.ShipmentReturnedCommand;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 
 @Component
@@ -26,12 +33,16 @@ public class ShipmentEventListener {
 
     private final RouteTrackerService routeTrackerService;
 
+    private final ReturningServicePort returningServicePort;
+
     public ShipmentEventListener(final RouteTrackerHistoryNotifier routeTrackerHistoryNotifier,
                                  final ShipmentService shipmentService,
-                                 final RouteTrackerService routeTrackerService) {
+                                 final RouteTrackerService routeTrackerService,
+                                 final ReturningServicePort returningServicePort) {
         this.routeTrackerHistoryNotifier = routeTrackerHistoryNotifier;
         this.shipmentService = shipmentService;
         this.routeTrackerService = routeTrackerService;
+        this.returningServicePort = returningServicePort;
     }
 
     @EventListener
@@ -41,19 +52,52 @@ public class ShipmentEventListener {
         final Result<RouteProcess, ErrorCode> routeProcess = this.routeTrackerService
                 .notifyShipmentCreated(snapshot.shipmentId());
 
+        if (routeProcess.isFailure()) {
+            throw new TechnicalException(HttpStatusCode.valueOf(routeProcess.getFailure().getCode()),
+                    routeProcess.getFailure().getMessage());
+        }
+
+        this.shipmentService.changeRouteProcessId(routeProcess.getSuccess().getProcessId(),
+                snapshot.shipmentId());
+
 		this.routeTrackerHistoryNotifier.notifyShipmentRoute(new ShipmentHistoryTracker(snapshot.shipmentId(),
 				snapshot.shipmentStatus(), routeProcess.isFailure() ? routeProcess.getFailure().getMessage() : null,
 				routeProcess.isFailure() ? String.valueOf(routeProcess.getFailure().getCode()) : null,
 				routeProcess.isSuccess(), Instant.now(), null));
     }
 
-    @EventListener
-    public void handle(final ShipmentStatusChangedEvent event) {
+    @TransactionalEventListener(fallbackExecution = true)
+    public void handle(final ShipmentReturned event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
-        final Result<RouteProcess, ErrorCode> routeProcess =
-                this.routeTrackerService.notifyShipmentStatusChanged(snapshot.shipmentId(), snapshot.shipmentStatus());
+        this.routeTrackerService.notifyShipmentStatusChanged(snapshot.shipmentId(), snapshot.shipmentStatus());
         this.routeTrackerHistoryNotifier.notifyShipmentRoute(new ShipmentHistoryTracker(snapshot.shipmentId(),
                 snapshot.shipmentStatus(), null, null, true, Instant.now(), null));
+
+        //this.returningServicePort.notifyShipmentReturn(snapshot);
+    }
+
+    @TransactionalEventListener(fallbackExecution = true)
+    public void handle(final ShipmentReturnCreated event) {
+        final ShipmentSnapshot snapshot = event.getSnapshot();
+        final ShipmentId shipmentId = snapshot.shipmentId();
+        final ReasonCode reasonCode = event.getReasonCode();
+        final String reason = event.getReason();
+        final Map<ShipmentId, ReturnId> responseMap =
+                this.returningServicePort.shipmentReturnCommand(
+                        new ShipmentReturnedCommand(shipmentId, reasonCode, reason)
+                );
+
+        final ReturnId returnId = responseMap.get(shipmentId);
+
+        if (returnId != null) {
+            this.shipmentService.assignExternalReturnId(shipmentId, returnId);
+        }
+    }
+
+    @TransactionalEventListener(fallbackExecution = true)
+    public void handle(final ShipmentLocked event) {
+        final ShipmentSnapshot snapshot = event.getSnapshot();
+        this.returningServicePort.notifyShipmentReturnCompleted(snapshot);
     }
 
     @EventListener

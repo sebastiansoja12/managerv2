@@ -1,7 +1,10 @@
 package com.warehouse.shipment.domain.service;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Recipient;
@@ -26,9 +29,9 @@ public interface ShipmentService {
 
     void changeCurrencyTo(final ShipmentId shipmentId, final Currency currency);
 
-    void changeShipmentIssuerCountryTo(final ShipmentId shipmentId, final Country originCountry);
+    void changeShipmentIssuerCountryTo(final ShipmentId shipmentId, final CountryCode originCountry);
 
-    void changeShipmentReceiverCountryTo(final ShipmentId shipmentId, final Country destinationCountry);
+    void changeShipmentReceiverCountryTo(final ShipmentId shipmentId, final CountryCode destinationCountry);
 
     void changeSignatureRequiredTo(final ShipmentId shipmentId, final boolean signatureRequired);
 
@@ -41,6 +44,10 @@ public interface ShipmentService {
     void notifyRelatedShipmentLocked(final ShipmentId shipmentId);
 
     void notifyShipmentSent(final ShipmentId shipmentId);
+
+    default void notifyShipmentReturned(final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode) {
+        notifyShipmentReturned(shipmentId);
+    }
 
     void notifyShipmentReturned(final ShipmentId shipmentId);
 
@@ -58,4 +65,9 @@ public interface ShipmentService {
 
     ShipmentId nextShipmentId();
 
+    void update(final Shipment shipment);
+
+    void changeRouteProcessId(final ProcessId processId, final ShipmentId shipmentId);
+
+    void assignExternalReturnId(final ShipmentId shipmentId, final ReturnId returnId);
 }

@@ -2,9 +2,6 @@ package com.warehouse.voronoi.domain.service;
 
 import java.util.*;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.Department;
@@ -20,20 +17,8 @@ public class ComputeServiceImpl implements ComputeService {
     
     private final VoronoiServicePort voronoiServicePort;
 
-	private List<Department> calculateCoordinates(List<Department> departments) {
-		departments.stream().filter(this::hasCity).forEach(depot -> {
-			final Coordinates coordinates = voronoiServicePort.obtainCoordinates(depot.getCity());
-			depot.setCoordinates(coordinates);
-		});
-		return departments;
-	}
-
-	private Coordinates calculateCoordinatesForRequestCity(String requestCity) {
+	private Coordinates calculateCoordinatesForRequestCity(final String requestCity) {
 		return voronoiServicePort.obtainCoordinates(requestCity);
-	}
-
-	private boolean hasCity(Department department) {
-		return ObjectUtils.isNotEmpty(department) && StringUtils.isNotEmpty(department.getCity());
 	}
 
 	@Override
@@ -42,21 +27,19 @@ public class ComputeServiceImpl implements ComputeService {
 		final Coordinates coordinates = calculateCoordinatesForRequestCity(request.getCity());
 
 		if (Objects.isNull(coordinates)) {
-			return DepartmentCode.empty();
+			return new DepartmentCode("");
 		}
 
-		final List<Department> depotsWithCoordinates = calculateCoordinates(departments);
-
-		depotsWithCoordinates.forEach(depot -> {
-			final double lon1 = depot.getCoordinates().getLon();
-			final double lat1 = depot.getCoordinates().getLat();
-			final double lat2 = coordinates.getLat();
-			final double lon2 = coordinates.getLon();
+		departments.forEach(depot -> {
+			final double lon1 = depot.getCoordinates().lon();
+			final double lat1 = depot.getCoordinates().lat();
+			final double lat2 = coordinates.lat();
+			final double lon2 = coordinates.lon();
 			final double result = Math.pow((lat2 - lat1), 2) + Math.pow((lon2 - lon1), 2);
 			cities.put(depot.getDepartmentCode(), result);
 		});
 
-		final String value =  Collections.min(cities.entrySet(), Map.Entry.comparingByValue()).getKey();
+		final String value = Collections.min(cities.entrySet(), Map.Entry.comparingByValue()).getKey();
 		return new DepartmentCode(value);
 	}
 }

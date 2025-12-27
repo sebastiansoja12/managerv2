@@ -7,11 +7,12 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,11 +24,12 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.domain.service.MailService;
-import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
-import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
+import com.warehouse.shipment.domain.listener.ShipmentEventListener;
+import com.warehouse.shipment.domain.port.secondary.*;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
+import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.voronoi.VoronoiService;
 
 @ExtendWith(SpringExtension.class)
@@ -43,20 +45,55 @@ public class ShipmentReadRepositoryTest {
     @EnableJpaRepositories(basePackages = { "com.warehouse.shipment"})
     public static class ShipmentReadRepositoryTestConfiguration {
 
-        @MockBean
-        public MailService mailService;
+        @Bean
+        MailService mailService() {
+            return Mockito.mock(MailService.class);
+        }
 
-        @MockBean
-        public ShipmentRepository shipmentRepository;
+        @Bean
+        ShipmentRepository shipmentRepository() {
+            return Mockito.mock(ShipmentRepository.class);
+        }
 
-        @MockBean
-        public RouteLogServicePort routeLogServicePort;
+        @Bean
+        RouteLogServicePort routeLogServicePort() {
+            return Mockito.mock(RouteLogServicePort.class);
+        }
 
-        @MockBean
-        public SoftwareConfigurationServicePort softwareConfigurationServicePort;
+        @Bean
+        SoftwareConfigurationServicePort softwareConfigurationServicePort() {
+            return Mockito.mock(SoftwareConfigurationServicePort.class);
+        }
 
-        @MockBean
-        public VoronoiService voronoiService;
+        @Bean
+        VoronoiService voronoiService() {
+            return Mockito.mock(VoronoiService.class);
+        }
+
+        @Bean
+        public ShipmentEventListener shipmentEventListener() {
+            return Mockito.mock(ShipmentEventListener.class);
+        }
+
+        @Bean
+        public ShipmentController shipmentController() {
+            return Mockito.mock(ShipmentController.class);
+        }
+
+        @Bean
+        public PathFinderServicePort pathFinderServicePort() {
+            return Mockito.mock(PathFinderServicePort.class);
+        }
+
+        @Bean
+        public SignatureRepository signatureRepository() {
+            return Mockito.mock(SignatureRepository.class);
+        }
+
+        @Bean
+        public ReturnProperties returnProperties() {
+            return new ReturnProperties();
+        }
     }
 
     @Autowired

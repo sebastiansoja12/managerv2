@@ -24,12 +24,7 @@ public class RouteTrackerServiceImpl implements RouteTrackerService {
     @Override
     public Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId) {
         final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
-        final RouteProcess routeProcess = this.routeLogServicePort.notifyShipmentCreated(shipmentId, softwareConfiguration);
-        if (routeProcess != null) {
-            return Result.success(routeProcess);
-        }
-
-        return Result.failure(ErrorCode.ROUTE_TRACKER_SERVICE_NOT_AVAILABLE);
+        return this.routeLogServicePort.notifyShipmentCreated(shipmentId, softwareConfiguration);
     }
 
     @Override

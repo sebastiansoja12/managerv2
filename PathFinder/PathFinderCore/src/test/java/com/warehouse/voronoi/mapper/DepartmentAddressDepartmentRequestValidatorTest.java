@@ -32,8 +32,8 @@ public class DepartmentAddressDepartmentRequestValidatorTest {
         final Coordinates coordinates = requestMapper.map(coordinatesDto);
         // then
         assertAll(
-                () -> assertThat(coordinates.getLat()).isEqualTo(coordinatesDto.getLat()),
-                () -> assertThat(coordinates.getLon()).isEqualTo(coordinatesDto.getLon())
+                () -> assertThat(coordinates.lat()).isEqualTo(coordinatesDto.getLat()),
+                () -> assertThat(coordinates.lon()).isEqualTo(coordinatesDto.getLon())
         );
     }
 }

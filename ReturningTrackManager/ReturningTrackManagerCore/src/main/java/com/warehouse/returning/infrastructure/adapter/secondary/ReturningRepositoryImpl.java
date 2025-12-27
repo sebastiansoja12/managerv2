@@ -29,6 +29,12 @@ public class ReturningRepositoryImpl implements ReturnRepository {
     }
 
     @Override
+    public ReturnPackage findByShipmentId(final ShipmentId shipmentId) {
+        final Optional<ReturnPackageEntity> returnPackage = this.repository.findByShipmentId(shipmentId);
+        return returnPackage.map(ReturnPackageToModelMapper::map).orElse(null);
+    }
+
+    @Override
     public void createOrUpdate(final ReturnPackage returnPackage) {
         final ReturnPackageEntity returnPackageEntity = ReturnPackageToEntityMapper.map(returnPackage);
         this.repository.save(returnPackageEntity);

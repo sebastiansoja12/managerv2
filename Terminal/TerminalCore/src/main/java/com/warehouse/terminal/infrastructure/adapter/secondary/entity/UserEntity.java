@@ -40,6 +40,7 @@ public class UserEntity {
     private String email;
 
     @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column(name = "department_code", nullable = false)

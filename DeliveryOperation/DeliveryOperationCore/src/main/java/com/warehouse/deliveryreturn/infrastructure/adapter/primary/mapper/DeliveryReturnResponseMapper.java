@@ -40,6 +40,8 @@ public interface DeliveryReturnResponseMapper {
 
     SupplierCodeDto map(final SupplierCode supplierCode);
 
+    String map(Object value);
+
     DepartmentCodeDto map(final DepartmentCode departmentCode);
 
     DeliveryIdDto map(final DeliveryId deliveryId);

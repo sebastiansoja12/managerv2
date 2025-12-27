@@ -7,10 +7,7 @@ import com.warehouse.department.domain.event.*;
 import com.warehouse.department.domain.exception.ForbiddenDepartmentTypeException;
 import com.warehouse.department.domain.exception.WrongUserAssignedException;
 import com.warehouse.department.domain.registry.DomainRegistry;
-import com.warehouse.department.domain.vo.Address;
-import com.warehouse.department.domain.vo.DepartmentCode;
-import com.warehouse.department.domain.vo.DepartmentSnapshot;
-import com.warehouse.department.domain.vo.TaxId;
+import com.warehouse.department.domain.vo.*;
 
 import java.time.Instant;
 
@@ -31,6 +28,8 @@ public class Department {
     private DepartmentType departmentType;
 
     private Department.Status status;
+
+    private Coordinates coordinates;
 
     private Instant createdAt;
 
@@ -54,6 +53,7 @@ public class Department {
             final String email,
             final DepartmentType departmentType,
             final Status status,
+            final Coordinates coordinates,
             final Instant createdAt,
             final Instant updatedAt,
             final UserId adminUserId,
@@ -68,6 +68,7 @@ public class Department {
         this.email = email;
         this.departmentType = departmentType;
         this.status = status;
+        this.coordinates = coordinates;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.adminUserId = adminUserId;
@@ -100,15 +101,19 @@ public class Department {
         this.adminUserId = null;
         this.createdBy = DomainRegistry.authenticationService().currentUser();
         this.lastModifiedBy = null;
-        DomainRegistry.eventPublisher().publishEvent(
-                new DepartmentCreated(this.snapshot(), Instant.now())
-        );
+        this.coordinates = DomainRegistry.departmentCoordinatesServicePort()
+                .getCoordinates(getAddress());
     }
 
 
     public DepartmentSnapshot snapshot() {
 		return new DepartmentSnapshot(departmentCode, address, taxId, telephoneNumber, openingHours, email,
 				departmentType, status, createdAt, updatedAt, adminUserId, createdBy, lastModifiedBy);
+    }
+
+    public void changeCoordinates(final Coordinates coordinates) {
+        this.coordinates = coordinates;
+        markAsModified();
     }
 
     public enum Status {
@@ -235,6 +240,18 @@ public class Department {
         return adminUserId;
     }
 
+    public void setAdminUserId(final UserId adminUserId) {
+        this.adminUserId = adminUserId;
+    }
+
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(final Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
+
     private void markAsModified() {
         this.updatedAt = Instant.now();
     }
@@ -256,35 +273,31 @@ public class Department {
         this.status = Status.ACTIVE;
         this.lastModifiedBy = modifiedBy;
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentActivated(this.snapshot(), Instant.now()));
     }
 
     public void deactivate(final UserId modifiedBy) {
         this.status = Status.INACTIVE;
         this.lastModifiedBy = modifiedBy;
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentDeactivated(this.snapshot(), Instant.now()));
     }
 
     public void markAsArchived() {
         this.status = Status.ARCHIVED;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentArchived(this.snapshot(), Instant.now()));
     }
 
     public void markAsDeleted() {
         this.status = Status.DELETED;
+        this.adminUserId = null;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentDeleted(this.snapshot(), Instant.now()));
     }
 
     public void markAsSuspended() {
         this.status = Status.SUSPENDED;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
-        DomainRegistry.eventPublisher().publishEvent(new DepartmentSuspended(this.snapshot(), Instant.now()));
     }
 
     public void changeDepartmentType(final DepartmentType departmentType) {
@@ -305,5 +318,11 @@ public class Department {
         }
         this.adminUserId = adminUserId;
         markAsModified();
+    }
+
+    public void changeEmail(final String email) {
+        this.email = email;
+        markAsModified();
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentEmailChanged(this.snapshot(), Instant.now()));
     }
 }

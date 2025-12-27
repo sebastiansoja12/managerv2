@@ -10,6 +10,11 @@
     </parent>
 
     <artifactId>LogisticsOrchestrator</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>LogisticsOrchestratorApi</module>
+        <module>LogisticsOrchestratorCore</module>
+    </modules>
 
     <dependencies>
         <dependency>
@@ -197,7 +202,7 @@
     <build>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>LogisticsOrchestratorCore/src/main/resources</directory>
                 <filtering>false</filtering>
             </resource>
         </resources>

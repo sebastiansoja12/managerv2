@@ -5,7 +5,8 @@ import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.DepartmentAlreadyExistsException;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreate;
-import com.warehouse.department.domain.model.DepartmentCreateRequest;
+import com.warehouse.department.domain.model.DepartmentCreateCommand;
+import com.warehouse.department.domain.port.secondary.DepartmentCoordinatesServicePort;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.department.domain.registry.DomainRegistry;
@@ -30,19 +31,23 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     private final Validator validator;
 
+    private final DepartmentCoordinatesServicePort departmentCoordinatesServicePort;
+
     public DepartmentPortImpl(final DepartmentRepository departmentRepository,
                               final DepartmentService departmentService,
                               final TenantAdminProvisioningPort tenantAdminProvisioningPort,
-                              final Validator validator) {
+                              final Validator validator,
+                              final DepartmentCoordinatesServicePort departmentCoordinatesServicePort) {
         this.departmentRepository = departmentRepository;
         this.departmentService = departmentService;
         this.tenantAdminProvisioningPort = tenantAdminProvisioningPort;
         this.validator = validator;
+        this.departmentCoordinatesServicePort = departmentCoordinatesServicePort;
     }
 
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
-        return this.departmentRepository.findByCode(departmentCode);
+        return this.departmentRepository.findByDepartmentCode(departmentCode);
     }
 
     @Override
@@ -52,20 +57,21 @@ public class DepartmentPortImpl implements DepartmentPort {
 
     @Override
     @Transactional
-    public DepartmentCreateResponse createDepartments(final DepartmentCreateRequest request) {
+    public DepartmentCreateResponse createDepartments(final DepartmentCreateCommand command) {
 
-        validateRequest(request.getDepartments());
+        validateRequest(command.getDepartments());
 
-        checkIfDepartmentWithGivenCodeAlreadyExists(request.getDepartments());
+        checkIfDepartmentWithGivenCodeAlreadyExists(command.getDepartments());
 
         final Map<Department, Boolean> createdDepartments = new HashMap<>();
-        for (final DepartmentCreate departmentCreate : request.getDepartments()) {
+        for (final DepartmentCreate departmentCreate : command.getDepartments()) {
             final DepartmentCode departmentCode = departmentCreate.getDepartmentCode();
 			final Department department = new Department(departmentCode, departmentCreate.getCity(),
 					departmentCreate.getStreet(), departmentCreate.getPostalCode(),
 					new TaxId(departmentCreate.getTaxId()), departmentCreate.getTelephoneNumber(),
 					departmentCreate.getOpeningHours(), departmentCreate.getEmail(),
 					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
+
             this.departmentService.createDepartment(department);
 
             tenantAdminProvisioningPort.createInitialAdminUser(department.snapshot());
@@ -91,18 +97,18 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
-    public void changeAddress(final UpdateAddressRequest request) {
-        validateAddress(request.address());
+    public void changeAddress(final UpdateAddressCommand command) {
+        validateAddress(command.address());
 
-        this.departmentService.changeAddress(request.departmentCode(), request.address());
+        this.departmentService.changeAddress(command.departmentCode(), command.address());
     }
 
     @Override
-    public IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeRequest request) {
-        final DepartmentCode departmentCode = request.departmentCode();
+    public IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeCommand command) {
+        final DepartmentCode departmentCode = command.departmentCode();
         final Department department = this.departmentService.findByDepartmentCode(departmentCode);
         final TaxId oldIdentificationNumber = department.getTaxId();
-        final TaxId newIdentificationNumber = new TaxId(request.identificationNumber());
+        final TaxId newIdentificationNumber = new TaxId(command.identificationNumber());
         final boolean identificationNumberChanged = !oldIdentificationNumber.equals(newIdentificationNumber);
         if (identificationNumberChanged) {
             this.departmentService.changeTaxId(departmentCode, newIdentificationNumber);
@@ -129,6 +135,18 @@ public class DepartmentPortImpl implements DepartmentPort {
     @Override
     public void changeAdminUser(final DepartmentCode departmentCode, final UserId userId) {
         this.departmentService.changeAdminUser(departmentCode, userId);
+    }
+
+    @Override
+    public void changeStatus(final ChangeDepartmentStatusCommand command) {
+        final DepartmentCode departmentCode = command.departmentCode();
+        final Department.Status status = Department.Status.valueOf(command.status());
+        this.departmentService.changeStatus(departmentCode, status);
+    }
+
+    @Override
+    public void changeEmail(final DepartmentCode departmentCode, final String email) {
+        this.departmentService.changeEmail(departmentCode, email);
     }
 
     private void validateAddress(final Address address) {

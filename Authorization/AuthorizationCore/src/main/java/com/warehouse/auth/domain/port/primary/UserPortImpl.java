@@ -6,8 +6,12 @@ import com.warehouse.auth.domain.model.RolePermission;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.UserService;
+import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 
 @Slf4j
@@ -36,6 +40,11 @@ public class UserPortImpl implements UserPort {
     @Override
     public void changeRole(final UserId userId, final User.Role role) {
         this.userService.changeRole(userId, role);
+    }
+
+    @Override
+    public void changeAdminDepartmentInfo(final UserDepartmentUpdateRequest request) {
+        this.userService.updateDefaultDepartmentUser(request);
     }
 
     @Override
@@ -74,5 +83,15 @@ public class UserPortImpl implements UserPort {
         this.userService.removePermission(userIdToModify, permission);
 
         return Result.success();
+    }
+
+    @Override
+    public void deleteDataForDepartment(final DepartmentCode departmentCode) {
+        log.info("Deleting data for department {}", departmentCode.getValue());
+        final List<UserId> users = this.userService.findAllActiveUsersByDepartmentCode(departmentCode);
+        for (final UserId user : users) {
+            log.debug("Deleting data for user {}", user.getValue());
+            this.userService.deleteDataForUser(user);
+        }
     }
 }

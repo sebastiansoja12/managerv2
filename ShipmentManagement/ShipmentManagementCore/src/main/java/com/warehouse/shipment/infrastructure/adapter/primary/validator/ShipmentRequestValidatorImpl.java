@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.domain.service.PriceService;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
@@ -41,6 +42,13 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
         if (validateShipmentPrice(request.price())) {
             errors.add("Invalid price");
+        }
+
+        try {
+            CountryCode.valueOf(request.issuerCountryCode());
+            CountryCode.valueOf(request.receiverCountryCode());
+        } catch (final IllegalArgumentException e) {
+            errors.add("Invalid country code");
         }
 
         if (!errors.isEmpty()) {

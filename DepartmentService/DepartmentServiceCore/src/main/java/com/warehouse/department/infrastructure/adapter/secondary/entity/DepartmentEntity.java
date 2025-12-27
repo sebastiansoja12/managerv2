@@ -47,6 +47,13 @@ public class DepartmentEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "latitude", nullable = false)),
+            @AttributeOverride(name = "longitude", column = @Column(name = "longitude", nullable = false))
+    })
+    private DepartmentCoordinates departmentCoordinates;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -76,6 +83,7 @@ public class DepartmentEntity {
                             final String email,
                             final DepartmentType departmentType,
                             final Status status,
+                            final DepartmentCoordinates departmentCoordinates,
                             final Instant createdAt,
                             final Instant updatedAt,
                             final UserId adminUserId,
@@ -89,6 +97,7 @@ public class DepartmentEntity {
         this.email = email;
         this.departmentType = departmentType;
         this.status = status;
+        this.departmentCoordinates = departmentCoordinates;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.adminUserId = adminUserId;
@@ -146,6 +155,10 @@ public class DepartmentEntity {
 
     public UserId getLastModifiedBy() {
         return lastModifiedBy;
+    }
+
+    public DepartmentCoordinates getDepartmentCoordinates() {
+        return departmentCoordinates;
     }
 
     public enum DepartmentType {

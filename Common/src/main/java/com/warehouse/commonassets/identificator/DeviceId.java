@@ -17,4 +17,8 @@ public class DeviceId {
     public Long getValue() {
         return value;
     }
+
+    public Long value() {
+        return value;
+    }
 }

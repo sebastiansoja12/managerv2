@@ -11,7 +11,7 @@ public class PathFinderMockAdapter implements PathFinderServicePort {
 
     private final PathFinderMockService pathFinderMockService;
 
-    public PathFinderMockAdapter(PathFinderMockService pathFinderMockService) {
+    public PathFinderMockAdapter(final PathFinderMockService pathFinderMockService) {
         this.pathFinderMockService = pathFinderMockService;
     }
 

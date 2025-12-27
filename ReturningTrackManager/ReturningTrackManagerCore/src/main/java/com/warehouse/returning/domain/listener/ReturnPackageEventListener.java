@@ -1,16 +1,14 @@
 package com.warehouse.returning.domain.listener;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.warehouse.returning.domain.enumeration.ErrorCode;
-import com.warehouse.returning.domain.enumeration.ResponseStatus;
 import com.warehouse.returning.domain.event.ReturnPackageChanged;
-import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.domain.port.secondary.ShipmentNotifyClientPort;
 import com.warehouse.returning.domain.service.ReturnService;
 import com.warehouse.returning.domain.vo.ReturnPackageSnapshot;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -31,11 +29,11 @@ public class ReturnPackageEventListener {
     @EventListener
     public void handle(final ReturnPackageChanged event) {
         final ReturnPackageSnapshot snapshot = event.getSnapshot();
-        final Result<ResponseStatus, ErrorCode> result = this.shipmentNotifyClientPort.notifyReturnChanged(snapshot);
-        if (result.isSuccess()) {
-            log.info(String.format("Shipment %s updated successfully", snapshot.shipmentId().value()));
-        } else if (result.isFailure()) {
-            log.error(String.format("Shipment %s failed to update", snapshot.shipmentId().value()));
-        }
+//        final Result<ResponseStatus, ErrorCode> result = this.shipmentNotifyClientPort.notifyReturnChanged(snapshot);
+//        if (result.isSuccess()) {
+//            log.info(String.format("Shipment %s updated successfully", snapshot.shipmentId().value()));
+//        } else if (result.isFailure()) {
+//            log.error(String.format("Shipment %s failed to update", snapshot.shipmentId().value()));
+//        }
     }
 }

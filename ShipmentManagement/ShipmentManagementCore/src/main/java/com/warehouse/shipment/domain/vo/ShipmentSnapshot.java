@@ -1,7 +1,32 @@
 package com.warehouse.shipment.domain.vo;
 
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import java.time.LocalDateTime;
 
-public record ShipmentSnapshot(ShipmentId shipmentId, Sender sender, Recipient recipient, ShipmentStatus shipmentStatus) {
+import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.model.DangerousGood;
+import com.warehouse.shipment.domain.model.Signature;
+
+public record ShipmentSnapshot(ShipmentId shipmentId,
+                               Sender sender,
+                               Recipient recipient,
+                               ShipmentSize shipmentSize,
+                               String destination,
+                               ShipmentStatus shipmentStatus,
+                               ShipmentType shipmentType,
+                               ShipmentId shipmentRelatedId,
+                               Money price,
+                               LocalDateTime createdAt,
+                               LocalDateTime updatedAt,
+                               Boolean locked,
+                               DangerousGood dangerousGood,
+                               Boolean signatureRequired,
+                               ShipmentPriority shipmentPriority,
+                               CountryCode originCountry,
+                               CountryCode destinationCountry,
+                               Signature signature,
+                               ExternalId<String> routeExternalId,
+                               ExternalId<Long> returnExternalId) {
 }

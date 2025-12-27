@@ -2,7 +2,6 @@ package com.warehouse.shipment.domain.model;
 
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.vo.ShipmentUpdateRequest;
 
 public class ShipmentUpdate {
 
@@ -42,9 +41,5 @@ public class ShipmentUpdate {
 
     public void updateDestination(final String destination) {
         this.destination = destination;
-    }
-
-    public static ShipmentUpdate from(final ShipmentUpdateRequest request) {
-        return request.getShipmentUpdate();
     }
 }

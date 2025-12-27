@@ -1,9 +1,11 @@
 package com.warehouse.auth.domain.service;
 
+import com.warehouse.auth.domain.event.UserLoggedOutEvent;
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.LoginResponse;
 import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.vo.UsernamePasswordAuthentication;
@@ -43,6 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final User user = this.userRepository.findById(userId);
         user.markAsLoggedOut();
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserLoggedOutEvent(user.snapshot()));
     }
 
     @Override

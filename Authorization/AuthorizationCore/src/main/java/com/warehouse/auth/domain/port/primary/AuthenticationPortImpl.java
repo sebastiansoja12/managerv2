@@ -1,19 +1,21 @@
 package com.warehouse.auth.domain.port.primary;
 
+import java.util.Set;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.AdminCreateRequest;
 import com.warehouse.auth.domain.model.RefreshTokenRequest;
 import com.warehouse.auth.domain.model.RegisterRequest;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.domain.vo.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Set;
 
 
 public class AuthenticationPortImpl implements AuthenticationPort {
@@ -30,18 +32,22 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final DepartmentService departmentService;
 
+    private final MailServicePort mailServicePort;
+
     public AuthenticationPortImpl(final AuthenticationService authenticationService,
                                   final UserService userService,
                                   final JwtService jwtService,
                                   final Logger logger,
                                   final PasswordEncoder passwordEncoder,
-                                  final DepartmentService departmentService) {
+                                  final DepartmentService departmentService,
+                                  final MailServicePort mailServicePort) {
         this.authenticationService = authenticationService;
         this.userService = userService;
         this.jwtService = jwtService;
         this.logger = logger;
         this.passwordEncoder = passwordEncoder;
         this.departmentService = departmentService;
+        this.mailServicePort = mailServicePort;
     }
 
     @Override
@@ -132,7 +138,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     @Override
     public void initiatePasswordReset(final String email) {
-        //
+        final User user = this.userService.findByEmail(email);
+        if (user == null) {
+            throw new AuthenticationErrorException("User with email " + email + " does not exist");
+        }
+
     }
 
     private User.Role mapRole(final String value) {

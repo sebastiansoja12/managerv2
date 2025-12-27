@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+
+    <xs:element name="TerminalRequest" type="TerminalRequest"/>
+
+    <xs:complexType name="TerminalRequest">
+        <xs:sequence>
+            <xs:element name="ProcessType" type="ProcessType"/>
+
+            <xs:element name="Device" type="DeviceType"/>
+
+            <xs:element name="DeliveryRejectRequest" type="DeliveryRejectRequest" minOccurs="0"/>
+            <xs:element name="DeliveryReturnRequest" type="DeliveryReturnRequest" minOccurs="0"/>
+            <xs:element name="DeliveryMissedRequest" type="DeliveryMissedRequest" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="ProcessType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DELIVERY_REJECT"/>
+            <xs:enumeration value="DELIVERY_RETURN"/>
+            <xs:enumeration value="DELIVERY_MISSED"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="DeviceType">
+        <xs:sequence>
+            <xs:element name="Id" type="xs:string" minOccurs="0"/>
+            <xs:element name="Type" type="xs:string" minOccurs="0"/>
+            <xs:element name="Serial" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryRejectRequest">
+        <xs:sequence>
+            <xs:element name="ReasonCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="Comment" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryReturnRequest">
+        <xs:sequence>
+            <xs:element name="ReasonCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="Comment" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryMissedRequest">
+        <xs:sequence>
+            <xs:element name="ReasonCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="Comment" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

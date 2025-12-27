@@ -1,9 +1,16 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
+
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
@@ -11,10 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.envers.Audited;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -116,11 +119,11 @@ public class ShipmentEntity {
 
     @Column(name = "origin_country", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Country originCountry;
+    private CountryCode originCountry;
 
     @Column(name = "destination_country", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Country destinationCountry;
+    private CountryCode destinationCountry;
 
     @Column(name = "shipment_priority", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -141,14 +144,23 @@ public class ShipmentEntity {
     @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id", insertable = false)
     private SignatureEntity signature;
 
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "external_route_id"))
+    private ExternalId<String> externalRouteId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "external_return_id"))
+    private ExternalId<Long> externalReturnId;
+
 	public ShipmentEntity(final ShipmentId shipmentId, final String senderFirstName, final String senderLastName,
 			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode, final String senderTelephone,
 			final String recipientFirstName, final String recipientLastName, final String recipientEmail,
 			final String recipientCity, final String recipientStreet, final String recipientPostalCode, final String recipientTelephone,
 			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
 			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
-			final LocalDateTime updatedAt, final Boolean locked, final Country originCountry, final Country destinationCountry, 
-            final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood) {
+			final LocalDateTime updatedAt, final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
+            final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood,
+            final ExternalId<String> externalRouteId, final ExternalId<Long> externalReturnId) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;
         this.lastName = senderLastName;
@@ -177,6 +189,8 @@ public class ShipmentEntity {
         this.shipmentPriority = shipmentPriority;
         this.price = price;
         this.dangerousGood = dangerousGood;
+        this.externalRouteId = externalRouteId;
+        this.externalReturnId = externalReturnId;
     }
 
     public static ShipmentEntity from(final Shipment shipment) {
@@ -202,6 +216,7 @@ public class ShipmentEntity {
                 shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
                 shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
 				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
-				shipment.getShipmentPriority(), dangerousGoodEntity);
+				shipment.getShipmentPriority(), dangerousGoodEntity, shipment.getExternalRouteId(),
+                shipment.getExternalReturnId());
     }
 }

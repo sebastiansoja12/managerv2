@@ -15,6 +15,7 @@
 
     <modules>
         <module>DepartmentServiceCore</module>
+        <module>DepartmentServiceApi</module>
     </modules>
 
 </project>

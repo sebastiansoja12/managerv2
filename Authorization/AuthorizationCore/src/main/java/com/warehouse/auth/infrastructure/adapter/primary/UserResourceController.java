@@ -1,24 +1,27 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
 
-import com.warehouse.auth.domain.helper.Result;
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.primary.UserPort;
-import com.warehouse.auth.domain.service.ApiKeyService;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.FullNameRequest;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
-import com.warehouse.auth.infrastructure.adapter.primary.validator.RoleValidator;
-import com.warehouse.auth.infrastructure.adapter.secondary.exception.BusinessException;
-import com.warehouse.auth.infrastructure.adapter.secondary.exception.TechnicalException;
-import com.warehouse.commonassets.identificator.UserId;
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.warehouse.auth.domain.helper.Result;
+import com.warehouse.auth.domain.model.FullNameRequest;
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.primary.UserPort;
+import com.warehouse.auth.domain.service.ApiKeyService;
+import com.warehouse.auth.infrastructure.adapter.primary.dto.FullNameRequestApiDto;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
+import com.warehouse.auth.infrastructure.adapter.primary.validator.RoleValidator;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.BusinessException;
+import com.warehouse.auth.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.commonassets.identificator.UserId;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -40,8 +43,8 @@ public class UserResourceController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateUser(@Valid @RequestBody final FullNameRequest fullNameRequest) {
-        final com.warehouse.auth.domain.model.FullNameRequest request = new com.warehouse.auth.domain.model.FullNameRequest(
+    public ResponseEntity<?> updateUser(@Valid @RequestBody final FullNameRequestApiDto fullNameRequest) {
+        final FullNameRequest request = new FullNameRequest(
                 fullNameRequest.firstName(), fullNameRequest.lastName(), fullNameRequest.username(), null
         );
         this.userPort.updateFullName(request);

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "parcel")
+@Table(name = "shipment")
 @Entity(name = "csv.ParcelEntity")
 @EntityListeners(AuditingEntityListener.class)
 public class ParcelEntity {

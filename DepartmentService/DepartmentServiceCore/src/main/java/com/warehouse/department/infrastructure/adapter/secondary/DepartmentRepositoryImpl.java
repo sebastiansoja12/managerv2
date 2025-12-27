@@ -19,19 +19,11 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     }
 
     @Override
-    public Department findByCode(final DepartmentCode departmentCode) {
+    public Department findByDepartmentCode(final DepartmentCode departmentCode) {
 		final DepartmentEntity department = repository
 				.findByDepartmentCode(
 						new com.warehouse.commonassets.identificator.DepartmentCode(departmentCode.getValue()))
 				.orElse(null);
-        return DepartmentToModelMapper.map(department);
-    }
-
-    @Override
-    public Department findByReference(final DepartmentCode departmentCode) {
-        final DepartmentEntity department = repository
-                .getReferenceById(
-                        new com.warehouse.commonassets.identificator.DepartmentCode(departmentCode.getValue()));
         return DepartmentToModelMapper.map(department);
     }
 

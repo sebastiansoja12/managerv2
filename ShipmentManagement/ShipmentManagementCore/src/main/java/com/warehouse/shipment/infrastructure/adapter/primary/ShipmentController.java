@@ -18,10 +18,12 @@ import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
+import com.warehouse.shipment.infrastructure.adapter.primary.exception.ShipmentValidationException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.DangerousGoodValidator;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
 
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
@@ -57,7 +59,7 @@ public class ShipmentController {
     @Timed(value = "controller.shipment.create")
     public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestApi shipmentRequest) {
         shipmentRequestValidator.validateBody(shipmentRequest);
-        final ShipmentCreateRequest request = requestMapper.map(shipmentRequest);
+        final ShipmentCreateCommand request = requestMapper.map(shipmentRequest);
         final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
 
         final ResponseEntity<?> response;
@@ -87,7 +89,7 @@ public class ShipmentController {
     @Timed(value = "controller.shipment.update")
     public ResponseEntity<?> update(@RequestBody final ShipmentUpdateRequestApi shipmentUpdateRequest) {
         shipmentRequestValidator.validateBody(shipmentUpdateRequest);
-        final ShipmentUpdateRequest request = requestMapper.map(shipmentUpdateRequest);
+        final ShipmentUpdateCommand request = requestMapper.map(shipmentUpdateRequest);
         final Result<Void, ErrorCode> result = shipmentPort.update(request);
 
         final ResponseEntity<?> response;
@@ -103,7 +105,7 @@ public class ShipmentController {
     @Counted(value = "controller.shipment.return")
     @Timed(value = "controller.shipment.return")
     public ResponseEntity<?> returnShipment(@RequestBody final ShipmentReturnRequestApi shipmentReturnRequest) {
-        final ShipmentReturnRequest request = ShipmentReturnRequest.from(shipmentReturnRequest);
+        final ShipmentReturnCommand request = ShipmentReturnCommand.from(shipmentReturnRequest);
         this.shipmentPort.processShipmentReturn(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
@@ -115,7 +117,7 @@ public class ShipmentController {
 			@RequestBody final DangerousGoodCreateRequestApi dangerousGoodCreateRequest) {
         dangerousGoodValidator.validateDangerousGood(dangerousGoodCreateRequest);
 
-        final DangerousGoodCreateRequest request = DangerousGoodCreateRequest.from(dangerousGoodCreateRequest);
+        final DangerousGoodCreateCommand request = DangerousGoodCreateCommand.from(dangerousGoodCreateRequest);
         final Result<Void, ErrorCode> result = shipmentPort.addDangerousGood(request);
 
         final ResponseEntity<?> response;
@@ -194,5 +196,15 @@ public class ShipmentController {
     @ExceptionHandler
     public ResponseEntity<?> handleException(final EmptyRequestException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
+    }
+
+    @ExceptionHandler(ShipmentValidationException.class)
+    public ResponseEntity<?> handleException(final ShipmentValidationException exception) {
+        return ResponseEntity.status(exception.getCode()).body(exception.getValidationErrors());
+    }
+
+    @ExceptionHandler(TechnicalException.class)
+    public ResponseEntity<?> handleException(final TechnicalException exception) {
+        return ResponseEntity.status(exception.getCode()).body(exception.getMessage());
     }
 }
