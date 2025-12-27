@@ -19,7 +19,8 @@ import lombok.NoArgsConstructor;
 public class ParcelEntity {
 
     @Id
-    private Long id;
+    @Column(name = "shipment_id", nullable = false)
+    private Long shipmentId;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -77,7 +78,7 @@ public class ParcelEntity {
     @Column(name = "destination", nullable = false)
     private String destination;
 
-    @Column(name = "parent_related_id")
+    @Column(name = "shipment_related_id")
     private Long parcelRelatedId;
 }
 
