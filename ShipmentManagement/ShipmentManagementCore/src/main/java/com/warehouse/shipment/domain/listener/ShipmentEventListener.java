@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Map;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -20,6 +21,7 @@ import com.warehouse.shipment.domain.vo.RouteProcess;
 import com.warehouse.shipment.domain.vo.ShipmentHistoryTracker;
 import com.warehouse.shipment.domain.vo.ShipmentReturnedCommand;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 
 @Component
@@ -49,6 +51,11 @@ public class ShipmentEventListener {
 
         final Result<RouteProcess, ErrorCode> routeProcess = this.routeTrackerService
                 .notifyShipmentCreated(snapshot.shipmentId());
+
+        if (routeProcess.isFailure()) {
+            throw new TechnicalException(HttpStatusCode.valueOf(routeProcess.getFailure().getCode()),
+                    routeProcess.getFailure().getMessage());
+        }
 
         this.shipmentService.changeRouteProcessId(routeProcess.getSuccess().getProcessId(),
                 snapshot.shipmentId());

@@ -23,6 +23,7 @@ import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequ
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.DangerousGoodValidator;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
+import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
 
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
@@ -200,5 +201,10 @@ public class ShipmentController {
     @ExceptionHandler(ShipmentValidationException.class)
     public ResponseEntity<?> handleException(final ShipmentValidationException exception) {
         return ResponseEntity.status(exception.getCode()).body(exception.getValidationErrors());
+    }
+
+    @ExceptionHandler(TechnicalException.class)
+    public ResponseEntity<?> handleException(final TechnicalException exception) {
+        return ResponseEntity.status(exception.getCode()).body(exception.getMessage());
     }
 }
