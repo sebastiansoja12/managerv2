@@ -5,7 +5,7 @@ import lombok.*;
 @Value
 @Builder
 public class ParcelCsv {
-    Long id;
+    Long shipmentId;
     String firstName;
     String lastName;
     String senderEmail;
