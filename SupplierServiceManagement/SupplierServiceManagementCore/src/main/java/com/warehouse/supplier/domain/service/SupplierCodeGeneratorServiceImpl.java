@@ -1,6 +1,6 @@
 package com.warehouse.supplier.domain.service;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,7 +11,7 @@ public class SupplierCodeGeneratorServiceImpl implements SupplierCodeGeneratorSe
 
     private final static Integer SUPPLIER_CODE_LENGTH = 6;
 
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public String generate() {
         StringBuilder builder = new StringBuilder(SUPPLIER_CODE_LENGTH);
