@@ -8,10 +8,10 @@
             first_name="Sebastian"
             last_name="Soja"
             email="sebastian5152@wp.pl"
-            role="2"
+            role="ADMIN"
             department_code="TST"
     />
-    <shipment
+    <parcel
             id="100"
             first_name="test"
             last_name="test"
@@ -36,7 +36,7 @@
             locked = "false"
     />
 
-    <shipment
+    <parcel
             id="101"
             first_name="test"
             last_name="test"

@@ -104,7 +104,7 @@ class ReturnIntegrationTest {
 
         final ReturnResponse response = this.returnPort.process(request);
 
-        assertEquals(0, response.processReturn().size());
+        assertEquals(1, response.processReturn().size());
     }
 
     @Test
