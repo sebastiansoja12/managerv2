@@ -51,7 +51,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ReturningServicePort returningServicePort;
 
-    private final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT, ShipmentStatus.REROUTE,
+    private final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT,
             ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
 
 	public ShipmentPortImpl(final ShipmentService shipmentService,
