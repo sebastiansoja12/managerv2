@@ -7,15 +7,12 @@
         <groupId>com.warehouse</groupId>
         <artifactId>LogisticsOrchestrator</artifactId>
         <version>2026.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>LogisticsOrchestratorCore</artifactId>
+    <packaging>jar</packaging>
 
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -199,14 +196,5 @@
             </properties>
         </profile>
     </profiles>
-
-    <build>
-        <resources>
-            <resource>
-                <directory>LogisticsOrchestratorCore/src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
-    </build>
 
 </project>
