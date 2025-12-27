@@ -124,7 +124,32 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>LogisticsOrchestrator</artifactId>
+            <artifactId>LogisticsOrchestratorCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>PalletHandlingManagerCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>RouteTrackerFlowCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>SupplierServiceManagementCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>SoftwareConfigurationCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ProcessHubCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

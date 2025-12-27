@@ -11,4 +11,6 @@ public interface DeliveryRejectResponseMapper {
     @Mapping(target = "deviceInformation.version.value", source = "deviceInformation.version")
     @Mapping(target = "deviceInformation.username.value", source = "deviceInformation.username")
     DeliveryRejectResponseDto map(final DeliveryRejectResponse response);
+
+    String map(Object value);
 }

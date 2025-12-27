@@ -1,5 +1,6 @@
 package com.warehouse.department.domain.registry;
 
+import com.warehouse.department.domain.port.secondary.DepartmentCoordinatesServicePort;
 import com.warehouse.department.domain.service.AuthenticationService;
 import com.warehouse.department.domain.service.DepartmentService;
 import org.slf4j.Logger;
@@ -26,6 +27,10 @@ public final class DomainRegistry implements ApplicationEventPublisherAware, App
 
     public static DepartmentService departmentService() {
         return context.getBean(DepartmentService.class);
+    }
+
+    public static DepartmentCoordinatesServicePort departmentCoordinatesServicePort() {
+        return context.getBean(DepartmentCoordinatesServicePort.class);
     }
 
     public static synchronized ApplicationEventPublisher eventPublisher() {

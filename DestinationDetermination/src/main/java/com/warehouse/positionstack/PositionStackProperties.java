@@ -34,7 +34,7 @@ public class PositionStackProperties extends Properties {
         this.token = token;
     }
 
-    public String createRequest(String value) {
-        return getUrl() + DIVIDER + ACCESS_KEY + getToken() + QUERY + value;
+    public String createRequest(final String token, final String value) {
+        return getUrl() + DIVIDER + ACCESS_KEY + token + QUERY + value;
     }
 }

@@ -1,12 +1,5 @@
 package com.warehouse.department.domain.vo;
 
-import lombok.Builder;
-import lombok.Value;
+public record Coordinates(Double lat, Double lon) {
 
-
-@Value
-@Builder
-public class Coordinates {
-    double lat;
-    double lon;
 }

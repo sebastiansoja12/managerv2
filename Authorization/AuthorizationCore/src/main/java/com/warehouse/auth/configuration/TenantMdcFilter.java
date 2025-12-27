@@ -22,7 +22,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
     private final ApiKeyService apiKeyService;
 
     private static final List<String> API_KEY_ENDPOINTS = List.of(
-            "/v2/api/devices",
+//            "/v2/api/devices",
             "/v2/api/device-pairing",
             "/v2/api/deliveries"
     );

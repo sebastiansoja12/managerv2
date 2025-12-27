@@ -33,8 +33,10 @@ public class ReturnPortImpl implements ReturnPort {
         final List<ReturnPackageRequest> returnPackageRequests = request.getRequests();
 
         for (final ReturnPackageRequest returnPackageRequest : returnPackageRequests) {
-            if (this.returnService.existsForShipment(returnPackageRequest.getShipmentId())) {
-                log.warn("Return for shipment {} already exists", returnPackageRequest.getShipmentId());
+            final ReturnPackage existingPackage = this.returnService.findByShipmentId(returnPackageRequest.getShipmentId());
+            if (existingPackage != null) {
+                log.info("Return for shipment {} already exists", returnPackageRequest.getShipmentId().value());
+                processReturns.add(ProcessReturn.from(existingPackage));
                 continue;
             }
             final ReturnPackageId returnPackageId = this.returnService.nextReturnPackageId();

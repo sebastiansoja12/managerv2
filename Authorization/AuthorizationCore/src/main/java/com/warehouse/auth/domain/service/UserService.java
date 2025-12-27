@@ -3,7 +3,11 @@ package com.warehouse.auth.domain.service;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.vo.RegisterResponse;
+import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+
+import java.util.List;
 
 public interface UserService {
 
@@ -22,4 +26,12 @@ public interface UserService {
     void removePermission(final UserId userId, final String permission);
 
     User findUserById(final UserId userId);
+
+    User findByEmail(final String email);
+
+    List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode);
+
+    void deleteDataForUser(final UserId userId);
+
+    void updateDefaultDepartmentUser(final UserDepartmentUpdateRequest request);
 }

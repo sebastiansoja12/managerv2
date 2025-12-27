@@ -8,7 +8,7 @@ public record DeviceInformationRequestDto(ShipmentIdDto shipmentId,
 
     public static DeviceInformationRequestDto from(final DeviceInformationRequest request) {
         final ShipmentIdDto shipmentId = new ShipmentIdDto(request.getShipmentId().getValue());
-        final DeviceIdDto deviceId = new DeviceIdDto(request.getDeviceId().getValue());
+        final DeviceIdDto deviceId = new DeviceIdDto(request.getDeviceId().value());
         final DepartmentCodeDto departmentCode = new DepartmentCodeDto(request.getDepartmentCode().getValue());
         final DeviceTypeDto deviceType = DeviceTypeDto.valueOf(request.getDeviceType().name());
         final DeviceVersionDto deviceVersion = new DeviceVersionDto(request.getVersion());

@@ -38,7 +38,6 @@ public class JwtServiceTest {
 
     @Test
     void shouldGenerateToken() {
-        // given
         final User user = new User(new UserId(1L), "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
                 new DepartmentCode("TST"), "");
 
@@ -50,18 +49,16 @@ public class JwtServiceTest {
                 .when(jwtProvider)
                 .getSecretKey();
 
-        // when
         final String jwtToken = jwtService.generateToken(user);
-        // then
         assertTrue(StringUtils.isNotEmpty(jwtToken));
         assertTrue(jwtToken.startsWith("eyJhbGciOiJIUzM4NCJ9"));
     }
 
     @Test
     void shouldCheckIfTokenIsValid() {
-        // given
         final User user = new User(null, "test", "test", "Test", "Test", "test@test.pl", User.Role.ADMIN,
                 new DepartmentCode("TST"), "");
+        user.setDeleted(false);
 
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
@@ -71,16 +68,13 @@ public class JwtServiceTest {
                 ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDg2Mzc2LCJleHAiOjkyNDkzMzU2NDAwfQ" +
                 ".CqWbN5YR41WobyySEKZGbWFrUFpIFSCb4TwQt5DzlLM";
 
-        // when
         final boolean isValid = jwtService.isTokenValid(jwtToken, user);
 
-        // then
         assertTrue(isValid);
     }
 
     @Test
     void shouldTokenBeInvalid() {
-        // given
         final User user = new User(null, "test", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
                 new DepartmentCode("TST"), "");
 
@@ -92,25 +86,20 @@ public class JwtServiceTest {
                 ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDgzMjk2LCJleHAiOjE2ODg0ODQ3MzZ9" +
                 ".8Ms_0WQZRMl-uyOfASWGvujzVhmgesOjIuqEXd0vAjo";
 
-        // when
         final Executable executable = () -> jwtService.isTokenValid(jwtToken, user);
-        // then
         final ExpiredJwtException exception = assertThrows(ExpiredJwtException.class, executable);
         assertTrue(exception.getMessage().startsWith("JWT expired at"));
     }
 
     @Test
     void shouldExtractUsernameFromJwt() {
-        // given
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
                 .getSecretKey();
         final String jwtToken = "eyJhbGciOiJIUzI1NiJ9" +
                 ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDg2Mzc2LCJleHAiOjkyNDkzMzU2NDAwfQ" +
                 ".CqWbN5YR41WobyySEKZGbWFrUFpIFSCb4TwQt5DzlLM";
-        // when
         final String username = jwtService.extractUsername(jwtToken);
-        // then
         assertEquals("test", username);
     }
 }

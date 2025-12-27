@@ -8,6 +8,8 @@ public interface ReturnRepository {
 
     ReturnPackage findById(final ReturnPackageId returnPackageId);
 
+    ReturnPackage findByShipmentId(final ShipmentId shipmentId);
+
     void createOrUpdate(final ReturnPackage returnPackage);
 
     boolean existsForShipment(final ShipmentId shipmentId);

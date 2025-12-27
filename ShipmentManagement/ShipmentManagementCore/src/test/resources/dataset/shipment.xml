@@ -2,7 +2,7 @@
 
 <dataset>
     <shipment
-            id = "100001"
+            shipment_id = "100001"
             first_name="test"
             last_name="test"
             sender_telephone="12345"
@@ -17,12 +17,17 @@
             recipient_city="test"
             recipient_street="test"
             recipient_postal_code="00-000"
-            parcel_size="1"
+            parcel_size="BIG"
             destination="KT1"
-            status="0"
-            type="0"
+            status="CREATED"
+            type="PARENT"
             created_at="2023-10-23 17:27:49.254626"
             updated_at="2023-10-23 17:27:49.254626"
+            destination_country="PL"
+            origin_country="PL"
+            shipment_priority="LOW"
+            price_amount="50"
+            price_currency="PLN"
             locked = "false"
     />
 </dataset>

@@ -1,24 +1,26 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
+import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
-import com.warehouse.shipment.domain.enumeration.UpdateType;
-import com.warehouse.shipment.domain.model.ShipmentUpdate;
+import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
+import com.warehouse.shipment.domain.model.ShipmentUpdateCommand;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.Recipient;
+import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
+import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentRequestMapper {
 
-    ShipmentCreateRequest map(final ShipmentCreateRequestApi requestDto);
+    ShipmentCreateCommand map(final ShipmentCreateRequestApi requestDto);
 
     default Money map(final MoneyApi money) {
         if (money == null) {
@@ -27,16 +29,12 @@ public interface ShipmentRequestMapper {
         return new Money(money.getAmount(), Currency.valueOf(money.getCurrency()));
     }
 
-    ShipmentId map(final ShipmentIdDto shipmentId);
+    ShipmentUpdateCommand map(final ShipmentUpdateRequestApi request);
 
-    default ShipmentUpdateRequest map(final ShipmentUpdateRequestApi request) {
-        final ShipmentId shipmentId = map(request.getShipmentId());
-        final Sender sender = mapToSender(request.getSender());
-        final Recipient recipient = mapToRecipient(request.getRecipient());
-		final ShipmentUpdate shipmentUpdate = new ShipmentUpdate(sender, recipient,
-				request.getDestination(), request.getToken());
-        return new ShipmentUpdateRequest(shipmentId, shipmentUpdate, UpdateType.AUTO, null,
-                map(request.getShipmentUpdateType()));
+    ShipmentConfiguration map(final ShipmentConfigurationApi configuration);
+
+    default ShipmentId map(final ShipmentIdDto shipmentId) {
+        return new ShipmentId(shipmentId.getValue());
     }
 
     ShipmentUpdateType map(final ShipmentUpdateTypeApi shipmentUpdateType);

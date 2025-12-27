@@ -1,7 +1,5 @@
 package com.warehouse.terminal.domain.model;
 
-import java.time.Instant;
-
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.commonassets.identificator.Username;
@@ -9,6 +7,8 @@ import com.warehouse.terminal.domain.enumeration.ExecutionSourceType;
 import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
 import com.warehouse.terminal.dto.DeviceValidationRequestDto;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
+
+import java.time.Instant;
 
 public class Terminal extends Device implements DeviceHandler, ExecutionSourceResolver {
     private TerminalId terminalId;
@@ -42,7 +42,7 @@ public class Terminal extends Device implements DeviceHandler, ExecutionSourceRe
 	}
 
     public static Terminal from(final DeviceEntity device) {
-        return new Terminal(new TerminalId(device.getDeviceId().getValue()), device.getDeviceType(), device.getUsername(),
+        return new Terminal(new TerminalId(device.getDeviceId().value()), device.getDeviceType(), device.getUsername(),
                 device.getDepartmentCode().getValue(), device.getVersion(),
                 Instant.now(), device.isActive());
     }

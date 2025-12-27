@@ -16,7 +16,6 @@ import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.Department;
 import com.warehouse.voronoi.domain.model.VoronoiRequest;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPortImpl;
-import com.warehouse.voronoi.domain.port.secondary.DepotServicePort;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
 import com.warehouse.voronoi.domain.service.ComputeService;
 import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
@@ -27,9 +26,6 @@ public class VoronoiPortImplTest {
 
 
     @Mock
-    private DepotServicePort depotServicePort;
-
-    @Mock
     private VoronoiServicePort voronoiServicePort;
 
     private VoronoiPortImpl voronoiPort;
@@ -37,7 +33,7 @@ public class VoronoiPortImplTest {
     @BeforeEach
     void setup() {
         final ComputeService computeService = new ComputeServiceImpl(voronoiServicePort);
-        voronoiPort = new VoronoiPortImpl(depotServicePort, computeService);
+        voronoiPort = new VoronoiPortImpl(computeService, voronoiServicePort);
     }
 
     @Test
@@ -51,16 +47,13 @@ public class VoronoiPortImplTest {
         // request city to send
         final String requestCity = "Gliwice";
 
-        doReturn(depotsList)
-                .when(depotServicePort)
-                .downloadDepots();
-
 		doReturn(Coordinates.builder().lon(50.3013283).lat(18.5795769).build())
                 .when(voronoiServicePort)
 				.obtainCoordinates(requestCity);
 
         // when
-        final VoronoiResponse nearestDepot = voronoiPort.findFastestRoute(new VoronoiRequest(requestCity, null));
+        final VoronoiResponse nearestDepot = voronoiPort.findFastestRoute(new VoronoiRequest(requestCity, null,
+                depotsList));
         // then
         assertEquals(expectedNearestDepot, nearestDepot.departmentCode().getValue());
     }

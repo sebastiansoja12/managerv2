@@ -3,7 +3,7 @@ package com.warehouse.shipment.domain.service;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
+import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
 import com.warehouse.shipment.domain.port.secondary.CountryRepository;
 import com.warehouse.shipment.domain.vo.*;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,6 @@ public class CountryDetermineServiceImpl implements CountryDetermineService {
     }
 
     public CountryDetermine determineCountry(final Shipment shipment) {
-        final Country originCountry = shipment.getOriginCountry();
-        final Country destinationCountry = shipment.getDestinationCountry();
         final Sender sender = shipment.getSender();
         final Recipient recipient = shipment.getRecipient();
 
@@ -39,7 +37,7 @@ public class CountryDetermineServiceImpl implements CountryDetermineService {
     }
 
     @Override
-    public Result<CountryDetermine, ErrorCode> determineCountry(final ShipmentCreateRequest request) {
+    public Result<CountryDetermine, ErrorCode> determineCountry(final ShipmentCreateCommand request) {
         final LocationInfo locationInfo = LocationInfo.from(request.getSender(), request.getRecipient());
         final ShipmentCountry shipmentCountry = countryDetermineServicePort.determineCountry(locationInfo);
         return Result.success();

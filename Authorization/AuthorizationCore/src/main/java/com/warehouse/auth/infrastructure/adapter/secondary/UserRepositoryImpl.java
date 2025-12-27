@@ -7,7 +7,10 @@ import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToEntityMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToModelMapper;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+
+import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
 
@@ -40,5 +43,19 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findById(final UserId userId) {
         return repository.findById(userId).map(UserToModelMapper::map).orElse(null);
+    }
+
+    @Override
+    public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
+        return repository.findAll().stream().map(UserToModelMapper::map)
+                .filter(user -> !user.isDeleted())
+                .filter(user -> user.getDepartmentCode().equals(departmentCode))
+                .map(User::getUserId)
+                .toList();
+    }
+
+    @Override
+    public User findByEmail(final String email) {
+        return repository.findByEmail(email).map(UserToModelMapper::map).orElse(null);
     }
 }

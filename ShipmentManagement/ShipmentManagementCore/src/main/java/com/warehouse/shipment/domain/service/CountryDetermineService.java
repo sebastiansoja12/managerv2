@@ -5,10 +5,10 @@ import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.vo.CountryDetermine;
-import com.warehouse.shipment.domain.model.ShipmentCreateRequest;
+import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
 
 public interface CountryDetermineService {
-    Result<CountryDetermine, ErrorCode> determineCountry(final ShipmentCreateRequest request);
+    Result<CountryDetermine, ErrorCode> determineCountry(final ShipmentCreateCommand request);
 
     Country determineCountryByCode(final CountryCode issuerCountryCode);
 }

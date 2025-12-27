@@ -1,12 +1,18 @@
 package com.warehouse.auth.domain.service;
 
+import com.warehouse.auth.domain.event.*;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.RegisterResponse;
+import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserResponse;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -20,6 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public RegisterResponse create(final User user) {
         final UserResponse userResponse = userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserCreatedEvent(user.snapshot()));
         return new RegisterResponse(userResponse);
     }
 
@@ -38,6 +45,7 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findByUsername(request.getUsername());
         user.changeFullName(request);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserFullNameChangedEvent(user.snapshot()));
     }
 
     @Override
@@ -45,6 +53,7 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findById(userId);
         user.changeRole(role);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserRoleChangedEvent(user.snapshot()));
     }
 
     @Override
@@ -52,6 +61,7 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findById(userId);
         user.addPermission(permission);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserRoleAddedEvent(user.snapshot()));
     }
 
     @Override
@@ -59,10 +69,36 @@ public class UserServiceImpl implements UserService {
         final User user = this.userRepository.findById(userId);
         user.removePermission(permission);
         this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserRoleRemovedEvent(user.snapshot()));
     }
 
     @Override
     public User findUserById(final UserId userId) {
         return this.userRepository.findById(userId);
+    }
+
+    @Override
+    public User findByEmail(final String email) {
+        return this.userRepository.findByEmail(email);
+    }
+
+    @Override
+    public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
+        return this.userRepository.findAllActiveUsersByDepartmentCode(departmentCode);
+    }
+
+    @Override
+    public void deleteDataForUser(final UserId userId) {
+        final User user = this.userRepository.findById(userId);
+        user.markAsDeleted();
+        this.userRepository.createOrUpdate(user);
+    }
+
+    @Override
+    public void updateDefaultDepartmentUser(final UserDepartmentUpdateRequest request) {
+        final User user = this.userRepository.findById(request.userId());
+        user.updateUserInfo(request);
+        this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
     }
 }

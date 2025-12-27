@@ -6,10 +6,14 @@ import java.time.LocalDateTime;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
-import com.warehouse.shipment.domain.event.*;
+import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
+import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
+import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
 import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
@@ -47,12 +51,15 @@ public class Shipment {
 
     private ShipmentPriority shipmentPriority;
 
-    private Country originCountry;
+    private CountryCode originCountry;
 
-    private Country destinationCountry;
+    private CountryCode destinationCountry;
 
     private Signature signature;
 
+    private ExternalId<String> externalRouteId;
+
+    private ExternalId<Long> externalReturnId;
 
     public Shipment() {
         //
@@ -69,13 +76,15 @@ public class Shipment {
                     final LocalDateTime createdAt,
                     final LocalDateTime updatedAt,
                     final Boolean locked,
-                    final Country originCountry,
-                    final Country destinationCountry,
+                    final CountryCode originCountry,
+                    final CountryCode destinationCountry,
                     final String destination,
                     final Signature signature,
                     final boolean signatureRequired,
                     final ShipmentPriority shipmentPriority,
-                    final DangerousGood dangerousGood) {
+                    final DangerousGood dangerousGood,
+                    final ExternalId<String> externalRouteId,
+                    final ExternalId<Long> externalReturnId) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -94,6 +103,8 @@ public class Shipment {
         this.signatureRequired = signatureRequired;
         this.shipmentPriority = shipmentPriority;
         this.dangerousGood = dangerousGood;
+        this.externalRouteId = externalRouteId;
+        this.externalReturnId = externalReturnId;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -101,8 +112,8 @@ public class Shipment {
                     final Recipient recipient,
                     final ShipmentSize shipmentSize,
                     final ShipmentId shipmentRelatedId,
-                    final Country originCountry,
-                    final Country destinationCountry,
+                    final CountryCode originCountry,
+                    final CountryCode destinationCountry,
                     final Money price,
                     final Boolean locked,
                     final String destination,
@@ -125,55 +136,13 @@ public class Shipment {
         this.destination = destination;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
-    }
-    
-    public Shipment(final Sender sender, 
-                    final Recipient recipient,
-                    final ShipmentSize shipmentSize,
-                    final Money price,
-                    final DangerousGood dangerousGood) {
-        this.sender = sender;
-        this.recipient = recipient;
-        this.shipmentSize = shipmentSize;
-        this.price = price;
-        this.dangerousGood = dangerousGood;
-        this.shipmentStatus = ShipmentStatus.CREATED;
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
     }
 
-    private ShipmentSnapshot snapshot() {
-        return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentStatus);
-    }
-
-    public Shipment(final ShipmentId shipmentId,
-                    final Sender sender,
-                    final Recipient recipient,
-                    final ShipmentUpdateType updateType) {
-        this.shipmentId = shipmentId;
-        this.sender = sender;
-        this.recipient = recipient;
-        this.shipmentStatus = determineShipmentStatus(updateType);
-        DomainRegistry.publish(new ShipmentCreatedEvent(this.snapshot(), Instant.now()));
-    }
-
-    private ShipmentStatus determineShipmentStatus(final ShipmentUpdateType updateType) {
-        return switch (updateType) {
-            case REROUTE -> ShipmentStatus.REROUTE;
-            case REDIRECT -> ShipmentStatus.REDIRECT;
-        };
-    }
-
-    public static Shipment from(final ShipmentCreateRequest request) {
-		return new Shipment(request.getSender(), request.getRecipient(), request.getShipmentSize(), request.getPrice(),
-				request.getDangerousGood());
-    }
-
-    public static Shipment from(final ShipmentUpdateRequest request) {
-        final ShipmentId shipmentId = request.getShipmentId();
-        final ShipmentUpdate shipmentUpdate = request.getShipmentUpdate();
-        return new Shipment(shipmentId, shipmentUpdate.getSender(), shipmentUpdate.getRecipient(), request.getShipmentUpdateType());
-    }
+	public ShipmentSnapshot snapshot() {
+		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destination, shipmentStatus,
+				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
+				shipmentPriority, originCountry, destinationCountry, signature, externalRouteId, externalReturnId);
+	}
 
     public static Shipment from(final ShipmentEntity shipmentEntity) {
         final ShipmentId shipmentId = shipmentEntity.getShipmentId();
@@ -187,13 +156,15 @@ public class Shipment {
         final LocalDateTime createdAt = shipmentEntity.getCreatedAt();
         final LocalDateTime updatedAt = shipmentEntity.getUpdatedAt();
         final Boolean locked = shipmentEntity.getLocked();
-        final Country originCountry = shipmentEntity.getOriginCountry();
-        final Country destinationCountry = shipmentEntity.getDestinationCountry();
+        final CountryCode originCountry = shipmentEntity.getOriginCountry();
+        final CountryCode destinationCountry = shipmentEntity.getDestinationCountry();
         final String destination = shipmentEntity.getDestination();
         final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
         final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
         final DangerousGood dangerousGood = shipmentEntity.getDangerousGood() != null ? DangerousGood.from(shipmentEntity.getDangerousGood()) : null;
+        final ExternalId<String> externalRouteId = shipmentEntity.getExternalRouteId();
+        final ExternalId<Long> externalReturnId = shipmentEntity.getExternalReturnId();
 
         return new Shipment(
                 shipmentId,
@@ -213,7 +184,9 @@ public class Shipment {
                 signature,
                 signatureRequired,
                 shipmentPriority,
-                dangerousGood
+                dangerousGood,
+                externalRouteId,
+                externalReturnId
         );
     }
 
@@ -333,12 +306,28 @@ public class Shipment {
         return shipmentPriority;
     }
 
-    public Country getOriginCountry() {
+    public CountryCode getOriginCountry() {
         return originCountry;
     }
 
-    public Country getDestinationCountry() {
+    public CountryCode getDestinationCountry() {
         return destinationCountry;
+    }
+
+    public ExternalId<Long> getExternalReturnId() {
+        return externalReturnId;
+    }
+
+    public void setExternalReturnId(final ExternalId<Long> externalReturnId) {
+        this.externalReturnId = externalReturnId;
+    }
+
+    public ExternalId<String> getExternalRouteId() {
+        return externalRouteId;
+    }
+
+    public void setExternalRouteId(final ExternalId<String> externalRouteId) {
+        this.externalRouteId = externalRouteId;
     }
 
     public void changeSignature(final Signature signature) {
@@ -383,13 +372,11 @@ public class Shipment {
     public void changeSender(final Sender sender) {
         this.sender = sender;
         markAsModified();
-        DomainRegistry.publish(new ShipmentSenderChanged(snapshot(), Instant.now()));
     }
 
     public void changeRecipient(final Recipient recipient) {
         this.recipient = recipient;
         markAsModified();
-        DomainRegistry.publish(new ShipmentRecipientChanged(snapshot(), Instant.now()));
     }
 
     public void changeShipmentSize(final ShipmentSize shipmentSize) {
@@ -419,6 +406,24 @@ public class Shipment {
         markAsModified();
     }
 
+    public void update(final Sender sender, final Recipient recipient, final ShipmentStatus shipmentStatus,
+                       final ShipmentPriority shipmentPriority, final ShipmentSize shipmentSize,
+                       final Money price, final DangerousGood dangerousGood,
+                       final String destination, final Boolean signatureRequired) {
+        this.recipient = recipient;
+        this.sender = sender;
+        this.shipmentStatus = shipmentStatus;
+        this.shipmentPriority = shipmentPriority;
+        this.shipmentSize = shipmentSize;
+        this.price = price;
+        if (dangerousGood != null) {
+            this.dangerousGood = dangerousGood;
+        }
+        this.destination = destination;
+        this.signatureRequired = signatureRequired;
+        markAsModified();
+    }
+
     public void changeShipmentType(final ShipmentType shipmentType) {
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = null;
@@ -441,7 +446,6 @@ public class Shipment {
     public void changeCurrency(final Currency currency) {
         this.price.changeCurrency(currency);
         markAsModified();
-        DomainRegistry.publish(new ShipmentCurrencyChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeSignatureRequired(final boolean signatureRequired) {
@@ -487,19 +491,23 @@ public class Shipment {
     public void notifyShipmentReturned() {
         changeShipmentStatus(ShipmentStatus.RETURN);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentDelivered() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentReturnCanceled() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
+    }
+
+    public void notifyShipmentReturnCreated(final ExternalId<String> externalRouteId,
+                                            final ExternalId<Long> externalReturnId) {
+        this.externalRouteId = externalRouteId;
+        this.externalReturnId = externalReturnId;
+        markAsModified();
     }
 
     public void changeDestinationDepartment(final String destination) {
@@ -514,11 +522,11 @@ public class Shipment {
         this.dangerousGood = dangerousGood;
     }
 
-    public void setDestinationCountry(final Country destinationCountry) {
+    public void setDestinationCountry(final CountryCode destinationCountry) {
         this.destinationCountry = destinationCountry;
     }
 
-    public void setOriginCountry(final Country originCountry) {
+    public void setOriginCountry(final CountryCode originCountry) {
         this.originCountry = originCountry;
     }
 
@@ -547,39 +555,16 @@ public class Shipment {
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
-    public void changeIssuerCountry(final Country originCountry) {
+    public void changeIssuerCountry(final CountryCode originCountry) {
         this.originCountry = originCountry;
         markAsModified();
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
-    public void changeReceiverCountry(final Country destinationCountry) {
+    public void changeReceiverCountry(final CountryCode destinationCountry) {
         this.destinationCountry = destinationCountry;
         markAsModified();
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
-    }
-
-    public Shipment copy() {
-        return new Shipment(
-                shipmentId,
-                sender,
-                recipient,
-                shipmentSize,
-                shipmentStatus,
-                shipmentType,
-                shipmentRelatedId,
-                price,
-                createdAt,
-                updatedAt,
-                locked,
-                originCountry,
-                destinationCountry,
-                destination,
-                signature,
-                signatureRequired,
-                shipmentPriority,
-                dangerousGood
-        );
     }
 
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
@@ -592,5 +577,15 @@ public class Shipment {
     public void lockShipmentWithShipmentType(final ShipmentType shipmentType) {
         this.shipmentType = shipmentType;
         lockShipment();
+    }
+
+    public void assignRouteProcessId(final ProcessId processId) {
+        this.externalRouteId = new ExternalId<>(processId.getValue().toString());
+        markAsModified();
+    }
+
+    public void assignReturnId(final ReturnId returnId) {
+        this.externalReturnId = new ExternalId<>(returnId.getId());
+        markAsModified();
     }
 }

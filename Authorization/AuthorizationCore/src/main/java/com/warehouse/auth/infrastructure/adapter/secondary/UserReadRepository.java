@@ -16,4 +16,6 @@ public interface UserReadRepository extends JpaRepository<UserEntity, UserId> {
     Optional<UserEntity> findByUsername(@Param("username") final String username);
 
     Optional<UserEntity> findByApiKey(final String apiKey);
+
+    Optional<UserEntity> findByEmail(final String email);
 }
