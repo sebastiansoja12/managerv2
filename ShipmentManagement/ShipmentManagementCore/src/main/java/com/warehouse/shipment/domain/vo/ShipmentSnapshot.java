@@ -3,6 +3,7 @@ package com.warehouse.shipment.domain.vo;
 import java.time.LocalDateTime;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.DangerousGood;
@@ -25,5 +26,7 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                ShipmentPriority shipmentPriority,
                                CountryCode originCountry,
                                CountryCode destinationCountry,
-                               Signature signature) {
+                               Signature signature,
+                               ExternalId<String> routeExternalId,
+                               ExternalId<Long> returnExternalId) {
 }

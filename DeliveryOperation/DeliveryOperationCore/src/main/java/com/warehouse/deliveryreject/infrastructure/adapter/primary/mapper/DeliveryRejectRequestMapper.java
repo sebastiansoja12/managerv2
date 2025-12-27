@@ -33,6 +33,7 @@ public interface DeliveryRejectRequestMapper {
 
     @Mapping(target = "username", source = "username.value")
     @Mapping(target = "version", source = "version.value")
+    @Mapping(target = "updateRequired", ignore = true)
     DeviceInformation map(final DeviceInformationDto deviceInformation);
 
     default DeviceId map(final DeviceIdDto deviceId) {

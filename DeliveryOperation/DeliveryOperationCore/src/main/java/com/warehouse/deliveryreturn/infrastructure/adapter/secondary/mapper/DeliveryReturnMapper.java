@@ -28,6 +28,7 @@ public interface DeliveryReturnMapper {
     @Mapping(target = "depotCode", source = "departmentCode.value")
     @Mapping(target = "parcelId", source = "shipmentId.value")
     @Mapping(target = "token", constant = "tokenValue")
+    @Mapping(target = "id", ignore = true)
     // TODO
     DeliveryReturnEntity map(DeliveryReturnDetails deliveryReturnRequest);
 

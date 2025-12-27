@@ -2,5 +2,5 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.api;
 
 import java.util.List;
 
-public record ReturnRequestApi(List<ReturnPackageResponseApi> requests) {
+public record ReturnResponseApi(List<ProcessReturnDto> processReturn) {
 }

@@ -2,7 +2,9 @@ package com.warehouse.shipment.domain.service;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Recipient;
@@ -43,6 +45,10 @@ public interface ShipmentService {
 
     void notifyShipmentSent(final ShipmentId shipmentId);
 
+    default void notifyShipmentReturned(final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode) {
+        notifyShipmentReturned(shipmentId);
+    }
+
     void notifyShipmentReturned(final ShipmentId shipmentId);
 
     void notifyShipmentDelivered(final ShipmentId shipmentId);
@@ -62,4 +68,6 @@ public interface ShipmentService {
     void update(final Shipment shipment);
 
     void changeRouteProcessId(final ProcessId processId, final ShipmentId shipmentId);
+
+    void assignExternalReturnId(final ShipmentId shipmentId, final ReturnId returnId);
 }

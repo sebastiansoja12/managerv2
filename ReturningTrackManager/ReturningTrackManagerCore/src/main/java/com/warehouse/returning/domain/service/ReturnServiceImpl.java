@@ -64,4 +64,11 @@ public class ReturnServiceImpl implements ReturnService {
         this.saveOrUpdate(returnPackage);
         DomainRegistry.publish(new ReturnPackageCompleted(returnPackage.toSnapshot(), Instant.now()));
     }
+
+    @Override
+    public ReturnPackage findByShipmentId(final ShipmentId shipmentId) {
+		return this.returnRepository.findByShipmentId(
+				new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
+						shipmentId.value()));
+    }
 }

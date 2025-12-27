@@ -214,7 +214,8 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ReturnStatus returnStatus = command.getReturnStatus();
         final ShipmentId shipmentId = command.getShipmentId();
         switch (returnStatus) {
-            case CREATED ->  this.shipmentService.notifyShipmentReturned(shipmentId);
+            case CREATED -> this.shipmentService.notifyShipmentReturned(shipmentId, command.getReason(),
+                    command.getReasonCode());
             case COMPLETED -> this.shipmentService.lockShipment(shipmentId);
             case CANCELLED -> this.shipmentService.notifyReturnCanceled(shipmentId);
         }

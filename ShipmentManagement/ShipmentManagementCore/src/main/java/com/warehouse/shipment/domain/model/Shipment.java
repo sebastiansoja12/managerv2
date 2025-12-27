@@ -8,6 +8,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
@@ -58,7 +59,7 @@ public class Shipment {
 
     private ExternalId<String> externalRouteId;
 
-    private ExternalId<String> externalReturnId;
+    private ExternalId<Long> externalReturnId;
 
     public Shipment() {
         //
@@ -81,7 +82,9 @@ public class Shipment {
                     final Signature signature,
                     final boolean signatureRequired,
                     final ShipmentPriority shipmentPriority,
-                    final DangerousGood dangerousGood) {
+                    final DangerousGood dangerousGood,
+                    final ExternalId<String> externalRouteId,
+                    final ExternalId<Long> externalReturnId) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -100,6 +103,8 @@ public class Shipment {
         this.signatureRequired = signatureRequired;
         this.shipmentPriority = shipmentPriority;
         this.dangerousGood = dangerousGood;
+        this.externalRouteId = externalRouteId;
+        this.externalReturnId = externalReturnId;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -132,30 +137,12 @@ public class Shipment {
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
     }
-    
-    public Shipment(final Sender sender, 
-                    final Recipient recipient,
-                    final ShipmentSize shipmentSize,
-                    final Money price,
-                    final DangerousGood dangerousGood) {
-        this.sender = sender;
-        this.recipient = recipient;
-        this.shipmentSize = shipmentSize;
-        this.price = price;
-        this.dangerousGood = dangerousGood;
-        this.shipmentStatus = ShipmentStatus.CREATED;
-    }
 
 	public ShipmentSnapshot snapshot() {
 		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destination, shipmentStatus,
 				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
-				shipmentPriority, originCountry, destinationCountry, signature);
+				shipmentPriority, originCountry, destinationCountry, signature, externalRouteId, externalReturnId);
 	}
-
-    public static Shipment from(final ShipmentCreateCommand request) {
-		return new Shipment(request.getSender(), request.getRecipient(), request.getShipmentSize(), request.getPrice(),
-				request.getDangerousGood());
-    }
 
     public static Shipment from(final ShipmentEntity shipmentEntity) {
         final ShipmentId shipmentId = shipmentEntity.getShipmentId();
@@ -176,6 +163,8 @@ public class Shipment {
         final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
         final DangerousGood dangerousGood = shipmentEntity.getDangerousGood() != null ? DangerousGood.from(shipmentEntity.getDangerousGood()) : null;
+        final ExternalId<String> externalRouteId = shipmentEntity.getExternalRouteId();
+        final ExternalId<Long> externalReturnId = shipmentEntity.getExternalReturnId();
 
         return new Shipment(
                 shipmentId,
@@ -195,7 +184,9 @@ public class Shipment {
                 signature,
                 signatureRequired,
                 shipmentPriority,
-                dangerousGood
+                dangerousGood,
+                externalRouteId,
+                externalReturnId
         );
     }
 
@@ -321,6 +312,22 @@ public class Shipment {
 
     public CountryCode getDestinationCountry() {
         return destinationCountry;
+    }
+
+    public ExternalId<Long> getExternalReturnId() {
+        return externalReturnId;
+    }
+
+    public void setExternalReturnId(final ExternalId<Long> externalReturnId) {
+        this.externalReturnId = externalReturnId;
+    }
+
+    public ExternalId<String> getExternalRouteId() {
+        return externalRouteId;
+    }
+
+    public void setExternalRouteId(final ExternalId<String> externalRouteId) {
+        this.externalRouteId = externalRouteId;
     }
 
     public void changeSignature(final Signature signature) {
@@ -497,7 +504,7 @@ public class Shipment {
     }
 
     public void notifyShipmentReturnCreated(final ExternalId<String> externalRouteId,
-                                            final ExternalId<String> externalReturnId) {
+                                            final ExternalId<Long> externalReturnId) {
         this.externalRouteId = externalRouteId;
         this.externalReturnId = externalReturnId;
         markAsModified();
@@ -560,29 +567,6 @@ public class Shipment {
         DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
-    public Shipment copy() {
-        return new Shipment(
-                shipmentId,
-                sender,
-                recipient,
-                shipmentSize,
-                shipmentStatus,
-                shipmentType,
-                shipmentRelatedId,
-                price,
-                createdAt,
-                updatedAt,
-                locked,
-                originCountry,
-                destinationCountry,
-                destination,
-                signature,
-                signatureRequired,
-                shipmentPriority,
-                dangerousGood
-        );
-    }
-
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = relatedShipmentId;
@@ -596,6 +580,12 @@ public class Shipment {
     }
 
     public void assignRouteProcessId(final ProcessId processId) {
+        this.externalRouteId = new ExternalId<>(processId.getValue().toString());
+        markAsModified();
+    }
+
+    public void assignReturnId(final ReturnId returnId) {
+        this.externalReturnId = new ExternalId<>(returnId.getId());
         markAsModified();
     }
 }

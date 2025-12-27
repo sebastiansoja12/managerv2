@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -172,6 +174,15 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
+    public void notifyShipmentReturned(final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.notifyShipmentReturned();
+        this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentReturnCreated(shipment.snapshot(),
+                reasonCode, reason, Instant.now()));
+    }
+
+    @Override
     public void notifyShipmentDelivered(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentDelivered();
@@ -199,6 +210,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.lockShipment();
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentLocked(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -217,6 +229,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void changeRouteProcessId(final ProcessId processId, final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.assignRouteProcessId(processId);
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
+    public void assignExternalReturnId(final ShipmentId shipmentId, final ReturnId returnId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.assignReturnId(returnId);
         this.shipmentRepository.createOrUpdate(shipment);
     }
 }

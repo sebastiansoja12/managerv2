@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.reroute.infrastructure.adapter.secondary.api.ShipmentIdDto;
+import com.warehouse.shipment.domain.vo.ShipmentReturnedCommand;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.*;
 import org.springframework.security.core.Authentication;
@@ -14,12 +15,20 @@ import java.util.List;
 
 public abstract class OutputRequestMapper {
 	public static ReturnRequestApi map(final ShipmentSnapshot snapshot) {
-		final List<ReturnPackageRequestApi> requests = new ArrayList<>();
-		requests.add(new ReturnPackageRequestApi(new ShipmentIdDto(snapshot.shipmentId().getValue()), "SYSTEM",
+		final List<ReturnPackageResponseApi> requests = new ArrayList<>();
+		requests.add(new ReturnPackageResponseApi(new ShipmentIdDto(snapshot.shipmentId().getValue()), "SYSTEM",
 				getCurrentDepartmentCode(), new UserIdApi(getCurrentUser().value()), new ReasonCodeApi("NO_LONGER_NEEDED")
 		));
 		return new ReturnRequestApi(requests);
 	}
+
+    public static ReturnRequestApi map(final ShipmentReturnedCommand command) {
+        final List<ReturnPackageResponseApi> requests = new ArrayList<>();
+        requests.add(new ReturnPackageResponseApi(new ShipmentIdDto(command.shipmentId().getValue()), command.reason(),
+                getCurrentDepartmentCode(), new UserIdApi(getCurrentUser().value()), new ReasonCodeApi(command.reasonCode().name()))
+        );
+        return new ReturnRequestApi(requests);
+    }
 
     public static DepartmentCodeApi getCurrentDepartmentCode() {
         return new DepartmentCodeApi(getDepartmentCode().value());

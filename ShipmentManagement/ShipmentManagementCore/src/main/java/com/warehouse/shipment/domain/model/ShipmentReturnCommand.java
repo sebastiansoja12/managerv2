@@ -3,6 +3,7 @@ package com.warehouse.shipment.domain.model;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentReturnRequestApi;
 
@@ -12,20 +13,22 @@ public class ShipmentReturnCommand {
     private DepartmentCode departmentCode;
     private UserId issuedBy;
     private ReturnStatus returnStatus;
+    private ReasonCode reasonCode;
 
-
-    public ShipmentReturnCommand(final DepartmentCode departmentCode, final UserId issuedBy, final String reason,
-                                 final ShipmentId shipmentId, final ReturnStatus returnStatus) {
+    public ShipmentReturnCommand(final DepartmentCode departmentCode, final String reason,
+                                 final ShipmentId shipmentId, final ReturnStatus returnStatus,
+                                 final ReasonCode reasonCode) {
         this.departmentCode = departmentCode;
-        this.issuedBy = issuedBy;
         this.reason = reason;
         this.shipmentId = shipmentId;
         this.returnStatus = returnStatus;
+        this.reasonCode = reasonCode;
     }
 
     public static ShipmentReturnCommand from(final ShipmentReturnRequestApi req) {
-		return new ShipmentReturnCommand(req.departmentCode(), req.issuedBy(), req.reason(),
-				new ShipmentId(req.shipmentId().getValue()), ReturnStatus.valueOf(req.returnStatus()));
+		return new ShipmentReturnCommand(req.departmentCode(), req.reason(),
+				new ShipmentId(req.shipmentId().getValue()), ReturnStatus.valueOf(req.returnStatus()),
+                ReasonCode.valueOf(req.reasonCode().value()));
     }
 
     public DepartmentCode getDepartmentCode() {
@@ -66,5 +69,13 @@ public class ShipmentReturnCommand {
 
     public void setReturnStatus(final ReturnStatus returnStatus) {
         this.returnStatus = returnStatus;
+    }
+
+    public ReasonCode getReasonCode() {
+        return reasonCode;
+    }
+
+    public void setReasonCode(final ReasonCode reasonCode) {
+        this.reasonCode = reasonCode;
     }
 }
