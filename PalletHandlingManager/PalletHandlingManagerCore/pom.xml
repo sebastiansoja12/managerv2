@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>PalletHandlingManager</artifactId>
-        <version>2025.3-SNAPSHOT</version>
+        <version>2026.1-SNAPSHOT</version>
     </parent>
 
     <packaging>jar</packaging>

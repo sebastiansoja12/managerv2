@@ -1,1 +1,1 @@
- **Manager 2.0 - Development Version 2025.3  - 1st September, 2025**
+ **Manager 2.0 - Development Version 2026.1  - 1st January, 2026**

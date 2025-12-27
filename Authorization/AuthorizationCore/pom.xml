@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>Authorization</artifactId>
-        <version>2025.3-SNAPSHOT</version>
+        <version>2026.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
