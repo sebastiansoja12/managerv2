@@ -1,4 +1,11 @@
 package com.warehouse.process.domain.service;
 
+import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.process.domain.model.ProcessLog;
+
 public interface ProcessService {
+    ProcessId nextProcessId();
+    void createProcess(final ProcessLog processLog);
+    void updateResponse(final ProcessId processId, final String response);
+    ProcessLog findById(final ProcessId processId);
 }
