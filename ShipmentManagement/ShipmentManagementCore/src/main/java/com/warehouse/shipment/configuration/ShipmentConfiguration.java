@@ -201,10 +201,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository,
-										   final RouteLogServicePort routeLogServicePort,
-										   final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
-		return new ShipmentServiceImpl(shipmentRepository, routeLogServicePort, softwareConfigurationServicePort);
+	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository) {
+		return new ShipmentServiceImpl(shipmentRepository);
 	}
 
 	@Bean("shipment.routeTrackerLogProperties")

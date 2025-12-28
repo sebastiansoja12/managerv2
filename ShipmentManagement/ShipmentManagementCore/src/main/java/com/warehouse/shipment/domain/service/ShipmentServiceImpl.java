@@ -11,9 +11,7 @@ import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
-import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
@@ -23,16 +21,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     private final ShipmentRepository shipmentRepository;
 
-    private final RouteLogServicePort routeLogServicePort;
-
-    private final SoftwareConfigurationServicePort softwareConfigurationServicePort;
-
-	public ShipmentServiceImpl(final ShipmentRepository shipmentRepository,
-                               final RouteLogServicePort routeLogServicePort,
-                               final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
+	public ShipmentServiceImpl(final ShipmentRepository shipmentRepository) {
         this.shipmentRepository = shipmentRepository;
-        this.routeLogServicePort = routeLogServicePort;
-        this.softwareConfigurationServicePort = softwareConfigurationServicePort;
     }
 
     @Override
@@ -76,6 +66,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             shipment.changeShipmentTypeWithRelatedId(shipmentType, relatedShipmentId);
         }
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentTypeChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -83,6 +74,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeShipmentStatus(shipmentStatus);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentStatusChangedEvent(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -142,6 +134,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyRelatedShipmentRedirected(relatedShipmentId);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentRedirected(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -149,6 +142,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentRerouted();
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentRerouted(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -156,6 +150,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyRelatedShipmentLocked();
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentRelatedLocked(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -163,6 +158,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentSent();
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentSent(shipment.snapshot(), Instant.now()));
     }
 
     @Override

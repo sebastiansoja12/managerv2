@@ -13,7 +13,6 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
 import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
-import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
 import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
@@ -433,7 +432,6 @@ public class Shipment {
 
     public void changeShipmentStatus(final ShipmentStatus shipmentStatus) {
         this.shipmentStatus = shipmentStatus;
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyRelatedShipmentRedirected(final ShipmentId relatedShipmentId) {
@@ -473,19 +471,16 @@ public class Shipment {
         this.shipmentRelatedId = null;
         unlockShipment();
         markAsModified();
-        DomainRegistry.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentRerouted() {
         changeShipmentStatus(ShipmentStatus.REROUTE);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentSent() {
         changeShipmentStatus(ShipmentStatus.SENT);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentReturned() {
@@ -500,6 +495,7 @@ public class Shipment {
 
     public void notifyShipmentReturnCanceled() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
+        this.locked = false;
         markAsModified();
     }
 
