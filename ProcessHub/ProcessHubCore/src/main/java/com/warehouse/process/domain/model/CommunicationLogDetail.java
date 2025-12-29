@@ -8,6 +8,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.process.domain.vo.CommunicationLogId;
+import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 import lombok.Builder;
 
@@ -27,6 +28,21 @@ public class CommunicationLogDetail {
     private Instant createdAt;
     private Instant updatedAt;
     private String faultDescription;
+
+    public void saveShipmentUpdate(final ShipmentUpdated shipmentUpdated) {
+        this.deviceId = shipmentUpdated.deviceId();
+        this.sourceService = shipmentUpdated.sourceService();
+        this.targetService = shipmentUpdated.targetService();
+        this.createdBy = shipmentUpdated.createdBy();
+        this.updatedBy = shipmentUpdated.createdBy();
+        this.departmentCode = shipmentUpdated.departmentCode();
+        this.processType = shipmentUpdated.processType();
+        this.serviceType = shipmentUpdated.serviceType();
+        this.request = shipmentUpdated.request();
+        this.response = shipmentUpdated.response();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
 
     public void changeSourceService(final String sourceService) {
         this.sourceService = sourceService;

@@ -1,6 +1,5 @@
 package com.warehouse.process.infrastructure.adapter.secondary.mapper;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import com.warehouse.process.domain.model.CommunicationLogDetail;
@@ -14,7 +13,6 @@ public abstract class ProcessLogToEntityMapper {
 
     public static ProcessLogWriteEntity map(final ProcessLog processLog) {
         final ProcessLogWriteEntity parent = ProcessLogWriteEntity.builder()
-                .communicationLogs(new HashSet<>())
                 .faultDescription(processLog.getFaultDescription())
                 .processId(processLog.getProcessId())
                 .request(processLog.getRequest())
@@ -43,6 +41,8 @@ public abstract class ProcessLogToEntityMapper {
                     .faultDescription(d.getFaultDescription())
                     .sourceService(d.getSourceService())
                     .targetService(d.getTargetService())
+                    .createdBy(d.getCreatedBy())
+                    .updatedBy(d.getUpdatedBy())
                     .build();
             parent.getCommunicationLogs().add(child);
         }

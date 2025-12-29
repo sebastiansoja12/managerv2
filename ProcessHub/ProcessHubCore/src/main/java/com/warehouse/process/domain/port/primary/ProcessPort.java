@@ -4,9 +4,12 @@ import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.InitializeProcessCommand;
 import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
+import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 public interface ProcessPort {
     ProcessId initialize(final InitializeProcessCommand command);
     void changeResponse(final ChangeResponseProcessCommand command);
     void finishProcess(final ProcessId processId, final ProcessStatus processStatus);
+
+    void assignShipmentUpdated(final ProcessId processId, final ShipmentUpdated shipmentUpdated);
 }

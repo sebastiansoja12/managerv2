@@ -23,7 +23,7 @@ public class CommunicationLogDetails {
                                                             final ServiceType serviceType) {
         return getCommunicationLogDetails()
                 .stream()
-                .filter(equalProcessType(processType))
+                .filter(equalProcessType(serviceType, processType))
                 .findFirst()
                 .orElseGet(() -> addNewCommunicationLog(processType, serviceType));
     }
@@ -49,7 +49,7 @@ public class CommunicationLogDetails {
         return communicationLogDetail -> Objects.equals(id, communicationLogDetail.getId());
     }
 
-    private Predicate<? super CommunicationLogDetail> equalProcessType(final ProcessType processType) {
-        return communicationLogDetail -> processType.equals(communicationLogDetail.getProcessType());
+    private Predicate<? super CommunicationLogDetail> equalProcessType(final ServiceType serviceType, final ProcessType processType) {
+        return communicationLogDetail -> processType.equals(communicationLogDetail.getProcessType()) && serviceType.equals(communicationLogDetail.getServiceType());
     }
 }

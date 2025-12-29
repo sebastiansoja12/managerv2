@@ -2,17 +2,12 @@ package com.warehouse.process.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.enumeration.DeviceUserType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.DeviceInformation;
 import com.warehouse.process.domain.model.InitializeProcessCommand;
-import com.warehouse.process.infrastructure.dto.DeviceInformationDto;
-import com.warehouse.process.infrastructure.dto.InitializeProcessRequestDto;
-import com.warehouse.process.infrastructure.dto.ProcessLogId;
-import com.warehouse.process.infrastructure.dto.ProcessStatusDto;
+import com.warehouse.process.domain.vo.ShipmentUpdated;
+import com.warehouse.process.infrastructure.dto.*;
 
 public abstract class RequestMapper {
 
@@ -41,4 +36,13 @@ public abstract class RequestMapper {
     public static ProcessId map(final ProcessLogId processLogId) {
         return new ProcessId(processLogId.value());
     }
+
+	public static ShipmentUpdated map(final ShipmentUpdateDto shipmentUpdate) {
+		return new ShipmentUpdated(new ShipmentId(shipmentUpdate.shipmentId().value()),
+                new DeviceId(shipmentUpdate.deviceId().value()),
+				new UserId(shipmentUpdate.createdBy().value()),
+				new DepartmentCode(shipmentUpdate.departmentCode().value()), shipmentUpdate.serviceType(),
+				shipmentUpdate.processType(), shipmentUpdate.sourceService(), shipmentUpdate.targetService(),
+                shipmentUpdate.request(), shipmentUpdate.response());
+	}
 }

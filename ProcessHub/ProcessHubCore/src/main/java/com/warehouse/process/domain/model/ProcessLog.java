@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
+import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 import lombok.Builder;
 
@@ -66,6 +67,12 @@ public class ProcessLog {
         return modifiedAt;
     }
 
+    public void saveShipmentUpdated(final ShipmentUpdated shipmentUpdated) {
+        final CommunicationLogDetail communicationLogDetail = getCommunicationLogDetails()
+                .getCommunicationLogDetail(shipmentUpdated.processType(), shipmentUpdated.serviceType());
+        communicationLogDetail.saveShipmentUpdate(shipmentUpdated);
+    }
+
     public void changeResponse(final String response) {
         this.response = response;
         markAsModified();
@@ -80,10 +87,10 @@ public class ProcessLog {
     }
 
     public boolean successed() {
-        return status.equals(ProcessStatus.SUCCESS);
+        return status != null && status.equals(ProcessStatus.SUCCESS);
     }
 
     public boolean failed() {
-        return status.equals(ProcessStatus.FAILURE);
+        return status != null && status.equals(ProcessStatus.FAILURE);
     }
 }
