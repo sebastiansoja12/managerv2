@@ -28,7 +28,7 @@ public class DeviceInformationEmbeddable {
     @Column(name = "device_user_type", nullable = false)
     private DeviceUserType deviceUserType;
 
-    @Column(name = "version", nullable = false)
+    @Column(name = "device_version", nullable = false)
     private String version;
 
     public DeviceInformationEmbeddable() {

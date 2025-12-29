@@ -6,17 +6,17 @@ import org.hibernate.annotations.Immutable;
 import com.warehouse.process.infrastructure.adapter.secondary.entity.CommunicationLogBaseEntity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "communication_log_details")
 @Access(AccessType.FIELD)
 @Immutable
-@Builder
+@SuperBuilder
 public class CommunicationLogWriteEntity extends CommunicationLogBaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "process_log_id", columnDefinition = "BINARY(16)")
+    @JoinColumn(name = "process_id", columnDefinition = "BINARY(16)")
     private ProcessLogWriteEntity processLog;
 
     protected CommunicationLogWriteEntity() {

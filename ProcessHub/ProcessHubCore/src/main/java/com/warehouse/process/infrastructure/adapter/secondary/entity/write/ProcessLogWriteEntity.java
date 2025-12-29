@@ -9,13 +9,13 @@ import org.hibernate.annotations.Immutable;
 import com.warehouse.process.infrastructure.adapter.secondary.entity.ProcessLogBaseEntity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "process_logs")
 @Access(AccessType.FIELD)
 @Immutable
-@Builder
+@SuperBuilder
 public class ProcessLogWriteEntity extends ProcessLogBaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "processLog")
@@ -27,5 +27,9 @@ public class ProcessLogWriteEntity extends ProcessLogBaseEntity {
 
     public Set<CommunicationLogWriteEntity> getCommunicationLogs() {
         return Collections.unmodifiableSet(communicationLogs);
+    }
+
+    public void addCommunicationLog(final CommunicationLogWriteEntity child) {
+        this.communicationLogs.add(child);
     }
 }

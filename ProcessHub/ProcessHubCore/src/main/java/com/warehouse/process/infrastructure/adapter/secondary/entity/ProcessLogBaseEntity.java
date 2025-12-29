@@ -8,12 +8,12 @@ import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @Access(AccessType.FIELD)
 @Immutable
-@Builder
+@SuperBuilder
 public abstract class ProcessLogBaseEntity {
 
     @EmbeddedId
@@ -23,11 +23,9 @@ public abstract class ProcessLogBaseEntity {
     )
     private ProcessId processId;
 
-    @Lob
     @Column(name = "request")
     private String request;
 
-    @Lob
     @Column(name = "response")
     private String response;
 

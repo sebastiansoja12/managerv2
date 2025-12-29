@@ -100,4 +100,20 @@ public class CommunicationLogDetail {
     public Instant getUpdatedAt() {
         return updatedAt;
     }
+
+    public UserId getCreatedBy() {
+        return createdBy;
+    }
+
+    public DepartmentCode getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public DeviceId getDeviceId() {
+        return deviceId;
+    }
+
+    public UserId getUpdatedBy() {
+        return updatedBy;
+    }
 }

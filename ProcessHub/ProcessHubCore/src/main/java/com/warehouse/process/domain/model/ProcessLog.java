@@ -54,6 +54,18 @@ public class ProcessLog {
         return faultDescription;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public DeviceInformation getDeviceInformation() {
+        return deviceInformation;
+    }
+
+    public Instant getModifiedAt() {
+        return modifiedAt;
+    }
+
     public void changeResponse(final String response) {
         this.response = response;
         markAsModified();

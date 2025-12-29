@@ -12,12 +12,12 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.process.domain.vo.CommunicationLogId;
 
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @Access(AccessType.FIELD)
 @Immutable
-@Builder
+@SuperBuilder
 public abstract class CommunicationLogBaseEntity {
 
     @EmbeddedId
@@ -37,11 +37,11 @@ public abstract class CommunicationLogBaseEntity {
     private ServiceType serviceType;
 
     @Column(name = "created_by")
-    @AttributeOverride(name = "value", column = @Column(name = "user_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "created_by"))
     private UserId createdBy;
 
     @Column(name = "updated_by")
-    @AttributeOverride(name = "value", column = @Column(name = "user_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "updated_by"))
     private UserId updatedBy;
 
     @Column(name = "department_code")
@@ -54,15 +54,12 @@ public abstract class CommunicationLogBaseEntity {
     @Column(name = "target_service")
     private String targetService;
 
-    @Lob
     @Column(name = "request")
     private String request;
 
-    @Lob
     @Column(name = "response")
     private String response;
 
-    @Lob
     @Column(name = "fault_description")
     private String faultDescription;
 

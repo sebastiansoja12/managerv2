@@ -23,7 +23,7 @@ CREATE TABLE process_logs
 
 CREATE TABLE communication_log_details
 (
-    id                BIGINT     NOT NULL AUTO_INCREMENT,
+    communication_log_id                BIGINT     NOT NULL AUTO_INCREMENT,
 
     process_id        BINARY(16) NOT NULL,
 
@@ -41,7 +41,7 @@ CREATE TABLE communication_log_details
 
     request           LONGTEXT,
     response          LONGTEXT,
-    fault_description LONGTEXT,
+    fault_description VARCHAR(50),
 
     created_at        TIMESTAMP(6),
     updated_at        TIMESTAMP(6),
@@ -82,7 +82,7 @@ CREATE TABLE process_logs_rd
 
 CREATE TABLE communication_log_details_rd
 (
-    id                BIGINT     NOT NULL AUTO_INCREMENT,
+    communication_log_id                BIGINT     NOT NULL AUTO_INCREMENT,
 
     process_id        BINARY(16) NOT NULL,
 
@@ -100,7 +100,7 @@ CREATE TABLE communication_log_details_rd
 
     request           LONGTEXT,
     response          LONGTEXT,
-    fault_description LONGTEXT,
+    fault_description VARCHAR(50),
 
     created_at        TIMESTAMP(6),
     updated_at        TIMESTAMP(6),
