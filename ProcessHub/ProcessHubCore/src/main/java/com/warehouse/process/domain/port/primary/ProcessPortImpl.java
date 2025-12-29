@@ -1,6 +1,7 @@
 package com.warehouse.process.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.InitializeProcessCommand;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.service.ProcessService;
@@ -36,5 +37,14 @@ public class ProcessPortImpl implements ProcessPort {
     @Override
     public void changeResponse(final ChangeResponseProcessCommand command) {
         this.processService.updateResponse(command.processId(), command.response());
+    }
+
+    @Override
+    public void finishProcess(final ProcessId processId, final ProcessStatus processStatus) {
+        if (processStatus.equals(ProcessStatus.SUCCESS)) {
+            this.processService.logFinishedProcess(processId);
+        } else if (processStatus.equals(ProcessStatus.FAILURE)) {
+            this.processService.logFailedProcess(processId);
+        }
     }
 }

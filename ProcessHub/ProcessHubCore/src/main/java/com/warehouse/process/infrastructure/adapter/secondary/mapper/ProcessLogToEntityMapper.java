@@ -5,6 +5,6 @@ import com.warehouse.process.infrastructure.adapter.secondary.entity.write.Proce
 
 public abstract class ProcessLogToEntityMapper {
     public static ProcessLogWriteEntity map(final ProcessLog processLog) {
-        return new ProcessLogWriteEntity();
+        return ProcessLogWriteEntity.builder().build();
     }
 }
