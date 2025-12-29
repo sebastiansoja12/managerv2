@@ -67,15 +67,14 @@ public class ProcessRepositoryImpl implements ProcessRepository {
     }
 
     @Override
-    public ProcessLog findById(final ProcessId processId) {
-        final ProcessLog inMemory = inFlight.get(processId);
-        if (inMemory != null) {
+    public Optional<ProcessLog> findById(final ProcessId processId) {
+        final Optional<ProcessLog> inMemory = Optional.ofNullable(inFlight.get(processId));
+        if (inMemory.isPresent()) {
             return inMemory;
         }
 
         return readRepository.findById(processId)
-                .map(ProcessLogToModelMapper::map)
-                .orElse(null);
+                .map(ProcessLogToModelMapper::map);
     }
 
     public void finish(final ProcessId processId) {
