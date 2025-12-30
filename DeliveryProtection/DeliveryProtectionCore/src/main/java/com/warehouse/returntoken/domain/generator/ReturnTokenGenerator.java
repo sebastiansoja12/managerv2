@@ -8,12 +8,11 @@ import java.util.Base64;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.returntoken.domain.vo.ReturnToken;
 
 @Component
 public class ReturnTokenGenerator {
 
-    public static ReturnToken generateReturnToken(final ShipmentId shipmentId) {
+    public static String generateReturnToken(final ShipmentId shipmentId) {
         final String shipmentIdString = shipmentId.toString();
         final byte[] hashBytes = hashShipmentId(shipmentIdString);
         final String base64EncodedHash = Base64.getEncoder().encodeToString(hashBytes);
@@ -22,7 +21,7 @@ public class ReturnTokenGenerator {
         final String combined = numericPortion + salt;
         final byte[] finalHashBytes = hashShipmentId(combined);
         final int token = Math.abs(BytesToIntConverter.bytesToInt(finalHashBytes)) % 1000000;
-        return new ReturnToken(String.format("%06d", token));
+        return String.format("%06d", token);
     }
 
     private static byte[] hashShipmentId(String input) {

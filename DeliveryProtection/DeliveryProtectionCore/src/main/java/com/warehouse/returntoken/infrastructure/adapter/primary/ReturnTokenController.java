@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.returntoken.domain.exception.ReturnTokenNotFoundException;
 import com.warehouse.returntoken.domain.port.primary.ReturnTokenPort;
 import com.warehouse.returntoken.domain.vo.ReturnToken;
 import com.warehouse.returntoken.domain.vo.ReturnTokenRequest;
@@ -47,5 +48,10 @@ public class ReturnTokenController {
         final ReturnToken returnToken = new ReturnToken(value);
         final Boolean valid = returnTokenPort.verify(returnToken);
         return ResponseEntity.ok(new ReturnTokenVerifyDto(valid));
+    }
+
+    @ExceptionHandler(ReturnTokenNotFoundException.class)
+    public ResponseEntity<String> handleReturnTokenNotFoundException(final ReturnTokenNotFoundException exception) {
+        return ResponseEntity.notFound().build();
     }
 }
