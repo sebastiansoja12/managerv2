@@ -10,10 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.deliverytoken.domain.vo.*;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
-import com.warehouse.tools.shipment.ShipmentProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,13 +23,17 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.deliverytoken.configuration.DeliveryTokenTestConfiguration;
-import com.warehouse.deliverytoken.domain.model.*;
+import com.warehouse.deliverytoken.domain.model.DeliveryTokenRequest;
 import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPort;
 import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
+import com.warehouse.deliverytoken.domain.vo.*;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
 import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.SupplierNotAllowedException;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.tools.shipment.ShipmentProperties;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest

@@ -1,16 +1,14 @@
 package com.warehouse.deliverytoken;
 
 
-import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.deliverytoken.domain.exception.MissingParcelIdException;
-import com.warehouse.deliverytoken.domain.model.*;
-import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPortImpl;
-import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
-import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
-import com.warehouse.deliverytoken.domain.service.DeliveryService;
-import com.warehouse.deliverytoken.domain.service.DeliveryServiceImpl;
-import com.warehouse.deliverytoken.domain.vo.*;
-import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,12 +16,16 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.deliverytoken.domain.exception.MissingParcelIdException;
+import com.warehouse.deliverytoken.domain.model.DeliveryTokenRequest;
+import com.warehouse.deliverytoken.domain.port.primary.DeliveryTokenPortImpl;
+import com.warehouse.deliverytoken.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.deliverytoken.domain.port.secondary.ParcelServicePort;
+import com.warehouse.deliverytoken.domain.service.DeliveryService;
+import com.warehouse.deliverytoken.domain.service.DeliveryServiceImpl;
+import com.warehouse.deliverytoken.domain.vo.*;
+import com.warehouse.deliverytoken.infrastructure.adapter.secondary.exception.CommunicationException;
 
 @ExtendWith(MockitoExtension.class)
 public class DeliveryTokenPortImplTest {

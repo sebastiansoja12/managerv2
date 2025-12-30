@@ -27,7 +27,6 @@
         <module>DestinationDetermination</module>
         <module>DocumentManager</module>
 		<module>ExceptionHandler</module>
-		<module>DeliveryProtection</module>
         <module>Terminal</module>
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>

@@ -78,8 +78,4 @@ public class LogisticsServiceImpl implements LogisticsService {
 		}
 		return null;
 	}
-
-    private DeliveryTokenResponse secureDelivery(final DeliveryTokenRequest request) {
-        return deliveryTokenServicePort.protect(request);
-    }
 }
