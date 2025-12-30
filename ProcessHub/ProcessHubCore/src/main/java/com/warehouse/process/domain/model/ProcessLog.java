@@ -67,10 +67,10 @@ public class ProcessLog {
         return modifiedAt;
     }
 
-    public void saveShipmentUpdated(final ShipmentUpdated shipmentUpdated) {
+    public void applyShipmentUpdate(final ShipmentUpdated shipmentUpdated) {
         final CommunicationLogDetail communicationLogDetail = getCommunicationLogDetails()
                 .getCommunicationLogDetail(shipmentUpdated.processType(), shipmentUpdated.serviceType());
-        communicationLogDetail.saveShipmentUpdate(shipmentUpdated);
+        communicationLogDetail.applyShipmentUpdate(shipmentUpdated);
     }
 
     public void changeResponse(final String response) {
