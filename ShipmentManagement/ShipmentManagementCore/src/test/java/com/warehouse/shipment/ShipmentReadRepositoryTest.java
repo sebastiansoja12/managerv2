@@ -24,6 +24,7 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.domain.service.MailService;
+import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.domain.listener.ShipmentEventListener;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
@@ -93,6 +94,11 @@ public class ShipmentReadRepositoryTest {
         @Bean
         public ReturnProperties returnProperties() {
             return new ReturnProperties();
+        }
+
+        @Bean
+        public NotificationEventPublisher notificationEventPublisher() {
+            return Mockito.mock(NotificationEventPublisher.class);
         }
     }
 

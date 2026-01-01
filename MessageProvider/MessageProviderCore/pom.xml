@@ -20,6 +20,11 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>MessageProviderApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>Common</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -1,7 +1,5 @@
 package com.warehouse.returntoken.domain.model;
 
-import java.util.UUID;
-
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -13,29 +11,22 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ReturnPackageRequest {
-    private final UUID id;
     private final ShipmentId shipmentId;
     private final DepartmentCode departmentCode;
     private final SupplierCode supplierCode;
     private final DeliveryStatus deliveryStatus;
     private final Boolean locked;
 
-    public ReturnPackageRequest(final UUID id,
-                                final ShipmentId shipmentId,
+    public ReturnPackageRequest(final ShipmentId shipmentId,
                                 final DepartmentCode departmentCode,
                                 final SupplierCode supplierCode,
                                 final DeliveryStatus deliveryStatus,
                                 final Boolean locked) {
-        this.id = id;
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deliveryStatus = deliveryStatus;
         this.locked = locked;
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public ShipmentId getShipmentId() {

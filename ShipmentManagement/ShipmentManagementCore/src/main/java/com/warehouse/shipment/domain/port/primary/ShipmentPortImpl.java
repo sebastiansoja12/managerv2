@@ -17,10 +17,7 @@ import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.port.secondary.Logger;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
-import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.*;
 
@@ -51,6 +48,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ReturningServicePort returningServicePort;
 
+    private final MailNotificationServicePort mailNotificationServicePort;
+
     private final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT,
             ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
 
@@ -64,7 +63,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final CountryServiceAvailabilityService countryServiceAvailabilityService,
                             final SignatureService signatureService,
                             final RouteLogServicePort routeLogServicePort,
-                            final ReturningServicePort returningServicePort) {
+                            final ReturningServicePort returningServicePort,
+                            final MailNotificationServicePort mailNotificationServicePort) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -76,6 +76,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.signatureService = signatureService;
         this.routeLogServicePort = routeLogServicePort;
         this.returningServicePort = returningServicePort;
+        this.mailNotificationServicePort = mailNotificationServicePort;
     }
 
     @Override
@@ -222,6 +223,37 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    @Transactional
+    public void processShipmentDelivery(final ShipmentDeliveryCommand command) {
+        final DeliveryStatus deliveryStatus = command.getDeliveryStatus();
+        final ShipmentId shipmentId = command.getShipmentId();
+
+        final Shipment shipment = this.shipmentService.find(shipmentId);
+
+        if (shipment.isFullyDelivered()) {
+            throw new RestException(400, "Shipment is fully delivered");
+        }
+
+        switch (deliveryStatus) {
+            case DELIVERY, DEPOT -> changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.DELIVERY));
+            case RETURN -> changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.RETURN));
+            case UNAVAILABLE, REJECTED, SENDER -> {
+                changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.REDIRECT));
+                this.shipmentService.redirectShipmentToSender(shipmentId);
+            }
+            case UNKNOWN, LOST -> changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.SENT));
+            case DELIVERED -> this.shipmentService.notifyShipmentDelivered(shipmentId);
+        }
+
+        final Result<Void, ErrorCode> result =
+                mailNotificationServicePort.notifyRecipient(deliveryStatus, this.loadShipment(shipmentId));
+
+        if (result.isFailure()) {
+            throw new RestException(400, result.getFailure().getMessage());
+        }
+    }
+
+    @Override
     public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
         validateShipmentNotInStatus(shipmentId);
         this.shipmentService.changeSenderTo(shipmentId, sender);
@@ -360,8 +392,11 @@ public class ShipmentPortImpl implements ShipmentPort {
             return command.getDestination();
         }
 
+        final Address address = Address.from(command.getShipmentStatus()
+                .equals(ShipmentStatus.RETURN) ? command.getSender() : command.getRecipient());
+
         final Result<VoronoiResponse, ErrorCode> voronoiResult =
-                this.pathFinderServicePort.determineDeliveryDepartment(Address.from(shipment.getRecipient()));
+                this.pathFinderServicePort.determineDeliveryDepartment(address);
 
         return voronoiResult.isSuccess()
                 ? voronoiResult.getSuccess().getValue()

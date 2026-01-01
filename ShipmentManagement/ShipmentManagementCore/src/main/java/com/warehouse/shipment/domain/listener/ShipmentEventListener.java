@@ -14,13 +14,11 @@ import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.domain.service.RouteTrackerService;
 import com.warehouse.shipment.domain.service.ShipmentService;
-import com.warehouse.shipment.domain.vo.RouteProcess;
-import com.warehouse.shipment.domain.vo.ShipmentHistoryTracker;
-import com.warehouse.shipment.domain.vo.ShipmentReturnedCommand;
-import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
+import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 
@@ -35,14 +33,18 @@ public class ShipmentEventListener {
 
     private final ReturningServicePort returningServicePort;
 
+    private final PathFinderServicePort pathFinderServicePort;
+
     public ShipmentEventListener(final RouteTrackerHistoryNotifier routeTrackerHistoryNotifier,
                                  final ShipmentService shipmentService,
                                  final RouteTrackerService routeTrackerService,
-                                 final ReturningServicePort returningServicePort) {
+                                 final ReturningServicePort returningServicePort,
+                                 final PathFinderServicePort pathFinderServicePort) {
         this.routeTrackerHistoryNotifier = routeTrackerHistoryNotifier;
         this.shipmentService = shipmentService;
         this.routeTrackerService = routeTrackerService;
         this.returningServicePort = returningServicePort;
+        this.pathFinderServicePort = pathFinderServicePort;
     }
 
     @EventListener
@@ -69,11 +71,24 @@ public class ShipmentEventListener {
     @TransactionalEventListener(fallbackExecution = true)
     public void handle(final ShipmentReturned event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
-        this.routeTrackerService.notifyShipmentStatusChanged(snapshot.shipmentId(), snapshot.shipmentStatus());
-        this.routeTrackerHistoryNotifier.notifyShipmentRoute(new ShipmentHistoryTracker(snapshot.shipmentId(),
-                snapshot.shipmentStatus(), null, null, true, Instant.now(), null));
+        final Result<VoronoiResponse, ErrorCode> destinationResult = this.pathFinderServicePort
+                .determineDeliveryDepartment(Address.from(snapshot.sender()));
 
-        //this.returningServicePort.notifyShipmentReturn(snapshot);
+        if (destinationResult.isFailure()) {
+            throw new TechnicalException(HttpStatusCode.valueOf(destinationResult.getFailure().getCode()),
+                    destinationResult.getFailure().getMessage());
+        }
+
+        final VoronoiResponse voronoiResponse = destinationResult.getSuccess();
+        this.shipmentService.changeDestination(snapshot.shipmentId(), voronoiResponse.getValue());
+
+        final Result<RouteProcess, ErrorCode> result =
+                this.routeTrackerService.notifyShipmentStatusChanged(snapshot.shipmentId(), snapshot.shipmentStatus());
+
+        if (result.isFailure()) {
+            throw new TechnicalException(HttpStatusCode.valueOf(result.getFailure().getCode()),
+                    result.getFailure().getMessage());
+        }
     }
 
     @TransactionalEventListener(fallbackExecution = true)
@@ -107,5 +122,17 @@ public class ShipmentEventListener {
                 this.routeTrackerService.notifyShipmentPersonChanged(snapshot.shipmentId(), snapshot.recipient());
         this.routeTrackerHistoryNotifier.notifyShipmentRoute(new ShipmentHistoryTracker(snapshot.shipmentId(),
                 snapshot.shipmentStatus(), null, null, true, Instant.now(), null));
+    }
+
+    @EventListener
+    public void handle(final ShipmentRedirected event) {
+        final ShipmentSnapshot snapshot = event.getSnapshot();
+        final Result<RouteProcess, ErrorCode> routeProcess = this.routeTrackerService
+                .notifyShipmentStatusChanged(snapshot.shipmentId(), snapshot.shipmentStatus());
+
+        if (routeProcess.isFailure()) {
+            throw new TechnicalException(HttpStatusCode.valueOf(routeProcess.getFailure().getCode()),
+                    routeProcess.getFailure().getMessage());
+        }
     }
 }

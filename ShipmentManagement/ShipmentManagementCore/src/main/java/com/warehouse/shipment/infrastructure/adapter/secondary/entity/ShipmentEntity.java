@@ -153,14 +153,15 @@ public class ShipmentEntity {
     private ExternalId<Long> externalReturnId;
 
 	public ShipmentEntity(final ShipmentId shipmentId, final String senderFirstName, final String senderLastName,
-			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode, final String senderTelephone,
-			final String recipientFirstName, final String recipientLastName, final String recipientEmail,
-			final String recipientCity, final String recipientStreet, final String recipientPostalCode, final String recipientTelephone,
-			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
-			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
-			final LocalDateTime updatedAt, final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
-            final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood,
-            final ExternalId<String> externalRouteId, final ExternalId<Long> externalReturnId) {
+			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode,
+			final String senderTelephone, final String recipientFirstName, final String recipientLastName,
+			final String recipientEmail, final String recipientCity, final String recipientStreet,
+			final String recipientPostalCode, final String recipientTelephone, final ShipmentSize shipmentSize,
+			final String destination, final ShipmentStatus shipmentStatus, final ShipmentType shipmentType,
+			final ShipmentId shipmentRelatedId, final LocalDateTime createdAt, final LocalDateTime updatedAt,
+			final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
+			final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood,
+			final ExternalId<String> externalRouteId, final ExternalId<Long> externalReturnId) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;
         this.lastName = senderLastName;

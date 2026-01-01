@@ -58,7 +58,7 @@ public class RouteTrackerServiceImpl implements RouteTrackerService {
 
     @Override
     public Result<RouteProcess, ErrorCode> notifyShipmentStatusChanged(final ShipmentId shipmentId, final ShipmentStatus shipmentStatus) {
-        return null;
+        return Result.success();
     }
 
     @Override

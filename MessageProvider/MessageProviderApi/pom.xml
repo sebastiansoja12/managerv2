@@ -5,15 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>warehouse</artifactId>
+        <artifactId>MessageProvider</artifactId>
         <version>2026.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>MessageProvider</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>MessageProviderCore</module>
-        <module>MessageProviderApi</module>
-    </modules>
+    <artifactId>MessageProviderApi</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
 </project>
