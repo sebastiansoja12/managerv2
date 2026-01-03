@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.warehouse</groupId>
-    <version>2025.3-SNAPSHOT</version>
+    <version>2026.1-SNAPSHOT</version>
     <name>RouteTracker</name>
     <description>Pom file route tracker service</description>
     <packaging>pom</packaging>

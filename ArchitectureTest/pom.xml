@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2025.3-SNAPSHOT</version>
+        <version>2026.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>ArchitectureTest</artifactId>
@@ -84,11 +84,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ReturningTrackManagerCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>DeliveryOperationApi</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -129,22 +124,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>PalletHandlingManagerCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>RouteTrackerFlowCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>SupplierServiceManagementCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>SoftwareConfigurationCore</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
