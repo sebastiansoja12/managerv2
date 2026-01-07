@@ -105,3 +105,4 @@ build/
 /TransportAssets/TransportAssetsApi/pom.xml.versionsBackup
 /TransportAssets/TransportAssetsCore/pom.xml.versionsBackup
 /TransportAssets/pom.xml.versionsBackup
+${project.build.directory}/
