@@ -81,8 +81,7 @@ class ShipmentPortImplTest {
 
     @BeforeEach
     void setUp() {
-        final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository, routeLogServicePort,
-                softwareConfigurationServicePort);
+        final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository);
         final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort, countryRepository);
         final PriceService priceService = new PriceServiceImpl(priceRepository);
         final Logger logger = mock(Logger.class);
