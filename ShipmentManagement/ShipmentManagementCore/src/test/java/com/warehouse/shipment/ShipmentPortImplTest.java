@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.util.Set;
 import java.util.UUID;
 
+import com.warehouse.shipment.domain.registry.DomainContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +29,6 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.ChangeShipmentTypeRequest;
 import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
@@ -91,7 +91,7 @@ class ShipmentPortImplTest {
                 new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
         final ApplicationContext applicationContext = mock(ApplicationContext.class);
         final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
-        final DomainRegistry domainContext = new DomainRegistry();
+        final DomainContext domainContext = new DomainContext();
         domainContext.setApplicationEventPublisher(eventPublisher);
         domainContext.setApplicationContext(applicationContext);
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,

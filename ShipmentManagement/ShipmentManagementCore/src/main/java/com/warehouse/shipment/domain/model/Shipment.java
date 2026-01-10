@@ -3,6 +3,7 @@ package com.warehouse.shipment.domain.model;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+import com.warehouse.shipment.domain.registry.DomainContext;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
@@ -13,7 +14,6 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
 import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
-import com.warehouse.shipment.domain.registry.DomainRegistry;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 
@@ -350,7 +350,7 @@ public class Shipment {
         this.shipmentRelatedId = newRelatedShipmentId;
         markAsModified();
         lockShipment();
-        DomainRegistry.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
+        DomainContext.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void lockShipment() {
@@ -548,19 +548,19 @@ public class Shipment {
 
     public void updateCountries(final ShipmentCountryRequest request) {
         markAsModified();
-        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeIssuerCountry(final CountryCode originCountry) {
         this.originCountry = originCountry;
         markAsModified();
-        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeReceiverCountry(final CountryCode destinationCountry) {
         this.destinationCountry = destinationCountry;
         markAsModified();
-        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
