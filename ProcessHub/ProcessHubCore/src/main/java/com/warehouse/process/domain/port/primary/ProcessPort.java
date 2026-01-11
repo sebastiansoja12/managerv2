@@ -1,8 +1,10 @@
 package com.warehouse.process.domain.port.primary;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.process.domain.vo.ProcessId;
+import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.process.domain.model.InitializeProcessCommand;
+import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
 
 public interface ProcessPort {
-    ProcessId initialize(final ShipmentId shipmentId);
+    ProcessId initialize(final InitializeProcessCommand command);
+    void changeResponse(final ChangeResponseProcessCommand command);
 }
