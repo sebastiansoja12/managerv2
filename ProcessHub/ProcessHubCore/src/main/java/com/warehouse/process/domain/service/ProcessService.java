@@ -7,5 +7,7 @@ public interface ProcessService {
     ProcessId nextProcessId();
     void createProcess(final ProcessLog processLog);
     void updateResponse(final ProcessId processId, final String response);
+    void logFinishedProcess(final ProcessId processId);
+    void logFailedProcess(final ProcessId processId);
     ProcessLog findById(final ProcessId processId);
 }

@@ -56,15 +56,22 @@ public class ProcessLog {
 
     public void changeResponse(final String response) {
         this.response = response;
-        changeStatus(ProcessStatus.SUCCESS);
         markAsModified();
     }
 
-    private void changeStatus(final ProcessStatus status) {
+    public void changeStatus(final ProcessStatus status) {
         this.status = status;
     }
 
     private void markAsModified() {
         this.modifiedAt = Instant.now();
+    }
+
+    public boolean successed() {
+        return status.equals(ProcessStatus.SUCCESS);
+    }
+
+    public boolean failed() {
+        return status.equals(ProcessStatus.FAILURE);
     }
 }
