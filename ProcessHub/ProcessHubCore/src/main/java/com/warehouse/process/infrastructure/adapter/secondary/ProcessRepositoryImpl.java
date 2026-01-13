@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
-import com.warehouse.process.infrastructure.adapter.secondary.entity.identificator.ProcessLogId;
 import com.warehouse.process.infrastructure.adapter.secondary.entity.read.ProcessLogReadEntity;
 import com.warehouse.process.infrastructure.adapter.secondary.entity.write.ProcessLogWriteEntity;
 import com.warehouse.process.infrastructure.adapter.secondary.mapper.ProcessLogToEntityMapper;
@@ -74,7 +73,7 @@ public class ProcessRepositoryImpl implements ProcessRepository {
             return inMemory;
         }
 
-        return readRepository.findById(new ProcessLogId(processId.value()))
+        return readRepository.findById(processId)
                 .map(ProcessLogToModelMapper::map)
                 .orElse(null);
     }
@@ -107,7 +106,7 @@ public class ProcessRepositoryImpl implements ProcessRepository {
 
     private void validateNotExists(final ProcessId processId) {
         final Optional<ProcessLogReadEntity> existing =
-                readRepository.findById(new ProcessLogId(processId.value()));
+                readRepository.findById(processId);
 
         if (existing.isPresent()) {
             throw new RuntimeException("Process log record already exists");

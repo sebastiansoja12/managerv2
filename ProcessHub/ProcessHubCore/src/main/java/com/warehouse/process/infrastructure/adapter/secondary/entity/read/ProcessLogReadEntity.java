@@ -9,13 +9,13 @@ import org.hibernate.annotations.Immutable;
 import com.warehouse.process.infrastructure.adapter.secondary.entity.ProcessLogBaseEntity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "process_logs_rd")
 @Access(AccessType.FIELD)
 @Immutable
-@Builder
+@SuperBuilder
 public class ProcessLogReadEntity extends ProcessLogBaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "processLog")
