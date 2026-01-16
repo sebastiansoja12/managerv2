@@ -7,6 +7,7 @@ import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.service.ProcessService;
 
 import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
+import com.warehouse.process.domain.vo.ShipmentUpdated;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -46,5 +47,10 @@ public class ProcessPortImpl implements ProcessPort {
         } else if (processStatus.equals(ProcessStatus.FAILURE)) {
             this.processService.logFailedProcess(processId);
         }
+    }
+
+    @Override
+    public void assignShipmentUpdated(final ProcessId processId, final ShipmentUpdated shipmentUpdated) {
+        this.processService.assignShipmentUpdated(processId, shipmentUpdated);
     }
 }

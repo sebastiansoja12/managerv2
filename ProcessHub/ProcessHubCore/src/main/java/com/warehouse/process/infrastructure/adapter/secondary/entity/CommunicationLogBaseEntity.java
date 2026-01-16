@@ -21,6 +21,7 @@ import lombok.experimental.SuperBuilder;
 public abstract class CommunicationLogBaseEntity {
 
     @EmbeddedId
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @AttributeOverride(name = "value", column = @Column(name = "communication_log_id", nullable = false))
     private CommunicationLogId communicationLogId;
 

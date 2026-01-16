@@ -7,6 +7,7 @@ import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.exception.ProcessLogNotFoundException;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
+import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 public class ProcessServiceImpl implements ProcessService {
 
@@ -30,6 +31,15 @@ public class ProcessServiceImpl implements ProcessService {
     public ProcessLog findById(final ProcessId processId) {
         return this.processRepository.findById(processId)
                 .orElseThrow(() -> new ProcessLogNotFoundException("Process log not found"));
+    }
+
+    @Override
+    public void assignShipmentUpdated(final ProcessId processId, final ShipmentUpdated shipmentUpdated) {
+        this.processRepository.findById(processId)
+                .ifPresent(processLog -> {
+                    processLog.saveShipmentUpdated(shipmentUpdated);
+                    this.processRepository.update(processLog);
+                });
     }
 
     @Override
