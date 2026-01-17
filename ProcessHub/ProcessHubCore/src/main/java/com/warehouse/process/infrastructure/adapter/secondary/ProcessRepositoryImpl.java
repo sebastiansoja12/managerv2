@@ -39,6 +39,8 @@ public class ProcessRepositoryImpl implements ProcessRepository {
             }
             validateNotExists(processId);
             inFlight.put(processId, processLog);
+            final ProcessLogWriteEntity writeEntity = ProcessLogToEntityMapper.map(processLog);
+            writeRepository.save(writeEntity);
         } finally {
             lock.unlock();
         }

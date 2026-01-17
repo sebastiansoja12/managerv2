@@ -37,7 +37,7 @@ public class ProcessServiceImpl implements ProcessService {
     public void assignShipmentUpdated(final ProcessId processId, final ShipmentUpdated shipmentUpdated) {
         this.processRepository.findById(processId)
                 .ifPresent(processLog -> {
-                    processLog.saveShipmentUpdated(shipmentUpdated);
+                    processLog.applyShipmentUpdate(shipmentUpdated);
                     this.processRepository.update(processLog);
                 });
     }
