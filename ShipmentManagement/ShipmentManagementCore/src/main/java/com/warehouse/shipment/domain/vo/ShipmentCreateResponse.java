@@ -1,7 +1,10 @@
 package com.warehouse.shipment.domain.vo;
 
 
-import com.warehouse.commonassets.identificator.ShipmentId;
+import java.util.UUID;
 
-public record ShipmentCreateResponse(ShipmentId shipmentId) {
+import com.warehouse.commonassets.identificator.ExternalId;
+
+public record ShipmentCreateResponse(ExternalId<UUID> shipmentId,
+                                     String trackingNumber) {
 }

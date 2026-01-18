@@ -56,7 +56,7 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
 
             final Supplier<ResponseEntity<RouteProcessDto>> retryableSupplier = Retry
                     .decorateSupplier(retry, () -> sendRouteProcessRequest(restClient,
-                            shipmentId, softwareConfiguration.getValue()));
+                            shipmentId, softwareConfiguration.getUrl() + softwareConfiguration.getValue()));
 
             final ResponseEntity<RouteProcessDto> process = retryableSupplier.get();
 

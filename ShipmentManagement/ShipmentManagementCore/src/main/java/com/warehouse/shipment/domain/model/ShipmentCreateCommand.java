@@ -4,6 +4,7 @@ import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 
@@ -26,6 +27,8 @@ public class ShipmentCreateCommand {
 
 	private ShipmentPriority shipmentPriority;
 
+	private CarrierOperator carrierOperator;
+
 	public ShipmentCreateCommand() {
 
 	}
@@ -37,7 +40,8 @@ public class ShipmentCreateCommand {
 								 final ShipmentSize shipmentSize,
 								 final CountryCode issuerCountryCode,
 								 final CountryCode receiverCountryCode,
-								 final ShipmentPriority shipmentPriority) {
+								 final ShipmentPriority shipmentPriority,
+								 final CarrierOperator carrierOperator) {
 		this.dangerousGood = dangerousGood;
 		this.price = price;
 		this.recipient = recipient;
@@ -46,6 +50,7 @@ public class ShipmentCreateCommand {
         this.issuerCountryCode = issuerCountryCode;
         this.receiverCountryCode = receiverCountryCode;
 		this.shipmentPriority = shipmentPriority;
+		this.carrierOperator = carrierOperator;
     }
 
 	public DangerousGood getDangerousGood() {
@@ -114,5 +119,13 @@ public class ShipmentCreateCommand {
 
 	public void setShipmentPriority(final ShipmentPriority shipmentPriority) {
 		this.shipmentPriority = shipmentPriority;
+	}
+
+	public CarrierOperator getCarrierOperator() {
+		return carrierOperator;
+	}
+
+	public void setCarrierOperator(final CarrierOperator carrierOperator) {
+		this.carrierOperator = carrierOperator;
 	}
 }
