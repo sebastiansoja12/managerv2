@@ -1,5 +1,6 @@
 package com.warehouse.returntoken.configuration;
 
+import com.warehouse.returntoken.infrastructure.adapter.secondary.ReturnTokenReadRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,7 +21,7 @@ public class ReturnTokenConfiguration {
     }
 
     @Bean
-    public ReturnTokenRepository returnTokenRepository() {
-        return new ReturnTokenRepositoryImpl(null);
+    public ReturnTokenRepository returnTokenRepository(final ReturnTokenReadRepository repository) {
+        return new ReturnTokenRepositoryImpl(repository);
     }
 }
