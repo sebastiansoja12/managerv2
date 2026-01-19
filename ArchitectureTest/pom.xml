@@ -29,11 +29,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DeliveryProtectionCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>DepartmentServiceCore</artifactId>
             <version>${project.version}</version>
         </dependency>
