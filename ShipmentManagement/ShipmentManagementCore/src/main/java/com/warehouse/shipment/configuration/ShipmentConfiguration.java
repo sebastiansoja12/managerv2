@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
+import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
@@ -84,10 +85,18 @@ public class ShipmentConfiguration {
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
 									 final SignatureService signatureService,
 									 final RouteLogServicePort routeLogServicePort,
-									 final ReturningServicePort returningServicePort) {
+									 final ReturningServicePort returningServicePort,
+									 final MailNotificationServicePort mailNotificationServicePort) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
-				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort);
+				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort,
+				mailNotificationServicePort);
+	}
+	
+	@Bean
+	public MailNotificationServicePort mailNotificationServicePort(
+			final NotificationEventPublisher notificationEventPublisher) {
+		return new MailNotificationServiceAdapter(notificationEventPublisher);
 	}
 	
 	@Bean

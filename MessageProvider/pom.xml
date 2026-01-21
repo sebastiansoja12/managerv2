@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>MessageProviderCore</module>
+        <module>MessageProviderApi</module>
     </modules>
 
 </project>

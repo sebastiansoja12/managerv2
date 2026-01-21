@@ -9,6 +9,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 
+import com.warehouse.shipment.domain.service.ShipmentService;
+
 @Component("shipment.domainContext")
 public final class DomainContext implements ApplicationEventPublisherAware, ApplicationContextAware {
 
@@ -20,6 +22,10 @@ public final class DomainContext implements ApplicationEventPublisherAware, Appl
 
     public static synchronized ApplicationEventPublisher eventPublisher() {
         return eventPublisher;
+    }
+
+    public static synchronized ShipmentService shipmentService() {
+        return context.getBean(ShipmentService.class);
     }
 
     @Override

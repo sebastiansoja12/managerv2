@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 import java.util.Set;
 import java.util.UUID;
 
-import com.warehouse.shipment.domain.registry.DomainContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +28,7 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
+import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.ChangeShipmentTypeRequest;
 import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
@@ -71,6 +71,9 @@ class ShipmentPortImplTest {
     @Mock
     private ReturningServicePort returningServicePort;
 
+    @Mock
+    private MailNotificationServicePort mailNotificationServicePort;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
@@ -96,7 +99,7 @@ class ShipmentPortImplTest {
         domainContext.setApplicationContext(applicationContext);
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
 				shipmentStatusHandlers, countryDetermineService, priceService, countryServiceAvailabilityService,
-				signatureService, routeLogServicePort, returningServicePort);
+				signatureService, routeLogServicePort, returningServicePort, mailNotificationServicePort);
 	}
 
     @Test

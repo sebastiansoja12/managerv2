@@ -3,6 +3,8 @@ package com.warehouse.shipment.domain.service;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ReturnId;
@@ -232,6 +234,21 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void assignExternalReturnId(final ShipmentId shipmentId, final ReturnId returnId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.assignReturnId(returnId);
+        this.shipmentRepository.createOrUpdate(shipment);
+    }
+
+    @Override
+    public void redirectShipmentToSender(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        final Shipment shipmentAfterRedirection = shipment.redirectToSender(shipment.getShipmentRelatedId());
+        this.shipmentRepository.createOrUpdate(shipmentAfterRedirection);
+    }
+
+    @Override
+    @Transactional
+    public void changeDestination(final ShipmentId shipmentId, final String destination) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.changeDestinationDepartment(destination);
         this.shipmentRepository.createOrUpdate(shipment);
     }
 }

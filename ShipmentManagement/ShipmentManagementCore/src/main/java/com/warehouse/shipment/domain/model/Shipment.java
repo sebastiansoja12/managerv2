@@ -3,7 +3,6 @@ package com.warehouse.shipment.domain.model;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-import com.warehouse.shipment.domain.registry.DomainContext;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
@@ -14,6 +13,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
 import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
+import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 
@@ -437,6 +437,7 @@ public class Shipment {
     public void notifyRelatedShipmentRedirected(final ShipmentId relatedShipmentId) {
         this.shipmentRelatedId = relatedShipmentId;
         this.shipmentType = ShipmentType.CHILD;
+        this.shipmentStatus = ShipmentStatus.REDIRECT;
         lockShipment();
         markAsModified();
     }
@@ -490,6 +491,7 @@ public class Shipment {
 
     public void notifyShipmentDelivered() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
+        lockShipment();
         markAsModified();
     }
 
@@ -508,6 +510,7 @@ public class Shipment {
 
     public void changeDestinationDepartment(final String destination) {
         this.destination = destination;
+        markAsModified();
     }
 
     private void unlockShipment() {
@@ -584,4 +587,43 @@ public class Shipment {
         this.externalReturnId = new ExternalId<>(returnId.getId());
         markAsModified();
     }
+
+    public boolean isFullyDelivered() {
+        return isLocked() && ShipmentStatus.DELIVERY.equals(this.shipmentStatus);
+    }
+
+    public Shipment redirectToSender(final ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
+        this.shipmentType = ShipmentType.PARENT;
+
+        final Sender newSender = new Sender(
+                recipient.getFirstName(),
+                recipient.getLastName(),
+                recipient.getEmail(),
+                recipient.getTelephoneNumber(),
+                recipient.getCity(),
+                recipient.getPostalCode(),
+                recipient.getStreet()
+        );
+
+        final Recipient newRecipient = new Recipient(
+                sender.getFirstName(),
+                sender.getLastName(),
+                sender.getEmail(),
+                sender.getTelephoneNumber(),
+                sender.getCity(),
+                sender.getPostalCode(),
+                sender.getStreet()
+        );
+
+        this.sender = newSender;
+        this.recipient = newRecipient;
+
+        this.shipmentStatus = ShipmentStatus.CREATED;
+
+        markAsModified();
+
+        return this;
+    }
+
 }

@@ -109,6 +109,15 @@ public class ShipmentController {
         this.shipmentPort.processShipmentReturn(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
+
+    @PutMapping("/deliveries")
+    @Counted(value = "controller.shipment.delivery")
+    @Timed(value = "controller.shipment.delivery")
+    public ResponseEntity<?> deliverShipment(@RequestBody final ShipmentDeliveryRequestApiDto deliveryRequest) {
+        final ShipmentDeliveryCommand command = requestMapper.map(deliveryRequest);
+        this.shipmentPort.processShipmentDelivery(command);
+        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
+    }
     
 	// disabled
     @Counted(value = "controller.dangerousgood.add")
