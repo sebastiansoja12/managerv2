@@ -9,6 +9,7 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.exceptionhandler.exception.RestException;
+import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
@@ -50,6 +51,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final MailNotificationServicePort mailNotificationServicePort;
 
+    private final TrackingNumberService trackingNumberService;
+
     private final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT,
             ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
 
@@ -64,7 +67,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final SignatureService signatureService,
                             final RouteLogServicePort routeLogServicePort,
                             final ReturningServicePort returningServicePort,
-                            final MailNotificationServicePort mailNotificationServicePort) {
+                            final MailNotificationServicePort mailNotificationServicePort,
+                            final TrackingNumberService trackingNumberService) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -77,14 +81,15 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.routeLogServicePort = routeLogServicePort;
         this.returningServicePort = returningServicePort;
         this.mailNotificationServicePort = mailNotificationServicePort;
+        this.trackingNumberService = trackingNumberService;
     }
 
     @Override
     @Transactional
-    public Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand request) {
+    public Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand command) {
 
-        final CountryCode issuerCountryCode = request.getIssuerCountryCode();
-        final CountryCode receiverCountryCode = request.getReceiverCountryCode();
+        final CountryCode issuerCountryCode = command.getIssuerCountryCode();
+        final CountryCode receiverCountryCode = command.getReceiverCountryCode();
 
         final Result<Void, ErrorCode> countryValidation =
                 validateCountries(issuerCountryCode, receiverCountryCode);
@@ -92,8 +97,8 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(countryValidation.getFailure());
         }
 
-        final Sender sender = request.getSender();
-        final Recipient recipient = request.getRecipient();
+        final Sender sender = command.getSender();
+        final Recipient recipient = command.getRecipient();
         final Address recipientAddress = Address.from(recipient);
 
         final Result<VoronoiResponse, ErrorCode> voronoiResponse =
@@ -103,7 +108,11 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
 
         final Price shipmentPrice =
-                resolveShipmentPrice(request.getPrice(), request.getShipmentSize());
+                resolveShipmentPrice(command.getPrice(), command.getShipmentSize());
+
+        final CarrierOperator carrierOperator = command.getCarrierOperator();
+
+        final TrackingNumber trackingNumber = this.trackingNumberService.nextTrackingNumber(carrierOperator);
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
@@ -111,7 +120,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 shipmentId,
                 sender,
                 recipient,
-                request.getShipmentSize(),
+                command.getShipmentSize(),
                 null,
                 issuerCountryCode,
                 receiverCountryCode,
@@ -119,13 +128,15 @@ public class ShipmentPortImpl implements ShipmentPort {
                 false,
                 voronoiResponse.getSuccess().getValue(),
                 null,
-                request.getShipmentPriority()
+                command.getShipmentPriority(),
+                trackingNumber
         );
 
         this.shipmentService.createShipment(shipment);
         logCreatedShipment(shipment);
 
-        return Result.success(new ShipmentCreateResponse(shipmentId));
+        return Result.success(new ShipmentCreateResponse(shipment.getExternalShipmentId(),
+                shipment.getTrackingNumber().value()));
     }
 
     @Override
@@ -291,11 +302,11 @@ public class ShipmentPortImpl implements ShipmentPort {
 
 		if (request.shipmentType() == ShipmentType.CHILD) {
 			final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
-
+            final TrackingNumber trackingNumber = this.trackingNumberService.nextTrackingNumber(null);
 			final Shipment newShipment = new Shipment(shipmentId, shipment.getSender(), shipment.getRecipient(),
 					shipment.getShipmentSize(), shipment.getShipmentId(), shipment.getOriginCountry(),
 					shipment.getDestinationCountry(), shipment.getPrice(), shipment.isLocked(),
-					shipment.getDestination(), shipment.getSignature(), shipment.getShipmentPriority());
+					shipment.getDestination(), shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber);
 			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, shipmentId);
 			this.shipmentService.createShipment(newShipment);
         } else {

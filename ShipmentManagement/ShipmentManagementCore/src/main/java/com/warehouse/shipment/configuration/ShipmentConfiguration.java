@@ -86,11 +86,17 @@ public class ShipmentConfiguration {
 									 final SignatureService signatureService,
 									 final RouteLogServicePort routeLogServicePort,
 									 final ReturningServicePort returningServicePort,
-									 final MailNotificationServicePort mailNotificationServicePort) {
+									 final MailNotificationServicePort mailNotificationServicePort,
+									 final TrackingNumberService trackingNumberService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort,
-				mailNotificationServicePort);
+				mailNotificationServicePort, trackingNumberService);
+	}
+
+	@Bean
+	public TrackingSequenceRepository trackingSequenceRepository(final TrackingSequenceReadRepository repository) {
+		return new TrackingSequenceRepositoryImpl(repository);
 	}
 	
 	@Bean
@@ -145,14 +151,8 @@ public class ShipmentConfiguration {
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties());
-	}
-
-	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
-	public SoftwareConfigurationServicePort softwareConfigurationServiceMockPort() {
-		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock software configuration");
-		return new SoftwareConfigurationServiceMockAdapter();
+		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties(),
+				routeTrackerLogProperties());
 	}
 
 	@Bean

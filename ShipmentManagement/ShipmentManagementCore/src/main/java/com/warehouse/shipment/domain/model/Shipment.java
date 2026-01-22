@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.model;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -60,6 +61,10 @@ public class Shipment {
 
     private ExternalId<Long> externalReturnId;
 
+    private TrackingNumber trackingNumber;
+
+    private ExternalId<UUID> externalShipmentId;
+
     public Shipment() {
         //
     }
@@ -83,7 +88,9 @@ public class Shipment {
                     final ShipmentPriority shipmentPriority,
                     final DangerousGood dangerousGood,
                     final ExternalId<String> externalRouteId,
-                    final ExternalId<Long> externalReturnId) {
+                    final ExternalId<Long> externalReturnId,
+                    final String trackingNumber,
+                    final ExternalId<UUID> externalShipmentId) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -104,6 +111,8 @@ public class Shipment {
         this.dangerousGood = dangerousGood;
         this.externalRouteId = externalRouteId;
         this.externalReturnId = externalReturnId;
+        this.trackingNumber = new TrackingNumber(trackingNumber);
+        this.externalShipmentId = externalShipmentId;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -117,7 +126,8 @@ public class Shipment {
                     final Boolean locked,
                     final String destination,
                     final Signature signature,
-                    final ShipmentPriority shipmentPriority) {
+                    final ShipmentPriority shipmentPriority,
+                    final TrackingNumber trackingNumber) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
@@ -135,6 +145,8 @@ public class Shipment {
         this.destination = destination;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
+        this.trackingNumber = trackingNumber;
+        this.externalShipmentId = ExternalId.randomUUID();
     }
 
 	public ShipmentSnapshot snapshot() {
@@ -185,7 +197,9 @@ public class Shipment {
                 shipmentPriority,
                 dangerousGood,
                 externalRouteId,
-                externalReturnId
+                externalReturnId,
+                shipmentEntity.getTrackingNumber(),
+                new ExternalId<>(UUID.fromString(shipmentEntity.getExternalId().value()))
         );
     }
 
@@ -327,6 +341,14 @@ public class Shipment {
 
     public void setExternalRouteId(final ExternalId<String> externalRouteId) {
         this.externalRouteId = externalRouteId;
+    }
+
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public ExternalId<UUID> getExternalShipmentId() {
+        return externalShipmentId;
     }
 
     public void changeSignature(final Signature signature) {

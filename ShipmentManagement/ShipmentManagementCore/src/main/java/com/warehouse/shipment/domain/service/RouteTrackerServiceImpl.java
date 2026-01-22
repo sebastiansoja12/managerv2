@@ -23,13 +23,13 @@ public class RouteTrackerServiceImpl implements RouteTrackerService {
 
     @Override
     public Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId) {
-        final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
+        final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getShipmentSoftwareConfiguration();
         return this.routeLogServicePort.notifyShipmentCreated(shipmentId, softwareConfiguration);
     }
 
     @Override
     public Result<RouteProcess, ErrorCode> notifyShipmentRecipientChanged(final ShipmentId shipmentId, final Recipient recipient) {
-        final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
+        final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getShipmentPersonSoftwareConfiguration();
         final RouteProcess routeProcess = this.routeLogServicePort.notifyPersonChanged(shipmentId, recipient, softwareConfiguration);
 
         if (routeProcess != null) {
@@ -41,7 +41,7 @@ public class RouteTrackerServiceImpl implements RouteTrackerService {
 
     @Override
     public Result<RouteProcess, ErrorCode> notifyShipmentPersonChanged(final ShipmentId shipmentId, final Person person) {
-        final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getSoftwareConfiguration();
+        final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getShipmentPersonSoftwareConfiguration();
         final RouteProcess routeProcess = this.routeLogServicePort.notifyPersonChanged(shipmentId, person, softwareConfiguration);
 
         if (routeProcess != null) {

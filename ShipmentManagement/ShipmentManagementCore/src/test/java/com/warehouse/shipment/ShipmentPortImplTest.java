@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +21,7 @@ import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
+import com.warehouse.shipment.domain.generator.TrackingNumberGenerator;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -74,11 +74,12 @@ class ShipmentPortImplTest {
     @Mock
     private MailNotificationServicePort mailNotificationServicePort;
 
+    @Mock
+    private Set<TrackingNumberGenerator> generators;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
-
-    private final static UUID processId = UUID.fromString("2d255296-3f50-4cc1-b8dc-ef6e634aab0d");
 
     private static final String SHIPMENT_WAS_NOT_FOUND = "Shipment not found";
 
@@ -97,9 +98,11 @@ class ShipmentPortImplTest {
         final DomainContext domainContext = new DomainContext();
         domainContext.setApplicationEventPublisher(eventPublisher);
         domainContext.setApplicationContext(applicationContext);
+        final TrackingNumberService trackingNumberService = new TrackingNumberServiceImpl(generators);
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
 				shipmentStatusHandlers, countryDetermineService, priceService, countryServiceAvailabilityService,
-				signatureService, routeLogServicePort, returningServicePort, mailNotificationServicePort);
+				signatureService, routeLogServicePort, returningServicePort, mailNotificationServicePort,
+                trackingNumberService);
 	}
 
     @Test

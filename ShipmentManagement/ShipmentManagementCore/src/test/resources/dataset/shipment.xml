@@ -29,5 +29,7 @@
             price_amount="50"
             price_currency="PLN"
             locked = "false"
+            external_id="4de57c8f-b60e-430f-b72c-55cd12b4ae94"
+            tracking_number="1234567"
     />
 </dataset>
