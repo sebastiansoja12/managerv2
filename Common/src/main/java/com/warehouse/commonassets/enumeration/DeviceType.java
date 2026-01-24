@@ -1,5 +1,5 @@
 package com.warehouse.commonassets.enumeration;
 
 public enum DeviceType {
-    MANAGER, SUPPLIER, TERMINAL
+    SCANNER, MOBILE, TERMINAL
 }

@@ -27,7 +27,7 @@ import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.domain.listener.ShipmentEventListener;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.tools.returning.ReturnProperties;
@@ -77,8 +77,8 @@ public class ShipmentReadRepositoryTest {
         }
 
         @Bean
-        public ShipmentController shipmentController() {
-            return Mockito.mock(ShipmentController.class);
+        public ShipmentInternalController shipmentController() {
+            return Mockito.mock(ShipmentInternalController.class);
         }
 
         @Bean

@@ -7,7 +7,7 @@ import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.Username;
-import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.device.Device;
 
 import jakarta.persistence.*;
 
@@ -65,10 +65,8 @@ public class DeviceEntity {
         this.username = username;
     }
 
-    public static DeviceEntity from(final Terminal terminal) {
-        return new DeviceEntity(terminal.getDeviceId(), terminal.getVersion(),
-                new DepartmentCode(terminal.getDepartmentCode()), terminal.getDeviceType(), terminal.isActive(),
-                terminal.getUsername());
+    public static DeviceEntity from(final Device device) {
+        return null;
     }
 
     public Boolean isActive() {
