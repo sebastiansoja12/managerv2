@@ -1,5 +1,7 @@
 package com.warehouse.department.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.department.api.dto.CoordinatesDto;
+import com.warehouse.department.api.dto.DepartmentDto;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCreateResponse;
@@ -24,6 +26,13 @@ public abstract class ResponseMapper {
 		return new DepartmentApi(departmentCode, map(department.getAddress()), department.getTaxId().value(),
 				department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
                 department.getDepartmentType().name(), department.getStatus().name(), department.getCreatedAt(), department.getUpdatedAt());
+    }
+
+    public static DepartmentDto mapToDto(final Department department) {
+        final String departmentCode = department.getDepartmentCode().getValue();
+        final CoordinatesDto coordinates = new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
+        return new DepartmentDto(departmentCode, department.getCity(), department.getStreet(),
+                department.getCity(), department.getPostalCode(), coordinates);
     }
 
     public static IdentificationNumberChangeApiResponse map(final IdentificationNumberChangeResponse response) {

@@ -1,5 +1,9 @@
 package com.warehouse.terminal;
 
-public interface DeviceApiService {
+import com.warehouse.terminal.response.DeviceAuthenticationResponseDto;
+import com.warehouse.terminal.response.DeviceInformationResponseDto;
 
+public interface DeviceApiService {
+    DeviceInformationResponseDto isDeviceValidByPairKey(final String pairKey);
+    DeviceAuthenticationResponseDto authenticateByPairKey(final String pairKey);
 }

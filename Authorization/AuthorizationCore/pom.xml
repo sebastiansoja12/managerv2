@@ -28,6 +28,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>TerminalApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>MailService</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>

@@ -14,5 +14,6 @@ public interface DevicePairRepository {
     DevicePair findDevicePairByDeviceId(final DeviceId deviceId);
     void update(final DevicePair devicePair);
     Optional<DevicePair> findByDeviceId(final DeviceId deviceId);
+    Optional<DevicePair> findByPairKey(final String pairKey);
     void save(final DevicePair devicePair);
 }

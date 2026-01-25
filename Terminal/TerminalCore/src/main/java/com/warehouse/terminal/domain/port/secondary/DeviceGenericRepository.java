@@ -2,9 +2,10 @@ package com.warehouse.terminal.domain.port.secondary;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.terminal.domain.model.device.Device;
+import com.warehouse.terminal.domain.model.Device;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -29,6 +30,13 @@ public class DeviceGenericRepository {
     public DeviceId nextDeviceId(final DeviceType type) {
         final DeviceRepository repository = determineDeviceRepository(type);
         return repository.nextDeviceId();
+    }
+
+    public List<Device> findAll() {
+        return repositories.stream()
+                .flatMap(repository -> repository.findAll().stream())
+                .map(device -> (Device) device)
+                .toList();
     }
 
     private DeviceRepository determineDeviceRepository(final DeviceType type) {

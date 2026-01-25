@@ -3,7 +3,15 @@ package com.warehouse.terminal.request;
 import com.warehouse.terminal.dto.*;
 
 public record DeviceCreateRequestDto(UserIdDto userId,
+                                     DepartmentCodeDto departmentCode,
                                      SupplierCodeDto supplierCode,
                                      VersionDto version,
-                                     DeviceTypeDto deviceType) {
+                                     DeviceUserTypeDto deviceUserType,
+                                     DeviceTypeDto deviceType,
+                                     DeviceIdentityRequestDto identity,
+                                     DeviceHardwareRequestDto hardware,
+                                     DeviceSoftwareRequestDto software,
+                                     DeviceNetworkRequestDto network,
+                                     DeviceSecurityRequestDto security,
+                                     DeviceLocationRequestDto location) {
 }

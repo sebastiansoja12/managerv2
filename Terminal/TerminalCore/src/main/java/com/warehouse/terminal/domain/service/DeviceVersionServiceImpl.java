@@ -14,7 +14,7 @@ public class DeviceVersionServiceImpl implements DeviceVersionService {
 
     @Override
     public DeviceVersion findByDeviceId(final DeviceId deviceId) {
-        return null;
+        return this.deviceVersionRepository.find(deviceId).orElse(null);
     }
 
     @Override

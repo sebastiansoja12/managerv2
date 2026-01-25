@@ -13,6 +13,6 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public Supplier findBySupplierCode(final String supplierCode) {
-        return null;
+        return this.supplierRepository.findBySupplierCode(supplierCode);
     }
 }

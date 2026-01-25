@@ -10,6 +10,7 @@ import com.warehouse.terminal.domain.vo.DevicePairResponse;
 public interface DevicePairPort {
     boolean isPaired(final DeviceId deviceId);
     boolean isValid(final DeviceId deviceId);
+    boolean isPairKeyValid(final String pairKey);
     boolean isUserValid(final DeviceId deviceId, final Username username);
     boolean isVersionValid(final DeviceId deviceId, final DeviceVersion version);
     boolean updateRequired(final DeviceId deviceId, final DeviceVersion version);

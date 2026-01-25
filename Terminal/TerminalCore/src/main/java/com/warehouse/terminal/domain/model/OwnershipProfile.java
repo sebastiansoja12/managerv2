@@ -30,6 +30,11 @@ public class OwnershipProfile {
         this.vehicleId = vehicleId;
     }
 
+    public static OwnershipProfile initializeOwnership(
+            final String assignedRole, final UserId userId, final DepartmentCode departmentCode, final VehicleId vehicleId) {
+        return new OwnershipProfile(Instant.now(), assignedRole, departmentCode, null, null, null, userId, null);
+    }
+
     public Instant getAssignedAt() {
         return assignedAt;
     }

@@ -1,6 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
@@ -10,7 +11,14 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.entity.TerminalEn
 import com.warehouse.terminal.infrastructure.adapter.secondary.mapper.EntityToModelMapper;
 import com.warehouse.terminal.infrastructure.adapter.secondary.mapper.ModelToEntityMapper;
 
+
+import org.springframework.stereotype.Repository;
+
+
+@Repository
 public class TerminalRepositoryImpl implements DeviceRepository<Terminal> {
+
+    private static final long TERMINAL_ID_PREFIX = 101_000_000_000_000_000L;
 
     private final TerminalReadRepository repository;
 
@@ -41,7 +49,10 @@ public class TerminalRepositoryImpl implements DeviceRepository<Terminal> {
 
     @Override
     public List<Terminal> findAll() {
-        return List.of();
+        return repository.findAll()
+                .stream()
+                .map(toModelMapper::map)
+                .toList();
     }
 
     @Override
@@ -51,6 +62,12 @@ public class TerminalRepositoryImpl implements DeviceRepository<Terminal> {
 
     @Override
     public DeviceId nextDeviceId() {
-        return null;
+        final long maxId = repository.findAll().stream()
+                .map(TerminalEntity::getId)
+                .filter(Objects::nonNull)
+                .mapToLong(DeviceId::getValue)
+                .max()
+                .orElse(TERMINAL_ID_PREFIX);
+        return new DeviceId(maxId >= TERMINAL_ID_PREFIX ? maxId + 1 : TERMINAL_ID_PREFIX + 1);
     }
 }

@@ -18,13 +18,13 @@ public class DeviceValidatorServiceImpl implements DeviceValidatorService {
 
     private final SupplierRepository supplierRepository;
 
-    private final DeviceRepository deviceRepository;
+    private final DeviceRepository<Terminal> deviceRepository;
 
     public DeviceValidatorServiceImpl(final DeviceVersionRepository deviceVersionRepository,
                                       final DepartmentRepository departmentRepository,
                                       final UserRepository userRepository,
                                       final SupplierRepository supplierRepository,
-                                      final DeviceRepository deviceRepository) {
+                                      final DeviceRepository<Terminal> deviceRepository) {
         this.deviceVersionRepository = deviceVersionRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;

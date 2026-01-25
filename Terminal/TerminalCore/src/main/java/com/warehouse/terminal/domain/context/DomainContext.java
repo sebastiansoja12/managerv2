@@ -8,6 +8,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Component("device.domainContext")
 public final class DomainContext implements ApplicationEventPublisherAware, ApplicationContextAware {
@@ -45,9 +47,29 @@ public final class DomainContext implements ApplicationEventPublisherAware, Appl
         publisher.publishEvent(event);
     }
 
+    public static <T> void publishAfterCommit(final T event) {
+        final ApplicationEventPublisher publisher = eventPublisher();
+
+        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+            log.info("No TX active, publishing event immediately: {}",
+                    event.getClass().getSimpleName());
+            publisher.publishEvent(event);
+        } else {
+            TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            log.info("Publishing event AFTER COMMIT: {}",
+                                    event.getClass().getSimpleName());
+                            publisher.publishEvent(event);
+                        }
+                    }
+            );
+        }
+    }
+
     @Override
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         context = applicationContext;
     }
 }
-

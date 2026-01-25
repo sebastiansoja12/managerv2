@@ -10,5 +10,6 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DevicePair
 
 @Repository
 public interface DevicePairReadRepository extends JpaRepository<DevicePairEntity, Long> {
-    Optional<DevicePairEntity> findByDevice_DeviceId(final DeviceId deviceId);
+    Optional<DevicePairEntity> findByDeviceId(final DeviceId deviceId);
+    Optional<DevicePairEntity> findByPairKey(final String pairKey);
 }
