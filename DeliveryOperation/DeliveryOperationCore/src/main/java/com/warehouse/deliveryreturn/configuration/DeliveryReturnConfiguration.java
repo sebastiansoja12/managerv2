@@ -61,7 +61,7 @@ public class DeliveryReturnConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "service.mock", havingValue = "false")
+    @ConditionalOnProperty(name = "services.mock", havingValue = "false")
     public ReturnTokenServicePort deliveryReturnTokenServicePort(ReturnTokenProperties returnTokenProperties) {
         return ReturnTokenServiceAdapter
                 .builder()
@@ -71,7 +71,7 @@ public class DeliveryReturnConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "service.mock", havingValue = "true")
+    @ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
     public ReturnTokenServicePort deliveryReturnTokenMockServicePort() {
         return new ReturnTokenServiceMockAdapter();
     }

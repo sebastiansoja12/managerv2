@@ -1,12 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
 
-    <changeSet id="create-supplier-table" author="s-soja">
+    <changeSet id="create-supplier-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="supplier"/>
+            </not>
+        </preConditions>
+
         <createTable tableName="supplier">
             <column name="supplier_code" type="VARCHAR(255)">
-                <constraints primaryKey="true" unique="true" nullable="false"/>
+                <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
             <column name="first_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -18,16 +25,28 @@
                 <constraints nullable="false"/>
             </column>
             <column name="department_code" type="VARCHAR(255)"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
-    <changeSet id="add-supplier-foreign-keys" author="s-soja">
-    <addForeignKeyConstraint
-            baseTableName="supplier"
-            baseColumnNames="department_code"
-            referencedTableName="department"
-            referencedColumnNames="department_code"
-            constraintName="FKbxmw0i9gg06jh9dx8a1cnck7n"
-    />
+    <changeSet id="supplier-add-department-foreign-key-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="supplier"/>
+                <tableExists tableName="department"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_supplier_department_code"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="supplier"
+                                 baseColumnNames="department_code"
+                                 referencedTableName="department"
+                                 referencedColumnNames="department_code"
+                                 constraintName="fk_supplier_department_code"/>
     </changeSet>
+
 </databaseChangeLog>

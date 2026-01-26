@@ -129,7 +129,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public SignatureRepository signatureMockRepository() {
 		return new SignatureMockRepositoryImpl();
 	}
@@ -142,7 +142,6 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean("shipment.softwareConfigurationServicePort")
-	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
 	public SoftwareConfigurationServicePort softwareConfigurationServicePort() {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using software configuration");
 		final RetryConfig config = RetryConfig.custom()
@@ -156,7 +155,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public RouteLogServicePort routeLogServiceMockPort() {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock Route log service port");
 		return new RouteLogServiceMockAdapter();
@@ -176,7 +175,6 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
 	public ShipmentRepository shipmentRepository(final ShipmentReadRepository repository) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment repository");
 		return new ShipmentRepositoryImpl(repository);
@@ -222,7 +220,7 @@ public class ShipmentConfiguration {
 
 	//MOCK
 	@Bean
-	@ConditionalOnProperty(name="services.mock", havingValue="true")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock path finder service");
 		return new PathFinderMockAdapter(pathFinderMockService);

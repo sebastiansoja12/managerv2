@@ -4,6 +4,13 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
 
     <changeSet author="s-soja" id="1">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="returning_information"/>
+            </not>
+        </preConditions>
+
         <createTable tableName="returning_information">
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false" />
@@ -11,7 +18,7 @@
             <column name="reason" type="VARCHAR(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="return_status" type="tinyint">
+            <column name="return_status" type="INT">
                 <constraints nullable="false" />
             </column>
         </createTable>

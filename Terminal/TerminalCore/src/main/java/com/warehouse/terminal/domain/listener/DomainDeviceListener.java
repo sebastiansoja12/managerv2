@@ -20,7 +20,7 @@ public class DomainDeviceListener {
     public void handle(final DeviceChanged event) {
         final DeviceSnapshot snapshot = event.getSnapshot();
         if (snapshot.deviceId() != null && snapshot.version() != null) {
-            this.deviceVersionService.saveOrUpdate(snapshot.deviceId(), snapshot.version());
+            this.deviceVersionService.saveOrUpdate(snapshot.deviceType(), snapshot.deviceId(), snapshot.version());
         }
     }
 }

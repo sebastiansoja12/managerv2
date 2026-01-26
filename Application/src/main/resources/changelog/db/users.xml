@@ -1,44 +1,149 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
 
-    <changeSet id="create-users-table" author="s-soja">
+    <changeSet id="create-users-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users"/>
+            </not>
+        </preConditions>
+
         <createTable tableName="users">
-            <column name="id" type="bigint">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="email" type="varchar(255)">
+            <column name="user_id" type="BIGINT">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="first_name" type="varchar(255)">
-                <constraints nullable="true"/>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
             </column>
-            <column name="last_name" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="password" type="varchar(255)">
+            <column name="password" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="role" type="varchar(255)">
-                <constraints nullable="true"/>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
             </column>
-            <column name="username" type="varchar(255)">
-                <constraints primaryKey="true" nullable="false" unique="true"/>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
             </column>
-            <column name="depot_code" type="varchar(255)">
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="role" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="api_key" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
 
-    <changeSet id="add-users-foreign-key" author="s-soja">
-        <addForeignKeyConstraint
-                baseTableName="users"
-                baseColumnNames="depot_code"
-                referencedTableName="department"
-                referencedColumnNames="department_code"
-                constraintName="FK1r271p0jw8cic2j8xdtj53d0"
-        />
+    <changeSet id="users-add-department-foreign-key-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="users"/>
+                <tableExists tableName="department"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_users_department_code"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="users"
+                                 baseColumnNames="department_code"
+                                 referencedTableName="department"
+                                 referencedColumnNames="department_code"
+                                 constraintName="fk_users_department_code"/>
     </changeSet>
+
+    <changeSet id="create-role-permissions-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="role_permissions"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="role_permissions">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-users-role-permissions-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="users_role_permissions"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="users_role_permissions">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="users_role_permissions"
+                       columnNames="user_id, permission_id"
+                       constraintName="pk_users_role_permissions"/>
+    </changeSet>
+
+    <changeSet id="users-role-permissions-add-user-foreign-key-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="users_role_permissions"/>
+                <tableExists tableName="users"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_users_role_permissions_user_id"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="users_role_permissions"
+                                 baseColumnNames="user_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="user_id"
+                                 constraintName="fk_users_role_permissions_user_id"/>
+    </changeSet>
+
+    <changeSet id="users-role-permissions-add-permission-foreign-key-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="users_role_permissions"/>
+                <tableExists tableName="role_permissions"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_users_role_permissions_permission_id"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="users_role_permissions"
+                                 baseColumnNames="permission_id"
+                                 referencedTableName="role_permissions"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_users_role_permissions_permission_id"/>
+    </changeSet>
+
 </databaseChangeLog>

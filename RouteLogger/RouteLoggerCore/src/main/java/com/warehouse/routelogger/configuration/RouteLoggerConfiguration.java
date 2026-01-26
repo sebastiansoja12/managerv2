@@ -44,7 +44,7 @@ public class RouteLoggerConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public RouteLoggerDeviceInformationServicePort routeLoggerDeviceInformationMockServicePort() {
 		return new RouteLoggerDeviceInformationServiceMockAdapter();
 	}

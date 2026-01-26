@@ -59,7 +59,7 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
     @Override
     public void saveOrUpdate(final DeviceVersion deviceVersion) {
         final DeviceVersionEntity deviceVersionEntity = DeviceVersionEntity.from(deviceVersion);
-        this.deviceVersionReadRepository.saveAndFlush(deviceVersionEntity);
+        this.deviceVersionReadRepository.save(deviceVersionEntity);
     }
 
     private Optional<String> resolveCurrentVersion(final DeviceId deviceId) {
