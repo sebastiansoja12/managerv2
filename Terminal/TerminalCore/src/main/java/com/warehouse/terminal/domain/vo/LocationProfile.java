@@ -71,5 +71,33 @@ public class LocationProfile {
     public Double getLongitude() {
         return longitude;
     }
-}
 
+    public void update(final LocationProfile location) {
+        if (location != null) {
+            if (location.getLatitude() != null) {
+                this.latitude = location.getLatitude();
+            }
+            if (location.getLongitude() != null) {
+                this.longitude = location.getLongitude();
+            }
+            if (location.getAltitude() != null) {
+                this.altitude = location.getAltitude();
+            }
+            if (location.getAccuracyMeters() != null) {
+                this.accuracyMeters = location.getAccuracyMeters();
+            }
+            if (location.getLastKnownAddress() != null) {
+                this.lastKnownAddress = location.getLastKnownAddress();
+            }
+            if (location.getGeoZone() != null) {
+                this.geoZone = location.getGeoZone();
+            }
+            if (location.getGpsEnabled() != null) {
+                this.gpsEnabled = location.getGpsEnabled();
+            }
+            if (location.getLastLocationUpdateAt() != null) {
+                this.lastLocationUpdateAt = location.getLastLocationUpdateAt();
+            }
+        }
+    }
+}

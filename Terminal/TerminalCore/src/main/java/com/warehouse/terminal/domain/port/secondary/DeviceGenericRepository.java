@@ -1,12 +1,14 @@
 package com.warehouse.terminal.domain.port.secondary;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.stereotype.Repository;
+
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.Device;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Set;
 
 @Repository
 public class DeviceGenericRepository {
@@ -17,12 +19,17 @@ public class DeviceGenericRepository {
         this.repositories = repositories;
     }
 
-    public Device findById(final DeviceId deviceId) {
+    public Optional<Device> findById(final DeviceId deviceId) {
         final DeviceRepository repository = determineDeviceRepository(deviceId.type());
-        return repository.findById(deviceId);
+        return Optional.ofNullable(repository.findById(deviceId));
     }
 
     public void create(final Device device) {
+        final DeviceRepository repository = determineDeviceRepository(device.getDeviceType());
+        repository.saveOrUpdate(device);
+    }
+
+    public void update(final Device device) {
         final DeviceRepository repository = determineDeviceRepository(device.getDeviceType());
         repository.saveOrUpdate(device);
     }
@@ -32,10 +39,9 @@ public class DeviceGenericRepository {
         return repository.nextDeviceId();
     }
 
-    public List<Device> findAll() {
+    public List findAll() {
         return repositories.stream()
                 .flatMap(repository -> repository.findAll().stream())
-                .map(device -> (Device) device)
                 .toList();
     }
 

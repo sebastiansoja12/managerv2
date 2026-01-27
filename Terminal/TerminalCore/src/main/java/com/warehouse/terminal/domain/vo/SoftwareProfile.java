@@ -110,5 +110,39 @@ public class SoftwareProfile {
     public void setRooted(final Boolean rooted) {
         this.rooted = rooted;
     }
-}
 
+    public void update(final SoftwareProfile software) {
+        if (software != null) {
+            if (software.getOsName() != null) {
+                this.osName = software.getOsName();
+            }
+            if (software.getOsVersion() != null) {
+                this.osVersion = software.getOsVersion();
+            }
+            if (software.getFirmwareVersion() != null) {
+                this.firmwareVersion = software.getFirmwareVersion();
+            }
+            if (software.getKernelVersion() != null) {
+                this.kernelVersion = software.getKernelVersion();
+            }
+            if (software.getBootloaderVersion() != null) {
+                this.bootloaderVersion = software.getBootloaderVersion();
+            }
+            if (software.getAppVersion() != null) {
+                this.appVersion = software.getAppVersion();
+            }
+            if (software.getBuildNumber() != null) {
+                this.buildNumber = software.getBuildNumber();
+            }
+            if (software.getRooted() != null) {
+                this.rooted = software.getRooted();
+            }
+            if (software.getDeveloperModeEnabled() != null) {
+                this.developerModeEnabled = software.getDeveloperModeEnabled();
+            }
+            if (software.getInstalledApps() != null) {
+                this.installedApps = software.getInstalledApps();
+            }
+        }
+    }
+}

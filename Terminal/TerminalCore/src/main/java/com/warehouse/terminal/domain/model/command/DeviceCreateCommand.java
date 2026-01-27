@@ -6,6 +6,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
+import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.vo.*;
 
 import lombok.Builder;
@@ -18,6 +19,8 @@ public class DeviceCreateCommand {
     private DeviceUserType deviceUserType;
     private DepartmentCode departmentCode;
     private DeviceType deviceType;
+    private Scanner.ScanType scanType;
+    private Scanner.ScannerType scannerType;
     private IdentityInfo identity;
     private HardwareProfile hardware;
     private SoftwareProfile software;
@@ -33,6 +36,8 @@ public class DeviceCreateCommand {
             final DeviceUserType deviceUserType,
             final DepartmentCode departmentCode,
             final DeviceType deviceType,
+            final Scanner.ScanType scanType,
+            final Scanner.ScannerType scannerType,
             final IdentityInfo identity,
             final HardwareProfile hardware,
             final SoftwareProfile software,
@@ -46,6 +51,8 @@ public class DeviceCreateCommand {
         this.deviceUserType = deviceUserType;
         this.departmentCode = departmentCode;
         this.deviceType = deviceType;
+        this.scanType = scanType;
+        this.scannerType = scannerType;
         this.identity = identity;
         this.hardware = hardware;
         this.software = software;
@@ -101,6 +108,14 @@ public class DeviceCreateCommand {
 
     public HardwareProfile getHardware() {
         return hardware;
+    }
+
+    public Scanner.ScanType getScanType() {
+        return scanType;
+    }
+
+    public Scanner.ScannerType getScannerType() {
+        return scannerType;
     }
 
     public IdentityInfo getIdentity() {

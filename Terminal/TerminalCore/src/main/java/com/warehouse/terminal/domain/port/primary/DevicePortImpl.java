@@ -11,6 +11,7 @@ import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.exception.UserNotFoundException;
 import com.warehouse.terminal.domain.model.Department;
 import com.warehouse.terminal.domain.model.Device;
+import com.warehouse.terminal.domain.model.DeviceSettings;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
 import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
 import com.warehouse.terminal.domain.model.command.DeviceSettingsRequest;
@@ -74,7 +75,7 @@ public class DevicePortImpl implements DevicePort {
 					networkProfile, locationProfile, ownershipProfile);
 		} else if (deviceType.equals(DeviceType.SCANNER)) {
 			device = new Scanner(deviceId, deviceIdentityInfo, hardwareProfile, networkProfile, ownershipProfile,
-					Scanner.ScanType.BARCODE, Scanner.ScannerType.HANDHELD);
+                    command.getScanType(), command.getScannerType());
 		} else {
 			device = new Mobile(deviceId, DeviceStatus.ACTIVE, deviceIdentityInfo, hardwareProfile, softwareProfile,
                     networkProfile, locationProfile, ownershipProfile);
@@ -82,13 +83,6 @@ public class DevicePortImpl implements DevicePort {
         this.deviceGenericService.create(device);
 
         return new DeviceCreateResult(deviceId);
-    }
-
-    @Override
-    public void changeDeviceTypeTo(final DeviceTypeChangeCommand request) {
-        final DeviceId deviceId = request.getDeviceId();
-        final DeviceType deviceType = request.getDeviceType();
-        this.deviceGenericService.changeDeviceType(deviceId, deviceType);
     }
 
     @Override
@@ -119,7 +113,8 @@ public class DevicePortImpl implements DevicePort {
     public void updateSettings(final DeviceSettingsRequest request) {
         final Device device = deviceGenericService.findByDeviceId(request.getDeviceId());
         if (device != null) {
-            this.deviceGenericService.updateSettings(request);
+            this.deviceGenericService.updateSettings(request.getDeviceId(),
+                    DeviceSettings.from(request));
         }
     }
 

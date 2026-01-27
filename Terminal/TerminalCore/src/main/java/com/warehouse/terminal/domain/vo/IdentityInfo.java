@@ -92,6 +92,33 @@ public class IdentityInfo {
     public void setSerialNumber(final String serialNumber) {
         this.serialNumber = serialNumber;
     }
+
+    public void update(final IdentityInfo identity) {
+        if (identity != null) {
+            if (identity.getHardwareUuid() != null) {
+                this.hardwareUuid = identity.getHardwareUuid();
+            }
+            if (identity.getSerialNumber() != null) {
+                this.serialNumber = identity.getSerialNumber();
+            }
+            if (identity.getImei() != null) {
+                this.imei = identity.getImei();
+            }
+            if (identity.getMacAddress() != null) {
+                this.macAddress = identity.getMacAddress();
+            }
+            if (identity.getAssetTag() != null) {
+                this.assetTag = identity.getAssetTag();
+            }
+            if (identity.getBarcode() != null) {
+                this.barcode = identity.getBarcode();
+            }
+            if (identity.getExternalSystemId() != null) {
+                this.externalSystemId = identity.getExternalSystemId();
+            }
+            if (identity.getMdmDeviceId() != null) {
+                this.mdmDeviceId = identity.getMdmDeviceId();
+            }
+        }
+    }
 }
-
-
