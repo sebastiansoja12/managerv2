@@ -23,7 +23,7 @@ public class RouteLogRecordDetailEntity {
     private Long id;
 
     @Column(name = "device_id")
-    private Long deviceId;
+    private String deviceId;
 
     @Column(name = "version")
     private String version;

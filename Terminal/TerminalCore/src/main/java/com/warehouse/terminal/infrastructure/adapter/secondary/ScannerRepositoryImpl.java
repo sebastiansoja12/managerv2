@@ -1,7 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
@@ -17,8 +17,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScannerRepositoryImpl implements DeviceRepository<Scanner> {
-
-    private static final long SCANNER_ID_PREFIX = 202_000_000_000_000_000L;
+    private static final String SCANNER_ID_PREFIX = "SC:";
 
     private final ScannerReadRepository repository;
 
@@ -61,12 +60,6 @@ public class ScannerRepositoryImpl implements DeviceRepository<Scanner> {
 
     @Override
     public DeviceId nextDeviceId() {
-        final long maxId = repository.findAll().stream()
-                .map(ScannerEntity::getId)
-                .filter(Objects::nonNull)
-                .mapToLong(DeviceId::getValue)
-                .max()
-                .orElse(SCANNER_ID_PREFIX);
-        return new DeviceId(maxId >= SCANNER_ID_PREFIX ? maxId + 1 : SCANNER_ID_PREFIX + 1);
+        return new DeviceId(SCANNER_ID_PREFIX + UUID.randomUUID());
     }
 }

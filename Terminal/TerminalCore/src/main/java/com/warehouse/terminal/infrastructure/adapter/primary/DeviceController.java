@@ -70,7 +70,7 @@ public class DeviceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getDevice(@PathVariable final Long id) {
+    public ResponseEntity<?> getDevice(@PathVariable final String id) {
         final DeviceId deviceId = new DeviceId(id);
         final Device device = this.devicePort.getDevice(deviceId);
         return ResponseEntity.ok(responseMapper.mapToDeviceResponse(device));

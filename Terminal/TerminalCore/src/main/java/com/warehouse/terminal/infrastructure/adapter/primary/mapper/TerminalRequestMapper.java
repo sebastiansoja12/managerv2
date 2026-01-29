@@ -11,13 +11,12 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.enumeration.NetworkType;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
-import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
 import com.warehouse.terminal.domain.model.command.DevicePairRequest;
 import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
+import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.vo.*;
 import com.warehouse.terminal.dto.DeviceIdDto;
-import com.warehouse.terminal.dto.TerminalIdDto;
 import com.warehouse.terminal.request.*;
 
 @Mapper
@@ -27,10 +26,6 @@ public interface TerminalRequestMapper {
         final UserId userId = new UserId(terminalPairRequest.userId().value());
         final DeviceId deviceId = new DeviceId(terminalPairRequest.terminalId().value());
         return new DevicePairRequest(deviceId, userId);
-    }
-
-    default TerminalIdDto map(final DeviceId deviceId) {
-        return new TerminalIdDto(deviceId != null ? deviceId.value() : null);
     }
 
     default DeviceCreateCommand map(final DeviceCreateRequestDto request) {

@@ -1,4 +1,4 @@
 package com.warehouse.process.infrastructure.dto;
 
-public record DeviceIdDto(Long value) {
+public record DeviceIdDto(String value) {
 }

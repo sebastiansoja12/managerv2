@@ -39,14 +39,14 @@ public class DevicePairController {
     }
 
     @GetMapping("/connected/{deviceId}")
-    public ResponseEntity<?> isConnected(@PathVariable final Long deviceId) {
+    public ResponseEntity<?> isConnected(@PathVariable final String deviceId) {
         final DeviceId terminalId = new DeviceId(deviceId);
         final DeviceInformationResponse response = new DeviceInformationResponse(this.devicePairPort.isPaired(terminalId));
         return ResponseEntity.ok().body(responseMapper.map(response));
     }
 
     @GetMapping("/update-required")
-    public ResponseEntity<?> isUpdateRequired(@RequestParam("deviceId") final Long deviceId,
+    public ResponseEntity<?> isUpdateRequired(@RequestParam("deviceId") final String deviceId,
                                                @RequestParam("version") final String version) {
         final DeviceId id = new DeviceId(deviceId);
         final DeviceVersion deviceVersion = new DeviceVersion(version, id);
@@ -56,7 +56,7 @@ public class DevicePairController {
     }
 
     @GetMapping("/version-valid")
-    public ResponseEntity<?> isVersionValid(@RequestParam("deviceId") final Long deviceId,
+    public ResponseEntity<?> isVersionValid(@RequestParam("deviceId") final String deviceId,
                                              @RequestParam("version") final String version) {
         final DeviceId id = new DeviceId(deviceId);
         final DeviceVersion deviceVersion = new DeviceVersion(version, id);
@@ -66,7 +66,7 @@ public class DevicePairController {
     }
 
     @GetMapping("/user-valid")
-    public ResponseEntity<?> isUserValid(@RequestParam("deviceId") final Long deviceId,
+    public ResponseEntity<?> isUserValid(@RequestParam("deviceId") final String deviceId,
                                           @RequestParam("username") final String username) {
         final DeviceId id = new DeviceId(deviceId);
         final Username user = new Username(username);
@@ -76,7 +76,7 @@ public class DevicePairController {
     }
 
     @GetMapping("/device-validation")
-    public ResponseEntity<?> validate(@RequestParam("deviceId") final Long deviceId) {
+    public ResponseEntity<?> validate(@RequestParam("deviceId") final String deviceId) {
         final DeviceInformationResponse response =
                 new DeviceInformationResponse(this.devicePairPort.isValid(new DeviceId(deviceId)));
         return ResponseEntity.ok().body(responseMapper.map(response));
