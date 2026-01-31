@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.port.primary.DepartmentPortImpl;
 import com.warehouse.department.domain.port.secondary.DepartmentCoordinatesServicePort;
@@ -15,6 +16,7 @@ import com.warehouse.department.domain.service.AuthenticationServiceImpl;
 import com.warehouse.department.domain.service.DepartmentService;
 import com.warehouse.department.domain.service.DepartmentServiceImpl;
 import com.warehouse.department.domain.validator.Validator;
+import com.warehouse.department.infrastructure.adapter.primary.DepartmentServiceAdapter;
 import com.warehouse.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
 import com.warehouse.department.infrastructure.adapter.secondary.*;
 import com.warehouse.voronoi.VoronoiCoordinatesService;
@@ -52,6 +54,11 @@ public class DepartmentConfiguration {
     public Validator validator() {
         return new Validator() {
         };
+    }
+
+    @Bean
+    public DepartmentApiService departmentApiService(final DepartmentPort departmentPort) {
+        return new DepartmentServiceAdapter(departmentPort);
     }
 
     @Bean

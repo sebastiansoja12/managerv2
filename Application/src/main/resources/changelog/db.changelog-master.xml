@@ -5,9 +5,10 @@
 
     <include file="/changelog/db/department.xml"/>
     <include file="/changelog/db/supplier.xml"/>
+    <include file="/changelog/db/suppliers.xml"/>
     <include file="/changelog/db/users.xml"/>
-    <include file="/changelog/db/delivery.xml"/>
     <include file="/changelog/db/shipment.xml"/>
+    <include file="/changelog/db/delivery.xml"/>
     <include file="/changelog/db/redirect_token.xml"/>
     <include file="/changelog/db/refresh_token.xml"/>
     <include file="/changelog/db/reroute_token.xml"/>
@@ -16,11 +17,12 @@
     <include file="/changelog/db/message_sequence.xml"/>
     <include file="/changelog/db/returning_information_seq.xml"/>
     <include file="/changelog/db/message.xml"/>
-    <include file="/changelog/db/device.xml"/>
     <include file="/changelog/db/device_pair.xml"/>
     <include file="/changelog/db/device_version.xml"/>
+    <include file="/changelog/db/device_profiles.xml"/>
+    <include file="/changelog/db/additional_entities.xml"/>
+    <include file="/changelog/db/device_id_string_migration.xml"/>
 
-    <!--Insert default start data-->
     <include file="/changelog/insertDepartments.xml"/>
     <include file="/changelog/insertSuppliers.xml"/>
     <include file="/changelog/insertUser.xml"/>

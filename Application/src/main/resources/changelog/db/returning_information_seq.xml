@@ -5,6 +5,13 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
     <changeSet author="s-soja" id="createReturningInformationSequenceTable">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="returning_information_seq"/>
+            </not>
+        </preConditions>
+
         <createTable tableName="returning_information_seq">
             <column name="next_val" type="bigint">
                 <constraints nullable="true"/>

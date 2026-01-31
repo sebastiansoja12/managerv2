@@ -1,0 +1,8 @@
+package com.warehouse.terminal.infrastructure.adapter.secondary;
+
+import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.ScannerEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ScannerReadRepository extends JpaRepository<ScannerEntity, DeviceId> {
+}

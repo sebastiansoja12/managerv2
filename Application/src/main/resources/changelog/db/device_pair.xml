@@ -1,37 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
 
-    <changeSet id="create-device-pair-table" author="s-soja">
+    <changeSet id="create-device-pair-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="device_pair"/>
+            </not>
+        </preConditions>
+
         <createTable tableName="device_pair">
             <column name="device_pair_id" type="BIGINT">
-                <constraints primaryKey="true" nullable="false" />
+                <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="device_entity_id" type="BIGINT">
-                <constraints nullable="true" />
+            <column name="device_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
             <column name="paired" type="BOOLEAN">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
-            <column name="pair_time" type="TIMESTAMP">
-                <constraints nullable="true" />
-            </column>
-            <column name="error_description" type="VARCHAR(255)">
-                <constraints nullable="true" />
-            </column>
-            <column name="pair_key" type="VARCHAR(255)">
-                <constraints nullable="true" />
-            </column>
+            <column name="pair_time" type="TIMESTAMP"/>
+            <column name="error_description" type="VARCHAR(255)"/>
+            <column name="pair_key" type="VARCHAR(255)"/>
         </createTable>
-
-        <addForeignKeyConstraint
-                baseTableName="device_pair"
-                baseColumnNames="device_entity_id"
-                referencedTableName="device"
-                referencedColumnNames="id"
-                constraintName="fk_device_pair_device" />
     </changeSet>
+
+    <changeSet id="create-device-pair-key-index-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="device_pair"/>
+                <not>
+                    <indexExists tableName="device_pair" indexName="idx_device_pair_pair_key"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <createIndex tableName="device_pair" indexName="idx_device_pair_pair_key">
+            <column name="pair_key"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

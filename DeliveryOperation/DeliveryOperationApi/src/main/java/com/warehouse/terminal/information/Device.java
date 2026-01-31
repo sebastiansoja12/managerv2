@@ -21,7 +21,7 @@ public class Device {
     private String version;
 
     @XmlElement(name = "DeviceID")
-    private Long deviceId;
+    private String deviceId;
 
     @XmlElement(name = "ResponsibleUser")
     private String username;

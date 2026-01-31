@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>ProcessHub</artifactId>
-        <version>2025.3-SNAPSHOT</version>
+        <version>2026.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>ProcessHubApi</artifactId>
@@ -16,5 +16,13 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>Common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -3,6 +3,7 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.mapper;
 import org.mapstruct.Mapper;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
@@ -36,4 +37,8 @@ public interface RouteRequestMapper {
     ZebraInitializeRequest map(ZebraInitializeRequestDto initializeRequest);
 
     DeliveryStatusRequest map(DeliveryStatusRequestDto deliveryStatusRequest);
+
+    default TerminalId map(final TerminalIdDto terminalId) {
+        return terminalId != null ? new TerminalId(terminalId.getValue()) : null;
+    }
 }

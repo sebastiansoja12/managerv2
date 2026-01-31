@@ -152,15 +152,24 @@ public class ShipmentEntity {
     @AttributeOverride(name = "value", column = @Column(name = "external_return_id"))
     private ExternalId<Long> externalReturnId;
 
+    @Column(name = "external_id", nullable = false)
+    @AttributeOverride(name = "value", column = @Column(name = "external_id"))
+    private ExternalId<String> externalId;
+
+    @Column(name = "tracking_number", nullable = false)
+    private String trackingNumber;
+
 	public ShipmentEntity(final ShipmentId shipmentId, final String senderFirstName, final String senderLastName,
-			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode, final String senderTelephone,
-			final String recipientFirstName, final String recipientLastName, final String recipientEmail,
-			final String recipientCity, final String recipientStreet, final String recipientPostalCode, final String recipientTelephone,
-			final ShipmentSize shipmentSize, final String destination, final ShipmentStatus shipmentStatus,
-			final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
-			final LocalDateTime updatedAt, final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
-            final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood,
-            final ExternalId<String> externalRouteId, final ExternalId<Long> externalReturnId) {
+			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode,
+			final String senderTelephone, final String recipientFirstName, final String recipientLastName,
+			final String recipientEmail, final String recipientCity, final String recipientStreet,
+			final String recipientPostalCode, final String recipientTelephone, final ShipmentSize shipmentSize,
+			final String destination, final ShipmentStatus shipmentStatus, final ShipmentType shipmentType,
+			final ShipmentId shipmentRelatedId, final LocalDateTime createdAt, final LocalDateTime updatedAt,
+			final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
+			final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood,
+			final ExternalId<String> externalRouteId, final ExternalId<Long> externalReturnId,
+            final ExternalId<String> externalId, final String trackingNumber) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;
         this.lastName = senderLastName;
@@ -191,6 +200,8 @@ public class ShipmentEntity {
         this.dangerousGood = dangerousGood;
         this.externalRouteId = externalRouteId;
         this.externalReturnId = externalReturnId;
+        this.externalId = externalId;
+        this.trackingNumber = trackingNumber;
     }
 
     public static ShipmentEntity from(final Shipment shipment) {
@@ -217,6 +228,7 @@ public class ShipmentEntity {
                 shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
 				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
 				shipment.getShipmentPriority(), dangerousGoodEntity, shipment.getExternalRouteId(),
-                shipment.getExternalReturnId());
+                shipment.getExternalReturnId(), new ExternalId<>(shipment.getExternalShipmentId().value().toString()),
+                shipment.getTrackingNumber().value());
     }
 }

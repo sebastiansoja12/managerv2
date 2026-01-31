@@ -99,6 +99,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeEmail(email);
         this.departmentRepository.createOrUpdate(department);
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentEmailChanged(department.snapshot(), Instant.now()));
     }
 
     private DepartmentEvent createDepartmentEvent(final Department.Status status, final Department department) {

@@ -1,10 +1,13 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
+
+import java.util.Optional;
 
 public class ShipmentRepositoryImpl implements ShipmentRepository {
 
@@ -33,5 +36,17 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     @Override
     public boolean exists(final ShipmentId shipmentId) {
         return shipmentId != null && repository.existsById(shipmentId);
+    }
+
+    @Override
+    public Optional<Shipment> findByExternalId(final ExternalId<String> externalId) {
+        final Optional<ShipmentEntity> entity = repository.findByExternalId(externalId);
+        return entity.map(Shipment::from);
+    }
+
+    @Override
+    public Optional<ShipmentId> findIdByExternalId(final ExternalId<String> externalId) {
+        final Optional<ShipmentEntity> entity = repository.findByExternalId(externalId);
+        return entity.map(ShipmentEntity::getShipmentId);
     }
 }

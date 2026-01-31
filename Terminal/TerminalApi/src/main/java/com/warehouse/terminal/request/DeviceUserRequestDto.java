@@ -19,6 +19,10 @@ public class DeviceUserRequestDto {
         return deviceId;
     }
 
+    public UsernameDto getUsername() {
+        return username;
+    }
+
     public UsernameDto getUserId() {
         return username;
     }

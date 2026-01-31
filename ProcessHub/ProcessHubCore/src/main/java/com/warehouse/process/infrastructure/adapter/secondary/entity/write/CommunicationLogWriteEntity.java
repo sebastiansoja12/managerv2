@@ -1,4 +1,26 @@
 package com.warehouse.process.infrastructure.adapter.secondary.entity.write;
 
-public class CommunicationLogWriteEntity {
+
+import com.warehouse.process.infrastructure.adapter.secondary.entity.CommunicationLogBaseEntity;
+
+import jakarta.persistence.*;
+import lombok.experimental.SuperBuilder;
+
+@Entity
+@Table(name = "communication_log_details")
+@Access(AccessType.FIELD)
+@SuperBuilder
+public class CommunicationLogWriteEntity extends CommunicationLogBaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "process_id", columnDefinition = "BINARY(16)")
+    private ProcessLogWriteEntity processLog;
+
+    protected CommunicationLogWriteEntity() {
+
+    }
+
+    public ProcessLogWriteEntity getProcessLog() {
+        return processLog;
+    }
 }

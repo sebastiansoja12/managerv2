@@ -4,13 +4,13 @@ public class DeviceInformation {
 
     private final String version;
 
-    private final Long deviceId;
+    private final String deviceId;
 
     private final Long userId;
 
     private final String depotCode;
 
-    public DeviceInformation(final String version, final Long deviceId, final Long userId, final String depotCode) {
+    public DeviceInformation(final String version, final String deviceId, final Long userId, final String depotCode) {
         this.version = version;
         this.deviceId = deviceId;
         this.userId = userId;
@@ -21,7 +21,7 @@ public class DeviceInformation {
         return version;
     }
 
-    public Long getDeviceId() {
+    public String getDeviceId() {
         return deviceId;
     }
 
@@ -33,4 +33,3 @@ public class DeviceInformation {
         return depotCode;
     }
 }
-

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
+import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
@@ -84,10 +85,24 @@ public class ShipmentConfiguration {
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
 									 final SignatureService signatureService,
 									 final RouteLogServicePort routeLogServicePort,
-									 final ReturningServicePort returningServicePort) {
+									 final ReturningServicePort returningServicePort,
+									 final MailNotificationServicePort mailNotificationServicePort,
+									 final TrackingNumberService trackingNumberService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
-				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort);
+				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort,
+				mailNotificationServicePort, trackingNumberService);
+	}
+
+	@Bean
+	public TrackingSequenceRepository trackingSequenceRepository(final TrackingSequenceReadRepository repository) {
+		return new TrackingSequenceRepositoryImpl(repository);
+	}
+	
+	@Bean
+	public MailNotificationServicePort mailNotificationServicePort(
+			final NotificationEventPublisher notificationEventPublisher) {
+		return new MailNotificationServiceAdapter(notificationEventPublisher);
 	}
 	
 	@Bean
@@ -114,7 +129,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public SignatureRepository signatureMockRepository() {
 		return new SignatureMockRepositoryImpl();
 	}
@@ -127,7 +142,6 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean("shipment.softwareConfigurationServicePort")
-	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
 	public SoftwareConfigurationServicePort softwareConfigurationServicePort() {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using software configuration");
 		final RetryConfig config = RetryConfig.custom()
@@ -136,18 +150,12 @@ public class ShipmentConfiguration {
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties());
+		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties(),
+				routeTrackerLogProperties());
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
-	public SoftwareConfigurationServicePort softwareConfigurationServiceMockPort() {
-		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock software configuration");
-		return new SoftwareConfigurationServiceMockAdapter();
-	}
-
-	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public RouteLogServicePort routeLogServiceMockPort() {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock Route log service port");
 		return new RouteLogServiceMockAdapter();
@@ -167,17 +175,9 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
 	public ShipmentRepository shipmentRepository(final ShipmentReadRepository repository) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment repository");
 		return new ShipmentRepositoryImpl(repository);
-	}
-
-	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
-	public ShipmentRepository shipmentMockRepository() {
-		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment mock repository");
-		return new ShipmentRepositoryMockImpl();
 	}
 
 	@Bean
@@ -201,10 +201,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository,
-										   final RouteLogServicePort routeLogServicePort,
-										   final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
-		return new ShipmentServiceImpl(shipmentRepository, routeLogServicePort, softwareConfigurationServicePort);
+	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository) {
+		return new ShipmentServiceImpl(shipmentRepository);
 	}
 
 	@Bean("shipment.routeTrackerLogProperties")
@@ -222,7 +220,7 @@ public class ShipmentConfiguration {
 
 	//MOCK
 	@Bean
-	@ConditionalOnProperty(name="services.mock", havingValue="true")
+	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public PathFinderServicePort pathFinderMockServicePort(final PathFinderMockService pathFinderMockService) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock path finder service");
 		return new PathFinderMockAdapter(pathFinderMockService);

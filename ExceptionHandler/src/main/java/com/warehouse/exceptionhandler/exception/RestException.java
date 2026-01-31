@@ -1,17 +1,14 @@
 package com.warehouse.exceptionhandler.exception;
 
-import lombok.Getter;
+import com.warehouse.commonassets.exception.ProblemDetailsException;
 
-@Getter
-public class RestException extends RuntimeException {
+public class RestException extends ProblemDetailsException {
 
-    int code;
+    public RestException(final int code, final String exMessage) {
+        super("about:blank", "Request failed", code, exMessage, null, null);
+    }
 
-    String message;
-
-    public RestException(int code, String exMessage) {
-        super(exMessage);
-        this.code = code;
-        this.message = exMessage;
+    public int getCode() {
+        return getStatus();
     }
 }

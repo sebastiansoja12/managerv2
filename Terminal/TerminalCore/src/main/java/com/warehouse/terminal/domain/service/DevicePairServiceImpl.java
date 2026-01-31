@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.DevicePair;
-import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.secondary.DevicePairRepository;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 
@@ -47,6 +47,11 @@ public class DevicePairServiceImpl implements DevicePairService {
     @Override
     public DevicePair findByDeviceId(final DeviceId deviceId) {
         return this.devicePairRepository.findDevicePairByDeviceId(deviceId);
+    }
+
+    @Override
+    public Optional<DevicePair> findByPairKey(final String pairKey) {
+        return this.devicePairRepository.findByPairKey(pairKey);
     }
 
     private DevicePairId nextDevicePairId() {

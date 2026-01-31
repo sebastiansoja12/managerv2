@@ -116,7 +116,7 @@ public class SupplyPortImplTest {
 
     @Test
     void shouldAddDevice() {
-        final DeviceId deviceId = new DeviceId(1L);
+        final DeviceId deviceId = new DeviceId("");
         final ChangeSupplierDeviceCommand request = new ChangeSupplierDeviceCommand(new SupplierCode("123"), deviceId);
         when(deviceServicePort.validateDevice(deviceId)).thenReturn(Result.success(null));
         when(supplierRepository.findByCode(new SupplierCode("123"))).thenReturn(mock(Supplier.class));

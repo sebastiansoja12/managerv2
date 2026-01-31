@@ -4,11 +4,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
+import com.warehouse.shipment.domain.model.ShipmentDeliveryCommand;
 import com.warehouse.shipment.domain.model.ShipmentUpdateCommand;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.Recipient;
@@ -51,5 +55,11 @@ public interface ShipmentRequestMapper {
         final ShipmentId shipmentId = new ShipmentId(signatureChangeRequest.shipmentId().getValue());
         return new SignatureChangeRequest(shipmentId, signatureChangeRequest.signature(), signatureChangeRequest.signerName(),
                 signatureChangeRequest.documentReference());
+    }
+
+    default ShipmentDeliveryCommand map(final ShipmentDeliveryRequestApiDto deliveryRequest) {
+        return new ShipmentDeliveryCommand(new ShipmentId(deliveryRequest.shipmentId().getValue()),
+                DeliveryMethod.valueOf(deliveryRequest.deliveryMethod()), new SupplierCode(deliveryRequest.supplierCode().value()),
+                DeliveryStatus.valueOf(deliveryRequest.deliveryStatus()));
     }
 }

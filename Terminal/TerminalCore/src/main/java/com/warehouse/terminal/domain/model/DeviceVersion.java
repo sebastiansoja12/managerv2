@@ -30,6 +30,12 @@ public class DeviceVersion {
         this.lastUpdate = lastUpdate;
     }
 
+    public DeviceVersion(final DeviceType deviceType, final String version, final DeviceId deviceId) {
+        this.deviceType = deviceType;
+        this.version = version;
+        this.deviceId = deviceId;
+    }
+
     public DeviceVersion(final String version, final DeviceId deviceId) {
         this.version = version;
         this.deviceId = deviceId;
@@ -76,7 +82,7 @@ public class DeviceVersion {
 
 	public static DeviceVersion from(final DeviceVersionEntity deviceVersionEntity) {
 		return new DeviceVersion(deviceVersionEntity.getId(), deviceVersionEntity.getDeviceType(),
-				deviceVersionEntity.getVersion(), new DeviceId(deviceVersionEntity.getId()),
+				deviceVersionEntity.getVersion(), deviceVersionEntity.getDeviceId(),
 				deviceVersionEntity.getLastUpdate());
 	}
 }

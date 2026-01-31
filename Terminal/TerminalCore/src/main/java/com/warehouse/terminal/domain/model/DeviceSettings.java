@@ -1,7 +1,7 @@
 package com.warehouse.terminal.domain.model;
 
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.terminal.domain.model.request.DeviceSettingsRequest;
+import com.warehouse.terminal.domain.model.command.DeviceSettingsRequest;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceSettingsEntity;
 
 public class DeviceSettings {

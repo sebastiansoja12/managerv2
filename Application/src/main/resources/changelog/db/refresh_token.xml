@@ -4,29 +4,66 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
 
     <changeSet id="create_refresh_token_table" author="your_name">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="refresh_token"/>
+            </not>
+        </preConditions>
+
         <createTable tableName="refresh_token">
             <column name="id" type="BIGINT">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created_date" type="TIMESTAMP(6)">
+            <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
             <column name="token" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="expired" type="BIT(1)">
+            <column name="expired" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="revoked" type="BIT(1)">
+            <column name="revoked" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="expiry_date" type="TIMESTAMP(6)">
+            <column name="expiry_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
             <column name="username" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet id="refresh-token-add-auto-increment-v2026-1" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="refresh_token"/>
+                <columnExists tableName="refresh_token" columnName="id"/>
+            </and>
+        </preConditions>
+
+        <addAutoIncrement tableName="refresh_token"
+                          columnName="id"
+                          columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="refresh-token-add-token-unique-constraint-v2026-1" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="refresh_token"/>
+                <columnExists tableName="refresh_token" columnName="token"/>
+                <not>
+                    <indexExists tableName="refresh_token"
+                                 indexName="uk_refresh_token_token"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addUniqueConstraint tableName="refresh_token"
+                             columnNames="token"
+                             constraintName="uk_refresh_token_token"/>
     </changeSet>
 
 </databaseChangeLog>

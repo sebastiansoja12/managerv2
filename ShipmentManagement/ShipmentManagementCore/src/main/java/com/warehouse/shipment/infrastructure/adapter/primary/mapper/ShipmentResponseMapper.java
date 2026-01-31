@@ -17,13 +17,14 @@ import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 @Mapper
 public interface ShipmentResponseMapper {
 
-    ShipmentCreateResponse map(final ShipmentCreateResponseDto responseDto);
-
     default ShipmentId map(final ShipmentIdDto shipmentId) {
         return new ShipmentId(shipmentId.getValue());
     }
 
-    ShipmentCreateResponseDto map(final ShipmentCreateResponse response);
+    default ShipmentCreateResponseDto map(final ShipmentCreateResponse response) {
+        return new ShipmentCreateResponseDto(response.shipmentId().value().toString(),
+                response.trackingNumber());
+    }
 
     @Mapping(target = "dangerousGood.weight.value", source = "dangerousGood.weight.weight")
     ShipmentDto map(final Shipment shipment);
