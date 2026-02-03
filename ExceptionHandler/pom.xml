@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2026.1-SNAPSHOT</version>
+        <version>2026.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>ExceptionHandler</artifactId>
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>Common</artifactId>
-            <version>2026.1-SNAPSHOT</version>
+            <version>2026.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
