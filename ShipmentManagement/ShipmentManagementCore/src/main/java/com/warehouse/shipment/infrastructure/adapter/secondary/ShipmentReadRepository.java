@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 
 @Repository
@@ -15,4 +16,6 @@ public interface ShipmentReadRepository extends JpaRepository<ShipmentEntity, Sh
     Optional<ShipmentEntity> findByShipmentId(final ShipmentId shipmentId);
 
     Optional<ShipmentEntity> findByExternalId(final ExternalId<String> externalId);
+
+    Optional<ShipmentEntity> findByTrackingNumber(final TrackingNumber trackingNumber);
 }

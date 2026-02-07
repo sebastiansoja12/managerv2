@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
 
@@ -157,7 +158,8 @@ public class ShipmentEntity {
     private ExternalId<String> externalId;
 
     @Column(name = "tracking_number", nullable = false)
-    private String trackingNumber;
+    @AttributeOverride(name = "value", column = @Column(name = "tracking_number"))
+    private TrackingNumber trackingNumber;
 
 	public ShipmentEntity(final ShipmentId shipmentId, final String senderFirstName, final String senderLastName,
 			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode,
@@ -169,7 +171,7 @@ public class ShipmentEntity {
 			final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
 			final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood,
 			final ExternalId<String> externalRouteId, final ExternalId<Long> externalReturnId,
-            final ExternalId<String> externalId, final String trackingNumber) {
+            final ExternalId<String> externalId, final TrackingNumber trackingNumber) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;
         this.lastName = senderLastName;
@@ -229,6 +231,6 @@ public class ShipmentEntity {
 				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
 				shipment.getShipmentPriority(), dangerousGoodEntity, shipment.getExternalRouteId(),
                 shipment.getExternalReturnId(), new ExternalId<>(shipment.getExternalShipmentId().value().toString()),
-                shipment.getTrackingNumber().value());
+                shipment.getTrackingNumber());
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
@@ -80,6 +81,15 @@ public class ShipmentInternalController {
     @Timed(value = "controller.shipment.get")
     public ResponseEntity<?> get(@PathVariable final ShipmentIdDto shipmentId) {
         final Shipment shipment = shipmentPort.loadShipment(new ShipmentId(shipmentId.getValue()));
+        final ShipmentDto shipmentResponse = responseMapper.map(shipment);
+        return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
+    }
+
+    @GetMapping("/tracking-numbers/{trackingNumber}")
+    @Counted(value = "controller.shipment.trackingnumber.get")
+    @Timed(value = "controller.shipment.trackingnumber.get")
+    public ResponseEntity<?> getByTrackingNumber(@PathVariable final String trackingNumber) {
+        final Shipment shipment = shipmentPort.loadShipment(new TrackingNumber(trackingNumber));
         final ShipmentDto shipmentResponse = responseMapper.map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }

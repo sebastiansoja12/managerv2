@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
@@ -363,6 +364,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public Shipment loadShipment(final ShipmentId shipmentId) {
         return this.shipmentService.find(shipmentId);
+    }
+
+    @Override
+    public Shipment loadShipment(final TrackingNumber trackingNumber) {
+        return this.shipmentService.find(trackingNumber);
     }
 
     @Override

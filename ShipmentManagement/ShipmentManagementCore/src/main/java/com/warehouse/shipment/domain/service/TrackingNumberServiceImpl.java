@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.generator.TrackingNumberGenerator;
-import com.warehouse.shipment.domain.vo.TrackingNumber;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 @Service
 public class TrackingNumberServiceImpl implements TrackingNumberService {

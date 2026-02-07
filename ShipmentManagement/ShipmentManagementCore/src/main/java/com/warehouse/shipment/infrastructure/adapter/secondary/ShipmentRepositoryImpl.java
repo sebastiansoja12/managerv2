@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 
@@ -48,5 +49,12 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     public Optional<ShipmentId> findIdByExternalId(final ExternalId<String> externalId) {
         final Optional<ShipmentEntity> entity = repository.findByExternalId(externalId);
         return entity.map(ShipmentEntity::getShipmentId);
+    }
+
+    @Override
+    public Shipment findByTrackingNumber(final TrackingNumber trackingNumber) {
+        return repository.findByTrackingNumber(trackingNumber).map(Shipment::from).orElseThrow(
+                () -> new ShipmentNotFoundException("Shipment was not found")
+        );
     }
 }

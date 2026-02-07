@@ -7,10 +7,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ReturnId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
 import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
@@ -89,7 +86,7 @@ public class Shipment {
                     final DangerousGood dangerousGood,
                     final ExternalId<String> externalRouteId,
                     final ExternalId<Long> externalReturnId,
-                    final String trackingNumber,
+                    final TrackingNumber trackingNumber,
                     final ExternalId<UUID> externalShipmentId) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
@@ -111,7 +108,7 @@ public class Shipment {
         this.dangerousGood = dangerousGood;
         this.externalRouteId = externalRouteId;
         this.externalReturnId = externalReturnId;
-        this.trackingNumber = new TrackingNumber(trackingNumber);
+        this.trackingNumber = trackingNumber;
         this.externalShipmentId = externalShipmentId;
     }
 

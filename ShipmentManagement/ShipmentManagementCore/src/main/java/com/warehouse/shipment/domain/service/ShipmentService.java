@@ -11,6 +11,7 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 public interface ShipmentService {
 
@@ -61,6 +62,8 @@ public interface ShipmentService {
     void lockShipment(final ShipmentId shipmentId);
 
     Shipment find(final ShipmentId shipmentId);
+
+    Shipment find(final TrackingNumber trackingNumber);
 
     boolean existsShipment(final ShipmentId shipmentId);
 
