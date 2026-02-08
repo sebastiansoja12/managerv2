@@ -3,10 +3,8 @@ package com.warehouse.terminal.domain.vo;
 import java.time.Instant;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
@@ -17,15 +15,13 @@ public record DeviceSnapshot(
         ExternalId<String> externalDeviceId,
         DeviceType deviceType,
         DeviceStatus status,
-        IdentityInfo identity,
-        HardwareProfile hardware,
-        SoftwareProfile software,
-        NetworkProfile network,
+        DeviceIdentity identity,
+        DeviceHardware hardware,
+        DeviceSoftware software,
+        DeviceNetwork network,
         SecurityProfile security,
-        LocationProfile location,
+        DeviceLocation location,
         OwnershipProfile ownership,
-        UserId userId,
-        DepartmentCode departmentCode,
         String version,
         Instant createdAt,
         Instant updatedAt,

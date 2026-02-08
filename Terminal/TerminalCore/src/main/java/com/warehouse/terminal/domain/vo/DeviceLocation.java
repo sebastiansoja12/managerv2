@@ -4,7 +4,7 @@ import com.warehouse.terminal.domain.model.Department;
 
 import java.time.Instant;
 
-public class LocationProfile {
+public class DeviceLocation {
     private Double latitude;
     private Double longitude;
     private Double altitude;
@@ -14,9 +14,9 @@ public class LocationProfile {
     private Boolean gpsEnabled;
     private Instant lastLocationUpdateAt;
 
-    public LocationProfile() {}
+    public DeviceLocation() {}
 
-    public LocationProfile(
+    public DeviceLocation(
             final Double latitude,
             final Double longitude,
             final Double altitude,
@@ -35,9 +35,9 @@ public class LocationProfile {
         this.lastLocationUpdateAt = lastLocationUpdateAt;
     }
 
-    public static LocationProfile initializeLocation(final Department.Coordinates coordinates,
-			final String lastKnownAddress, final String geoZone, final boolean gpsEnabled) {
-        return new LocationProfile(coordinates.getLatitude(), coordinates.getLongitude(), null, null, lastKnownAddress, geoZone, gpsEnabled, Instant.now());
+    public static DeviceLocation initializeLocation(final Department.Coordinates coordinates,
+                                                    final String lastKnownAddress, final String geoZone, final boolean gpsEnabled) {
+        return new DeviceLocation(coordinates.getLatitude(), coordinates.getLongitude(), null, null, lastKnownAddress, geoZone, gpsEnabled, Instant.now());
     }
 
     public Float getAccuracyMeters() {
@@ -72,32 +72,30 @@ public class LocationProfile {
         return longitude;
     }
 
-    public void update(final LocationProfile location) {
-        if (location != null) {
-            if (location.getLatitude() != null) {
-                this.latitude = location.getLatitude();
-            }
-            if (location.getLongitude() != null) {
-                this.longitude = location.getLongitude();
-            }
-            if (location.getAltitude() != null) {
-                this.altitude = location.getAltitude();
-            }
-            if (location.getAccuracyMeters() != null) {
-                this.accuracyMeters = location.getAccuracyMeters();
-            }
-            if (location.getLastKnownAddress() != null) {
-                this.lastKnownAddress = location.getLastKnownAddress();
-            }
-            if (location.getGeoZone() != null) {
-                this.geoZone = location.getGeoZone();
-            }
-            if (location.getGpsEnabled() != null) {
-                this.gpsEnabled = location.getGpsEnabled();
-            }
-            if (location.getLastLocationUpdateAt() != null) {
-                this.lastLocationUpdateAt = location.getLastLocationUpdateAt();
-            }
+    public void update(final DeviceLocation location) {
+        if (location.getLatitude() != null) {
+            this.latitude = location.getLatitude();
+        }
+        if (location.getLongitude() != null) {
+            this.longitude = location.getLongitude();
+        }
+        if (location.getAltitude() != null) {
+            this.altitude = location.getAltitude();
+        }
+        if (location.getAccuracyMeters() != null) {
+            this.accuracyMeters = location.getAccuracyMeters();
+        }
+        if (location.getLastKnownAddress() != null) {
+            this.lastKnownAddress = location.getLastKnownAddress();
+        }
+        if (location.getGeoZone() != null) {
+            this.geoZone = location.getGeoZone();
+        }
+        if (location.getGpsEnabled() != null) {
+            this.gpsEnabled = location.getGpsEnabled();
+        }
+        if (location.getLastLocationUpdateAt() != null) {
+            this.lastLocationUpdateAt = location.getLastLocationUpdateAt();
         }
     }
 }

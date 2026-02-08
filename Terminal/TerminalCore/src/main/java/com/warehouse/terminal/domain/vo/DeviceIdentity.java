@@ -2,7 +2,7 @@ package com.warehouse.terminal.domain.vo;
 
 import java.util.UUID;
 
-public class IdentityInfo {
+public class DeviceIdentity {
     private UUID hardwareUuid;
     private String serialNumber;
     private String imei;
@@ -12,13 +12,13 @@ public class IdentityInfo {
     private String externalSystemId;
     private String mdmDeviceId;
 
-    public IdentityInfo() {
+    public DeviceIdentity() {
 
     }
 
-	public IdentityInfo(final String assetTag, final String barcode, final String externalSystemId,
-			final UUID hardwareUuid, final String imei, final String macAddress, final String mdmDeviceId,
-			final String serialNumber) {
+	public DeviceIdentity(final String assetTag, final String barcode, final String externalSystemId,
+                          final UUID hardwareUuid, final String imei, final String macAddress, final String mdmDeviceId,
+                          final String serialNumber) {
         this.assetTag = assetTag;
         this.barcode = barcode;
         this.externalSystemId = externalSystemId;
@@ -93,32 +93,30 @@ public class IdentityInfo {
         this.serialNumber = serialNumber;
     }
 
-    public void update(final IdentityInfo identity) {
-        if (identity != null) {
-            if (identity.getHardwareUuid() != null) {
-                this.hardwareUuid = identity.getHardwareUuid();
-            }
-            if (identity.getSerialNumber() != null) {
-                this.serialNumber = identity.getSerialNumber();
-            }
-            if (identity.getImei() != null) {
-                this.imei = identity.getImei();
-            }
-            if (identity.getMacAddress() != null) {
-                this.macAddress = identity.getMacAddress();
-            }
-            if (identity.getAssetTag() != null) {
-                this.assetTag = identity.getAssetTag();
-            }
-            if (identity.getBarcode() != null) {
-                this.barcode = identity.getBarcode();
-            }
-            if (identity.getExternalSystemId() != null) {
-                this.externalSystemId = identity.getExternalSystemId();
-            }
-            if (identity.getMdmDeviceId() != null) {
-                this.mdmDeviceId = identity.getMdmDeviceId();
-            }
+    public void update(final DeviceIdentity identity) {
+        if (identity.getHardwareUuid() != null) {
+            this.hardwareUuid = identity.getHardwareUuid();
+        }
+        if (identity.getSerialNumber() != null) {
+            this.serialNumber = identity.getSerialNumber();
+        }
+        if (identity.getImei() != null) {
+            this.imei = identity.getImei();
+        }
+        if (identity.getMacAddress() != null) {
+            this.macAddress = identity.getMacAddress();
+        }
+        if (identity.getAssetTag() != null) {
+            this.assetTag = identity.getAssetTag();
+        }
+        if (identity.getBarcode() != null) {
+            this.barcode = identity.getBarcode();
+        }
+        if (identity.getExternalSystemId() != null) {
+            this.externalSystemId = identity.getExternalSystemId();
+        }
+        if (identity.getMdmDeviceId() != null) {
+            this.mdmDeviceId = identity.getMdmDeviceId();
         }
     }
 }

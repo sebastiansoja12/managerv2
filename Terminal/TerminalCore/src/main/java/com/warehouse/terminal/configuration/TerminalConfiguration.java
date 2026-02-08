@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.warehouse.auth.UserApiService;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.domain.model.device.Terminal;
@@ -121,9 +122,14 @@ public class TerminalConfiguration {
     @Bean
     public DevicePort terminalPort(final DeviceGenericService deviceGenericService,
                                    final UserService userService,
-                                   final DeviceVersionService deviceVersionService,
-                                   final DepartmentServicePort departmentServicePort) {
-        return new DevicePortImpl(deviceGenericService, userService, deviceVersionService, departmentServicePort);
+                                   final DepartmentServicePort departmentServicePort,
+                                   final UserServicePort userServicePort) {
+        return new DevicePortImpl(deviceGenericService, userService, departmentServicePort, userServicePort);
+    }
+
+    @Bean
+    public UserServicePort userServicePort(final UserApiService userApiService) {
+        return new UserServiceAdapter(userApiService);
     }
 
     @Bean

@@ -2,7 +2,7 @@ package com.warehouse.terminal.domain.vo;
 
 import com.warehouse.terminal.domain.enumeration.NetworkType;
 
-public class NetworkProfile {
+public class DeviceNetwork {
     private String ipAddress;
     private String publicIpAddress;
     private NetworkType networkType;
@@ -13,11 +13,11 @@ public class NetworkProfile {
     private String wifiSsid;
     private String bluetoothMac;
 
-    public NetworkProfile() {}
+    public DeviceNetwork() {}
 
-	public NetworkProfile(final String bluetoothMac, final String carrier, final String ipAddress,
-			final NetworkType networkType, final String publicIpAddress, final Boolean roaming, final String simSerial,
-			final Boolean vpnConnected, final String wifiSsid) {
+	public DeviceNetwork(final String bluetoothMac, final String carrier, final String ipAddress,
+                         final NetworkType networkType, final String publicIpAddress, final Boolean roaming, final String simSerial,
+                         final Boolean vpnConnected, final String wifiSsid) {
         this.bluetoothMac = bluetoothMac;
         this.carrier = carrier;
         this.ipAddress = ipAddress;
@@ -101,35 +101,33 @@ public class NetworkProfile {
         this.wifiSsid = wifiSsid;
     }
 
-    public NetworkProfile update(final NetworkProfile network) {
-        if (network != null) {
-            if (network.getIpAddress() != null) {
-                this.ipAddress = network.getIpAddress();
-            }
-            if (network.getPublicIpAddress() != null) {
-                this.publicIpAddress = network.getPublicIpAddress();
-            }
-            if (network.getNetworkType() != null) {
-                this.networkType = network.getNetworkType();
-            }
-            if (network.getCarrier() != null) {
-                this.carrier = network.getCarrier();
-            }
-            if (network.getSimSerial() != null) {
-                this.simSerial = network.getSimSerial();
-            }
-            if (network.getRoaming() != null) {
-                this.roaming = network.getRoaming();
-            }
-            if (network.getVpnConnected() != null) {
-                this.vpnConnected = network.getVpnConnected();
-            }
-            if (network.getWifiSsid() != null) {
-                this.wifiSsid = network.getWifiSsid();
-            }
-            if (network.getBluetoothMac() != null) {
-                this.bluetoothMac = network.getBluetoothMac();
-            }
+    public DeviceNetwork update(final DeviceNetwork network) {
+        if (network.getIpAddress() != null) {
+            this.ipAddress = network.getIpAddress();
+        }
+        if (network.getPublicIpAddress() != null) {
+            this.publicIpAddress = network.getPublicIpAddress();
+        }
+        if (network.getNetworkType() != null) {
+            this.networkType = network.getNetworkType();
+        }
+        if (network.getCarrier() != null) {
+            this.carrier = network.getCarrier();
+        }
+        if (network.getSimSerial() != null) {
+            this.simSerial = network.getSimSerial();
+        }
+        if (network.getRoaming() != null) {
+            this.roaming = network.getRoaming();
+        }
+        if (network.getVpnConnected() != null) {
+            this.vpnConnected = network.getVpnConnected();
+        }
+        if (network.getWifiSsid() != null) {
+            this.wifiSsid = network.getWifiSsid();
+        }
+        if (network.getBluetoothMac() != null) {
+            this.bluetoothMac = network.getBluetoothMac();
         }
         return this;
     }

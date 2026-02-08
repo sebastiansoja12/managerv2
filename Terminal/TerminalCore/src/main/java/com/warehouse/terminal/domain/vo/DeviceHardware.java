@@ -1,6 +1,6 @@
 package com.warehouse.terminal.domain.vo;
 
-public class HardwareProfile {
+public class DeviceHardware {
 	private String manufacturer;
 	private String model;
 	private String productName;
@@ -14,11 +14,11 @@ public class HardwareProfile {
 	private Boolean hasGps;
 	private Boolean ruggedized;
 
-    public HardwareProfile() {}
+    public DeviceHardware() {}
 
-	public HardwareProfile(final String cpu, final Boolean hasCamera, final Boolean hasGps, final Boolean hasNfc,
-			final Boolean hasScanner, final String manufacturer, final String model, final String productName,
-			final Integer ramMb, final Boolean ruggedized, final String screenResolution, final Integer storageMb) {
+	public DeviceHardware(final String cpu, final Boolean hasCamera, final Boolean hasGps, final Boolean hasNfc,
+                          final Boolean hasScanner, final String manufacturer, final String model, final String productName,
+                          final Integer ramMb, final Boolean ruggedized, final String screenResolution, final Integer storageMb) {
 		this.cpu = cpu;
 		this.hasCamera = hasCamera;
 		this.hasGps = hasGps;
@@ -129,44 +129,42 @@ public class HardwareProfile {
         this.storageMb = storageMb;
     }
 
-    public void update(final HardwareProfile hardware) {
-        if (hardware != null) {
-            if (hardware.getManufacturer() != null) {
-                this.manufacturer = hardware.getManufacturer();
-            }
-            if (hardware.getModel() != null) {
-                this.model = hardware.getModel();
-            }
-            if (hardware.getProductName() != null) {
-                this.productName = hardware.getProductName();
-            }
-            if (hardware.getCpu() != null) {
-                this.cpu = hardware.getCpu();
-            }
-            if (hardware.getRamMb() != null) {
-                this.ramMb = hardware.getRamMb();
-            }
-            if (hardware.getStorageMb() != null) {
-                this.storageMb = hardware.getStorageMb();
-            }
-            if (hardware.getScreenResolution() != null) {
-                this.screenResolution = hardware.getScreenResolution();
-            }
-            if (hardware.getHasScanner() != null) {
-                this.hasScanner = hardware.getHasScanner();
-            }
-            if (hardware.getHasCamera() != null) {
-                this.hasCamera = hardware.getHasCamera();
-            }
-            if (hardware.getHasNfc() != null) {
-                this.hasNfc = hardware.getHasNfc();
-            }
-            if (hardware.getHasGps() != null) {
-                this.hasGps = hardware.getHasGps();
-            }
-            if (hardware.getRuggedized() != null) {
-                this.ruggedized = hardware.getRuggedized();
-            }
+    public void update(final DeviceHardware hardware) {
+        if (hardware.getManufacturer() != null) {
+            this.manufacturer = hardware.getManufacturer();
+        }
+        if (hardware.getModel() != null) {
+            this.model = hardware.getModel();
+        }
+        if (hardware.getProductName() != null) {
+            this.productName = hardware.getProductName();
+        }
+        if (hardware.getCpu() != null) {
+            this.cpu = hardware.getCpu();
+        }
+        if (hardware.getRamMb() != null) {
+            this.ramMb = hardware.getRamMb();
+        }
+        if (hardware.getStorageMb() != null) {
+            this.storageMb = hardware.getStorageMb();
+        }
+        if (hardware.getScreenResolution() != null) {
+            this.screenResolution = hardware.getScreenResolution();
+        }
+        if (hardware.getHasScanner() != null) {
+            this.hasScanner = hardware.getHasScanner();
+        }
+        if (hardware.getHasCamera() != null) {
+            this.hasCamera = hardware.getHasCamera();
+        }
+        if (hardware.getHasNfc() != null) {
+            this.hasNfc = hardware.getHasNfc();
+        }
+        if (hardware.getHasGps() != null) {
+            this.hasGps = hardware.getHasGps();
+        }
+        if (hardware.getRuggedized() != null) {
+            this.ruggedized = hardware.getRuggedized();
         }
     }
 }

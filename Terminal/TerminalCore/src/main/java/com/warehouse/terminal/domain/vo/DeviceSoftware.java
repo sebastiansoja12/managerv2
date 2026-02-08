@@ -2,7 +2,7 @@ package com.warehouse.terminal.domain.vo;
 
 import java.util.Set;
 
-public class SoftwareProfile {
+public class DeviceSoftware {
     private String osName;
     private String osVersion;
     private String firmwareVersion;
@@ -14,11 +14,11 @@ public class SoftwareProfile {
     private Boolean developerModeEnabled;
     private Set<String> installedApps;
 
-    public SoftwareProfile() {}
+    public DeviceSoftware() {}
 
-	public SoftwareProfile(final String appVersion, final String bootloaderVersion, final String buildNumber,
-			final Boolean developerModeEnabled, final String firmwareVersion, final Set<String> installedApps,
-			final String kernelVersion, final String osName, final String osVersion, final Boolean rooted) {
+	public DeviceSoftware(final String appVersion, final String bootloaderVersion, final String buildNumber,
+                          final Boolean developerModeEnabled, final String firmwareVersion, final Set<String> installedApps,
+                          final String kernelVersion, final String osName, final String osVersion, final Boolean rooted) {
         this.appVersion = appVersion;
         this.bootloaderVersion = bootloaderVersion;
         this.buildNumber = buildNumber;
@@ -111,38 +111,36 @@ public class SoftwareProfile {
         this.rooted = rooted;
     }
 
-    public void update(final SoftwareProfile software) {
-        if (software != null) {
-            if (software.getOsName() != null) {
-                this.osName = software.getOsName();
-            }
-            if (software.getOsVersion() != null) {
-                this.osVersion = software.getOsVersion();
-            }
-            if (software.getFirmwareVersion() != null) {
-                this.firmwareVersion = software.getFirmwareVersion();
-            }
-            if (software.getKernelVersion() != null) {
-                this.kernelVersion = software.getKernelVersion();
-            }
-            if (software.getBootloaderVersion() != null) {
-                this.bootloaderVersion = software.getBootloaderVersion();
-            }
-            if (software.getAppVersion() != null) {
-                this.appVersion = software.getAppVersion();
-            }
-            if (software.getBuildNumber() != null) {
-                this.buildNumber = software.getBuildNumber();
-            }
-            if (software.getRooted() != null) {
-                this.rooted = software.getRooted();
-            }
-            if (software.getDeveloperModeEnabled() != null) {
-                this.developerModeEnabled = software.getDeveloperModeEnabled();
-            }
-            if (software.getInstalledApps() != null) {
-                this.installedApps = software.getInstalledApps();
-            }
+    public void update(final DeviceSoftware software) {
+        if (software.getOsName() != null) {
+            this.osName = software.getOsName();
+        }
+        if (software.getOsVersion() != null) {
+            this.osVersion = software.getOsVersion();
+        }
+        if (software.getFirmwareVersion() != null) {
+            this.firmwareVersion = software.getFirmwareVersion();
+        }
+        if (software.getKernelVersion() != null) {
+            this.kernelVersion = software.getKernelVersion();
+        }
+        if (software.getBootloaderVersion() != null) {
+            this.bootloaderVersion = software.getBootloaderVersion();
+        }
+        if (software.getAppVersion() != null) {
+            this.appVersion = software.getAppVersion();
+        }
+        if (software.getBuildNumber() != null) {
+            this.buildNumber = software.getBuildNumber();
+        }
+        if (software.getRooted() != null) {
+            this.rooted = software.getRooted();
+        }
+        if (software.getDeveloperModeEnabled() != null) {
+            this.developerModeEnabled = software.getDeveloperModeEnabled();
+        }
+        if (software.getInstalledApps() != null) {
+            this.installedApps = software.getInstalledApps();
         }
     }
 }

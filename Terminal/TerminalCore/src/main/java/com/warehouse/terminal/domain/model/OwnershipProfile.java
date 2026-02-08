@@ -100,31 +100,29 @@ public class OwnershipProfile {
     }
 
     public OwnershipProfile update(final OwnershipProfile ownership) {
-        if (ownership != null) {
-            if (ownership.getUserId() != null) {
-                this.userId = ownership.getUserId();
-            }
-            if (ownership.getPreviousUserId() != null) {
-                this.previousUserId = ownership.getPreviousUserId();
-            }
-            if (ownership.getDepartmentCode() != null) {
-                this.departmentCode = ownership.getDepartmentCode();
-            }
-            if (ownership.getTeamId() != null) {
-                this.teamId = ownership.getTeamId();
-            }
-            if (ownership.getVehicleId() != null) {
-                this.vehicleId = ownership.getVehicleId();
-            }
-            if (ownership.getAssignedRole() != null) {
-                this.assignedRole = ownership.getAssignedRole();
-            }
-            if (ownership.getAssignedAt() != null) {
-                this.assignedAt = ownership.getAssignedAt();
-            }
-            if (ownership.getUnassignedAt() != null) {
-                this.unassignedAt = ownership.getUnassignedAt();
-            }
+        if (ownership.getUserId() != null) {
+            this.userId = ownership.getUserId();
+        }
+        if (ownership.getPreviousUserId() != null) {
+            this.previousUserId = ownership.getPreviousUserId();
+        }
+        if (ownership.getDepartmentCode() != null) {
+            this.departmentCode = ownership.getDepartmentCode();
+        }
+        if (ownership.getTeamId() != null) {
+            this.teamId = ownership.getTeamId();
+        }
+        if (ownership.getVehicleId() != null) {
+            this.vehicleId = ownership.getVehicleId();
+        }
+        if (ownership.getAssignedRole() != null) {
+            this.assignedRole = ownership.getAssignedRole();
+        }
+        if (ownership.getAssignedAt() != null) {
+            this.assignedAt = ownership.getAssignedAt();
+        }
+        if (ownership.getUnassignedAt() != null) {
+            this.unassignedAt = ownership.getUnassignedAt();
         }
         return this;
     }
