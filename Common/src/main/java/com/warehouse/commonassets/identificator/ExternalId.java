@@ -11,5 +11,9 @@ public record ExternalId<T>(T value) {
     public static ExternalId<UUID> randomUUID() {
         return new ExternalId<>(UUID.randomUUID());
     }
+
+    public static ExternalId<String> generateId() {
+        return new ExternalId<>(UUID.randomUUID().toString());
+    }
 }
 

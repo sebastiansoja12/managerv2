@@ -14,13 +14,12 @@ public class DeviceVersionServiceImpl implements DeviceVersionService {
 
     @Override
     public DeviceVersion findByDeviceId(final DeviceId deviceId) {
-        return deviceVersionRepository.find(deviceId);
+        return null;
     }
 
     @Override
     public void saveOrUpdate(final DeviceId deviceId, final String version) {
-        final DeviceVersion deviceVersion = this.deviceVersionRepository.find(deviceId);
-        deviceVersion.updateVersion(version);
-        this.deviceVersionRepository.saveOrUpdate(deviceVersion);
+        final DeviceVersion deviceVersion = new DeviceVersion(version, deviceId);
+        deviceVersionRepository.saveOrUpdate(deviceVersion);
     }
 }

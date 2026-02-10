@@ -2,7 +2,7 @@ package com.warehouse.terminal.domain.service;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.DevicePair;
-import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.device.Terminal;
 
 public interface DevicePairService {
     void pairDevice(final Terminal terminal);

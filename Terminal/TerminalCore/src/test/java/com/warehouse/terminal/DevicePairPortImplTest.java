@@ -5,22 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.time.Instant;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.commonassets.identificator.Username;
-import com.warehouse.terminal.domain.model.Device;
+import com.warehouse.terminal.domain.model.device.Device;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.DeviceVersion;
-import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.primary.DevicePairPortImpl;
 import com.warehouse.terminal.domain.port.secondary.*;
 import com.warehouse.terminal.domain.service.*;
@@ -53,13 +50,13 @@ public class DevicePairPortImplTest {
     
     @BeforeEach
     void setup() {
-		final TerminalValidatorService terminalValidatorService = new TerminalValidatorServiceImpl(
+		final DeviceValidatorService deviceValidatorService = new DeviceValidatorServiceImpl(
 				deviceVersionRepository, departmentRepository, userRepository, supplierRepository, deviceRepository);
-        final TerminalService terminalService = new TerminalServiceImpl(deviceRepository, deviceSettingsRepository);
+        final DeviceGenericService deviceGenericService = new DeviceGenericServiceImpl(deviceRepository, deviceSettingsRepository);
         final UserService userService = new UserServiceImpl(userRepository);
         final DevicePairService devicePairService = new DevicePairServiceImpl(devicePairRepository);
         final DeviceVersionService deviceVersionService = new DeviceVersionServiceImpl(deviceVersionRepository);
-		devicePairPort = new DevicePairPortImpl(terminalValidatorService, terminalService, userService,
+		devicePairPort = new DevicePairPortImpl(deviceValidatorService, deviceGenericService, userService,
 				devicePairService, deviceVersionService);
     }
 
@@ -310,6 +307,6 @@ public class DevicePairPortImplTest {
 
     private static Terminal createDevice(final TerminalId terminalId, final String version, final Username username,
                                          final String departmentCode, final Boolean active) {
-        return new Terminal(terminalId, DeviceType.TERMINAL, username, departmentCode, version, Instant.now(), active);
+        return null;
     }
 }

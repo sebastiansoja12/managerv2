@@ -13,12 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.TerminalId;
-import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.model.DevicePair;
-import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 import com.warehouse.terminal.infrastructure.adapter.secondary.DevicePairReadRepository;
@@ -44,7 +42,7 @@ public class DevicePairRepositoryImplTest {
         final TerminalId terminalId = new TerminalId(1L);
         final DevicePairId devicePairId = new DevicePairId(1L);
         final DevicePair devicePair = new DevicePair(terminalId, "", devicePairId);
-        final Terminal terminal = new Terminal(terminalId, DeviceType.TERMINAL, new Username("user"), "KT1", "1.0.0", null, true);
+        final Terminal terminal = null;
         when(deviceRepository.findById(terminalId)).thenReturn(terminal);
         devicePairRepository.save(devicePair);
         verify(repository).save(any());

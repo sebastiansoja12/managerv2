@@ -5,11 +5,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.enumeration.PairStatus;
-import com.warehouse.terminal.domain.model.Device;
+import com.warehouse.terminal.domain.model.device.Device;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.DeviceVersion;
-import com.warehouse.terminal.domain.model.Terminal;
-import com.warehouse.terminal.domain.model.request.DevicePairRequest;
+import com.warehouse.terminal.domain.model.device.Terminal;
+import com.warehouse.terminal.domain.model.command.DevicePairRequest;
 import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.domain.vo.DevicePairResponse;
 
@@ -18,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DevicePairPortImpl implements DevicePairPort {
     
-    private final TerminalValidatorService terminalValidatorService;
+    private final DeviceValidatorService deviceValidatorService;
     
-    private final TerminalService terminalService;
+    private final DeviceGenericService deviceGenericService;
 
     private final UserService userService;
 
@@ -28,13 +28,13 @@ public class DevicePairPortImpl implements DevicePairPort {
 
     private final DeviceVersionService deviceVersionService;
 
-	public DevicePairPortImpl(final TerminalValidatorService terminalValidatorService,
-                              final TerminalService terminalService,
+	public DevicePairPortImpl(final DeviceValidatorService deviceValidatorService,
+                              final DeviceGenericService deviceGenericService,
                               final UserService userService,
                               final DevicePairService devicePairService,
                               final DeviceVersionService deviceVersionService) {
-		this.terminalValidatorService = terminalValidatorService;
-		this.terminalService = terminalService;
+		this.deviceValidatorService = deviceValidatorService;
+		this.deviceGenericService = deviceGenericService;
         this.userService = userService;
         this.devicePairService = devicePairService;
         this.deviceVersionService = deviceVersionService;
@@ -48,7 +48,7 @@ public class DevicePairPortImpl implements DevicePairPort {
 
     @Override
     public boolean isValid(final DeviceId deviceId) {
-        final Device device = this.terminalService.findByDeviceId(deviceId);
+        final Device device = this.deviceGenericService.findByDeviceId(deviceId);
         final DeviceVersion deviceVersion = this.deviceVersionService.findByDeviceId(deviceId);
         final DevicePair devicePair = this.devicePairService.findByDeviceId(deviceId);
         return device != null && deviceVersion != null && devicePair != null;
@@ -56,13 +56,13 @@ public class DevicePairPortImpl implements DevicePairPort {
 
     @Override
     public boolean isUserValid(final DeviceId deviceId, final Username username) {
-        final Device device = this.terminalService.findByDeviceId(deviceId);
+        final Device device = this.deviceGenericService.findByDeviceId(deviceId);
         return this.userService.existsByUsername(username) && device != null && device.getUsername().equals(username);
     }
 
     @Override
     public boolean isVersionValid(final DeviceId deviceId, final DeviceVersion deviceVersion) {
-        final Device device = this.terminalService.findByDeviceId(deviceId);
+        final Device device = this.deviceGenericService.findByDeviceId(deviceId);
         return device != null && device.getVersion().equals(deviceVersion.getVersion());
     }
 
@@ -74,13 +74,10 @@ public class DevicePairPortImpl implements DevicePairPort {
 
     @Override
     public DevicePairResponse pair(final DevicePairRequest request) {
-        final Terminal terminal = this.terminalService.findByDeviceId(request.getDeviceId());
+        final Terminal terminal = this.deviceGenericService.findByDeviceId(request.getDeviceId());
         log.info("Pairing terminal [{}]", terminal.getTerminalId().getValue());
         final DeviceId deviceId = terminal.getDeviceId();
-        this.terminalValidatorService.validateDepartment(terminal.getDepartmentCode());
-        this.terminalValidatorService.validateTerminalVersion(deviceId);
-        final Boolean userValid = this.userService.existsByUsername(terminal.getUsername())
-                && this.userService.existsByUserId(request.getUserId());
+        final Boolean userValid = this.userService.existsByUserId(request.getUserId());
 
         final DeviceVersion deviceVersion = new DeviceVersion(terminal.getVersion(), terminal.getTerminalId());
         final Boolean deviceUpToDate = !updateRequired(deviceId, deviceVersion);

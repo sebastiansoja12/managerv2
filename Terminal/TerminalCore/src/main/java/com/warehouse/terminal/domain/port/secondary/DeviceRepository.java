@@ -2,11 +2,14 @@ package com.warehouse.terminal.domain.port.secondary;
 
 import java.util.List;
 
+import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.device.Device;
 
-public interface DeviceRepository<T> {
+public interface DeviceRepository<T extends Device> {
     T findById(final DeviceId deviceId);
-    T saveOrUpdate(final Terminal terminal);
-    List<T> findAll();
+    void saveOrUpdate(final T t);
+    List findAll();
+    boolean canHandle(final DeviceType type);
+    DeviceId nextDeviceId();
 }

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.Username;
+import com.warehouse.terminal.domain.exception.UserNotFoundException;
 import com.warehouse.terminal.domain.port.secondary.UserRepository;
 import com.warehouse.terminal.domain.vo.User;
 import com.warehouse.terminal.domain.vo.UserToken;
@@ -27,7 +28,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findById(final UserId userId) {
         final Optional<UserEntity> user = this.repository.findById(userId);
-        return user.map(User::from).orElse(null);
+        return user.map(User::from).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Override

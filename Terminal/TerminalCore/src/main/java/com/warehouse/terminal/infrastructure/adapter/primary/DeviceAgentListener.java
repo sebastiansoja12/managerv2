@@ -1,14 +1,14 @@
 package com.warehouse.terminal.infrastructure.adapter.primary;
 
-import com.warehouse.terminal.domain.model.request.DeviceSettingsRequest;
+import com.warehouse.terminal.domain.model.command.DeviceSettingsRequest;
 import com.warehouse.terminal.domain.vo.DeviceVersionRequest;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.warehouse.terminal.domain.model.Terminal;
-import com.warehouse.terminal.domain.port.primary.TerminalPort;
+import com.warehouse.terminal.domain.model.device.Terminal;
+import com.warehouse.terminal.domain.port.primary.DevicePort;
 import com.warehouse.terminal.domain.service.DeviceValidatorConfigurationService;
-import com.warehouse.terminal.domain.service.TerminalValidatorService;
+import com.warehouse.terminal.domain.service.DeviceValidatorService;
 import com.warehouse.terminal.dto.DeviceSettingsRequestDto;
 import com.warehouse.terminal.dto.DeviceUpdateRequestDto;
 import com.warehouse.terminal.dto.DeviceValidationRequestDto;
@@ -23,27 +23,27 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class DeviceAgentListener {
 
-    private final TerminalValidatorService terminalValidatorService;
+    private final DeviceValidatorService deviceValidatorService;
 
     private final DeviceValidatorConfigurationService deviceValidatorConfiguration;
 
-    private final TerminalPort terminalPort;
+    private final DevicePort devicePort;
 
-    public DeviceAgentListener(final TerminalValidatorService terminalValidatorService,
+    public DeviceAgentListener(final DeviceValidatorService deviceValidatorService,
                                final DeviceValidatorConfigurationService deviceValidatorConfiguration,
-                               final TerminalPort terminalPort) {
-        this.terminalValidatorService = terminalValidatorService;
+                               final DevicePort devicePort) {
+        this.deviceValidatorService = deviceValidatorService;
         this.deviceValidatorConfiguration = deviceValidatorConfiguration;
-        this.terminalPort = terminalPort;
+        this.devicePort = devicePort;
     }
 
     @EventListener
     public void handle(final DeviceValidationEvent event) {
         logEvent(event);
         final DeviceValidationRequestDto deviceValidationRequest = event.getDeviceValidationRequest();
-        final Terminal terminal = Terminal.from(deviceValidationRequest);
+        final Terminal terminal = null;
         if (deviceValidatorConfiguration.validateSoftwareConfiguration(terminal.getDeviceId()).validation()) {
-            terminalValidatorService.validateDevice(terminal);
+            deviceValidatorService.validateDevice(terminal);
         }
     }
 
@@ -51,14 +51,14 @@ public class DeviceAgentListener {
     public void handle(final DeviceUpdateEvent event) {
         logEvent(event);
         final DeviceUpdateRequestDto deviceUpdateRequest = event.getDeviceUpdateRequest();
-        terminalPort.changeVersionTo(DeviceVersionRequest.from(deviceUpdateRequest));
+        devicePort.changeVersionTo(DeviceVersionRequest.from(deviceUpdateRequest));
     }
 
     @EventListener
     public void handle(final DeviceSettingsEvent event) {
         logEvent(event);
         final DeviceSettingsRequestDto deviceSettingsRequest = event.getRequest();
-        terminalPort.updateSettings(DeviceSettingsRequest.from(deviceSettingsRequest));
+        devicePort.updateSettings(DeviceSettingsRequest.from(deviceSettingsRequest));
     }
 
     private void logEvent(final DeviceEvent event) {

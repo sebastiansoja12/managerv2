@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
-import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentController;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.voronoi.VoronoiService;
 
 @ComponentScan(basePackages = { "com.warehouse.shipment"})
@@ -24,7 +24,7 @@ public class ShipmentTestConfiguration {
     public MailService mailService;
 
     @MockBean
-    public ShipmentController shipmentController;
+    public ShipmentInternalController shipmentInternalController;
 
     @MockBean
     public DepartmentPort departmentPort;

@@ -1,6 +1,7 @@
 package com.warehouse.shipment.domain.service;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -74,4 +75,6 @@ public interface ShipmentService {
     void redirectShipmentToSender(final ShipmentId shipmentId);
 
     void changeDestination(final ShipmentId shipmentId, final String value);
+
+    Shipment findByExternalId(final ExternalId<String> externalId);
 }

@@ -7,6 +7,7 @@ import com.warehouse.terminal.domain.vo.UserToken;
 
 public interface UserService {
     User findByUsername(final Username username);
+    User findByUserId(final UserId userId);
     UserToken validateUser(final UserId userId);
     Boolean existsByUserId(final UserId userId);
     Boolean existsByUsername(final Username username);

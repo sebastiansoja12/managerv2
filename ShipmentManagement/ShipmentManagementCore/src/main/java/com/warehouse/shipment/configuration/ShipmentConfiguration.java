@@ -183,13 +183,6 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true")
-	public ShipmentRepository shipmentMockRepository() {
-		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment mock repository");
-		return new ShipmentRepositoryMockImpl();
-	}
-
-	@Bean
 	public SoftwareConfigurationProperties softwareConfigurationProperties() {
 		return new SoftwareConfigurationProperties();
 	}

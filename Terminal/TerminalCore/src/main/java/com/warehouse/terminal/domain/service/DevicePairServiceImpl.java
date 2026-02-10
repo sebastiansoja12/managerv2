@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.DevicePair;
-import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.secondary.DevicePairRepository;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 

@@ -6,6 +6,8 @@ import com.warehouse.terminal.domain.port.secondary.DeviceVersionRepository;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceVersionEntity;
 
+import java.util.Optional;
+
 public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
 
     private final DeviceReadRepository deviceReadRepository;
@@ -31,11 +33,10 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
     }
 
     @Override
-    public DeviceVersion find(final DeviceId deviceId) {
+    public Optional<DeviceVersion> find(final DeviceId deviceId) {
         return this.deviceVersionReadRepository
                 .findByDeviceId(deviceId)
-                .map(DeviceVersion::from)
-                .orElse(null);
+                .map(DeviceVersion::from);
     }
 
     @Override

@@ -1,13 +1,13 @@
 package com.warehouse.terminal.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.terminal.domain.model.request.DevicePairRequest;
-import com.warehouse.terminal.domain.model.request.TerminalAddRequest;
-import com.warehouse.terminal.domain.vo.DeviceTypeRequest;
+import com.warehouse.terminal.domain.model.command.DevicePairRequest;
+import com.warehouse.terminal.domain.vo.DeviceTypeChangeCommand;
 import com.warehouse.terminal.domain.vo.DeviceUserRequest;
 import com.warehouse.terminal.domain.vo.DeviceVersionRequest;
 import com.warehouse.terminal.dto.DeviceIdDto;
@@ -28,10 +28,10 @@ public interface TerminalRequestMapper {
     }
 
     @Mapping(target = "version", source = "version.value")
-    @Mapping(target = "departmentCode", source = "departmentCode.value")
-    TerminalAddRequest map(final TerminalAddRequestDto terminalAddRequest);
+    @Mapping(target = "departmentCode", ignore = true)
+    DeviceCreateCommand map(final DeviceCreateRequestDto terminalAddRequest);
 
-    DeviceTypeRequest map(final DeviceTypeRequestDto deviceTypeRequest);
+    DeviceTypeChangeCommand map(final DeviceTypeRequestDto deviceTypeRequest);
 
     default DeviceId map(final DeviceIdDto deviceIdDto) {
         return new DeviceId(deviceIdDto.value());

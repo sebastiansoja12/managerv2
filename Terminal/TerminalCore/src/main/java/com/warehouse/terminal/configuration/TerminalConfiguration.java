@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.port.primary.DevicePairPortImpl;
-import com.warehouse.terminal.domain.port.primary.TerminalPort;
-import com.warehouse.terminal.domain.port.primary.TerminalPortImpl;
+import com.warehouse.terminal.domain.port.primary.DevicePort;
+import com.warehouse.terminal.domain.port.primary.DevicePortImpl;
 import com.warehouse.terminal.domain.port.secondary.*;
 import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.infrastructure.adapter.secondary.*;
@@ -22,22 +22,22 @@ import java.time.Duration;
 public class TerminalConfiguration {
 
     @Bean
-    public DevicePairPort terminalPairPort(final TerminalValidatorService terminalValidatorService,
-                                           final TerminalService terminalService,
+    public DevicePairPort terminalPairPort(final DeviceValidatorService deviceValidatorService,
+                                           final DeviceGenericService deviceGenericService,
                                            final UserService userService,
                                            final DevicePairService devicePairService,
                                            final DeviceVersionService deviceVersionService) {
-        return new DevicePairPortImpl(terminalValidatorService, terminalService, userService, devicePairService,
+        return new DevicePairPortImpl(deviceValidatorService, deviceGenericService, userService, devicePairService,
                 deviceVersionService);
     }
 
     @Bean
-    public TerminalValidatorService terminalValidatorService(final DeviceVersionRepository deviceVersionRepository,
-                                                             final DepartmentRepository departmentRepository,
-                                                             final UserRepository userRepository,
-                                                             final SupplierRepository supplierRepository,
-                                                             final DeviceRepository deviceRepository) {
-        return new TerminalValidatorServiceImpl(deviceVersionRepository, departmentRepository,
+    public DeviceValidatorService terminalValidatorService(final DeviceVersionRepository deviceVersionRepository,
+                                                           final DepartmentRepository departmentRepository,
+                                                           final UserRepository userRepository,
+                                                           final SupplierRepository supplierRepository,
+                                                           final DeviceRepository deviceRepository) {
+        return new DeviceValidatorServiceImpl(deviceVersionRepository, departmentRepository,
                 userRepository, supplierRepository, deviceRepository);
     }
 
@@ -86,9 +86,9 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public TerminalService terminalService(final DeviceRepository deviceRepository,
-            final DeviceSettingsRepository deviceSettingsRepository) {
-        return new TerminalServiceImpl(deviceRepository, deviceSettingsRepository);
+    public DeviceGenericService terminalService(final DeviceRepository deviceRepository,
+                                                final DeviceSettingsRepository deviceSettingsRepository) {
+        return new DeviceGenericServiceImpl(deviceRepository, deviceSettingsRepository);
     }
 
     @Bean
@@ -118,10 +118,10 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public TerminalPort terminalPort(final TerminalService terminalService,
-                                     final UserService userService,
-                                     final DeviceVersionService deviceVersionService) {
-        return new TerminalPortImpl(terminalService, userService, deviceVersionService);
+    public DevicePort terminalPort(final DeviceGenericService deviceGenericService,
+                                   final UserService userService,
+                                   final DeviceVersionService deviceVersionService) {
+        return new DevicePortImpl(deviceGenericService, userService, deviceVersionService);
     }
 
     @Bean
