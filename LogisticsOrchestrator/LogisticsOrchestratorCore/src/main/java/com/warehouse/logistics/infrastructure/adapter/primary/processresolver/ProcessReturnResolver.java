@@ -1,7 +1,5 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.processresolver;
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import org.springframework.stereotype.Component;
@@ -19,9 +17,9 @@ public class ProcessReturnResolver implements ProcessHandler {
 
     private final DeliveryReturnService deliveryReturnService;
 
-    private final LogisticsRequestMapper requestMapper = getMapper(LogisticsRequestMapper.class);
+    private final LogisticsRequestMapper requestMapper = new LogisticsRequestMapper();
 
-    private final LogisticsResponseMapper responseMapper = getMapper(LogisticsResponseMapper.class);
+    private final LogisticsResponseMapper responseMapper = new LogisticsResponseMapper();
 
     public ProcessReturnResolver(final DeliveryReturnService deliveryReturnService) {
         this.deliveryReturnService = deliveryReturnService;

@@ -2,11 +2,15 @@ package com.warehouse.terminal.domain.service;
 
 import java.util.Objects;
 
+import com.warehouse.commonassets.exception.ProcessFailureDetails;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.terminal.domain.exception.DeviceValidationException;
 import com.warehouse.terminal.domain.model.Department;
+import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.secondary.*;
+import com.warehouse.terminal.domain.vo.DeviceValidationRequest;
 
 public class DeviceValidatorServiceImpl implements DeviceValidatorService {
 
@@ -18,18 +22,22 @@ public class DeviceValidatorServiceImpl implements DeviceValidatorService {
 
     private final SupplierRepository supplierRepository;
 
-    private final DeviceRepository<Terminal> deviceRepository;
+    private final DeviceRepository deviceRepository;
+
+    private final DepartmentServicePort departmentServicePort;
 
     public DeviceValidatorServiceImpl(final DeviceVersionRepository deviceVersionRepository,
                                       final DepartmentRepository departmentRepository,
                                       final UserRepository userRepository,
                                       final SupplierRepository supplierRepository,
-                                      final DeviceRepository<Terminal> deviceRepository) {
+                                      final DeviceRepository<Terminal> deviceRepository,
+                                      final DepartmentServicePort departmentServicePort) {
         this.deviceVersionRepository = deviceVersionRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
         this.supplierRepository = supplierRepository;
         this.deviceRepository = deviceRepository;
+        this.departmentServicePort = departmentServicePort;
     }
 
     @Override
@@ -48,15 +56,18 @@ public class DeviceValidatorServiceImpl implements DeviceValidatorService {
     }
 
     @Override
-    public void validateDevice(final Terminal terminal) {
-        final Terminal device = (Terminal) this.deviceRepository.findById(terminal.getDeviceId());
-        final boolean userExists = userRepository.findByUsername(null) != null;
-        final boolean deviceExists = deviceRepository.findById(terminal.getDeviceId()) != null;
-        final boolean departmentExists = departmentRepository.existsByDepartmentCode(null);
-        final boolean deviceValid = device != null && device.isActive();
+    public void validateDevice(final DeviceValidationRequest request) {
+        final boolean userExists = userRepository.existsByUsername(request.username());
+        final Device device = deviceRepository.findById(request.deviceId());
+        final boolean deviceExists = device != null;
+        final boolean departmentExists = departmentServicePort.getDepartment(request.departmentCode()) != null;
+        final boolean deviceValid = deviceExists && device.isActive();
 
-        if (!userExists || !deviceExists || !departmentExists || !deviceValid) {
-            throw new RuntimeException("Device is not valid");
-        }
+		if (!userExists || !deviceExists || !departmentExists || !deviceValid
+				|| Boolean.FALSE.equals(request.active())) {
+			throw new DeviceValidationException(ProcessFailureDetails.now(request.processId(),
+					request.sourceServiceType().name(), request.targetServiceType().name(),
+					"Device is not valid:" + request.deviceId().toString()));
+		}
     }
 }

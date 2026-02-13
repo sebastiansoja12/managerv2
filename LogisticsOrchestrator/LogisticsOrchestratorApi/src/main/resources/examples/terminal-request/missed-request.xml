@@ -1,0 +1,22 @@
+<TerminalRequest>
+    <ProcessType>MISS</ProcessType>
+    <Device>
+        <Version>2.0.1</Version>
+        <DeviceID>MB:e6ab36fa-5d2d-4f9e-9a7d-0d1f836f8b71</DeviceID>
+        <ResponsibleUser>mobile.driver</ResponsibleUser>
+        <DepartmentCode>KT2</DepartmentCode>
+        <DeviceUserType>MANAGER</DeviceUserType>
+        <DeviceType>MOBILE</DeviceType>
+        <DeviceUpToDate>YES</DeviceUpToDate>
+    </Device>
+    <DeliveryMissedRequest>
+        <DeliveryMissedDetails>
+            <DeliveryMissedDetail>
+                <ShipmentID>1000000004</ShipmentID>
+                <DeliveryStatus>UNKNOWN</DeliveryStatus>
+                <DepartmentCode>KT2</DepartmentCode>
+                <SupplierCode>SUP-99</SupplierCode>
+            </DeliveryMissedDetail>
+        </DeliveryMissedDetails>
+    </DeliveryMissedRequest>
+</TerminalRequest>

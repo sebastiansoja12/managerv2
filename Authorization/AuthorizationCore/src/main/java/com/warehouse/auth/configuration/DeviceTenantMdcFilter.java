@@ -31,7 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class DeviceTenantMdcFilter extends OncePerRequestFilter {
 
     private static final List<String> DEVICE_ENDPOINTS = List.of(
-            "/v2/api/deliveries"
+            "/v2/api/deliveries",
+            "/v2/api/ws"
     );
 
     private static final String HEADER_DEVICE_PAIR_KEY = "X-DEVICE-PAIR-KEY";
@@ -96,6 +97,9 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(final HttpServletRequest request) {
         final String uri = request.getRequestURI();
+        if (uri.endsWith(".wsdl") || uri.endsWith(".xsd")) {
+            return true;
+        }
         return DEVICE_ENDPOINTS.stream().noneMatch(uri::startsWith);
     }
 

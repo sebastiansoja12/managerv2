@@ -1,5 +1,7 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.enumeration.ServiceType;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.logistics.domain.port.secondary.DeviceAgentServicePort;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.DeviceEventPublisher;
@@ -21,7 +23,7 @@ public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
     }
 
     @Override
-    public void validateDevice(final DeviceInformation deviceInformation) {
+    public void validateDevice(final ProcessId processId, final DeviceInformation deviceInformation) {
         final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().value());
         final DepartmentCodeDto departmentCode = new DepartmentCodeDto(deviceInformation.getDepartmentCode().getValue());
         final UsernameDto username = new UsernameDto(deviceInformation.getUsername());
@@ -31,7 +33,8 @@ public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
         final DeviceValidationRequestDto deviceValidationRequest = new DeviceValidationRequestDto(
                 deviceId, departmentCode, username, version, deviceUserType, deviceType, true
         );
-        deviceEventPublisher.send(new DeviceValidationEvent(deviceValidationRequest, Instant.now()));
+        deviceEventPublisher.send(new DeviceValidationEvent(deviceValidationRequest, Instant.now(), processId,
+                ServiceType.LOGISTICS_ORCHESTRATOR));
     }
 
     @Override
