@@ -40,9 +40,10 @@ public class TerminalConfiguration {
                                                            final DepartmentRepository departmentRepository,
                                                            final UserRepository userRepository,
                                                            final SupplierRepository supplierRepository,
-                                                           final DeviceRepository<Terminal> deviceRepository) {
+                                                           final DeviceGenericRepository deviceRepository,
+                                                           final DepartmentServicePort departmentServicePort) {
         return new DeviceValidatorServiceImpl(deviceVersionRepository, departmentRepository,
-                userRepository, supplierRepository, deviceRepository);
+                userRepository, supplierRepository, deviceRepository, departmentServicePort);
     }
 
     @Bean("device.softwareConfigurationServicePort")
