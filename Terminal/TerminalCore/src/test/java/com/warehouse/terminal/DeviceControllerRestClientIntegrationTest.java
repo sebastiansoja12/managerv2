@@ -3,10 +3,7 @@ package com.warehouse.terminal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,21 +30,17 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.terminal.configuration.DeviceControllerRestClientTestConfiguration;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.exception.DeviceNotFoundException;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
-import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
-import com.warehouse.terminal.domain.model.command.DeviceIdentityUpdateCommand;
-import com.warehouse.terminal.domain.model.command.DeviceStatusUpdateCommand;
-import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
-import com.warehouse.terminal.domain.model.command.DeviceVersionUpdateCommand;
+import com.warehouse.terminal.domain.model.command.*;
 import com.warehouse.terminal.domain.model.device.Mobile;
 import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.primary.DevicePort;
 import com.warehouse.terminal.domain.vo.DeviceCreateResult;
-import com.warehouse.terminal.configuration.DeviceControllerRestClientTestConfiguration;
 
 @SpringBootTest(
         classes = DeviceControllerRestClientTestConfiguration.class,
@@ -318,7 +311,6 @@ class DeviceControllerRestClientIntegrationTest {
     private Terminal terminal(final String deviceId, final DeviceStatus status, final long userId, final String departmentCode) {
         return new Terminal(
                 new DeviceId(deviceId),
-                status,
                 null,
                 null,
                 null,
@@ -331,7 +323,6 @@ class DeviceControllerRestClientIntegrationTest {
     private Mobile mobile(final String deviceId, final DeviceStatus status, final long userId, final String departmentCode) {
         return new Mobile(
                 new DeviceId(deviceId),
-                status,
                 null,
                 null,
                 null,

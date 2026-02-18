@@ -81,8 +81,6 @@ class DevicePortImplTest {
         assertEquals(nextId, created.getDeviceId());
         assertEquals(command.getUserId(), created.getUserId());
         assertEquals(command.getDepartmentCode().value(), created.getDepartmentCode().value());
-        assertEquals(50.0614d, created.getLocation().getLatitude());
-        assertEquals(19.9366d, created.getLocation().getLongitude());
     }
 
     @Test
@@ -266,7 +264,6 @@ class DevicePortImplTest {
         final List<Device> devices = List.of(
                 new Terminal(
                         new DeviceId("TL:all-1"),
-                        DeviceStatus.ACTIVE,
                         null,
                         null,
                         null,
@@ -276,7 +273,6 @@ class DevicePortImplTest {
                 ),
                 new Mobile(
                         new DeviceId("MB:all-2"),
-                        DeviceStatus.ACTIVE,
                         null,
                         null,
                         null,

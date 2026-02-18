@@ -35,7 +35,6 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
     private Instant lastUpdate;
 
     public Mobile(final DeviceId deviceId,
-                  final DeviceStatus status,
                   final DeviceIdentity identity,
                   final DeviceHardware hardware,
                   final DeviceSoftware software,
@@ -45,7 +44,7 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
         this(deviceId,
                 ExternalId.generateId(),
                 DeviceType.MOBILE,
-                status,
+                DeviceStatus.ACTIVE,
                 identity,
                 hardware,
                 software,
