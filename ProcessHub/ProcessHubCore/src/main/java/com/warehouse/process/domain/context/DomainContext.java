@@ -1,5 +1,6 @@
 package com.warehouse.process.domain.context;
 
+import com.warehouse.process.domain.port.secondary.CurrentUserServicePort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -8,8 +9,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Component("processlog.domainContext")
 public final class DomainContext implements ApplicationEventPublisherAware, ApplicationContextAware {
@@ -19,6 +18,10 @@ public final class DomainContext implements ApplicationEventPublisherAware, Appl
     private static volatile ApplicationEventPublisher eventPublisher;
 
     private static ApplicationContext context;
+
+    public static CurrentUserServicePort currentUserServicePort() {
+        return context.getBean(CurrentUserServicePort.class);
+    }
 
     public static synchronized ApplicationEventPublisher eventPublisher() {
         return eventPublisher;
@@ -51,25 +54,4 @@ public final class DomainContext implements ApplicationEventPublisherAware, Appl
         context = applicationContext;
     }
 
-    public static <T> void publishAfterCommit(final T event) {
-        final ApplicationEventPublisher publisher = eventPublisher();
-
-        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-            log.info("No TX active, publishing event immediately: {}",
-                    event.getClass().getSimpleName());
-            publisher.publishEvent(event);
-            return;
-        }
-
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        log.info("Publishing event AFTER COMMIT: {}",
-                                event.getClass().getSimpleName());
-                        publisher.publishEvent(event);
-                    }
-                }
-        );
-    }
 }

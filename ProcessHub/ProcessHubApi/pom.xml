@@ -23,6 +23,12 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>AuthorizationApi</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

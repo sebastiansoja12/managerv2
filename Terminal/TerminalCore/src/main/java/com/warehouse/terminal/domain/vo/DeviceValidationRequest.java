@@ -2,6 +2,7 @@ package com.warehouse.terminal.domain.vo;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.enumeration.DeviceUserType;
+import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
@@ -14,6 +15,7 @@ public record DeviceValidationRequest(
         ProcessId processId,
         ServiceType sourceServiceType,
         ServiceType targetServiceType,
+        ProcessType processType,
         DeviceId deviceId,
         DepartmentCode departmentCode,
         Username username,
@@ -28,6 +30,7 @@ public record DeviceValidationRequest(
                 event.getProcessId(),
                 event.getSourceServiceType(),
                 event.getTargetServiceType(),
+                event.getProcessType(),
                 new DeviceId(request.deviceId().value()),
                 new DepartmentCode(request.departmentCode().value()),
                 new Username(request.username().value()),

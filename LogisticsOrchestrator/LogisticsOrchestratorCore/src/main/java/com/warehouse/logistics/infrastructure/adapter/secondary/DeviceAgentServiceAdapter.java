@@ -1,8 +1,11 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
-import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.logistics.domain.model.DeviceValidateCommand;
 import com.warehouse.logistics.domain.port.secondary.DeviceAgentServicePort;
+import com.warehouse.process.ProcessHubEventPublisher;
+import com.warehouse.process.infrastructure.event.ProcessDeviceValidatedEvent;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.DeviceEventPublisher;
 
@@ -17,13 +20,19 @@ import java.time.Instant;
 public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
 
     private final DeviceEventPublisher deviceEventPublisher;
+    
+    private final ProcessHubEventPublisher processHubEventPublisher;
 
-    public DeviceAgentServiceAdapter(final DeviceEventPublisher deviceEventPublisher) {
+    public DeviceAgentServiceAdapter(final DeviceEventPublisher deviceEventPublisher, 
+                                     final ProcessHubEventPublisher processHubEventPublisher) {
         this.deviceEventPublisher = deviceEventPublisher;
+        this.processHubEventPublisher = processHubEventPublisher;
     }
 
     @Override
-    public void validateDevice(final ProcessId processId, final DeviceInformation deviceInformation) {
+    public void validateDevice(final DeviceValidateCommand command) {
+        final ProcessType processType = command.getProcessType();
+        final DeviceInformation deviceInformation = command.getDeviceInformation();
         final DeviceIdDto deviceId = new DeviceIdDto(deviceInformation.getDeviceId().value());
         final DepartmentCodeDto departmentCode = new DepartmentCodeDto(deviceInformation.getDepartmentCode().getValue());
         final UsernameDto username = new UsernameDto(deviceInformation.getUsername());
@@ -33,8 +42,10 @@ public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
         final DeviceValidationRequestDto deviceValidationRequest = new DeviceValidationRequestDto(
                 deviceId, departmentCode, username, version, deviceUserType, deviceType, true
         );
-        deviceEventPublisher.send(new DeviceValidationEvent(deviceValidationRequest, Instant.now(), processId,
-                ServiceType.LOGISTICS_ORCHESTRATOR));
+        deviceEventPublisher.send(new DeviceValidationEvent(deviceValidationRequest, Instant.now(), command.getProcessId(),
+                processType, ServiceType.LOGISTICS_ORCHESTRATOR));
+		processHubEventPublisher.publish(new ProcessDeviceValidatedEvent(command.getProcessId(), deviceInformation.getDeviceId(),
+				processType, ServiceType.LOGISTICS_ORCHESTRATOR));
     }
 
     @Override

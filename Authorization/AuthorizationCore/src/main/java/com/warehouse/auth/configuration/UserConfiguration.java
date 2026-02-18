@@ -1,6 +1,6 @@
 package com.warehouse.auth.configuration;
 
-import com.warehouse.auth.CurrentUserService;
+import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPort;
 import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPortImpl;
@@ -11,7 +11,7 @@ import com.warehouse.auth.domain.port.secondary.RolePermissionRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
-import com.warehouse.auth.infrastructure.adapter.primary.CurrentUserServiceAdapter;
+import com.warehouse.auth.infrastructure.adapter.primary.CurrentUserApiServiceAdapter;
 import com.warehouse.auth.infrastructure.adapter.primary.UserApiServiceAdapter;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
@@ -59,8 +59,8 @@ public class UserConfiguration {
     }
 
     @Bean
-    public CurrentUserService currentUserService(final UserService userService) {
-        return new CurrentUserServiceAdapter(userService);
+    public CurrentUserApiService currentUserService(final UserService userService) {
+        return new CurrentUserApiServiceAdapter(userService);
     }
 
     @Bean
