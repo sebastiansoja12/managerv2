@@ -15,6 +15,8 @@ import org.springframework.xml.xsd.XsdSchema;
 @Configuration
 public class LogisticsSoapWebServiceConfiguration {
 
+    public static final String TERMINAL_NAMESPACE = "http://warehouse.com/logistics/terminal";
+
     @Bean
     public ServletRegistrationBean<MessageDispatcherServlet> logisticsMessageDispatcherServlet(
             final ApplicationContext applicationContext) {
@@ -29,6 +31,7 @@ public class LogisticsSoapWebServiceConfiguration {
         final DefaultWsdl11Definition definition = new DefaultWsdl11Definition();
         definition.setPortTypeName("LogisticsDispatchPort");
         definition.setLocationUri("/ws");
+        definition.setTargetNamespace(TERMINAL_NAMESPACE);
         definition.setRequestSuffix("Request");
         definition.setResponseSuffix("Response");
         definition.setSchema(terminalSchema);

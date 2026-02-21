@@ -1,4 +1,4 @@
-<TerminalRequest>
+<TerminalRequest xmlns="http://warehouse.com/logistics/terminal">
     <ProcessType>MISS</ProcessType>
     <Device>
         <Version>2.0.1</Version>
