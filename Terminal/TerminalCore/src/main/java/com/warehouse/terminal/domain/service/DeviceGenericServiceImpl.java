@@ -2,6 +2,7 @@ package com.warehouse.terminal.domain.service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
@@ -183,5 +184,10 @@ public class DeviceGenericServiceImpl implements DeviceGenericService {
     @Override
     public DeviceId nextDeviceId(final DeviceType deviceType) {
         return this.deviceRepository.nextDeviceId(deviceType);
+    }
+
+    @Override
+    public Optional<Device> findByExternalSystemId(final String externalSystemId) {
+        return this.deviceRepository.findByExternalSystemId(externalSystemId);
     }
 }

@@ -38,6 +38,9 @@ public class DevicePairEntity {
     @Column(name = "pair_key")
     private String pairKey;
 
+    @Column(name = "pair_key_expires_at")
+    private Instant pairKeyExpiresAt;
+
     public DevicePairEntity() {
     }
 
@@ -46,13 +49,15 @@ public class DevicePairEntity {
                             final boolean paired,
                             final Instant loginTime,
                             final String errorDescription,
-                            final String pairKey) {
+                            final String pairKey,
+                            final Instant pairKeyExpiresAt) {
         this.devicePairId = devicePairId;
         this.deviceId = deviceId;
         this.paired = paired;
         this.loginTime = loginTime;
         this.errorDescription = errorDescription;
         this.pairKey = pairKey;
+        this.pairKeyExpiresAt = pairKeyExpiresAt;
     }
 
     public DevicePairEntity(final DeviceId deviceId) {
@@ -68,13 +73,15 @@ public class DevicePairEntity {
                             final boolean paired,
                             final Instant loginTime,
                             final String errorDescription,
-                            final String pairKey) {
+                            final String pairKey,
+                            final Instant pairKeyExpiresAt) {
         this.devicePairId = devicePairId.value();
         this.deviceId = deviceId;
         this.paired = paired;
         this.loginTime = loginTime;
         this.errorDescription = errorDescription;
         this.pairKey = pairKey;
+        this.pairKeyExpiresAt = pairKeyExpiresAt;
     }
 
     public DevicePairEntity(final DeviceId deviceId, final String errorDescription) {
@@ -91,7 +98,8 @@ public class DevicePairEntity {
                 devicePair.isPaired(),
                 devicePair.getLoginTime(),
                 devicePair.getErrorDescription(),
-                devicePair.getPairKey());
+                devicePair.getPairKey(),
+                devicePair.getPairKeyExpiresAt());
     }
 
     public static DevicePairEntity from(final DevicePair devicePair) {
@@ -101,7 +109,8 @@ public class DevicePairEntity {
                 devicePair.isPaired(),
                 devicePair.getLoginTime(),
                 devicePair.getErrorDescription(),
-                devicePair.getPairKey());
+                devicePair.getPairKey(),
+                devicePair.getPairKeyExpiresAt());
     }
 
     public Long getDevicePairId() {
@@ -146,6 +155,10 @@ public class DevicePairEntity {
 
     public String getPairKey() {
         return pairKey;
+    }
+
+    public Instant getPairKeyExpiresAt() {
+        return pairKeyExpiresAt;
     }
 
     public void pair() {

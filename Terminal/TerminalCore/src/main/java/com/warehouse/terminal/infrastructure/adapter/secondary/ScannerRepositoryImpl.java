@@ -1,6 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
@@ -37,6 +38,12 @@ public class ScannerRepositoryImpl implements DeviceRepository<Scanner> {
     public Scanner findById(final DeviceId deviceId) {
         final ScannerEntity entity = repository.findById(deviceId).orElseThrow();
         return toModelMapper.map(entity);
+    }
+
+    @Override
+    public Optional<Scanner> findByExternalSystemId(final String externalSystemId) {
+        return repository.findByIdentityExternalSystemId(externalSystemId)
+                .map(toModelMapper::map);
     }
 
     @Override

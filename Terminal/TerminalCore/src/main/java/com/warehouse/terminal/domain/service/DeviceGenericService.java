@@ -1,6 +1,7 @@
 package com.warehouse.terminal.domain.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
@@ -34,4 +35,6 @@ public interface DeviceGenericService {
     void updateSettings(final DeviceId deviceId, final DeviceSettings deviceSettings);
 
     DeviceId nextDeviceId(final DeviceType deviceType);
+
+    Optional<Device> findByExternalSystemId(final String externalSystemId);
 }
