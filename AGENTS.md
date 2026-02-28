@@ -13,6 +13,10 @@
 - Do not run build or test commands after changes unless the user explicitly asks for it.
 - Before implementing anything, read an existing similar file and follow the established local pattern.
 - Department is called Department (DepartmentCode) not Depot (DepotCode).
+- Secondary Adapter for communication with external system has in its name Client
+- Mappers are in primary and secondary adapters ONLY
+- Primary adapters are connected with primary ports
+- Secondary adapters are implementation of secondary ports
 
 ---
 

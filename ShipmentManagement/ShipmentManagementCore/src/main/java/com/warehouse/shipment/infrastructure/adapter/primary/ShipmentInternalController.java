@@ -31,6 +31,7 @@ import io.micrometer.core.annotation.Timed;
 
 @RestController
 @RequestMapping("/shipments")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ShipmentInternalController {
 
     private final ShipmentPort shipmentPort;

@@ -3,10 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 import java.net.URI;
 import java.util.function.Supplier;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClient;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -19,30 +16,33 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteLogRecor
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteProcessDto;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.ShipmentCreatedRequest;
 
+import feign.FeignException;
+import feign.RetryableException;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RouteLogServiceAdapter implements RouteLogServicePort {
+public class RouteLogServiceClient implements RouteLogServicePort {
 
     private final Retry retry;
 
-    public RouteLogServiceAdapter(final RetryConfig retryConfig) {
+    private final ExternalFeignClient externalFeignClient;
+
+    public RouteLogServiceClient(final RetryConfig retryConfig,
+                                 final ExternalFeignClient externalFeignClient) {
         this.retry = Retry.of("routeProcessRetry", retryConfig);
+        this.externalFeignClient = externalFeignClient;
     }
 
-	private ResponseEntity<RouteProcessDto> sendRouteProcessRequest(final RestClient restClient,
-			final ShipmentId shipmentId, final String url) {
+	private ResponseEntity<RouteProcessDto> sendRouteProcessRequest(final ShipmentId shipmentId,
+                                                                    final SoftwareConfiguration softwareConfiguration) {
         log.info("Trying to send route process request for shipment {}", shipmentId.getValue());
         final ShipmentCreatedRequest request = new ShipmentCreatedRequest(shipmentId, null);
-        return restClient
-                .post()
-                .uri(url)
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toEntity(RouteProcessDto.class);
+        return externalFeignClient.createShipmentRoute(
+                URI.create(softwareConfiguration.getUrl() + softwareConfiguration.getValue()),
+                request
+        );
     }
 
     // TODO
@@ -50,13 +50,8 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
     public Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId,
                                                                  final SoftwareConfiguration softwareConfiguration) {
         try {
-            final RestClient restClient = RestClient.builder()
-                    .baseUrl(softwareConfiguration.getUrl())
-                    .build();
-
             final Supplier<ResponseEntity<RouteProcessDto>> retryableSupplier = Retry
-                    .decorateSupplier(retry, () -> sendRouteProcessRequest(restClient,
-                            shipmentId, softwareConfiguration.getUrl() + softwareConfiguration.getValue()));
+                    .decorateSupplier(retry, () -> sendRouteProcessRequest(shipmentId, softwareConfiguration));
 
             final ResponseEntity<RouteProcessDto> process = retryableSupplier.get();
 
@@ -68,10 +63,14 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
             log.info("Successfully registered route {} for shipment {}", process.getBody().getProcessId(),
                     shipmentId.getValue());
             return Result.success(RouteProcess.from(shipmentId, new ProcessId(process.getBody().getProcessId()), "", ""));
-        } catch (final ResourceAccessException e) {
-            log.error("ResourceAccessException while registering route for shipment {}: {}",
+        } catch (final RetryableException e) {
+            log.error("RetryableException while registering route for shipment {}: {}",
                     shipmentId.getValue(), e.getMessage());
             return Result.failure(ErrorCode.ROUTE_TRACKER_SERVICE_NOT_AVAILABLE);
+        } catch (final FeignException e) {
+            log.error("FeignException while registering route for shipment {}: {}",
+                    shipmentId.getValue(), e.getMessage());
+            return Result.failure(ErrorCode.ROUTE_TRACKER_SERVICE_ERROR);
         }
     }
 
@@ -87,18 +86,12 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
 			final SoftwareConfiguration softwareConfiguration) {
         final PersonChangedRequest request = new PersonChangedRequest(shipmentId, person);
 
-        final RestClient restClient = buildRestClient(softwareConfiguration);
-
-        final ResponseEntity<RouteLogRecord> responseEntity = restClient
-                .put()
-                .uri(URI.create(
-                        softwareConfiguration.getValue()
-                                + "/persons?personType=" + person.getType().name()
-                ))
-                .body(request)
-                .header("X-API-KEY", softwareConfiguration.getApiKey())
-                .retrieve()
-                .toEntity(RouteLogRecord.class);
+        final ResponseEntity<RouteLogRecord> responseEntity = externalFeignClient.updateRoutePerson(
+                URI.create(softwareConfiguration.getUrl() + softwareConfiguration.getValue()
+                        + "/persons?personType=" + person.getType().name()),
+                softwareConfiguration.getApiKey(),
+                request
+        );
 
         return RouteProcess.from(responseEntity, shipmentId);
     }
@@ -108,9 +101,4 @@ public class RouteLogServiceAdapter implements RouteLogServicePort {
 
     }
 
-    private RestClient buildRestClient(final SoftwareConfiguration softwareConfiguration) {
-        return RestClient.builder()
-                .baseUrl(softwareConfiguration.getUrl() + "/persons")
-                .build();
-    }
 }

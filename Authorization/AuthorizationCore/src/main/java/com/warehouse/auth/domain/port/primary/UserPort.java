@@ -12,6 +12,8 @@ public interface UserPort {
 
     User findUser(String username);
 
+    User findUser(UserId userId);
+
     void updateFullName(final FullNameRequest request);
 
     void changeRole(final UserId userId, final User.Role role);

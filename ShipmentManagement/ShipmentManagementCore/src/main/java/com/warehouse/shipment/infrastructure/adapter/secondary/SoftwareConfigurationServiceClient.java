@@ -10,7 +10,7 @@ import io.github.resilience4j.retry.RetryConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SoftwareConfigurationServiceAdapter implements SoftwareConfigurationServicePort {
+public class SoftwareConfigurationServiceClient implements SoftwareConfigurationServicePort {
 
     private final Retry retry;
     
@@ -18,9 +18,9 @@ public class SoftwareConfigurationServiceAdapter implements SoftwareConfiguratio
 
     private final RouteTrackerLogProperties routeTrackerLogProperties;
 
-	public SoftwareConfigurationServiceAdapter(final RetryConfig retryConfig,
-                                               final SoftwareConfigurationProperties softwareConfigurationProperties,
-                                               final RouteTrackerLogProperties routeTrackerLogProperties) {
+	public SoftwareConfigurationServiceClient(final RetryConfig retryConfig,
+                                              final SoftwareConfigurationProperties softwareConfigurationProperties,
+                                              final RouteTrackerLogProperties routeTrackerLogProperties) {
         this.retry = Retry.of("softwareConfiguration", retryConfig);
         this.softwareConfigurationProperties = softwareConfigurationProperties;
         this.routeTrackerLogProperties = routeTrackerLogProperties;

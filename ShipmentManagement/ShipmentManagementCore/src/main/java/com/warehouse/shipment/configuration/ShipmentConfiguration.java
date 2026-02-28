@@ -71,8 +71,9 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ReturningServicePort returningServicePort(final ReturnProperties returnProperties) {
-		return new ReturningServiceAdapter(returnProperties);
+	public ReturningServicePort returningServicePort(final ExternalFeignClient externalFeignClient,
+													 final ReturnProperties returnProperties) {
+		return new ReturningServiceClient(externalFeignClient, returnProperties);
 	}
 
 	@Bean
@@ -150,7 +151,7 @@ public class ShipmentConfiguration {
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties(),
+		return new SoftwareConfigurationServiceClient(config, softwareConfigurationProperties(),
 				routeTrackerLogProperties());
 	}
 
@@ -163,7 +164,7 @@ public class ShipmentConfiguration {
 
 	@Bean(name = "shipment.routeLogServicePort")
 	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
-	public RouteLogServicePort routeLogServicePort() {
+	public RouteLogServicePort routeLogServicePort(final ExternalFeignClient externalFeignClient) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Route log service port");
 		final RetryConfig config = RetryConfig.custom()
 				.maxAttempts(3)
@@ -171,7 +172,7 @@ public class ShipmentConfiguration {
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new RouteLogServiceAdapter(config);
+		return new RouteLogServiceClient(config, externalFeignClient);
 	}
 
 	@Bean
