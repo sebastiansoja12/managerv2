@@ -370,6 +370,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public List<Shipment> searchShipments(final ShipmentSearchCriteria criteria) {
+        return this.shipmentService.search(criteria);
+    }
+
+    @Override
     public boolean existsShipment(final ShipmentId shipmentId) {
         return this.shipmentService.existsShipment(shipmentId);
     }

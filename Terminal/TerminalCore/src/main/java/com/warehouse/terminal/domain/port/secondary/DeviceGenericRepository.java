@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.Device;
 
 @Repository
@@ -32,6 +33,12 @@ public class DeviceGenericRepository {
             }
         }
         return Optional.empty();
+    }
+
+    public List<Device> findByUserId(final UserId userId) {
+        return repositories.stream()
+                .flatMap(repository -> repository.findByUserId(userId).stream())
+                .toList();
     }
 
     public void create(final Device device) {

@@ -43,6 +43,11 @@ public class UserPortImpl implements UserPort {
     }
 
     @Override
+    public void changePassword(final UserId userId, final String encodedPassword) {
+        this.userService.changePassword(userId, encodedPassword);
+    }
+
+    @Override
     public void changeRole(final UserId userId, final User.Role role) {
         this.userService.changeRole(userId, role);
     }

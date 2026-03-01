@@ -37,4 +37,5 @@ public interface DeviceGenericService {
     DeviceId nextDeviceId(final DeviceType deviceType);
 
     Optional<Device> findByExternalSystemId(final String externalSystemId);
+    List<Device> findByUserId(final UserId userId);
 }

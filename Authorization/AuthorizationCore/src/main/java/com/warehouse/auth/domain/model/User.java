@@ -254,6 +254,11 @@ public class User {
         markAsModified();
     }
 
+    public void changePassword(final String encodedPassword) {
+        this.password = encodedPassword;
+        markAsModified();
+    }
+
     public void changeRole(final Role role) {
         if (deleted) {
             throw new UserDeletedException("User is already deleted");

@@ -1,17 +1,7 @@
 package com.warehouse.shipment;
 
-import static com.warehouse.shipment.DataTestCreator.dangerousGood;
-import static com.warehouse.shipment.DataTestCreator.recipient;
-import static com.warehouse.shipment.DataTestCreator.sender;
-import static com.warehouse.shipment.DataTestCreator.shipment;
-import static com.warehouse.shipment.DataTestCreator.shipmentId;
-import static com.warehouse.shipment.DataTestCreator.trackingNumber;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.warehouse.shipment.DataTestCreator.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,34 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ReturnId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.*;
+import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
-import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
-import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
-import com.warehouse.shipment.domain.event.ShipmentCurrencyChanged;
-import com.warehouse.shipment.domain.event.ShipmentDelivered;
-import com.warehouse.shipment.domain.event.ShipmentLocked;
-import com.warehouse.shipment.domain.event.ShipmentRecipientChanged;
-import com.warehouse.shipment.domain.event.ShipmentRedirected;
-import com.warehouse.shipment.domain.event.ShipmentRelatedLocked;
-import com.warehouse.shipment.domain.event.ShipmentReturnCanceled;
-import com.warehouse.shipment.domain.event.ShipmentReturnCreated;
-import com.warehouse.shipment.domain.event.ShipmentReturned;
-import com.warehouse.shipment.domain.event.ShipmentRerouted;
-import com.warehouse.shipment.domain.event.ShipmentSenderChanged;
-import com.warehouse.shipment.domain.event.ShipmentSent;
-import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
-import com.warehouse.shipment.domain.event.ShipmentTypeChanged;
-import com.warehouse.shipment.domain.event.ShipmentUpdated;
+import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -74,12 +41,15 @@ class ShipmentServiceImplTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private SpecificationRepository specificationShipmentRepository;
+
     private ShipmentServiceImpl shipmentService;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(DomainContext.class, "eventPublisher", eventPublisher);
-        shipmentService = new ShipmentServiceImpl(shipmentRepository);
+        shipmentService = new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
     }
 
     @Test

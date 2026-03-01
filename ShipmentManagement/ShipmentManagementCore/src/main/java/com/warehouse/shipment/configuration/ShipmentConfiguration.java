@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
@@ -202,8 +203,13 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository) {
-		return new ShipmentServiceImpl(shipmentRepository);
+	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository, final SpecificationRepository specificationShipmentRepository) {
+		return new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
+	}
+
+	@Bean
+	public SpecificationRepository specificationShipmentRepository(final ShipmentReadRepository repository) {
+		return new SpecificationShipmentRepositoryImpl(repository);
 	}
 
 	@Bean("shipment.routeTrackerLogProperties")

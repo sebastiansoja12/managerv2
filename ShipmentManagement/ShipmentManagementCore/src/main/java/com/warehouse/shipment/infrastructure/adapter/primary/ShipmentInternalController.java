@@ -2,6 +2,8 @@ package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import static com.warehouse.shipment.infrastructure.adapter.primary.validator.SignatureValidator.validateSignatureMethod;
 
+import java.util.List;
+
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +33,6 @@ import io.micrometer.core.annotation.Timed;
 
 @RestController
 @RequestMapping("/shipments")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ShipmentInternalController {
 
     private final ShipmentPort shipmentPort;
@@ -77,11 +78,22 @@ public class ShipmentInternalController {
         return response;
     }
 
+    @PostMapping("/search")
+    @Counted(value = "controller.shipment.list")
+    @Timed(value = "controller.shipment.list")
+    public ResponseEntity<?> search(@RequestBody(required = false) final ShipmentSearchRequestApi request) {
+        final ShipmentSearchCriteria criteria = requestMapper.map(request);
+        final List<ShipmentDto> shipmentResponse = shipmentPort.searchShipments(criteria).stream()
+                .map(responseMapper::map)
+                .toList();
+        return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
+    }
+
     @GetMapping("/{shipmentId}")
     @Counted(value = "controller.shipment.get")
     @Timed(value = "controller.shipment.get")
-    public ResponseEntity<?> get(@PathVariable final ShipmentIdDto shipmentId) {
-        final Shipment shipment = shipmentPort.loadShipment(new ShipmentId(shipmentId.getValue()));
+    public ResponseEntity<?> get(@PathVariable final Long shipmentId) {
+        final Shipment shipment = shipmentPort.loadShipment(new ShipmentId(shipmentId));
         final ShipmentDto shipmentResponse = responseMapper.map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
@@ -174,20 +186,18 @@ public class ShipmentInternalController {
     @GetMapping("/exists/{shipmentId}")
     @Counted(value = "controller.shipment.exist")
     @Timed(value = "controller.shipment.exist")
-    public ResponseEntity<?> existsShipment(@PathVariable final ShipmentIdDto shipmentId) {
-        shipmentRequestValidator.validateBody(shipmentId);
-        final ShipmentId id = requestMapper.map(shipmentId);
-        return ResponseEntity.status(HttpStatus.OK).body(shipmentPort.existsShipment(id));
+    public ResponseEntity<?> existsShipment(@PathVariable final Long shipmentId) {
+        return ResponseEntity.status(HttpStatus.OK).body(shipmentPort.existsShipment(new ShipmentId(shipmentId)));
     }
 
     @PutMapping("/person")
     @Counted(value = "controller.person.update")
     @Timed(value = "controller.person.update")
     public ResponseEntity<?> updatePerson(@RequestBody final PersonApi personRequest,
-                                          @RequestParam("shipmentId") @PathVariable final ShipmentIdDto shipmentId,
+                                          @RequestParam("shipmentId") final Long shipmentId,
                                           @RequestParam("personType") final PersonType personType) {
         final Person person = personType == PersonType.SENDER ? Sender.from(personRequest) : Recipient.from(personRequest);
-        this.shipmentPort.changePersonTo(person, new ShipmentId(shipmentId.getValue()));
+        this.shipmentPort.changePersonTo(person, new ShipmentId(shipmentId));
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 
@@ -207,8 +217,8 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.type.update")
     @Timed(value = "controller.shipment.type.update")
 	public ResponseEntity<?> changeShipmentType(@RequestParam("shipmentType") final ShipmentType shipmentType,
-                                                @RequestParam("shipmentId") @PathVariable final String shipmentId) {
-        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(new ShipmentId(Long.parseLong(shipmentId)), shipmentType);
+                                                @RequestParam("shipmentId") final Long shipmentId) {
+        final ChangeShipmentTypeRequest request = new ChangeShipmentTypeRequest(new ShipmentId(shipmentId), shipmentType);
         this.shipmentPort.changeShipmentTypeTo(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }

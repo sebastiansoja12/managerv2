@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.handler.*;
@@ -71,6 +72,9 @@ class ShipmentPortImplTest {
     @Mock
     private MailNotificationServicePort mailNotificationServicePort;
 
+    @Mock
+    private SpecificationRepository specificationShipmentRepository;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
@@ -79,7 +83,7 @@ class ShipmentPortImplTest {
 
     @BeforeEach
     void setUp() {
-        final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository);
+        final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
         final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort, countryRepository);
         final PriceService priceService = new PriceServiceImpl(priceRepository);
         final NotificationCreatorProvider notificationCreatorProvider = new NotificationCreatorProviderImpl();
