@@ -370,6 +370,18 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public ShipmentControlCenter loadShipmentControlCenter(final ShipmentId shipmentId) {
+        final Shipment shipment = loadShipment(shipmentId);
+        return new ShipmentControlCenter(shipment, this.routeLogServicePort.findByShipmentId(shipmentId));
+    }
+
+    @Override
+    public ShipmentControlCenter loadShipmentControlCenter(final TrackingNumber trackingNumber) {
+        final Shipment shipment = loadShipment(trackingNumber);
+        return new ShipmentControlCenter(shipment, this.routeLogServicePort.findByShipmentId(shipment.getShipmentId()));
+    }
+
+    @Override
     public List<Shipment> searchShipments(final ShipmentSearchCriteria criteria) {
         return this.shipmentService.search(criteria);
     }

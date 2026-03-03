@@ -48,6 +48,11 @@ public class UserPortImpl implements UserPort {
     }
 
     @Override
+    public void changeLanguage(final UserId userId, final String language) {
+        this.userService.changeLanguage(userId, language);
+    }
+
+    @Override
     public void changeRole(final UserId userId, final User.Role role) {
         this.userService.changeRole(userId, role);
     }

@@ -12,9 +12,10 @@ import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.PersonChangedRequest;
-import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteLogRecord;
+import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteLogRecordDto;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteProcessDto;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.ShipmentCreatedRequest;
+import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 
 import feign.FeignException;
 import feign.RetryableException;
@@ -29,10 +30,22 @@ public class RouteLogServiceClient implements RouteLogServicePort {
 
     private final ExternalFeignClient externalFeignClient;
 
+    private final GenericFeignResourceService genericFeignResourceService;
+
+    private final RouteTrackerLogProperties routeTrackerLogProperties;
+
+    private final RouteLogRecordMapper routeLogRecordMapper;
+
     public RouteLogServiceClient(final RetryConfig retryConfig,
-                                 final ExternalFeignClient externalFeignClient) {
+                                 final ExternalFeignClient externalFeignClient,
+                                 final GenericFeignResourceService genericFeignResourceService,
+                                 final RouteTrackerLogProperties routeTrackerLogProperties,
+                                 final RouteLogRecordMapper routeLogRecordMapper) {
         this.retry = Retry.of("routeProcessRetry", retryConfig);
         this.externalFeignClient = externalFeignClient;
+        this.genericFeignResourceService = genericFeignResourceService;
+        this.routeTrackerLogProperties = routeTrackerLogProperties;
+        this.routeLogRecordMapper = routeLogRecordMapper;
     }
 
 	private ResponseEntity<RouteProcessDto> sendRouteProcessRequest(final ShipmentId shipmentId,
@@ -76,6 +89,25 @@ public class RouteLogServiceClient implements RouteLogServicePort {
 
 
     @Override
+    public RouteLogRecord findByShipmentId(final ShipmentId shipmentId) {
+        try {
+            final RouteLogRecordDto routeLogRecordDto = genericFeignResourceService.findById(
+                    routeTrackerLogProperties.getUrl(),
+                    shipmentId.getValue(),
+                    RouteLogRecordDto.class
+            );
+            return routeLogRecordMapper.map(routeLogRecordDto);
+        } catch (final FeignException.NotFound e) {
+            log.info("Route log not found for shipment {}", shipmentId.getValue());
+            return null;
+        } catch (final FeignException e) {
+            log.error("FeignException while fetching route log for shipment {}: {}",
+                    shipmentId.getValue(), e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
 	public RouteProcess notifyRecipientChanged(final ShipmentId shipmentId, final Recipient recipient,
 			final SoftwareConfiguration softwareConfiguration) {
         return null;
@@ -86,14 +118,14 @@ public class RouteLogServiceClient implements RouteLogServicePort {
 			final SoftwareConfiguration softwareConfiguration) {
         final PersonChangedRequest request = new PersonChangedRequest(shipmentId, person);
 
-        final ResponseEntity<RouteLogRecord> responseEntity = externalFeignClient.updateRoutePerson(
+        final ResponseEntity<RouteLogRecordDto> responseEntity = externalFeignClient.updateRoutePerson(
                 URI.create(softwareConfiguration.getUrl() + softwareConfiguration.getValue()
                         + "/persons?personType=" + person.getType().name()),
                 softwareConfiguration.getApiKey(),
                 request
         );
 
-        return RouteProcess.from(responseEntity, shipmentId);
+        return RouteProcess.from(routeLogRecordMapper.map(responseEntity.getBody()), responseEntity.getStatusCode(), shipmentId);
     }
 
     @Override

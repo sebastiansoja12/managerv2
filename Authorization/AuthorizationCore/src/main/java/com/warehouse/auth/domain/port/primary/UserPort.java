@@ -18,6 +18,8 @@ public interface UserPort {
 
     void changePassword(final UserId userId, final String encodedPassword);
 
+    void changeLanguage(final UserId userId, final String language);
+
     void changeRole(final UserId userId, final User.Role role);
 
     void changeAdminDepartmentInfo(final UserDepartmentUpdateRequest request);

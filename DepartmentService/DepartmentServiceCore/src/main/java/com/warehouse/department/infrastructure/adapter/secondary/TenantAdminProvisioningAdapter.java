@@ -1,6 +1,7 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
 import com.warehouse.auth.infrastructure.adapter.primary.event.AdminUserCommand;
+import com.warehouse.commonassets.enumeration.Language;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.department.domain.event.DepartmentAdminChanged;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
@@ -14,7 +15,8 @@ public class TenantAdminProvisioningAdapter implements TenantAdminProvisioningPo
         final DepartmentCode departmentCode = new DepartmentCode(snapshot.departmentCode().getValue());
         final String telephoneNumber = snapshot.telephoneNumber();
         final String email = snapshot.email();
-        InfrastructureRegistry.eventPublisher().publishEvent(new AdminUserCommand(departmentCode, telephoneNumber, email,
+		InfrastructureRegistry.eventPublisher().publishEvent(new AdminUserCommand(departmentCode, telephoneNumber,
+				email, Language.EN,
                 userId -> DomainRegistry.eventPublisher().publishEvent(
 						new DepartmentAdminChanged(snapshot.departmentCode(), userId))));
     }

@@ -32,7 +32,7 @@ public class AuthEventListener {
     @EventListener
     public void handle(final AdminUserCommand command) {
         final AdminCreateRequest request = new AdminCreateRequest(command.getDepartmentCode(),
-                command.getEmail(), command.getTelephoneNumber());
+                command.getEmail(), command.getTelephoneNumber(), command.getLanguage().name());
         final UserId userId = this.authenticationPort.createAdminUser(request);
         command.getAdminCreatedId().accept(userId);
         log.info("Admin user created: {}", userId.getValue());

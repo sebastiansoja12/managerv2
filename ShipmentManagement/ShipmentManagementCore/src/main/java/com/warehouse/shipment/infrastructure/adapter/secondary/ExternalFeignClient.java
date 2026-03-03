@@ -34,9 +34,9 @@ public interface ExternalFeignClient {
     ResponseEntity<RouteProcessDto> createShipmentRoute(final URI uri, @RequestBody final ShipmentCreatedRequest request);
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<RouteLogRecord> updateRoutePerson(final URI uri,
-                                                     @RequestHeader("X-API-KEY") final String apiKey,
-                                                     @RequestBody final PersonChangedRequest request);
+    ResponseEntity<RouteLogRecordDto> updateRoutePerson(final URI uri,
+                                                        @RequestHeader("X-API-KEY") final String apiKey,
+                                                        @RequestBody final PersonChangedRequest request);
 
     class Configuration {
 

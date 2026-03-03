@@ -1,4 +1,4 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.api;
 
-public record TerminalId(String value) {
+public record FaultDescriptionDto(String value) {
 }

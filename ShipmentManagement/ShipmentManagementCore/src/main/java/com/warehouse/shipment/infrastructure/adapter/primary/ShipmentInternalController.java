@@ -98,6 +98,14 @@ public class ShipmentInternalController {
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
 
+    @GetMapping("/{shipmentId}/control-center")
+    @Counted(value = "controller.shipment.controlcenter.get")
+    @Timed(value = "controller.shipment.controlcenter.get")
+    public ResponseEntity<?> getControlCenter(@PathVariable final Long shipmentId) {
+        final ShipmentControlCenter controlCenter = shipmentPort.loadShipmentControlCenter(new ShipmentId(shipmentId));
+        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(controlCenter));
+    }
+
     @GetMapping("/tracking-numbers/{trackingNumber}")
     @Counted(value = "controller.shipment.trackingnumber.get")
     @Timed(value = "controller.shipment.trackingnumber.get")
@@ -105,6 +113,14 @@ public class ShipmentInternalController {
         final Shipment shipment = shipmentPort.loadShipment(new TrackingNumber(trackingNumber));
         final ShipmentDto shipmentResponse = responseMapper.map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
+    }
+
+    @GetMapping("/tracking-numbers/{trackingNumber}/control-center")
+    @Counted(value = "controller.shipment.trackingnumber.controlcenter.get")
+    @Timed(value = "controller.shipment.trackingnumber.controlcenter.get")
+    public ResponseEntity<?> getControlCenterByTrackingNumber(@PathVariable final String trackingNumber) {
+        final ShipmentControlCenter controlCenter = shipmentPort.loadShipmentControlCenter(new TrackingNumber(trackingNumber));
+        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(controlCenter));
     }
 
     @PutMapping

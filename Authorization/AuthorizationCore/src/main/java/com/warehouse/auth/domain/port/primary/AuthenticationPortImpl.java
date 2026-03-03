@@ -87,11 +87,14 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final DepartmentCode departmentCode = request.getDepartmentCode();
 
+        final String language = request.getLanguage();
+
         validateDepartmentCode(departmentCode);
 
         final String apiKey = jwtService.generateToken(firstName, username, role, departmentCode);
 
-        final User user = new User(userId, username, password, email, firstName, lastName, role, departmentCode, apiKey, Set.of());
+        final User user = new User(userId, username, password, email, firstName, lastName, role, departmentCode, apiKey,
+                language, Set.of());
 
         return userService.create(user);
     }
@@ -113,9 +116,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final DepartmentCode departmentCode = request.getDepartmentCode();
 
+        final String language = request.getLanguage();
+
         validateDepartmentCode(departmentCode);
 
-        final User user = User.createAdmin(userId, username, password, email, firstName, lastName, departmentCode, null);
+        final User user = User.createAdmin(userId, username, password, email, firstName, lastName, departmentCode, language, null);
 
         this.userService.create(user);
 

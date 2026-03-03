@@ -2,6 +2,9 @@ package com.warehouse.process.domain.port.primary;
 
 import java.time.Instant;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.InitializeProcessCommand;
@@ -59,5 +62,15 @@ public class ProcessPortImpl implements ProcessPort {
     @Override
     public void assignProcessDeviceValidation(final ProcessDeviceValidatedCommand command) {
         this.processService.assignDeviceValidation(command.getProcessId(), DeviceValidation.of(command));
+    }
+
+    @Override
+    public ProcessLog findByIdForCurrentDepartment(final ProcessId processId) {
+        return this.processService.findByIdForCurrentDepartment(processId);
+    }
+
+    @Override
+    public Page<ProcessLog> findAllForCurrentDepartment(final Pageable pageable) {
+        return this.processService.findAllForCurrentDepartment(pageable);
     }
 }

@@ -5,7 +5,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
 import com.warehouse.process.infrastructure.adapter.secondary.entity.read.ProcessLogReadEntity;
@@ -79,6 +86,21 @@ public class ProcessRepositoryImpl implements ProcessRepository {
                 .map(ProcessLogToModelMapper::map);
     }
 
+    @Override
+    public Optional<ProcessLog> findByIdForCurrentDepartment(final ProcessId processId) {
+        final DepartmentCode departmentCode = getDepartmentCode();
+        return readRepository.findByIdAndDepartmentCode(processId, departmentCode)
+                .map(ProcessLogToModelMapper::map);
+    }
+
+    @Override
+    public Page<ProcessLog> findAllForCurrentDepartment(final Pageable pageable) {
+        final DepartmentCode departmentCode = getDepartmentCode();
+
+        return readRepository.findAllByDepartmentCode(departmentCode, pageable)
+                .map(ProcessLogToModelMapper::map);
+    }
+
     public void finish(final ProcessId processId) {
         flushAndRemove(processId);
     }
@@ -112,5 +134,15 @@ public class ProcessRepositoryImpl implements ProcessRepository {
         if (existing.isPresent()) {
             throw new RuntimeException("Process log record already exists");
         }
+    }
+
+    private DepartmentCode getDepartmentCode() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication instanceof UsernameTenantPasswordAuthenticationToken token) {
+            return token.getDepartmentCode();
+        }
+
+        throw new IllegalStateException("No department code found");
     }
 }

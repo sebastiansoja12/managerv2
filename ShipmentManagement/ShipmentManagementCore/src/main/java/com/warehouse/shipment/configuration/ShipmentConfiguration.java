@@ -3,11 +3,15 @@ package com.warehouse.shipment.configuration;
 import java.time.Duration;
 import java.util.Set;
 
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
@@ -165,7 +169,10 @@ public class ShipmentConfiguration {
 
 	@Bean(name = "shipment.routeLogServicePort")
 	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
-	public RouteLogServicePort routeLogServicePort(final ExternalFeignClient externalFeignClient) {
+	public RouteLogServicePort routeLogServicePort(final ExternalFeignClient externalFeignClient,
+												   final GenericFeignResourceService genericFeignResourceService,
+												   final RouteTrackerLogProperties routeTrackerLogProperties,
+												   final RouteLogRecordMapper routeLogRecordMapper) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Route log service port");
 		final RetryConfig config = RetryConfig.custom()
 				.maxAttempts(3)
@@ -173,7 +180,25 @@ public class ShipmentConfiguration {
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new RouteLogServiceClient(config, externalFeignClient);
+		return new RouteLogServiceClient(config, externalFeignClient, genericFeignResourceService,
+				routeTrackerLogProperties, routeLogRecordMapper);
+	}
+
+	@Bean
+	public GenericFeignClientFactory genericFeignClientFactory(final ObjectFactory<HttpMessageConverters> messageConverters,
+															  final CurrentUserApiService currentUserApiService) {
+		return new GenericFeignClientFactory(messageConverters, currentUserApiService);
+	}
+
+	@Bean
+	public GenericFeignResourceService genericFeignResourceService(final GenericFeignClientFactory genericFeignClientFactory,
+																  final ObjectMapper objectMapper) {
+		return new GenericFeignResourceService(genericFeignClientFactory, objectMapper);
+	}
+
+	@Bean
+	public RouteLogRecordMapper routeLogRecordMapper() {
+		return new RouteLogRecordMapper();
 	}
 
 	@Bean

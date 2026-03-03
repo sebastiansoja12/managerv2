@@ -18,6 +18,11 @@ public class RouteLogServiceMockAdapter implements RouteLogServicePort {
     }
 
     @Override
+    public RouteLogRecord findByShipmentId(final ShipmentId shipmentId) {
+        return null;
+    }
+
+    @Override
     public RouteProcess notifyRecipientChanged(final ShipmentId shipmentId, final Recipient recipient, final SoftwareConfiguration softwareConfiguration) {
         return new RouteProcess(shipmentId, new ProcessId(UUID.randomUUID()), "" , "");
     }
