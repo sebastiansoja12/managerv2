@@ -2,6 +2,7 @@ package com.warehouse.deliveryreject.domain.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +49,8 @@ public class DeliveryRejectRequest implements Serializable, ExecutionSourceResol
     public void rewriteSupplierCodeFromDevice() {
         deliveryRejectDetails = deliveryRejectDetails
                 .stream()
+                .filter(deliveryRejectDetail ->
+                        Objects.isNull(deliveryRejectDetail.getSupplierCode()))
                 .peek(deliveryReturnDetail -> deliveryReturnDetail
                         .setSupplierCode(new SupplierCode(deviceInformation.getUsername())))
                 .collect(Collectors.toList());

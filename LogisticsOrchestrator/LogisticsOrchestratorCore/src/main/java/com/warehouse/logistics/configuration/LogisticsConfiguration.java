@@ -15,6 +15,10 @@ import com.warehouse.logistics.infrastructure.adapter.secondary.*;
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
+import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValidatorAspect;
+import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator;
+import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
+import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.DeviceEventPublisher;
 import com.warehouse.xmlconverter.XmlToStringService;
 import com.warehouse.xmlconverter.XmlToStringServiceImpl;
@@ -42,6 +46,23 @@ public class LogisticsConfiguration {
     @Bean
     public DeviceAgentPort deviceAgentPort(final DeviceAgentServicePort deviceAgentServicePort) {
         return new DeviceAgentPortImpl(deviceAgentServicePort);
+    }
+
+    @Bean
+    public DeviceContextAuthenticator deviceContextAuthenticator(final DeviceApiService deviceApiService) {
+        return new DeviceContextAuthenticator(deviceApiService);
+    }
+
+    @Bean
+    public DeviceAccessValidatorAspect deviceAccessValidatorAspect(
+            final DeviceContextAuthenticator deviceContextAuthenticator) {
+        return new DeviceAccessValidatorAspect(deviceContextAuthenticator);
+    }
+
+    @Bean
+    public LogisticsProcessFinishAspect terminalResponseProcessFinishAspect(
+            final ProcessHubEventPublisher processHubEventPublisher) {
+        return new LogisticsProcessFinishAspect(processHubEventPublisher);
     }
 
     @Bean

@@ -3,13 +3,13 @@ package com.warehouse.process.infrastructure.event;
 import java.time.LocalDateTime;
 
 import com.warehouse.commonassets.enumeration.ServiceType;
-import com.warehouse.process.infrastructure.dto.ProcessLogId;
+import com.warehouse.commonassets.identificator.ProcessId;
 
 public class ProcessResponseChangedEvent extends ProcessChangedEvent implements ProcessLogEvent {
 
     private final String response;
 
-    public ProcessResponseChangedEvent(final ProcessLogId processLogId,
+    public ProcessResponseChangedEvent(final ProcessId processLogId,
                                        final ServiceType serviceType,
                                        final LocalDateTime createdAt,
                                        final String response) {

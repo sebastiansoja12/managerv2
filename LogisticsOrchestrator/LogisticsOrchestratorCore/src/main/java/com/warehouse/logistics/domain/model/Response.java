@@ -2,12 +2,10 @@ package com.warehouse.logistics.domain.model;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.warehouse.deliverymissed.domain.vo.DeliveryMissedResponse;
 import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
-import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponseDetails;
 import com.warehouse.terminal.DeviceInformation;
 
 public class Response {
@@ -67,29 +65,29 @@ public class Response {
 
     public void updateLogisticsResponse(final Set<LogisticsResponse> logisticsRespons) {
         this.logisticsRespons = logisticsRespons;
-        final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturnResponse.getDeliveryReturnResponseDetails()
-                .stream()
-                .map(deliveryReturnResponseDetail -> logisticsRespons.stream()
-                        .filter(deliveryResponse -> deliveryResponse.getShipmentId().equals(deliveryReturnResponseDetail.getShipmentId()))
-                        .findFirst()
-                        .map(deliveryResponse -> new DeliveryReturnResponseDetails(
-                                deliveryReturnResponseDetail.getProcessId(),
-                                deliveryResponse.getDeliveryId(),
-                                deliveryReturnResponseDetail.getDepartmentCode(),
-                                deliveryReturnResponseDetail.getSupplierCode(),
-                                deliveryReturnResponseDetail.getShipmentId(),
-                                deliveryReturnResponseDetail.getDeliveryStatus(),
-                                deliveryReturnResponseDetail.getReturnToken(),
-                                deliveryReturnResponseDetail.getUpdateStatus()
-                        ))
-                        .orElse(deliveryReturnResponseDetail))
-                .collect(Collectors.toList());
-
-        this.deliveryReturnResponse = DeliveryReturnResponse
-                .builder()
-                .deviceInformation(this.deviceInformation)
-                .deliveryReturnResponseDetails(deliveryReturnResponseDetails)
-                .build();
+//        final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturnResponse.getDeliveryReturnResponseDetails()
+//                .stream()
+//                .map(deliveryReturnResponseDetail -> logisticsRespons.stream()
+//                        .filter(deliveryResponse -> deliveryResponse.getShipmentId().equals(deliveryReturnResponseDetail.getShipmentId()))
+//                        .findFirst()
+//                        .map(deliveryResponse -> new DeliveryReturnResponseDetails(
+//                                deliveryReturnResponseDetail.getProcessId(),
+//                                deliveryResponse.getDeliveryId(),
+//                                deliveryReturnResponseDetail.getDepartmentCode(),
+//                                deliveryReturnResponseDetail.getSupplierCode(),
+//                                deliveryReturnResponseDetail.getShipmentId(),
+//                                deliveryReturnResponseDetail.getDeliveryStatus(),
+//                                deliveryReturnResponseDetail.getReturnToken(),
+//                                deliveryReturnResponseDetail.getUpdateStatus()
+//                        ))
+//                        .orElse(deliveryReturnResponseDetail))
+//                .collect(Collectors.toList());
+//
+//        this.deliveryReturnResponse = DeliveryReturnResponse
+//                .builder()
+//                .deviceInformation(this.deviceInformation)
+//                .deliveryReturnResponseDetails(deliveryReturnResponseDetails)
+//                .build();
     }
 
 }

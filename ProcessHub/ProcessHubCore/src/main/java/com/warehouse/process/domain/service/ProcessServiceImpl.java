@@ -10,6 +10,7 @@ import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.context.DomainContext;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.event.ProcessCreatedEvent;
+import com.warehouse.process.domain.event.ProcessFinished;
 import com.warehouse.process.domain.event.ProcessResponseUpdated;
 import com.warehouse.process.domain.exception.ProcessLogNotFoundException;
 import com.warehouse.process.domain.model.ProcessLog;
@@ -85,7 +86,8 @@ public class ProcessServiceImpl implements ProcessService {
 		this.processRepository.findById(processId).ifPresent(processLog -> {
 			processLog.changeStatus(ProcessStatus.SUCCESS);
 			this.processRepository.update(processLog);
-		});
+            DomainContext.eventPublisher().publishEvent(new ProcessFinished(processLog.snapshot(), Instant.now()));
+        });
 	}
 
 	@Override
@@ -93,6 +95,7 @@ public class ProcessServiceImpl implements ProcessService {
 		this.processRepository.findById(processId).ifPresent(processLog -> {
 			processLog.changeStatus(ProcessStatus.FAILURE);
 			this.processRepository.update(processLog);
+            DomainContext.eventPublisher().publishEvent(new ProcessFinished(processLog.snapshot(), Instant.now()));
 		});
 	}
 }

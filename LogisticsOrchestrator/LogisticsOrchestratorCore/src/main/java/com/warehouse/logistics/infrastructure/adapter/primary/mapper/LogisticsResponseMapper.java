@@ -6,11 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.delivery.dto.DeviceIdDto;
 import com.warehouse.delivery.dto.DeviceInformationDto;
 import com.warehouse.delivery.dto.ShipmentIdDto;
@@ -37,7 +33,7 @@ import com.warehouse.terminal.response.TerminalResponse;
 
 public class LogisticsResponseMapper {
 
-    public TerminalResponse map(final Response response) {
+    public TerminalResponse map(final ProcessId processId, final Response response) {
         if (response == null) {
             return null;
         }
@@ -45,7 +41,7 @@ public class LogisticsResponseMapper {
         final Device device = map(response.getDeviceInformation());
         final DeliveryRejectResponse deliveryRejectResponse = map(response.getDeliveryRejectResponse());
         final com.warehouse.terminal.model.DeliveryReturnResponse deliveryReturnResponse = map(response.getDeliveryReturnResponse());
-        return new TerminalResponse(device, deliveryRejectResponse, deliveryReturnResponse);
+        return new TerminalResponse(device, processId.getValue().toString(), deliveryRejectResponse, deliveryReturnResponse);
     }
 
     public String map(final SupplierCode supplierCode) {
