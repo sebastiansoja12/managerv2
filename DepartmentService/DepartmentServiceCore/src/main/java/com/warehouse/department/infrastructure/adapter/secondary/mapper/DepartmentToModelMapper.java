@@ -1,10 +1,10 @@
 package com.warehouse.department.infrastructure.adapter.secondary.mapper;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.Coordinates;
-import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.TaxId;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentAddress;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentCoordinates;
