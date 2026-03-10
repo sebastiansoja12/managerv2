@@ -39,7 +39,7 @@ public class DeviceAccessValidatorAspect {
                 return terminalRequest;
             }
         }
-        throw new IllegalArgumentException("@DeviceAccessValidator requires TerminalRequest argument");
+        throw new IllegalArgumentException("DeviceAccessValidator requires TerminalRequest argument");
     }
 
     private DeviceType resolveDevice(final TerminalRequest terminalRequest) {

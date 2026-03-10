@@ -23,7 +23,20 @@ public class DeliveryRejectConverterServiceImpl implements DeliveryRejectConvert
     public DeliveryRejectResponseDetails convertToDeliveryRejectResponseDetails(final DeliveryReject deliveryReject, final ShipmentRejectResponse response) {
         final RejectReasonId rejectReasonId = deliveryReject.getRejectReasonId();
         final ShipmentId shipmentId = deliveryReject.getShipmentId();
-        final ShipmentId newShipmentId = deliveryReject.getShipmentId();
-        return null;
+        final ShipmentId newShipmentId = response == null || response.newShipmentId() == null
+                ? shipmentId
+                : response.newShipmentId();
+
+        return new DeliveryRejectResponseDetails(
+                rejectReasonId,
+                shipmentId,
+                newShipmentId,
+                deliveryReject.getSupplierCode(),
+                deliveryReject.getDepartmentCode(),
+                deliveryReject.getRejectReason(),
+                deliveryReject.getDeliveryStatus(),
+                response == null ? null : response.success(),
+                response == null ? null : response.errorMessage()
+        );
     }
 }

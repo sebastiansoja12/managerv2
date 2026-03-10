@@ -10,7 +10,7 @@ import com.warehouse.process.infrastructure.adapter.secondary.entity.read.Proces
 public abstract class ProcessLogToReadEntityMapper {
 
     public static ProcessLogReadEntity map(final ProcessLog processLog) {
-        return ProcessLogReadEntity.builder()
+        final ProcessLogReadEntity parent = ProcessLogReadEntity.builder()
                 .faultDescription(processLog.getFaultDescription())
                 .processId(processLog.getProcessId())
                 .request(processLog.getRequest())
@@ -20,6 +20,14 @@ public abstract class ProcessLogToReadEntityMapper {
                 .createdAt(processLog.getCreatedAt())
                 .modifiedAt(processLog.getModifiedAt())
                 .build();
+
+        processLog.getCommunicationLogDetails()
+                .getCommunicationLogDetails()
+                .stream()
+                .map(detail -> map(detail, parent))
+                .forEach(parent::addCommunicationLog);
+
+        return parent;
     }
 
     public static CommunicationLogReadEntity map(final CommunicationLogDetail detail,

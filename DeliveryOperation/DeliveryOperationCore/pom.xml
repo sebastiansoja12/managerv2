@@ -21,6 +21,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>ShipmentManagementApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>RouteLoggerCore</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -4,10 +4,12 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
+import com.warehouse.process.domain.vo.CommunicationLogId;
 
 public class CommunicationLogDetails {
     private Set<CommunicationLogDetail> communicationLogDetails;
@@ -28,6 +30,11 @@ public class CommunicationLogDetails {
                 .orElseGet(() -> addNewCommunicationLog(processType, serviceType));
     }
 
+    public CommunicationLogDetail addCommunicationLogDetail(final ProcessType processType,
+                                                            final ServiceType serviceType) {
+        return addNewCommunicationLog(processType, serviceType);
+    }
+
     private CommunicationLogDetail addNewCommunicationLog(final ProcessType processType, final ServiceType serviceType) {
         final CommunicationLogDetail communicationLogDetail = createNewCommunicationLogDetail(processType, serviceType);
         getCommunicationLogDetails().add(communicationLogDetail);
@@ -38,11 +45,17 @@ public class CommunicationLogDetails {
                                                                    final ServiceType serviceType) {
         return CommunicationLogDetail
                 .builder()
+                .communicationLogId(nextCommunicationLogId())
                 .serviceType(serviceType)
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .processType(processType)
                 .build();
+    }
+
+    private CommunicationLogId nextCommunicationLogId() {
+        final long value = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+        return new CommunicationLogId(value);
     }
 
     private Predicate<? super CommunicationLogDetail> equalRouteLogRecordDetailId(final Long id) {

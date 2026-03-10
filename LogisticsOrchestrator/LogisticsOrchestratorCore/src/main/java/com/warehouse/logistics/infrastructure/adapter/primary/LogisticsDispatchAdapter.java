@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import com.warehouse.commonassets.validator.DeviceAccessValidator;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -13,9 +12,16 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.validator.DeviceAccessValidator;
 import com.warehouse.logistics.configuration.LogisticsSoapWebServiceConfiguration;
-import com.warehouse.logistics.domain.model.*;
-import com.warehouse.logistics.domain.port.primary.*;
+import com.warehouse.logistics.domain.model.LogisticsRequest;
+import com.warehouse.logistics.domain.model.LogisticsResponse;
+import com.warehouse.logistics.domain.model.Request;
+import com.warehouse.logistics.domain.model.Response;
+import com.warehouse.logistics.domain.port.primary.DeviceAgentPort;
+import com.warehouse.logistics.domain.port.primary.DeviceValidatorPort;
+import com.warehouse.logistics.domain.port.primary.LogisticsPort;
+import com.warehouse.logistics.domain.port.primary.ProcessInitializerPort;
 import com.warehouse.logistics.infrastructure.adapter.primary.creator.DeliveryCreator;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
@@ -37,19 +43,13 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
 
     private final Set<DeliveryCreator> deliveryCreators;
 
-    private final TerminalRequestLoggerPort terminalRequestLoggerPort;
-
-    private final SupplierValidatorPort supplierValidatorPort;
-
-    private final DepartmentValidatorPort departmentValidatorPort;
-
     private final DeviceValidatorPort deviceValidatorPort;
 
     private final DeviceAgentPort deviceAgentPort;
 
-    private final LogisticsRequestMapper requestMapper = new LogisticsRequestMapper();
+    private final LogisticsRequestMapper requestMapper;
 
-    private final LogisticsResponseMapper responseMapper = new LogisticsResponseMapper();
+    private final LogisticsResponseMapper responseMapper;
 
     private final ProcessInitializerPort processInitializerPort;
 
@@ -60,22 +60,20 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
     public LogisticsDispatchAdapter(final List<ProcessHandler> handlers,
                                     final LogisticsPort logisticsPort,
                                     final Set<DeliveryCreator> deliveryCreators,
-                                    final TerminalRequestLoggerPort terminalRequestLoggerPort,
-                                    final SupplierValidatorPort supplierValidatorPort,
-                                    final DepartmentValidatorPort departmentValidatorPort,
                                     final DeviceValidatorPort deviceValidatorPort,
                                     final DeviceAgentPort deviceAgentPort,
+                                    final LogisticsRequestMapper requestMapper,
+                                    final LogisticsResponseMapper responseMapper,
                                     final ProcessInitializerPort processInitializerPort,
                                     final ProcessHubEventPublisher processHubEventPublisher,
                                     final XmlToStringService xmlToStringService) {
         super(handlers);
         this.logisticsPort = logisticsPort;
         this.deliveryCreators = deliveryCreators;
-        this.terminalRequestLoggerPort = terminalRequestLoggerPort;
-        this.supplierValidatorPort = supplierValidatorPort;
-        this.departmentValidatorPort = departmentValidatorPort;
         this.deviceValidatorPort = deviceValidatorPort;
         this.deviceAgentPort = deviceAgentPort;
+        this.requestMapper = requestMapper;
+        this.responseMapper = responseMapper;
         this.processInitializerPort = processInitializerPort;
         this.processHubEventPublisher = processHubEventPublisher;
         this.xmlToStringService = xmlToStringService;
@@ -92,18 +90,16 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
                 device.getResponsibleUser(), device.getDepartmentCode());
 
         final ProcessId processId = this.processInitializerPort.initializeProcess(terminalRequest);
+        LogisticsProcessContext.setProcessId(processId);
         log.info("Process initialized in orchestrator flow: {}", processId.value());
 
-        deviceValidatorPort.validateDevice(new DeviceValidateCommand(
-                processId,
-                ProcessType.valueOf(terminalRequest.getProcessType().name()),
-                JaxbDeviceInformationMapper.map(device)));
+        deviceValidatorPort.validateDevice(processId, terminalRequest);
 
         deviceAgentPort.updateDeviceIfNeed(JaxbDeviceInformationMapper.map(device));
 
         final Request request = this.requestMapper.map(terminalRequest);
 
-        final Response response = this.process(request);
+        final Response response = this.process(processId, request);
 
         final DeliveryCreator deliveryCreator = determineDeliveryCreator(request.getProcessType());
 

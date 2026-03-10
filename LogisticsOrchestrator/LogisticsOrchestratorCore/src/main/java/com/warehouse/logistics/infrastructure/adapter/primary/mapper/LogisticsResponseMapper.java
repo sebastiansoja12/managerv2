@@ -175,7 +175,9 @@ public class LogisticsResponseMapper {
                 new SupplierCode(dto.getSupplierCode().value()),
                 new DepartmentCode(dto.getDepartmentCode().value()),
                 new RejectReason(dto.getRejectReason().value()),
-                DeliveryStatus.valueOf(dto.getDeliveryStatus().name()));
+                DeliveryStatus.valueOf(dto.getDeliveryStatus().name()),
+                dto.getSuccess(),
+                dto.getErrorMessage());
     }
 
     public ShipmentId map(final ShipmentIdDto shipmentId) {

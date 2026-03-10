@@ -6,6 +6,7 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.deliveryreject.domain.vo.Person;
 import com.warehouse.deliveryreject.domain.vo.RejectReason;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
 
@@ -15,6 +16,7 @@ public class DeliveryRejectDetails {
     private SupplierCode supplierCode;
     private DeliveryStatus deliveryStatus;
     private RejectReason rejectReason;
+    private Person recipient;
     private ShipmentStatus shipmentStatus;
     private ProcessType processType;
 
@@ -23,6 +25,7 @@ public class DeliveryRejectDetails {
                                  final SupplierCode supplierCode,
                                  final DeliveryStatus deliveryStatus,
                                  final RejectReason rejectReason,
+                                 final Person recipient,
                                  final ShipmentStatus shipmentStatus,
                                  final ProcessType processType) {
         this.shipmentId = shipmentId;
@@ -30,6 +33,7 @@ public class DeliveryRejectDetails {
         this.supplierCode = supplierCode;
         this.deliveryStatus = deliveryStatus;
         this.rejectReason = rejectReason;
+        this.recipient = recipient;
         this.shipmentStatus = shipmentStatus;
         this.processType = processType;
     }
@@ -86,5 +90,13 @@ public class DeliveryRejectDetails {
 
     public ShipmentStatus getShipmentStatus() {
         return shipmentStatus;
+    }
+
+    public Person getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(final Person recipient) {
+        this.recipient = recipient;
     }
 }

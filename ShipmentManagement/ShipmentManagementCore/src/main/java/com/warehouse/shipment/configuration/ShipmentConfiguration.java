@@ -3,10 +3,10 @@ package com.warehouse.shipment.configuration;
 import java.time.Duration;
 import java.util.Set;
 
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,6 +22,8 @@ import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.*;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentApiServiceAdapter;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
@@ -98,6 +100,11 @@ public class ShipmentConfiguration {
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort,
 				mailNotificationServicePort, trackingNumberService);
+	}
+
+	@Bean
+	public ShipmentApiService shipmentApiService(final ShipmentPort shipmentPort) {
+		return new ShipmentApiServiceAdapter(shipmentPort);
 	}
 
 	@Bean

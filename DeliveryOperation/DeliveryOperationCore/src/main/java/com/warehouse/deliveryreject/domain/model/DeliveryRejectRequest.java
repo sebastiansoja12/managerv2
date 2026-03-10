@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.enumeration.ExecutionSourceType;
@@ -17,17 +18,30 @@ public class DeliveryRejectRequest implements Serializable, ExecutionSourceResol
     private List<DeliveryRejectDetails> deliveryRejectDetails;
     private DeviceInformation deviceInformation;
     private ProcessType processType;
+    private ProcessId processId;
 
     public DeliveryRejectRequest(final List<DeliveryRejectDetails> deliveryRejectDetails,
                                  final DeviceInformation deviceInformation,
                                  final ProcessType processType) {
+        this(deliveryRejectDetails, deviceInformation, processType, null);
+    }
+
+    public DeliveryRejectRequest(final List<DeliveryRejectDetails> deliveryRejectDetails,
+                                 final DeviceInformation deviceInformation,
+                                 final ProcessType processType,
+                                 final ProcessId processId) {
         this.deliveryRejectDetails = deliveryRejectDetails;
         this.deviceInformation = deviceInformation;
         this.processType = processType;
+        this.processId = processId;
     }
 
     public ProcessType getProcessType() {
         return processType;
+    }
+
+    public ProcessId getProcessId() {
+        return processId;
     }
 
     public void setDeliveryRejectDetails(final List<DeliveryRejectDetails> deliveryRejectDetails) {

@@ -88,7 +88,6 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } finally {
             MDC.clear();
-            JwtContext.clear();
             SecurityContextHolder.clearContext();
         }
     }

@@ -15,6 +15,11 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>ShipmentManagementApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>DepartmentServiceCore</artifactId>
             <version>${project.version}</version>
         </dependency>

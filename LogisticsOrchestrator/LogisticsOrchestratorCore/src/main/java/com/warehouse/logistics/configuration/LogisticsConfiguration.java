@@ -1,23 +1,25 @@
 package com.warehouse.logistics.configuration;
 
-import com.warehouse.auth.UserApiService;
-import com.warehouse.process.ProcessHubEventPublisher;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.warehouse.auth.UserApiService;
 import com.warehouse.logistics.domain.port.primary.*;
 import com.warehouse.logistics.domain.port.secondary.*;
 import com.warehouse.logistics.domain.service.LogisticsService;
 import com.warehouse.logistics.domain.service.LogisticsServiceImpl;
-import com.warehouse.logistics.infrastructure.adapter.secondary.*;
-import com.warehouse.process.ProcessHubApiService;
-import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValidatorAspect;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator;
 import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
+import com.warehouse.logistics.infrastructure.adapter.secondary.*;
+import com.warehouse.process.ProcessHubApiService;
+import com.warehouse.process.ProcessHubEventPublisher;
+import com.warehouse.routelogger.RouteLogEventPublisher;
+import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.DeviceEventPublisher;
 import com.warehouse.xmlconverter.XmlToStringService;
@@ -136,5 +138,15 @@ public class LogisticsConfiguration {
     @Bean("logistics.departmentRepository")
     public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
         return new DepartmentRepositoryImpl(repository);
+    }
+
+    @Bean(name = "logistics.requestMapper")
+    public LogisticsRequestMapper requestMapper() {
+        return new LogisticsRequestMapper();
+    }
+
+    @Bean(name = "logistics.responseMapper")
+    public LogisticsResponseMapper responseMapper() {
+        return new LogisticsResponseMapper();
     }
 }

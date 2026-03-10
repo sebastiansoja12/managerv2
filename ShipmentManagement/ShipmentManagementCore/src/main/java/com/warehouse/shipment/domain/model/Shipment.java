@@ -9,6 +9,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
@@ -637,6 +638,8 @@ public class Shipment {
         this.recipient = newRecipient;
 
         this.shipmentStatus = ShipmentStatus.CREATED;
+        this.externalShipmentId = ExternalId.randomUUID();
+        this.trackingNumber = DomainContext.trackingNumberService().nextTrackingNumber(CarrierOperator.DEFAULT);
 
         markAsModified();
 

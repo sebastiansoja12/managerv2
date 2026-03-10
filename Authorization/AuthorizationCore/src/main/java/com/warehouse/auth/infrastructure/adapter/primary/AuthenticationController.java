@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.warehouse.auth.domain.model.RefreshTokenRequest;
 import com.warehouse.auth.domain.model.RegisterRequest;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.auth.domain.service.ApiKeyService;
+import com.warehouse.auth.domain.service.JwtDecodeService;
 import com.warehouse.auth.domain.vo.AuthenticationResponse;
 import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.domain.vo.RegisterResponse;
@@ -27,7 +27,7 @@ public class AuthenticationController {
 
     private final AuthenticationPort authenticationPort;
 
-    private final ApiKeyService apiKeyService;
+    private final JwtDecodeService jwtDecodeService;
 
     private final AuthenticationRequestMapper requestMapper;
 

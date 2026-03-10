@@ -2,11 +2,11 @@ package com.warehouse.deliveryreject.domain.model;
 
 import java.io.Serializable;
 
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.deliveryreject.domain.enumeration.DeliveryStatus;
 import com.warehouse.deliveryreject.domain.vo.Person;
 import com.warehouse.deliveryreject.domain.vo.RejectReason;
 import com.warehouse.deliveryreject.domain.vo.RejectReasonId;

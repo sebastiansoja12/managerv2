@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 
 import com.warehouse.commonassets.enumeration.ServiceType;
@@ -26,13 +27,37 @@ public class LogisticsProcessFinishAspect {
             pointcut = "@annotation(com.warehouse.commonassets.validator.DeviceAccessValidator)",
             returning = "terminalResponse")
     public void publishProcessFinishEvent(final TerminalResponse terminalResponse) {
-        if (terminalResponse == null || terminalResponse.getProcessId() == null || terminalResponse.getProcessId().isBlank()) {
-            return;
+        try {
+            if (terminalResponse == null || terminalResponse.getProcessId() == null || terminalResponse.getProcessId().isBlank()) {
+                return;
+            }
+            processHubEventPublisher.publish(new ProcessFinishEvent(
+                    new ProcessId(UUID.fromString(terminalResponse.getProcessId())),
+                    ServiceType.LOGISTICS_ORCHESTRATOR,
+                    ProcessStatusDto.SUCCESS,
+                    LocalDateTime.now()));
+        } finally {
+            LogisticsProcessContext.clear();
         }
-        processHubEventPublisher.publish(new ProcessFinishEvent(
-                new ProcessId(UUID.fromString(terminalResponse.getProcessId())),
-                ServiceType.LOGISTICS_ORCHESTRATOR,
-                ProcessStatusDto.SUCCESS,
-                LocalDateTime.now()));
+    }
+
+    @AfterThrowing(
+            pointcut = "@annotation(com.warehouse.commonassets.validator.DeviceAccessValidator)",
+            throwing = "exception")
+    public void publishProcessFailureEvent(final Throwable exception) {
+        try {
+            final ProcessId processId = LogisticsProcessContext.getProcessId();
+            if (processId == null) {
+                return;
+            }
+            processHubEventPublisher.publish(new ProcessFinishEvent(
+                    processId,
+                    ServiceType.LOGISTICS_ORCHESTRATOR,
+                    ProcessStatusDto.FAILURE,
+                    LocalDateTime.now(),
+                    exception.getMessage()));
+        } finally {
+            LogisticsProcessContext.clear();
+        }
     }
 }

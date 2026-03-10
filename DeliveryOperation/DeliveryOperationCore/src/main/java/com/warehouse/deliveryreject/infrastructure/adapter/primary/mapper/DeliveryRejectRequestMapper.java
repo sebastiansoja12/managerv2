@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectDetails;
@@ -22,7 +23,10 @@ public interface DeliveryRejectRequestMapper {
         final List<DeliveryRejectDetails> deliveryRejectDetails = map(deliveryRejectRequest.getDeliveryRejectDetails());
         final DeviceInformation deviceInformation = map(deliveryRejectRequest.getDeviceInformation());
         final ProcessType processType = map(deliveryRejectRequest.getProcessType());
-        return new DeliveryRejectRequest(deliveryRejectDetails, deviceInformation, processType);
+        final ProcessId processId = deliveryRejectRequest.getProcessId() == null
+                ? null
+                : new ProcessId(deliveryRejectRequest.getProcessId());
+        return new DeliveryRejectRequest(deliveryRejectDetails, deviceInformation, processType, processId);
     }
 
     List<DeliveryRejectDetails> map(final List<DeliveryRejectDetailsDto> deliveryRejectDetails);
