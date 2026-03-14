@@ -1,10 +1,14 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.enumeration.ShipmentPriority;
+import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
@@ -18,6 +22,7 @@ import com.warehouse.shipment.domain.model.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
+import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 
@@ -61,5 +66,49 @@ public interface ShipmentRequestMapper {
         return new ShipmentDeliveryCommand(new ShipmentId(deliveryRequest.shipmentId().getValue()),
                 DeliveryMethod.valueOf(deliveryRequest.deliveryMethod()), new SupplierCode(deliveryRequest.supplierCode().value()),
                 DeliveryStatus.valueOf(deliveryRequest.deliveryStatus()));
+    }
+
+    default ShipmentSearchCriteria map(final ShipmentSearchRequestApi request) {
+        if (request == null) {
+            return new ShipmentSearchCriteria(null, null, List.of(), List.of(), List.of(), null, null, null,
+                    null, null, null, null, null, null, null, null);
+        }
+
+        return new ShipmentSearchCriteria(
+                request.shipmentId(),
+                request.trackingNumber(),
+                mapStatuses(request.shipmentStatuses()),
+                mapSizes(request.shipmentSizes()),
+                mapPriorities(request.shipmentPriorities()),
+                request.senderName(),
+                request.recipientName(),
+                request.destination(),
+                request.minPrice(),
+                request.maxPrice(),
+                request.currency() == null || request.currency().isBlank() ? null : Currency.valueOf(request.currency()),
+                request.locked(),
+                request.createdFrom(),
+                request.createdTo(),
+                request.page(),
+                request.size()
+        );
+    }
+
+    private List<ShipmentStatus> mapStatuses(final List<ShipmentStatusDto> statuses) {
+        return statuses == null ? List.of() : statuses.stream()
+                .map(status -> ShipmentStatus.valueOf(status.name()))
+                .toList();
+    }
+
+    private List<ShipmentSize> mapSizes(final List<ShipmentSizeDto> sizes) {
+        return sizes == null ? List.of() : sizes.stream()
+                .map(size -> ShipmentSize.valueOf(size.name()))
+                .toList();
+    }
+
+    private List<ShipmentPriority> mapPriorities(final List<ShipmentPriorityDto> priorities) {
+        return priorities == null ? List.of() : priorities.stream()
+                .map(priority -> ShipmentPriority.valueOf(priority.name()))
+                .toList();
     }
 }

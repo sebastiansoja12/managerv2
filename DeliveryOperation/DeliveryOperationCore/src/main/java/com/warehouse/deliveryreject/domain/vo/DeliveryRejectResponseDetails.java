@@ -13,6 +13,8 @@ public class DeliveryRejectResponseDetails {
     private final DepartmentCode departmentCode;
     private final RejectReason rejectReason;
     private final DeliveryStatus deliveryStatus;
+    private final Boolean success;
+    private final String errorMessage;
 
     public DeliveryRejectResponseDetails(final RejectReasonId rejectReasonId,
                                          final ShipmentId shipmentId,
@@ -21,6 +23,19 @@ public class DeliveryRejectResponseDetails {
                                          final DepartmentCode departmentCode,
                                          final RejectReason rejectReason,
                                          final DeliveryStatus deliveryStatus) {
+        this(rejectReasonId, shipmentId, newShipmentId, supplierCode, departmentCode, rejectReason, deliveryStatus,
+                null, null);
+    }
+
+    public DeliveryRejectResponseDetails(final RejectReasonId rejectReasonId,
+                                         final ShipmentId shipmentId,
+                                         final ShipmentId newShipmentId,
+                                         final SupplierCode supplierCode,
+                                         final DepartmentCode departmentCode,
+                                         final RejectReason rejectReason,
+                                         final DeliveryStatus deliveryStatus,
+                                         final Boolean success,
+                                         final String errorMessage) {
         this.rejectReasonId = rejectReasonId;
         this.shipmentId = shipmentId;
         this.newShipmentId = newShipmentId;
@@ -28,6 +43,8 @@ public class DeliveryRejectResponseDetails {
         this.departmentCode = departmentCode;
         this.rejectReason = rejectReason;
         this.deliveryStatus = deliveryStatus;
+        this.success = success;
+        this.errorMessage = errorMessage;
     }
 
     public RejectReasonId getRejectReasonId() {
@@ -56,5 +73,13 @@ public class DeliveryRejectResponseDetails {
 
     public RejectReason getRejectReason() {
         return rejectReason;
+    }
+
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

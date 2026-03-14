@@ -1,10 +1,9 @@
 package com.warehouse.logistics.domain.port.primary;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.logistics.domain.port.secondary.DepartmentRepository;
 import com.warehouse.logistics.domain.vo.Department;
 import com.warehouse.logistics.infrastructure.adapter.primary.exception.RestException;
-import com.warehouse.terminal.information.Device;
+import com.warehouse.terminal.DeviceInformation;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,14 +17,14 @@ public class DepartmentValidatorPortImpl implements DepartmentValidatorPort {
     }
 
     @Override
-    public void validateDepartment(final Device device) {
-        log.info("Validating department {} from device {}", device.getDepartmentCode(), device);
-        final Department department = this.departmentRepository.findByCode(new DepartmentCode(device.getDepartmentCode()));
+    public void validateDepartment(final DeviceInformation deviceInformation) {
+        log.info("Validating department {} from device {}", deviceInformation.getDepartmentCode(), deviceInformation);
+        final Department department = this.departmentRepository.findByCode(deviceInformation.getDepartmentCode());
         if (department == null || !department.isActive()) {
-            log.error("User {} validation for department {} failed. Used Device: [{}]", device.getUsername(),
-                    device.getDepartmentCode(), device);
+            log.error("User {} validation for department {} failed. Used Device: [{}]", deviceInformation.getUsername(),
+                    deviceInformation.getDepartmentCode(), deviceInformation);
             throw new RestException(400, "Department is not valid");
         }
-        log.info("Device [{}] department validated", device);
+        log.info("Device [{}] department validated", deviceInformation);
     }
 }

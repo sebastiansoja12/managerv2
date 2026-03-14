@@ -3,7 +3,7 @@ package com.warehouse.auth.domain.model;
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RegisterRequestDto;
+import com.warehouse.auth.infrastructure.dto.RegisterRequestDto;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 
 import lombok.NonNull;
@@ -25,8 +25,10 @@ public class RegisterRequest {
 
     private DepartmentCode departmentCode;
 
+    private String language;
+
 	public RegisterRequest(final DepartmentCode departmentCode, final String email, final String firstName,
-			final String lastName, final String password, final String role, final String username) {
+			final String lastName, final String password, final String role, final String username, final String language) {
 		this.departmentCode = departmentCode;
 		this.email = email;
 		this.firstName = firstName;
@@ -34,6 +36,7 @@ public class RegisterRequest {
 		this.password = password;
 		this.role = role;
 		this.username = username;
+        this.language = language;
 	}
 
     public DepartmentCode getDepartmentCode() {
@@ -88,9 +91,17 @@ public class RegisterRequest {
         this.username = username;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(final String language) {
+        this.language = language;
+    }
+
     public static RegisterRequest from(final RegisterRequestDto req) {
 		return new RegisterRequest(new DepartmentCode(req.departmentCode()), req.email(), req.firstName(),
-				req.lastName(), req.password(), req.role(), req.username());
+				req.lastName(), req.password(), req.role(), req.username(), req.language());
     }
 
     public String getUsername() {

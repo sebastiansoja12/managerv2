@@ -8,13 +8,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
+import com.warehouse.process.domain.model.ProcessDeviceValidatedCommand;
 import com.warehouse.process.domain.port.primary.ProcessPort;
+import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
+import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 import com.warehouse.process.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.process.infrastructure.dto.ShipmentUpdateDto;
-import com.warehouse.process.infrastructure.event.ProcessFinishEvent;
-import com.warehouse.process.infrastructure.event.ProcessLogEvent;
-import com.warehouse.process.infrastructure.event.ProcessShipmentUpdatedEvent;
+import com.warehouse.process.infrastructure.event.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +37,7 @@ public class ProcessResourceEventListener {
         logEvent(event);
         final ProcessStatus processStatus = RequestMapper.map(event.getProcessStatus());
         final ProcessId processId = RequestMapper.map(event.getProcessLogId());
-        this.processPort.finishProcess(processId, processStatus);
+        this.processPort.finishProcess(processId, processStatus, event.getFaultDescription());
     }
 
     @EventListener
@@ -46,6 +47,57 @@ public class ProcessResourceEventListener {
         final ShipmentUpdateDto shipmentUpdate = event.getShipmentUpdate();
         final ShipmentUpdated shipmentUpdated = RequestMapper.map(shipmentUpdate);
         this.processPort.assignShipmentUpdated(processId, shipmentUpdated);
+    }
+
+    @EventListener
+    public void handle(final ProcessShipmentRejectedEvent event) {
+        if (event instanceof ProcessShipmentRejectedFailedEvent) {
+            return;
+        }
+        logEvent(event);
+        final ProcessId processId = RequestMapper.map(event.getProcessLogId());
+        this.processPort.assignShipmentRejected(processId, new ShipmentRejected(
+                event.getServiceType(),
+                com.warehouse.commonassets.enumeration.ProcessType.REJECT,
+                event.getRequest(),
+                event.getResponse(),
+                null
+        ));
+    }
+
+    @EventListener
+    public void handle(final ProcessShipmentRejectedFailedEvent event) {
+        logEvent(event);
+        final ProcessId processId = RequestMapper.map(event.getProcessLogId());
+        this.processPort.assignShipmentRejected(processId, new ShipmentRejected(
+                event.getServiceType(),
+                com.warehouse.commonassets.enumeration.ProcessType.REJECT,
+                event.getRequest(),
+                event.getResponse(),
+                event.getFaultDescription()
+        ));
+        this.processPort.finishProcess(processId, ProcessStatus.FAILURE, event.getFaultDescription());
+    }
+
+    @EventListener
+    public void handle(final ProcessDeviceValidatedEvent event) {
+        logEvent(event);
+        final ProcessDeviceValidatedCommand command = ProcessDeviceValidatedCommand.builder()
+                .deviceId(event.getDeviceId())
+                .processId(event.getProcessId())
+                .sourceServiceType(event.getSourceServiceType())
+                .targetServiceType(event.getTargetServiceType())
+                .timestamp(event.getCreatedAt())
+                .processType(event.getProcessType())
+                .build();
+        this.processPort.assignProcessDeviceValidation(command);
+    }
+
+    @EventListener
+    public void handle(final ProcessResponseChangedEvent event) {
+        logEvent(event);
+        final ProcessId processId = RequestMapper.map(event.getProcessLogId());
+        this.processPort.changeResponse(new ChangeResponseProcessCommand(processId, event.getResponse()));
     }
 
     private void logEvent(final ProcessLogEvent event) {

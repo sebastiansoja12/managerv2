@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>Terminal</artifactId>
-        <version>2026.1-SNAPSHOT</version>
+        <version>2026.2-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
 
@@ -16,6 +16,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>TerminalApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>AuthorizationApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -36,6 +41,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>DepartmentServiceApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ProcessHubApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -123,7 +133,6 @@
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-retry</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>

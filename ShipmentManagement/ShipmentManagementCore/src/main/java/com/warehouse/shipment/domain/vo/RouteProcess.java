@@ -1,10 +1,10 @@
 package com.warehouse.shipment.domain.vo;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatusCode;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.infrastructure.adapter.secondary.api.RouteLogRecord;
 
 
 public class RouteProcess {
@@ -23,14 +23,19 @@ public class RouteProcess {
     }
 
     public static RouteProcess from(final ResponseEntity<RouteLogRecord> responseEntity, final ShipmentId shipmentId) {
+        return from(responseEntity.getBody(), responseEntity.getStatusCode(), shipmentId);
+    }
+
+    public static RouteProcess from(final RouteLogRecord routeLogRecord,
+                                    final HttpStatusCode statusCode,
+                                    final ShipmentId shipmentId) {
         final RouteProcess routeProcess;
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            assert responseEntity.getBody() != null;
-            routeProcess = RouteProcess.from(shipmentId, responseEntity.getBody().processId(),
-                    responseEntity.getBody().faultDescription().value(), responseEntity.getBody().returnCode().value());
+        if (statusCode.is2xxSuccessful()) {
+            assert routeLogRecord != null;
+            routeProcess = RouteProcess.from(shipmentId, routeLogRecord.processId(),
+                    routeLogRecord.faultDescription().value(), routeLogRecord.returnCode().value());
         } else {
-            routeProcess = RouteProcess.from(null, null, responseEntity.getStatusCode().toString(),
-                    responseEntity.getStatusCode().toString());
+            routeProcess = RouteProcess.from(null, null, statusCode.toString(), statusCode.toString());
         }
         return routeProcess;
     }

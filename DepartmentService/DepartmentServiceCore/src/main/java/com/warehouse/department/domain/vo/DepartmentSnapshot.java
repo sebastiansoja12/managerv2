@@ -1,10 +1,11 @@
 package com.warehouse.department.domain.vo;
 
+import java.time.Instant;
+
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
-
-import java.time.Instant;
 
 public record DepartmentSnapshot(
         DepartmentCode departmentCode,

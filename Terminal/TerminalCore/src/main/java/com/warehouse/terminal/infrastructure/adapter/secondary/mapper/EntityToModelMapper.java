@@ -2,6 +2,8 @@ package com.warehouse.terminal.infrastructure.adapter.secondary.mapper;
 
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ExternalId;
@@ -11,24 +13,8 @@ import com.warehouse.terminal.domain.model.OwnershipProfile;
 import com.warehouse.terminal.domain.model.device.Mobile;
 import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.model.device.Terminal;
-import com.warehouse.terminal.domain.vo.HardwareProfile;
-import com.warehouse.terminal.domain.vo.IdentityInfo;
-import com.warehouse.terminal.domain.vo.LocationProfile;
-import com.warehouse.terminal.domain.vo.NetworkProfile;
-import com.warehouse.terminal.domain.vo.SecurityProfile;
-import com.warehouse.terminal.domain.vo.SoftwareProfile;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Hardware;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Identity;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Location;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.MobileEntity;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Network;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Ownership;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.ScannerEntity;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Security;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Software;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.TerminalEntity;
-
-import org.springframework.stereotype.Component;
+import com.warehouse.terminal.domain.vo.*;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.*;
 
 @Component
 public class EntityToModelMapper {
@@ -49,8 +35,7 @@ public class EntityToModelMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 coalesce(entity.getVersion(), appVersion(entity.getSoftware())),
-                entity.getLastUpdate(),
-                entity.getActive());
+                entity.getLastUpdate());
     }
 
     public Mobile map(final MobileEntity entity) {
@@ -68,31 +53,22 @@ public class EntityToModelMapper {
                 mapOwnership(entity.getUserId(), entity.getDepartmentCode(), entity.getOwnership()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
-                entity.getUserId(),
-                entity.getDepartmentCode(),
                 coalesce(entity.getVersion(), appVersion(entity.getSoftware())),
-                entity.getLastUpdate(),
-                entity.getActive());
+                entity.getLastUpdate());
     }
 
     public Scanner map(final ScannerEntity entity) {
         return new Scanner(
                 entity.getId(),
-                entity.getExternalDeviceId() != null ? entity.getExternalDeviceId() : ExternalId.generateId(),
-                entity.getDeviceType() != null ? entity.getDeviceType() : DeviceType.SCANNER,
-                entity.getStatus() != null ? entity.getStatus() : DeviceStatus.ACTIVE,
+                entity.getExternalDeviceId(),
+                entity.getDeviceType(),
+                entity.getStatus(),
                 mapIdentity(entity.getIdentity()),
                 mapHardware(entity.getHardware()),
-                null,
                 mapNetwork(entity.getNetwork()),
-                null,
-                null,
                 mapOwnership(entity.getUserId(), entity.getDepartmentCode(), entity.getOwnership()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
-                null,
-                null,
-                DeviceStatus.ACTIVE.equals(entity.getStatus()),
                 entity.getScanType(),
                 entity.getScannerType());
     }
@@ -112,11 +88,11 @@ public class EntityToModelMapper {
         return software != null ? software.getAppVersion() : null;
     }
 
-    private IdentityInfo mapIdentity(final Identity identity) {
+    private DeviceIdentity mapIdentity(final Identity identity) {
         if (identity == null) {
-            return new IdentityInfo(null, null, null, null, null, null, null, null);
+            return new DeviceIdentity(null, null, null, null, null, null, null, null);
         }
-        return new IdentityInfo(
+        return new DeviceIdentity(
                 identity.getAssetTag(),
                 identity.getBarcode(),
                 identity.getExternalSystemId(),
@@ -127,11 +103,11 @@ public class EntityToModelMapper {
                 identity.getSerialNumber());
     }
 
-    private HardwareProfile mapHardware(final Hardware hardware) {
+    private DeviceHardware mapHardware(final Hardware hardware) {
         if (hardware == null) {
-            return new HardwareProfile(null, null, null, null, null, null, null, null, null, null, null, null);
+            return new DeviceHardware(null, null, null, null, null, null, null, null, null, null, null, null);
         }
-        return new HardwareProfile(
+        return new DeviceHardware(
                 hardware.getCpu(),
                 hardware.getHasCamera(),
                 hardware.getHasGps(),
@@ -146,11 +122,11 @@ public class EntityToModelMapper {
                 hardware.getStorageMb());
     }
 
-    private SoftwareProfile mapSoftware(final Software software, final Set<String> installedApps) {
+    private DeviceSoftware mapSoftware(final Software software, final Set<String> installedApps) {
         if (software == null) {
-            return new SoftwareProfile(null, null, null, null, null, installedApps, null, null, null, null);
+            return new DeviceSoftware(null, null, null, null, null, installedApps, null, null, null, null);
         }
-        return new SoftwareProfile(
+        return new DeviceSoftware(
                 software.getAppVersion(),
                 software.getBootloaderVersion(),
                 software.getBuildNumber(),
@@ -163,11 +139,11 @@ public class EntityToModelMapper {
                 software.getRooted());
     }
 
-    private NetworkProfile mapNetwork(final Network network) {
+    private DeviceNetwork mapNetwork(final Network network) {
         if (network == null) {
-            return new NetworkProfile(null, null, null, null, null, null, null, null, null);
+            return new DeviceNetwork(null, null, null, null, null, null, null, null, null);
         }
-        return new NetworkProfile(
+        return new DeviceNetwork(
                 network.getBluetoothMac(),
                 network.getCarrier(),
                 network.getIpAddress(),
@@ -196,11 +172,11 @@ public class EntityToModelMapper {
                 security.getTamperDetected());
     }
 
-    private LocationProfile mapLocation(final Location location) {
+    private DeviceLocation mapLocation(final Location location) {
         if (location == null) {
-            return new LocationProfile(null, null, null, null, null, null, null, null);
+            return new DeviceLocation(null, null, null, null, null, null, null, null);
         }
-        return new LocationProfile(
+        return new DeviceLocation(
                 location.getLatitude(),
                 location.getLongitude(),
                 location.getAltitude(),

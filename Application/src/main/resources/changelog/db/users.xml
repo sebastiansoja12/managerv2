@@ -54,6 +54,23 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="users-add-language-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="users"/>
+                <not>
+                    <columnExists tableName="users" columnName="language"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="users">
+            <column name="language" type="VARCHAR(10)" defaultValue="pl">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
     <changeSet id="users-add-department-foreign-key-v2026-3" author="s-soja">
         <preConditions onFail="MARK_RAN">
             <and>

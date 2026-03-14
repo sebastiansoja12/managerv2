@@ -1,7 +1,5 @@
 package com.warehouse.terminal.domain.port.primary;
 
-import java.util.Objects;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.commonassets.identificator.DeviceId;
@@ -11,8 +9,8 @@ import com.warehouse.terminal.domain.enumeration.PairStatus;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.DeviceVersion;
-import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.model.command.DevicePairRequest;
+import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.domain.vo.DevicePairResponse;
 
@@ -20,9 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DevicePairPortImpl implements DevicePairPort {
-    
-    private final DeviceValidatorService deviceValidatorService;
-    
+
     private final DeviceGenericService deviceGenericService;
 
     private final UserService userService;
@@ -31,16 +27,18 @@ public class DevicePairPortImpl implements DevicePairPort {
 
     private final DeviceVersionService deviceVersionService;
 
-	public DevicePairPortImpl(final DeviceValidatorService deviceValidatorService,
-                              final DeviceGenericService deviceGenericService,
+    private final DevicePairValidationService devicePairValidationService;
+
+    public DevicePairPortImpl(final DeviceGenericService deviceGenericService,
                               final UserService userService,
                               final DevicePairService devicePairService,
-                              final DeviceVersionService deviceVersionService) {
-		this.deviceValidatorService = deviceValidatorService;
-		this.deviceGenericService = deviceGenericService;
+                              final DeviceVersionService deviceVersionService,
+                              final DevicePairValidationService devicePairValidationService) {
+        this.deviceGenericService = deviceGenericService;
         this.userService = userService;
         this.devicePairService = devicePairService;
         this.deviceVersionService = deviceVersionService;
+        this.devicePairValidationService = devicePairValidationService;
     }
 
     @Override
@@ -62,8 +60,7 @@ public class DevicePairPortImpl implements DevicePairPort {
         if (StringUtils.isBlank(pairKey)) {
             return false;
         }
-        return this.devicePairService.findByPairKey(pairKey)
-                .filter(DevicePair::isPaired)
+        return this.devicePairService.findValidByPairKey(pairKey)
                 .map(DevicePair::getDeviceId)
                 .map(deviceId -> {
                     try {
@@ -72,7 +69,6 @@ public class DevicePairPortImpl implements DevicePairPort {
                         return null;
                     }
                 })
-                .filter(Objects::nonNull)
                 .map(device -> DeviceStatus.ACTIVE.equals(device.getStatus()))
                 .orElse(false);
     }
@@ -106,21 +102,12 @@ public class DevicePairPortImpl implements DevicePairPort {
 
     @Override
     public DevicePairResponse pair(final DevicePairRequest request) {
-        final Terminal terminal = (Terminal) this.deviceGenericService.findByDeviceId(request.getDeviceId());
-        log.info("Pairing terminal [{}]", terminal.getTerminalId().getValue());
-        final DeviceId deviceId = terminal.getDeviceId();
-        final Boolean userValid = this.userService.existsByUserId(request.getUserId());
-
-        final DeviceVersion deviceVersion = new DeviceVersion(terminal.getVersion(), terminal.getTerminalId());
-        final Boolean deviceUpToDate = !updateRequired(deviceId, deviceVersion);
-        if (deviceUpToDate && userValid && terminal.isActive()) {
-            this.devicePairService.pairDevice(terminal);
-        }
-        final DevicePair devicePair = this.devicePairService.findByDeviceId(request.getDeviceId());
-		return new DevicePairResponse(request.getUserId(), request.getDeviceId(), devicePair.getDevicePairId(),
-				devicePair.isPaired() ? PairStatus.PAIRED.name() : PairStatus.UNPAIRED.name(), devicePair.containsApiKey() ?
-                devicePair.getPairKey() : StringUtils.EMPTY, userValid, terminal.isActive(),
-				deviceUpToDate);
+        final Device device = this.devicePairValidationService.validate(request);
+        final DevicePair devicePair = this.devicePairService.pairDevice(device);
+        log.info("Paired device [{}]", devicePair.getDeviceId().getValue());
+        return new DevicePairResponse(request.getUserId(), devicePair.getDeviceId(), devicePair.getDevicePairId(),
+                devicePair.isPaired() ? PairStatus.PAIRED.name() : PairStatus.UNPAIRED.name(),
+                devicePair.getPairKey(), true, true, true);
     }
 
     @Override

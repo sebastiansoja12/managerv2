@@ -5,4 +5,5 @@ import com.warehouse.terminal.domain.vo.User;
 
 public interface UserServicePort {
     User findUserById(final UserId userId);
+    User findUserByUsername(final String username);
 }

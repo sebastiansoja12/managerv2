@@ -1,6 +1,7 @@
 package com.warehouse.department.configuration;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -72,8 +73,8 @@ public class DepartmentConfiguration {
     }
 
     @Bean
-    public UserClientServicePort userClientServicePort() {
-        return new UserClientServiceAdapter();
+    public UserClientServicePort userClientServicePort(final ApplicationEventPublisher eventPublisher) {
+        return new UserClientServiceAdapter(eventPublisher);
     }
 
     @Bean

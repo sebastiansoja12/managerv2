@@ -6,11 +6,14 @@ public class AdminCreateRequest {
     private DepartmentCode departmentCode;
     private String email;
     private String telephoneNumber;
+    private String language;
 
-    public AdminCreateRequest(final DepartmentCode departmentCode, final String email, final String telephoneNumber) {
+    public AdminCreateRequest(final DepartmentCode departmentCode, final String email, final String telephoneNumber,
+                              final String language) {
         this.departmentCode = departmentCode;
         this.email = email;
         this.telephoneNumber = telephoneNumber;
+        this.language = language;
     }
 
     public DepartmentCode getDepartmentCode() {
@@ -35,5 +38,13 @@ public class AdminCreateRequest {
 
     public void setTelephoneNumber(final String telephoneNumber) {
         this.telephoneNumber = telephoneNumber;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(final String language) {
+        this.language = language;
     }
 }

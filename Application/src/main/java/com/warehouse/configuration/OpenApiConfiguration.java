@@ -1,5 +1,10 @@
 package com.warehouse.configuration;
 
+import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springframework.context.annotation.Bean;
+
+import com.warehouse.auth.configuration.ApiExposureProperties;
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -19,7 +24,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 ),
                 description = "OpenApi documentation for Spring Security",
                 title = "OpenApi specification - Manager Spring Boot Project",
-                version = "2026.1",
+                version = "2026.2",
                 license = @License(
                         name = "Licence name",
                         url = ""
@@ -51,4 +56,15 @@ import io.swagger.v3.oas.annotations.servers.Server;
         in = SecuritySchemeIn.HEADER
 )
 public class OpenApiConfiguration {
+
+    @Bean
+    public OpenApiCustomizer publicApiCustomizer(final ApiExposureProperties apiExposureProperties) {
+        return openApi -> {
+            if (openApi.getPaths() != null) {
+                openApi.getPaths()
+                        .keySet()
+                        .removeIf(apiExposureProperties::isInternalControllerPath);
+            }
+        };
+    }
 }

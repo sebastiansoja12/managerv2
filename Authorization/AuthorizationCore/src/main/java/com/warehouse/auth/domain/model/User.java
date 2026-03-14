@@ -36,6 +36,8 @@ public class User {
 
     private DepartmentCode departmentCode;
 
+    private String language;
+
     private String apiKey;
 
     private Set<RolePermission> permissions;
@@ -80,6 +82,7 @@ public class User {
                 final Role role,
                 final DepartmentCode departmentCode,
                 final String apiKey,
+                final String language,
                 final Set<RolePermission> permissions) {
         this.userId = userId;
         this.username = username;
@@ -90,6 +93,7 @@ public class User {
         this.role = role;
         this.departmentCode = departmentCode;
         this.apiKey = apiKey;
+        this.language = language;
         this.permissions = permissions;
         this.deleted = false;
         this.createdAt = Instant.now();
@@ -120,9 +124,11 @@ public class User {
                             final String lastName,
                             final String email,
                             final DepartmentCode departmentCode,
+                            final String language,
                             final String apiKey) {
         final Set<RolePermission> adminPermissions = DomainRegistry.rolePermissionService().findAllAdminPermissions();
-        return new User(userId, username, password, firstName, lastName, email, Role.ADMIN, departmentCode, apiKey, adminPermissions);
+        return new User(userId, username, password, firstName, lastName, email, Role.ADMIN, departmentCode, apiKey,
+                language, adminPermissions);
     }
 
     public DepartmentCode getDepartmentCode() {
@@ -197,6 +203,14 @@ public class User {
         this.apiKey = apiKey;
     }
 
+    public String getLanguage() {
+        return language == null || language.isBlank() ? "pl" : language;
+    }
+
+    public void setLanguage(final String language) {
+        this.language = language;
+    }
+
     public void setPermissions(final Set<RolePermission> permissions) {
         this.permissions = permissions;
     }
@@ -251,6 +265,16 @@ public class User {
     public void changeFullName(final FullNameRequest request) {
         this.firstName = request.getFirstName();
         this.lastName = request.getLastName();
+        markAsModified();
+    }
+
+    public void changePassword(final String encodedPassword) {
+        this.password = encodedPassword;
+        markAsModified();
+    }
+
+    public void changeLanguage(final String language) {
+        this.language = language;
         markAsModified();
     }
 

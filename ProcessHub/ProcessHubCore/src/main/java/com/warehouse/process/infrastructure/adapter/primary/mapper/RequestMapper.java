@@ -37,6 +37,10 @@ public abstract class RequestMapper {
         return new ProcessId(processLogId.value());
     }
 
+    public static ProcessId map(final ProcessId processId) {
+        return processId;
+    }
+
 	public static ShipmentUpdated map(final ShipmentUpdateDto shipmentUpdate) {
 		return new ShipmentUpdated(new ShipmentId(shipmentUpdate.shipmentId().value()),
                 new DeviceId(shipmentUpdate.deviceId().value()),

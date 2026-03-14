@@ -1,12 +1,15 @@
 package com.warehouse.shipment.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.model.ShipmentUpdateCommand;
 import com.warehouse.shipment.domain.vo.*;
+
+import java.util.List;
 
 public interface ShipmentPort {
 
@@ -33,6 +36,14 @@ public interface ShipmentPort {
     void changeShipmentCountries(final ShipmentCountryRequest request);
 
     Shipment loadShipment(final ShipmentId shipmentId);
+
+    Shipment loadShipment(final TrackingNumber trackingNumber);
+
+    ShipmentControlCenter loadShipmentControlCenter(final ShipmentId shipmentId);
+
+    ShipmentControlCenter loadShipmentControlCenter(final TrackingNumber trackingNumber);
+
+    List<Shipment> searchShipments(final ShipmentSearchCriteria criteria);
 
     boolean existsShipment(final ShipmentId shipmentId);
 

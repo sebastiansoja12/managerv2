@@ -1,7 +1,7 @@
 package com.warehouse.logistics.domain.port.primary;
 
-import com.warehouse.terminal.information.Device;
+import com.warehouse.terminal.DeviceInformation;
 
 public interface DeviceAgentPort {
-    void updateDeviceIfNeed(final Device device);
+    void updateDeviceIfNeed(final DeviceInformation deviceInformation);
 }

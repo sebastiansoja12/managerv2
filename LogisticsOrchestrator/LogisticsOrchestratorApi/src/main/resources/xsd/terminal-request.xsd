@@ -1,58 +1,194 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        elementFormDefault="qualified"
-        attributeFormDefault="unqualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://warehouse.com/logistics/terminal"
+           xmlns="http://warehouse.com/logistics/terminal"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
 
-    <xs:element name="TerminalRequest" type="TerminalRequest"/>
+    <xs:element name="TerminalRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ProcessType" type="ProcessTypeEnum"/>
+                <xs:element name="Device" type="DeviceType" minOccurs="0"/>
+                <xs:element name="DeliveryRejectRequest" type="DeliveryRejectRequestType" minOccurs="0"/>
+                <xs:element name="DeliveryReturnRequest" type="DeliveryReturnRequestType" minOccurs="0"/>
+                <xs:element name="DeliveryMissedRequest" type="DeliveryMissedRequestType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
-    <xs:complexType name="TerminalRequest">
+    <xs:element name="TerminalResponse" type="TerminalResponseType"/>
+
+    <xs:complexType name="TerminalResponseType">
         <xs:sequence>
-            <xs:element name="ProcessType" type="ProcessType"/>
-
-            <xs:element name="Device" type="DeviceType"/>
-
-            <xs:element name="DeliveryRejectRequest" type="DeliveryRejectRequest" minOccurs="0"/>
-            <xs:element name="DeliveryReturnRequest" type="DeliveryReturnRequest" minOccurs="0"/>
-            <xs:element name="DeliveryMissedRequest" type="DeliveryMissedRequest" minOccurs="0"/>
+            <xs:element name="Device" type="DeviceType" minOccurs="0"/>
+            <xs:element name="DeliveryRejectResponse" type="DeliveryRejectResponseType" minOccurs="0"/>
+            <xs:element name="DeliveryReturnResponse" type="DeliveryReturnResponseType" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
-
-    <xs:simpleType name="ProcessType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="DELIVERY_REJECT"/>
-            <xs:enumeration value="DELIVERY_RETURN"/>
-            <xs:enumeration value="DELIVERY_MISSED"/>
-        </xs:restriction>
-    </xs:simpleType>
 
     <xs:complexType name="DeviceType">
         <xs:sequence>
-            <xs:element name="Id" type="xs:string" minOccurs="0"/>
-            <xs:element name="Type" type="xs:string" minOccurs="0"/>
-            <xs:element name="Serial" type="xs:string" minOccurs="0"/>
+            <xs:element name="Version" type="xs:string" minOccurs="0"/>
+            <xs:element name="DeviceID" type="xs:string" minOccurs="0"/>
+            <xs:element name="ResponsibleUser" type="xs:string" minOccurs="0"/>
+            <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="PairKey" type="xs:string" minOccurs="0"/>
+            <xs:element name="DeviceUserType" type="DeviceUserTypeEnum" minOccurs="0"/>
+            <xs:element name="DeviceType" type="xs:string" minOccurs="0"/>
+            <xs:element name="DeviceUpToDate" type="DeviceUpToDateEnum" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="DeliveryRejectRequest">
+    <xs:complexType name="DeliveryRejectRequestType">
         <xs:sequence>
-            <xs:element name="ReasonCode" type="xs:string" minOccurs="0"/>
-            <xs:element name="Comment" type="xs:string" minOccurs="0"/>
+            <xs:element name="DeliveryRejectDetails" type="DeliveryRejectDetailsType" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="DeliveryReturnRequest">
+    <xs:complexType name="DeliveryRejectDetailsType">
         <xs:sequence>
-            <xs:element name="ReasonCode" type="xs:string" minOccurs="0"/>
-            <xs:element name="Comment" type="xs:string" minOccurs="0"/>
+            <xs:element name="DeliveryRejectDetail" type="DeliveryRejectDetailType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="DeliveryMissedRequest">
+    <xs:complexType name="DeliveryRejectDetailType">
         <xs:sequence>
-            <xs:element name="ReasonCode" type="xs:string" minOccurs="0"/>
-            <xs:element name="Comment" type="xs:string" minOccurs="0"/>
+            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
+            <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="RejectReason" type="xs:string" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
+
+    <xs:complexType name="DeliveryReturnRequestType">
+        <xs:sequence>
+            <xs:element name="DeliveryReturnDetails" type="DeliveryReturnDetailsType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryReturnDetailsType">
+        <xs:sequence>
+            <xs:element name="DeliveryReturnDetail" type="DeliveryReturnDetailType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryReturnDetailType">
+        <xs:sequence>
+            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
+            <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryMissedRequestType">
+        <xs:sequence>
+            <xs:element name="DeliveryMissedDetails" type="DeliveryMissedDetailsType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryMissedDetailsType">
+        <xs:sequence>
+            <xs:element name="DeliveryMissedDetail" type="DeliveryMissedDetailType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryMissedDetailType">
+        <xs:sequence>
+            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
+            <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryRejectResponseType">
+        <xs:sequence>
+            <xs:element name="DeliveryRejectResponseDetails" type="DeliveryRejectResponseDetailsType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryRejectResponseDetailsType">
+        <xs:sequence>
+            <xs:element name="DeliveryRejectResponseDetail" type="DeliveryRejectResponseDetailType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryRejectResponseDetailType">
+        <xs:sequence>
+            <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="NewShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
+            <xs:element name="RejectReason" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryReturnResponseType">
+        <xs:sequence>
+            <xs:element name="DeliveryReturnResponseDetails" type="DeliveryReturnResponseDetailsType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryReturnResponseDetailsType">
+        <xs:sequence>
+            <xs:element name="DeliveryReturnResponseDetail" type="DeliveryReturnResponseDetailType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DeliveryReturnResponseDetailType">
+        <xs:sequence>
+            <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="ReturnToken" type="xs:string" minOccurs="0"/>
+            <xs:element name="UpdateStatus" type="xs:string" minOccurs="0"/>
+            <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
+            <xs:element name="DeliveryID" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="ProcessTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="CREATED"/>
+            <xs:enumeration value="RETURN"/>
+            <xs:enumeration value="ROUTE"/>
+            <xs:enumeration value="REJECT"/>
+            <xs:enumeration value="REROUTE"/>
+            <xs:enumeration value="REDIRECT"/>
+            <xs:enumeration value="MISS"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DeliveryStatusEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DEPOT"/>
+            <xs:enumeration value="CLIENT"/>
+            <xs:enumeration value="DELIVERY"/>
+            <xs:enumeration value="SENDER"/>
+            <xs:enumeration value="LOST"/>
+            <xs:enumeration value="UNKNOWN"/>
+            <xs:enumeration value="DELIVERED"/>
+            <xs:enumeration value="REJECTED"/>
+            <xs:enumeration value="RETURN"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DeviceUserTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="MANAGER"/>
+            <xs:enumeration value="SUPPLIER"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DeviceUpToDateEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="YES"/>
+            <xs:enumeration value="NO"/>
+        </xs:restriction>
+    </xs:simpleType>
 
 </xs:schema>

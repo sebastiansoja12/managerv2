@@ -1,5 +1,12 @@
 package com.warehouse.department.domain.port.primary;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.DepartmentAlreadyExistsException;
@@ -13,12 +20,8 @@ import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.service.DepartmentService;
 import com.warehouse.department.domain.validator.Validator;
 import com.warehouse.department.domain.vo.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DepartmentPortImpl implements DepartmentPort {
@@ -91,7 +94,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 			final Department department = this.departmentService.findByDepartmentCode(dep.getDepartmentCode());
 			if (department != null) {
 				throw new DepartmentAlreadyExistsException(
-						"Department with code " + dep.getDepartmentCode().getValue() + " already exists");
+						"Department with code " + dep.getDepartmentCode() + " already exists");
 			}
 		});
     }
@@ -147,6 +150,11 @@ public class DepartmentPortImpl implements DepartmentPort {
     @Override
     public void changeEmail(final DepartmentCode departmentCode, final String email) {
         this.departmentService.changeEmail(departmentCode, email);
+    }
+
+    @Override
+    public Boolean checkExists(final DepartmentCode departmentCode) {
+        return this.departmentService.checkExists(departmentCode);
     }
 
     private void validateAddress(final Address address) {

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2026.1-SNAPSHOT</version>
+        <version>2026.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>ShipmentManagement</artifactId>
@@ -15,6 +15,7 @@
 
     <modules>
         <module>ShipmentManagementCore</module>
+        <module>ShipmentManagementApi</module>
     </modules>
 
 </project>

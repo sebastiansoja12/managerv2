@@ -1,10 +1,10 @@
 package com.warehouse.department.domain.service;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
-import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.TaxId;
 
 public interface DepartmentService {
@@ -27,4 +27,6 @@ public interface DepartmentService {
     void changeStatus(final DepartmentCode departmentCode, final Department.Status status);
 
     void changeEmail(final DepartmentCode departmentCode, final String email);
+
+    Boolean checkExists(final DepartmentCode departmentCode);
 }

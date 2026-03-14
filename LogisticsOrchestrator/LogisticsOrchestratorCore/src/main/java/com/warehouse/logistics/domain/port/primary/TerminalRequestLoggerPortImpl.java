@@ -1,13 +1,15 @@
 package com.warehouse.logistics.domain.port.primary;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.port.secondary.DeliveryTrackerLogServicePort;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
 import com.warehouse.terminal.DeviceInformation;
-import com.warehouse.terminal.model.DeliveryReturnDetail;
-import com.warehouse.terminal.request.TerminalRequest;
+import com.warehouse.terminal.jaxb.DeliveryReturnRequestType;
+import com.warehouse.terminal.jaxb.TerminalRequest;
 import com.warehouse.xmlconverter.XmlToStringService;
 import com.warehouse.xmlconverter.XmlToStringServiceImpl;
 
@@ -39,14 +41,20 @@ public class TerminalRequestLoggerPortImpl implements TerminalRequestLoggerPort 
 
     @Override
     public void logDeviceInformation(final TerminalRequest terminalRequest) {
-        final DeviceInformation deviceInformation = DeviceInformation.from(terminalRequest.getDevice());
-        final Set<ShipmentId> shipmentIds = terminalRequest
-                .getDeliveryReturnRequest()
-                .getDeliveryReturnDetails()
+        final DeviceInformation deviceInformation = JaxbDeviceInformationMapper.map(terminalRequest.getDevice());
+        final Set<ShipmentId> shipmentIds = extractShipmentIds(terminalRequest.getDeliveryReturnRequest());
+        deliveryTrackerLogServicePort.logDeviceInformation(shipmentIds, deviceInformation, terminalRequest.getProcessType());
+    }
+
+    private Set<ShipmentId> extractShipmentIds(final DeliveryReturnRequestType deliveryReturnRequest) {
+        if (deliveryReturnRequest == null || deliveryReturnRequest.getDeliveryReturnDetails() == null) {
+            return Collections.emptySet();
+        }
+        return deliveryReturnRequest.getDeliveryReturnDetails()
+                .getDeliveryReturnDetail()
                 .stream()
-                .map(DeliveryReturnDetail::getShipmentId)
+                .map(detail -> detail.getShipmentID())
                 .map(ShipmentId::new)
                 .collect(Collectors.toSet());
-        deliveryTrackerLogServicePort.logDeviceInformation(shipmentIds, deviceInformation, terminalRequest.getProcessType());
     }
 }

@@ -12,7 +12,13 @@ public interface UserPort {
 
     User findUser(String username);
 
+    User findUser(UserId userId);
+
     void updateFullName(final FullNameRequest request);
+
+    void changePassword(final UserId userId, final String encodedPassword);
+
+    void changeLanguage(final UserId userId, final String language);
 
     void changeRole(final UserId userId, final User.Role role);
 

@@ -12,6 +12,8 @@ public class DeliveryRejectResponseDetailsDto {
     private final DepartmentCodeDto departmentCode;
     private final SupplierCodeDto supplierCode;
     private final RejectReasonDto rejectReason;
+    private final Boolean success;
+    private final String errorMessage;
 
     public DeliveryRejectResponseDetailsDto(final ShipmentIdDto shipmentId,
                                             final ShipmentIdDto newShipmentId,
@@ -19,12 +21,25 @@ public class DeliveryRejectResponseDetailsDto {
                                             final DepartmentCodeDto departmentCode,
                                             final SupplierCodeDto supplierCode,
                                             final RejectReasonDto rejectReason) {
+        this(shipmentId, newShipmentId, deliveryStatus, departmentCode, supplierCode, rejectReason, null, null);
+    }
+
+    public DeliveryRejectResponseDetailsDto(final ShipmentIdDto shipmentId,
+                                            final ShipmentIdDto newShipmentId,
+                                            final DeliveryStatusDto deliveryStatus,
+                                            final DepartmentCodeDto departmentCode,
+                                            final SupplierCodeDto supplierCode,
+                                            final RejectReasonDto rejectReason,
+                                            final Boolean success,
+                                            final String errorMessage) {
         this.shipmentId = shipmentId;
         this.newShipmentId = newShipmentId;
         this.deliveryStatus = deliveryStatus;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.rejectReason = rejectReason;
+        this.success = success;
+        this.errorMessage = errorMessage;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -49,5 +64,13 @@ public class DeliveryRejectResponseDetailsDto {
 
     public RejectReasonDto getRejectReason() {
         return rejectReason;
+    }
+
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

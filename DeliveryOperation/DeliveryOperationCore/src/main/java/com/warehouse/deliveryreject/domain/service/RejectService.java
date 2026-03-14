@@ -7,5 +7,6 @@ import com.warehouse.deliveryreject.domain.vo.RejectReasonId;
 
 public interface RejectService {
     RejectReason findRejectReason(final RejectReasonId rejectReasonId);
-    void createReject(final DeliveryReject deliveryReject);
+    DeliveryReject createReject(final DeliveryReject deliveryReject);
+    RejectReasonId nextRejectReasonId();
 }

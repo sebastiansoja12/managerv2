@@ -16,9 +16,7 @@ public class DepartmentServiceAdapter implements DepartmentServicePort {
 
     @Override
     public Department getDepartment(final DepartmentCode departmentCode) {
-        final DepartmentDto department = this.departmentApiService.getDepartmentByCode(new com.warehouse.department.api.dto.DepartmentCode(
-                departmentCode.getValue()
-        ));
+        final DepartmentDto department = this.departmentApiService.getDepartmentByCode(departmentCode);
         return Department.from(department);
     }
 }

@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import org.springframework.stereotype.Service;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.event.*;
@@ -11,7 +12,6 @@ import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
-import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.TaxId;
 
 @Service("department.departmentService")
@@ -100,6 +100,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.changeEmail(email);
         this.departmentRepository.createOrUpdate(department);
         DomainRegistry.eventPublisher().publishEvent(new DepartmentEmailChanged(department.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public Boolean checkExists(final DepartmentCode departmentCode) {
+        return this.departmentRepository.checkExists(departmentCode);
     }
 
     private DepartmentEvent createDepartmentEvent(final Department.Status status, final Department department) {

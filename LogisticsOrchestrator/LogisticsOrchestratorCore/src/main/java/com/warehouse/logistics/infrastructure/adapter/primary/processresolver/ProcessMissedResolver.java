@@ -1,10 +1,9 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.processresolver;
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.logistics.domain.model.Request;
 import com.warehouse.logistics.domain.model.Response;
 import com.warehouse.logistics.infrastructure.adapter.primary.ProcessHandler;
@@ -19,9 +18,9 @@ public class ProcessMissedResolver implements ProcessHandler {
 
     private final DeliveryMissedService deliveryMissedService;
 
-    private final LogisticsRequestMapper requestMapper = getMapper(LogisticsRequestMapper.class);
+    private final LogisticsRequestMapper requestMapper = new LogisticsRequestMapper();
 
-    private final LogisticsResponseMapper responseMapper = getMapper(LogisticsResponseMapper.class);
+    private final LogisticsResponseMapper responseMapper = new LogisticsResponseMapper();
 
     public ProcessMissedResolver(final DeliveryMissedService deliveryMissedService) {
         this.deliveryMissedService = deliveryMissedService;
@@ -33,7 +32,7 @@ public class ProcessMissedResolver implements ProcessHandler {
     }
 
     @Override
-    public Response processRequest(final Request request) {
+    public Response processRequest(final ProcessId processId, final Request request) {
         final DeliveryMissedRequestDto deliveryMissedRequest = requestMapper.mapToDeliveryMissedRequest(request);
         final DeliveryMissedResponseDto deliveryMissedResponse =
                 deliveryMissedService.processDeliveryMiss(deliveryMissedRequest);

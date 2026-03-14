@@ -23,7 +23,7 @@ public class ProcessFailureHandler {
         final ProcessFailureDetails failureDetails = ex.getProcessFailureDetails();
         log.warn("Error occurred at: {} with message {}", failureDetails.getOccurredAt(), failureDetails.getExceptionMessage());
         this.processPort.finishProcess(
-                failureDetails.getProcessId(), ProcessStatus.FAILURE
+                failureDetails.getProcessId(), ProcessStatus.FAILURE, failureDetails.getExceptionMessage()
         );
     }
 }

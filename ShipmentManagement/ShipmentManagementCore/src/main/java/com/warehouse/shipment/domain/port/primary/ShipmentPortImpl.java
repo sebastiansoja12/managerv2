@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
@@ -42,8 +43,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     private final CountryServiceAvailabilityService countryServiceAvailabilityService;
 
     private final SignatureService signatureService;
-
-    private final ShipmentStateValidatorService shipmentStateValidatorService = new ShipmentStateValidatorServiceImpl();
 
     private final RouteLogServicePort routeLogServicePort;
 
@@ -151,7 +150,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ShipmentConfiguration configuration = command.getShipmentConfiguration();
         if (shouldValidateState(configuration)) {
             final Result<Void, String> validation =
-                    this.shipmentStateValidatorService.validateShipmentState(shipment);
+                    new ShipmentStateValidatorServiceImpl().validateShipmentState(shipment);
             if (validation.isFailure()) {
                 return Result.failure(ErrorCode.SHIPMENT_203);
             }
@@ -294,7 +293,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             throw new RestException(400, "Shipment type cannot be changed to the same type");
         }
 
-        final Result<Void, String> validateShipment = this.shipmentStateValidatorService.validateShipmentState(shipment);
+        final Result<Void, String> validateShipment = new ShipmentStateValidatorServiceImpl().validateShipmentState(shipment);
 
         if (validateShipment.isFailure()) {
             throw new RestException(400, validateShipment.getFailure());
@@ -363,6 +362,28 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public Shipment loadShipment(final ShipmentId shipmentId) {
         return this.shipmentService.find(shipmentId);
+    }
+
+    @Override
+    public Shipment loadShipment(final TrackingNumber trackingNumber) {
+        return this.shipmentService.find(trackingNumber);
+    }
+
+    @Override
+    public ShipmentControlCenter loadShipmentControlCenter(final ShipmentId shipmentId) {
+        final Shipment shipment = loadShipment(shipmentId);
+        return new ShipmentControlCenter(shipment, this.routeLogServicePort.findByShipmentId(shipmentId));
+    }
+
+    @Override
+    public ShipmentControlCenter loadShipmentControlCenter(final TrackingNumber trackingNumber) {
+        final Shipment shipment = loadShipment(trackingNumber);
+        return new ShipmentControlCenter(shipment, this.routeLogServicePort.findByShipmentId(shipment.getShipmentId()));
+    }
+
+    @Override
+    public List<Shipment> searchShipments(final ShipmentSearchCriteria criteria) {
+        return this.shipmentService.search(criteria);
     }
 
     @Override

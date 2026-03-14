@@ -11,6 +11,10 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
+import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
+import com.warehouse.commonassets.identificator.TrackingNumber;
+
+import java.util.List;
 
 public interface ShipmentService {
 
@@ -61,6 +65,10 @@ public interface ShipmentService {
     void lockShipment(final ShipmentId shipmentId);
 
     Shipment find(final ShipmentId shipmentId);
+
+    Shipment find(final TrackingNumber trackingNumber);
+
+    List<Shipment> search(final ShipmentSearchCriteria criteria);
 
     boolean existsShipment(final ShipmentId shipmentId);
 

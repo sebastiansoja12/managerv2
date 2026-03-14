@@ -4,10 +4,15 @@ import java.time.Duration;
 import java.util.Set;
 
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
@@ -17,6 +22,8 @@ import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.*;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentApiServiceAdapter;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
@@ -71,8 +78,9 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ReturningServicePort returningServicePort(final ReturnProperties returnProperties) {
-		return new ReturningServiceAdapter(returnProperties);
+	public ReturningServicePort returningServicePort(final ExternalFeignClient externalFeignClient,
+													 final ReturnProperties returnProperties) {
+		return new ReturningServiceClient(externalFeignClient, returnProperties);
 	}
 
 	@Bean
@@ -92,6 +100,11 @@ public class ShipmentConfiguration {
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort,
 				mailNotificationServicePort, trackingNumberService);
+	}
+
+	@Bean
+	public ShipmentApiService shipmentApiService(final ShipmentPort shipmentPort) {
+		return new ShipmentApiServiceAdapter(shipmentPort);
 	}
 
 	@Bean
@@ -150,7 +163,7 @@ public class ShipmentConfiguration {
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties(),
+		return new SoftwareConfigurationServiceClient(config, softwareConfigurationProperties(),
 				routeTrackerLogProperties());
 	}
 
@@ -163,7 +176,10 @@ public class ShipmentConfiguration {
 
 	@Bean(name = "shipment.routeLogServicePort")
 	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
-	public RouteLogServicePort routeLogServicePort() {
+	public RouteLogServicePort routeLogServicePort(final ExternalFeignClient externalFeignClient,
+												   final GenericFeignResourceService genericFeignResourceService,
+												   final RouteTrackerLogProperties routeTrackerLogProperties,
+												   final RouteLogRecordMapper routeLogRecordMapper) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Route log service port");
 		final RetryConfig config = RetryConfig.custom()
 				.maxAttempts(3)
@@ -171,7 +187,25 @@ public class ShipmentConfiguration {
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new RouteLogServiceAdapter(config);
+		return new RouteLogServiceClient(config, externalFeignClient, genericFeignResourceService,
+				routeTrackerLogProperties, routeLogRecordMapper);
+	}
+
+	@Bean
+	public GenericFeignClientFactory genericFeignClientFactory(final ObjectFactory<HttpMessageConverters> messageConverters,
+															  final CurrentUserApiService currentUserApiService) {
+		return new GenericFeignClientFactory(messageConverters, currentUserApiService);
+	}
+
+	@Bean
+	public GenericFeignResourceService genericFeignResourceService(final GenericFeignClientFactory genericFeignClientFactory,
+																  final ObjectMapper objectMapper) {
+		return new GenericFeignResourceService(genericFeignClientFactory, objectMapper);
+	}
+
+	@Bean
+	public RouteLogRecordMapper routeLogRecordMapper() {
+		return new RouteLogRecordMapper();
 	}
 
 	@Bean
@@ -201,8 +235,13 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository) {
-		return new ShipmentServiceImpl(shipmentRepository);
+	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository, final SpecificationRepository specificationShipmentRepository) {
+		return new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
+	}
+
+	@Bean
+	public SpecificationRepository specificationShipmentRepository(final ShipmentReadRepository repository) {
+		return new SpecificationShipmentRepositoryImpl(repository);
 	}
 
 	@Bean("shipment.routeTrackerLogProperties")

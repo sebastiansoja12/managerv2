@@ -1,19 +1,21 @@
 package com.warehouse.auth.configuration;
 
-import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPort;
-import com.warehouse.auth.domain.port.primary.RefreshTokenPortObserverPortImpl;
-import com.warehouse.auth.domain.port.primary.UserPort;
-import com.warehouse.auth.domain.port.primary.UserPortImpl;
+import org.mapstruct.factory.Mappers;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.auth.UserApiService;
+import com.warehouse.auth.domain.port.primary.*;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.RolePermissionRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.*;
+import com.warehouse.auth.infrastructure.adapter.primary.CurrentUserApiServiceAdapter;
+import com.warehouse.auth.infrastructure.adapter.primary.UserApiServiceAdapter;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
-import org.mapstruct.factory.Mappers;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class UserConfiguration {
@@ -52,6 +54,29 @@ public class UserConfiguration {
     @Bean
     public RefreshTokenPortObserverPort refreshTokenPortObserverPort(final RefreshTokenService refreshTokenService) {
         return new RefreshTokenPortObserverPortImpl(refreshTokenService);
+    }
+
+    @Bean
+    public CurrentUserAuthenticationService currentUserAuthenticationService(final AuthenticationService authenticationService,
+                                                                             final UserPort userPort,
+                                                                             final JwtService jwtService) {
+        return new CurrentUserAuthenticationService(authenticationService, userPort, jwtService);
+    }
+
+    @Bean
+    public CurrentUserAuthenticationPort currentUserAuthenticationPort(
+            final CurrentUserAuthenticationService currentUserAuthenticationService) {
+        return new CurrentUserAuthenticationPortImpl(currentUserAuthenticationService);
+    }
+
+    @Bean
+    public CurrentUserApiService currentUserService(final CurrentUserAuthenticationPort currentUserAuthenticationPort) {
+        return new CurrentUserApiServiceAdapter(currentUserAuthenticationPort);
+    }
+
+    @Bean
+    public UserApiService userApiService(final UserService userService) {
+        return new UserApiServiceAdapter(userService);
     }
 
 }

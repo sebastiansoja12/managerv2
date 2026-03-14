@@ -42,4 +42,19 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="add-device-pair-key-expiration-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="device_pair"/>
+                <not>
+                    <columnExists tableName="device_pair" columnName="pair_key_expires_at"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="device_pair">
+            <column name="pair_key_expires_at" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

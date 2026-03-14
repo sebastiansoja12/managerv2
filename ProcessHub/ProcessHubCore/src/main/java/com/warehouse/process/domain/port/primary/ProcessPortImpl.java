@@ -1,16 +1,22 @@
 package com.warehouse.process.domain.port.primary;
 
+import java.time.Instant;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.InitializeProcessCommand;
+import com.warehouse.process.domain.model.ProcessDeviceValidatedCommand;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.service.ProcessService;
-
 import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
+import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
-import lombok.extern.slf4j.Slf4j;
 
-import java.time.Instant;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ProcessPortImpl implements ProcessPort {
@@ -42,15 +48,40 @@ public class ProcessPortImpl implements ProcessPort {
 
     @Override
     public void finishProcess(final ProcessId processId, final ProcessStatus processStatus) {
+        finishProcess(processId, processStatus, null);
+    }
+
+    @Override
+    public void finishProcess(final ProcessId processId, final ProcessStatus processStatus, final String faultDescription) {
         if (processStatus.equals(ProcessStatus.SUCCESS)) {
             this.processService.logFinishedProcess(processId);
         } else if (processStatus.equals(ProcessStatus.FAILURE)) {
-            this.processService.logFailedProcess(processId);
+            this.processService.logFailedProcess(processId, faultDescription);
         }
     }
 
     @Override
     public void assignShipmentUpdated(final ProcessId processId, final ShipmentUpdated shipmentUpdated) {
         this.processService.assignShipmentUpdated(processId, shipmentUpdated);
+    }
+
+    @Override
+    public void assignShipmentRejected(final ProcessId processId, final ShipmentRejected shipmentRejected) {
+        this.processService.assignShipmentRejected(processId, shipmentRejected);
+    }
+
+    @Override
+    public void assignProcessDeviceValidation(final ProcessDeviceValidatedCommand command) {
+        this.processService.assignDeviceValidation(command.getProcessId(), DeviceValidation.of(command));
+    }
+
+    @Override
+    public ProcessLog findByIdForCurrentDepartment(final ProcessId processId) {
+        return this.processService.findByIdForCurrentDepartment(processId);
+    }
+
+    @Override
+    public Page<ProcessLog> findAllForCurrentDepartment(final Pageable pageable) {
+        return this.processService.findAllForCurrentDepartment(pageable);
     }
 }

@@ -1,40 +1,44 @@
 package com.warehouse.terminal.domain.service;
 
 import java.util.Objects;
+import java.util.Optional;
 
+import com.warehouse.commonassets.exception.ProcessFailureDetails;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.terminal.domain.exception.DeviceValidationException;
 import com.warehouse.terminal.domain.model.Department;
-import com.warehouse.terminal.domain.model.device.Terminal;
-import com.warehouse.terminal.domain.port.secondary.*;
+import com.warehouse.terminal.domain.model.Device;
+import com.warehouse.terminal.domain.port.secondary.DepartmentServicePort;
+import com.warehouse.terminal.domain.port.secondary.DeviceGenericRepository;
+import com.warehouse.terminal.domain.port.secondary.DeviceVersionRepository;
+import com.warehouse.terminal.domain.port.secondary.UserServicePort;
+import com.warehouse.terminal.domain.vo.DeviceValidationRequest;
+import com.warehouse.terminal.domain.vo.User;
 
 public class DeviceValidatorServiceImpl implements DeviceValidatorService {
 
     private final DeviceVersionRepository deviceVersionRepository;
 
-    private final DepartmentRepository departmentRepository;
+    private final DeviceGenericRepository deviceRepository;
 
-    private final UserRepository userRepository;
+    private final DepartmentServicePort departmentServicePort;
 
-    private final SupplierRepository supplierRepository;
-
-    private final DeviceRepository<Terminal> deviceRepository;
+    private final UserServicePort userServicePort;
 
     public DeviceValidatorServiceImpl(final DeviceVersionRepository deviceVersionRepository,
-                                      final DepartmentRepository departmentRepository,
-                                      final UserRepository userRepository,
-                                      final SupplierRepository supplierRepository,
-                                      final DeviceRepository<Terminal> deviceRepository) {
+                                      final DeviceGenericRepository deviceRepository,
+                                      final DepartmentServicePort departmentServicePort,
+                                      final UserServicePort userServicePort) {
         this.deviceVersionRepository = deviceVersionRepository;
-        this.departmentRepository = departmentRepository;
-        this.userRepository = userRepository;
-        this.supplierRepository = supplierRepository;
         this.deviceRepository = deviceRepository;
+        this.departmentServicePort = departmentServicePort;
+        this.userServicePort = userServicePort;
     }
 
     @Override
     public void validateDepartment(final String departmentCode) {
-        final Department department = this.departmentRepository.findByDepartmentCode(new DepartmentCode(departmentCode));
+        final Department department = this.departmentServicePort.getDepartment(new DepartmentCode(departmentCode));
         if (Objects.isNull(department) || !department.isActive()) {
             throw new RuntimeException("User is not assigned to given department or department is not valid");
         }
@@ -48,15 +52,21 @@ public class DeviceValidatorServiceImpl implements DeviceValidatorService {
     }
 
     @Override
-    public void validateDevice(final Terminal terminal) {
-        final Terminal device = (Terminal) this.deviceRepository.findById(terminal.getDeviceId());
-        final boolean userExists = userRepository.findByUsername(null) != null;
-        final boolean deviceExists = deviceRepository.findById(terminal.getDeviceId()) != null;
-        final boolean departmentExists = departmentRepository.existsByDepartmentCode(null);
-        final boolean deviceValid = device != null && device.isActive();
+    public void validateDevice(final DeviceValidationRequest request) {
+        final User user = userServicePort.findUserByUsername(request.username().value());
+        final Optional<Device> device = deviceRepository.findById(request.deviceId())
+                .stream()
+                .filter(dev -> user != null && dev.getUserId().equals(user.userId()))
+                .findAny();
+        final boolean deviceExists = device.isPresent();
+        final boolean departmentExists = departmentServicePort.getDepartment(request.departmentCode()) != null;
+        final boolean deviceValid = deviceExists && device.get().isActive();
 
-        if (!userExists || !deviceExists || !departmentExists || !deviceValid) {
-            throw new RuntimeException("Device is not valid");
-        }
+		if (user == null || !deviceExists || !departmentExists || !deviceValid
+				|| Boolean.FALSE.equals(request.active())) {
+			throw new DeviceValidationException(ProcessFailureDetails.now(request.processId(),
+					request.sourceServiceType().name(), request.targetServiceType().name(),
+					"Device is not valid:" + request.deviceId()));
+		}
     }
 }

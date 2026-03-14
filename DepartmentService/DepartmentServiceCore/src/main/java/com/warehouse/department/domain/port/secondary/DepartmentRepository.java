@@ -1,9 +1,9 @@
 package com.warehouse.department.domain.port.secondary;
 
-import com.warehouse.department.domain.model.Department;
-import com.warehouse.department.domain.vo.DepartmentCode;
-
 import java.util.List;
+
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.department.domain.model.Department;
 
 public interface DepartmentRepository {
 
@@ -13,4 +13,5 @@ public interface DepartmentRepository {
 
     List<Department> findAll();
 
+    Boolean checkExists(final DepartmentCode departmentCode);
 }

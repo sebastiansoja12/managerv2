@@ -30,17 +30,6 @@ create table message_sequence
     next_val bigint null
 );
 
-create table redirect_token
-(
-    id        bigint auto_increment
-        primary key,
-    created   datetime(6)  null,
-    email     varchar(255) not null,
-    timeout   datetime(6)  null,
-    parcel_id bigint       not null,
-    token     varchar(255) not null
-);
-
 create table parcel
 (
     id                    bigint       not null
