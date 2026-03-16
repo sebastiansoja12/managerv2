@@ -1,6 +1,7 @@
 package com.warehouse.deliveryreturn.configuration;
 
 
+import com.warehouse.auth.CurrentUserApiService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
+import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
 import com.warehouse.tools.returntoken.ReturnTokenProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
@@ -31,7 +33,7 @@ public class DeliveryReturnConfiguration {
                                                  final MailServicePort mailServicePort) {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
                 returnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
-		return new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort);
+		return new DeliveryReturnPortImpl(deliveryReturnService, returnTokenServicePort, shipmentStatusControlServicePort);
 	}
 
     @Bean("deliveryReturn.mailServicePort")
@@ -62,11 +64,15 @@ public class DeliveryReturnConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "services.mock", havingValue = "false")
-    public ReturnTokenServicePort deliveryReturnTokenServicePort(ReturnTokenProperties returnTokenProperties) {
+    public ReturnTokenServicePort deliveryReturnTokenServicePort(ReturnTokenProperties returnTokenProperties,
+                                                                 ProcessHubEventPublisher processHubEventPublisher,
+                                                                 final CurrentUserApiService currentUserApiService) {
         return ReturnTokenServiceAdapter
                 .builder()
                 .returnTokenProperties(returnTokenProperties)
-                .restClient(RestClient.builder().baseUrl(returnTokenProperties().getUrl()).build())
+                .restClient(RestClient.builder().baseUrl(returnTokenProperties.getUrl()).build())
+                .processHubEventPublisher(processHubEventPublisher)
+                .currentUserApiService(currentUserApiService)
                 .build();
     }
 
@@ -83,7 +89,8 @@ public class DeliveryReturnConfiguration {
 
     @Bean("deliveryReturn.parcelStatusControlChangeServicePort")
     public ShipmentStatusControlServicePort parcelStatusControlChangeServicePort(
-			final ShipmentProperties shipmentProperties) {
-        return new ShipmentStatusControlServiceAdapter(shipmentProperties);
+			final ShipmentProperties shipmentProperties,
+            final ProcessHubEventPublisher processHubEventPublisher) {
+        return new ShipmentStatusControlServiceAdapter(shipmentProperties, processHubEventPublisher);
     }
 }

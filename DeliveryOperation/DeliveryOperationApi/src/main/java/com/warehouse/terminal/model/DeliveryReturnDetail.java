@@ -27,4 +27,7 @@ public class DeliveryReturnDetail {
 
     @XmlElement(name = "SupplierCode")
     private String supplierCode;
+
+    @XmlElement(name = "ReturnToken")
+    private String returnToken;
 }

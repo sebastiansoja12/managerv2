@@ -7,4 +7,3 @@ import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEn
 
 public interface SupplierReadRepository extends JpaRepository<SupplierEntity, SupplierId> {
 }
-

@@ -36,6 +36,11 @@ public abstract class RequestMapper {
                 new DeviceId(request.deviceId().value()));
     }
 
+    public static SupplierBasicDataUpdateCommand map(final SupplierBasicDataUpdateApiRequest request) {
+        return new SupplierBasicDataUpdateCommand(new SupplierCode(request.supplierCode().value()),
+                request.firstName(), request.lastName(), request.telephoneNumber());
+    }
+
     public static SupplierUpdateCommand map(final SupplierUpdateApiRequest request) {
         final SupplierCode supplierCode = new SupplierCode(request.supplierCode().value());
         final String firstName = request.firstName();

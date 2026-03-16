@@ -33,7 +33,7 @@ public class ProcessReturnResolver implements ProcessHandler {
 
     @Override
     public Response processRequest(final ProcessId processId, final Request request) {
-        final DeliveryReturnRequestDto deliveryReturnRequest = requestMapper.mapToDeliveryReturnRequest(request);
+        final DeliveryReturnRequestDto deliveryReturnRequest = requestMapper.mapToDeliveryReturnRequest(processId, request);
 		final DeliveryReturnResponseDto deliveryReturnResponse = deliveryReturnService
 				.processDeliveryReturn(deliveryReturnRequest);
         return responseMapper.mapDeliveryReturnResponse(deliveryReturnResponse);

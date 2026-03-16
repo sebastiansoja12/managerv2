@@ -13,5 +13,7 @@ public interface ReturnPort {
 
     ReturnPackage getReturn(final ReturnPackageId returnId);
 
+    ReturnTokenValidation validateReturnToken(final ShipmentId shipmentId, final ReturnToken returnToken);
+
     void delete(final ReturnPackageId returnPackageId);
 }

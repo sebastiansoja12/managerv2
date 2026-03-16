@@ -2,6 +2,10 @@ package com.warehouse.deliveryreturn;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -28,6 +32,11 @@ import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPortImpl;
 import com.warehouse.deliveryreturn.domain.port.secondary.*;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
+import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
+import com.warehouse.deliveryreturn.domain.vo.ReturnTokenValidationResult;
+import com.warehouse.deliveryreturn.domain.vo.Shipment;
+import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
+import com.warehouse.deliveryreturn.domain.vo.UpdateStatusShipmentRequest;
 import com.warehouse.terminal.DeviceInformation;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,7 +70,8 @@ public class DeliveryReturnPortImplTest {
 	void setup() {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
 				returnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
-		returnPort = new DeliveryReturnPortImpl(deliveryReturnService, shipmentStatusControlServicePort);
+		returnPort = new DeliveryReturnPortImpl(deliveryReturnService, returnTokenServicePort,
+				shipmentStatusControlServicePort);
 	}
 
 	@Test
@@ -119,9 +129,54 @@ public class DeliveryReturnPortImplTest {
 		assertEquals(message, exception.getMessage());
 	}
 
+	@Test
+	void shouldStopProcessAndReturnErrorWhenReturnTokenIsWrong() {
+		// given
+		final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L, DeliveryStatus.RETURN, "KT1",
+				"abc", "wrong-token");
+		final DeliveryReturnRequest deliveryReturnRequest = buildDeliveryReturnRequest(ProcessType.RETURN,
+				deviceInformation, deliveryReturnDetails);
+		when(returnTokenServicePort.validate(any()))
+				.thenReturn(ReturnTokenValidationResult.invalid(new ShipmentId(1L)));
+
+		// when
+		final DeliveryReturnResponse response = returnPort.deliverReturn(deliveryReturnRequest);
+
+		// then
+		assertEquals(1, response.getDeliveryReturnResponseDetails().size());
+		assertEquals("Wrong return token", response.getDeliveryReturnResponseDetails().getFirst().getErrorMessage());
+		assertEquals(UpdateStatus.NOT_OK, response.getDeliveryReturnResponseDetails().getFirst().getUpdateStatus());
+		verify(shipmentStatusControlServicePort, never()).updateStatus(any(UpdateStatusShipmentRequest.class));
+		verify(shipmentRepositoryServicePort, never()).downloadShipment(any());
+		verify(mailServicePort, never()).sendNotification(any());
+	}
+
+	@Test
+	void shouldUpdateShipmentWhenReturnTokenIsValid() {
+		// given
+		final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L, DeliveryStatus.RETURN, "KT1",
+				"abc", "12345");
+		final DeliveryReturnRequest deliveryReturnRequest = buildDeliveryReturnRequest(ProcessType.RETURN,
+				deviceInformation, deliveryReturnDetails);
+		when(returnTokenServicePort.validate(any()))
+				.thenReturn(ReturnTokenValidationResult.valid(new ShipmentId(1L)));
+		when(shipmentRepositoryServicePort.downloadShipment(any()))
+				.thenReturn(Shipment.builder().build());
+		when(shipmentStatusControlServicePort.updateStatus(any()))
+				.thenReturn(UpdateStatus.OK);
+
+		// when
+		final DeliveryReturnResponse response = returnPort.deliverReturn(deliveryReturnRequest);
+
+		// then
+		assertEquals(UpdateStatus.OK, response.getDeliveryReturnResponseDetails().getFirst().getUpdateStatus());
+		assertEquals("12345", response.getDeliveryReturnResponseDetails().getFirst().getReturnToken().value());
+		verify(shipmentStatusControlServicePort).updateStatus(any(UpdateStatusShipmentRequest.class));
+	}
+
 	private DeliveryReturnRequest buildDeliveryReturnRequest(ProcessType processType,
 			DeviceInformation deviceInformation, List<DeliveryReturnDetails> deliveryReturnDetails) {
-		return new DeliveryReturnRequest(processType, deviceInformation, deliveryReturnDetails);
+		return new DeliveryReturnRequest(null, processType, deviceInformation, deliveryReturnDetails);
 	}
 
 	private List<DeliveryReturnDetails> buildReturnDetails(Long parcelId, DeliveryStatus deliveryStatus,
@@ -132,6 +187,7 @@ public class DeliveryReturnPortImplTest {
 				.shipmentId(new ShipmentId(parcelId))
 				.supplierCode(new SupplierCode(supplierCode))
 				.departmentCode(new DepartmentCode(depotCode))
+				.returnToken(new com.warehouse.deliveryreturn.domain.vo.ReturnToken(token))
 				.build();
 
 		return List.of(deliveryReturnDetails);

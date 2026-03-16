@@ -1,6 +1,7 @@
 package com.warehouse;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -14,13 +15,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "com.warehouse.routetracker",
-        exclude = { SecurityAutoConfiguration.class})
+        exclude = {SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class})
 @EntityScan(basePackages = {"com.warehouse.routetracker"})
 @EnableJpaRepositories(basePackages = {"com.warehouse.routetracker"})
 @ConfigurationPropertiesScan("com.warehouse.routetracker")
 public class RouteTrackerWebApplication {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(RouteTrackerWebApplication.class, args);
     }
 

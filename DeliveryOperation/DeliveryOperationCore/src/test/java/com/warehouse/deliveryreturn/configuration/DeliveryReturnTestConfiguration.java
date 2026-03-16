@@ -1,6 +1,7 @@
 package com.warehouse.deliveryreturn.configuration;
 
 import com.warehouse.routelogger.RouteLogEventPublisher;
+import com.warehouse.process.ProcessHubEventPublisher;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,4 +40,7 @@ public class DeliveryReturnTestConfiguration {
 
     @MockBean
     public RouteLogEventPublisher routeLogEventPublisher;
+
+    @MockBean
+    public ProcessHubEventPublisher processHubEventPublisher;
 }

@@ -1,6 +1,7 @@
 package com.warehouse.process.domain.service;
 
 import static com.warehouse.process.ProcessHubTestFixtures.initializeDomainContext;
+import static com.warehouse.process.ProcessHubTestFixtures.processCommunication;
 import static com.warehouse.process.ProcessHubTestFixtures.processId;
 import static com.warehouse.process.ProcessHubTestFixtures.processLog;
 import static com.warehouse.process.ProcessHubTestFixtures.shipmentUpdated;
@@ -17,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
@@ -74,5 +76,27 @@ class ProcessServiceImplTest {
 
         assertThat(captor.getValue().getStatus()).isEqualTo(ProcessStatus.FAILURE);
         assertThat(captor.getValue().getFaultDescription()).isEqualTo("NPE while processing terminal request");
+    }
+
+    @Test
+    void shouldAppendCommunicationLogForEachServiceCommunication() {
+        final ProcessLog processLog = processLog();
+        when(processRepository.findById(processId())).thenReturn(Optional.of(processLog));
+
+        processService.assignCommunication(processId(),
+                processCommunication(ServiceType.RETURNING_TRACK_MANAGER, "token-request", "token-response", null));
+        processService.assignCommunication(processId(),
+                processCommunication(ServiceType.SHIPMENT_MANAGEMENT, "shipment-request", "shipment-response", null));
+
+        final ArgumentCaptor<ProcessLog> captor = ArgumentCaptor.forClass(ProcessLog.class);
+        verify(processRepository, org.mockito.Mockito.times(2)).update(captor.capture());
+
+        final ProcessLog updated = captor.getAllValues().getLast();
+        assertThat(updated.getCommunicationLogDetails().getCommunicationLogDetails())
+                .hasSize(2)
+                .extracting(detail -> detail.getTargetService() + "|" + detail.getRequest())
+                .containsExactlyInAnyOrder(
+                        "RETURNING_TRACK_MANAGER|token-request",
+                        "SHIPMENT_MANAGEMENT|shipment-request");
     }
 }

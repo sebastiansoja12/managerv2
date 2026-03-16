@@ -13,6 +13,7 @@ import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.service.ProcessService;
 import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
 import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ProcessCommunication;
 import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
@@ -73,6 +74,11 @@ public class ProcessPortImpl implements ProcessPort {
     @Override
     public void assignProcessDeviceValidation(final ProcessDeviceValidatedCommand command) {
         this.processService.assignDeviceValidation(command.getProcessId(), DeviceValidation.of(command));
+    }
+
+    @Override
+    public void assignCommunication(final ProcessId processId, final ProcessCommunication communication) {
+        this.processService.assignCommunication(processId, communication);
     }
 
     @Override

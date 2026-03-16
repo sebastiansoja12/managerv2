@@ -301,7 +301,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
 		if (request.shipmentType() == ShipmentType.CHILD) {
 			final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
-            final TrackingNumber trackingNumber = this.trackingNumberService.nextTrackingNumber(null);
+            final TrackingNumber trackingNumber = this.trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT);
 			final Shipment newShipment = new Shipment(shipmentId, shipment.getSender(), shipment.getRecipient(),
 					shipment.getShipmentSize(), shipment.getShipmentId(), shipment.getOriginCountry(),
 					shipment.getDestinationCountry(), shipment.getPrice(), shipment.isLocked(),

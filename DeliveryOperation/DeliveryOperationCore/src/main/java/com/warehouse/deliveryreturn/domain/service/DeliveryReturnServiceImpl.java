@@ -1,9 +1,7 @@
 package com.warehouse.deliveryreturn.domain.service;
 
 
-import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
-import com.warehouse.deliveryreturn.domain.model.ReturnTokenRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.DeliveryReturnRepository;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
@@ -12,11 +10,7 @@ import com.warehouse.deliveryreturn.domain.vo.*;
 import com.warehouse.terminal.DeviceInformation;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 public class DeliveryReturnServiceImpl implements DeliveryReturnService {
@@ -43,51 +37,21 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
     public List<DeliveryReturn> deliverReturn(final Set<DeliveryReturnDetails> deliveryReturnRequests,
                                               final DeviceInformation deviceInformation) {
 
-        final ReturnTokenRequest returnTokenRequest = ReturnTokenRequest.from(deliveryReturnRequests, deviceInformation);
-
-        final ReturnTokenResponse returnTokenResponse = returnTokenServicePort.sign(returnTokenRequest);
-
-        final Map<ShipmentId, ReturnPackageResponse> signaturesMap = assignToHashMap(returnTokenResponse);
-
-        final List<ReturnTokenDetails> returnTokenDetails = assignTokenToDeliveryReturn(signaturesMap,
-                deliveryReturnRequests);
-
-        return returnTokenDetails.stream()
+        return deliveryReturnRequests.stream()
                 .peek(deliveryReturn -> {
                     final Shipment shipment = shipmentRepositoryServicePort.downloadShipment(deliveryReturn.getShipmentId());
                     mailServicePort.sendNotification(shipment);
                 })
                 .map(deliveryReturnDetails -> DeliveryReturn
                         .builder()
-                        .token(deliveryReturnDetails.getReturnToken().value())
+                        .token(deliveryReturnDetails.getReturnToken() != null
+                                ? deliveryReturnDetails.getReturnToken().value()
+                                : null)
                         .supplierCode(deliveryReturnDetails.getSupplierCode().value())
                         .departmentCode(deliveryReturnDetails.getDepartmentCode().getValue())
                         .shipmentId(deliveryReturnDetails.getShipmentId().getValue())
                         .deliveryStatus(deliveryReturnDetails.getDeliveryStatus().name())
                         .build())
                 .toList();
-    }
-
-	private List<ReturnTokenDetails> assignTokenToDeliveryReturn(final Map<ShipmentId, ReturnPackageResponse> signaturesMap,
-			final Set<DeliveryReturnDetails> deliveryReturnRequests) {
-        return deliveryReturnRequests.stream().map(delivery -> {
-			final ReturnPackageResponse returnPackageResponse = signaturesMap.get(delivery.getShipmentId());
-            return ReturnTokenDetails.builder()
-                    .supplierCode(delivery.getSupplierCode())
-                    .deliveryStatus(delivery.getDeliveryStatus())
-                    .departmentCode(delivery.getDepartmentCode())
-                    .shipmentId(delivery.getShipmentId())
-                    .returnToken(returnPackageResponse.getReturnToken())
-                    .build();
-		}).toList();
-	}
-
-    private Map<ShipmentId, ReturnPackageResponse> assignToHashMap(final ReturnTokenResponse responses) {
-        return responses.getDeliveryReturnSignatures().stream()
-                .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
-    }
-
-    private ShipmentId generateKeyFromResponse(final ReturnPackageResponse returnPackageResponse) {
-        return !Objects.isNull(returnPackageResponse) ? returnPackageResponse.getShipmentId() : null;
     }
 }

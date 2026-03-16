@@ -218,6 +218,16 @@ public class Supplier {
         markAsModified();
     }
 
+    public void changeBasicData(final String firstName, final String lastName, final String telephoneNumber) {
+        Validate.notBlank(firstName, "First name cannot be blank");
+        Validate.notBlank(lastName, "Last name cannot be blank");
+        Validate.notBlank(telephoneNumber, "Telephone number cannot be blank");
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.telephoneNumber = telephoneNumber;
+        markAsModified();
+    }
+
     public void assignVehicle(final VehicleId vehicleId) {
         this.vehicleId = vehicleId;
         markAsModified();

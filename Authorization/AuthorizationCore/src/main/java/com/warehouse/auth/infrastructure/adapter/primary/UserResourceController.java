@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.auth.domain.helper.Result;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
@@ -25,6 +25,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
+@AccessUserControl
 public class UserResourceController {
 
     private final UserPort userPort;
@@ -52,7 +53,7 @@ public class UserResourceController {
     }
 
     @PutMapping("/roles/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    @AccessUserControl("ROLE_ADMIN_CREATE")
     public ResponseEntity<?> changeUserRole(@PathVariable final Long id, @Param("role") final String userRole) {
         final UserId userId = new UserId(id);
         final Result<Void, List<String>> validatorResult = new RoleValidator().validateRole(userRole);
@@ -68,7 +69,7 @@ public class UserResourceController {
     }
 
     @PutMapping("/permissions/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> addUserPermission(@PathVariable final Long id, @RequestParam("permission") final String permission) {
 
         final UserId userId = new UserId(id);
@@ -89,7 +90,7 @@ public class UserResourceController {
     }
 
     @DeleteMapping("/permissions/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> removeUserPermission(@PathVariable final Long id, @RequestParam("permission") final String permission) {
 
         final UserId userId = new UserId(id);
