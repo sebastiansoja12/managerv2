@@ -9,7 +9,7 @@
         <version>2026.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>CrossLogisticsCore</artifactId>
+    <artifactId>CrossLogisticsImpl</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

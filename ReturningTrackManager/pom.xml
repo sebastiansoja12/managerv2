@@ -26,7 +26,7 @@
     </properties>
 
     <modules>
-        <module>ReturningTrackManagerCore</module>
+        <module>ReturningTrackManagerImpl</module>
     </modules>
 
     <dependencyManagement>

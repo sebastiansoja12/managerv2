@@ -9,12 +9,12 @@
         <version>2026.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>Terminal</artifactId>
+    <artifactId>Device</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>TerminalApi</module>
-        <module>TerminalCore</module>
+        <module>DeviceApi</module>
+        <module>DeviceImpl</module>
     </modules>
 
 </project>

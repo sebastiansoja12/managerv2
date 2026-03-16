@@ -15,7 +15,7 @@
 
     <modules>
         <module>DeliveryOperationApi</module>
-        <module>DeliveryOperationCore</module>
+        <module>DeliveryOperationImpl</module>
     </modules>
 
 
