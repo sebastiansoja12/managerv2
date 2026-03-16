@@ -11,7 +11,7 @@
     </parent>
     <artifactId>ReturningTrackManager</artifactId>
     <packaging>pom</packaging>
-    <version>2026.2-SNAPSHOT</version>
+    <version>2026.3-SNAPSHOT</version>
     <groupId>com.warehouse</groupId>
 
 
