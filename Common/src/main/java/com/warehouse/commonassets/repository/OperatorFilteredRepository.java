@@ -1,6 +1,6 @@
 package com.warehouse.commonassets.repository;
 
-public interface TenantFilteredRepository<T> {
+public interface OperatorFilteredRepository<T> {
 
     void create(final T object);
     void update(final T object);
