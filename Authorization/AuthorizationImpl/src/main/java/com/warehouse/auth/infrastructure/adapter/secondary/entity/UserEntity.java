@@ -2,6 +2,7 @@ package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.BelongsToOperator;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class UserEntity implements UserDetails {
+public class UserEntity extends BelongsToOperator implements UserDetails {
 
     @Id
     @Column(name = "user_id", unique = true, nullable = false)
@@ -57,16 +58,19 @@ public class UserEntity implements UserDetails {
     @Column(name = "api_key", nullable = false)
     private String apiKey;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_role_permissions",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id")
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id", referencedColumnName = "id")
     )
     private Set<RolePermissionEntity> permissions = new HashSet<>();
 
     @Column(name = "deleted", nullable = false)
     private Boolean deleted;
+
+    @Column(name = "initial", nullable = false)
+    private Boolean initial;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

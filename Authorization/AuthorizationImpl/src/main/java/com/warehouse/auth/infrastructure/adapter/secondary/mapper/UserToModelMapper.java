@@ -8,6 +8,7 @@ public abstract class UserToModelMapper {
     public static User map(final UserEntity entity) {
         final User user = new User();
         user.setUserId(entity.getUserId());
+        user.assignOperator(entity.operatorId());
         user.setUsername(entity.getUsername());
         user.setEmail(entity.getEmail());
         user.setFirstName(entity.getFirstName());
@@ -20,6 +21,7 @@ public abstract class UserToModelMapper {
         user.setCreatedAt(entity.getCreatedAt());
         user.setUpdatedAt(entity.getUpdatedAt());
         user.setDeleted(entity.isDeleted());
+        user.setInitial(entity.getInitial());
         user.setApiKey(entity.getApiKey());
         return user;
     }
