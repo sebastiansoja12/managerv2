@@ -46,7 +46,7 @@ public class JwtServiceImpl implements JwtService {
         claimsMap.put("firstName", user.getFirstName());
         claimsMap.put("username", user.getUsername());
         claimsMap.put("userId", user.getUserId().value());
-        claimsMap.put("tenant", user.getDepartmentCode().getValue());
+        claimsMap.put("operatorId", user.operatorId().value());
         final Long expiration = jwtProvider.getExpiration();
         return generateToken(claimsMap, user, expiration);
     }
@@ -56,7 +56,6 @@ public class JwtServiceImpl implements JwtService {
         final Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("firstName", firstName);
         claimsMap.put("username", username);
-        claimsMap.put("tenant", departmentCode);
         final Long expiration = jwtProvider.getExpiration();
         return Jwts
                 .builder()
