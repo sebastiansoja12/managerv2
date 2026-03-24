@@ -1,12 +1,19 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
+import java.time.Instant;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.DeviceVersion;
-import jakarta.persistence.*;
 
-import java.time.Instant;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "device_version")
@@ -22,8 +29,8 @@ public class DeviceVersionEntity {
     @Column(name = "version", nullable = false)
     private String version;
 
-    @Column(name = "device_id", nullable = false)
-    @AttributeOverride(name = "value", column = @Column(name = "device_id"))
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "device_id", nullable = false))
     private DeviceId deviceId;
 
     @Column(name = "last_update", nullable = false)
@@ -40,10 +47,10 @@ public class DeviceVersionEntity {
         this.lastUpdate = Instant.now();
     }
 
-	public static DeviceVersionEntity from(final DeviceVersion deviceVersion) {
-		return new DeviceVersionEntity(deviceVersion.getId(), deviceVersion.getDeviceType(), deviceVersion.getVersion(),
-				deviceVersion.getDeviceId());
-	}
+    public static DeviceVersionEntity from(final DeviceVersion deviceVersion) {
+        return new DeviceVersionEntity(deviceVersion.getId(), deviceVersion.getDeviceType(), deviceVersion.getVersion(),
+                deviceVersion.getDeviceId());
+    }
 
     public Instant getLastUpdate() {
         return lastUpdate;

@@ -1,11 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import java.util.Set;
 
 @Embeddable
 public class Software {
@@ -37,11 +33,6 @@ public class Software {
     @Column(name = "developer_mode_enabled")
     private Boolean developerModeEnabled;
 
-    @ElementCollection
-    @CollectionTable(name = "software_installed_apps", joinColumns = @JoinColumn(name = "owner_id"))
-    @Column(name = "app_name")
-    private Set<String> installedApps;
-
     protected Software() {}
 
     public Software(final String osName,
@@ -52,8 +43,7 @@ public class Software {
                     final String appVersion,
                     final String buildNumber,
                     final Boolean rooted,
-                    final Boolean developerModeEnabled,
-                    final Set<String> installedApps) {
+                    final Boolean developerModeEnabled) {
         this.osName = osName;
         this.osVersion = osVersion;
         this.firmwareVersion = firmwareVersion;
@@ -63,7 +53,6 @@ public class Software {
         this.buildNumber = buildNumber;
         this.rooted = rooted;
         this.developerModeEnabled = developerModeEnabled;
-        this.installedApps = installedApps;
     }
 
     public String getAppVersion() {
@@ -86,10 +75,6 @@ public class Software {
         return firmwareVersion;
     }
 
-    public Set<String> getInstalledApps() {
-        return installedApps;
-    }
-
     public String getKernelVersion() {
         return kernelVersion;
     }
@@ -106,4 +91,3 @@ public class Software {
         return rooted;
     }
 }
-

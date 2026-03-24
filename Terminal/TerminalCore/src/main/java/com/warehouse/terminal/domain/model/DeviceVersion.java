@@ -76,7 +76,7 @@ public class DeviceVersion {
 
 	public static DeviceVersion from(final DeviceVersionEntity deviceVersionEntity) {
 		return new DeviceVersion(deviceVersionEntity.getId(), deviceVersionEntity.getDeviceType(),
-				deviceVersionEntity.getVersion(), new DeviceId(deviceVersionEntity.getId()),
+				deviceVersionEntity.getVersion(), deviceVersionEntity.getDeviceId(),
 				deviceVersionEntity.getLastUpdate());
 	}
 }

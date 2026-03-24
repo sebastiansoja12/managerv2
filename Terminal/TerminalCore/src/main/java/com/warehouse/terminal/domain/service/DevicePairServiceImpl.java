@@ -49,6 +49,11 @@ public class DevicePairServiceImpl implements DevicePairService {
         return this.devicePairRepository.findDevicePairByDeviceId(deviceId);
     }
 
+    @Override
+    public Optional<DevicePair> findByPairKey(final String pairKey) {
+        return this.devicePairRepository.findByPairKey(pairKey);
+    }
+
     private DevicePairId nextDevicePairId() {
         return new DevicePairId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }

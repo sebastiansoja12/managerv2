@@ -1,4 +1,4 @@
-package com.warehouse.terminal.domain.enumeration;
+package com.warehouse.commonassets.enumeration;
 
 public enum ExecutionSourceType {
     MANUAL, DEVICE

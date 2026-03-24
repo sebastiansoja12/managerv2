@@ -11,9 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.department.api.DepartmentApiService;
-import com.warehouse.department.api.dto.CoordinatesDto;
-import com.warehouse.department.api.dto.DepartmentDto;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.RestException;
 import com.warehouse.department.domain.helper.Result;
@@ -31,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/departments")
 @Slf4j
-public class DepartmentController implements DepartmentApiService {
+public class DepartmentController {
 
     private final DepartmentPort departmentPort;
 
@@ -155,20 +152,6 @@ public class DepartmentController implements DepartmentApiService {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(this.departmentPort.findAll().stream().map(ResponseMapper::map).toList());
-    }
-
-    @GetMapping("/coordinates")
-    @Override
-    public List<DepartmentDto> getAllDepartments() {
-        return this.departmentPort.findAll()
-                .stream()
-                .filter(dep ->
-                        dep.getDepartmentType().equals(DepartmentType.BRANCH)
-                                || dep.getDepartmentType().equals(DepartmentType.WAREHOUSE))
-                .map(dep -> new DepartmentDto(dep.getDepartmentCode().getValue(),
-                dep.getCity(), dep.getStreet(), dep.getCountryCode().name(),
-                dep.getPostalCode(), new CoordinatesDto(dep.getCoordinates().lat(), dep.getCoordinates().lon())))
-                .toList();
     }
 
     public DepartmentRequestValidator getValidator(final String resourceName) {

@@ -11,17 +11,16 @@ import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.secondary.DevicePairRepository;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 import com.warehouse.terminal.domain.vo.DevicePairId;
-import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceEntity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DevicePairEntity;
 
 public class DevicePairRepositoryImpl implements DevicePairRepository {
-    
+
     private final DevicePairReadRepository repository;
 
-    private final DeviceRepository deviceRepository;
+    private final DeviceRepository<Terminal> deviceRepository;
 
     public DevicePairRepositoryImpl(final DevicePairReadRepository repository,
-                                    final DeviceRepository deviceRepository) {
+                                    final DeviceRepository<Terminal> deviceRepository) {
         this.repository = repository;
         this.deviceRepository = deviceRepository;
     }
@@ -34,21 +33,25 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
 
     @Override
     public void unpair(final Terminal terminal, final DevicePairId devicePairId) {
-        final DeviceEntity deviceEntity = DeviceEntity.from(terminal);
-        final DevicePairEntity devicePairEntity = new DevicePairEntity(devicePairId, deviceEntity, false, Instant.now(),
-                StringUtils.EMPTY, null);
+        final DevicePairEntity devicePairEntity = new DevicePairEntity(
+                devicePairId,
+                terminal.getDeviceId(),
+                false,
+                Instant.now(),
+                StringUtils.EMPTY,
+                null);
         this.repository.save(devicePairEntity);
     }
 
     @Override
     public DevicePairId findPairIdByDeviceId(final DeviceId deviceId) {
-        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDevice_DeviceId(deviceId);
+        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDeviceId(deviceId);
         return devicePairEntity.map(DevicePairId::from).orElseThrow();
     }
 
     @Override
     public DevicePair findDevicePairByDeviceId(final DeviceId deviceId) {
-        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDevice_DeviceId(deviceId);
+        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDeviceId(deviceId);
         return devicePairEntity.map(DevicePair::from).orElse(new DevicePair(false));
     }
 
@@ -60,13 +63,20 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
 
     @Override
     public Optional<DevicePair> findByDeviceId(final DeviceId deviceId) {
-        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDevice_DeviceId(deviceId);
+        final Optional<DevicePairEntity> devicePairEntity = this.repository.findByDeviceId(deviceId);
         return devicePairEntity.map(DevicePair::from);
     }
 
     @Override
+    public Optional<DevicePair> findByPairKey(final String pairKey) {
+        return this.repository.findByPairKey(pairKey).map(DevicePair::from);
+    }
+
+    @Override
     public void save(final DevicePair devicePair) {
-        final DevicePairEntity devicePairEntity = DevicePairEntity.from(devicePair, (Terminal) deviceRepository.findById(devicePair.getDeviceId()));
+        final DevicePairEntity devicePairEntity = DevicePairEntity.from(
+                devicePair,
+                deviceRepository.findById(devicePair.getDeviceId()));
         this.repository.save(devicePairEntity);
     }
 }

@@ -1,11 +1,14 @@
 package com.warehouse.terminal.domain.port.primary;
 
+import java.util.Objects;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.Username;
+import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.enumeration.PairStatus;
-import com.warehouse.terminal.domain.model.device.Device;
+import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.DeviceVersion;
 import com.warehouse.terminal.domain.model.device.Terminal;
@@ -55,15 +58,44 @@ public class DevicePairPortImpl implements DevicePairPort {
     }
 
     @Override
+    public boolean isPairKeyValid(final String pairKey) {
+        if (StringUtils.isBlank(pairKey)) {
+            return false;
+        }
+        return this.devicePairService.findByPairKey(pairKey)
+                .filter(DevicePair::isPaired)
+                .map(DevicePair::getDeviceId)
+                .map(deviceId -> {
+                    try {
+                        return this.deviceGenericService.findByDeviceId(deviceId);
+                    } catch (final RuntimeException ex) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .map(device -> DeviceStatus.ACTIVE.equals(device.getStatus()))
+                .orElse(false);
+    }
+
+    @Override
     public boolean isUserValid(final DeviceId deviceId, final Username username) {
         final Device device = this.deviceGenericService.findByDeviceId(deviceId);
-        return this.userService.existsByUsername(username) && device != null && device.getUsername().equals(username);
+        if (device == null) {
+            return false;
+        }
+        return this.userService.existsByUsername(username);
     }
 
     @Override
     public boolean isVersionValid(final DeviceId deviceId, final DeviceVersion deviceVersion) {
         final Device device = this.deviceGenericService.findByDeviceId(deviceId);
-        return device != null && device.getVersion().equals(deviceVersion.getVersion());
+        if (device == null || deviceVersion == null) {
+            return false;
+        }
+        if (device instanceof Terminal terminal) {
+            return terminal.getVersion() != null && terminal.getVersion().equals(deviceVersion.getVersion());
+        }
+        return false;
     }
 
     @Override
@@ -74,7 +106,7 @@ public class DevicePairPortImpl implements DevicePairPort {
 
     @Override
     public DevicePairResponse pair(final DevicePairRequest request) {
-        final Terminal terminal = this.deviceGenericService.findByDeviceId(request.getDeviceId());
+        final Terminal terminal = (Terminal) this.deviceGenericService.findByDeviceId(request.getDeviceId());
         log.info("Pairing terminal [{}]", terminal.getTerminalId().getValue());
         final DeviceId deviceId = terminal.getDeviceId();
         final Boolean userValid = this.userService.existsByUserId(request.getUserId());
