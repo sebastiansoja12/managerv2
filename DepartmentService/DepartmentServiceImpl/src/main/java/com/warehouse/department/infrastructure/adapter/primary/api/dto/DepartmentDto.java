@@ -11,8 +11,6 @@ public class DepartmentDto {
 
     String street;
 
-    String country;
-
     String postalCode;
 
     String nip;

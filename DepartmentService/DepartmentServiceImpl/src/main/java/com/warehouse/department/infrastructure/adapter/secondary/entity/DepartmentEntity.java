@@ -2,6 +2,7 @@ package com.warehouse.department.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.BelongsToOperator;
 import jakarta.persistence.*;
 import org.hibernate.envers.Audited;
 
@@ -11,7 +12,7 @@ import java.time.Instant;
 @Entity(name = "department.DepartmentEntity")
 @Table(name = "department")
 @Audited
-public class DepartmentEntity {
+public class DepartmentEntity extends BelongsToOperator {
 
     @EmbeddedId
     @Column(name = "department_code", nullable = false, unique = true)
