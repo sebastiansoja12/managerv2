@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.infrastructure.adapter.secondary.entity.read.ProcessLogReadEntity;
 
@@ -20,22 +20,22 @@ public interface ProcessLogReadRepository extends JpaRepository<ProcessLogReadEn
             select distinct p
             from ProcessLogReadEntity p
             left join p.communicationLogs c
-            where p.deviceInformation.departmentCode = :departmentCode
-               or c.departmentCode = :departmentCode
+            where p.operatorId = :operatorId
+               or c.operatorId = :operatorId
             """)
-    Page<ProcessLogReadEntity> findAllByDepartmentCode(final DepartmentCode departmentCode,
-                                                       final Pageable pageable);
+    Page<ProcessLogReadEntity> findAllByOperatorId(final OperatorId operatorId,
+                                                   final Pageable pageable);
 
     @Query("""
             select distinct p
             from ProcessLogReadEntity p
             left join fetch p.communicationLogs c
             where p.processId = :processId
-              and (p.deviceInformation.departmentCode = :departmentCode
-                   or c.departmentCode = :departmentCode)
+              and (p.operatorId = :operatorId
+                   or c.operatorId = :operatorId)
             """)
-    Optional<ProcessLogReadEntity> findByIdAndDepartmentCode(final ProcessId processId,
-                                                             final DepartmentCode departmentCode);
+    Optional<ProcessLogReadEntity> findByIdAndOperatorId(final ProcessId processId,
+                                                         final OperatorId operatorId);
 
     Optional<ProcessLogReadEntity> findByProcessId(final ProcessId processId);
 }
