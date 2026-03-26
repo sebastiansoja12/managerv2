@@ -36,7 +36,7 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     public List<Supplier> findAllByCurrentDepartment() {
         final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class);
         return criteria
-                .getResultList()
+                .list()
                 .stream()
                 .map(EntityToModelMapper::map)
                 .toList();
@@ -44,20 +44,18 @@ public class SupplierRepositoryImpl implements SupplierRepository {
 
     @Override
     public Supplier findById(final SupplierId supplierId) {
-        final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class);
-        criteria.and("supplierId.value", supplierId);
-        return criteria
-                .getSingleResult()
+        return this.supplierBaseRepository.createCriteria(SupplierEntity.class)
+                .eq("supplierId.value", supplierId)
+                .one()
                 .map(EntityToModelMapper::map)
                 .orElse(null);
     }
 
     @Override
     public Supplier findByCode(final SupplierCode supplierCode) {
-        final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class);
-        criteria.and("supplierCode.value", supplierCode);
-        return criteria
-                .getSingleResult()
+        return this.supplierBaseRepository.createCriteria(SupplierEntity.class)
+                .eq("supplierCode.value", supplierCode)
+                .one()
                 .map(EntityToModelMapper::map)
                 .orElse(null);
     }
