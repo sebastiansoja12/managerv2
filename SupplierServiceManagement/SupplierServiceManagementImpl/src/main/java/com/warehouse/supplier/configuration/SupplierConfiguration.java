@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.commonassets.repository.BaseRepository;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.supplier.domain.port.secondary.*;
 import com.warehouse.supplier.domain.service.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.*;
@@ -79,8 +80,8 @@ public class SupplierConfiguration {
     }
 
     @Bean
-    public BaseRepository<SupplierEntity> supplierBaseRepository() {
-        return new BaseRepository<>(entityManager);
+    public BaseRepository<SupplierEntity> supplierBaseRepository(final OperatorContextProvider operatorContextProvider) {
+        return new BaseRepository<>(entityManager, operatorContextProvider);
     }
 
     @Bean("supplier.mailServicePort")
