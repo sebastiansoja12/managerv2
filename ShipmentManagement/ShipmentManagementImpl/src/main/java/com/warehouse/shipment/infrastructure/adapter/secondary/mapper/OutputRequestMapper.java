@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.reroute.infrastructure.adapter.secondary.api.ShipmentIdDto;
@@ -17,7 +17,7 @@ public abstract class OutputRequestMapper {
 	public static ReturnRequestApi map(final ShipmentSnapshot snapshot) {
 		final List<ReturnPackageResponseApi> requests = new ArrayList<>();
 		requests.add(new ReturnPackageResponseApi(new ShipmentIdDto(snapshot.shipmentId().getValue()), "SYSTEM",
-				getCurrentDepartmentCode(), new UserIdApi(getCurrentUser().value()), new ReasonCodeApi("NO_LONGER_NEEDED")
+				null, new UserIdApi(getCurrentUser().value()), new ReasonCodeApi("NO_LONGER_NEEDED")
 		));
 		return new ReturnRequestApi(requests);
 	}
@@ -25,20 +25,16 @@ public abstract class OutputRequestMapper {
     public static ReturnRequestApi map(final ShipmentReturnedCommand command) {
         final List<ReturnPackageResponseApi> requests = new ArrayList<>();
         requests.add(new ReturnPackageResponseApi(new ShipmentIdDto(command.shipmentId().getValue()), command.reason(),
-                getCurrentDepartmentCode(), new UserIdApi(getCurrentUser().value()), new ReasonCodeApi(command.reasonCode().name()))
+                null, new UserIdApi(getCurrentUser().value()), new ReasonCodeApi(command.reasonCode().name()))
         );
         return new ReturnRequestApi(requests);
     }
 
-    public static DepartmentCodeApi getCurrentDepartmentCode() {
-        return new DepartmentCodeApi(getDepartmentCode().value());
-    }
-
-    private static DepartmentCode getDepartmentCode() {
+    private static OperatorId getOperatorId() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication instanceof UsernameTenantPasswordAuthenticationToken token) {
-            return token.getDepartmentCode();
+            return token.getOperatorId();
         } else {
             throw new IllegalStateException("No department code found");
         }
