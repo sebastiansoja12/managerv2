@@ -7,13 +7,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.AdminCreateRequest;
-import com.warehouse.auth.domain.model.RefreshTokenRequest;
 import com.warehouse.auth.domain.model.RegisterRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.domain.vo.*;
-import com.warehouse.auth.infrastructure.adapter.secondary.Logger;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 
@@ -26,8 +24,6 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final JwtService jwtService;
 
-    private final Logger logger;
-
     private final PasswordEncoder passwordEncoder;
 
     private final DepartmentService departmentService;
@@ -37,14 +33,12 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     public AuthenticationPortImpl(final AuthenticationService authenticationService,
                                   final UserService userService,
                                   final JwtService jwtService,
-                                  final Logger logger,
                                   final PasswordEncoder passwordEncoder,
                                   final DepartmentService departmentService,
                                   final MailServicePort mailServicePort) {
         this.authenticationService = authenticationService;
         this.userService = userService;
         this.jwtService = jwtService;
-        this.logger = logger;
         this.passwordEncoder = passwordEncoder;
         this.departmentService = departmentService;
         this.mailServicePort = mailServicePort;
@@ -60,12 +54,20 @@ public class AuthenticationPortImpl implements AuthenticationPort {
             throw new AuthenticationErrorException("Invalid username or password");
         }
 
-        final String authenticationToken = jwtService.generateToken(user);
+        final String accessToken = jwtService.generateToken(user);
 
         final LoginResponse loginResponse = authenticationService.login(
                 UsernamePasswordAuthentication.from(user));
 
-        return new AuthenticationResponse(authenticationToken, loginResponse);
+        return new AuthenticationResponse(accessToken, loginResponse.refreshToken().value());
+    }
+
+    @Override
+    public AuthenticationResponse refresh(final String refreshToken) {
+        final LoginResponse loginResponse = authenticationService.refresh(refreshToken);
+        final User user = userService.findUser(loginResponse.username());
+        final String accessToken = jwtService.generateToken(user);
+        return new AuthenticationResponse(accessToken, loginResponse.refreshToken().value());
     }
 
     @Override
@@ -128,17 +130,10 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     @Override
-    public void logout(final RefreshTokenRequest refreshTokenRequest) {
-
-        final User user = userService.findUser(refreshTokenRequest.getUsername());
-
-        this.authenticationService.logout(
-                user.getUserId(), refreshTokenRequest.getRefreshToken()
-        );
+    public void logout(final String refreshToken) {
+        this.authenticationService.logout(refreshToken);
 
         SecurityContextHolder.clearContext();
-
-        logLogoutInformation(refreshTokenRequest.getUsername());
     }
 
     @Override
@@ -158,10 +153,6 @@ public class AuthenticationPortImpl implements AuthenticationPort {
             case "SUPPLIER" -> User.Role.SUPPLIER;
             default -> User.Role.USER;
         };
-    }
-
-    private void logLogoutInformation(final String username) {
-        logger.info("User {} has been successfully logged out", username);
     }
 
     private void validateDepartmentCode(final DepartmentCode departmentCode) {
