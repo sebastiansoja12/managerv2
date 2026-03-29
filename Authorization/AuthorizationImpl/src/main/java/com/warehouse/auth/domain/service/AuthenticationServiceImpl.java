@@ -12,6 +12,9 @@ import com.warehouse.auth.domain.vo.UsernamePasswordAuthentication;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -38,15 +41,47 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .token(refreshTokenGenerator.generateToken(userRepository.findByUsername(usernamePasswordAuthentication.username())))
                 .build();
         final Token token = refreshTokenRepository.save(refreshToken);
-        return new LoginResponse(token);
+        return new LoginResponse(token, usernamePasswordAuthentication.username());
     }
 
     @Override
-    public void logout(final UserId userId, final String token) {
-        final User user = this.userRepository.findById(userId);
-        user.markAsLoggedOut();
-        this.userRepository.createOrUpdate(user);
-        DomainRegistry.eventPublisher().publishEvent(new UserLoggedOutEvent(user.snapshot()));
+    @Transactional
+    public LoginResponse refresh(final String refreshTokenValue) {
+        final RefreshToken currentRefreshToken = refreshTokenRepository.find(refreshTokenValue)
+                .filter(RefreshToken::isActual)
+                .filter(refreshToken -> refreshToken.getExpiryDate().isAfter(java.time.LocalDateTime.now()))
+                .orElseThrow(() -> new AuthenticationErrorException("Invalid or expired refresh token"));
+        final User user = userRepository.findByUsername(currentRefreshToken.getUsername());
+        if (user == null || Boolean.TRUE.equals(user.isDeleted())) {
+            throw new AuthenticationErrorException("Invalid or expired refresh token");
+        }
+
+        refreshTokenRepository.delete(refreshTokenValue);
+        final RefreshToken rotatedRefreshToken = RefreshToken.builder()
+                .username(user.getUsername())
+                .expired(false)
+                .revoked(false)
+                .token(refreshTokenGenerator.generateToken(user))
+                .build();
+        final Token rotatedToken = refreshTokenRepository.save(rotatedRefreshToken);
+        return new LoginResponse(rotatedToken, user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    public void logout(final String refreshTokenValue) {
+        final RefreshToken refreshToken = refreshTokenRepository.find(refreshTokenValue).orElse(null);
+        if (refreshToken == null) {
+            return;
+        }
+
+        refreshTokenRepository.delete(refreshTokenValue);
+        final User user = this.userRepository.findByUsername(refreshToken.getUsername());
+        if (user != null) {
+            user.markAsLoggedOut();
+            this.userRepository.createOrUpdate(user);
+            DomainRegistry.eventPublisher().publishEvent(new UserLoggedOutEvent(user.snapshot()));
+        }
     }
 
     @Override
