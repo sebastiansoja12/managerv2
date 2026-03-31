@@ -1,6 +1,7 @@
 package com.warehouse.supplier.domain.port.primary;
 
 import com.warehouse.commonassets.helper.Result;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
@@ -13,6 +14,7 @@ import com.warehouse.supplier.domain.service.SupplierService;
 import com.warehouse.supplier.domain.service.SupplierValidatorService;
 import com.warehouse.supplier.domain.vo.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
+import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
@@ -95,7 +97,8 @@ public class SupplyPortImpl implements SupplyPort {
 
     @Override
     public void addPackageType(final ChangeSupportedPackageTypeCommand command) {
-        this.supplierService.addSupportedPackageType(command.supplierCode(), command.packageType());
+        validateExists(command.supplierCode());
+        this.supplierService.changeSupportedPackageTypes(command.supplierCode(), command.supportedPackageTypes());
     }
 
     @Override
@@ -110,6 +113,33 @@ public class SupplyPortImpl implements SupplyPort {
             throw new SupplierNotFoundException(supplierCode.value());
         }
         this.supplierService.addDevice(supplierCode, deviceId);
+    }
+
+    @Override
+    public void assignVehicle(final ChangeSupplierVehicleCommand command) {
+        final SupplierCode supplierCode = command.supplierCode();
+        validateExists(supplierCode);
+        this.supplierService.assignVehicle(supplierCode, command.vehicleId());
+    }
+
+    @Override
+    public void updateDeliveryArea(final ChangeSupplierDeliveryAreaCommand command) {
+        final SupplierCode supplierCode = command.supplierCode();
+        validateExists(supplierCode);
+        this.supplierService.updateDeliveryArea(supplierCode, command.deliveryArea());
+    }
+
+    @Override
+    public void changeDepartmentCode(final ChangeSupplierDepartmentCodeCommand command) {
+        final SupplierCode supplierCode = command.supplierCode();
+        final DepartmentCode departmentCode = command.departmentCode();
+        final Boolean departmentExists = validatorService.validateDepartmentExistsByDeparmtneCode(departmentCode);
+
+        if (supplierService.findByCode(supplierCode) == null || !departmentExists) {
+            throw new RestClientException("Supplier or department not found");
+        }
+
+        this.supplierService.changeDepartment(supplierCode, departmentCode);
     }
 
     @Override
