@@ -228,6 +228,11 @@ public class Supplier {
         markAsModified();
     }
 
+    public void changeDepartmentCode(final DepartmentCode departmentCode) {
+        this.departmentCode = departmentCode;
+        markAsModified();
+    }
+
     public void assignVehicle(final VehicleId vehicleId) {
         this.vehicleId = vehicleId;
         markAsModified();
@@ -239,6 +244,10 @@ public class Supplier {
     }
 
     public void updateData(final SupplierDto supp) {
+        if (supp.departmentCode() != null) {
+            changeDepartmentCode(supp.departmentCode());
+        }
+
         if (supp.deviceId() != null) {
             changeDeviceId(supp.deviceId());
         }
