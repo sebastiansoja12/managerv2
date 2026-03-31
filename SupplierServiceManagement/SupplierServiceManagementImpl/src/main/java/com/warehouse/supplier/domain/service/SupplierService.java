@@ -1,10 +1,7 @@
 package com.warehouse.supplier.domain.service;
 
 import com.warehouse.commonassets.enumeration.PackageType;
-import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
@@ -24,8 +21,11 @@ public interface SupplierService {
     void updateDriverLicense(final SupplierCode supplierCode, final DriverLicense driverLicense);
     void updateUserCreated(final SupplierId supplierId, final UserId createdUserId);
     void updateDeliveryArea(final SupplierId supplierId, final DeliveryArea deliveryArea);
+    void updateDeliveryArea(final SupplierCode supplierCode, final DeliveryArea deliveryArea);
     void addSupportedPackageType(final SupplierCode supplierCode, final PackageType packageType);
+    void changeSupportedPackageTypes(final SupplierCode supplierCode, final java.util.Set<PackageType> packageTypes);
     void addDevice(final SupplierCode supplierCode, final DeviceId deviceId);
+    void assignVehicle(final SupplierCode supplierCode, final VehicleId vehicleId);
     void update(final SupplierCode supplierCode, final SupplierDto supplier);
 
     Supplier findById(final SupplierId supplierId);
@@ -36,4 +36,7 @@ public interface SupplierService {
     void invalidateDriverLicense(final SupplierCode supplierCode);
 
     void updateCertification(final SupplierCode supplierCode, final DangerousGoodCertification certification);
+
+    void changeDepartment(final SupplierId supplierId, final DepartmentCode departmentCode);
+    void changeDepartment(final SupplierCode supplierCode, final DepartmentCode departmentCode);
 }
