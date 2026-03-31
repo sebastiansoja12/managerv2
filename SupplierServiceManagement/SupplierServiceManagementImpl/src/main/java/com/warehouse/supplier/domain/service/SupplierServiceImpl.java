@@ -1,10 +1,7 @@
 package com.warehouse.supplier.domain.service;
 
 import com.warehouse.commonassets.enumeration.PackageType;
-import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.supplier.domain.event.*;
 import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
@@ -16,6 +13,7 @@ import com.warehouse.supplier.domain.vo.SupplierDto;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -107,9 +105,25 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    public void updateDeliveryArea(final SupplierCode supplierCode, final DeliveryArea deliveryArea) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.changeDeliveryArea(deliveryArea);
+        this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDeliveryAreaChanged(supplier.snapshot(), Instant.now()));
+    }
+
+    @Override
     public void addSupportedPackageType(final SupplierCode supplierCode, final PackageType packageType) {
         final Supplier supplier = this.findByCode(supplierCode);
         supplier.addSupportedPackageType(packageType);
+        this.supplierRepository.update(supplier);
+    }
+
+    @Override
+    public void changeSupportedPackageTypes(final SupplierCode supplierCode, final Set<PackageType> packageTypes) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.changeSupportedPackageTypes(packageTypes);
         this.supplierRepository.update(supplier);
     }
 
@@ -120,6 +134,15 @@ public class SupplierServiceImpl implements SupplierService {
         this.supplierRepository.update(supplier);
         DomainContext.eventPublisher()
                 .publishEvent(new SupplierDeviceAssigned(supplier.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public void assignVehicle(final SupplierCode supplierCode, final VehicleId vehicleId) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.assignVehicle(vehicleId);
+        this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierVehicleAssigned(supplier.snapshot(), Instant.now()));
     }
 
     @Override
@@ -168,5 +191,23 @@ public class SupplierServiceImpl implements SupplierService {
         this.supplierRepository.update(supplier);
 		DomainContext.eventPublisher()
 				.publishEvent(new SupplierDangerousGoodCertificationChanged(supplier.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public void changeDepartment(final SupplierId supplierId, final DepartmentCode departmentCode) {
+        final Supplier supplier = this.findById(supplierId);
+        supplier.changeDepartmentCode(departmentCode);
+        this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDepartmentChanged(supplier.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public void changeDepartment(final SupplierCode supplierCode, final DepartmentCode departmentCode) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.changeDepartmentCode(departmentCode);
+        this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDepartmentChanged(supplier.snapshot(), Instant.now()));
     }
 }
