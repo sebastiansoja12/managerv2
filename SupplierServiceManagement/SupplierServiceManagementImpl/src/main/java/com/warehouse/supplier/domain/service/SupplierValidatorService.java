@@ -1,6 +1,7 @@
 package com.warehouse.supplier.domain.service;
 
 import com.warehouse.commonassets.helper.Result;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.vo.SupplierUpdateCommand;
@@ -15,6 +16,8 @@ public interface SupplierValidatorService {
     boolean validateCity(final String city);
     boolean validatePostalCode(final String postalCode);
     boolean validateCountry(final String country);
-    boolean validateSupplierId(final SupplierId supplierId);
+    boolean validateSupplierExistsById(final SupplierId supplierId);
     Result<Void, String> validateSupplierForUpdate(final SupplierUpdateCommand supplierUpdateCommand);
+
+    Boolean validateDepartmentExistsByDeparmtneCode(final DepartmentCode departmentCode);
 }
