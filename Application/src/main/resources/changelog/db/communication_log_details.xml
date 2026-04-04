@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-1">
+        <createTable tableName="communication_log_details">
+            <column autoIncrement="true" name="communication_log_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="process_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_id" type="VARCHAR(64)"/>
+            <column name="process_type" type="VARCHAR(64)"/>
+            <column name="service_type" type="VARCHAR(64)"/>
+            <column name="created_by" type="BIGINT"/>
+            <column name="updated_by" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="source_service" type="VARCHAR(255)"/>
+            <column name="target_service" type="VARCHAR(255)"/>
+            <column name="request" type="LONGTEXT"/>
+            <column name="response" type="LONGTEXT"/>
+            <column name="fault_description" type="VARCHAR(2000)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-53">
+        <createIndex associatedWith="" indexName="fk_communication_log_details_process_logs" tableName="communication_log_details">
+            <column name="process_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
