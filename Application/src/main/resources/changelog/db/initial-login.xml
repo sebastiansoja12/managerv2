@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="s-soja" id="insert-initial-operator-department-and-user-2026-3">
+        <insert tableName="operators">
+            <column name="operator_id" valueNumeric="1"/>
+            <column name="registering_user_id" valueNumeric="1"/>
+            <column name="tax_id" value="1234567890"/>
+            <column name="supports_lockers" valueBoolean="true"/>
+            <column name="supports_international_shipping" valueBoolean="true"/>
+            <column name="supports_cash_on_delivery" valueBoolean="true"/>
+            <column name="contact_phone" value="+48123456789"/>
+            <column name="contact_email" value="a@a.pl"/>
+            <column name="name" value="Manager"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+
+        <insert tableName="department">
+            <column name="department_code" value="KT1"/>
+            <column name="city" value="Katowice"/>
+            <column name="street" value="Testowa 1"/>
+            <column name="postal_code" value="40-001"/>
+            <column name="tax_id" value="1234567890"/>
+            <column name="telephone_number" value="+48123456789"/>
+            <column name="opening_hours" value="08:00-16:00"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="country_code" value="PL"/>
+            <column name="status" value="ACTIVE"/>
+            <column name="email" value="kt1@manager.local"/>
+            <column name="department_type" value="BRANCH"/>
+            <column name="latitude" valueNumeric="50.2649"/>
+            <column name="longitude" valueNumeric="19.0238"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="admin_user_id" valueNumeric="1"/>
+            <column name="created_by" valueNumeric="1"/>
+            <column name="last_modified_by" valueNumeric="1"/>
+            <column name="operator_id" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="users">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="username" value="a@a.pl"/>
+            <column name="password" value="$2a$10$GIi6ypLfEcfc.9Q9R99IAeeZn9cCL0YpG8fUEIKijN.hs4koSdE5y"/>
+            <column name="first_name" value="Admin"/>
+            <column name="last_name" value="Manager"/>
+            <column name="email" value="a@a.pl"/>
+            <column name="role" value="ADMIN"/>
+            <column name="department_code" value="KT1"/>
+            <column name="api_key" value="initial-admin-api-key"/>
+            <column name="deleted" valueBoolean="false"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="language" value="pl"/>
+            <column name="initial" valueBoolean="false"/>
+            <column name="operator_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="s-soja" id="insert-initial-admin-permissions-2026-3">
+        <insert tableName="role_permissions">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="ROLE_ADMIN_READ"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="ROLE_ADMIN_UPDATE"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="ROLE_ADMIN_CREATE"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="ROLE_ADMIN_DELETE"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="id" valueNumeric="5"/>
+            <column name="name" value="ROLE_MANAGER_READ"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="id" valueNumeric="6"/>
+            <column name="name" value="ROLE_MANAGER_UPDATE"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="id" valueNumeric="7"/>
+            <column name="name" value="ROLE_MANAGER_CREATE"/>
+        </insert>
+        <insert tableName="role_permissions">
+            <column name="id" valueNumeric="8"/>
+            <column name="name" value="ROLE_MANAGER_DELETE"/>
+        </insert>
+
+        <sql>
+            INSERT INTO users_role_permissions (user_id, permission_id)
+            SELECT 1, id
+            FROM role_permissions
+            WHERE id BETWEEN 1 AND 8;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
