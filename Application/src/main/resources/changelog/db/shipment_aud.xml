@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-41">
+        <createTable tableName="shipment_aud">
+            <column name="rev" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="revtype" type="TINYINT(3)"/>
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp"/>
+            <column name="dangerous_good_id" type="BIGINT"/>
+            <column name="destination" type="VARCHAR(255)"/>
+            <column name="destination_country" type="VARCHAR(10)"/>
+            <column name="external_id" type="VARCHAR(255)"/>
+            <column name="external_return_id" type="BIGINT"/>
+            <column name="external_route_id" type="VARCHAR(255)"/>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="locked" type="BIT(1)"/>
+            <column name="origin_country" type="VARCHAR(10)"/>
+            <column name="price_amount" type="DECIMAL(19, 2)"/>
+            <column name="price_currency" type="VARCHAR(10)"/>
+            <column name="recipient_city" type="VARCHAR(255)"/>
+            <column name="recipient_email" type="VARCHAR(255)"/>
+            <column name="recipient_first_name" type="VARCHAR(255)"/>
+            <column name="recipient_last_name" type="VARCHAR(255)"/>
+            <column name="recipient_postal_code" type="VARCHAR(255)"/>
+            <column name="recipient_street" type="VARCHAR(255)"/>
+            <column name="recipient_telephone" type="VARCHAR(255)"/>
+            <column name="sender_city" type="VARCHAR(255)"/>
+            <column name="sender_email" type="VARCHAR(255)"/>
+            <column name="sender_postal_code" type="VARCHAR(255)"/>
+            <column name="sender_street" type="VARCHAR(255)"/>
+            <column name="sender_telephone" type="VARCHAR(255)"/>
+            <column name="shipment_priority" type="VARCHAR(32)"/>
+            <column name="shipment_related_id" type="BIGINT"/>
+            <column name="parcel_size" type="VARCHAR(64)"/>
+            <column name="status" type="VARCHAR(64)"/>
+            <column name="type" type="VARCHAR(64)"/>
+            <column name="tracking_number" type="VARCHAR(255)"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+        <addPrimaryKey tableName="shipment_aud"
+                       columnNames="shipment_id, rev"
+                       constraintName="pk_shipment_aud"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-70">
+        <createIndex associatedWith="" indexName="fk_shipment_aud_revinfo" tableName="shipment_aud">
+            <column name="rev"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
