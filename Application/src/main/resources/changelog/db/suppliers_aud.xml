@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-45">
+        <createTable tableName="suppliers_aud">
+            <column name="rev" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="revtype" type="TINYINT(3)"/>
+            <column name="supplier_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supplier_code" type="VARCHAR(50)"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="first_name" type="VARCHAR(100)"/>
+            <column name="last_name" type="VARCHAR(100)"/>
+            <column name="telephone_number" type="VARCHAR(20)"/>
+            <column name="status" type="VARCHAR(50)"/>
+            <column name="user_status" type="VARCHAR(50)"/>
+            <column name="vehicle_id" type="BIGINT"/>
+            <column name="device_id" type="VARCHAR(64)"/>
+            <column name="certificate_number" type="VARCHAR(100)"/>
+            <column name="issue_date" type="timestamp"/>
+            <column name="expiry_date" type="timestamp"/>
+            <column name="authority" type="VARCHAR(100)"/>
+            <column name="valid" type="BIT(1)"/>
+            <column name="driver_license_number" type="VARCHAR(50)"/>
+            <column name="acquired_date" type="timestamp"/>
+            <column name="driving_license_expiry_date" type="timestamp"/>
+            <column name="area_name" type="VARCHAR(100)"/>
+            <column name="city" type="VARCHAR(100)"/>
+            <column name="district" type="VARCHAR(100)"/>
+            <column name="municipality" type="VARCHAR(100)"/>
+            <column name="region" type="VARCHAR(100)"/>
+            <column name="country" type="VARCHAR(100)"/>
+            <column name="api_key" type="VARCHAR(255)"/>
+            <column name="terms_accepted" type="BIT(1)"/>
+            <column name="created_user_id" type="BIGINT"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+        <addPrimaryKey tableName="suppliers_aud"
+                       columnNames="supplier_id, rev"
+                       constraintName="pk_suppliers_aud"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-73">
+        <createIndex associatedWith="" indexName="fk_suppliers_aud_revinfo" tableName="suppliers_aud">
+            <column name="rev"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
