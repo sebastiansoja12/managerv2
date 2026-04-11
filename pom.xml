@@ -49,6 +49,7 @@
 		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 		<org.projectlombok.version>1.18.30</org.projectlombok.version>
 		<spring-starter.version>3.5.5</spring-starter.version>
+		<spring-boot.run.skip>true</spring-boot.run.skip>
 		<maven-jaxb2-plugin.version>0.15.1</maven-jaxb2-plugin.version>
 		<maven-jaxb2-basics-plugin.version>1.11.1</maven-jaxb2-basics-plugin.version>
 		<sonar.organization>sebastiansoja</sonar.organization>
@@ -308,7 +309,7 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>4.25.0</version>
+				<version>4.31.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.h2database</groupId>

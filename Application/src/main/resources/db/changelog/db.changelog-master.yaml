@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: classpath:/changelog/db.changelog-master.xml
+      relativeToChangelogFile: false

@@ -1,27 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
 
-    <changeSet id="create-device-version-table" author="s-soja">
+    <changeSet id="create-device-version-table-v2026-3" author="s-soja">
+        <validCheckSum>9:07f7c5b6e4d00e895fc8707b2558dad6</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="device_version"/>
+            </not>
+        </preConditions>
+
         <createTable tableName="device_version">
-            <column name="id" type="BIGINT">
-                <constraints primaryKey="true" nullable="false" />
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="device_type" type="VARCHAR(50)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="version" type="VARCHAR(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
-            <column name="device_id" type="VARCHAR(255)">
-                <constraints nullable="false" />
+            <column name="device_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
             <column name="last_update" type="TIMESTAMP">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet id="device-version-id-autoincrement-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <dbms type="mysql"/>
+                <tableExists tableName="device_version"/>
+                <columnExists tableName="device_version" columnName="id"/>
+            </and>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE device_version
+            MODIFY COLUMN id BIGINT NOT NULL AUTO_INCREMENT
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+
+    <changeSet id="create-parcel-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="parcel"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="parcel">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_telephone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_city" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_street" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_postal_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_telephone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_city" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_street" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_postal_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parcel_size" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_related_id" type="BIGINT"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-route-log-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="route_log"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="route_log">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="parcel_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="return_code" type="VARCHAR(255)"/>
+            <column name="fault_description" type="VARCHAR(2000)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-route-log-details-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="route_log_details"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="route_log_details">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="route_log_record_id" type="VARCHAR(255)"/>
+            <column name="device_id" type="BIGINT"/>
+            <column name="version" type="VARCHAR(255)"/>
+            <column name="created" type="TIMESTAMP"/>
+            <column name="description" type="VARCHAR(2000)"/>
+            <column name="process_type" type="INT"/>
+            <column name="request" type="CLOB"/>
+            <column name="parcel_status" type="INT"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="supplier_code" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="route-log-details-add-route-log-foreign-key-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="route_log_details"/>
+                <tableExists tableName="route_log"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_route_log_details_route_log"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="route_log_details"
+                                 baseColumnNames="route_log_record_id"
+                                 referencedTableName="route_log"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_route_log_details_route_log"/>
+    </changeSet>
+
+    <changeSet id="route-log-details-add-user-foreign-key-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="route_log_details"/>
+                <tableExists tableName="users"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_route_log_details_user"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="route_log_details"
+                                 baseColumnNames="username"
+                                 referencedTableName="users"
+                                 referencedColumnNames="username"
+                                 constraintName="fk_route_log_details_user"/>
+    </changeSet>
+
+    <changeSet id="route-log-details-add-department-foreign-key-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="route_log_details"/>
+                <tableExists tableName="department"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_route_log_details_department"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="route_log_details"
+                                 baseColumnNames="department_code"
+                                 referencedTableName="department"
+                                 referencedColumnNames="department_code"
+                                 constraintName="fk_route_log_details_department"/>
+    </changeSet>
+
+    <changeSet id="route-log-details-add-supplier-foreign-key-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="route_log_details"/>
+                <tableExists tableName="supplier"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_route_log_details_supplier"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="route_log_details"
+                                 baseColumnNames="supplier_code"
+                                 referencedTableName="supplier"
+                                 referencedColumnNames="supplier_code"
+                                 constraintName="fk_route_log_details_supplier"/>
+    </changeSet>
+
+    <changeSet id="create-return-tokens-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="return_tokens"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="return_tokens">
+            <column name="return_token_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="token" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="shipment_id" type="BIGINT"/>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="return-tokens-add-shipment-foreign-key-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="return_tokens"/>
+                <tableExists tableName="shipment"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_return_tokens_shipment"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="return_tokens"
+                                 baseColumnNames="shipment_id"
+                                 referencedTableName="shipment"
+                                 referencedColumnNames="shipment_id"
+                                 constraintName="fk_return_tokens_shipment"/>
+    </changeSet>
+
+    <changeSet id="create-returning-return-package-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="returning_return_package"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="returning_return_package">
+            <column name="return_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="shipment_id" type="BIGINT"/>
+            <column name="reason" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="return_status" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="return_token" type="VARCHAR(255)"/>
+            <column name="assigned_department" type="VARCHAR(255)"/>
+            <column name="returned_department" type="VARCHAR(255)"/>
+            <column name="assigned_to" type="BIGINT"/>
+            <column name="processed_by" type="BIGINT"/>
+            <column name="reason_code" type="VARCHAR(64)"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="returning-return-package-add-shipment-foreign-key-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="returning_return_package"/>
+                <tableExists tableName="shipment"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_returning_return_package_shipment"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="returning_return_package"
+                                 baseColumnNames="shipment_id"
+                                 referencedTableName="shipment"
+                                 referencedColumnNames="shipment_id"
+                                 constraintName="fk_returning_return_package_shipment"/>
+    </changeSet>
+
+    <changeSet id="create-reject-reason-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="reject_reason"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="reject_reason">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="reason" type="VARCHAR(2000)"/>
+            <column name="shipment_id" type="BIGINT"/>
+            <column name="recipient" type="VARCHAR(255)"/>
+            <column name="reject_department_code" type="VARCHAR(255)"/>
+            <column name="supplier_code" type="VARCHAR(255)"/>
+            <column name="delivery_status" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-delivery-missed-details-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="delivery_missed_details"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="delivery_missed_details">
+            <column name="delivery_missed_detail_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="planned_delivery_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delivery_date" type="TIMESTAMP"/>
+            <column name="created" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="new_proposed_date" type="TIMESTAMP"/>
+            <column name="address_changed" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delivery_attempt_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="penalty_fee" type="DECIMAL(19,2)"/>
+            <column name="suggested_action" type="VARCHAR(500)"/>
+            <column name="incident_report" type="VARCHAR(2000)"/>
+            <column name="shipment_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-process-logs-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="process_logs"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="process_logs">
+            <column name="process_id" type="BINARY(16)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="request" type="CLOB"/>
+            <column name="response" type="CLOB"/>
+            <column name="status" type="VARCHAR(64)"/>
+            <column name="fault_description" type="VARCHAR(2000)"/>
+            <column name="device_id" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="user_id" type="BIGINT"/>
+            <column name="device_type" type="VARCHAR(64)"/>
+            <column name="device_user_type" type="VARCHAR(64)"/>
+            <column name="device_version" type="VARCHAR(255)"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-process-logs-rd-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="process_logs_rd"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="process_logs_rd">
+            <column name="process_id" type="BINARY(16)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="request" type="CLOB"/>
+            <column name="response" type="CLOB"/>
+            <column name="status" type="VARCHAR(64)"/>
+            <column name="fault_description" type="VARCHAR(2000)"/>
+            <column name="device_id" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="user_id" type="BIGINT"/>
+            <column name="device_type" type="VARCHAR(64)"/>
+            <column name="device_user_type" type="VARCHAR(64)"/>
+            <column name="device_version" type="VARCHAR(255)"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-communication-log-details-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="communication_log_details"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="communication_log_details">
+            <column name="communication_log_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="process_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_id" type="BIGINT"/>
+            <column name="process_type" type="VARCHAR(64)"/>
+            <column name="service_type" type="VARCHAR(64)"/>
+            <column name="created_by" type="BIGINT"/>
+            <column name="updated_by" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="source_service" type="VARCHAR(255)"/>
+            <column name="target_service" type="VARCHAR(255)"/>
+            <column name="request" type="CLOB"/>
+            <column name="response" type="CLOB"/>
+            <column name="fault_description" type="VARCHAR(2000)"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-communication-log-details-rd-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="communication_log_details_rd"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="communication_log_details_rd">
+            <column name="communication_log_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="process_id" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_id" type="BIGINT"/>
+            <column name="process_type" type="VARCHAR(64)"/>
+            <column name="service_type" type="VARCHAR(64)"/>
+            <column name="created_by" type="BIGINT"/>
+            <column name="updated_by" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="source_service" type="VARCHAR(255)"/>
+            <column name="target_service" type="VARCHAR(255)"/>
+            <column name="request" type="CLOB"/>
+            <column name="response" type="CLOB"/>
+            <column name="fault_description" type="VARCHAR(2000)"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="communication-log-details-add-process-foreign-key-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="communication_log_details"/>
+                <tableExists tableName="process_logs"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_communication_log_details_process_logs"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="communication_log_details"
+                                 baseColumnNames="process_id"
+                                 referencedTableName="process_logs"
+                                 referencedColumnNames="process_id"
+                                 constraintName="fk_communication_log_details_process_logs"/>
+    </changeSet>
+
+    <changeSet id="communication-log-details-rd-add-process-foreign-key-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="communication_log_details_rd"/>
+                <tableExists tableName="process_logs_rd"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_communication_log_details_rd_process_logs_rd"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="communication_log_details_rd"
+                                 baseColumnNames="process_id"
+                                 referencedTableName="process_logs_rd"
+                                 referencedColumnNames="process_id"
+                                 constraintName="fk_communication_log_details_rd_process_logs_rd"/>
+    </changeSet>
+
+    <changeSet id="create-conf-position-stack-table-v2026-4" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="conf_position_stack"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="conf_position_stack">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="token" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valid" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

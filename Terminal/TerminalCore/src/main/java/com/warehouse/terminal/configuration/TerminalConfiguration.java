@@ -13,46 +13,11 @@ import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.port.primary.DevicePairPortImpl;
 import com.warehouse.terminal.domain.port.primary.DevicePort;
 import com.warehouse.terminal.domain.port.primary.DevicePortImpl;
-import com.warehouse.terminal.domain.port.secondary.DepartmentRepository;
-import com.warehouse.terminal.domain.port.secondary.DepartmentServicePort;
-import com.warehouse.terminal.domain.port.secondary.DevicePairRepository;
-import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
-import com.warehouse.terminal.domain.port.secondary.DeviceSettingsRepository;
-import com.warehouse.terminal.domain.port.secondary.DeviceVersionRepository;
-import com.warehouse.terminal.domain.port.secondary.SoftwareConfigurationServicePort;
-import com.warehouse.terminal.domain.port.secondary.SupplierRepository;
-import com.warehouse.terminal.domain.port.secondary.UserRepository;
-import com.warehouse.terminal.domain.service.DeviceGenericService;
-import com.warehouse.terminal.domain.service.DeviceGenericServiceImpl;
-import com.warehouse.terminal.domain.service.DevicePairService;
-import com.warehouse.terminal.domain.service.DevicePairServiceImpl;
-import com.warehouse.terminal.domain.service.DeviceValidatorService;
-import com.warehouse.terminal.domain.service.DeviceValidatorServiceImpl;
-import com.warehouse.terminal.domain.service.DeviceVersionService;
-import com.warehouse.terminal.domain.service.DeviceVersionServiceImpl;
-import com.warehouse.terminal.domain.service.UserService;
-import com.warehouse.terminal.domain.service.UserServiceImpl;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DepartmentReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DepartmentRepositoryImpl;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DepartmentServiceAdapter;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DeviceGenericRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DevicePairReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DevicePairRepositoryImpl;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DeviceSettingsReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DeviceSettingsRepositoryImpl;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DeviceVersionReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.DeviceVersionRepositoryImpl;
-import com.warehouse.terminal.infrastructure.adapter.secondary.MobileReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.ScannerReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.SoftwareConfigurationServiceAdapter;
-import com.warehouse.terminal.infrastructure.adapter.secondary.SoftwareConfigurationServiceMockAdapter;
-import com.warehouse.terminal.infrastructure.adapter.secondary.SupplierReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.SupplierRepositoryImpl;
-import com.warehouse.terminal.infrastructure.adapter.secondary.TerminalReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.UserReadRepository;
-import com.warehouse.terminal.infrastructure.adapter.secondary.UserRepositoryImpl;
-import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
+import com.warehouse.terminal.domain.port.secondary.*;
+import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.infrastructure.adapter.primary.DeviceServiceAdapter;
+import com.warehouse.terminal.infrastructure.adapter.secondary.*;
+import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 
 import io.github.resilience4j.retry.RetryConfig;
 
@@ -92,7 +57,7 @@ public class TerminalConfiguration {
     }
 
     @Bean("device.softwareConfigurationServicePort")
-    @ConditionalOnProperty(name = "services.mock", havingValue = "true")
+    @ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
     public SoftwareConfigurationServicePort softwareConfigurationServiceMockPort() {
         return new SoftwareConfigurationServiceMockAdapter();
     }

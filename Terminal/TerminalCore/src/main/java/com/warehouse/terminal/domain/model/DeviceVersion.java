@@ -30,6 +30,12 @@ public class DeviceVersion {
         this.lastUpdate = lastUpdate;
     }
 
+    public DeviceVersion(final DeviceType deviceType, final String version, final DeviceId deviceId) {
+        this.deviceType = deviceType;
+        this.version = version;
+        this.deviceId = deviceId;
+    }
+
     public DeviceVersion(final String version, final DeviceId deviceId) {
         this.version = version;
         this.deviceId = deviceId;

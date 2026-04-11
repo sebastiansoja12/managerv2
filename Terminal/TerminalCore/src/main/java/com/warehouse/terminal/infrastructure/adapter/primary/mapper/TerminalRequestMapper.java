@@ -2,24 +2,19 @@ package com.warehouse.terminal.infrastructure.adapter.primary.mapper;
 
 import java.util.UUID;
 
-import com.warehouse.commonassets.enumeration.DeviceType;
-import com.warehouse.commonassets.enumeration.DeviceUserType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.TeamId;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.commonassets.identificator.VehicleId;
-import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
-import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
-import com.warehouse.terminal.domain.enumeration.DeviceStatus;
-import com.warehouse.terminal.domain.enumeration.NetworkType;
-import com.warehouse.terminal.domain.vo.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.enumeration.DeviceUserType;
+import com.warehouse.commonassets.identificator.*;
+import com.warehouse.terminal.domain.enumeration.DeviceStatus;
+import com.warehouse.terminal.domain.enumeration.NetworkType;
+import com.warehouse.terminal.domain.model.OwnershipProfile;
+import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
 import com.warehouse.terminal.domain.model.command.DevicePairRequest;
+import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
+import com.warehouse.terminal.domain.vo.*;
 import com.warehouse.terminal.dto.DeviceIdDto;
 import com.warehouse.terminal.dto.TerminalIdDto;
 import com.warehouse.terminal.request.*;

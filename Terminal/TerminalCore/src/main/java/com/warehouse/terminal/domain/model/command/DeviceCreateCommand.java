@@ -26,14 +26,33 @@ public class DeviceCreateCommand {
     private LocationProfile location;
     private OwnershipProfile ownership;
 
-	public DeviceCreateCommand(final DepartmentCode departmentCode, final DeviceType deviceType,
-                               final SupplierCode supplierCode, final UserId userId, final String version, final DeviceUserType deviceUserType) {
-        this.departmentCode = departmentCode;
-        this.deviceType = deviceType;
-        this.supplierCode = supplierCode;
+    public DeviceCreateCommand(
+            final UserId userId,
+            final SupplierCode supplierCode,
+            final String version,
+            final DeviceUserType deviceUserType,
+            final DepartmentCode departmentCode,
+            final DeviceType deviceType,
+            final IdentityInfo identity,
+            final HardwareProfile hardware,
+            final SoftwareProfile software,
+            final NetworkProfile network,
+            final SecurityProfile security,
+            final LocationProfile location,
+            final OwnershipProfile ownership) {
         this.userId = userId;
+        this.supplierCode = supplierCode;
         this.version = version;
         this.deviceUserType = deviceUserType;
+        this.departmentCode = departmentCode;
+        this.deviceType = deviceType;
+        this.identity = identity;
+        this.hardware = hardware;
+        this.software = software;
+        this.network = network;
+        this.security = security;
+        this.location = location;
+        this.ownership = ownership;
     }
 
     public DepartmentCode getDepartmentCode() {
