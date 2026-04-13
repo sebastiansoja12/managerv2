@@ -1,14 +1,10 @@
 package com.warehouse.auth.domain.port.primary;
 
-import java.util.Set;
-
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.domain.model.AdminCreateRequest;
-import com.warehouse.auth.domain.model.RegisterRequest;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.domain.vo.*;
@@ -93,12 +89,54 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         validateDepartmentCode(departmentCode);
 
-        final String apiKey = jwtService.generateToken(firstName, username, role, departmentCode);
-
-        final User user = new User(userId, username, password, email, firstName, lastName, role, departmentCode, apiKey,
-                language, Set.of());
+        final User user = User.createWithRole(
+                userId, username, password, firstName, lastName, email, role, departmentCode, "dummy", language
+        );
 
         return userService.create(user);
+    }
+
+    @Override
+    public UserId createUser(final CreateUserCommand command) {
+        final UserId userId = userService.nextUserId();
+        final User.Role role = mapRole(command.role());
+        final String password = passwordEncoder.encode(command.password());
+        validateDepartmentCode(command.departmentCode());
+        final User user = User.createWithRole(
+                userId,
+                command.username(),
+                password,
+                command.firstName(),
+                command.lastName(),
+                command.email(),
+                role,
+                command.departmentCode(),
+                "dummy",
+                command.language()
+        );
+        userService.create(user);
+        return userId;
+    }
+
+    @Override
+    public UserId createOperatorUser(final CreateOperatorUserCommand command) {
+        final UserId userId = userService.nextUserId();
+        final String password = passwordEncoder.encode(command.password());
+        final User.Role role = mapRole(command.role());
+        final User user = User.createWithRole(
+                userId,
+                command.username(),
+                password,
+                command.firstName(),
+                command.lastName(),
+                command.email(),
+                role,
+                command.departmentCode(),
+                "dummy",
+                command.language()
+        );
+        userService.create(user);
+        return userId;
     }
 
     @Override
