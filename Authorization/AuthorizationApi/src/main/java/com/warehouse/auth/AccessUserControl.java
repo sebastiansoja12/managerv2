@@ -1,5 +1,7 @@
 package com.warehouse.auth;
 
+import com.warehouse.commonassets.enumeration.UserPermission;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,7 +13,7 @@ public @interface AccessUserControl {
 
     String[] value() default {};
 
-    String[] permissions() default {};
+    UserPermission[] permissions() default {};
 
     boolean requireAllPermissions() default false;
 }
