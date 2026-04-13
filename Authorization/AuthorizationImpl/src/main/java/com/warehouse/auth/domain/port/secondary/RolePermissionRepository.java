@@ -9,5 +9,7 @@ public interface RolePermissionRepository {
 
     Set<RolePermission> findAllAdminPermissions();
 
+    Set<RolePermission> findAllManagerPermissions();
+
     Set<RolePermission> findAllSupplierPermissions();
 }
