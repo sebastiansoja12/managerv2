@@ -135,6 +135,24 @@ public class User extends BelongsToOperator {
                 language, adminPermissions);
     }
 
+    public static User createWithRole(final UserId userId,
+                                      final String username,
+                                      final String password,
+                                      final String firstName,
+                                      final String lastName,
+                                      final String email,
+                                      final Role role,
+                                      final DepartmentCode departmentCode,
+                                      final String apiKey,
+                                      final String language) {
+        final User user = new User(
+                userId, username, password, firstName, lastName, email, role, departmentCode, apiKey,
+                language, new HashSet<>()
+        );
+        user.updatePermissionsForRole(role);
+        return user;
+    }
+
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
     }
@@ -288,6 +306,16 @@ public class User extends BelongsToOperator {
         markAsModified();
     }
 
+    public void update(final UpdateUserCommand command) {
+        this.firstName = command.firstName();
+        this.lastName = command.lastName();
+        this.username = command.username();
+        this.email = command.email();
+        this.departmentCode = command.departmentCode();
+        this.language = command.language();
+        markAsModified();
+    }
+
     public void changePassword(final String encodedPassword) {
         this.password = encodedPassword;
         markAsModified();
@@ -314,6 +342,7 @@ public class User extends BelongsToOperator {
 
         switch (role) {
             case ADMIN -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllAdminPermissions());
+            case MANAGER -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllManagerPermissions());
             case SUPPLIER -> getPermissions().addAll(DomainRegistry.rolePermissionService().findAllSupplierPermissions());
             case USER -> {}
             default -> throw new IllegalStateException("Unexpected role: " + role);
@@ -354,34 +383,6 @@ public class User extends BelongsToOperator {
     public void updateUserInfo(final UserDepartmentUpdateRequest request) {
         this.email = request.email();
         markAsModified();
-    }
-
-    public enum Permission {
-
-        ROLE_ADMIN_READ("admin:read"),
-        ROLE_ADMIN_UPDATE("admin:update"),
-        ROLE_ADMIN_CREATE("admin:create"),
-        ROLE_ADMIN_DELETE("admin:delete"),
-
-        ROLE_MANAGER_READ("management:read"),
-        ROLE_MANAGER_UPDATE("management:update"),
-        ROLE_MANAGER_CREATE("management:create"),
-        ROLE_MANAGER_DELETE("management:delete"),
-
-        ROLE_SUPPLIER_READ("supplier:read"),
-        ROLE_SUPPLIER_UPDATE("supplier:update"),
-        ROLE_SUPPLIER_CREATE("supplier:create"),
-        ROLE_SUPPLIER_DELETE("supplier:delete");
-
-        private final String permission;
-
-        Permission(final String permission) {
-            this.permission = permission;
-        }
-
-        public String getPermission() {
-            return permission;
-        }
     }
 
     public enum Role {
