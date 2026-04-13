@@ -7,5 +7,6 @@ import java.util.Set;
 public interface RolePermissionService {
     RolePermission findByName(final String name);
     Set<RolePermission> findAllAdminPermissions();
+    Set<RolePermission> findAllManagerPermissions();
     Set<RolePermission> findAllSupplierPermissions();
 }
