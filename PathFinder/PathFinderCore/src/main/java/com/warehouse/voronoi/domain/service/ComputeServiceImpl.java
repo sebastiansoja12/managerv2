@@ -2,11 +2,14 @@ package com.warehouse.voronoi.domain.service;
 
 import java.util.*;
 
+import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.Department;
 import com.warehouse.voronoi.domain.model.VoronoiRequest;
-import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
+import com.warehouse.voronoi.domain.port.secondary.GeocodingConfigServicePort;
+import com.warehouse.voronoi.domain.port.secondary.GeolocationServiceProvider;
+import com.warehouse.voronoi.domain.vo.GeocodingConfig;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +18,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ComputeServiceImpl implements ComputeService {
     
-    private final VoronoiServicePort voronoiServicePort;
+    private final Set<GeolocationServiceProvider> geolocationServiceProvider;
+
+	private final GeocodingConfigServicePort geocodingConfigServicePort;
 
 	private Coordinates calculateCoordinatesForRequestCity(final String requestCity) {
-		return voronoiServicePort.obtainCoordinates(requestCity);
+		final GeocodingConfig geocodingConfig = geocodingConfigServicePort.findGeocodingConfig(GeocodingProvider.POSITION_STACK);
+		return geolocationServiceProvider
+				.stream()
+				.filter(provider -> provider.canHandle(geocodingConfig.provider()))
+				.findAny()
+				.orElseThrow()
+				.obtainCoordinates(requestCity);
 	}
 
 	@Override
