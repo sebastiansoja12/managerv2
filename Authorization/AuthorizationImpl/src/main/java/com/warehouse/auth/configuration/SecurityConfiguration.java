@@ -36,6 +36,7 @@ public class SecurityConfiguration {
     private final ApiExposureProperties apiExposureProperties;
     private final UserAuthenticationEntryPoint authenticationEntryPoint;
     private final AuthProperties authProperties;
+    private final DepartmentReadSyncBasicAuthenticationFilter departmentReadSyncBasicAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http,
@@ -46,7 +47,8 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfTokenRepository)
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers("/departments/read-sync/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
@@ -67,6 +69,7 @@ public class SecurityConfiguration {
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(departmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http
                 .authenticationProvider(authenticationProvider);
 
