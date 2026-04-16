@@ -1,6 +1,6 @@
 package com.warehouse.commonassets.model;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -8,15 +8,15 @@ import java.util.Collection;
 
 public class UsernameTenantPasswordAuthenticationToken extends UsernamePasswordAuthenticationToken {
     
-    private final DepartmentCode departmentCode;
+    private final OperatorId operatorId;
     
-	public UsernameTenantPasswordAuthenticationToken(final Object principal, final Object departmentCode,
+	public UsernameTenantPasswordAuthenticationToken(final Object principal, final Object operatorId,
 			final Object credentials, final Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities);
-        this.departmentCode = (DepartmentCode) departmentCode;
+        this.operatorId = (OperatorId) operatorId;
     }
     
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
+    public OperatorId getOperatorId() {
+        return operatorId;
     }
 }
