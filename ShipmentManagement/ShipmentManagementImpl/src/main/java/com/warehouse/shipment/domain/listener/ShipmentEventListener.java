@@ -10,17 +10,20 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.kafkapublisher.KafkaPublisher;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.domain.service.RouteTrackerService;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.kafka.ShipmentCreatedMessage;
+import com.warehouse.shipment.domain.vo.kafka.ShipmentReturnMessage;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
-import com.warehouse.shipment.infrastructure.adapter.secondary.kafka.ShipmentReturnKafkaPublisher;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 
 @Component
@@ -36,33 +39,36 @@ public class ShipmentEventListener {
 
     private final PathFinderServicePort pathFinderServicePort;
 
-    private final ShipmentReturnKafkaPublisher shipmentReturnKafkaPublisher;
+    private final CurrentUserServicePort currentUserServicePort;
+
+    private final KafkaPublisher kafkaPublisher;
 
     public ShipmentEventListener(final RouteTrackerHistoryNotifier routeTrackerHistoryNotifier,
                                  final ShipmentService shipmentService,
                                  final RouteTrackerService routeTrackerService,
                                  final ReturningServicePort returningServicePort,
                                  final PathFinderServicePort pathFinderServicePort,
-                                 final ShipmentReturnKafkaPublisher shipmentReturnKafkaPublisher) {
+                                 final CurrentUserServicePort currentUserServicePort,
+                                 final KafkaPublisher kafkaPublisher) {
         this.routeTrackerHistoryNotifier = routeTrackerHistoryNotifier;
         this.shipmentService = shipmentService;
         this.routeTrackerService = routeTrackerService;
         this.returningServicePort = returningServicePort;
         this.pathFinderServicePort = pathFinderServicePort;
-        this.shipmentReturnKafkaPublisher = shipmentReturnKafkaPublisher;
+        this.currentUserServicePort = currentUserServicePort;
+        this.kafkaPublisher = kafkaPublisher;
     }
 
     @EventListener
     public void handle(final ShipmentCreatedEvent event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
 
-        final Result<RouteProcess, ErrorCode> routeProcess = this.routeTrackerService
-                .notifyShipmentCreated(snapshot.shipmentId());
+        final ShipmentCreatedMessage createdMessage = new ShipmentCreatedMessage(snapshot.shipmentId().getValue());
 
-        if (routeProcess.isFailure()) {
-            throw new TechnicalException(HttpStatusCode.valueOf(routeProcess.getFailure().getCode()),
-                    routeProcess.getFailure().getMessage());
-        }
+        this.kafkaPublisher.publish(createdMessage.kafkaKey(), createdMessage);
+
+        final Result<RouteProcess, ErrorCode> routeProcess =
+                this.routeTrackerService.notifyShipmentCreated(snapshot.shipmentId());
 
         this.shipmentService.changeRouteProcessId(routeProcess.getSuccess().getProcessId(),
                 snapshot.shipmentId());
@@ -95,7 +101,13 @@ public class ShipmentEventListener {
                     result.getFailure().getMessage());
         }
 
-        this.shipmentReturnKafkaPublisher.publish(snapshot, voronoiResponse.getValue());
+        final UserContext userContext = currentUserServicePort.getCurrentUserContext();
+
+        final ShipmentReturnMessage returnMessage = new ShipmentReturnMessage(snapshot.shipmentId().getValue(),
+                "NO_LONGER_NEEDED", "NO_LONGER_NEEDED", userContext.departmentCode().getValue(),
+                userContext.userId().getValue());
+
+        this.kafkaPublisher.publish(returnMessage.kafkaKey(), returnMessage);
     }
 
     @TransactionalEventListener(fallbackExecution = true)
