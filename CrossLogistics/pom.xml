@@ -12,7 +12,7 @@
     <artifactId>CrossLogistics</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>CrossLogisticsCore</module>
+        <module>CrossLogisticsImpl</module>
     </modules>
 
     <properties>

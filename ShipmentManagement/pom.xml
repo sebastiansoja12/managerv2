@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>ShipmentManagementCore</module>
+        <module>ShipmentManagementImpl</module>
         <module>ShipmentManagementApi</module>
     </modules>
 
