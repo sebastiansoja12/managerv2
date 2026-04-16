@@ -5,6 +5,7 @@ import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.JwtServiceImpl;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.common.util.StringUtils;
@@ -40,8 +41,7 @@ public class JwtServiceTest {
 
     @Test
     void shouldGenerateToken() {
-        final User user = new User(new UserId(1L), "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
-                new DepartmentCode("TST"), "");
+        final User user = user(new UserId(1L), "s-soja", User.Role.USER);
 
         doReturn(EXPIRATION)
                 .when(jwtProvider)
@@ -58,8 +58,7 @@ public class JwtServiceTest {
 
     @Test
     void shouldCheckIfTokenIsValid() {
-        final User user = new User(null, "test", "test", "Test", "Test", "test@test.pl", User.Role.ADMIN,
-                new DepartmentCode("TST"), "");
+        final User user = user(new UserId(2L), "test", User.Role.ADMIN);
         user.setDeleted(false);
 
         doReturn(SECRET_KEY)
@@ -79,8 +78,7 @@ public class JwtServiceTest {
 
     @Test
     void shouldTokenBeInvalid() {
-        final User user = new User(null, "test", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
-                new DepartmentCode("TST"), "");
+        final User user = user(new UserId(3L), "test", User.Role.USER);
 
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
@@ -99,8 +97,7 @@ public class JwtServiceTest {
 
     @Test
     void shouldExtractUsernameFromJwt() {
-        final User user = new User(null, "test", "test", "Test", "Test", "test@test.pl", User.Role.ADMIN,
-                new DepartmentCode("TST"), "");
+        final User user = user(new UserId(4L), "test", User.Role.ADMIN);
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
                 .getSecretKey();
@@ -111,5 +108,12 @@ public class JwtServiceTest {
         final String jwtToken = jwtService.generateToken(user);
         final String username = jwtService.extractUsername(jwtToken);
         assertEquals("test", username);
+    }
+
+    private User user(final UserId userId, final String username, final User.Role role) {
+        final User user = new User(userId, username, "test", "Test", "Test", "test@test.pl", role,
+                new DepartmentCode("TST"), "");
+        user.assignOperator(OperatorId.of(10001L));
+        return user;
     }
 }

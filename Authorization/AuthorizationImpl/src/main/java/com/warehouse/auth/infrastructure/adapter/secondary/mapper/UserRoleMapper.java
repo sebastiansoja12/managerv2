@@ -10,6 +10,7 @@ public abstract class UserRoleMapper {
             case ADMIN -> User.Role.ADMIN;
             case USER -> User.Role.USER;
             case MANAGER -> User.Role.MANAGER;
+            case SUPPLIER -> User.Role.SUPPLIER;
             default -> throw new IllegalArgumentException("Unknown role: " + role);
         };
     }
@@ -19,6 +20,7 @@ public abstract class UserRoleMapper {
             case ADMIN -> UserEntity.Role.ADMIN;
             case USER -> UserEntity.Role.USER;
             case MANAGER -> UserEntity.Role.MANAGER;
+            case SUPPLIER -> UserEntity.Role.SUPPLIER;
             default -> throw new IllegalArgumentException("Unknown role: " + role);
         };
     }
