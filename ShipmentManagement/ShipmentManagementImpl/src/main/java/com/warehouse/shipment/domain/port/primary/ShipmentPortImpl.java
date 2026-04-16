@@ -401,9 +401,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         if (shipment == null) {
             throw new RestException(404, "Shipment not found");
         }
-        if (shipmentStatuses.contains(shipment.getShipmentStatus())) {
-            throw new RestException(400, "Cannot modify shipment issuer or receiver country");
-        }
         if (shipment.getShipmentRelatedId() != null) {
             final Shipment relatedShipment = loadShipment(shipment.getShipmentRelatedId());
             if (shipmentStatuses.contains(relatedShipment.getShipmentStatus())) {
