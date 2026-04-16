@@ -3,7 +3,7 @@ package com.warehouse.dangerousgood.domain.model;
 import java.time.Instant;
 import java.util.List;
 
-import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
 import com.warehouse.dangerousgood.domain.enumeration.ClassificationCode;
@@ -32,7 +32,7 @@ public class DangerousGood {
     private boolean corrosive;
     private boolean toxic;
     private String emergencyContact;
-    private Country countryOfOrigin;
+    private CountryCode countryOfOrigin;
     private String safetyDataSheet;
     private Instant createdAt;
     private Instant modifiedAt;
@@ -44,7 +44,7 @@ public class DangerousGood {
                          final String description, final ClassificationCode classificationCode, final List<String> hazardSymbols,
                          final StorageRequirement storageRequirement, final String handlingInstructions, final Weight weight,
                          final Packaging packaging, final boolean flammable, final boolean isCorrosive, final boolean toxic,
-                         final String emergencyContact, final Country countryOfOrigin, final String safetyDataSheet) {
+                         final String emergencyContact, final CountryCode countryOfOrigin, final String safetyDataSheet) {
         this.dangerousGoodId = dangerousGoodId;
         this.shipmentId = shipmentId;
         this.name = name;
@@ -129,7 +129,7 @@ public class DangerousGood {
         this.emergencyContact = emergencyContact;
     }
 
-    public void setCountryOfOrigin(final Country countryOfOrigin) {
+    public void setCountryOfOrigin(final CountryCode countryOfOrigin) {
         this.countryOfOrigin = countryOfOrigin;
     }
 
@@ -185,7 +185,7 @@ public class DangerousGood {
         return emergencyContact;
     }
 
-    public Country getCountryOfOrigin() {
+    public CountryCode getCountryOfOrigin() {
         return countryOfOrigin;
     }
 

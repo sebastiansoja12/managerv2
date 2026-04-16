@@ -43,7 +43,7 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
             final Shipment shipment = this.shipmentPort.loadShipment(shipmentId);
             final ShipmentId newShipmentId = shipment.getShipmentRelatedId() == null ? shipmentId : shipment.getShipmentRelatedId();
 
-            return new ShipmentRejectResponseItemDto(shipmentId.getValue(), newShipmentId.getValue(), true, true, null);
+            return new ShipmentRejectResponseItemDto(shipmentId.getValue(), newShipmentId.getValue(), shipment.getExternalRouteId() != null, true, null);
         } catch (final RuntimeException e) {
             return new ShipmentRejectResponseItemDto(shipmentId.getValue(), shipmentId.getValue(), false, false,
                     e.getMessage());

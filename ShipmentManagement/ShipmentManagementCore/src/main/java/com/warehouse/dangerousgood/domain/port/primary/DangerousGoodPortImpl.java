@@ -2,7 +2,7 @@ package com.warehouse.dangerousgood.domain.port.primary;
 
 import java.util.List;
 
-import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
 import com.warehouse.dangerousgood.domain.enumeration.ClassificationCode;
@@ -55,7 +55,7 @@ public class DangerousGoodPortImpl implements DangerousGoodPort {
         final boolean corrosive = request.isCorrosive();
         final boolean toxic = request.isToxic();
         final String emergencyContact = request.getEmergencyContact();
-        final Country originCountry = request.getCountryOfOrigin();
+        final CountryCode originCountry = request.getCountryOfOrigin();
         final String safetyDataSheet = request.getSafetyDataSheet();
 
 		final DangerousGood dangerousGood = new DangerousGood(dangerousGoodId, shipmentId, name, description,

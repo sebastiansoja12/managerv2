@@ -9,6 +9,7 @@ import com.warehouse.process.domain.model.InitializeProcessCommand;
 import com.warehouse.process.domain.model.ProcessDeviceValidatedCommand;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
+import com.warehouse.process.domain.vo.ProcessCommunication;
 import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
@@ -23,6 +24,8 @@ public interface ProcessPort {
     void assignShipmentRejected(final ProcessId processId, final ShipmentRejected shipmentRejected);
 
     void assignProcessDeviceValidation(final ProcessDeviceValidatedCommand command);
+
+    void assignCommunication(final ProcessId processId, final ProcessCommunication communication);
 
     ProcessLog findByIdForCurrentDepartment(final ProcessId processId);
 

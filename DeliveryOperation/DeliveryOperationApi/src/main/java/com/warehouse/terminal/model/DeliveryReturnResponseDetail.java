@@ -37,4 +37,7 @@ public class DeliveryReturnResponseDetail {
 
     @XmlElement(name = "DeliveryID")
     private String deliveryID;
+
+    @XmlElement(name = "ErrorMessage")
+    private String errorMessage;
 }

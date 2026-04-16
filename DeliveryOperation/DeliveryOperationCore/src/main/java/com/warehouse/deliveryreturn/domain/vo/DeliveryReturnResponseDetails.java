@@ -16,6 +16,7 @@ public class DeliveryReturnResponseDetails {
     private DeliveryStatus deliveryStatus;
     private ReturnToken returnToken;
     private UpdateStatus updateStatus;
+    private String errorMessage;
 
     public DeliveryReturnResponseDetails(final ProcessId processId,
                                          final DeliveryId deliveryId,
@@ -24,7 +25,8 @@ public class DeliveryReturnResponseDetails {
                                          final ShipmentId shipmentId,
                                          final DeliveryStatus deliveryStatus,
                                          final ReturnToken returnToken,
-                                         final UpdateStatus updateStatus) {
+                                         final UpdateStatus updateStatus,
+                                         final String errorMessage) {
         this.processId = processId;
         this.deliveryId = deliveryId;
         this.departmentCode = departmentCode;
@@ -33,6 +35,7 @@ public class DeliveryReturnResponseDetails {
         this.deliveryStatus = deliveryStatus;
         this.returnToken = returnToken;
         this.updateStatus = updateStatus;
+        this.errorMessage = errorMessage;
     }
 
     public static DeliveryReturnResponseDetails from(final DeliveryReturn deliveryReturn, final UpdateStatus updateStatus) {
@@ -43,7 +46,27 @@ public class DeliveryReturnResponseDetails {
         final DepartmentCode departmentCode = new DepartmentCode(deliveryReturn.getDepartmentCode());
         final SupplierCode supplierCode = new SupplierCode(deliveryReturn.getSupplierCode());
         return new DeliveryReturnResponseDetails(id, null, departmentCode, supplierCode,
-                shipmentIdentificator, status, token, updateStatus);
+                shipmentIdentificator, status, token, updateStatus, null);
+    }
+
+    public static DeliveryReturnResponseDetails wrongReturnToken(final ProcessId processId,
+                                                                 final ShipmentId shipmentId,
+                                                                 final DepartmentCode departmentCode,
+                                                                 final SupplierCode supplierCode,
+                                                                 final DeliveryStatus deliveryStatus,
+                                                                 final ReturnToken returnToken,
+                                                                 final String message) {
+        return new DeliveryReturnResponseDetails(
+                processId,
+                null,
+                departmentCode,
+                supplierCode,
+                shipmentId,
+                deliveryStatus,
+                returnToken,
+                UpdateStatus.NOT_OK,
+                message
+        );
     }
 
     public ProcessId getProcessId() {
@@ -76,5 +99,9 @@ public class DeliveryReturnResponseDetails {
 
     public SupplierCode getSupplierCode() {
         return supplierCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

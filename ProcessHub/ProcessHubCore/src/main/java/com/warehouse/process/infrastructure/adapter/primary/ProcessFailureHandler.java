@@ -21,7 +21,11 @@ public class ProcessFailureHandler {
     @ExceptionHandler(ProcessException.class)
     public void handle(final ProcessException ex) {
         final ProcessFailureDetails failureDetails = ex.getProcessFailureDetails();
-        log.warn("Error occurred at: {} with message {}", failureDetails.getOccurredAt(), failureDetails.getExceptionMessage());
+        log.warn("Process exception occurred. processId={}, occurredAt={}, message={}",
+                failureDetails.getProcessId(),
+                failureDetails.getOccurredAt(),
+                failureDetails.getExceptionMessage(),
+                ex);
         this.processPort.finishProcess(
                 failureDetails.getProcessId(), ProcessStatus.FAILURE, failureDetails.getExceptionMessage()
         );

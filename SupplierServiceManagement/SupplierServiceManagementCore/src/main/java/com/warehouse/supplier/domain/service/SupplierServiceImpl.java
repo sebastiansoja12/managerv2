@@ -15,6 +15,7 @@ import com.warehouse.supplier.domain.vo.DriverLicense;
 import com.warehouse.supplier.domain.vo.SupplierDto;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -43,12 +44,41 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    public void activate(final SupplierCode supplierCode) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.markAsActive();
+        this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierActivated(supplier.snapshot(), Instant.now()));
+    }
+
+    @Override
     public void deactivate(final SupplierId supplierId) {
         final Supplier supplier = this.findById(supplierId);
         supplier.markAsInactive();
         this.supplierRepository.update(supplier);
         DomainContext.eventPublisher()
                 .publishEvent(new SupplierDeactivated(supplier.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public void deactivate(final SupplierCode supplierCode) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.markAsInactive();
+        this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher()
+                .publishEvent(new SupplierDeactivated(supplier.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public void updateBasicData(final SupplierCode supplierCode, final String firstName, final String lastName,
+                                final String telephoneNumber) {
+        final Supplier supplier = this.findByCode(supplierCode);
+        supplier.changeBasicData(firstName, lastName, telephoneNumber);
+        this.supplierRepository.update(supplier);
+        DomainContext.eventPublisher().publishEvent(
+                new SupplierUpdated(supplier.snapshot(), Instant.now())
+        );
     }
 
     @Override
@@ -110,6 +140,11 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public Supplier findByCode(final SupplierCode supplierCode) {
         return supplierRepository.findByCode(supplierCode);
+    }
+
+    @Override
+    public List<Supplier> findAllByCurrentDepartment() {
+        return supplierRepository.findAllByCurrentDepartment();
     }
 
     @Override

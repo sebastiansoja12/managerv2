@@ -3,15 +3,9 @@ package com.warehouse.shipment;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.warehouse.commonassets.enumeration.Country;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.WeightUnit;
-import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.commonassets.model.Weight;
 import com.warehouse.shipment.domain.model.DangerousGood;
@@ -114,7 +108,7 @@ public class DataTestCreator {
                 false,
                 false,
                 "112",
-                Country.POLAND,
+                CountryCode.PL,
                 "sds"
         );
     }

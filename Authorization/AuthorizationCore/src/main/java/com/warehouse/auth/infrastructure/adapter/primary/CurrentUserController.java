@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.CurrentUserAuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
@@ -17,6 +18,7 @@ import com.warehouse.auth.infrastructure.dto.ChangePasswordRequestDto;
 
 @RestController
 @RequestMapping("/auth/me")
+@AccessUserControl
 public class CurrentUserController {
 
     private final CurrentUserAuthenticationPort currentUserAuthenticationPort;
@@ -71,6 +73,6 @@ public class CurrentUserController {
     }
 
     private boolean isSupportedLanguage(final String language) {
-        return "pl".equals(language) || "en".equals(language);
+        return "pl".equals(language) || "en".equals(language) || "de".equals(language);
     }
 }

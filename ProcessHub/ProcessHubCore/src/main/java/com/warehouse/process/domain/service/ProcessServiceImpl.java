@@ -16,6 +16,7 @@ import com.warehouse.process.domain.exception.ProcessLogNotFoundException;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
 import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ProcessCommunication;
 import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
@@ -78,6 +79,15 @@ public class ProcessServiceImpl implements ProcessService {
         this.processRepository.findById(processId)
                 .ifPresent(processLog -> {
                     processLog.applyDeviceValidation(deviceValidation);
+                    this.processRepository.update(processLog);
+                });
+    }
+
+    @Override
+    public void assignCommunication(final ProcessId processId, final ProcessCommunication communication) {
+        this.processRepository.findById(processId)
+                .ifPresent(processLog -> {
+                    processLog.applyCommunication(communication);
                     this.processRepository.update(processLog);
                 });
     }
