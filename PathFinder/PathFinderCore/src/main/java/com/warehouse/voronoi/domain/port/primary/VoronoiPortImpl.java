@@ -53,7 +53,7 @@ public class VoronoiPortImpl implements VoronoiPort {
                 .filter(provider -> provider.canHandle(geocodingConfig.provider()))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("External system for finding geolocations not configured for this operator!!!"))
-                .obtainCoordinates(requestCity);
+                .obtainCoordinates(requestCity, geocodingConfig);
     }
 
     private void validateRequest(final List<Department> departments, final String requestCity) {
