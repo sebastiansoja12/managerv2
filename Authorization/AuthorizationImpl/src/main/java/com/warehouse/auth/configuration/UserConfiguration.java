@@ -10,6 +10,7 @@ import com.warehouse.auth.domain.port.primary.*;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.RolePermissionRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.provider.ApiKeyProvider;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.*;
@@ -39,8 +40,14 @@ public class UserConfiguration {
     }
 
     @Bean
-    public UserRepository userRepository(final OperatorFilteredRepository<UserEntity> repository) {
-        return new UserRepositoryImpl(repository);
+    public UserRepository userRepository(final OperatorFilteredRepository<UserEntity> repository,
+                                         final ApiKeyEncoder apiKeyEncoder) {
+        return new UserRepositoryImpl(repository, apiKeyEncoder);
+    }
+
+    @Bean
+    public ApiKeyEncoder apiKeyEncoder(final ApiKeyProvider apiKeyProvider) {
+        return new ApiEncoderImpl(apiKeyProvider);
     }
 
     @Bean

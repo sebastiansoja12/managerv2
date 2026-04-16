@@ -26,18 +26,22 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final MailServicePort mailServicePort;
 
+    private final ApiKeyEncoder apiKeyEncoder;
+
     public AuthenticationPortImpl(final AuthenticationService authenticationService,
                                   final UserService userService,
                                   final JwtService jwtService,
                                   final PasswordEncoder passwordEncoder,
                                   final DepartmentService departmentService,
-                                  final MailServicePort mailServicePort) {
+                                  final MailServicePort mailServicePort,
+                                  final ApiKeyEncoder apiKeyEncoder) {
         this.authenticationService = authenticationService;
         this.userService = userService;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.departmentService = departmentService;
         this.mailServicePort = mailServicePort;
+        this.apiKeyEncoder = apiKeyEncoder;
     }
 
     @Override
@@ -90,7 +94,8 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         validateDepartmentCode(departmentCode);
 
         final User user = User.createWithRole(
-                userId, username, password, firstName, lastName, email, role, departmentCode, "dummy", language
+                userId, username, password, firstName, lastName, email, role, departmentCode,
+                apiKeyEncoder.encode(userId, username).key(), language
         );
 
         return userService.create(user);
@@ -111,7 +116,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 command.email(),
                 role,
                 command.departmentCode(),
-                "dummy",
+                apiKeyEncoder.encode(userId, command.username()).key(),
                 command.language()
         );
         userService.create(user);
@@ -132,7 +137,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 command.email(),
                 role,
                 command.departmentCode(),
-                "dummy",
+                apiKeyEncoder.encode(userId, command.username()).key(),
                 command.language()
         );
         user.assignOperator(command.operatorId());
@@ -161,7 +166,8 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         validateDepartmentCode(departmentCode);
 
-        final User user = User.createAdmin(userId, username, password, email, firstName, lastName, departmentCode, language, null);
+        final User user = User.createAdmin(userId, username, password, email, firstName, lastName, departmentCode,
+                language, apiKeyEncoder.encode(userId, username).key());
 
         this.userService.create(user);
 
@@ -199,4 +205,5 @@ public class AuthenticationPortImpl implements AuthenticationPort {
             throw new AuthenticationErrorException("Department with code " + departmentCode + " does not exist");
         }
     }
+
 }
