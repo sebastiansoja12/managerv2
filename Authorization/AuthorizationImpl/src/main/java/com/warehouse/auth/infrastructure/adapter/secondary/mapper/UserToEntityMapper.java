@@ -5,7 +5,7 @@ import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
 public abstract class UserToEntityMapper {
     public static UserEntity map(final User user) {
-        return UserEntity.builder()
+        final UserEntity entity = UserEntity.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())
                 .username(user.getUsername())
@@ -18,8 +18,11 @@ public abstract class UserToEntityMapper {
                 .apiKey(user.getApiKey())
                 .permissions(UserPermissionToEntityMapper.map(user.getPermissions()))
                 .deleted(user.isDeleted())
+                .initial(user.isInitial())
                 .createdAt(user.createdAt())
                 .updatedAt(user.updatedAt())
                 .build();
+        entity.assignOperator(user.operatorId());
+        return entity;
     }
 }
