@@ -12,7 +12,7 @@ import com.warehouse.department.infrastructure.adapter.secondary.entity.TaxId;
 public abstract class DepartmentToEntityMapper {
 
 	public static DepartmentEntity map(final Department department) {
-		return new DepartmentEntity(new DepartmentCode(department.getDepartmentCode().getValue()),
+		final DepartmentEntity entity = new DepartmentEntity(new DepartmentCode(department.getDepartmentCode().getValue()),
 				map(department.getAddress()), new TaxId(department.getTaxId().value()), department.getTelephoneNumber(),
 				department.getOpeningHours(), department.getEmail(),
 				DepartmentEntity.DepartmentType.valueOf(department.getDepartmentType().name()),
@@ -20,6 +20,8 @@ public abstract class DepartmentToEntityMapper {
 				map(department.getCoordinates()), department.getCreatedAt(),
 				department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
 				department.getLastModifiedBy());
+		entity.assignOperator(department.operatorId());
+		return entity;
 	}
     
     public static DepartmentAddress map(final Address address) {
