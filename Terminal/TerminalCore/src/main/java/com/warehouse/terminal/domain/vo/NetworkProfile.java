@@ -100,5 +100,37 @@ public class NetworkProfile {
     public void setWifiSsid(final String wifiSsid) {
         this.wifiSsid = wifiSsid;
     }
-}
 
+    public NetworkProfile update(final NetworkProfile network) {
+        if (network != null) {
+            if (network.getIpAddress() != null) {
+                this.ipAddress = network.getIpAddress();
+            }
+            if (network.getPublicIpAddress() != null) {
+                this.publicIpAddress = network.getPublicIpAddress();
+            }
+            if (network.getNetworkType() != null) {
+                this.networkType = network.getNetworkType();
+            }
+            if (network.getCarrier() != null) {
+                this.carrier = network.getCarrier();
+            }
+            if (network.getSimSerial() != null) {
+                this.simSerial = network.getSimSerial();
+            }
+            if (network.getRoaming() != null) {
+                this.roaming = network.getRoaming();
+            }
+            if (network.getVpnConnected() != null) {
+                this.vpnConnected = network.getVpnConnected();
+            }
+            if (network.getWifiSsid() != null) {
+                this.wifiSsid = network.getWifiSsid();
+            }
+            if (network.getBluetoothMac() != null) {
+                this.bluetoothMac = network.getBluetoothMac();
+            }
+        }
+        return this;
+    }
+}

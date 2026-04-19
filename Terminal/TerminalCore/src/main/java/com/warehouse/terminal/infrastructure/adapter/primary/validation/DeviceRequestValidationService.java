@@ -17,6 +17,7 @@ import com.warehouse.terminal.request.DeviceOwnershipRequestDto;
 import com.warehouse.terminal.request.DeviceSecurityRequestDto;
 import com.warehouse.terminal.request.DeviceSoftwareRequestDto;
 import com.warehouse.terminal.request.DeviceUpdateRequestDto;
+import com.warehouse.terminal.dto.DeviceTypeDto;
 
 @Service
 public class DeviceRequestValidationService {
@@ -39,6 +40,7 @@ public class DeviceRequestValidationService {
             if (request.version() != null && StringUtils.isBlank(request.version().value())) {
                 validationErrors.add(DeviceInvalidParam.blankVersion());
             }
+            validateScannerSpecificFieldsOnCreate(request, validationErrors);
 
             validateIdentity(request.identity(), validationErrors);
             validateHardware(request.hardware(), validationErrors);
@@ -211,6 +213,22 @@ public class DeviceRequestValidationService {
     private void throwIfUpdateValidationFailed(final List<DeviceInvalidParam> validationErrors) {
         if (!validationErrors.isEmpty()) {
             throw DeviceInvalidUpdateRequestException.of(validationErrors);
+        }
+    }
+
+    private void validateScannerSpecificFieldsOnCreate(final DeviceCreateRequestDto request,
+                                                       final List<DeviceInvalidParam> validationErrors) {
+        if (request.deviceType() == null) {
+            return;
+        }
+
+        if (!DeviceTypeDto.SCANNER.equals(request.deviceType())) {
+            if (request.scanType() != null) {
+                validationErrors.add(DeviceInvalidParam.scanTypeAllowedOnlyForScanner());
+            }
+            if (request.scannerType() != null) {
+                validationErrors.add(DeviceInvalidParam.scannerTypeAllowedOnlyForScanner());
+            }
         }
     }
 

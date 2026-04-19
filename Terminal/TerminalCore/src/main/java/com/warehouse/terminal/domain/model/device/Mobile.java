@@ -280,47 +280,89 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
 
     @Override
     public void updateIdentity(final IdentityInfo identity) {
-        this.identity = identity;
-        markAsModified();
+        if (identity != null) {
+            if (this.identity == null) {
+                this.identity = identity;
+            } else {
+                this.identity.update(identity);
+            }
+            markAsModified();
+        }
     }
 
     @Override
     public void updateHardware(final HardwareProfile hardware) {
-        this.hardware = hardware;
-        markAsModified();
+        if (hardware != null) {
+            if (this.hardware == null) {
+                this.hardware = hardware;
+            } else {
+                this.hardware.update(hardware);
+            }
+            markAsModified();
+        }
     }
 
     @Override
     public void updateSoftware(final SoftwareProfile software) {
-        this.software = software;
-        this.version = software != null ? software.getAppVersion() : null;
-        markAsModified();
+        if (software != null) {
+            if (this.software == null) {
+                this.software = software;
+            } else {
+                this.software.update(software);
+            }
+            this.version = this.software.getAppVersion();
+            markAsModified();
+        }
     }
 
     @Override
     public void updateNetwork(final NetworkProfile network) {
-        this.network = network;
-        markAsModified();
+        if (network != null) {
+            if (this.network == null) {
+                this.network = network;
+            } else {
+                this.network.update(network);
+            }
+            markAsModified();
+        }
     }
 
     @Override
     public void updateSecurity(final SecurityProfile security) {
-        this.security = security;
-        markAsModified();
+        if (security != null) {
+            if (this.security == null) {
+                this.security = security;
+            } else {
+                this.security.update(security);
+            }
+            markAsModified();
+        }
     }
 
     @Override
     public void updateLocation(final LocationProfile location) {
-        this.location = location;
-        markAsModified();
+        if (location != null) {
+            if (this.location == null) {
+                this.location = location;
+            } else {
+                this.location.update(location);
+            }
+            markAsModified();
+        }
     }
 
     @Override
     public void updateOwnership(final OwnershipProfile ownership) {
-        this.ownership = ownership;
-        this.userId = ownership != null ? ownership.getUserId() : null;
-        this.departmentCode = ownership != null ? ownership.getDepartmentCode() : null;
-        markAsModified();
+        if (ownership != null) {
+            if (this.ownership == null) {
+                this.ownership = ownership;
+            } else {
+                this.ownership.update(ownership);
+            }
+            this.userId = this.ownership.getUserId();
+            this.departmentCode = this.ownership.getDepartmentCode();
+            markAsModified();
+        }
     }
 
     @Override

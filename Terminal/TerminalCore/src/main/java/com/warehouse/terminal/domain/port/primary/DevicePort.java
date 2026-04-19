@@ -8,13 +8,11 @@ import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
 import com.warehouse.terminal.domain.model.command.DeviceSettingsRequest;
 import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
 import com.warehouse.terminal.domain.vo.DeviceCreateResult;
-import com.warehouse.terminal.domain.vo.DeviceTypeChangeCommand;
 import com.warehouse.terminal.domain.vo.DeviceUserRequest;
 import com.warehouse.terminal.domain.vo.DeviceVersionRequest;
 
 public interface DevicePort {
     DeviceCreateResult create(final DeviceCreateCommand request);
-    void changeDeviceTypeTo(final DeviceTypeChangeCommand request);
     void changeUserTo(final DeviceUserRequest request);
     void changeVersionTo(final DeviceVersionRequest request);
     void updateDevice(final DeviceUpdateCommand request);

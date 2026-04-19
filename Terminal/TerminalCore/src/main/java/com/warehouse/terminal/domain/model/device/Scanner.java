@@ -265,26 +265,43 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
 
     @Override
     public void updateIdentity(final IdentityInfo identity) {
-        this.identity = identity;
-        markAsModified();
+        if (identity != null) {
+            if (this.identity == null) {
+                this.identity = identity;
+            } else {
+                this.identity.update(identity);
+            }
+            markAsModified();
+        }
     }
 
     @Override
     public void updateHardware(final HardwareProfile hardware) {
-        this.hardware = hardware;
-        markAsModified();
+        if (hardware != null) {
+            if (this.hardware == null) {
+                this.hardware = hardware;
+            } else {
+                this.hardware.update(hardware);
+            }
+            markAsModified();
+        }
     }
 
     @Override
     public void updateNetwork(final NetworkProfile network) {
-        this.network = network;
-        markAsModified();
+        this.network.update(network);
     }
 
     @Override
     public void updateOwnership(final OwnershipProfile ownership) {
-        this.ownership = ownership;
-        markAsModified();
+        if (ownership != null) {
+            if (this.ownership == null) {
+                this.ownership = ownership;
+            } else {
+                this.ownership.update(ownership);
+            }
+            markAsModified();
+        }
     }
 
     @Override

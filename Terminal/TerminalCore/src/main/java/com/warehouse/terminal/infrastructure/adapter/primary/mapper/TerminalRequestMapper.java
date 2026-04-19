@@ -11,6 +11,7 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.enumeration.NetworkType;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
+import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
 import com.warehouse.terminal.domain.model.command.DevicePairRequest;
 import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
@@ -40,6 +41,8 @@ public interface TerminalRequestMapper {
                 .version(request.version() != null ? request.version().value() : null)
                 .deviceUserType(request.deviceUserType() != null ? DeviceUserType.valueOf(request.deviceUserType().name()) : null)
                 .deviceType(request.deviceType() != null ? DeviceType.valueOf(request.deviceType().name()) : null)
+                .scanType(request.scanType() != null ? Scanner.ScanType.valueOf(request.scanType().name()) : null)
+                .scannerType(request.scannerType() != null ? Scanner.ScannerType.valueOf(request.scannerType().name()) : null)
                 .identity(map(request.identity()))
                 .hardware(map(request.hardware()))
                 .software(map(request.software()))

@@ -34,6 +34,14 @@ public class DeviceInvalidParam {
         return of("deviceType", "is required");
     }
 
+    public static DeviceInvalidParam scanTypeAllowedOnlyForScanner() {
+        return of("scanType", "can be provided only for deviceType=SCANNER");
+    }
+
+    public static DeviceInvalidParam scannerTypeAllowedOnlyForScanner() {
+        return of("scannerType", "can be provided only for deviceType=SCANNER");
+    }
+
     public static DeviceInvalidParam blankVersion() {
         return of("version", "cannot be blank when provided");
     }

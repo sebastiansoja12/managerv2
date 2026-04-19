@@ -9,9 +9,9 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.context.DomainContext;
 import com.warehouse.terminal.domain.event.*;
 import com.warehouse.terminal.domain.exception.DeviceFieldUpdateNotSupportedException;
+import com.warehouse.terminal.domain.exception.DeviceNotFoundException;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DeviceSettings;
-import com.warehouse.terminal.domain.model.command.DeviceSettingsRequest;
 import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
 import com.warehouse.terminal.domain.port.secondary.DeviceGenericRepository;
 import com.warehouse.terminal.domain.port.secondary.DeviceSettingsRepository;
@@ -34,52 +34,50 @@ public class DeviceGenericServiceImpl implements DeviceGenericService {
         DomainContext.publishAfterCommit(new DeviceCreated(device.toSnapshot(), Instant.now()));
     }
 
-    @Override
-    public void changeDeviceType(final DeviceId deviceId, final DeviceType deviceType) {
-        final Device device = this.deviceRepository.findById(deviceId);
-        device.updateDeviceType(deviceType);
-        this.deviceRepository.create(device);
-        DomainContext.publishAfterCommit(new DeviceTypeChanged(device.toSnapshot(), Instant.now()));
-    }
-
-    @Override
-    public void assignUser(final DeviceId deviceId, final UserId userId) {
-        final Device device = this.deviceRepository.findById(deviceId);
-        device.assignUser(userId);
-        this.deviceRepository.create(device);
-        DomainContext.publishAfterCommit(new DeviceUserChanged(device.toSnapshot(), Instant.now()));
-    }
+	@Override
+	public void assignUser(final DeviceId deviceId, final UserId userId) {
+		this.deviceRepository.findById(deviceId).ifPresent(device -> {
+			device.assignUser(userId);
+			this.deviceRepository.update(device);
+			DomainContext.publishAfterCommit(new DeviceUserChanged(device.toSnapshot(), Instant.now()));
+		});
+	}
 
     @Override
     public void updateVersion(final DeviceId deviceId, final String version) {
-        final Device device = this.deviceRepository.findById(deviceId);
-        device.changeVersion(version);
-        this.deviceRepository.create(device);
-        DomainContext.publishAfterCommit(new DeviceVersionChanged(device.toSnapshot(), Instant.now()));
+        this.deviceRepository.findById(deviceId).ifPresent(device -> {
+            device.changeVersion(version);
+            this.deviceRepository.update(device);
+            DomainContext.publishAfterCommit(new DeviceVersionChanged(device.toSnapshot(), Instant.now()));
+        });
     }
 
-    @Override
-    public void updateDevice(final DeviceUpdateCommand request) {
-        final Device device = this.deviceRepository.findById(request.deviceId());
-        applyUpdates(device, request);
-        this.deviceRepository.create(device);
-        DomainContext.publishAfterCommit(new DeviceChanged(device.toSnapshot(), Instant.now()));
-    }
+	@Override
+	public void updateDevice(final DeviceUpdateCommand request) {
+		this.deviceRepository.findById(request.deviceId()).ifPresent(device -> {
+			applyUpdates(device, request);
+			this.deviceRepository.update(device);
+			DomainContext.publishAfterCommit(new DeviceChanged(device.toSnapshot(), Instant.now()));
+		});
+	}
 
     @Override
     public Device findByDeviceId(final DeviceId deviceId) {
-        return this.deviceRepository.findById(deviceId);
+        return this.deviceRepository.findById(deviceId)
+                .orElseThrow(() -> DeviceNotFoundException.forDeviceId(deviceId));
     }
 
     @Override
-    public List<Device> findAll() {
+    public List findAll() {
         return this.deviceRepository.findAll();
     }
 
     @Override
-    public void updateSettings(final DeviceSettingsRequest request) {
-        final DeviceSettings deviceSettings = DeviceSettings.from(request);
-        this.deviceSettingsRepository.saveOrUpdate(deviceSettings);
+    public void updateSettings(final DeviceId deviceId, final DeviceSettings deviceSettings) {
+        this.deviceRepository.findById(deviceId).ifPresent(device -> {
+            this.deviceSettingsRepository.saveOrUpdate(deviceSettings);
+            DomainContext.publishAfterCommit(new DeviceSettingsChanged(device.toSnapshot(), Instant.now()));
+        });
     }
 
     @Override
