@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.port.primary.DepartmentPortImpl;
@@ -20,6 +21,7 @@ import com.warehouse.department.domain.validator.Validator;
 import com.warehouse.department.infrastructure.adapter.primary.DepartmentServiceAdapter;
 import com.warehouse.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
 import com.warehouse.department.infrastructure.adapter.secondary.*;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.voronoi.VoronoiCoordinatesService;
 
 @Configuration
@@ -29,10 +31,11 @@ public class DepartmentConfiguration {
 	public DepartmentCreateApiDepartmentRequestValidator departmentRequestValidator() {
 		return new DepartmentCreateApiDepartmentRequestValidator() {
 		};
-	}
+    }
 
     @Bean(name = "department.departmentRepository")
-    public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
+    public DepartmentRepository departmentRepository(
+            final OperatorFilteredRepository<DepartmentEntity> repository) {
         return new DepartmentRepositoryImpl(repository);
     }
 
