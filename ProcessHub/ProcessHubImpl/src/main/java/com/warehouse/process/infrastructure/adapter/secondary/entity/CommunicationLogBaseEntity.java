@@ -6,6 +6,7 @@ import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.process.domain.vo.CommunicationLogId;
 
@@ -20,6 +21,10 @@ public abstract class CommunicationLogBaseEntity {
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "communication_log_id", nullable = false))
     private CommunicationLogId communicationLogId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "operator_id"))
+    private OperatorId operatorId;
 
     @Column(name = "device_id")
     @AttributeOverride(name = "value", column = @Column(name = "device_id"))
@@ -70,6 +75,7 @@ public abstract class CommunicationLogBaseEntity {
     }
 
     public CommunicationLogId getCommunicationLogId() { return communicationLogId; }
+    public OperatorId getOperatorId() { return operatorId; }
     public DeviceId getDeviceId() { return deviceId; }
     public ProcessType getProcessType() { return processType; }
     public ServiceType getServiceType() { return serviceType; }
@@ -83,6 +89,10 @@ public abstract class CommunicationLogBaseEntity {
     public String getFaultDescription() { return faultDescription; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+
+    public void assignOperator(final OperatorId operatorId) {
+        this.operatorId = operatorId;
+    }
 
     @Override
     public boolean equals(Object o) {
