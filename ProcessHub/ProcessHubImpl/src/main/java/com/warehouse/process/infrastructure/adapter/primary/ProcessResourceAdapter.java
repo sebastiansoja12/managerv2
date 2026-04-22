@@ -1,5 +1,6 @@
 package com.warehouse.process.infrastructure.adapter.primary;
 
+import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.process.domain.model.InitializeProcessCommand;
@@ -16,13 +17,16 @@ public class ProcessResourceAdapter implements ProcessHubApiService {
 
     private final ProcessPort processPort;
 
-    public ProcessResourceAdapter(final ProcessPort processPort) {
+    private final CurrentOperatorService currentOperatorService;
+
+    public ProcessResourceAdapter(final ProcessPort processPort, final CurrentOperatorService currentOperatorService) {
         this.processPort = processPort;
+        this.currentOperatorService = currentOperatorService;
     }
 
     @Override
     public ProcessIdDto initialize(final InitializeProcessRequestDto request) {
-        final InitializeProcessCommand command = RequestMapper.map(request);
+        final InitializeProcessCommand command = RequestMapper.map(request, currentOperatorService.getCurrentOperatorId());
         final ProcessId processId = this.processPort.initialize(command);
         return ResponseMapper.map(processId);
     }

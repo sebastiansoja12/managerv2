@@ -8,6 +8,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.auth.CurrentOperatorService;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.port.primary.ProcessPort;
@@ -25,8 +27,12 @@ public class ProcessLogController {
 
     private final ProcessPort processPort;
 
-    public ProcessLogController(final ProcessPort processPort) {
+    private final CurrentOperatorService currentOperatorService;
+
+    public ProcessLogController(final ProcessPort processPort,
+                                final CurrentOperatorService currentOperatorService) {
         this.processPort = processPort;
+        this.currentOperatorService = currentOperatorService;
     }
 
     @GetMapping
@@ -46,7 +52,8 @@ public class ProcessLogController {
     @PostMapping
     @Operation(summary = "[TEST] Create process log", description = "⚠️ Test Endpoint")
     public ResponseEntity<?> create(@RequestBody final InitializeProcessRequestDto request) {
-        return ResponseEntity.ok().body(processPort.initialize(RequestMapper.map(request)));
+        final OperatorId operatorId = currentOperatorService.getCurrentOperatorId();
+        return ResponseEntity.ok().body(processPort.initialize(RequestMapper.map(request, operatorId)));
     }
 
     @DeleteMapping("/{processStatus}/{processId}")
@@ -61,7 +68,7 @@ public class ProcessLogController {
     @Operation(summary = "[TEST] Update shipment", description = "⚠️ Test Endpoint")
     public ResponseEntity<?> updateShipment(@PathVariable String processId, @RequestBody ShipmentUpdateDto shipmentUpdate) {
         final ProcessId prId = new ProcessId(UUID.fromString(processId));
-        final ShipmentUpdated shipmentUpdated = RequestMapper.map(shipmentUpdate);
+        final ShipmentUpdated shipmentUpdated = RequestMapper.map(shipmentUpdate, currentOperatorService.getCurrentOperatorId());
         this.processPort.assignShipmentUpdated(prId, shipmentUpdated);
         return ResponseEntity.ok().build();
     }
