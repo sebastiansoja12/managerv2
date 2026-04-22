@@ -9,6 +9,7 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
 
@@ -27,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "shipment.ShipmentEntity")
 @EntityListeners(AuditingEntityListener.class)
 @Audited
-public class ShipmentEntity {
+public class ShipmentEntity extends BelongsToOperator {
 
     @Column(name = "shipment_id")
     @EmbeddedId
