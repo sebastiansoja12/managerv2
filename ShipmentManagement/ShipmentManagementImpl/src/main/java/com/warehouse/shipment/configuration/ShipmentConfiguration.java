@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
@@ -29,6 +30,7 @@ import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResp
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
@@ -209,7 +211,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentRepository shipmentRepository(final ShipmentReadRepository repository) {
+	public ShipmentRepository shipmentRepository(final OperatorFilteredRepository<ShipmentEntity> repository) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment repository");
 		return new ShipmentRepositoryImpl(repository);
 	}
@@ -240,7 +242,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public SpecificationRepository specificationShipmentRepository(final ShipmentReadRepository repository) {
+	public SpecificationRepository specificationShipmentRepository(final OperatorFilteredRepository<ShipmentEntity> repository) {
 		return new SpecificationShipmentRepositoryImpl(repository);
 	}
 
