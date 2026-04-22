@@ -1,5 +1,6 @@
 package com.warehouse.process.configuration;
 
+import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.process.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.process.infrastructure.adapter.secondary.*;
@@ -51,8 +52,8 @@ public class ProcessConfiguration {
     }
 
     @Bean
-    public ProcessHubApiService processHubApiService(final ProcessPort processPort) {
-        return new ProcessResourceAdapter(processPort);
+    public ProcessHubApiService processHubApiService(final ProcessPort processPort, final CurrentOperatorService currentOperatorService) {
+        return new ProcessResourceAdapter(processPort, currentOperatorService);
     }
 
     @Bean
