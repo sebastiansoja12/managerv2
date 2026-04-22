@@ -11,14 +11,14 @@ import com.warehouse.process.infrastructure.dto.*;
 
 public abstract class RequestMapper {
 
-    public static InitializeProcessCommand map(final InitializeProcessRequestDto request) {
+    public static InitializeProcessCommand map(final InitializeProcessRequestDto request, final OperatorId operatorId) {
         return InitializeProcessCommand.builder()
                 .request(request.request())
-                .deviceInformation(map(request.deviceInformation()))
+                .deviceInformation(map(request.deviceInformation(), operatorId))
                 .build();
     }
 
-    public static DeviceInformation map(final DeviceInformationDto deviceInformation) {
+    public static DeviceInformation map(final DeviceInformationDto deviceInformation, final OperatorId operatorId) {
         final DeviceId deviceId = new DeviceId(deviceInformation.deviceId().value());
         final String version = deviceInformation.version();
         final DepartmentCode departmentCode = new DepartmentCode(deviceInformation.departmentCode().value());
@@ -41,7 +41,7 @@ public abstract class RequestMapper {
         return processId;
     }
 
-	public static ShipmentUpdated map(final ShipmentUpdateDto shipmentUpdate) {
+	public static ShipmentUpdated map(final ShipmentUpdateDto shipmentUpdate, final OperatorId operatorId) {
 		return new ShipmentUpdated(new ShipmentId(shipmentUpdate.shipmentId().value()),
                 new DeviceId(shipmentUpdate.deviceId().value()),
 				new UserId(shipmentUpdate.createdBy().value()),
