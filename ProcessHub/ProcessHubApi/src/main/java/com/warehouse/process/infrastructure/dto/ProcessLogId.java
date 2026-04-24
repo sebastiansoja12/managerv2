@@ -1,4 +1,6 @@
 package com.warehouse.process.infrastructure.dto;
 
-public record ProcessLogId(Long value) {
+import java.util.UUID;
+
+public record ProcessLogId(UUID value) {
 }

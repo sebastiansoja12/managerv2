@@ -18,10 +18,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final List<String> DEVICE_ENDPOINTS = List.of(
+            "/v2/api/deliveries"
+    );
 
     private final JwtService jwtService;
 
@@ -57,4 +62,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 		filterChain.doFilter(request, response);
 	}
+
+    @Override
+    protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
+        final String uri = request.getRequestURI();
+        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith);
+    }
 }

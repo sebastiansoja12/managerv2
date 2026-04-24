@@ -40,7 +40,7 @@ public interface DeliveryReturnRequestMapper {
     @Mapping(target = "departmentCode.value", source = "departmentCode")
     DeviceInformation map(final Device device);
 
-    default DeviceId map(final Long deviceId) {
+    default DeviceId map(final String deviceId) {
         return new DeviceId(deviceId);
     }
 

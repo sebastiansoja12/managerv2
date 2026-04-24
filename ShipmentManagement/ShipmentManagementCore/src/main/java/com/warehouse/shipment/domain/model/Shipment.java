@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.model;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -13,8 +14,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
 import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
-import com.warehouse.shipment.domain.event.ShipmentStatusChangedEvent;
-import com.warehouse.shipment.domain.registry.DomainRegistry;
+import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 
@@ -61,6 +61,10 @@ public class Shipment {
 
     private ExternalId<Long> externalReturnId;
 
+    private TrackingNumber trackingNumber;
+
+    private ExternalId<UUID> externalShipmentId;
+
     public Shipment() {
         //
     }
@@ -84,7 +88,9 @@ public class Shipment {
                     final ShipmentPriority shipmentPriority,
                     final DangerousGood dangerousGood,
                     final ExternalId<String> externalRouteId,
-                    final ExternalId<Long> externalReturnId) {
+                    final ExternalId<Long> externalReturnId,
+                    final String trackingNumber,
+                    final ExternalId<UUID> externalShipmentId) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
@@ -105,6 +111,8 @@ public class Shipment {
         this.dangerousGood = dangerousGood;
         this.externalRouteId = externalRouteId;
         this.externalReturnId = externalReturnId;
+        this.trackingNumber = new TrackingNumber(trackingNumber);
+        this.externalShipmentId = externalShipmentId;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -118,7 +126,8 @@ public class Shipment {
                     final Boolean locked,
                     final String destination,
                     final Signature signature,
-                    final ShipmentPriority shipmentPriority) {
+                    final ShipmentPriority shipmentPriority,
+                    final TrackingNumber trackingNumber) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
@@ -136,6 +145,8 @@ public class Shipment {
         this.destination = destination;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
+        this.trackingNumber = trackingNumber;
+        this.externalShipmentId = ExternalId.randomUUID();
     }
 
 	public ShipmentSnapshot snapshot() {
@@ -186,7 +197,9 @@ public class Shipment {
                 shipmentPriority,
                 dangerousGood,
                 externalRouteId,
-                externalReturnId
+                externalReturnId,
+                shipmentEntity.getTrackingNumber(),
+                new ExternalId<>(UUID.fromString(shipmentEntity.getExternalId().value()))
         );
     }
 
@@ -330,6 +343,14 @@ public class Shipment {
         this.externalRouteId = externalRouteId;
     }
 
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public ExternalId<UUID> getExternalShipmentId() {
+        return externalShipmentId;
+    }
+
     public void changeSignature(final Signature signature) {
         this.signature = signature;
         markAsModified();
@@ -351,7 +372,7 @@ public class Shipment {
         this.shipmentRelatedId = newRelatedShipmentId;
         markAsModified();
         lockShipment();
-        DomainRegistry.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
+        DomainContext.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void lockShipment() {
@@ -433,12 +454,12 @@ public class Shipment {
 
     public void changeShipmentStatus(final ShipmentStatus shipmentStatus) {
         this.shipmentStatus = shipmentStatus;
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyRelatedShipmentRedirected(final ShipmentId relatedShipmentId) {
         this.shipmentRelatedId = relatedShipmentId;
         this.shipmentType = ShipmentType.CHILD;
+        this.shipmentStatus = ShipmentStatus.REDIRECT;
         lockShipment();
         markAsModified();
     }
@@ -473,19 +494,16 @@ public class Shipment {
         this.shipmentRelatedId = null;
         unlockShipment();
         markAsModified();
-        DomainRegistry.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentRerouted() {
         changeShipmentStatus(ShipmentStatus.REROUTE);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentSent() {
         changeShipmentStatus(ShipmentStatus.SENT);
         markAsModified();
-        DomainRegistry.publish(new ShipmentStatusChangedEvent(snapshot(), Instant.now()));
     }
 
     public void notifyShipmentReturned() {
@@ -495,11 +513,13 @@ public class Shipment {
 
     public void notifyShipmentDelivered() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
+        lockShipment();
         markAsModified();
     }
 
     public void notifyShipmentReturnCanceled() {
         changeShipmentStatus(ShipmentStatus.DELIVERY);
+        this.locked = false;
         markAsModified();
     }
 
@@ -512,6 +532,7 @@ public class Shipment {
 
     public void changeDestinationDepartment(final String destination) {
         this.destination = destination;
+        markAsModified();
     }
 
     private void unlockShipment() {
@@ -552,19 +573,19 @@ public class Shipment {
 
     public void updateCountries(final ShipmentCountryRequest request) {
         markAsModified();
-        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeIssuerCountry(final CountryCode originCountry) {
         this.originCountry = originCountry;
         markAsModified();
-        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeReceiverCountry(final CountryCode destinationCountry) {
         this.destinationCountry = destinationCountry;
         markAsModified();
-        DomainRegistry.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
+        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
@@ -588,4 +609,43 @@ public class Shipment {
         this.externalReturnId = new ExternalId<>(returnId.getId());
         markAsModified();
     }
+
+    public boolean isFullyDelivered() {
+        return isLocked() && ShipmentStatus.DELIVERY.equals(this.shipmentStatus);
+    }
+
+    public Shipment redirectToSender(final ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
+        this.shipmentType = ShipmentType.PARENT;
+
+        final Sender newSender = new Sender(
+                recipient.getFirstName(),
+                recipient.getLastName(),
+                recipient.getEmail(),
+                recipient.getTelephoneNumber(),
+                recipient.getCity(),
+                recipient.getPostalCode(),
+                recipient.getStreet()
+        );
+
+        final Recipient newRecipient = new Recipient(
+                sender.getFirstName(),
+                sender.getLastName(),
+                sender.getEmail(),
+                sender.getTelephoneNumber(),
+                sender.getCity(),
+                sender.getPostalCode(),
+                sender.getStreet()
+        );
+
+        this.sender = newSender;
+        this.recipient = newRecipient;
+
+        this.shipmentStatus = ShipmentStatus.CREATED;
+
+        markAsModified();
+
+        return this;
+    }
+
 }

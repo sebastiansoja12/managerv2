@@ -20,6 +20,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findByUserId(final UserId userId) {
+        return this.userRepository.findById(userId);
+    }
+
+    @Override
     public UserToken validateUser(final UserId userId) {
         return userRepository.obtainUserToken(userId);
     }

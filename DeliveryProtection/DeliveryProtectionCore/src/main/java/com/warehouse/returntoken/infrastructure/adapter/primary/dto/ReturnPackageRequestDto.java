@@ -1,31 +1,22 @@
 package com.warehouse.returntoken.infrastructure.adapter.primary.dto;
 
-import java.util.UUID;
-
 public class ReturnPackageRequestDto {
-    private UUID id;
     private ShipmentIdDto shipmentId;
     private DepartmentCodeDto departmentCode;
     private SupplierCodeDto supplierCode;
     private String deliveryStatus;
     private Boolean locked;
 
-    public ReturnPackageRequestDto(final UUID id,
-                                   final ShipmentIdDto shipmentId,
+    public ReturnPackageRequestDto(final ShipmentIdDto shipmentId,
                                    final DepartmentCodeDto departmentCode,
                                    final SupplierCodeDto supplierCode,
                                    final String deliveryStatus,
                                    final Boolean locked) {
-        this.id = id;
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deliveryStatus = deliveryStatus;
         this.locked = locked;
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public ShipmentIdDto getShipmentId() {

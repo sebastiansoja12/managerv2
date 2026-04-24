@@ -29,14 +29,27 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
 
     private final List<String> dependencies;
 
-    public BoundedContextVisitor() throws IOException {
+    private final Set<String> allowedModules;
+
+    private final Path rootPath;
+
+    public BoundedContextVisitor(Path rootPath) throws IOException {
         this.contexts = new HashSet<>();
         this.dependencies = loadModuleDependencies();
+        this.allowedModules = loadAllowedModules();
+        this.rootPath = rootPath.toAbsolutePath().normalize();
     }
 
     @Override
     public FileVisitResult preVisitDirectory(final Path path, final BasicFileAttributes attrs) {
         final String absolutePath = normalize(path.toAbsolutePath().toString());
+        final Path abs = path.toAbsolutePath().normalize();
+        if (abs.getParent() != null && abs.getParent().equals(rootPath)) {
+            String dirName = abs.getFileName().toString();
+            if (!allowedModules.contains(dirName)) {
+                return FileVisitResult.SKIP_SUBTREE;
+            }
+        }
         final Matcher matcher = PATTERN.matcher(absolutePath);
         final boolean isDomainDirectory = matcher.find();
         if (isDomainDirectory) {
@@ -73,6 +86,32 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
         }
     }
 
+    private Set<String> loadAllowedModules() throws IOException {
+        Path rootPom = Paths.get(Creator.getManagerDirectory().toString(), "pom.xml");
+
+        if (!Files.exists(rootPom)) {
+            throw new IllegalStateException("Root pom.xml not found at " + rootPom);
+        }
+
+        final Set<String> modules = new HashSet<>();
+
+        for (String line : Files.readAllLines(rootPom)) {
+            line = line.trim();
+            if (line.startsWith("<module>") && line.endsWith("</module>")) {
+                String module = line
+                        .replace("<module>", "")
+                        .replace("</module>", "")
+                        .trim();
+
+                modules.add(module);
+            }
+        }
+
+        LOGGER.info("Allowed modules for architecture scan: {}", modules);
+        return modules;
+    }
+
+
     private List<String> loadModuleDependencies() throws IOException {
         final Path architectureTestDirectory = getArchitectureTestDirectory();
         final Path path = Paths.get(architectureTestDirectory.toAbsolutePath().toString(), "pom.xml");
@@ -92,7 +131,7 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
     }
 
     private String pack(final String domain) {
-        return ROOT + domain;
+        return ROOT + "." + domain;
     }
 
     private static Path getArchitectureTestDirectory() {
@@ -108,7 +147,7 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
             final Path path = getManagerDirectory();
             LOGGER.info("Search bounded context in path: {}. ", normalize(path.toString()));
 
-            final BoundedContextVisitor boundedContextVisitor = new BoundedContextVisitor();
+            final BoundedContextVisitor boundedContextVisitor = new BoundedContextVisitor(path);
             Files.walkFileTree(path, boundedContextVisitor);
             return boundedContextVisitor.contexts
                     .stream()

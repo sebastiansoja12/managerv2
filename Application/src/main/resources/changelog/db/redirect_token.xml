@@ -6,23 +6,30 @@
 
     <!-- Change Set to Create the 'redirect_token' Table -->
     <changeSet author="s-soja" id="createRedirectTokenTable">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="redirect_token"/>
+            </not>
+        </preConditions>
+
         <createTable tableName="redirect_token">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="created" type="datetime(6)">
+            <column name="created" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="email" type="varchar(255)">
+            <column name="email" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="timeout" type="datetime(6)">
+            <column name="timeout" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="parcel_id" type="bigint">
+            <column name="parcel_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="token" type="varchar(255)">
+            <column name="token" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -30,6 +37,17 @@
 
     <!-- Index on the 'parcel_id' Column -->
     <changeSet author="your_name" id="addParcelIdIndex">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="redirect_token"/>
+                <columnExists tableName="redirect_token" columnName="parcel_id"/>
+                <not>
+                    <indexExists tableName="redirect_token" indexName="IDX_redirect_token_parcel_id"/>
+                </not>
+            </and>
+        </preConditions>
+
         <createIndex tableName="redirect_token" indexName="IDX_redirect_token_parcel_id" unique="false">
             <column name="parcel_id"/>
         </createIndex>

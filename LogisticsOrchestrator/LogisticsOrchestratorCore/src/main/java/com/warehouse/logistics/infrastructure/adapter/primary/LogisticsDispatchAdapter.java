@@ -76,7 +76,10 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
 
     @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<TerminalResponse> processRequest(@RequestBody final TerminalRequest terminalRequest) {
+        return processRequestInternal(terminalRequest);
+    }
 
+    private ResponseEntity<TerminalResponse> processRequestInternal(final TerminalRequest terminalRequest) {
         final Device device = terminalRequest.getDevice();
 
         log.info("Detected request from Terminal device: ID - {}, Version - {}, Responsible User - {}, Department - {}",

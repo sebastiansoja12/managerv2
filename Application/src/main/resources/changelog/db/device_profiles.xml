@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="create-terminals-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="terminals"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="terminals">
+            <column name="device_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="external_device_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="version" type="VARCHAR(255)"/>
+            <column name="last_update" type="TIMESTAMP"/>
+            <column name="active" type="BOOLEAN"/>
+            <column name="hardware_uuid" type="BINARY(16)"/>
+            <column name="serial_number" type="VARCHAR(255)"/>
+            <column name="imei" type="VARCHAR(255)"/>
+            <column name="mac_address" type="VARCHAR(255)"/>
+            <column name="asset_tag" type="VARCHAR(255)"/>
+            <column name="barcode" type="VARCHAR(255)"/>
+            <column name="external_system_id" type="VARCHAR(255)"/>
+            <column name="mdm_device_id" type="VARCHAR(255)"/>
+            <column name="manufacturer" type="VARCHAR(255)"/>
+            <column name="model" type="VARCHAR(255)"/>
+            <column name="product_name" type="VARCHAR(255)"/>
+            <column name="cpu" type="VARCHAR(255)"/>
+            <column name="ram_mb" type="INT"/>
+            <column name="storage_mb" type="INT"/>
+            <column name="screen_resolution" type="VARCHAR(255)"/>
+            <column name="has_scanner" type="BOOLEAN"/>
+            <column name="has_camera" type="BOOLEAN"/>
+            <column name="has_nfc" type="BOOLEAN"/>
+            <column name="has_gps" type="BOOLEAN"/>
+            <column name="ruggedized" type="BOOLEAN"/>
+            <column name="os_name" type="VARCHAR(255)"/>
+            <column name="os_version" type="VARCHAR(255)"/>
+            <column name="firmware_version" type="VARCHAR(255)"/>
+            <column name="kernel_version" type="VARCHAR(255)"/>
+            <column name="bootloader_version" type="VARCHAR(255)"/>
+            <column name="app_version" type="VARCHAR(255)"/>
+            <column name="build_number" type="VARCHAR(255)"/>
+            <column name="rooted" type="BOOLEAN"/>
+            <column name="developer_mode_enabled" type="BOOLEAN"/>
+            <column name="ip_address" type="VARCHAR(255)"/>
+            <column name="public_ip_address" type="VARCHAR(255)"/>
+            <column name="network_type" type="VARCHAR(50)"/>
+            <column name="carrier" type="VARCHAR(255)"/>
+            <column name="sim_serial" type="VARCHAR(255)"/>
+            <column name="roaming" type="BOOLEAN"/>
+            <column name="vpn_connected" type="BOOLEAN"/>
+            <column name="wifi_ssid" type="VARCHAR(255)"/>
+            <column name="bluetooth_mac" type="VARCHAR(255)"/>
+            <column name="encrypted" type="BOOLEAN"/>
+            <column name="secure_boot_enabled" type="BOOLEAN"/>
+            <column name="tamper_detected" type="BOOLEAN"/>
+            <column name="screen_lock_enabled" type="BOOLEAN"/>
+            <column name="biometric_enabled" type="BOOLEAN"/>
+            <column name="compromised" type="BOOLEAN"/>
+            <column name="failed_login_attempts" type="INT"/>
+            <column name="last_security_scan_at" type="TIMESTAMP"/>
+            <column name="security_policy_version" type="VARCHAR(255)"/>
+            <column name="certificate_fingerprint" type="VARCHAR(255)"/>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+            <column name="altitude" type="DOUBLE"/>
+            <column name="accuracy_meters" type="FLOAT"/>
+            <column name="last_known_address" type="VARCHAR(255)"/>
+            <column name="geo_zone" type="VARCHAR(255)"/>
+            <column name="gps_enabled" type="BOOLEAN"/>
+            <column name="last_location_update_at" type="TIMESTAMP"/>
+            <column name="previous_user_id" type="BIGINT"/>
+            <column name="team_id" type="BIGINT"/>
+            <column name="vehicle_id" type="BIGINT"/>
+            <column name="assigned_role" type="VARCHAR(255)"/>
+            <column name="assigned_at" type="TIMESTAMP"/>
+            <column name="unassigned_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-scanners-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="scanners"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="scanners">
+            <column name="device_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="external_device_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="hardware_uuid" type="BINARY(16)"/>
+            <column name="serial_number" type="VARCHAR(255)"/>
+            <column name="imei" type="VARCHAR(255)"/>
+            <column name="mac_address" type="VARCHAR(255)"/>
+            <column name="asset_tag" type="VARCHAR(255)"/>
+            <column name="barcode" type="VARCHAR(255)"/>
+            <column name="external_system_id" type="VARCHAR(255)"/>
+            <column name="mdm_device_id" type="VARCHAR(255)"/>
+            <column name="manufacturer" type="VARCHAR(255)"/>
+            <column name="model" type="VARCHAR(255)"/>
+            <column name="product_name" type="VARCHAR(255)"/>
+            <column name="cpu" type="VARCHAR(255)"/>
+            <column name="ram_mb" type="INT"/>
+            <column name="storage_mb" type="INT"/>
+            <column name="screen_resolution" type="VARCHAR(255)"/>
+            <column name="has_scanner" type="BOOLEAN"/>
+            <column name="has_camera" type="BOOLEAN"/>
+            <column name="has_nfc" type="BOOLEAN"/>
+            <column name="has_gps" type="BOOLEAN"/>
+            <column name="ruggedized" type="BOOLEAN"/>
+            <column name="ip_address" type="VARCHAR(255)"/>
+            <column name="public_ip_address" type="VARCHAR(255)"/>
+            <column name="network_type" type="VARCHAR(50)"/>
+            <column name="carrier" type="VARCHAR(255)"/>
+            <column name="sim_serial" type="VARCHAR(255)"/>
+            <column name="roaming" type="BOOLEAN"/>
+            <column name="vpn_connected" type="BOOLEAN"/>
+            <column name="wifi_ssid" type="VARCHAR(255)"/>
+            <column name="bluetooth_mac" type="VARCHAR(255)"/>
+            <column name="previous_user_id" type="BIGINT"/>
+            <column name="team_id" type="BIGINT"/>
+            <column name="vehicle_id" type="BIGINT"/>
+            <column name="assigned_role" type="VARCHAR(255)"/>
+            <column name="assigned_at" type="TIMESTAMP"/>
+            <column name="unassigned_at" type="TIMESTAMP"/>
+            <column name="scan_type" type="VARCHAR(50)"/>
+            <column name="scanner_type" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-mobiles-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mobiles"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="mobiles">
+            <column name="device_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="external_device_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="version" type="VARCHAR(255)"/>
+            <column name="last_update" type="TIMESTAMP"/>
+            <column name="active" type="BOOLEAN"/>
+            <column name="hardware_uuid" type="BINARY(16)"/>
+            <column name="serial_number" type="VARCHAR(255)"/>
+            <column name="imei" type="VARCHAR(255)"/>
+            <column name="mac_address" type="VARCHAR(255)"/>
+            <column name="asset_tag" type="VARCHAR(255)"/>
+            <column name="barcode" type="VARCHAR(255)"/>
+            <column name="external_system_id" type="VARCHAR(255)"/>
+            <column name="mdm_device_id" type="VARCHAR(255)"/>
+            <column name="manufacturer" type="VARCHAR(255)"/>
+            <column name="model" type="VARCHAR(255)"/>
+            <column name="product_name" type="VARCHAR(255)"/>
+            <column name="cpu" type="VARCHAR(255)"/>
+            <column name="ram_mb" type="INT"/>
+            <column name="storage_mb" type="INT"/>
+            <column name="screen_resolution" type="VARCHAR(255)"/>
+            <column name="has_scanner" type="BOOLEAN"/>
+            <column name="has_camera" type="BOOLEAN"/>
+            <column name="has_nfc" type="BOOLEAN"/>
+            <column name="has_gps" type="BOOLEAN"/>
+            <column name="ruggedized" type="BOOLEAN"/>
+            <column name="os_name" type="VARCHAR(255)"/>
+            <column name="os_version" type="VARCHAR(255)"/>
+            <column name="firmware_version" type="VARCHAR(255)"/>
+            <column name="kernel_version" type="VARCHAR(255)"/>
+            <column name="bootloader_version" type="VARCHAR(255)"/>
+            <column name="app_version" type="VARCHAR(255)"/>
+            <column name="build_number" type="VARCHAR(255)"/>
+            <column name="rooted" type="BOOLEAN"/>
+            <column name="developer_mode_enabled" type="BOOLEAN"/>
+            <column name="ip_address" type="VARCHAR(255)"/>
+            <column name="public_ip_address" type="VARCHAR(255)"/>
+            <column name="network_type" type="VARCHAR(50)"/>
+            <column name="carrier" type="VARCHAR(255)"/>
+            <column name="sim_serial" type="VARCHAR(255)"/>
+            <column name="roaming" type="BOOLEAN"/>
+            <column name="vpn_connected" type="BOOLEAN"/>
+            <column name="wifi_ssid" type="VARCHAR(255)"/>
+            <column name="bluetooth_mac" type="VARCHAR(255)"/>
+            <column name="encrypted" type="BOOLEAN"/>
+            <column name="secure_boot_enabled" type="BOOLEAN"/>
+            <column name="tamper_detected" type="BOOLEAN"/>
+            <column name="screen_lock_enabled" type="BOOLEAN"/>
+            <column name="biometric_enabled" type="BOOLEAN"/>
+            <column name="compromised" type="BOOLEAN"/>
+            <column name="failed_login_attempts" type="INT"/>
+            <column name="last_security_scan_at" type="TIMESTAMP"/>
+            <column name="security_policy_version" type="VARCHAR(255)"/>
+            <column name="certificate_fingerprint" type="VARCHAR(255)"/>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+            <column name="altitude" type="DOUBLE"/>
+            <column name="accuracy_meters" type="FLOAT"/>
+            <column name="last_known_address" type="VARCHAR(255)"/>
+            <column name="geo_zone" type="VARCHAR(255)"/>
+            <column name="gps_enabled" type="BOOLEAN"/>
+            <column name="last_location_update_at" type="TIMESTAMP"/>
+            <column name="previous_user_id" type="BIGINT"/>
+            <column name="team_id" type="BIGINT"/>
+            <column name="vehicle_id" type="BIGINT"/>
+            <column name="assigned_role" type="VARCHAR(255)"/>
+            <column name="assigned_at" type="TIMESTAMP"/>
+            <column name="unassigned_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-mobile-installed-apps-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mobile_installed_apps"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="mobile_installed_apps">
+            <column name="device_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="mobile_installed_apps"
+                       columnNames="device_id, app_name"
+                       constraintName="pk_mobile_installed_apps"/>
+
+        <addForeignKeyConstraint baseTableName="mobile_installed_apps"
+                                 baseColumnNames="device_id"
+                                 referencedTableName="mobiles"
+                                 referencedColumnNames="device_id"
+                                 constraintName="fk_mobile_installed_apps_mobile"/>
+    </changeSet>
+
+    <changeSet id="create-device-settings-table-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="device_settings"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="device_settings">
+            <column name="device_settings_id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="device_id" type="BIGINT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="cross_courier_delivery" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="validate_responsible_user" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="validate_department_code" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

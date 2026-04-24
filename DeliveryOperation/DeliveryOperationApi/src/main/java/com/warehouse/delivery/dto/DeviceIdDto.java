@@ -2,7 +2,7 @@ package com.warehouse.delivery.dto;
 
 import java.util.Objects;
 
-public record DeviceIdDto(Long value) {
+public record DeviceIdDto(String value) {
 
     @Override
     public boolean equals(final Object o) {

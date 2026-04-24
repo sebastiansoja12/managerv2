@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>ProcessHub</artifactId>
-        <version>2025.3-SNAPSHOT</version>
+        <version>2026.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>ProcessHubCore</artifactId>
@@ -21,11 +21,6 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>ProcessHubApi</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>Common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -150,6 +145,11 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

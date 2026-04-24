@@ -1,19 +1,21 @@
 package com.warehouse.auth.configuration;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import com.warehouse.auth.domain.service.ApiKeyService;
 import com.warehouse.auth.domain.vo.DecodedApiTenant;
+
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Component
 @Slf4j
@@ -22,8 +24,10 @@ public class TenantMdcFilter extends OncePerRequestFilter {
     private final ApiKeyService apiKeyService;
 
     private static final List<String> API_KEY_ENDPOINTS = List.of(
-//            "/v2/api/devices",
-            "/v2/api/device-pairing",
+            "/v2/api/device-pairings"
+    );
+
+    private static final List<String> DEVICE_ENDPOINTS = List.of(
             "/v2/api/deliveries"
     );
 
@@ -91,7 +95,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
     }
 
     private DecodedApiTenant authenticateWithApiKey(final HttpServletRequest request,
-                                                    final HttpServletResponse response) throws IOException, java.io.IOException {
+                                                     final HttpServletResponse response) throws IOException, java.io.IOException {
         final String apiKey = request.getHeader("X-API-KEY");
         if (apiKey == null || apiKey.isBlank()) {
             unauthorized(response, "Missing or invalid api key");
@@ -108,7 +112,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
     }
 
     private DecodedApiTenant authenticateWithJwt(final HttpServletRequest request,
-                                                 final HttpServletResponse response) throws IOException, java.io.IOException {
+                                                  final HttpServletResponse response) throws IOException, java.io.IOException {
 
         final String auth = request.getHeader("Authorization");
         if (auth == null || !auth.startsWith("Bearer ")) {
@@ -151,5 +155,14 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
     private boolean isApiKeyEndpoint(final String uri) {
         return API_KEY_ENDPOINTS.stream().anyMatch(uri::startsWith);
+    }
+
+    private boolean isDeviceEndpoint(final String uri) {
+        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(final HttpServletRequest request) {
+        return isDeviceEndpoint(request.getRequestURI());
     }
 }

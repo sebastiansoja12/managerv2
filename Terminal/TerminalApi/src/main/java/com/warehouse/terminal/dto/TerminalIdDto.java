@@ -1,4 +1,4 @@
 package com.warehouse.terminal.dto;
 
-public record TerminalIdDto(Long value) {
+public record TerminalIdDto(String value) {
 }

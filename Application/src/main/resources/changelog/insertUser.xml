@@ -1,17 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
     <changeSet id="insert_initial_users" author="s-soja">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <or>
+                <dbms type="h2"/>
+                <changeLogPropertyDefined property="seedData" value="true"/>
+            </or>
+        </preConditions>
+
         <insert tableName="users">
-            <column name="id" value="1"/>
-            <column name="username" value="s-soja" />
-            <column name="password" value="test" />
-            <column name="first_name" value="Sebastian" />
-            <column name="last_name" value="Soja" />
-            <column name="email" value="sebastian5152@wp.pl" />
-            <column name="role" value="1" />
-            <column name="depot_code" value="KT1" />
+            <column name="id" valueNumeric="1"/>
+            <column name="user_id" valueNumeric="1"/>
+            <column name="username" value="s-soja"/>
+            <column name="password" value="test"/>
+            <column name="first_name" value="Sebastian"/>
+            <column name="last_name" value="Soja"/>
+            <column name="email" value="sebastian5152@wp.pl"/>
+            <column name="role" value="ADMIN"/>
+            <column name="department_code" value="KT1"/>
+            <column name="api_key" value="dev-api-key-s-soja"/>
+            <column name="deleted" valueBoolean="false"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
         </insert>
     </changeSet>
 

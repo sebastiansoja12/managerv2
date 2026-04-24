@@ -39,4 +39,6 @@ public interface ShipmentPort {
     Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateCommand request);
 
     void processShipmentReturn(final ShipmentReturnCommand request);
+
+    void processShipmentDelivery(final ShipmentDeliveryCommand command);
 }

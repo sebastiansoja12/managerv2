@@ -1,5 +1,6 @@
 package com.warehouse.terminal.domain.service;
 
+import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.DeviceVersion;
 import com.warehouse.terminal.domain.port.secondary.DeviceVersionRepository;
@@ -14,13 +15,12 @@ public class DeviceVersionServiceImpl implements DeviceVersionService {
 
     @Override
     public DeviceVersion findByDeviceId(final DeviceId deviceId) {
-        return deviceVersionRepository.find(deviceId);
+        return this.deviceVersionRepository.find(deviceId).orElse(null);
     }
 
     @Override
-    public void saveOrUpdate(final DeviceId deviceId, final String version) {
-        final DeviceVersion deviceVersion = this.deviceVersionRepository.find(deviceId);
-        deviceVersion.updateVersion(version);
-        this.deviceVersionRepository.saveOrUpdate(deviceVersion);
+    public void saveOrUpdate(final DeviceType deviceType, final DeviceId deviceId, final String version) {
+        final DeviceVersion deviceVersion = new DeviceVersion(deviceType, version, deviceId);
+        deviceVersionRepository.saveOrUpdate(deviceVersion);
     }
 }

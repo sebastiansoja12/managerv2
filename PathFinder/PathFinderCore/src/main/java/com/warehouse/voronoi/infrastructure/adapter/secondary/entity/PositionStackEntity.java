@@ -3,8 +3,10 @@ package com.warehouse.voronoi.infrastructure.adapter.secondary.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity(name = "conf_position_stack")
+@Table(name = "conf_position_stack")
 public class PositionStackEntity {
     @Id
     private Long id;

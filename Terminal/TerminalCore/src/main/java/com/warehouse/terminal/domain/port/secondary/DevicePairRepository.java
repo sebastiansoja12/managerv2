@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.DevicePair;
-import com.warehouse.terminal.domain.model.Terminal;
+import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 
 public interface DevicePairRepository {
@@ -14,5 +14,6 @@ public interface DevicePairRepository {
     DevicePair findDevicePairByDeviceId(final DeviceId deviceId);
     void update(final DevicePair devicePair);
     Optional<DevicePair> findByDeviceId(final DeviceId deviceId);
+    Optional<DevicePair> findByPairKey(final String pairKey);
     void save(final DevicePair devicePair);
 }

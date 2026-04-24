@@ -17,6 +17,6 @@ public class PositionStackRepositoryImpl implements PositionStackRepository {
         return repository.findAll().stream().filter(PositionStackEntity::isValid)
                 .findAny()
                 .map(pos -> new PositionStack(pos.getId(), pos.getToken(), pos.isValid()))
-                .orElse(null);
+                .orElseThrow(() -> new IllegalStateException("PositionStack is not configured"));
     }
 }

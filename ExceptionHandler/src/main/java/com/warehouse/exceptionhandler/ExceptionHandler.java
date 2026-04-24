@@ -1,22 +1,39 @@
 package com.warehouse.exceptionhandler;
 
-import org.springframework.http.HttpStatusCode;
+import com.warehouse.commonassets.exception.ProblemDetails;
+import com.warehouse.commonassets.exception.ProblemDetailsException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import com.warehouse.exceptionhandler.exception.RestException;
-import com.warehouse.exceptionhandler.model.ErrorResponse;
-
-import java.time.LocalDateTime;
-
 
 @ControllerAdvice
 public class ExceptionHandler {
-    @org.springframework.web.bind.annotation.ExceptionHandler(RestException.class)
-    public ResponseEntity<?> handleException(RestException ex) {
-        final ErrorResponse errors = new ErrorResponse();
-        errors.setTimestamp(LocalDateTime.now());
-        errors.setStatus(ex.getCode());
-        errors.setError(ex.getMessage());
-        return new ResponseEntity<>(errors, HttpStatusCode.valueOf(errors.getStatus()));
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(ProblemDetailsException.class)
+    public ResponseEntity<ProblemDetails> handleProblemDetails(final ProblemDetailsException ex,
+                                                               final HttpServletRequest request) {
+        final ProblemDetails body = ProblemDetails.fromException(ex, request != null ? request.getRequestURI() : null);
+        return ResponseEntity
+                .status(ex.getStatus())
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(body);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
+    public ResponseEntity<ProblemDetails> handleUnexpected(final Exception ex,
+                                                           final HttpServletRequest request) {
+        final ProblemDetailsException fallback = new ProblemDetailsException(
+                "about:blank",
+                "Internal Server Error",
+                500,
+                ex.getMessage() != null ? ex.getMessage() : "Unexpected error");
+
+        final ProblemDetails body = ProblemDetails.fromException(fallback, request != null ? request.getRequestURI() : null);
+        return ResponseEntity
+                .status(500)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(body);
     }
 }

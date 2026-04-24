@@ -1,15 +1,15 @@
 package com.warehouse.shipment;
 
-import com.warehouse.commonassets.enumeration.*;
+import java.math.BigDecimal;
+
+import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.enumeration.ShipmentSize;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.vo.Parcel;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public class DataTestCreator {
 
@@ -52,10 +52,5 @@ public class DataTestCreator {
 
     static Money money() {
         return new Money(new BigDecimal(10L), Currency.PLN);
-    }
-
-    static Shipment createShipment() {
-		return new Shipment(shipmentId(), sender(), recipient(), ShipmentSize.TEST, ShipmentStatus.CREATED, ShipmentType.PARENT, null, money(), LocalDateTime.now(),
-				LocalDateTime.now(), false, CountryCode.AL, CountryCode.AD, "KT1", null, false, ShipmentPriority.LOW, null, null, null);
     }
 }

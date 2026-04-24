@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,13 +21,14 @@ import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
+import com.warehouse.shipment.domain.generator.TrackingNumberGenerator;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.registry.DomainRegistry;
+import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.ChangeShipmentTypeRequest;
 import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
@@ -71,18 +71,21 @@ class ShipmentPortImplTest {
     @Mock
     private ReturningServicePort returningServicePort;
 
+    @Mock
+    private MailNotificationServicePort mailNotificationServicePort;
+
+    @Mock
+    private Set<TrackingNumberGenerator> generators;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
-
-    private final static UUID processId = UUID.fromString("2d255296-3f50-4cc1-b8dc-ef6e634aab0d");
 
     private static final String SHIPMENT_WAS_NOT_FOUND = "Shipment not found";
 
     @BeforeEach
     void setUp() {
-        final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository, routeLogServicePort,
-                softwareConfigurationServicePort);
+        final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository);
         final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort, countryRepository);
         final PriceService priceService = new PriceServiceImpl(priceRepository);
         final Logger logger = mock(Logger.class);
@@ -92,12 +95,14 @@ class ShipmentPortImplTest {
                 new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
         final ApplicationContext applicationContext = mock(ApplicationContext.class);
         final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
-        final DomainRegistry domainContext = new DomainRegistry();
+        final DomainContext domainContext = new DomainContext();
         domainContext.setApplicationEventPublisher(eventPublisher);
         domainContext.setApplicationContext(applicationContext);
+        final TrackingNumberService trackingNumberService = new TrackingNumberServiceImpl(generators);
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
 				shipmentStatusHandlers, countryDetermineService, priceService, countryServiceAvailabilityService,
-				signatureService, routeLogServicePort, returningServicePort);
+				signatureService, routeLogServicePort, returningServicePort, mailNotificationServicePort,
+                trackingNumberService);
 	}
 
     @Test

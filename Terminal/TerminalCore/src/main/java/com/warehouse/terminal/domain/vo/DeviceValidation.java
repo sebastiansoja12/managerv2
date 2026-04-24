@@ -6,7 +6,7 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.api.SoftwareConfi
 public record DeviceValidation(DeviceId deviceId, Boolean validation) {
 
     public static DeviceValidation from(final SoftwareConfigurationDto softwareConfiguration) {
-		return new DeviceValidation(new DeviceId(Long.parseLong(softwareConfiguration.name())),
+		return new DeviceValidation(new DeviceId(softwareConfiguration.name()),
 				Boolean.parseBoolean(softwareConfiguration.value()));
     }
 }

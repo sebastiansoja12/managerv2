@@ -19,7 +19,9 @@ public interface ReturnTokenResponseMapper {
         return new ReturnTokenResponseDto(returnPackageResponses, supplierDto);
     }
 
-    SupplierDto map(final Supplier supplier);
+    default SupplierDto map(final Supplier supplier) {
+        return new SupplierDto(new SupplierCodeDto(supplier.getSupplierCode().value()));
+    }
 
     default ReturnPackageResponseDto map(final ReturnPackageResponse returnPackageResponse) {
         final ShipmentIdDto shipmentId = map(returnPackageResponse.getShipmentId());
@@ -32,7 +34,11 @@ public interface ReturnTokenResponseMapper {
 
     String map(Object value);
 
-    ReturnTokenDto map(final ReturnToken returnToken);
+    default ReturnTokenDto map(final ReturnToken returnToken) {
+        return new ReturnTokenDto(returnToken.getToken(),
+                new ShipmentIdDto(returnToken.getShipmentId().getValue()),
+                returnToken.getExpiresAt());
+    }
 
     default ShipmentIdDto map(final ShipmentId shipmentId) {
         return new ShipmentIdDto(shipmentId.getValue());

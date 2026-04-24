@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.service.ShipmentService;
 
 
@@ -26,7 +25,6 @@ public class ShipmentRedirectHandler implements ShipmentStatusHandler {
 
     @Override
     public void notifyShipmentStatusChange(final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentService.find(shipmentId);
-        this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, shipment.getShipmentRelatedId());
+        this.shipmentService.notifyRelatedShipmentRedirected(shipmentId, this.shipmentService.nextShipmentId());
     }
 }
