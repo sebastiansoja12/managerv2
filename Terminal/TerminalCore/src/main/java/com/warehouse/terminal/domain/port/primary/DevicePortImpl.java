@@ -111,11 +111,7 @@ public class DevicePortImpl implements DevicePort {
 
     @Override
     public void updateSettings(final DeviceSettingsRequest request) {
-        final Device device = deviceGenericService.findByDeviceId(request.getDeviceId());
-        if (device != null) {
-            this.deviceGenericService.updateSettings(request.getDeviceId(),
-                    DeviceSettings.from(request));
-        }
+        this.deviceGenericService.updateSettings(request.getDeviceId(), DeviceSettings.from(request));
     }
 
     @Override

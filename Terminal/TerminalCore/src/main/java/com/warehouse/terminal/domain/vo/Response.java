@@ -5,7 +5,7 @@ import java.util.Objects;
 
 
 public class Response {
-    private final Long terminalId;
+    private final String terminalId;
     private final String version;
     private final Long userId;
     private final List<ProcessReturn> processReturns;
@@ -22,7 +22,7 @@ public class Response {
         this.routeProcesses = routeProcesses;
     }
 
-    public Long getTerminalId() {
+    public String getTerminalId() {
         return terminalId;
     }
 
@@ -42,4 +42,3 @@ public class Response {
         return userId;
     }
 }
-

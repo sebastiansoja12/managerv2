@@ -1,13 +1,22 @@
 package com.warehouse.commonassets.identificator;
 
+import java.io.Serializable;
+import java.util.Locale;
+import java.util.Objects;
+
 import com.warehouse.commonassets.enumeration.DeviceType;
+
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public class DeviceId {
-    private Long value;
+public class DeviceId implements Serializable {
+    private static final String TERMINAL_PREFIX = "TL:";
+    private static final String SCANNER_PREFIX = "SC:";
+    private static final String MOBILE_PREFIX = "MB:";
 
-    public DeviceId(final Long value) {
+    private String value;
+
+    public DeviceId(final String value) {
         this.value = value;
     }
 
@@ -15,25 +24,51 @@ public class DeviceId {
 
     }
 
-    public Long getValue() {
+    public String getValue() {
         return value;
     }
 
-    public Long value() {
+    public String value() {
         return value;
     }
 
     public DeviceType type() {
-        final long v = this.value();
+        if (this.value == null || this.value.isBlank()) {
+            throw new IllegalStateException("Device id is blank");
+        }
 
-        final long prefix = v / 1_000_000_000_000_000L;
+        final String normalized = this.value.toUpperCase(Locale.ROOT);
+        if (normalized.startsWith(TERMINAL_PREFIX)) {
+            return DeviceType.TERMINAL;
+        }
+        if (normalized.startsWith(SCANNER_PREFIX)) {
+            return DeviceType.SCANNER;
+        }
+        if (normalized.startsWith(MOBILE_PREFIX)) {
+            return DeviceType.MOBILE;
+        }
+        throw new IllegalStateException("Unknown device type in id: " + this.value);
+    }
 
-        return switch ((int) prefix) {
-            case 101 -> DeviceType.TERMINAL;
-            case 202 -> DeviceType.SCANNER;
-            case 303 -> DeviceType.MOBILE;
-            default -> throw new IllegalStateException("Unknown device type in id: " + v);
-        };
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DeviceId deviceId)) {
+            return false;
+        }
+        return Objects.equals(value, deviceId.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 
 }

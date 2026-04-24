@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
@@ -30,8 +31,12 @@ public interface RouteModelMapper {
     @Mapping(target = "departmentCode", source = "department.departmentCode")
     @Mapping(target = "username", source = "user.username")
     @Mapping(target = "supplierCode", source = "supplier.supplierCode")
-    @Mapping(target = "terminalId.value", source = "deviceId")
+    @Mapping(target = "terminalId", source = "deviceId")
     RouteLogRecordDetail map(RouteLogRecordDetailEntity routeLogRecordDetailEntity);
+
+    default TerminalId mapTerminalId(final String deviceId) {
+        return deviceId != null ? new TerminalId(deviceId) : null;
+    }
 
     @Mapping(target = "processId", source = "id")
     @Mapping(target = "shipmentId.value", source = "parcelId")

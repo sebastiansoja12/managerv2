@@ -52,7 +52,7 @@ public class DeliveryReturnPortImplTest {
 
 	private final DeviceInformation deviceInformation = DeviceInformation.builder()
 			.version("1")
-			.deviceId(new DeviceId(1L))
+			.deviceId(new DeviceId(""))
 			.username("s-soja")
 			.departmentCode(new DepartmentCode("KT1"))
 			.build();

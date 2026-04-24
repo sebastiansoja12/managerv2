@@ -1,7 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
@@ -17,8 +17,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class MobileRepositoryImpl implements DeviceRepository<Mobile> {
-
-    private static final long MOBILE_ID_PREFIX = 303_000_000_000_000_000L;
+    private static final String MOBILE_ID_PREFIX = "MB:";
 
     private final MobileReadRepository repository;
 
@@ -61,12 +60,6 @@ public class MobileRepositoryImpl implements DeviceRepository<Mobile> {
 
     @Override
     public DeviceId nextDeviceId() {
-        final long maxId = repository.findAll().stream()
-                .map(MobileEntity::getId)
-                .filter(Objects::nonNull)
-                .mapToLong(DeviceId::getValue)
-                .max()
-                .orElse(MOBILE_ID_PREFIX);
-        return new DeviceId(maxId >= MOBILE_ID_PREFIX ? maxId + 1 : MOBILE_ID_PREFIX + 1);
+        return new DeviceId(MOBILE_ID_PREFIX + UUID.randomUUID());
     }
 }

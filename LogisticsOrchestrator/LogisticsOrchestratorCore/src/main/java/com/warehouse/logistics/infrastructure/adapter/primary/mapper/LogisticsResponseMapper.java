@@ -63,7 +63,7 @@ public interface LogisticsResponseMapper {
     default Device map(final DeviceInformation deviceInformation) {
         final String version = deviceInformation.getVersion();
         final String username = deviceInformation.getUsername();
-        final Long deviceId = deviceInformation.getDeviceId().value();
+        final String deviceId = deviceInformation.getDeviceId().value();
         final String departmentCode = deviceInformation.getDepartmentCode().getValue();
         final String deviceUserType = deviceInformation.getDeviceUserType().toString();
         final String deviceType = deviceInformation.getDeviceType().toString();

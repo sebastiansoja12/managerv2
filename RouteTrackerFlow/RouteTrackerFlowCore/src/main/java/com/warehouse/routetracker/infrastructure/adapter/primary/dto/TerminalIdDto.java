@@ -3,16 +3,16 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 import com.warehouse.commonassets.identificator.TerminalId;
 
 public class TerminalIdDto {
-    private Long value;
+    private String value;
 
     public TerminalIdDto() {
     }
 
-    public TerminalIdDto(final Long value) {
+    public TerminalIdDto(final String value) {
         this.value = value;
     }
 
-    public Long getValue() {
+    public String getValue() {
         return value;
     }
 

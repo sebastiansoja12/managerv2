@@ -77,7 +77,7 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
         }
 
         final Long userId = authentication.userId() != null ? authentication.userId().value() : null;
-        final Long deviceId = authentication.deviceId() != null ? authentication.deviceId().value() : null;
+        final String deviceId = authentication.deviceId() != null ? authentication.deviceId().value() : null;
         final String username = authentication.username() != null ? authentication.username().value() : null;
 
         setMdcFromDevice(userId, deviceId, username, department);
@@ -108,19 +108,19 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
         MDC.put("method", request.getMethod());
     }
 
-    private void setMdcFromDevice(final Long userId, final Long deviceId, final String username, final String department) {
+    private void setMdcFromDevice(final Long userId, final String deviceId, final String username, final String department) {
         MDC.put("tenant", department);
         if (userId != null) {
             MDC.put("user", userId.toString());
         } else if (deviceId != null) {
-            MDC.put("user", deviceId.toString());
+            MDC.put("user", deviceId);
         }
         if (username != null && !username.isBlank()) {
             MDC.put("username", username);
         }
     }
 
-    private Object resolvePrincipal(final Long userId, final Long deviceId) {
+    private Object resolvePrincipal(final Long userId, final String deviceId) {
         if (userId != null) {
             return new UserId(userId);
         }
