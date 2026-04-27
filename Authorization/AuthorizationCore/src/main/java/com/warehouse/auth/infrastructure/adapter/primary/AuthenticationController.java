@@ -11,9 +11,9 @@ import com.warehouse.auth.domain.service.ApiKeyService;
 import com.warehouse.auth.domain.vo.AuthenticationResponse;
 import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.domain.vo.RegisterResponse;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.LoginRequestDto;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RefreshTokenRequestDto;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RegisterRequestDto;
+import com.warehouse.auth.infrastructure.dto.LoginRequestDto;
+import com.warehouse.auth.infrastructure.dto.RefreshTokenRequestDto;
+import com.warehouse.auth.infrastructure.dto.RegisterRequestDto;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
 

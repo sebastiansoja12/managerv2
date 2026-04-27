@@ -3,7 +3,7 @@ package com.warehouse.auth.domain.model;
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RegisterRequestDto;
+import com.warehouse.auth.infrastructure.dto.RegisterRequestDto;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 
 import lombok.NonNull;

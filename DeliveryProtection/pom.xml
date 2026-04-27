@@ -9,6 +9,7 @@
         <version>3.5.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+    <groupId>com.warehouse</groupId>
     <version>2026.2-SNAPSHOT</version>
     <artifactId>DeliveryProtection</artifactId>
     <packaging>pom</packaging>

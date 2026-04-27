@@ -14,7 +14,7 @@ import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.service.ApiKeyService;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.FullNameRequestApiDto;
+import com.warehouse.auth.infrastructure.dto.FullNameRequestApiDto;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.validator.RoleValidator;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.BusinessException;

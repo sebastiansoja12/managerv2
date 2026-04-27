@@ -1,20 +1,18 @@
 package com.warehouse.logistics.configuration;
 
-import com.warehouse.logistics.domain.port.primary.*;
-import com.warehouse.logistics.domain.port.secondary.*;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
-import com.warehouse.logistics.infrastructure.adapter.secondary.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-
+import com.warehouse.logistics.domain.port.primary.*;
+import com.warehouse.logistics.domain.port.secondary.*;
 import com.warehouse.logistics.domain.service.LogisticsService;
 import com.warehouse.logistics.domain.service.LogisticsServiceImpl;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
-import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
+import com.warehouse.logistics.infrastructure.adapter.secondary.*;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.terminal.DeviceEventPublisher;
@@ -76,8 +74,8 @@ public class LogisticsConfiguration {
     }
 
     @Bean(name = "logistics.supplierTokenServicePort")
-    public DeliveryTokenServicePort supplierTokenServicePort(DeliveryTokenService service) {
-        return new DeliveryTokenAdapter(service);
+    public DeliveryTokenServicePort supplierTokenServicePort() {
+        return new DeliveryTokenAdapter();
     }
 
     @Bean

@@ -1,10 +1,9 @@
 package com.warehouse.auth.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RolePermissionApi;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RolePermissionIdApi;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.UserDto;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.UserIdDto;
+import com.warehouse.auth.infrastructure.dto.RolePermissionApi;
+import com.warehouse.auth.infrastructure.dto.UserDto;
+import com.warehouse.auth.infrastructure.dto.UserIdDto;
 
 import java.time.Instant;
 import java.util.Set;
