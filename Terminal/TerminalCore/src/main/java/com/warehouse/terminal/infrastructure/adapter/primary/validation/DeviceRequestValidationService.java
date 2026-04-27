@@ -267,9 +267,6 @@ public class DeviceRequestValidationService {
                 || request.userId() != null
                 || request.departmentCode() != null
                 || request.version() != null
-                || request.createdAt() != null
-                || request.updatedAt() != null
-                || request.lastUpdate() != null
                 || request.active() != null
                 || request.identity() != null
                 || request.hardware() != null

@@ -13,15 +13,13 @@ import com.warehouse.terminal.domain.model.Department;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DeviceSettings;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
-import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
-import com.warehouse.terminal.domain.model.command.DeviceSettingsRequest;
-import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
+import com.warehouse.terminal.domain.model.command.*;
 import com.warehouse.terminal.domain.model.device.Mobile;
 import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.secondary.DepartmentServicePort;
+import com.warehouse.terminal.domain.port.secondary.UserServicePort;
 import com.warehouse.terminal.domain.service.DeviceGenericService;
-import com.warehouse.terminal.domain.service.DeviceVersionService;
 import com.warehouse.terminal.domain.service.UserService;
 import com.warehouse.terminal.domain.vo.*;
 
@@ -34,18 +32,18 @@ public class DevicePortImpl implements DevicePort {
 
     private final UserService userService;
 
-    private final DeviceVersionService deviceVersionService;
-
     private final DepartmentServicePort departmentServicePort;
+
+    private final UserServicePort userServicePort;
 
     public DevicePortImpl(final DeviceGenericService deviceGenericService,
                           final UserService userService,
-                          final DeviceVersionService deviceVersionService,
-                          final DepartmentServicePort departmentServicePort) {
+                          final DepartmentServicePort departmentServicePort,
+                          final UserServicePort userServicePort) {
         this.deviceGenericService = deviceGenericService;
         this.userService = userService;
-        this.deviceVersionService = deviceVersionService;
         this.departmentServicePort = departmentServicePort;
+        this.userServicePort = userServicePort;
     }
 
     @Override
@@ -54,36 +52,45 @@ public class DevicePortImpl implements DevicePort {
         final UserId userId = command.getUserId();
         final DeviceType deviceType = command.getDeviceType();
         final DepartmentCode departmentCode = command.getDepartmentCode();
-        final User user = this.userService.findByUserId(command.getUserId());
+        final User user = this.userServicePort.findUserById(userId);
         if (user == null) {
             throw new UserNotFoundException(userId);
         }
         final Department department = this.departmentServicePort.getDepartment(departmentCode);
         final DeviceId deviceId = this.deviceGenericService.nextDeviceId(deviceType);
-        final IdentityInfo deviceIdentityInfo = command.getIdentity();
-        final HardwareProfile hardwareProfile = command.getHardware();
-        final SoftwareProfile softwareProfile = command.getSoftware();
-        final NetworkProfile networkProfile = command.getNetwork();
-        final LocationProfile locationProfile = LocationProfile.initializeLocation(department.getCoordinates(),
+        final DeviceIdentity deviceDeviceIdentity = command.getIdentity();
+        final DeviceHardware deviceHardware = command.getHardware();
+        final DeviceSoftware deviceSoftware = command.getSoftware();
+        final DeviceNetwork deviceNetwork = command.getNetwork();
+        final DeviceLocation deviceLocation = DeviceLocation.initializeLocation(department.getCoordinates(),
                 "", "", false);
 		final OwnershipProfile ownershipProfile = OwnershipProfile.initializeOwnership("", userId, departmentCode,
                 null);
         
-		final Device device;
-		if (deviceType.equals(DeviceType.TERMINAL)) {
-			device = new Terminal(deviceId, DeviceStatus.ACTIVE, deviceIdentityInfo, hardwareProfile, softwareProfile,
-					networkProfile, locationProfile, ownershipProfile);
-		} else if (deviceType.equals(DeviceType.SCANNER)) {
-			device = new Scanner(deviceId, deviceIdentityInfo, hardwareProfile, networkProfile, ownershipProfile,
-                    command.getScanType(), command.getScannerType());
-		} else {
-			device = new Mobile(deviceId, DeviceStatus.ACTIVE, deviceIdentityInfo, hardwareProfile, softwareProfile,
-                    networkProfile, locationProfile, ownershipProfile);
-		}
+		final Device device = 
+                getDevice(command, deviceType, deviceId, deviceDeviceIdentity, deviceHardware, deviceSoftware, deviceNetwork, deviceLocation, ownershipProfile);
         this.deviceGenericService.create(device);
 
         return new DeviceCreateResult(deviceId);
     }
+
+	private Device getDevice(final DeviceCreateCommand command, final DeviceType deviceType, final DeviceId deviceId,
+			final DeviceIdentity deviceDeviceIdentity, final DeviceHardware deviceHardware,
+			final DeviceSoftware deviceSoftware, final DeviceNetwork deviceNetwork, final DeviceLocation deviceLocation,
+			final OwnershipProfile ownershipProfile) {
+		final Device device;
+		if (deviceType.equals(DeviceType.TERMINAL)) {
+			device = new Terminal(deviceId, DeviceStatus.ACTIVE, deviceDeviceIdentity, deviceHardware, deviceSoftware,
+					deviceNetwork, deviceLocation, ownershipProfile);
+		} else if (deviceType.equals(DeviceType.SCANNER)) {
+			device = new Scanner(deviceId, deviceDeviceIdentity, deviceHardware, deviceNetwork, ownershipProfile,
+					command.getScanType(), command.getScannerType());
+		} else {
+			device = new Mobile(deviceId, DeviceStatus.ACTIVE, deviceDeviceIdentity, deviceHardware, deviceSoftware,
+					deviceNetwork, deviceLocation, ownershipProfile);
+		}
+		return device;
+	}
 
     @Override
     public void changeUserTo(final DeviceUserRequest request) {
@@ -124,6 +131,62 @@ public class DevicePortImpl implements DevicePort {
         return this.deviceGenericService.findByDeviceId(deviceId);
     }
 
+    @Override
+    public void updateDeviceType(final DeviceTypeUpdateCommand request) {
+        this.deviceGenericService.updateDeviceType(request.deviceId(), request.deviceType());
+    }
+
+    @Override
+    public void updateActiveField(final DeviceActiveUpdateCommand request) {
+        this.deviceGenericService.updateActive(request.deviceId(), request.active());
+    }
+
+    @Override
+    public void updateStatusField(final DeviceStatusUpdateCommand request) {
+        this.deviceGenericService.updateStatus(request.deviceId(), request.status());
+    }
+
+    @Override
+    public void updateIdentityField(final DeviceIdentityUpdateCommand request) {
+        this.deviceGenericService.updateIdentity(request.deviceId(), request.identity());
+    }
+
+    @Override
+    public void updateHardwareField(final DeviceHardwareUpdateCommand request) {
+        this.deviceGenericService.updateHardware(request.deviceId(), request.hardware());
+    }
+
+    @Override
+    public void updateSoftwareField(final DeviceSoftwareUpdateCommand request) {
+        this.deviceGenericService.updateSoftware(request.deviceId(), request.software());
+    }
+
+    @Override
+    public void updateNetworkField(final DeviceNetworkUpdateCommand request) {
+        this.deviceGenericService.updateNetwork(request.deviceId(), request.network());
+    }
+
+    @Override
+    public void updateSecurityField(final DeviceSecurityUpdateCommand request) {
+        this.deviceGenericService.updateSecurity(request.deviceId(), request.security());
+    }
+
+    @Override
+    public void updateLocationField(final DeviceLocationUpdateCommand request) {
+        this.deviceGenericService.updateLocation(request.deviceId(), request.location());
+    }
+
+    @Override
+    public void updateOwnershipField(final DeviceOwnershipUpdateCommand request) {
+        validateOwnership(request.ownership());
+        this.deviceGenericService.updateOwnership(request.deviceId(), request.ownership());
+    }
+
+    @Override
+    public void updateVersionField(final DeviceVersionUpdateCommand request) {
+        this.deviceGenericService.updateVersionField(request.deviceId(), request.version());
+    }
+
     private void logDeviceCreation(final DeviceCreateCommand request) {
         log.info("Creating device for user {}", request.getUserId());
     }
@@ -135,14 +198,7 @@ public class DevicePortImpl implements DevicePort {
         if (request.departmentCode() != null) {
             this.departmentServicePort.getDepartment(request.departmentCode());
         }
-        if (request.ownership() != null) {
-            if (request.ownership().getUserId() != null) {
-                validateUser(request.ownership().getUserId());
-            }
-            if (request.ownership().getDepartmentCode() != null) {
-                this.departmentServicePort.getDepartment(request.ownership().getDepartmentCode());
-            }
-        }
+        validateOwnership(request.ownership());
     }
 
     private void validateUser(final UserId userId) {
@@ -151,4 +207,16 @@ public class DevicePortImpl implements DevicePort {
             throw new UserNotFoundException(userId);
         }
     }
+
+    private void validateOwnership(final OwnershipProfile ownership) {
+        if (ownership != null) {
+            if (ownership.getUserId() != null) {
+                validateUser(ownership.getUserId());
+            }
+            if (ownership.getDepartmentCode() != null) {
+                this.departmentServicePort.getDepartment(ownership.getDepartmentCode());
+            }
+        }
+    }
+
 }

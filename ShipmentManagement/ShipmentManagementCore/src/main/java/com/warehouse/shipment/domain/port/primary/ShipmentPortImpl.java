@@ -44,8 +44,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final SignatureService signatureService;
 
-    private final ShipmentStateValidatorService shipmentStateValidatorService = new ShipmentStateValidatorServiceImpl();
-
     private final RouteLogServicePort routeLogServicePort;
 
     private final ReturningServicePort returningServicePort;
@@ -152,7 +150,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ShipmentConfiguration configuration = command.getShipmentConfiguration();
         if (shouldValidateState(configuration)) {
             final Result<Void, String> validation =
-                    this.shipmentStateValidatorService.validateShipmentState(shipment);
+                    new ShipmentStateValidatorServiceImpl().validateShipmentState(shipment);
             if (validation.isFailure()) {
                 return Result.failure(ErrorCode.SHIPMENT_203);
             }
@@ -295,7 +293,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             throw new RestException(400, "Shipment type cannot be changed to the same type");
         }
 
-        final Result<Void, String> validateShipment = this.shipmentStateValidatorService.validateShipmentState(shipment);
+        final Result<Void, String> validateShipment = new ShipmentStateValidatorServiceImpl().validateShipmentState(shipment);
 
         if (validateShipment.isFailure()) {
             throw new RestException(400, validateShipment.getFailure());

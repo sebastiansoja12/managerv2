@@ -21,12 +21,12 @@ public class DeviceCreateCommand {
     private DeviceType deviceType;
     private Scanner.ScanType scanType;
     private Scanner.ScannerType scannerType;
-    private IdentityInfo identity;
-    private HardwareProfile hardware;
-    private SoftwareProfile software;
-    private NetworkProfile network;
+    private DeviceIdentity identity;
+    private DeviceHardware hardware;
+    private DeviceSoftware software;
+    private DeviceNetwork network;
     private SecurityProfile security;
-    private LocationProfile location;
+    private DeviceLocation location;
     private OwnershipProfile ownership;
 
     public DeviceCreateCommand(
@@ -38,12 +38,12 @@ public class DeviceCreateCommand {
             final DeviceType deviceType,
             final Scanner.ScanType scanType,
             final Scanner.ScannerType scannerType,
-            final IdentityInfo identity,
-            final HardwareProfile hardware,
-            final SoftwareProfile software,
-            final NetworkProfile network,
+            final DeviceIdentity identity,
+            final DeviceHardware hardware,
+            final DeviceSoftware software,
+            final DeviceNetwork network,
             final SecurityProfile security,
-            final LocationProfile location,
+            final DeviceLocation location,
             final OwnershipProfile ownership) {
         this.userId = userId;
         this.supplierCode = supplierCode;
@@ -106,7 +106,7 @@ public class DeviceCreateCommand {
         return deviceUserType;
     }
 
-    public HardwareProfile getHardware() {
+    public DeviceHardware getHardware() {
         return hardware;
     }
 
@@ -118,15 +118,15 @@ public class DeviceCreateCommand {
         return scannerType;
     }
 
-    public IdentityInfo getIdentity() {
+    public DeviceIdentity getIdentity() {
         return identity;
     }
 
-    public LocationProfile getLocation() {
+    public DeviceLocation getLocation() {
         return location;
     }
 
-    public NetworkProfile getNetwork() {
+    public DeviceNetwork getNetwork() {
         return network;
     }
 
@@ -138,7 +138,7 @@ public class DeviceCreateCommand {
         return security;
     }
 
-    public SoftwareProfile getSoftware() {
+    public DeviceSoftware getSoftware() {
         return software;
     }
 }

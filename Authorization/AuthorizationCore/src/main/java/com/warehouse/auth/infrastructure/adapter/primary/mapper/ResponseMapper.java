@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 public abstract class ResponseMapper {
 
     public static UserDto map(final User user) {
+        if (user == null) {
+            return null;
+        }
         final UserIdDto userId = new UserIdDto(user.getUserId().value());
         final String username = user.getUsername();
         final String firstName = user.getFirstName();

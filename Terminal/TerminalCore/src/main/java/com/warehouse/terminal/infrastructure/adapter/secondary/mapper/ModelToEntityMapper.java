@@ -9,12 +9,12 @@ import com.warehouse.terminal.domain.model.OwnershipProfile;
 import com.warehouse.terminal.domain.model.device.Mobile;
 import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.model.device.Terminal;
-import com.warehouse.terminal.domain.vo.HardwareProfile;
-import com.warehouse.terminal.domain.vo.IdentityInfo;
-import com.warehouse.terminal.domain.vo.LocationProfile;
-import com.warehouse.terminal.domain.vo.NetworkProfile;
+import com.warehouse.terminal.domain.vo.DeviceHardware;
+import com.warehouse.terminal.domain.vo.DeviceIdentity;
+import com.warehouse.terminal.domain.vo.DeviceLocation;
+import com.warehouse.terminal.domain.vo.DeviceNetwork;
 import com.warehouse.terminal.domain.vo.SecurityProfile;
-import com.warehouse.terminal.domain.vo.SoftwareProfile;
+import com.warehouse.terminal.domain.vo.DeviceSoftware;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Hardware;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Identity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.Location;
@@ -123,7 +123,7 @@ public class ModelToEntityMapper {
         return scanner.getDepartmentCode();
     }
 
-    private Identity mapIdentity(final IdentityInfo identity) {
+    private Identity mapIdentity(final DeviceIdentity identity) {
         if (identity == null) {
             return null;
         }
@@ -138,7 +138,7 @@ public class ModelToEntityMapper {
                 identity.getMdmDeviceId());
     }
 
-    private Hardware mapHardware(final HardwareProfile hardware) {
+    private Hardware mapHardware(final DeviceHardware hardware) {
         if (hardware == null) {
             return null;
         }
@@ -157,7 +157,7 @@ public class ModelToEntityMapper {
                 hardware.getRuggedized());
     }
 
-    private Software mapSoftware(final SoftwareProfile software) {
+    private Software mapSoftware(final DeviceSoftware software) {
         if (software == null) {
             return null;
         }
@@ -173,7 +173,7 @@ public class ModelToEntityMapper {
                 software.getDeveloperModeEnabled());
     }
 
-    private Network mapNetwork(final NetworkProfile network) {
+    private Network mapNetwork(final DeviceNetwork network) {
         if (network == null) {
             return null;
         }
@@ -206,7 +206,7 @@ public class ModelToEntityMapper {
                 security.getCertificateFingerprint());
     }
 
-    private Location mapLocation(final LocationProfile location) {
+    private Location mapLocation(final DeviceLocation location) {
         if (location == null) {
             return null;
         }
