@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.model.TrackingSequence;
 import com.warehouse.shipment.domain.port.secondary.TrackingSequenceRepository;
-import com.warehouse.shipment.domain.vo.TrackingNumber;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 @Component
 public class DhlTrackingNumberGeneratorImpl implements TrackingNumberGenerator {

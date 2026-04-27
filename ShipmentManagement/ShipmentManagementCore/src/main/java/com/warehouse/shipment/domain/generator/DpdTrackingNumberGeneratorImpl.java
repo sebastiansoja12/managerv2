@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.port.secondary.TrackingSequenceRepository;
-import com.warehouse.shipment.domain.vo.TrackingNumber;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.model.TrackingSequence;
 
 @Component

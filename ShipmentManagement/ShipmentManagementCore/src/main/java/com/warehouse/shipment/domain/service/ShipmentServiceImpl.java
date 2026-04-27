@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ReturnId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
@@ -39,6 +36,11 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public Shipment find(final ShipmentId shipmentId) {
         return this.shipmentRepository.findById(shipmentId);
+    }
+
+    @Override
+    public Shipment find(final TrackingNumber trackingNumber) {
+        return this.shipmentRepository.findByTrackingNumber(trackingNumber);
     }
 
     @Override

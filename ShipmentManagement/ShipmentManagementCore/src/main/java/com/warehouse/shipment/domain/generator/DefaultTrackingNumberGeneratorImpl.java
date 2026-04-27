@@ -3,7 +3,7 @@ package com.warehouse.shipment.domain.generator;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
-import com.warehouse.shipment.domain.vo.TrackingNumber;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 @Component
 public class DefaultTrackingNumberGeneratorImpl implements TrackingNumberGenerator {
