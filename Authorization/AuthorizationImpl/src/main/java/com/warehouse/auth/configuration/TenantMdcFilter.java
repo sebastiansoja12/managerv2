@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.warehouse.auth.domain.service.JwtDecodeService;
 import com.warehouse.auth.domain.vo.DecodedApiTenant;
+import com.warehouse.exceptionhandler.exception.RestException;
 
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
@@ -24,6 +25,8 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
     private final ApiExposureProperties apiExposureProperties;
 
+    private final AuthCookieService authCookieService;
+
     private final Logger log = org.slf4j.LoggerFactory.getLogger("");
 
     private static final List<String> WHITELIST = List.of(
@@ -32,14 +35,19 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/v2/api/swagger-resources",
             "/v2/api/webjars",
             "/v2/api/auth/login",
+            "/v2/api/auth/refresh",
+            "/v2/api/auth/logout",
+            "/v2/api/auth/csrf",
             "/v2/api/ws",
             "/ws"
     );
 
     public TenantMdcFilter(final JwtDecodeService jwtDecodeService,
-                           final ApiExposureProperties apiExposureProperties) {
+                           final ApiExposureProperties apiExposureProperties,
+                           final AuthCookieService authCookieService) {
         this.jwtDecodeService = jwtDecodeService;
         this.apiExposureProperties = apiExposureProperties;
+        this.authCookieService = authCookieService;
     }
 
     @Override
@@ -89,26 +97,17 @@ public class TenantMdcFilter extends OncePerRequestFilter {
     private DecodedApiTenant authenticateWithJwt(final HttpServletRequest request,
                                                   final HttpServletResponse response) throws IOException, java.io.IOException {
 
-        final String auth = request.getHeader("Authorization");
-        if (auth == null || !auth.startsWith("Bearer ")) {
-            unauthorized(response, "Missing or invalid Authorization header");
+        final String token = authCookieService.readAccessToken(request).orElse(null);
+        if (token == null) {
+            unauthorized(response, "Missing access token");
             return null;
         }
         try {
-            final String token = auth.substring(7);
             return jwtDecodeService.decodeJwt(token);
-        } catch (final IllegalArgumentException e) {
-            unauthorized(response, e.getMessage());
-        } catch (final Exception e) {
-            internalError(response, "Failed to decode JWT");
+        } catch (final RestException exception) {
+            unauthorized(response, "Invalid or expired access token");
         }
         return null;
-    }
-
-    private void setMdcFromTenant(final DecodedApiTenant tenant) {
-        MDC.put("operator", tenant.operatorId() != null ? tenant.operatorId().toString() : "N/A");
-        MDC.put("user", tenant.userId().value().toString());
-        MDC.put("username", tenant.username());
     }
 
     private void unauthorized(final HttpServletResponse response, final String message) throws IOException, java.io.IOException {
@@ -117,13 +116,10 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         response.getWriter().write(message);
     }
 
-    private void internalError(final HttpServletResponse response, final String message) throws IOException, java.io.IOException {
-        log.error(message);
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        response.getWriter().write("Internal server error");
-    }
-
     private boolean isWhitelisted(final HttpServletRequest request) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
         final String uri = request.getRequestURI();
         if (apiExposureProperties.isPublicEndpoint(request)) {
             return true;
