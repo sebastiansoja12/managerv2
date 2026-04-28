@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="create-users-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="users"/>
-            </not>
-        </preConditions>
-
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-50">
         <createTable tableName="users">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="user_id" type="BIGINT">
                 <constraints nullable="false" unique="true"/>
@@ -42,142 +35,33 @@
             <column name="api_key" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+            <column defaultValueNumeric="0" name="deleted" type="BIT(1)">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="TIMESTAMP">
+            <column name="created_at" type="timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="TIMESTAMP">
+            <column name="updated_at" type="timestamp">
                 <constraints nullable="false"/>
             </column>
+            <column defaultValue="pl" name="language" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="initial" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operator_id" type="BIGINT"/>
         </createTable>
     </changeSet>
-
-    <changeSet id="users-add-language-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="users"/>
-                <not>
-                    <columnExists tableName="users" columnName="language"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addColumn tableName="users">
-            <column name="language" type="VARCHAR(10)" defaultValue="pl">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-76">
+        <createIndex associatedWith="" indexName="fk_users_department_code" tableName="users">
+            <column name="department_code"/>
+        </createIndex>
     </changeSet>
-
-    <changeSet id="users-add-initial-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="users"/>
-                <not>
-                    <columnExists tableName="users" columnName="initial"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addColumn tableName="users">
-            <column name="initial" type="BOOLEAN" defaultValueBoolean="false">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-    </changeSet>
-
-    <changeSet id="users-add-department-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="users"/>
-                <tableExists tableName="department"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_users_department_code"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="users"
-                                 baseColumnNames="department_code"
-                                 referencedTableName="department"
-                                 referencedColumnNames="department_code"
-                                 constraintName="fk_users_department_code"/>
-    </changeSet>
-
-    <changeSet id="create-role-permissions-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="role_permissions"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="role_permissions">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="create-users-role-permissions-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="users_role_permissions"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="users_role_permissions">
-            <column name="user_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="permission_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addPrimaryKey tableName="users_role_permissions"
-                       columnNames="user_id, permission_id"
-                       constraintName="pk_users_role_permissions"/>
-    </changeSet>
-
-    <changeSet id="users-role-permissions-add-user-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="users_role_permissions"/>
-                <tableExists tableName="users"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_users_role_permissions_user_id"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="users_role_permissions"
-                                 baseColumnNames="user_id"
-                                 referencedTableName="users"
-                                 referencedColumnNames="user_id"
-                                 constraintName="fk_users_role_permissions_user_id"/>
-    </changeSet>
-
-    <changeSet id="users-role-permissions-add-permission-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="users_role_permissions"/>
-                <tableExists tableName="role_permissions"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_users_role_permissions_permission_id"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="users_role_permissions"
-                                 baseColumnNames="permission_id"
-                                 referencedTableName="role_permissions"
-                                 referencedColumnNames="id"
-                                 constraintName="fk_users_role_permissions_permission_id"/>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-82">
+        <createIndex associatedWith="" indexName="idx_users_operator_id" tableName="users">
+            <column name="operator_id"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>
