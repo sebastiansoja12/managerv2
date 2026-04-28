@@ -35,7 +35,6 @@ public class Terminal implements Device, DeviceHandler, ExecutionSourceResolver 
     private Instant lastUpdate;
 
     public Terminal(final DeviceId deviceId,
-                    final DeviceStatus status,
                     final DeviceIdentity identity,
                     final DeviceHardware hardware,
                     final DeviceSoftware software,
@@ -45,7 +44,7 @@ public class Terminal implements Device, DeviceHandler, ExecutionSourceResolver 
         this(deviceId,
                 ExternalId.generateId(),
                 DeviceType.TERMINAL,
-                status,
+                DeviceStatus.ACTIVE,
                 identity,
                 hardware,
                 software,

@@ -7,7 +7,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.Username;
-import com.warehouse.terminal.domain.enumeration.DeviceStatus;
+import com.warehouse.terminal.domain.exception.DepartmentNotFoundException;
 import com.warehouse.terminal.domain.exception.UserNotFoundException;
 import com.warehouse.terminal.domain.model.Department;
 import com.warehouse.terminal.domain.model.Device;
@@ -57,13 +57,15 @@ public class DevicePortImpl implements DevicePort {
             throw new UserNotFoundException(userId);
         }
         final Department department = this.departmentServicePort.getDepartment(departmentCode);
+        if (department == null) {
+            throw new DepartmentNotFoundException(departmentCode);
+        }
         final DeviceId deviceId = this.deviceGenericService.nextDeviceId(deviceType);
         final DeviceIdentity deviceDeviceIdentity = command.getIdentity();
         final DeviceHardware deviceHardware = command.getHardware();
         final DeviceSoftware deviceSoftware = command.getSoftware();
         final DeviceNetwork deviceNetwork = command.getNetwork();
-        final DeviceLocation deviceLocation = DeviceLocation.initializeLocation(department.getCoordinates(),
-                "", "", false);
+        final DeviceLocation deviceLocation = command.getLocation();
 		final OwnershipProfile ownershipProfile = OwnershipProfile.initializeOwnership("", userId, departmentCode,
                 null);
         
@@ -80,13 +82,13 @@ public class DevicePortImpl implements DevicePort {
 			final OwnershipProfile ownershipProfile) {
 		final Device device;
 		if (deviceType.equals(DeviceType.TERMINAL)) {
-			device = new Terminal(deviceId, DeviceStatus.ACTIVE, deviceDeviceIdentity, deviceHardware, deviceSoftware,
+			device = new Terminal(deviceId, deviceDeviceIdentity, deviceHardware, deviceSoftware,
 					deviceNetwork, deviceLocation, ownershipProfile);
 		} else if (deviceType.equals(DeviceType.SCANNER)) {
 			device = new Scanner(deviceId, deviceDeviceIdentity, deviceHardware, deviceNetwork, ownershipProfile,
 					command.getScanType(), command.getScannerType());
 		} else {
-			device = new Mobile(deviceId, DeviceStatus.ACTIVE, deviceDeviceIdentity, deviceHardware, deviceSoftware,
+			device = new Mobile(deviceId, deviceDeviceIdentity, deviceHardware, deviceSoftware,
 					deviceNetwork, deviceLocation, ownershipProfile);
 		}
 		return device;
