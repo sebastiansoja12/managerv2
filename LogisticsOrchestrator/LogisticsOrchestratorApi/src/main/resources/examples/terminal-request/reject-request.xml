@@ -1,0 +1,23 @@
+<TerminalRequest>
+    <ProcessType>REJECT</ProcessType>
+    <Device>
+        <Version>1.3.0</Version>
+        <DeviceID>TL:74ff9633-71a9-4cb9-bdc0-e374755f66f2</DeviceID>
+        <ResponsibleUser>s-soja</ResponsibleUser>
+        <DepartmentCode>KT1</DepartmentCode>
+        <DeviceUserType>MANAGER</DeviceUserType>
+        <DeviceType>TERMINAL</DeviceType>
+        <DeviceUpToDate>YES</DeviceUpToDate>
+    </Device>
+    <DeliveryRejectRequest>
+        <DeliveryRejectDetails>
+            <DeliveryRejectDetail>
+                <ShipmentID>1000000001</ShipmentID>
+                <SupplierCode>SUP-01</SupplierCode>
+                <DeliveryStatus>REJECTED</DeliveryStatus>
+                <DepartmentCode>KT1</DepartmentCode>
+                <RejectReason>Recipient unavailable</RejectReason>
+            </DeliveryRejectDetail>
+        </DeliveryRejectDetails>
+    </DeliveryRejectRequest>
+</TerminalRequest>

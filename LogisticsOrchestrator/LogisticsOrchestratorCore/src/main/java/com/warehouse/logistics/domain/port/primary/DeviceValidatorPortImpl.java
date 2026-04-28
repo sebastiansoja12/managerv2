@@ -1,8 +1,8 @@
 package com.warehouse.logistics.domain.port.primary;
 
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.logistics.domain.port.secondary.DeviceAgentServicePort;
 import com.warehouse.terminal.DeviceInformation;
-import com.warehouse.terminal.information.Device;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -15,8 +15,8 @@ public class DeviceValidatorPortImpl implements DeviceValidatorPort {
     }
 
     @Override
-    public void validateDevice(final Device device) {
-        final DeviceInformation deviceInformation = DeviceInformation.from(device);
-        deviceAgentServicePort.validateDevice(deviceInformation);
+    public void validateDevice(final ProcessId processId,
+                               final DeviceInformation deviceInformation) {
+        deviceAgentServicePort.validateDevice(processId, deviceInformation);
     }
 }

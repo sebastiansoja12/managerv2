@@ -16,7 +16,8 @@ import com.warehouse.routelogger.dto.ProcessTypeDto;
 import com.warehouse.routelogger.dto.ShipmentIdDto;
 import com.warehouse.routelogger.event.*;
 import com.warehouse.terminal.DeviceInformation;
-import com.warehouse.terminal.request.TerminalRequest;
+import com.warehouse.terminal.jaxb.ProcessTypeEnum;
+import com.warehouse.terminal.jaxb.TerminalRequest;
 
 import lombok.AllArgsConstructor;
 
@@ -60,9 +61,11 @@ public class DeliveryTrackerLogServiceAdapter implements DeliveryTrackerLogServi
 
     @Override
     public void logDeviceInformation(final Set<ShipmentId> shipmentIds,
-                                     final DeviceInformation deviceInformation, final com.warehouse.terminal.enumeration.ProcessType processType) {
-        shipmentIds.forEach(shipmentId ->
-                sendEvent(buildDeviceInformationLogEvent(ProcessType.valueOf(processType.name()), shipmentId, deviceInformation)));
+                                     final DeviceInformation deviceInformation, final ProcessTypeEnum processType) {
+        shipmentIds.forEach(shipmentId -> sendEvent(buildDeviceInformationLogEvent(
+                ProcessType.valueOf(processType.name()),
+                shipmentId,
+                deviceInformation)));
     }
 
     private DeviceInformationLogEvent buildDeviceInformationLogEvent(final ProcessType processType,

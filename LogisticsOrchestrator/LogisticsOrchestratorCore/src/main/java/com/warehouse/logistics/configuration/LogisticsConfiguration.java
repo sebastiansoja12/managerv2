@@ -1,6 +1,6 @@
 package com.warehouse.logistics.configuration;
 
-import org.mapstruct.factory.Mappers;
+import com.warehouse.auth.UserApiService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +10,13 @@ import com.warehouse.logistics.domain.port.primary.*;
 import com.warehouse.logistics.domain.port.secondary.*;
 import com.warehouse.logistics.domain.service.LogisticsService;
 import com.warehouse.logistics.domain.service.LogisticsServiceImpl;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import com.warehouse.logistics.infrastructure.adapter.secondary.*;
+import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.terminal.DeviceEventPublisher;
+import com.warehouse.xmlconverter.XmlToStringService;
+import com.warehouse.xmlconverter.XmlToStringServiceImpl;
 
 @Configuration
 public class LogisticsConfiguration {
@@ -39,6 +40,22 @@ public class LogisticsConfiguration {
     @Bean
     public DeviceAgentPort deviceAgentPort(final DeviceAgentServicePort deviceAgentServicePort) {
         return new DeviceAgentPortImpl(deviceAgentServicePort);
+    }
+
+    @Bean
+    public ProcessInitializerPort processInitializerPort(final ProcessHubServicePort processHubServicePort, final XmlToStringService xmlToStringService) {
+        return new ProcessInitializerPortImpl(processHubServicePort, xmlToStringService);
+    }
+
+    @Bean
+    public XmlToStringService xmlToStringService() {
+        return new XmlToStringServiceImpl();
+    }
+
+    @Bean
+    public ProcessHubServicePort processHubServicePort(final ProcessHubApiService processHubApiService,
+                                                       final UserApiService userApiService) {
+        return new ProcessHubServiceAdapter(processHubApiService, userApiService);
     }
 
     @Bean
@@ -96,16 +113,5 @@ public class LogisticsConfiguration {
     @Bean("logistics.departmentRepository")
     public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
         return new DepartmentRepositoryImpl(repository);
-    }
-
-    // Mappers
-    @Bean(name = "logistics.requestMapper")
-    public LogisticsRequestMapper requestMapper() {
-        return Mappers.getMapper(LogisticsRequestMapper.class);
-    }
-
-    @Bean(name = "logistics.responseMapper")
-    public LogisticsResponseMapper responseMapper() {
-        return Mappers.getMapper(LogisticsResponseMapper.class);
     }
 }

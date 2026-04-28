@@ -1,39 +1,32 @@
 package com.warehouse.logistics.infrastructure.adapter.primary;
 
-import static org.mapstruct.factory.Mappers.getMapper;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.ws.server.endpoint.annotation.Endpoint;
+import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
+import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.logistics.domain.model.LogisticsRequest;
 import com.warehouse.logistics.domain.model.LogisticsResponse;
 import com.warehouse.logistics.domain.model.Request;
 import com.warehouse.logistics.domain.model.Response;
 import com.warehouse.logistics.domain.port.primary.*;
 import com.warehouse.logistics.infrastructure.adapter.primary.creator.DeliveryCreator;
-import com.warehouse.logistics.infrastructure.adapter.primary.dto.ErrorResponseDto;
-import com.warehouse.logistics.infrastructure.adapter.primary.exception.RestException;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
-import com.warehouse.terminal.information.Device;
-import com.warehouse.terminal.request.TerminalRequest;
+import com.warehouse.terminal.jaxb.DeviceType;
+import com.warehouse.terminal.jaxb.TerminalRequest;
 import com.warehouse.terminal.response.TerminalResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestController
-@RequestMapping("/deliveries")
+@Endpoint
 public class LogisticsDispatchAdapter extends ProcessDispatcher {
 
     private final LogisticsPort logisticsPort;
@@ -50,11 +43,11 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
 
     private final DeviceAgentPort deviceAgentPort;
 
-    private final LogisticsRequestMapper requestMapper = getMapper(LogisticsRequestMapper.class);
+    private final LogisticsRequestMapper requestMapper = new LogisticsRequestMapper();
 
-    private final LogisticsResponseMapper responseMapper = getMapper(LogisticsResponseMapper.class);
+    private final LogisticsResponseMapper responseMapper = new LogisticsResponseMapper();
 
-    final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd H:mm:ss", Locale.of("PL"));
+    private final ProcessInitializerPort processInitializerPort;
 
     public LogisticsDispatchAdapter(final List<ProcessHandler> handlers,
                                     final LogisticsPort logisticsPort,
@@ -63,7 +56,8 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
                                     final SupplierValidatorPort supplierValidatorPort,
                                     final DepartmentValidatorPort departmentValidatorPort,
                                     final DeviceValidatorPort deviceValidatorPort,
-                                    final DeviceAgentPort deviceAgentPort) {
+                                    final DeviceAgentPort deviceAgentPort,
+                                    final ProcessInitializerPort processInitializerPort) {
         super(handlers);
         this.logisticsPort = logisticsPort;
         this.deliveryCreators = deliveryCreators;
@@ -72,31 +66,24 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
         this.departmentValidatorPort = departmentValidatorPort;
         this.deviceValidatorPort = deviceValidatorPort;
         this.deviceAgentPort = deviceAgentPort;
+        this.processInitializerPort = processInitializerPort;
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<TerminalResponse> processRequest(@RequestBody final TerminalRequest terminalRequest) {
-        return processRequestInternal(terminalRequest);
-    }
-
-    private ResponseEntity<TerminalResponse> processRequestInternal(final TerminalRequest terminalRequest) {
-        final Device device = terminalRequest.getDevice();
+    @PayloadRoot(namespace = "", localPart = "TerminalRequest")
+    @ResponsePayload
+    public TerminalResponse processRequestWsdl(@RequestPayload final TerminalRequest terminalRequest) {
+        final DeviceType device = terminalRequest.getDevice();
 
         log.info("Detected request from Terminal device: ID - {}, Version - {}, Responsible User - {}, Department - {}",
-                device.getDeviceId(), device.getVersion(),
-                device.getUsername(), device.getDepartmentCode());
+                device.getDeviceID(), device.getVersion(),
+                device.getResponsibleUser(), device.getDepartmentCode());
 
-        deviceValidatorPort.validateDevice(device);
+        final ProcessId processId = this.processInitializerPort.initializeProcess(terminalRequest);
+        log.info("Process initialized in orchestrator flow: {}", processId.value());
 
-        deviceAgentPort.updateDeviceIfNeed(device);
+        deviceValidatorPort.validateDevice(processId, JaxbDeviceInformationMapper.map(device));
 
-        logDeviceInformation(terminalRequest);
-
-        logTerminalRequest(terminalRequest);
-
-        logDeviceId(terminalRequest);
-
-        logVersion(terminalRequest);
+        deviceAgentPort.updateDeviceIfNeed(JaxbDeviceInformationMapper.map(device));
 
         final Request request = this.requestMapper.map(terminalRequest);
 
@@ -110,14 +97,7 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
 
         response.updateLogisticsResponse(logisticsResponses);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(responseMapper.map(response));
-    }
-
-    private void logDeviceInformation(final TerminalRequest terminalRequest) {
-        log.info("Logging device information in tracker");
-        terminalRequestLoggerPort.logDeviceInformation(terminalRequest);
+        return responseMapper.map(response);
     }
 
     private DeliveryCreator determineDeliveryCreator(final ProcessType processType) {
@@ -125,30 +105,5 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
                 .filter(deliveryCreator -> deliveryCreator.canHandle(processType))
                 .findFirst()
                 .orElseThrow();
-    }
-
-    private void logDeviceId(final TerminalRequest terminalRequest) {
-        log.info("Logging terminal id in tracker");
-        terminalRequestLoggerPort.logDeviceId(terminalRequest);
-    }
-
-    private void logTerminalRequest(final TerminalRequest terminalRequest) {
-        log.info("Logging request in tracker");
-        terminalRequestLoggerPort.logRequest(terminalRequest);
-    }
-
-    private void logVersion(final TerminalRequest terminalRequest) {
-        log.info("Logging device version in tracker");
-        terminalRequestLoggerPort.logVersion(terminalRequest);
-    }
-
-    @ExceptionHandler(RestException.class)
-    @ResponsePayload
-    public ResponseEntity<ErrorResponseDto> handleException(final RestException ex) {
-        final ErrorResponseDto errorResponse =
-                new ErrorResponseDto(LocalDateTime.now().format(dtf), ex.getCode(), ex.getMessage());
-        return ResponseEntity.status(ex.getCode())
-                .header("Content-Type", "application/xml")
-                .body(errorResponse);
     }
 }
