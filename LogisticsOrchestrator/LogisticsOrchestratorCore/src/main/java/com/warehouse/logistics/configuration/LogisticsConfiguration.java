@@ -1,6 +1,7 @@
 package com.warehouse.logistics.configuration;
 
 import com.warehouse.auth.UserApiService;
+import com.warehouse.process.ProcessHubEventPublisher;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +34,9 @@ public class LogisticsConfiguration {
     }
 
     @Bean
-    public DeviceAgentServicePort deviceValidatorServicePort(final DeviceEventPublisher deviceEventPublisher) {
-        return new DeviceAgentServiceAdapter(deviceEventPublisher);
+    public DeviceAgentServicePort deviceValidatorServicePort(final DeviceEventPublisher deviceEventPublisher,
+                                                             final ProcessHubEventPublisher processHubEventPublisher) {
+        return new DeviceAgentServiceAdapter(deviceEventPublisher, processHubEventPublisher);
     }
 
     @Bean

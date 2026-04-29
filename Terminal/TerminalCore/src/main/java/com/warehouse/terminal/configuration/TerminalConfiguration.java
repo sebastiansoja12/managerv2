@@ -37,13 +37,11 @@ public class TerminalConfiguration {
 
     @Bean
     public DeviceValidatorService terminalValidatorService(final DeviceVersionRepository deviceVersionRepository,
-                                                           final DepartmentRepository departmentRepository,
-                                                           final UserRepository userRepository,
-                                                           final SupplierRepository supplierRepository,
                                                            final DeviceGenericRepository deviceRepository,
-                                                           final DepartmentServicePort departmentServicePort) {
-        return new DeviceValidatorServiceImpl(deviceVersionRepository, departmentRepository,
-                userRepository, supplierRepository, deviceRepository, departmentServicePort);
+                                                           final DepartmentServicePort departmentServicePort,
+                                                           final UserServicePort userServicePort) {
+        return new DeviceValidatorServiceImpl(deviceVersionRepository, deviceRepository, departmentServicePort,
+                userServicePort);
     }
 
     @Bean("device.softwareConfigurationServicePort")

@@ -10,6 +10,7 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.logistics.domain.model.DeviceValidateCommand;
 import com.warehouse.logistics.domain.model.LogisticsRequest;
 import com.warehouse.logistics.domain.model.LogisticsResponse;
 import com.warehouse.logistics.domain.model.Request;
@@ -81,7 +82,10 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
         final ProcessId processId = this.processInitializerPort.initializeProcess(terminalRequest);
         log.info("Process initialized in orchestrator flow: {}", processId.value());
 
-        deviceValidatorPort.validateDevice(processId, JaxbDeviceInformationMapper.map(device));
+        deviceValidatorPort.validateDevice(new DeviceValidateCommand(
+                processId,
+                ProcessType.valueOf(terminalRequest.getProcessType().name()),
+                JaxbDeviceInformationMapper.map(device)));
 
         deviceAgentPort.updateDeviceIfNeed(JaxbDeviceInformationMapper.map(device));
 

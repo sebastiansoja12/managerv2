@@ -7,7 +7,9 @@ import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.process.domain.context.DomainContext;
 import com.warehouse.process.domain.vo.CommunicationLogId;
+import com.warehouse.process.domain.vo.DeviceValidation;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 import lombok.Builder;
@@ -15,7 +17,7 @@ import lombok.Builder;
 public class CommunicationLogDetail {
 
     private final CommunicationLogId communicationLogId;
-    private final Instant createdAt;
+    private Instant createdAt;
 
     private DeviceId deviceId;
     private ProcessType processType;
@@ -87,6 +89,15 @@ public class CommunicationLogDetail {
         this.request = shipmentUpdated.request();
         this.response = shipmentUpdated.response();
         markAsModified();
+    }
+
+    public void applyDeviceValidation(final DeviceValidation deviceValidation) {
+        this.deviceId = deviceValidation.deviceId();
+        this.sourceService = deviceValidation.sourceServiceType().name();
+        this.targetService = deviceValidation.targetServiceType().name();
+        this.createdAt = Instant.now();
+        this.updatedBy = DomainContext.currentUserServicePort().getCurrentUserId();
+        this.createdBy = DomainContext.currentUserServicePort().getCurrentUserId();
     }
 
     public void changeSourceService(final String sourceService) {

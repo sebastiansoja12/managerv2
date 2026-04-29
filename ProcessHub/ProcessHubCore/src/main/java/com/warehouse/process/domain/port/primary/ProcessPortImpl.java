@@ -1,16 +1,18 @@
 package com.warehouse.process.domain.port.primary;
 
+import java.time.Instant;
+
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.InitializeProcessCommand;
+import com.warehouse.process.domain.model.ProcessDeviceValidatedCommand;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.service.ProcessService;
-
 import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
+import com.warehouse.process.domain.vo.DeviceValidation;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
-import lombok.extern.slf4j.Slf4j;
 
-import java.time.Instant;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ProcessPortImpl implements ProcessPort {
@@ -52,5 +54,10 @@ public class ProcessPortImpl implements ProcessPort {
     @Override
     public void assignShipmentUpdated(final ProcessId processId, final ShipmentUpdated shipmentUpdated) {
         this.processService.assignShipmentUpdated(processId, shipmentUpdated);
+    }
+
+    @Override
+    public void assignProcessDeviceValidation(final ProcessDeviceValidatedCommand command) {
+        this.processService.assignDeviceValidation(command.getProcessId(), DeviceValidation.of(command));
     }
 }

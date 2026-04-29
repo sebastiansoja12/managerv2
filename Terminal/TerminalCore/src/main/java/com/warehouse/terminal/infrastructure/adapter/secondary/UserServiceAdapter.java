@@ -19,4 +19,10 @@ public class UserServiceAdapter implements UserServicePort {
         final UserDto user = this.userApiService.findById(userId);
         return User.from(user);
     }
+
+    @Override
+    public User findUserByUsername(final String username) {
+        final UserDto user = this.userApiService.findByUsername(username);
+        return User.from(user);
+    }
 }

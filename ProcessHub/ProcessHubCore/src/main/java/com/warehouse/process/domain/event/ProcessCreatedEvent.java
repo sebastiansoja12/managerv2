@@ -4,12 +4,12 @@ import java.time.Instant;
 
 import com.warehouse.process.domain.vo.ProcessLogSnapshot;
 
-public class ProcessResponseUpdated implements ProcessEvent {
+public class ProcessCreatedEvent implements ProcessEvent {
 
     private final ProcessLogSnapshot snapshot;
     private final Instant timestamp;
 
-    public ProcessResponseUpdated(final ProcessLogSnapshot snapshot, final Instant timestamp) {
+    public ProcessCreatedEvent(final ProcessLogSnapshot snapshot, final Instant timestamp) {
         this.snapshot = snapshot;
         this.timestamp = timestamp;
     }

@@ -1,9 +1,7 @@
 package com.warehouse.logistics.domain.port.primary;
 
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.terminal.DeviceInformation;
+import com.warehouse.logistics.domain.model.DeviceValidateCommand;
 
 public interface DeviceValidatorPort {
-    void validateDevice(final ProcessId processId,
-                        final DeviceInformation deviceInformation);
+    void validateDevice(final DeviceValidateCommand command);
 }

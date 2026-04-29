@@ -1,11 +1,14 @@
 package com.warehouse.process.configuration;
 
+import com.warehouse.process.infrastructure.adapter.secondary.ProcessHubEventPublisherImpl;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.process.domain.port.primary.ProcessPort;
 import com.warehouse.process.domain.port.primary.ProcessPortImpl;
+import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
 import com.warehouse.process.domain.service.ProcessService;
 import com.warehouse.process.domain.service.ProcessServiceImpl;
@@ -36,5 +39,11 @@ public class ProcessConfiguration {
     @Bean
     public ProcessHubApiService processHubApiService(final ProcessPort processPort) {
         return new ProcessResourceAdapter(processPort);
+    }
+
+    @Bean
+    public ProcessHubEventPublisher processHubEventPublisherPort(
+            final ApplicationEventPublisher eventPublisher) {
+        return new ProcessHubEventPublisherImpl(eventPublisher);
     }
 }

@@ -4,6 +4,8 @@ import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
+import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ProcessLogSnapshot;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 import lombok.Builder;
@@ -73,6 +75,12 @@ public class ProcessLog {
         communicationLogDetail.applyShipmentUpdate(shipmentUpdated);
     }
 
+    public void applyDeviceValidation(final DeviceValidation deviceValidation) {
+        final CommunicationLogDetail communicationLogDetail = getCommunicationLogDetails()
+                .getCommunicationLogDetail(deviceValidation.processType(), deviceValidation.serviceType());
+        communicationLogDetail.applyDeviceValidation(deviceValidation);
+    }
+
     public void changeResponse(final String response) {
         this.response = response;
         markAsModified();
@@ -92,5 +100,18 @@ public class ProcessLog {
 
     public boolean failed() {
         return status != null && status.equals(ProcessStatus.FAILURE);
+    }
+
+    public ProcessLogSnapshot snapshot() {
+        return new ProcessLogSnapshot(
+                this.processId,
+                this.request,
+                this.response,
+                this.createdAt,
+                this.modifiedAt,
+                this.communicationLogDetails,
+                this.status,
+                this.faultDescription,
+                this.deviceInformation);
     }
 }
