@@ -2,19 +2,18 @@ package com.warehouse.auth.domain.port.secondary;
 
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.vo.Token;
-import com.warehouse.commonassets.identificator.UserId;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface RefreshTokenRepository {
 
-    Token save(RefreshToken refreshToken);
+    Token save(final RefreshToken refreshToken);
 
-    RefreshToken validateRefreshToken(String token);
+    Optional<RefreshToken> find(final String token);
 
-    void delete(String refreshToken);
+    void delete(final String refreshToken);
 
-    void delete(LocalDateTime time);
+    void delete(final LocalDateTime time);
 
-    RefreshToken findByUserId(final UserId userId);
 }
