@@ -1,6 +1,7 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.CacheControl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,7 +39,7 @@ public class CurrentUserController {
     @GetMapping
     public ResponseEntity<?> getCurrentUser() {
         final User user = currentUserAuthenticationPort.getCurrentUser();
-        return ResponseEntity.ok(ResponseMapper.map(user));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(ResponseMapper.map(user));
     }
 
     @PutMapping("/password")
