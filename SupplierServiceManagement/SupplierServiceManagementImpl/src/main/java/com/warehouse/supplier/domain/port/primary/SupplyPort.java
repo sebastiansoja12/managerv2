@@ -18,6 +18,9 @@ public interface SupplyPort {
     Result<Void, String> updateBasicData(final SupplierBasicDataUpdateCommand request);
     void addPackageType(final ChangeSupportedPackageTypeCommand request);
     void addDevice(final ChangeSupplierDeviceCommand request);
+    void assignVehicle(final ChangeSupplierVehicleCommand request);
+    void updateDeliveryArea(final ChangeSupplierDeliveryAreaCommand request);
+    void changeDepartmentCode(final ChangeSupplierDepartmentCodeCommand command);
     Result<Void, String> update(final SupplierUpdateCommand request);
     DriverLicenseResponse updateDriverLicense(final DriverLicenseCommand request);
     CertificationUpdateResponse updateCertification(CertificationUpdateCommand request);
