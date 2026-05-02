@@ -1,5 +1,6 @@
 package com.warehouse.supplier.configuration;
 
+import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.supplier.domain.port.primary.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -82,6 +83,11 @@ public class SupplierConfiguration {
     @Bean
     public BaseRepository<SupplierEntity> supplierBaseRepository(final OperatorContextProvider operatorContextProvider) {
         return new BaseRepository<>(entityManager, operatorContextProvider);
+    }
+
+    @Bean(name = "supplier.departmentServicePort")
+    public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService) {
+        return new DepartmentServiceAdapter(departmentApiService);
     }
 
     @Bean("supplier.mailServicePort")
