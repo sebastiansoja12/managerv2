@@ -34,6 +34,8 @@ public class JwtServiceTest {
     @BeforeEach
     void setup() {
         jwtService = new JwtServiceImpl(jwtProvider);
+        doReturn("manager-v2").when(jwtProvider).getIssuer();
+        doReturn("manager-v2-gui").when(jwtProvider).getAudience();
     }
 
     @Test
@@ -64,9 +66,11 @@ public class JwtServiceTest {
                 .when(jwtProvider)
                 .getSecretKey();
 
-        final String jwtToken = "eyJhbGciOiJIUzI1NiJ9" +
-                ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDg2Mzc2LCJleHAiOjkyNDkzMzU2NDAwfQ" +
-                ".CqWbN5YR41WobyySEKZGbWFrUFpIFSCb4TwQt5DzlLM";
+        doReturn(EXPIRATION)
+                .when(jwtProvider)
+                .getExpiration();
+
+        final String jwtToken = jwtService.generateToken(user);
 
         final boolean isValid = jwtService.isTokenValid(jwtToken, user);
 
@@ -82,9 +86,11 @@ public class JwtServiceTest {
                 .when(jwtProvider)
                 .getSecretKey();
 
-        final String jwtToken = "eyJhbGciOiJIUzI1NiJ9" +
-                ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDgzMjk2LCJleHAiOjE2ODg0ODQ3MzZ9" +
-                ".8Ms_0WQZRMl-uyOfASWGvujzVhmgesOjIuqEXd0vAjo";
+        doReturn(-1L)
+                .when(jwtProvider)
+                .getExpiration();
+
+        final String jwtToken = jwtService.generateToken(user);
 
         final Executable executable = () -> jwtService.isTokenValid(jwtToken, user);
         final ExpiredJwtException exception = assertThrows(ExpiredJwtException.class, executable);
@@ -93,12 +99,16 @@ public class JwtServiceTest {
 
     @Test
     void shouldExtractUsernameFromJwt() {
+        final User user = new User(null, "test", "test", "Test", "Test", "test@test.pl", User.Role.ADMIN,
+                new DepartmentCode("TST"), "");
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
                 .getSecretKey();
-        final String jwtToken = "eyJhbGciOiJIUzI1NiJ9" +
-                ".eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNjg4NDg2Mzc2LCJleHAiOjkyNDkzMzU2NDAwfQ" +
-                ".CqWbN5YR41WobyySEKZGbWFrUFpIFSCb4TwQt5DzlLM";
+        doReturn(EXPIRATION)
+                .when(jwtProvider)
+                .getExpiration();
+
+        final String jwtToken = jwtService.generateToken(user);
         final String username = jwtService.extractUsername(jwtToken);
         assertEquals("test", username);
     }
