@@ -2,7 +2,8 @@ package com.warehouse.supplier.infrastructure.adapter.primary.dto;
 
 import java.util.Set;
 
-public record SupplierApi(SupplierCodeApi supplierCode,
+public record SupplierApi(Long supplierId,
+                          SupplierCodeApi supplierCode,
                           String firstName,
                           String lastName,
                           String telephoneNumber,
