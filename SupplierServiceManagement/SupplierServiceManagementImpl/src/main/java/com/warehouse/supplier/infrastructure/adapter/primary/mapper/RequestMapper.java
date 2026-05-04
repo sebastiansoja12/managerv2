@@ -1,6 +1,7 @@
 package com.warehouse.supplier.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.commonassets.enumeration.PackageType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.VehicleId;
@@ -28,12 +29,24 @@ public abstract class RequestMapper {
 
     public static ChangeSupportedPackageTypeCommand map(final ChangeSupportedPackageTypesApiRequest request) {
         return new ChangeSupportedPackageTypeCommand(new SupplierCode(request.supplierCode().value()),
-                PackageType.valueOf(request.packageType()));
+                request.supportedPackageTypes().stream()
+                        .map(packageTypeApi -> PackageType.valueOf(packageTypeApi.name()))
+                        .collect(Collectors.toSet()));
     }
 
     public static ChangeSupplierDeviceCommand map(final ChangeSupplierDeviceApiRequest request) {
         return new ChangeSupplierDeviceCommand(new SupplierCode(request.supplierCode().value()),
                 new DeviceId(request.deviceId().value()));
+    }
+
+    public static ChangeSupplierVehicleCommand map(final ChangeSupplierVehicleApiRequest request) {
+        return new ChangeSupplierVehicleCommand(new SupplierCode(request.supplierCode().value()),
+                new VehicleId(request.vehicleId().value()));
+    }
+
+    public static ChangeSupplierDeliveryAreaCommand map(final ChangeSupplierDeliveryAreaApiRequest request) {
+        return new ChangeSupplierDeliveryAreaCommand(new SupplierCode(request.supplierCode().value()),
+                map(request.deliveryArea()));
     }
 
     public static SupplierBasicDataUpdateCommand map(final SupplierBasicDataUpdateApiRequest request) {
@@ -46,6 +59,7 @@ public abstract class RequestMapper {
         final String firstName = request.firstName();
         final String lastName = request.lastName();
         final String telephoneNumber = request.telephoneNumber();
+        final DepartmentCode departmentCode = new DepartmentCode(request.departmentCode().value());
         final VehicleId vehicleId = new VehicleId(request.vehicleId().value());
         final DeviceId deviceId = new DeviceId(request.deviceId().value());
         final DangerousGoodCertification dangerousGoodCertification = map(request.dangerousGoodCertification());
@@ -55,7 +69,7 @@ public abstract class RequestMapper {
                 .map(packageTypeApi -> PackageType.valueOf(packageTypeApi.name()))
                 .collect(Collectors.toSet());
 
-        return new SupplierUpdateCommand(supplierCode, firstName, lastName, telephoneNumber, vehicleId,
+        return new SupplierUpdateCommand(supplierCode, firstName, lastName, telephoneNumber, departmentCode, vehicleId,
                 deviceId, dangerousGoodCertification, driverLicense, deliveryArea, supportedPackageTypes);
     }
 
@@ -78,5 +92,10 @@ public abstract class RequestMapper {
 
     private static SupplierCode map(final SupplierCodeApi supplierCode) {
         return new SupplierCode(supplierCode.value());
+    }
+
+    public static ChangeSupplierDepartmentCodeCommand map(final ChangeSupplierDepartmentCodeApiRequest departmentCodeApiRequest) {
+        return new ChangeSupplierDepartmentCodeCommand(map(departmentCodeApiRequest.supplierCode()),
+                new DepartmentCode(departmentCodeApiRequest.departmentCode().value()));
     }
 }
