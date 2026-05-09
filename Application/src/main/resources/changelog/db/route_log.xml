@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-37">
+        <createTable tableName="route_log">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="parcel_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="return_code" type="VARCHAR(255)"/>
+            <column name="fault_description" type="VARCHAR(2000)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
