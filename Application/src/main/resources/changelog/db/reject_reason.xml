@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-28">
+        <createTable tableName="reject_reason">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="reason" type="VARCHAR(2000)"/>
+            <column name="shipment_id" type="BIGINT"/>
+            <column name="recipient" type="VARCHAR(255)"/>
+            <column name="reject_department_code" type="VARCHAR(255)"/>
+            <column name="supplier_code" type="VARCHAR(255)"/>
+            <column name="delivery_status" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
