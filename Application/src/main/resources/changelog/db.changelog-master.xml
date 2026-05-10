@@ -6,6 +6,7 @@
     <include file="/changelog/db/communication_log_details.xml"/>
     <include file="/changelog/db/communication_log_details_rd.xml"/>
     <include file="/changelog/db/conf_position_stack.xml"/>
+    <include file="/changelog/db/geocoding_configurations.xml"/>
     <include file="/changelog/db/country.xml"/>
     <include file="/changelog/db/dangerous_good.xml"/>
     <include file="/changelog/db/delivery.xml"/>
