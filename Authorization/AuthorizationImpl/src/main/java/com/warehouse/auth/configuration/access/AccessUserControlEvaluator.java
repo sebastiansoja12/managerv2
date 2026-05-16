@@ -15,6 +15,7 @@ import com.warehouse.auth.AccessUserControl;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.commonassets.exception.ProblemDetailsException;
+import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.api.DepartmentApiService;
@@ -97,7 +98,10 @@ public class AccessUserControlEvaluator {
     }
 
     private Set<String> resolveRequiredPermissions(final AccessUserControl accessUserControl) {
-        return Stream.concat(Arrays.stream(accessUserControl.value()), Arrays.stream(accessUserControl.permissions()))
+        return Stream.concat(
+                        Arrays.stream(accessUserControl.value()),
+                        Arrays.stream(accessUserControl.permissions()).map(UserPermission::name)
+                )
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toSet());
     }
