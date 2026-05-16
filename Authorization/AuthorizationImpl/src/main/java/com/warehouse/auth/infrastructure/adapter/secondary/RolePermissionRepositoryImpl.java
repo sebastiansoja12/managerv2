@@ -1,11 +1,11 @@
 package com.warehouse.auth.infrastructure.adapter.secondary;
 
+import java.util.Set;
+
 import com.warehouse.auth.domain.model.RolePermission;
-import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.RolePermissionRepository;
 import com.warehouse.auth.domain.vo.RolePermissionId;
-
-import java.util.Set;
+import com.warehouse.commonassets.enumeration.UserPermission;
 
 public class RolePermissionRepositoryImpl implements RolePermissionRepository {
     
@@ -18,7 +18,7 @@ public class RolePermissionRepositoryImpl implements RolePermissionRepository {
 	@Override
 	public RolePermission findByName(final String name) {
 		return rolePermissionReadRepository.findByName(name)
-                .map(role -> new RolePermission(new RolePermissionId(role.getId()), User.Permission.valueOf(role.getName())))
+                .map(role -> new RolePermission(new RolePermissionId(role.getId()), UserPermission.valueOf(role.getName())))
 				.orElse(null);
 	}
 
@@ -29,6 +29,12 @@ public class RolePermissionRepositoryImpl implements RolePermissionRepository {
     }
 
     @Override
+    public Set<RolePermission> findAllManagerPermissions() {
+        final Set<RolePermission> rolePermissions = findAll();
+        return rolePermissions.stream().filter(RolePermission::isManager).collect(java.util.stream.Collectors.toSet());
+    }
+
+    @Override
     public Set<RolePermission> findAllSupplierPermissions() {
         final Set<RolePermission> rolePermissions = findAll();
         return rolePermissions.stream().filter(RolePermission::isSupplier).collect(java.util.stream.Collectors.toSet());
@@ -36,7 +42,7 @@ public class RolePermissionRepositoryImpl implements RolePermissionRepository {
 
     private Set<RolePermission> findAll() {
         return rolePermissionReadRepository.findAll().stream().map(
-                        role -> new RolePermission(new RolePermissionId(role.getId()), User.Permission.valueOf(role.getName())))
+                        role -> new RolePermission(new RolePermissionId(role.getId()), UserPermission.valueOf(role.getName())))
                 .collect(java.util.stream.Collectors.toSet());
     }
 }
