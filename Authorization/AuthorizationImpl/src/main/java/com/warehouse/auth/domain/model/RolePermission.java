@@ -1,29 +1,30 @@
 package com.warehouse.auth.domain.model;
 
 import com.warehouse.auth.domain.vo.RolePermissionId;
+import com.warehouse.commonassets.enumeration.UserPermission;
 
 public class RolePermission {
     private RolePermissionId rolePermissionId;
-    private User.Permission permission;
+    private UserPermission userPermission;
 
     public RolePermission() {
     }
 
-    public RolePermission(final User.Permission permission) {
-        this.permission = permission;
+    public RolePermission(final UserPermission userPermission) {
+        this.userPermission = userPermission;
     }
 
-    public RolePermission(final RolePermissionId rolePermissionId, final User.Permission permission) {
-        this.permission = permission;
+    public RolePermission(final RolePermissionId rolePermissionId, final UserPermission userPermission) {
+        this.userPermission = userPermission;
         this.rolePermissionId = rolePermissionId;
     }
 
-    public User.Permission getPermission() {
-        return permission;
+    public UserPermission getPermission() {
+        return userPermission;
     }
 
-    public void setPermission(final User.Permission permission) {
-        this.permission = permission;
+    public void setPermission(final UserPermission userPermission) {
+        this.userPermission = userPermission;
     }
 
     public RolePermissionId getRolePermissionId() {
@@ -35,10 +36,14 @@ public class RolePermission {
     }
 
     public boolean isAdmin() {
-        return permission != null && permission.name().contains("ADMIN");
+        return userPermission != null && userPermission.name().contains("ADMIN");
     }
 
     public boolean isSupplier() {
-        return permission != null && permission.name().contains("SUPPLIER");
+        return userPermission != null && userPermission.name().contains("SUPPLIER");
+    }
+
+    public boolean isManager() {
+        return userPermission != null && userPermission.name().contains("MANAGER");
     }
 }
