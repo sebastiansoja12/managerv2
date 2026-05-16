@@ -4,9 +4,11 @@ import com.warehouse.auth.domain.helper.Result;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.RolePermission;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
+import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +35,18 @@ public class UserPortImpl implements UserPort {
     }
 
     @Override
+    public List<User> findAll() {
+        return userService.findAll();
+    }
+
+    @Override
     public User findUser(final UserId userId) {
         return userService.findUserById(userId);
+    }
+
+    @Override
+    public User update(final UpdateUserCommand command) {
+        return userService.update(command);
     }
 
     @Override
@@ -71,13 +83,13 @@ public class UserPortImpl implements UserPort {
             return Result.failure("You cannot add permission to yourself");
         }
 
-        final RolePermission rolePermission = new RolePermission(User.Permission.valueOf(permission));
+        final RolePermission rolePermission = new RolePermission(UserPermission.valueOf(permission));
 
         final User user = this.userService.findUserById(userIdToModify);
 
         if (rolePermission.isAdmin()) {
             if (user != null && !user.isAdmin()) {
-                return Result.failure("Permission " + permission + " cannot be assigned to nonadmin user");
+                return Result.failure("UserPermission " + permission + " cannot be assigned to nonadmin user");
             }
         }
 
