@@ -3,6 +3,7 @@ package com.warehouse.department.domain.vo;
 import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
@@ -16,6 +17,8 @@ public record DepartmentSnapshot(
         String email,
         DepartmentType departmentType,
         Department.Status status,
+        Coordinates coordinates,
+        OperatorId operatorId,
         Instant createdAt,
         Instant updatedAt,
         UserId adminUserId,
