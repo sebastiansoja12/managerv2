@@ -29,7 +29,7 @@ public class ComputeServiceImpl implements ComputeService {
 				.filter(provider -> provider.canHandle(geocodingConfig.provider()))
 				.findAny()
 				.orElseThrow()
-				.obtainCoordinates(requestCity);
+				.obtainCoordinates(requestCity, geocodingConfig);
 	}
 
 	@Override
