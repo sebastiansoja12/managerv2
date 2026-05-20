@@ -1,91 +1,187 @@
-version: '3.8'
-
 services:
   mysql:
     image: mysql:8.0
-    container_name: mysql-container
+    container_name: manager-mysql
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: dev
-      MYSQL_USER: root
-      MYSQL_PASSWORD: rootpassword
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
-      - my_network
+      - manager_network
 
   mongodb:
     image: mongo:latest
-    container_name: warehouse
+    container_name: manager-mongodb
+    restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
     networks:
-      - my_network
+      - manager_network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - manager_network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - manager_network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: unless-stopped
+    depends_on:
+      - kafka
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    networks:
+      - manager_network
 
   manager-application:
-    image: your-8080-app-image:latest
-    container_name: manager-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: Application/target/Application-2026.3-SNAPSHOT.jar
+    image: managerv2/application:local
+    container_name: manager-application
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dev
+      SPRING_PROFILES_ACTIVE: dev,docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword
-      SPRING_DATA_MONGODB_URI: mongodb://warehouse:27017/dev
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/dev
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
-      - mysql
-      - mongodb
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_started
     networks:
-      - my_network
+      - manager_network
 
   software-configuration:
-    image: your-8081-app-image:latest
-    container_name: spring-boot-app-8081-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: SoftwareConfiguration/SoftwareConfigurationCore/target/SoftwareConfigurationCore-2026.3-SNAPSHOT.jar
+    image: managerv2/software-configuration:local
+    container_name: software-configuration
+    restart: unless-stopped
     ports:
       - "8081:8081"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/warehouse
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
-      - mysql
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_started
     networks:
-      - my_network
+      - manager_network
 
   returning-manager:
-    image: your-8070-app-image:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: ReturningTrackManager/ReturningTrackManagerImpl/target/ReturningTrackManagerImpl-2026.3-SNAPSHOT.jar
+    image: managerv2/returning-manager:local
     container_name: returning-manager
+    restart: unless-stopped
     ports:
       - "8070:8070"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dev
+      SPRING_PROFILES_ACTIVE: dev,docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword
-      SPRING_DATA_MONGODB_URI: mongodb://warehouse:27017/dev
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/dev
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
-      - mysql
-      - mongodb
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_started
     networks:
-      - my_network
+      - manager_network
 
   route-tracker:
-    image: your-8082-app-image:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: RouteTrackerFlow/RouteTrackerFlowImpl/target/RouteTrackerFlowImpl-2026.3-SNAPSHOT.jar
+    image: managerv2/route-tracker:local
     container_name: route-tracker
+    restart: unless-stopped
     ports:
       - "8082:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword
-      SPRING_DATA_MONGODB_URI: mongodb://warehouse:27017/dev
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/dev
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
-      - mysql
-      - mongodb
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_started
     networks:
-      - my_network
+      - manager_network
 
 networks:
-  my_network:
+  manager_network:
     driver: bridge
 
 volumes:
