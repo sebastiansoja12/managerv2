@@ -104,10 +104,6 @@ public class SupplyPortImpl implements SupplyPort {
     @Override
     public void addDevice(final ChangeSupplierDeviceCommand command) {
         final DeviceId deviceId = command.deviceId();
-        final Result<Void, String> result = deviceServicePort.validateDevice(deviceId);
-        if (result.isFailure()) {
-            throw new IllegalArgumentException(result.getFailure());
-        }
         final SupplierCode supplierCode = command.supplierCode();
         if (supplierService.findByCode(supplierCode) == null) {
             throw new SupplierNotFoundException(supplierCode.value());
