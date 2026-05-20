@@ -29,8 +29,11 @@ import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.domain.provider.ApiKeyProvider;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.registry.DomainRegistry;
+import com.warehouse.auth.domain.service.ApiEncoderImpl;
+import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.AuthenticationServiceImpl;
 import com.warehouse.auth.domain.service.DepartmentService;
@@ -42,6 +45,7 @@ import com.warehouse.auth.domain.service.RolePermissionService;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.service.UserServiceImpl;
 import com.warehouse.auth.domain.vo.AuthenticationResponse;
+import com.warehouse.auth.domain.vo.ApiKey;
 import com.warehouse.auth.domain.vo.LoginRequest;
 import com.warehouse.auth.domain.vo.RolePermissionId;
 import com.warehouse.auth.domain.vo.Token;
@@ -57,6 +61,7 @@ class AuthenticationPortImplTest {
     private InMemoryRefreshTokenRepository refreshTokenRepository;
     private AuthenticationPortImpl port;
     private JwtService jwtService;
+    private ApiKeyEncoder apiKeyEncoder;
     private PasswordEncoder passwordEncoder;
     private FakeDepartmentServicePort departmentServicePort;
 
@@ -75,6 +80,8 @@ class AuthenticationPortImplTest {
 
         final RefreshTokenProvider refreshTokenProvider = new RefreshTokenProvider();
         refreshTokenProvider.setKey("test-refresh-token-key");
+        final ApiKeyProvider apiKeyProvider = new ApiKeyProvider();
+        apiKeyProvider.setKey("test-api-key-secret");
 
         final UserService userService = new UserServiceImpl(userRepository);
         final RefreshTokenGenerator refreshTokenGenerator = new RefreshTokenGeneratorImpl(refreshTokenProvider);
@@ -87,8 +94,9 @@ class AuthenticationPortImplTest {
         final DepartmentService departmentService = new DepartmentService(departmentServicePort);
         final MailServicePort mailServicePort = emailNotification -> {
         };
+        apiKeyEncoder = new ApiEncoderImpl(apiKeyProvider);
         port = new AuthenticationPortImpl(authenticationService, userService, jwtService, passwordEncoder,
-                departmentService, mailServicePort);
+                departmentService, mailServicePort, apiKeyEncoder);
 
         final StaticApplicationContext applicationContext = new StaticApplicationContext();
         applicationContext.getBeanFactory()
@@ -155,6 +163,12 @@ class AuthenticationPortImplTest {
         assertThat(createdUser.getRole()).isEqualTo(User.Role.SUPPLIER);
         assertThat(passwordEncoder.matches("raw-password", createdUser.getPassword())).isTrue();
         assertThat(createdUser.getDepartmentCode().getValue()).isEqualTo("TST");
+        assertThat(createdUser.getApiKey()).isNotNull();
+        assertThat(createdUser.getApiKey()).isNotEqualTo("dummy");
+        assertThat(createdUser.getApiKey()).doesNotContain("operator-user");
+        assertThat(createdUser.getApiKey()).isEqualTo(
+                apiKeyEncoder.decode(new ApiKey(userId, "operator-user")).key()
+        );
     }
 
     @Test
