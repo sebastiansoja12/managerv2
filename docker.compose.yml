@@ -104,6 +104,26 @@ services:
     networks:
       - manager_network
 
+  manager-gui:
+    build:
+      context: ../managerv2gui
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_SERVER_URL: http://localhost:8080/v2/api
+        REACT_APP_GATEWAY_URL: http://localhost:8080/v2/api
+        REACT_APP_VERSION: 2026.3
+        REACT_APP_ENVIRONMENT: development
+    image: managerv2/gui:local
+    container_name: manager-gui
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      manager-application:
+        condition: service_started
+    networks:
+      - manager_network
+
   software-configuration:
     build:
       context: .
