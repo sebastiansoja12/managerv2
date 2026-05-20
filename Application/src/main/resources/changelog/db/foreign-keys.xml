@@ -33,6 +33,9 @@
     <changeSet author="sebastiansoja (generated)" id="1784048035699-92">
         <addForeignKeyConstraint baseColumnNames="rev" baseTableName="department_aud" constraintName="fk_department_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
     </changeSet>
+    <changeSet author="sebastiansoja" id="20260718-5-fk-department-rd-aud-revinfo">
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="department_rd_aud" constraintName="fk_department_rd_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
+    </changeSet>
     <changeSet author="sebastiansoja (generated)" id="1784048035699-93">
         <addForeignKeyConstraint baseColumnNames="device_id" baseTableName="mobile_installed_apps" constraintName="fk_mobile_installed_apps_mobile" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="device_id" referencedTableName="mobiles" validate="true"/>
     </changeSet>
