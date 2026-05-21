@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.RouteLogException;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.RouteLogToEntityMapper;
@@ -56,7 +56,7 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
     @Override
     public RouteLogRecord find(final ShipmentId shipmentId) {
 		return routeLogRecordReadRepository
-                .findByShipmentId(shipmentId.getValue())
+                .findByShipmentId(shipmentId.value())
                 .map(logToModelMapper::map)
 				.orElseThrow(() -> new RouteLogException("Route log does not exist"));
     }

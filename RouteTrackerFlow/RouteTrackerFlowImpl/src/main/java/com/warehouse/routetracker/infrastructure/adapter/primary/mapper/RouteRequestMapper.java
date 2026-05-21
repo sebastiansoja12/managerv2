@@ -2,10 +2,9 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.mapper;
 
 import org.mapstruct.Mapper;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.vo.*;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn.DeliveryReturnRequestDto;
 

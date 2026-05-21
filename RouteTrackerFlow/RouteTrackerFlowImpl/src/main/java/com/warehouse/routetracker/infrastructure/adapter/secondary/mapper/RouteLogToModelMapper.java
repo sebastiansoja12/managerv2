@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 
-import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
+import com.warehouse.routetracker.domain.vo.TerminalId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 
