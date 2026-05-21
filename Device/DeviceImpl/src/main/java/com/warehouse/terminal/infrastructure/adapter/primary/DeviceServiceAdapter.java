@@ -76,7 +76,8 @@ public class DeviceServiceAdapter implements DeviceApiService {
                 mapDeviceId(deviceId),
                 mapDepartmentCode(departmentCode),
                 mapUserId(userId),
-                mapUsername(username)
+                mapUsername(username),
+                null
         ));
     }
 
