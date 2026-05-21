@@ -1,12 +1,9 @@
-# syntax=docker/dockerfile:1.7
-
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /workspace
 
 COPY . .
-RUN --mount=type=secret,id=maven_settings,target=/root/.m2/manager_settings.xml,required=false \
-    cd ReturningTrackManager && mvn -pl ReturningTrackManagerImpl -am package -DskipTests
+RUN cd ReturningTrackManager && mvn -pl ReturningTrackManagerImpl -am package -DskipTests
 
 FROM eclipse-temurin:21-jre
 
