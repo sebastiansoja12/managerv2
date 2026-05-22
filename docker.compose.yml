@@ -80,8 +80,6 @@ services:
     build:
       context: .
       dockerfile: Application/Dockerfile
-      secrets:
-        - maven_settings
     image: managerv2/application:local
     container_name: manager-application
     restart: unless-stopped
@@ -128,8 +126,6 @@ services:
     build:
       context: .
       dockerfile: SoftwareConfiguration/SoftwareConfigurationCore/Dockerfile
-      secrets:
-        - maven_settings
     image: managerv2/software-configuration:local
     container_name: software-configuration
     restart: unless-stopped
@@ -150,8 +146,6 @@ services:
     build:
       context: .
       dockerfile: ReturningTrackManager/ReturningTrackManagerImpl/Dockerfile
-      secrets:
-        - maven_settings
     image: managerv2/returning-manager:local
     container_name: returning-manager
     restart: unless-stopped
@@ -178,8 +172,6 @@ services:
     build:
       context: .
       dockerfile: RouteTrackerFlow/RouteTrackerFlowImpl/Dockerfile
-      secrets:
-        - maven_settings
     image: managerv2/route-tracker:local
     container_name: route-tracker
     restart: unless-stopped
@@ -207,7 +199,3 @@ networks:
 volumes:
   mysql_data:
   mongo_data:
-
-secrets:
-  maven_settings:
-    file: ${HOME}/.m2/manager_settings.xml
