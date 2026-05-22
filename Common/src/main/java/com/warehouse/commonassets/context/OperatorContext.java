@@ -31,6 +31,14 @@ public class OperatorContext {
         });
     }
 
+    public void assignOperator(final OperatorId operatorId) {
+        login(operatorId);
+    }
+
+    public void clear() {
+        SecurityContextHolder.clearContext();
+    }
+
     private void login(final OperatorId operatorId) {
         final SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(new UsernameTenantPasswordAuthenticationToken(
