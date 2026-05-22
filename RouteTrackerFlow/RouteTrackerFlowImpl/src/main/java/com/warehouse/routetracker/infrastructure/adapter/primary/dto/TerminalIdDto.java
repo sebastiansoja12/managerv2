@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 
-import com.warehouse.commonassets.identificator.TerminalId;
+
+import com.warehouse.routetracker.domain.vo.TerminalId;
 
 public class TerminalIdDto {
     private String value;
@@ -17,6 +18,6 @@ public class TerminalIdDto {
     }
 
     public static TerminalIdDto from(final TerminalId terminalId) {
-        return new TerminalIdDto(terminalId != null ? terminalId.getValue() : null);
+        return new TerminalIdDto(terminalId != null ? terminalId.value() : null);
     }
 }

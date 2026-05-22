@@ -16,8 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.*;
@@ -25,6 +23,7 @@ import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.domain.vo.Error;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.exception.RouteLogException;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,7 +80,7 @@ public class RouteTrackerLogPortImplTest {
                 .builder()
                 .id(processId)
                 .routeLogRecordDetails(routeLogRecordDetails)
-                .parcelId(shipmentId.getValue())
+                .parcelId(shipmentId.value())
                 .build();
 
         doReturn(routeLogRecord)
@@ -131,7 +130,7 @@ public class RouteTrackerLogPortImplTest {
                 .builder()
                 .id(processId)
                 .routeLogRecordDetails(routeLogRecordDetails)
-                .parcelId(shipmentId.getValue())
+                .parcelId(shipmentId.value())
                 .build();
 
         doReturn(routeLogRecord)
@@ -186,7 +185,7 @@ public class RouteTrackerLogPortImplTest {
                 .builder()
                 .id(processId)
                 .routeLogRecordDetails(routeLogRecordDetails)
-                .parcelId(shipmentId.getValue())
+                .parcelId(shipmentId.value())
                 .build();
 
         doReturn(routeLogRecord)
@@ -225,7 +224,7 @@ public class RouteTrackerLogPortImplTest {
                 .builder()
                 .id(processId)
                 .routeLogRecordDetails(routeLogRecordDetails)
-                .parcelId(shipmentId.getValue())
+                .parcelId(shipmentId.value())
                 .build();
 
         doReturn(routeLogRecord)

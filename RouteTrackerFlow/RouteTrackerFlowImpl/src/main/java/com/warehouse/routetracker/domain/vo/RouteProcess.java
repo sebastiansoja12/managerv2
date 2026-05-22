@@ -2,7 +2,8 @@ package com.warehouse.routetracker.domain.vo;
 
 import java.util.UUID;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
+
 
 
 public class RouteProcess {

@@ -2,10 +2,10 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.helper.Result;
 import com.warehouse.routetracker.domain.model.*;
 import com.warehouse.routetracker.domain.vo.*;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 
 public interface RouteTrackerLogPort {
 

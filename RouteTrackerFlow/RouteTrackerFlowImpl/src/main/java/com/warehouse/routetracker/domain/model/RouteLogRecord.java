@@ -3,10 +3,10 @@ package com.warehouse.routetracker.domain.model;
 
 import java.util.UUID;
 
-import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
+import com.warehouse.routetracker.domain.vo.TerminalId;
 
 import lombok.*;
 
