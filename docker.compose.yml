@@ -80,6 +80,8 @@ services:
     build:
       context: .
       dockerfile: Application/Dockerfile
+    env_file:
+      - .env
     image: managerv2/application:local
     container_name: manager-application
     restart: unless-stopped
