@@ -3,7 +3,9 @@ package com.warehouse.gateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+@EnableDiscoveryClient
 @SpringBootApplication(scanBasePackages = "com.warehouse.gateway")
 @ConfigurationPropertiesScan(basePackages = "com.warehouse.gateway")
 public class GatewayApplication {

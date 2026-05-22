@@ -39,6 +39,7 @@
         <module>LogisticsOrchestrator</module>
         <module>CrossLogistics</module>
         <module>Gateway</module>
+        <module>EurekaServer</module>
         <module>SupplierServiceManagement</module>
         <module>TransportAssets</module>
         <module>DriverHub</module>
@@ -51,6 +52,7 @@
 		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 		<org.projectlombok.version>1.18.30</org.projectlombok.version>
 		<spring-starter.version>3.5.5</spring-starter.version>
+        <spring-cloud.version>2025.0.3</spring-cloud.version>
 		<spring-boot.run.skip>true</spring-boot.run.skip>
 		<maven-jaxb2-plugin.version>0.15.1</maven-jaxb2-plugin.version>
 		<maven-jaxb2-basics-plugin.version>1.11.1</maven-jaxb2-basics-plugin.version>
@@ -100,6 +102,13 @@
 
 	<dependencyManagement>
 		<dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-data-jdbc</artifactId>
@@ -124,16 +133,6 @@
 				<artifactId>spring-boot-starter-aop</artifactId>
 				<version>${spring-starter.version}</version>
 			</dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-openfeign</artifactId>
-                <version>4.3.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-                <version>4.3.0</version>
-            </dependency>
             <dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
