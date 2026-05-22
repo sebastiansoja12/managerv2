@@ -58,6 +58,8 @@ public class GatewayProperties {
         @NotNull
         private URI uri;
 
+        private String serviceId;
+
         @NotBlank
         private String healthPath = "/actuator/health";
 
@@ -88,6 +90,14 @@ public class GatewayProperties {
 
         public void setUri(final URI uri) {
             this.uri = uri;
+        }
+
+        public String getServiceId() {
+            return this.serviceId;
+        }
+
+        public void setServiceId(final String serviceId) {
+            this.serviceId = serviceId;
         }
 
         public String getHealthPath() {
