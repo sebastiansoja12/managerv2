@@ -272,6 +272,16 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient) {
         validateShipmentNotInStatus(shipmentId);
+        final Shipment shipment = this.shipmentService.find(shipmentId);
+        if (!shipment.recipientCityMatches(recipient.getCity())) {
+            final Result<VoronoiResponse, ErrorCode> voronoiResponse =
+                    this.pathFinderServicePort.determineDeliveryDepartment(Address.from(recipient));
+            if (voronoiResponse.isFailure()) {
+                logger.warn("Cannot determine delivery department for recipient {}, skipping...", recipient);
+            } else {
+                this.shipmentService.changeDestination(shipmentId, voronoiResponse.getSuccess().getValue());
+            }
+        }
         this.shipmentService.changeRecipientTo(shipmentId, recipient);
     }
 
@@ -279,9 +289,9 @@ public class ShipmentPortImpl implements ShipmentPort {
     public void changePersonTo(final Person person, final ShipmentId shipmentId) {
         validateShipmentNotInStatus(shipmentId);
         if (person.getType() == PersonType.SENDER) {
-            this.shipmentService.changeSenderTo(shipmentId, (Sender) person);
+            changeSenderTo(shipmentId, (Sender) person);
         } else if (person.getType() == PersonType.RECIPIENT) {
-            this.shipmentService.changeRecipientTo(shipmentId, (Recipient) person);
+            changeRecipientTo(shipmentId, (Recipient) person);
         }
     }
 
@@ -400,6 +410,9 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Shipment shipment = loadShipment(shipmentId);
         if (shipment == null) {
             throw new RestException(404, "Shipment not found");
+        }
+        if (shipmentStatuses.contains(shipment.getShipmentStatus())) {
+            throw new RestException(400, "Cannot modify shipment in current status");
         }
         if (shipment.getShipmentRelatedId() != null) {
             final Shipment relatedShipment = loadShipment(shipment.getShipmentRelatedId());
