@@ -37,6 +37,7 @@ public class SecurityConfiguration {
     private final UserAuthenticationEntryPoint authenticationEntryPoint;
     private final AuthProperties authProperties;
     private final DepartmentReadSyncBasicAuthenticationFilter departmentReadSyncBasicAuthenticationFilter;
+    private final ShipmentReadSyncBasicAuthenticationFilter shipmentReadSyncBasicAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http,
@@ -48,7 +49,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfTokenRepository)
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .ignoringRequestMatchers("/departments/read-sync/**"))
+                        .ignoringRequestMatchers("/departments/read-sync/**", "/internal/shipments/read-sync/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
@@ -70,6 +71,7 @@ public class SecurityConfiguration {
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(departmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(shipmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http
                 .authenticationProvider(authenticationProvider);
 
