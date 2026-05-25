@@ -10,10 +10,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
@@ -22,11 +27,19 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.registry.DomainContext;
+import com.warehouse.shipment.domain.service.TrackingNumberService;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 
 class ShipmentTest {
+
+    @AfterEach
+    void tearDown() {
+        ReflectionTestUtils.setField(DomainContext.class, "context", null);
+    }
 
     @Test
     void shouldCreateParentShipmentWhenRelatedShipmentIsMissing() {
@@ -104,6 +117,12 @@ class ShipmentTest {
         final Sender originalSender = shipment.getSender();
         final Recipient originalRecipient = shipment.getRecipient();
         final ShipmentId redirectedShipmentId = new ShipmentId(10L);
+        final ApplicationContext applicationContext = mock(ApplicationContext.class);
+        final TrackingNumberService trackingNumberService = mock(TrackingNumberService.class);
+        ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
+        when(applicationContext.getBean(TrackingNumberService.class)).thenReturn(trackingNumberService);
+        when(trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT))
+                .thenReturn(new TrackingNumber("REDIRECTED-TRACKING-NUMBER"));
 
         final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId);
 
