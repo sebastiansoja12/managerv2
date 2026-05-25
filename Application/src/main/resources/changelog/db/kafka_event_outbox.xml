@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="s-soja" id="20260722-01-create-kafka-event-outbox">
+        <createTable tableName="kafka_event_outbox">
+            <column name="event_id" type="VARCHAR(36)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="topic" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_key" type="VARCHAR(255)"/>
+            <column name="event_type" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="occurred_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operator_id" type="BIGINT"/>
+            <column name="payload_json" type="CLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="headers_json" type="CLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="published_at" type="TIMESTAMP"/>
+            <column name="last_error" type="CLOB"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="s-soja" id="20260722-02-index-kafka-event-outbox">
+        <createIndex indexName="idx_kafka_event_outbox_unpublished" tableName="kafka_event_outbox">
+            <column name="published_at"/>
+            <column name="created_at"/>
+        </createIndex>
+        <createIndex indexName="idx_kafka_event_outbox_topic" tableName="kafka_event_outbox">
+            <column name="topic"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
