@@ -13,10 +13,11 @@ services:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      start_period: 40s
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 20
     networks:
       - manager_network
 
@@ -136,7 +137,6 @@ services:
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       MANAGER_API_URL: http://manager-application:8080/v2/api
       SOFTWARE_CONFIGURATION_URL: http://software-configuration:8081
-      DELIVERY_PROTECTION_URL: http://delivery-protection:8060/v2/api
       RETURNING_TRACK_MANAGER_URL: http://returning-manager:8070/v2/api
       ROUTE_TRACKER_FLOW_URL: http://route-tracker:8082/v2/api
       PALLET_HANDLING_MANAGER_URL: http://pallet-handling-manager:8071
@@ -144,6 +144,12 @@ services:
       eureka-server:
         condition: service_started
       manager-application:
+        condition: service_started
+      returning-manager:
+        condition: service_started
+      route-tracker:
+        condition: service_started
+      pallet-handling-manager:
         condition: service_started
     networks:
       - manager_network
@@ -154,7 +160,7 @@ services:
       dockerfile: Dockerfile
       args:
         REACT_APP_SERVER_URL: http://localhost:8080/v2/api
-        REACT_APP_GATEWAY_URL: http://localhost:8080/v2/api
+        REACT_APP_GATEWAY_URL: http://localhost:8088/gateway
         REACT_APP_VERSION: 2026.3
         REACT_APP_ENVIRONMENT: development
     image: managerv2/gui:local
@@ -216,6 +222,27 @@ services:
       mongodb:
         condition: service_started
       kafka:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - manager_network
+
+  pallet-handling-manager:
+    build:
+      context: .
+      dockerfile: PalletHandlingManager/PalletHandlingManagerCore/Dockerfile
+    image: managerv2/pallet-handling-manager:local
+    container_name: pallet-handling-manager
+    restart: unless-stopped
+    ports:
+      - "8071:8071"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/warehouse
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    depends_on:
+      mongodb:
         condition: service_started
       eureka-server:
         condition: service_started

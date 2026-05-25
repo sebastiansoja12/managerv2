@@ -25,7 +25,7 @@ public class Shipment {
 
     private ShipmentSize shipmentSize;
 
-    private String destination;
+    private DepartmentCode destination;
 
     private ShipmentStatus shipmentStatus;
 
@@ -78,7 +78,7 @@ public class Shipment {
                     final Boolean locked,
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
-                    final String destination,
+                    final DepartmentCode destination,
                     final Signature signature,
                     final boolean signatureRequired,
                     final ShipmentPriority shipmentPriority,
@@ -120,7 +120,7 @@ public class Shipment {
                     final CountryCode destinationCountry,
                     final Money price,
                     final Boolean locked,
-                    final String destination,
+                    final DepartmentCode destination,
                     final Signature signature,
                     final ShipmentPriority shipmentPriority,
                     final TrackingNumber trackingNumber) {
@@ -166,7 +166,7 @@ public class Shipment {
         final Boolean locked = shipmentEntity.getLocked();
         final CountryCode originCountry = shipmentEntity.getOriginCountry();
         final CountryCode destinationCountry = shipmentEntity.getDestinationCountry();
-        final String destination = shipmentEntity.getDestination();
+        final DepartmentCode destination = shipmentEntity.getDestination();
         final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
         final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
@@ -251,7 +251,7 @@ public class Shipment {
         return shipmentSize;
     }
 
-    public String getDestination() {
+    public DepartmentCode getDestination() {
         return destination;
     }
 
@@ -291,7 +291,7 @@ public class Shipment {
         this.shipmentSize = parcelShipmentSize;
     }
 
-    public void setDestination(final String destination) {
+    public void setDestination(final DepartmentCode destination) {
         this.destination = destination;
     }
 
@@ -450,8 +450,8 @@ public class Shipment {
     }
 
     public void updateDestination(final VoronoiResponse voronoiResponse) {
-        if (ObjectUtils.isNotEmpty(voronoiResponse) && voronoiResponse.getValue() != null) {
-            this.destination = voronoiResponse.getValue();
+        if (ObjectUtils.isNotEmpty(voronoiResponse) && voronoiResponse.getDepartmentCodeResult() != null) {
+            this.destination = voronoiResponse.getDepartmentCodeResult();
             markAsModified();
         }
     }
@@ -465,7 +465,7 @@ public class Shipment {
     public void update(final Sender sender, final Recipient recipient, final ShipmentStatus shipmentStatus,
                        final ShipmentPriority shipmentPriority, final ShipmentSize shipmentSize,
                        final Money price, final DangerousGood dangerousGood,
-                       final String destination, final Boolean signatureRequired) {
+                       final DepartmentCode destination, final Boolean signatureRequired) {
         this.recipient = recipient;
         this.sender = sender;
         this.shipmentStatus = shipmentStatus;
@@ -565,7 +565,7 @@ public class Shipment {
         markAsModified();
     }
 
-    public void changeDestinationDepartment(final String destination) {
+    public void changeDestinationDepartment(final DepartmentCode destination) {
         this.destination = destination;
         markAsModified();
     }

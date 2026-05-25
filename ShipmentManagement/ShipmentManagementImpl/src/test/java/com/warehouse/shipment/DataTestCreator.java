@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
@@ -85,7 +86,7 @@ public class DataTestCreator {
                 CountryCode.DE,
                 money(),
                 locked,
-                "KT1",
+                new DepartmentCode("KT1"),
                 null,
                 ShipmentPriority.MEDIUM,
                 trackingNumber()

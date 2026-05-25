@@ -1,4 +1,6 @@
 package com.warehouse.voronoi;
 
-public record VoronoiResponseDto(String departmentCode, String city) {
+import com.warehouse.voronoi.dto.DepartmentCodeDto;
+
+public record VoronoiResponseDto(DepartmentCodeDto departmentCode, String city) {
 }

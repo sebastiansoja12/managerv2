@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
@@ -125,7 +126,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 receiverCountryCode,
                 shipmentPrice.getMoney(),
                 false,
-                voronoiResponse.getSuccess().getValue(),
+                voronoiResponse.getSuccess().getDepartmentCodeResult(),
                 null,
                 command.getShipmentPriority(),
                 trackingNumber
@@ -165,7 +166,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(countryValidation.getFailure());
         }
 
-        final String destination = resolveDestination(command, shipment, configuration);
+        final DepartmentCode destination = resolveDestination(command, shipment, configuration);
 
         final Price shipmentPrice =
                 resolveShipmentPrice(command.getPrice(), command.getShipmentSize());
@@ -279,7 +280,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             if (voronoiResponse.isFailure()) {
                 logger.warn("Cannot determine delivery department for recipient {}, skipping...", recipient);
             } else {
-                this.shipmentService.changeDestination(shipmentId, voronoiResponse.getSuccess().getValue());
+                this.shipmentService.changeDestination(shipmentId, voronoiResponse.getSuccess().getDepartmentCodeResult());
             }
         }
         this.shipmentService.changeRecipientTo(shipmentId, recipient);
@@ -426,7 +427,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         return !configuration.forceUpdate();
     }
 
-    private String resolveDestination(final ShipmentUpdateCommand command,
+    private DepartmentCode resolveDestination(final ShipmentUpdateCommand command,
                                       final Shipment shipment,
                                       final ShipmentConfiguration configuration) {
 
@@ -441,7 +442,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 this.pathFinderServicePort.determineDeliveryDepartment(address);
 
         return voronoiResult.isSuccess()
-                ? voronoiResult.getSuccess().getValue()
+                ? voronoiResult.getSuccess().getDepartmentCodeResult()
                 : shipment.getDestination();
     }
 

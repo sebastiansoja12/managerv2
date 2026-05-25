@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
@@ -93,7 +94,8 @@ public class ShipmentReadEntity extends BelongsToOperator {
     private ShipmentSize shipmentSize;
 
     @Column(name = "destination", nullable = false)
-    private String destination;
+    @AttributeOverride(name = "value", column = @Column(name = "destination"))
+    private DepartmentCode destination;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

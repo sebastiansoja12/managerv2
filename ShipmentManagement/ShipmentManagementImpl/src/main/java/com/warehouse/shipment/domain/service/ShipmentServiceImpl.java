@@ -267,7 +267,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public void changeDestination(final ShipmentId shipmentId, final String destination) {
+    public void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeDestinationDepartment(destination);
         this.shipmentRepository.createOrUpdate(shipment);

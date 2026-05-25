@@ -77,7 +77,7 @@ public class ShipmentEventListener {
         }
 
         final VoronoiResponse voronoiResponse = destinationResult.getSuccess();
-        this.shipmentService.changeDestination(snapshot.shipmentId(), voronoiResponse.getValue());
+        this.shipmentService.changeDestination(snapshot.shipmentId(), voronoiResponse.getDepartmentCodeResult());
 
         final Result<RouteProcess, ErrorCode> result =
                 this.routeTrackerService.notifyShipmentStatusChanged(snapshot.shipmentId(), snapshot.shipmentStatus());

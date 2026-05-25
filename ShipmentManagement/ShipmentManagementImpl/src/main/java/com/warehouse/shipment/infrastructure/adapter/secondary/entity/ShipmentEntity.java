@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import java.time.LocalDateTime;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -93,7 +94,8 @@ public class ShipmentEntity extends BelongsToOperator {
     private ShipmentSize shipmentSize;
 
     @Column(name = "destination", nullable = false)
-    private String destination;
+    @AttributeOverride(name = "value", column = @Column(name = "destination"))
+    private DepartmentCode destination;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -165,7 +167,7 @@ public class ShipmentEntity extends BelongsToOperator {
 			final String senderTelephone, final String recipientFirstName, final String recipientLastName,
 			final String recipientEmail, final String recipientCity, final String recipientStreet,
 			final String recipientPostalCode, final String recipientTelephone, final ShipmentSize shipmentSize,
-			final String destination, final ShipmentStatus shipmentStatus, final ShipmentType shipmentType,
+			final DepartmentCode destination, final ShipmentStatus shipmentStatus, final ShipmentType shipmentType,
 			final ShipmentId shipmentRelatedId, final LocalDateTime createdAt, final LocalDateTime updatedAt,
 			final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
 			final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood,
