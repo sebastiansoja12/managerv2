@@ -27,7 +27,7 @@ public class AuthProperties {
 
     @Data
     public static class Cors {
-        private List<String> allowedOrigins = List.of("http://localhost:3000");
+        private List<String> allowedOrigins = List.of("http://localhost:3000", "https://managerv2gui.onrender.com");
         private List<String> allowedMethods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
         private List<String> allowedHeaders = List.of("Content-Type", "X-XSRF-TOKEN", "X-Correlation-ID", "X-Requested-With");
         private List<String> exposedHeaders = List.of("X-Correlation-ID");
