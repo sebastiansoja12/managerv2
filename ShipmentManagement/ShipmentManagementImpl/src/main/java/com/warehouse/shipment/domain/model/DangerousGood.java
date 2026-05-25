@@ -3,6 +3,8 @@ package com.warehouse.shipment.domain.model;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
@@ -49,6 +51,29 @@ public class DangerousGood {
         this.emergencyContact = emergencyContact;
         this.countryOfOrigin = countryOfOrigin;
         this.safetyDataSheet = safetyDataSheet;
+    }
+
+    @JsonCreator
+    public static DangerousGood fromJson(@JsonProperty("dangerousGoodId") final DangerousGoodId dangerousGoodId,
+                                         @JsonProperty("shipmentId") final ShipmentId shipmentId,
+                                         @JsonProperty("name") final String name,
+                                         @JsonProperty("description") final String description,
+                                         @JsonProperty("classificationCode") final String classificationCode,
+                                         @JsonProperty("hazardSymbols") final String hazardSymbols,
+                                         @JsonProperty("storageRequirements") final String storageRequirements,
+                                         @JsonProperty("handlingInstructions") final String handlingInstructions,
+                                         @JsonProperty("weight") final Weight weight,
+                                         @JsonProperty("packaging") final String packaging,
+                                         @JsonProperty("flammable") final boolean flammable,
+                                         @JsonProperty("corrosive") final boolean corrosive,
+                                         @JsonProperty("toxic") final boolean toxic,
+                                         @JsonProperty("emergencyContact") final String emergencyContact,
+                                         @JsonProperty("countryOfOrigin") final CountryCode countryOfOrigin,
+                                         @JsonProperty("safetyDataSheet") final String safetyDataSheet) {
+        return new DangerousGood(dangerousGoodId, shipmentId, name, description, classificationCode,
+                hazardSymbols == null ? Collections.emptyList() : Collections.singletonList(hazardSymbols),
+                storageRequirements, handlingInstructions, weight, packaging, flammable, corrosive, toxic,
+                emergencyContact, countryOfOrigin, safetyDataSheet);
     }
 
     public static DangerousGood from(final DangerousGoodCreateCommand request) {
@@ -218,4 +243,3 @@ public class DangerousGood {
         return safetyDataSheet;
     }
 }
-

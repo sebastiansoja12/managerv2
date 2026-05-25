@@ -8,7 +8,7 @@ import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -17,15 +17,15 @@ import jakarta.persistence.criteria.Root;
 public class SpecificationShipmentRepositoryImpl
         implements SpecificationRepository<ShipmentSearchCriteria, Shipment> {
 
-    private final OperatorFilteredRepository<ShipmentEntity> repository;
+    private final OperatorFilteredRepository<ShipmentReadEntity> repository;
 
-    public SpecificationShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentEntity> repository) {
+    public SpecificationShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentReadEntity> repository) {
         this.repository = repository;
     }
 
     @Override
     public List<Shipment> list(final ShipmentSearchCriteria criteria) {
-        final Criteria<ShipmentEntity> shipmentCriteria = repository.createCriteria(ShipmentEntity.class);
+        final Criteria<ShipmentReadEntity> shipmentCriteria = repository.createCriteria(ShipmentReadEntity.class);
 
         if (criteria.shipmentId() != null) {
             shipmentCriteria.eq("shipmentId.value", criteria.shipmentId());
@@ -99,13 +99,13 @@ public class SpecificationShipmentRepositoryImpl
     }
 
     private Predicate nameLike(
-            final Criteria<ShipmentEntity> criteria,
+            final Criteria<ShipmentReadEntity> criteria,
             final String value,
             final String firstNameField,
             final String lastNameField
     ) {
         final CriteriaBuilder cb = criteria.getCriteriaBuilder();
-        final Root<ShipmentEntity> root = criteria.getRoot();
+        final Root<ShipmentReadEntity> root = criteria.getRoot();
         final String pattern = like(value);
 
         return cb.or(

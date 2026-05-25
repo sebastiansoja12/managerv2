@@ -5,6 +5,7 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.domain.vo.*;
@@ -15,16 +16,21 @@ public class RouteTrackerServiceImpl implements RouteTrackerService {
 
     private final SoftwareConfigurationServicePort softwareConfigurationServicePort;
 
+    private final CurrentUserServicePort currentUserServicePort;
+
     public RouteTrackerServiceImpl(final RouteLogServicePort routeLogServicePort,
-                                   final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
+                                   final SoftwareConfigurationServicePort softwareConfigurationServicePort,
+                                   final CurrentUserServicePort currentUserServicePort) {
         this.routeLogServicePort = routeLogServicePort;
         this.softwareConfigurationServicePort = softwareConfigurationServicePort;
+        this.currentUserServicePort = currentUserServicePort;
     }
 
     @Override
     public Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId) {
         final SoftwareConfiguration softwareConfiguration = this.softwareConfigurationServicePort.getShipmentSoftwareConfiguration();
-        return this.routeLogServicePort.notifyShipmentCreated(shipmentId, softwareConfiguration);
+        final UserContext userContext = currentUserServicePort.getCurrentUserContext();
+        return this.routeLogServicePort.notifyShipmentCreated(shipmentId, softwareConfiguration, userContext.userId());
     }
 
     @Override

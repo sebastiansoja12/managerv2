@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.department.api.DepartmentApiService;
@@ -31,6 +32,7 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
@@ -122,8 +124,9 @@ public class ShipmentConfiguration {
 	
 	@Bean
 	public RouteTrackerService routeTrackerService(final RouteLogServicePort routeLogServicePort,
-			final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
-		return new RouteTrackerServiceImpl(routeLogServicePort, softwareConfigurationServicePort);
+			final SoftwareConfigurationServicePort softwareConfigurationServicePort,
+			final CurrentUserServicePort currentUserServicePort) {
+		return new RouteTrackerServiceImpl(routeLogServicePort, softwareConfigurationServicePort, currentUserServicePort);
 	}
 
 	@Bean
@@ -217,6 +220,21 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
+	public ShipmentReadModelRepository shipmentReadModelRepository(
+			final OperatorFilteredRepository<ShipmentReadEntity> repository) {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment read model repository");
+		return new ShipmentReadModelRepositoryImpl(repository);
+	}
+
+	@Bean
+	public ShipmentReadModelSyncService shipmentReadModelSyncService(
+			final ShipmentReadModelRepository shipmentReadModelRepository,
+			final OperatorFilteredRepository<ShipmentEntity> shipmentRepository,
+			final OperatorContext operatorContext) {
+		return new ShipmentReadModelSyncServiceImpl(shipmentReadModelRepository, shipmentRepository, operatorContext);
+	}
+
+	@Bean
 	public SoftwareConfigurationProperties softwareConfigurationProperties() {
 		return new SoftwareConfigurationProperties();
 	}
@@ -237,12 +255,14 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository, final SpecificationRepository specificationShipmentRepository) {
+	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository,
+										   final SpecificationRepository specificationShipmentRepository) {
 		return new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
 	}
 
 	@Bean
-	public SpecificationRepository specificationShipmentRepository(final OperatorFilteredRepository<ShipmentEntity> repository) {
+	public SpecificationRepository specificationShipmentRepository(
+			final OperatorFilteredRepository<ShipmentReadEntity> repository) {
 		return new SpecificationShipmentRepositoryImpl(repository);
 	}
 
