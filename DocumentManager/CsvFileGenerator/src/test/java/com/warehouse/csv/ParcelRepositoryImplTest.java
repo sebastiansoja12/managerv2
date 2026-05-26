@@ -37,6 +37,8 @@ public class ParcelRepositoryImplTest {
         final ParcelCsv parcel = parcelRepository.find(1L);
         // then
         assertNotNull(parcel);
+        assertEquals("UN3480", parcel.getDangerousGoodUnNumber());
+        assertEquals("Lithium ion batteries", parcel.getDangerousGoodProperShippingName());
     }
 
     @Test
