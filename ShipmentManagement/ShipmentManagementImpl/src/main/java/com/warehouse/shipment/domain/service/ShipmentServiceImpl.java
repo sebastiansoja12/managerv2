@@ -1,12 +1,5 @@
 package com.warehouse.shipment.domain.service;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.http.HttpStatusCode;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
@@ -21,6 +14,13 @@ import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ShipmentServiceImpl implements ShipmentService {
 
@@ -146,6 +146,20 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeDangerousGood(dangerousGood);
         this.shipmentRepository.createOrUpdate(shipment);
+        DomainContext.publish(new ShipmentDangerousGoodUpdated(shipment.snapshot(), Instant.now()));
+    }
+
+    @Override
+    public Optional<DangerousGood> findDangerousGood(final ShipmentId shipmentId) {
+        return Optional.ofNullable(this.shipmentRepository.findById(shipmentId).getDangerousGood());
+    }
+
+    @Override
+    public void removeDangerousGood(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.removeDangerousGood();
+        this.shipmentRepository.createOrUpdate(shipment);
+        DomainContext.publish(new ShipmentDangerousGoodRemoved(shipment.snapshot(), Instant.now()));
     }
 
     @Override

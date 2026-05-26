@@ -11,6 +11,7 @@ import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ShipmentService {
 
@@ -37,6 +38,10 @@ public interface ShipmentService {
     void changeSignatureRequiredTo(final ShipmentId shipmentId, final boolean signatureRequired);
 
     void changeDangerousGoodTo(final ShipmentId shipmentId, final DangerousGood dangerousGood);
+
+    Optional<DangerousGood> findDangerousGood(final ShipmentId shipmentId);
+
+    void removeDangerousGood(final ShipmentId shipmentId);
 
     void notifyRelatedShipmentRedirected(final ShipmentId shipmentId, final ShipmentId relatedShipmentId);
 

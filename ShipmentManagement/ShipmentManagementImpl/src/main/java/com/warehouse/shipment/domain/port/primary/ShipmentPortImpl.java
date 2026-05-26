@@ -2,6 +2,7 @@ package com.warehouse.shipment.domain.port.primary;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -131,6 +132,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 command.getShipmentPriority(),
                 trackingNumber
         );
+        shipment.setDangerousGood(command.getDangerousGood());
 
         this.shipmentService.createShipment(shipment);
         logCreatedShipment(shipment);
@@ -210,15 +212,18 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateCommand command) {
-        final ShipmentId shipmentId = command.getShipmentId();
-        if (!existsShipment(shipmentId)) {
-            return Result.failure(ErrorCode.SHIPMENT_202);
-        }
+    public Optional<DangerousGood> loadDangerousGood(final ShipmentId shipmentId) {
+        return this.shipmentService.findDangerousGood(shipmentId);
+    }
 
-        this.shipmentService.changeDangerousGoodTo(shipmentId, DangerousGood.from(command));
+    @Override
+    public void putDangerousGood(final ShipmentId shipmentId, final DangerousGood dangerousGood) {
+        this.shipmentService.changeDangerousGoodTo(shipmentId, dangerousGood);
+    }
 
-        return Result.success();
+    @Override
+    public void deleteDangerousGood(final ShipmentId shipmentId) {
+        this.shipmentService.removeDangerousGood(shipmentId);
     }
 
     @Override
