@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
@@ -27,8 +26,28 @@ public interface ShipmentResponseMapper {
                 response.trackingNumber());
     }
 
-    @Mapping(target = "dangerousGood.weight.value", source = "dangerousGood.weight.weight")
     ShipmentDto map(final Shipment shipment);
+
+    default DangerousGoodApi map(final com.warehouse.shipment.domain.model.DangerousGood dangerousGood) {
+        if (dangerousGood == null) {
+            return null;
+        }
+        return new DangerousGoodApi(
+                dangerousGood.getUnNumber(), dangerousGood.getProperShippingName(), dangerousGood.getDescription(),
+                dangerousGood.getHazardClass(), dangerousGood.getHazardDivision(), dangerousGood.getSubsidiaryRisk(),
+                dangerousGood.getPackingGroup(), dangerousGood.getQuantity(), dangerousGood.getQuantityUnit(),
+                dangerousGood.getPackageCount(), dangerousGood.getPackagingType(), dangerousGood.isLimitedQuantity(),
+                dangerousGood.isExceptedQuantity(), dangerousGood.isEnvironmentallyHazardous(),
+                dangerousGood.isMarinePollutant(), dangerousGood.getTransportCategory(),
+                dangerousGood.getTunnelRestrictionCode(), dangerousGood.getFlashPoint(),
+                dangerousGood.getEmergencyContact(), dangerousGood.getEmergencyContact24h(),
+                dangerousGood.getSafetyDataSheetReference(), dangerousGood.getDeclarationDocumentReference(),
+                dangerousGood.getRegulationType(), dangerousGood.getTransportMode(), dangerousGood.isFlammable(),
+                dangerousGood.isCorrosive(), dangerousGood.isToxic(), dangerousGood.getHazardSymbols(),
+                dangerousGood.getStorageRequirements(), dangerousGood.getHandlingInstructions(),
+                dangerousGood.getCountryOfOrigin()
+        );
+    }
 
     default ShipmentControlCenterResponseApi map(final ShipmentControlCenter controlCenter) {
         return new ShipmentControlCenterResponseApi(map(controlCenter.shipment()), controlCenter.routeLog());
