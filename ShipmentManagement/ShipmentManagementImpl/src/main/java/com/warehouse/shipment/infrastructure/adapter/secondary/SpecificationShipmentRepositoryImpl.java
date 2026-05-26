@@ -88,6 +88,30 @@ public class SpecificationShipmentRepositoryImpl
             shipmentCriteria.le("createdAt", criteria.createdTo());
         }
 
+        if (criteria.hasDangerousGoods() != null) {
+            if (criteria.hasDangerousGoods()) {
+                shipmentCriteria.isNotNull("dangerousGood.unNumber");
+            } else {
+                shipmentCriteria.isNull("dangerousGood.unNumber");
+            }
+        }
+
+        if (hasText(criteria.unNumber())) {
+            shipmentCriteria.eq("dangerousGood.unNumber", criteria.unNumber().trim().toUpperCase());
+        }
+
+        if (hasText(criteria.hazardClass())) {
+            shipmentCriteria.eq("dangerousGood.hazardClass", criteria.hazardClass().trim());
+        }
+
+        if (hasText(criteria.regulationType())) {
+            shipmentCriteria.eq("dangerousGood.regulationType", criteria.regulationType().trim().toUpperCase());
+        }
+
+        if (hasText(criteria.transportMode())) {
+            shipmentCriteria.eq("dangerousGood.transportMode", criteria.transportMode().trim().toUpperCase());
+        }
+
         return shipmentCriteria
                 .desc("createdAt")
                 .firstResult(criteria.pageNumber() * criteria.pageSize())

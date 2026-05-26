@@ -59,5 +59,6 @@
     <include file="/changelog/db/users_role_permissions.xml"/>
     <include file="/changelog/db/foreign-keys.xml"/>
     <include file="/changelog/db/initial-login.xml"/>
+    <include file="/changelog/db/shipment-dangerous-good-embedded.xml"/>
 
 </databaseChangeLog>
