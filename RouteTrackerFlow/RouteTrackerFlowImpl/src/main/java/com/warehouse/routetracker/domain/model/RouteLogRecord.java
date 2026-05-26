@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.domain.model;
 
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
@@ -35,6 +36,19 @@ public class RouteLogRecord {
 
     public void saveFaultDescription(final String faultDescription) {
         this.faultDescription = faultDescription;
+    }
+
+    public void recordShipmentEvent(final String eventType,
+                                    final ParcelStatus parcelStatus,
+                                    final LocalDateTime occurredAt,
+                                    final String payload) {
+        getRouteLogRecordDetails().getRouteLogRecordDetailSet().add(RouteLogRecordDetail.builder()
+                .description(eventType)
+                .parcelStatus(parcelStatus)
+                .processType(determineProcessType(parcelStatus))
+                .timestamp(occurredAt)
+                .request(payload)
+                .build());
     }
 
     public void saveTerminalId(final ProcessType processType, final TerminalId terminalId) {
@@ -108,5 +122,15 @@ public class RouteLogRecord {
                         .username("s-soja")
                         .build());
         
+    }
+
+    private ProcessType determineProcessType(final ParcelStatus parcelStatus) {
+        return switch (parcelStatus) {
+            case CREATED -> ProcessType.CREATED;
+            case REROUTE -> ProcessType.REROUTE;
+            case SENT, DELIVERY -> ProcessType.ROUTE;
+            case RETURN -> ProcessType.RETURN;
+            case REDIRECT -> ProcessType.REDIRECT;
+        };
     }
 }

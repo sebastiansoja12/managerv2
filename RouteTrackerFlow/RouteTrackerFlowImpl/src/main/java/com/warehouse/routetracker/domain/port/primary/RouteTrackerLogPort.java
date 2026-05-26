@@ -1,45 +1,45 @@
 package com.warehouse.routetracker.domain.port.primary;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import com.warehouse.routetracker.domain.helper.Result;
-import com.warehouse.routetracker.domain.model.*;
-import com.warehouse.routetracker.domain.vo.*;
+import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
+import com.warehouse.routetracker.domain.vo.DepotCodeRequest;
+import com.warehouse.routetracker.domain.vo.DeviceIdInformation;
+import com.warehouse.routetracker.domain.vo.DeviceVersionInformation;
+import com.warehouse.routetracker.domain.vo.DeliveryStatusRequest;
+import com.warehouse.routetracker.domain.vo.SupplierCodeRequest;
+import com.warehouse.routetracker.domain.vo.TerminalRequest;
+import com.warehouse.routetracker.domain.vo.UsernameRequest;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 
 public interface RouteTrackerLogPort {
 
-    RouteProcess initializeRouteProcess(final ShipmentId shipmentId);
+    void saveShipmentEvent(final ShipmentId shipmentId,
+                           final String eventType,
+                           final ParcelStatus parcelStatus,
+                           final LocalDateTime occurredAt,
+                           final String payload);
+
+    void saveDeliveryStatus(final DeliveryStatusRequest request);
+
+    void saveDepotCode(final DepotCodeRequest request);
+
+    void saveSupplierCode(final SupplierCodeRequest request);
+
+    void saveTerminalRequest(final TerminalRequest request);
+
+    void saveDeviceIdInformation(final DeviceIdInformation information);
+
+    void saveDeviceVersionInformation(final DeviceVersionInformation information);
+
+    void saveUsername(final UsernameRequest request);
+
+    void saveDeviceInformation(final DeviceInformationRequest request);
 
     RouteLogRecord find(final ShipmentId shipmentId);
 
     List<RouteLogRecord> findAll();
-
-    void saveDeviceIdInformation(DeviceIdInformation deviceIdInformation);
-
-    void saveDeviceVersionInformation(DeviceVersionInformation deviceVersionInformation);
-
-    void saveReturnErrorCode(ErrorInformation information);
-
-    void saveFaultDescription(final FaultDescription faultDescription);
-
-    void saveDescription(DescriptionRequest request);
-
-    void saveSupplierCode(SupplierCodeRequest request);
-
-    void saveUsername(UsernameRequest usernameRequest);
-
-    void saveDepotCode(DepotCodeRequest depotCodeRequest);
-
-    void saveTerminalRequest(TerminalRequest request);
-
-    void saveReturnTrackRequest(ReturnTrackRequest request);
-
-    void saveDeliveryReturnRequest(DeliveryReturnRequest request);
-
-    void saveDeliveryStatus(DeliveryStatusRequest request);
-
-    void saveDeviceInformation(final DeviceInformationRequest request);
-
-    Result<RouteLogRecord, Exception> changePerson(final ShipmentId shipmentId, final Person person);
 }
