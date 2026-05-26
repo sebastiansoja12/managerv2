@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -18,6 +20,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.service.TrackingNumberService;
 import com.warehouse.shipment.domain.vo.Recipient;
@@ -98,6 +101,63 @@ class ShipmentTest {
                 () -> assertTrue(shipment.getLocked()),
                 () -> assertTrue(shipment.isFullyDelivered())
         );
+    }
+
+    @Test
+    void shouldAddAndRemoveDangerousGoodBeforeShipmentIsSent() {
+        final Shipment shipment = shipment(null);
+
+        shipment.changeDangerousGood(dangerousGood());
+        assertNotNull(shipment.getDangerousGood());
+
+        shipment.removeDangerousGood();
+        assertNull(shipment.getDangerousGood());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ShipmentStatus.class, names = {"SENT", "DELIVERY", "RETURN"})
+    void shouldRejectDangerousGoodChangeForFinalShipmentStatus(final ShipmentStatus status) {
+        final Shipment shipment = shipment(null);
+        shipment.changeShipmentStatus(status);
+
+        assertThrows(
+                ShipmentModificationException.class,
+                () -> shipment.changeDangerousGood(dangerousGood())
+        );
+    }
+
+    @Test
+    void shouldRejectDangerousGoodChangeForLockedShipment() {
+        final Shipment shipment = shipment(null);
+        shipment.lockShipment();
+
+        assertThrows(
+                ShipmentModificationException.class,
+                () -> shipment.changeDangerousGood(dangerousGood())
+        );
+    }
+
+    @Test
+    void shouldNotBypassDangerousGoodStatusRuleThroughGeneralUpdate() {
+        final Shipment shipment = shipment(null);
+        shipment.changeShipmentStatus(ShipmentStatus.SENT);
+
+        assertThrows(
+                ShipmentModificationException.class,
+                () -> shipment.update(
+                        shipment.getSender(),
+                        shipment.getRecipient(),
+                        ShipmentStatus.CREATED,
+                        shipment.getShipmentPriority(),
+                        shipment.getShipmentSize(),
+                        shipment.getPrice(),
+                        dangerousGood(),
+                        shipment.getDestination(),
+                        shipment.getSignatureRequired()
+                )
+        );
+        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+        assertNull(shipment.getDangerousGood());
     }
 
     @Test
