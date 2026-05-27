@@ -3,6 +3,7 @@ package com.warehouse.shipment.domain.vo;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ExternalId;
@@ -12,6 +13,7 @@ import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Signature;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record ShipmentSnapshot(ShipmentId shipmentId,
                                Sender sender,
                                Recipient recipient,
@@ -30,8 +32,6 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                CountryCode originCountry,
                                CountryCode destinationCountry,
                                Signature signature,
-                               ExternalId<String> routeExternalId,
-                               ExternalId<Long> returnExternalId,
                                TrackingNumber trackingNumber,
                                ExternalId<UUID> externalShipmentId) {
 }
