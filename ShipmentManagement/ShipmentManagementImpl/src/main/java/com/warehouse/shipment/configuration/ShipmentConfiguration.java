@@ -1,6 +1,5 @@
 package com.warehouse.shipment.configuration;
 
-import java.time.Duration;
 import java.util.Set;
 
 import org.mapstruct.factory.Mappers;
@@ -33,13 +32,9 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
-import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import com.warehouse.voronoi.VoronoiService;
-
-import io.github.resilience4j.retry.RetryConfig;
 
 @Configuration
 public class ShipmentConfiguration {
@@ -69,11 +64,6 @@ public class ShipmentConfiguration {
 	@Bean
 	public PriceRepository priceRepository(final PriceReadRepository repository) {
 		return new PriceRepositoryImpl(repository);
-	}
-
-	@Bean
-	public RouteTrackerHistoryNotifier routeTrackerNotifier() {
-		return new RouteTrackerHistoryNotifier();
 	}
 
 	@Bean
@@ -123,13 +113,6 @@ public class ShipmentConfiguration {
 	}
 	
 	@Bean
-	public RouteTrackerService routeTrackerService(final RouteLogServicePort routeLogServicePort,
-			final SoftwareConfigurationServicePort softwareConfigurationServicePort,
-			final CurrentUserServicePort currentUserServicePort) {
-		return new RouteTrackerServiceImpl(routeLogServicePort, softwareConfigurationServicePort, currentUserServicePort);
-	}
-
-	@Bean
 	public CountryRepository countryRepository(final CountryReadRepository repository) {
 		return new CountryRepositoryImpl(repository);
 	}
@@ -159,19 +142,6 @@ public class ShipmentConfiguration {
 				new ShipmentRedirectHandler(service), new ShipmentReturnHandler(service));
 	}
 
-	@Bean("shipment.softwareConfigurationServicePort")
-	public SoftwareConfigurationServicePort softwareConfigurationServicePort() {
-		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using software configuration");
-		final RetryConfig config = RetryConfig.custom()
-				.maxAttempts(4)
-				.waitDuration(Duration.ofSeconds(2))
-				.retryExceptions(RuntimeException.class)
-				.writableStackTraceEnabled(true)
-				.build();
-		return new SoftwareConfigurationServiceClient(config, softwareConfigurationProperties(),
-				routeTrackerLogProperties());
-	}
-
 	@Bean
 	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public RouteLogServicePort routeLogServiceMockPort() {
@@ -181,19 +151,12 @@ public class ShipmentConfiguration {
 
 	@Bean(name = "shipment.routeLogServicePort")
 	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
-	public RouteLogServicePort routeLogServicePort(final ExternalFeignClient externalFeignClient,
-												   final GenericFeignResourceService genericFeignResourceService,
-												   final RouteTrackerLogProperties routeTrackerLogProperties,
-												   final RouteLogRecordMapper routeLogRecordMapper) {
+	public RouteLogServicePort routeLogServicePort(final GenericFeignResourceService genericFeignResourceService,
+											   final RouteTrackerLogProperties routeTrackerLogProperties,
+											   final RouteLogRecordMapper routeLogRecordMapper) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Route log service port");
-		final RetryConfig config = RetryConfig.custom()
-				.maxAttempts(3)
-				.waitDuration(Duration.ofSeconds(2))
-				.retryExceptions(RuntimeException.class)
-				.writableStackTraceEnabled(true)
-				.build();
-		return new RouteLogServiceClient(config, externalFeignClient, genericFeignResourceService,
-				routeTrackerLogProperties, routeLogRecordMapper);
+		return new RouteLogServiceClient(genericFeignResourceService, routeTrackerLogProperties,
+				routeLogRecordMapper);
 	}
 
 	@Bean
@@ -232,11 +195,6 @@ public class ShipmentConfiguration {
 			final OperatorFilteredRepository<ShipmentEntity> shipmentRepository,
 			final OperatorContext operatorContext) {
 		return new ShipmentReadModelSyncServiceImpl(shipmentReadModelRepository, shipmentRepository, operatorContext);
-	}
-
-	@Bean
-	public SoftwareConfigurationProperties softwareConfigurationProperties() {
-		return new SoftwareConfigurationProperties();
 	}
 
 	@Bean
