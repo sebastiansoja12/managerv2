@@ -1,10 +1,5 @@
 package com.warehouse.shipment.domain.service;
 
-import java.util.List;
-
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
@@ -13,6 +8,10 @@ import com.warehouse.shipment.domain.port.secondary.ShipmentReadModelRepository;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncService {
 
@@ -43,10 +42,6 @@ public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncSe
                 .eq("shipmentId.value", shipmentId.getValue())
                 .one()
                 .orElseThrow(() -> new ShipmentNotFoundException("Shipment was not found"));
-
-        if (entity.operatorId() == null) {
-            throw new IllegalStateException("Shipment has no operator id");
-        }
 
         final Shipment shipment = Shipment.from(entity);
         this.operatorContext.runAs(entity.operatorId(), () -> this.repository.sync(shipment.snapshot()));
