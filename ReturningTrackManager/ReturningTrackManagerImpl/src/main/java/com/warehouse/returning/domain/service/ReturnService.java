@@ -19,7 +19,7 @@ public interface ReturnService {
 
     void saveOrUpdate(final ReturnPackage returnPackage);
 
-    void completeReturn(final ReturnPackageId returnPackageId);
+    void completeReturn(final ShipmentId shipmentId);
 
     ReturnPackage findByShipmentId(final ShipmentId shipmentId);
 }

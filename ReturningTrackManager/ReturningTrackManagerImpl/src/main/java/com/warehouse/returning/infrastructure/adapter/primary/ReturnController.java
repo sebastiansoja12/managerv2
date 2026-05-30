@@ -117,7 +117,7 @@ public class ReturnController {
         }
 
         final ChangeReturnStatusRequest request = RequestMapper.map(changeReturnStatusRequest);
-        this.returnPort.complete(request.getReturnPackageId());
+        this.returnPort.complete(request.getShipmentId());
         return ResponseEntity.ok().build();
     }
 
