@@ -1,9 +1,7 @@
 package com.warehouse.logistics.configuration;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import com.warehouse.auth.UserApiService;
 import com.warehouse.logistics.domain.port.primary.*;
@@ -19,8 +17,6 @@ import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRe
 import com.warehouse.logistics.infrastructure.adapter.secondary.*;
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.process.ProcessHubEventPublisher;
-import com.warehouse.routelogger.RouteLogEventPublisher;
-import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
 import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.DeviceEventPublisher;
 import com.warehouse.xmlconverter.XmlToStringService;
@@ -30,9 +26,8 @@ import com.warehouse.xmlconverter.XmlToStringServiceImpl;
 public class LogisticsConfiguration {
 
     @Bean
-    public LogisticsPort logisticsPort(final LogisticsService logisticsService,
-                                       final RouteLogDeliveryStatusServicePort logServicePort) {
-        return new LogisticsPortImpl(logisticsService, logServicePort);
+    public LogisticsPort logisticsPort(final LogisticsService logisticsService) {
+        return new LogisticsPortImpl(logisticsService);
     }
 
     @Bean
@@ -89,22 +84,6 @@ public class LogisticsConfiguration {
         return new ProcessHubServiceAdapter(processHubApiService, userApiService);
     }
 
-    @Bean
-    public TerminalRequestLoggerPort terminalRequestLoggerPort(final DeliveryTrackerLogServicePort deliveryTrackerLogServicePort) {
-        return new TerminalRequestLoggerPortImpl(deliveryTrackerLogServicePort);
-    }
-
-    @Bean
-    public DeliveryTrackerLogServicePort deliveryTrackerLogServicePort(final RouteLogEventPublisher routeLogEventPublisher) {
-        return new DeliveryTrackerLogServiceAdapter(routeLogEventPublisher);
-    }
-
-    @Bean("logistics.routeLogEventPublisher")
-    @Primary
-    public RouteLogEventPublisher routeLogEventPublisher(final ApplicationEventPublisher eventPublisher) {
-        return new RouteLogEventPublisherImpl(eventPublisher);
-    }
-
 	@Bean
 	public LogisticsService deliveryService(LogisticsRepository logisticsRepository,
                                             DeliveryTokenServicePort servicePort) {
@@ -114,11 +93,6 @@ public class LogisticsConfiguration {
     @Bean
     public LogisticsRepository deliveryRepository(LogisticsReadRepository repository) {
         return new LogisticsRepositoryImpl(repository);
-    }
-
-    @Bean
-    public RouteLogDeliveryStatusServicePort deliveryServicePort(RouteLogEventPublisher routeLogEventPublisher) {
-        return new RouteLogDeliveryStatusAdapter(routeLogEventPublisher);
     }
 
     @Bean(name = "logistics.supplierTokenServicePort")
