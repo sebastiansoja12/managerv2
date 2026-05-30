@@ -12,7 +12,6 @@ import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
 import com.warehouse.deliveryreject.domain.model.ShipmentRejectRequest;
 import com.warehouse.deliveryreject.domain.port.secondary.PersonShipmentServicePort;
 import com.warehouse.deliveryreject.domain.port.secondary.RejectShipmentServicePort;
-import com.warehouse.deliveryreject.domain.port.secondary.RejectTrackerServicePort;
 import com.warehouse.deliveryreject.domain.service.DeliveryRejectConverterService;
 import com.warehouse.deliveryreject.domain.service.RejectService;
 import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse;
@@ -34,18 +33,14 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
 
     private final DeliveryRejectConverterService deliveryRejectConverterService;
 
-    private final RejectTrackerServicePort rejectTrackerServicePort;
-
     public DeliveryRejectPortImpl(final RejectService rejectService,
                                   final RejectShipmentServicePort rejectShipmentServicePort,
                                   final PersonShipmentServicePort personShipmentServicePort,
-                                  final DeliveryRejectConverterService deliveryRejectConverterService,
-                                  final RejectTrackerServicePort rejectTrackerServicePort) {
+                                  final DeliveryRejectConverterService deliveryRejectConverterService) {
         this.rejectService = rejectService;
         this.rejectShipmentServicePort = rejectShipmentServicePort;
         this.personShipmentServicePort = personShipmentServicePort;
         this.deliveryRejectConverterService = deliveryRejectConverterService;
-        this.rejectTrackerServicePort = rejectTrackerServicePort;
     }
 
     @Override
