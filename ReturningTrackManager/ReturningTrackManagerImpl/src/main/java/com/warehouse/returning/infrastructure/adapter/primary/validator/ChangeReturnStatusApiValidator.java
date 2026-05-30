@@ -15,8 +15,9 @@ public class ChangeReturnStatusApiValidator extends RequestValidator<ChangeRetur
     public Result<Void, List<String>> validateBody(final ChangeReturnStatusApiRequest changeReturnStatusApiRequest) {
         final List<String> errors = new ArrayList<>();
 
-        if (changeReturnStatusApiRequest.returnPackageId() == null || changeReturnStatusApiRequest.returnPackageId().value() == null) {
-            errors.add("Return package id must be provided");
+        if (changeReturnStatusApiRequest.shipmentId() == null
+                || changeReturnStatusApiRequest.shipmentId().value() == null) {
+            errors.add("Shipment id must be provided");
         }
 
         if (changeReturnStatusApiRequest.returnStatus() == null) {
