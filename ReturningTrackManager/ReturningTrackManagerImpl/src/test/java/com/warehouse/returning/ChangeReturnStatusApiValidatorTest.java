@@ -7,8 +7,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.returning.domain.helper.Result;
-import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReturnStatusApiRequest;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ShipmentIdDto;
 import com.warehouse.returning.infrastructure.adapter.primary.validator.ChangeReturnStatusApiValidator;
 
 class ChangeReturnStatusApiValidatorTest {
@@ -16,7 +16,7 @@ class ChangeReturnStatusApiValidatorTest {
     private final ChangeReturnStatusApiValidator validator = new ChangeReturnStatusApiValidator();
 
     @Test
-    void shouldReturnErrorWhenReturnPackageIdIsMissing() {
+    void shouldReturnErrorWhenShipmentIdIsMissing() {
         final ChangeReturnStatusApiRequest request = new ChangeReturnStatusApiRequest(
                 null,
                 "PROCESSING"
@@ -25,13 +25,13 @@ class ChangeReturnStatusApiValidatorTest {
         final Result<Void, List<String>> result = validator.validateBody(request);
 
         assertThat(result.isFailure()).isTrue();
-        assertThat(result.getFailure()).containsExactly("Return package id must be provided");
+        assertThat(result.getFailure()).containsExactly("Shipment id must be provided");
     }
 
     @Test
     void shouldReturnErrorWhenReturnStatusIsMissing() {
         final ChangeReturnStatusApiRequest request = new ChangeReturnStatusApiRequest(
-                new ReturnPackageId(123L),
+                new ShipmentIdDto(123L),
                 null
         );
 
@@ -44,7 +44,7 @@ class ChangeReturnStatusApiValidatorTest {
     @Test
     void shouldReturnErrorWhenReturnStatusIsInvalid() {
         final ChangeReturnStatusApiRequest request = new ChangeReturnStatusApiRequest(
-                new ReturnPackageId(123L),
+                new ShipmentIdDto(123L),
                 "INVALID_STATUS"
         );
 
@@ -57,7 +57,7 @@ class ChangeReturnStatusApiValidatorTest {
     @Test
     void shouldReturnSuccessWhenAllFieldsAreValid() {
         final ChangeReturnStatusApiRequest request = new ChangeReturnStatusApiRequest(
-                new ReturnPackageId(123L),
+                new ShipmentIdDto(123L),
                 "COMPLETED"
         );
 
