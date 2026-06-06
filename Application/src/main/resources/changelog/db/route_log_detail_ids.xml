@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="codex" id="20260811-1-route-log-detail-ids">
+        <addColumn tableName="route_log_details">
+            <column name="user_id" type="BIGINT"/>
+            <column name="department_id" type="BIGINT"/>
+            <column name="supplier_id" type="BIGINT"/>
+        </addColumn>
+
+        <sql>
+            UPDATE route_log_details
+            SET user_id = (
+                    SELECT users.user_id
+                    FROM users
+                    WHERE users.username = route_log_details.username
+                ),
+                department_id = (
+                    SELECT department.department_id
+                    FROM department
+                    WHERE department.department_code = route_log_details.department_code
+                ),
+                supplier_id = (
+                    SELECT MAX(suppliers.supplier_id)
+                    FROM suppliers
+                    WHERE suppliers.supplier_code = route_log_details.supplier_code
+                )
+        </sql>
+
+        <dropForeignKeyConstraint baseTableName="route_log_details"
+                                  constraintName="fk_route_log_details_department"/>
+        <dropForeignKeyConstraint baseTableName="route_log_details"
+                                  constraintName="fk_route_log_details_supplier"/>
+        <dropForeignKeyConstraint baseTableName="route_log_details"
+                                  constraintName="fk_route_log_details_user"/>
+
+        <dropColumn tableName="route_log_details" columnName="username"/>
+        <dropColumn tableName="route_log_details" columnName="department_code"/>
+        <dropColumn tableName="route_log_details" columnName="supplier_code"/>
+    </changeSet>
+
+    <changeSet author="codex" id="20260812-1-route-log-shipment-columns">
+        <renameColumn tableName="route_log_details"
+                      oldColumnName="parcel_status"
+                      newColumnName="shipment_status"
+                      columnDataType="INT"/>
+        <renameColumn tableName="route_log"
+                      oldColumnName="parcel_id"
+                      newColumnName="shipmentId"
+                      columnDataType="BIGINT"/>
+    </changeSet>
+
+</databaseChangeLog>
