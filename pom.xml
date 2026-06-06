@@ -33,7 +33,6 @@
         <module>ManagerTools</module>
         <module>E2E</module>
         <module>Common</module>
-        <module>RouteLogger</module>
         <module>AssetConverter</module>
 		<module>MessageProvider</module>
         <module>LogisticsOrchestrator</module>
