@@ -3,12 +3,14 @@ package com.warehouse.department.domain.vo;
 import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 
 public record DepartmentSnapshot(
+        DepartmentId departmentId,
         DepartmentCode departmentCode,
         Address address,
         TaxId taxId,
