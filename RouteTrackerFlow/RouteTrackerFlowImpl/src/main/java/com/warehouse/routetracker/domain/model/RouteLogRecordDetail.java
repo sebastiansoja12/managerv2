@@ -2,7 +2,10 @@ package com.warehouse.routetracker.domain.model;
 
 import java.time.LocalDateTime;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.TerminalId;
 
@@ -17,10 +20,10 @@ public class RouteLogRecordDetail {
     private Long id;
     private TerminalId terminalId;
     private String version;
-    private String username;
-    private String supplierCode;
-    private String departmentCode;
-    private ParcelStatus parcelStatus;
+    private UserId userId;
+    private SupplierId supplierId;
+    private DepartmentId departmentId;
+    private ShipmentStatus shipmentStatus;
     private String description;
     private LocalDateTime timestamp;
     private ProcessType processType;
@@ -41,8 +44,8 @@ public class RouteLogRecordDetail {
         markAsModified();
     }
 
-    public void saveSupplierCode(final String supplierCode) {
-        this.supplierCode = supplierCode;
+    public void saveSupplierId(final SupplierId supplierId) {
+        this.supplierId = supplierId;
         markAsModified();
     }
 
@@ -51,18 +54,18 @@ public class RouteLogRecordDetail {
         markAsModified();
     }
 
-    public void saveUsername(final String username) {
-        this.username = username;
+    public void saveUserId(final UserId userId) {
+        this.userId = userId;
         markAsModified();
     }
 
-    public void saveDepartmentCode(final String departmentCode) {
-        this.departmentCode = departmentCode;
+    public void saveDepartmentId(final DepartmentId departmentId) {
+        this.departmentId = departmentId;
         markAsModified();
     }
 
-    public void saveParcelStatus(final ParcelStatus parcelStatus) {
-        this.parcelStatus = parcelStatus;
+    public void saveShipmentStatus(final ShipmentStatus shipmentStatus) {
+        this.shipmentStatus = shipmentStatus;
         markAsModified();
     }
 
@@ -71,8 +74,8 @@ public class RouteLogRecordDetail {
     }
 
     public void updateDeviceInformation(final DeviceInformationRequest request) {
-        this.departmentCode = request.getDepartmentCode().value();
-        this.username = request.getUsername().value();
+        this.departmentId = request.getDepartmentId();
+        this.userId = request.getUserId();
         this.terminalId = new TerminalId(request.getDeviceId().value());
         this.version = request.getVersion();
     }

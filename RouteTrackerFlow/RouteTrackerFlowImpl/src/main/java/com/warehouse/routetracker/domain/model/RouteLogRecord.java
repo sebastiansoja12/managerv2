@@ -1,15 +1,18 @@
 package com.warehouse.routetracker.domain.model;
 
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
 import com.warehouse.routetracker.domain.vo.TerminalId;
-
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Builder
 @EqualsAndHashCode
@@ -18,7 +21,7 @@ import lombok.*;
 @NoArgsConstructor
 public class RouteLogRecord {
     private UUID id;
-    private Long parcelId;
+    private ShipmentId shipmentId;
     private RouteLogRecordDetails routeLogRecordDetails;
     private String returnCode;
     private String faultDescription;
@@ -38,16 +41,21 @@ public class RouteLogRecord {
         this.faultDescription = faultDescription;
     }
 
-    public void recordShipmentEvent(final String eventType,
-                                    final ParcelStatus parcelStatus,
+    public void createShipmentEvent(final String eventType,
+                                    final ShipmentStatus shipmentStatus,
                                     final LocalDateTime occurredAt,
-                                    final String payload) {
-        getRouteLogRecordDetails().getRouteLogRecordDetailSet().add(RouteLogRecordDetail.builder()
+                                    final String payload,
+                                    final UserId userId,
+                                    final DepartmentId departmentId) {
+        getRouteLogRecordDetails()
+                .getRouteLogRecordDetailSet().add(RouteLogRecordDetail.builder()
+                .shipmentStatus(shipmentStatus)
+                .processType(determineProcessType(shipmentStatus))
                 .description(eventType)
-                .parcelStatus(parcelStatus)
-                .processType(determineProcessType(parcelStatus))
                 .timestamp(occurredAt)
                 .request(payload)
+                .userId(userId)
+                .departmentId(departmentId)
                 .build());
     }
 
@@ -63,16 +71,16 @@ public class RouteLogRecord {
         routeLogRecordDetail.saveZebraVersionInformation(version);
     }
 
-    public void saveUsername(final ProcessType processType, final String username) {
+    public void saveUserId(final ProcessType processType, final UserId userId) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
-        routeLogRecordDetail.saveUsername(username);
+        routeLogRecordDetail.saveUserId(userId);
     }
 
-    public void saveDepotCode(final ProcessType processType, final String depotCode) {
+    public void saveDepartmentId(final ProcessType processType, final DepartmentId departmentId) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
-        routeLogRecordDetail.saveDepartmentCode(depotCode);
+        routeLogRecordDetail.saveDepartmentId(departmentId);
     }
 
     public void saveDescription(final ProcessType processType, final String description) {
@@ -81,16 +89,16 @@ public class RouteLogRecord {
         routeLogRecordDetail.saveDescription(description);
     }
 
-    public void saveSupplierCode(final ProcessType processType, final String supplierCode) {
+    public void saveSupplierId(final ProcessType processType, final SupplierId supplierId) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
-        routeLogRecordDetail.saveSupplierCode(supplierCode);
+        routeLogRecordDetail.saveSupplierId(supplierId);
     }
 
-    public void updateShipmentStatus(final ProcessType processType, final ParcelStatus parcelStatus) {
+    public void updateShipmentStatus(final ProcessType processType, final ShipmentStatus shipmentStatus) {
         final RouteLogRecordDetail routeLogRecordDetail = getRouteLogRecordDetails()
                 .getRouteLogRecordDetail(processType);
-        routeLogRecordDetail.saveParcelStatus(parcelStatus);
+        routeLogRecordDetail.saveShipmentStatus(shipmentStatus);
     }
 
     public void updateRequest(final ProcessType processType, final String request) {
@@ -118,14 +126,13 @@ public class RouteLogRecord {
 						.description(String.format(description, person.getPersonType(), person.getFirstName(),
 								person.getLastName()))
                         .processType(routeLogRecordDetail.getProcessType())
-                        .parcelStatus(routeLogRecordDetail.getParcelStatus())
-                        .username("s-soja")
+                        .shipmentStatus(routeLogRecordDetail.getShipmentStatus())
                         .build());
         
     }
 
-    private ProcessType determineProcessType(final ParcelStatus parcelStatus) {
-        return switch (parcelStatus) {
+    private ProcessType determineProcessType(final ShipmentStatus shipmentStatus) {
+        return switch (shipmentStatus) {
             case CREATED -> ProcessType.CREATED;
             case REROUTE -> ProcessType.REROUTE;
             case SENT, DELIVERY -> ProcessType.ROUTE;
