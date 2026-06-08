@@ -53,7 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (jwtService.isTokenValid(jwt, user)) {
                     final SecurityContext context = SecurityContextHolder.createEmptyContext();
                     final UsernameTenantPasswordAuthenticationToken authToken = new UsernameTenantPasswordAuthenticationToken(
-                            user.getUserId(), user.operatorId(), jwt, user.getAuthorities());
+                            user.getUserId(), user.operatorId(), this.jwtService.extractDepartmentId(jwt).orElse(null),
+                            jwt, user.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     context.setAuthentication(authToken);
                     SecurityContextHolder.setContext(context);
