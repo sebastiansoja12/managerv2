@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.commonassets.kafka.domain.annotation.KafkaDomainEvent;
 import com.warehouse.commonassets.kafka.domain.model.KafkaEventKey;
+import com.warehouse.commonassets.kafka.domain.model.OperatorAwareContext;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ import java.time.Instant;
         topicProperty = "manager.kafka.topics.shipment-read-model-sync",
         topic = "shipment.read-model.sync"
 )
-public class ShipmentChangedEvent implements KafkaEventKey {
+public class ShipmentChangedEvent extends OperatorAwareContext implements KafkaEventKey {
 
     @NotNull
     private final ShipmentSnapshot snapshot;
