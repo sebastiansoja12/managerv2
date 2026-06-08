@@ -5,6 +5,6 @@ import lombok.Value;
 
 @Value
 public class ZebraInitializeRequest {
-    Long parcelId;
+    Long shipmentId;
     ProcessType processType;
 }

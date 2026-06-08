@@ -1,7 +1,8 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 
-public record DeviceInformationRequestDto(DeviceIdDto deviceId, DepartmentCodeDto departmentCode, DeviceTypeDto deviceType, DeviceVersionDto deviceVersion, UsernameDto username,
-                                          ShipmentIdDto shipmentId, ProcessTypeDto processType) {
+public record DeviceInformationRequestDto(DeviceIdDto deviceId, DepartmentIdDto departmentId,
+                                          DeviceTypeDto deviceType, DeviceVersionDto deviceVersion,
+                                          UserIdDto userId, ShipmentIdDto shipmentId,
+                                          ProcessTypeDto processType) {
 
 }
-
