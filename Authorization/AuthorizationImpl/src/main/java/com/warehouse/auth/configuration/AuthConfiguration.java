@@ -3,6 +3,7 @@ package com.warehouse.auth.configuration;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -60,8 +61,10 @@ public class AuthConfiguration  {
     }
 
     @Bean
-    public JwtService jwtService(JwtProvider jwtProvider) {
-        return new JwtServiceImpl(jwtProvider);
+    public JwtService jwtService(final JwtProvider jwtProvider,
+                                 @Qualifier("authentication.departmentServicePort")
+                                 final DepartmentServicePort departmentServicePort) {
+        return new JwtServiceImpl(jwtProvider, departmentServicePort);
     }
     
     @Bean

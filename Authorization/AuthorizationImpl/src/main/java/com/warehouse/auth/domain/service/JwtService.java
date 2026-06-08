@@ -2,11 +2,15 @@ package com.warehouse.auth.domain.service;
 
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 
 import java.util.Map;
+import java.util.Optional;
 
 public interface JwtService {
     String extractUsername(String jwt);
+
+    Optional<DepartmentId> extractDepartmentId(String jwt);
 
     String generateToken(Map<String, Object> extraClaims, User user, Long expiration);
 

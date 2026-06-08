@@ -1,8 +1,10 @@
 package com.warehouse.auth.domain.service;
 
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,6 +17,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class JwtServiceImpl implements JwtService {
@@ -25,9 +28,20 @@ public class JwtServiceImpl implements JwtService {
     @NonNull
     private final JwtProvider jwtProvider;
 
+    @NonNull
+    private final DepartmentServicePort departmentServicePort;
+
     @Override
     public String extractUsername(final String token) {
         return getUsername(token);
+    }
+
+    @Override
+    public Optional<DepartmentId> extractDepartmentId(final String token) {
+        return Optional.ofNullable(extractAllClaims(token).get("departmentId"))
+                .map(Object::toString)
+                .map(Long::valueOf)
+                .map(DepartmentId::new);
     }
 
     @Override
@@ -52,6 +66,7 @@ public class JwtServiceImpl implements JwtService {
         claimsMap.put("username", user.getUsername());
         claimsMap.put("userId", user.getUserId().value());
         claimsMap.put("operatorId", user.operatorId().value());
+        claimsMap.put("departmentId", this.departmentServicePort.getDepartmentId(user.getDepartmentCode()).getValue());
         final Long expiration = jwtProvider.getExpiration();
         return generateToken(claimsMap, user, expiration);
     }
