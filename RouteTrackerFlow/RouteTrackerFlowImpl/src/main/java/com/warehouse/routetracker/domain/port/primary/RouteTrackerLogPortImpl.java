@@ -1,22 +1,18 @@
 package com.warehouse.routetracker.domain.port.primary;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.function.Consumer;
-
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
-import com.warehouse.routetracker.domain.vo.DepotCodeRequest;
-import com.warehouse.routetracker.domain.vo.DeviceIdInformation;
-import com.warehouse.routetracker.domain.vo.DeviceVersionInformation;
-import com.warehouse.routetracker.domain.vo.DeliveryStatusRequest;
-import com.warehouse.routetracker.domain.vo.SupplierCodeRequest;
-import com.warehouse.routetracker.domain.vo.TerminalRequest;
-import com.warehouse.routetracker.domain.vo.UsernameRequest;
+import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
 
@@ -27,31 +23,35 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public void saveShipmentEvent(final ShipmentId shipmentId,
-                                  final String eventType,
-                                  final ParcelStatus parcelStatus,
-                                  final LocalDateTime occurredAt,
-                                  final String payload) {
-        this.update(shipmentId,
-                routeLogRecord -> routeLogRecord.recordShipmentEvent(eventType, parcelStatus, occurredAt, payload));
+    public void createShipmentEvent(final ShipmentId shipmentId,
+                                    final String eventType,
+                                    final ShipmentStatus shipmentStatus,
+                                    final LocalDateTime occurredAt,
+                                    final String payload,
+                                    final UserId userId,
+                                    final DepartmentId departmentId) {
+        this.update(shipmentId, routeLogRecord -> {
+            routeLogRecord.createShipmentEvent(
+                    eventType, shipmentStatus, occurredAt, payload, userId, departmentId);
+        });
     }
 
     @Override
     public void saveDeliveryStatus(final DeliveryStatusRequest request) {
         this.update(request.getShipmentId(), routeLogRecord -> routeLogRecord.updateShipmentStatus(
-                request.getProcessType(), this.determineParcelStatus(request.getProcessType())));
+                request.getProcessType(), this.determineShipmentStatus(request.getProcessType())));
     }
 
     @Override
-    public void saveDepotCode(final DepotCodeRequest request) {
-        this.update(request.getShipmentId(), routeLogRecord ->
-                routeLogRecord.saveDepotCode(request.getProcessType(), request.getDepotCode()));
+    public void saveDepartmentId(final DepartmentIdRequest request) {
+        this.update(request.shipmentId(), routeLogRecord ->
+                routeLogRecord.saveDepartmentId(request.processType(), request.departmentId()));
     }
 
     @Override
-    public void saveSupplierCode(final SupplierCodeRequest request) {
-        this.update(request.getShipmentId(), routeLogRecord ->
-                routeLogRecord.saveSupplierCode(request.getProcessType(), request.getSupplierCode()));
+    public void saveSupplierId(final SupplierIdRequest request) {
+        this.update(request.shipmentId(), routeLogRecord ->
+                routeLogRecord.saveSupplierId(request.processType(), request.supplierId()));
     }
 
     @Override
@@ -73,9 +73,9 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public void saveUsername(final UsernameRequest request) {
-        this.update(request.getShipmentId(), routeLogRecord ->
-                routeLogRecord.saveUsername(request.getProcessType(), request.getUsername()));
+    public void saveUserId(final UserIdRequest request) {
+        this.update(request.shipmentId(), routeLogRecord ->
+                routeLogRecord.saveUserId(request.processType(), request.userId()));
     }
 
     @Override
@@ -94,25 +94,25 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     private void update(final ShipmentId shipmentId, final Consumer<RouteLogRecord> change) {
-        this.repository.findOptional(shipmentId).ifPresentOrElse(routeLogRecord -> {
+        this.repository.findById(shipmentId).ifPresentOrElse(routeLogRecord -> {
             change.accept(routeLogRecord);
             this.repository.update(routeLogRecord);
         }, () -> {
             final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
-                    .parcelId(shipmentId.value())
+                    .shipmentId(shipmentId)
                     .build();
             change.accept(routeLogRecord);
             this.repository.save(routeLogRecord);
         });
     }
 
-    private ParcelStatus determineParcelStatus(final ProcessType processType) {
+    private ShipmentStatus determineShipmentStatus(final ProcessType processType) {
         return switch (processType) {
-            case CREATED -> ParcelStatus.CREATED;
-            case ROUTE, MISS -> ParcelStatus.DELIVERY;
-            case RETURN -> ParcelStatus.RETURN;
-            case REROUTE -> ParcelStatus.REROUTE;
-            case REDIRECT, REJECT -> ParcelStatus.REDIRECT;
+            case CREATED -> ShipmentStatus.CREATED;
+            case ROUTE, MISS -> ShipmentStatus.DELIVERY;
+            case RETURN -> ShipmentStatus.RETURN;
+            case REROUTE -> ShipmentStatus.REROUTE;
+            case REDIRECT, REJECT -> ShipmentStatus.REDIRECT;
         };
     }
 }
