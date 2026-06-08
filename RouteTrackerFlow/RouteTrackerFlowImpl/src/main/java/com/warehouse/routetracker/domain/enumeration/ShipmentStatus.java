@@ -1,6 +1,6 @@
 package com.warehouse.routetracker.domain.enumeration;
 
-public enum ParcelStatus {
+public enum ShipmentStatus {
 
     CREATED,
 
