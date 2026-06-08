@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.configuration.JwtProperties;
@@ -26,19 +27,20 @@ class JwtDecodeServiceTest {
     private static final String AUDIENCE = "manager-v2-gui";
 
     @Test
-    void shouldDecodeUserAndOperatorFromAccessToken() {
+    void shouldDecodeUserOperatorAndDepartmentFromAccessToken() {
         final JwtDecodeService jwtDecodeService = new JwtDecodeService(
                 new JwtProperties(SECRET_KEY, ISSUER, AUDIENCE)
         );
-        final String token = createAccessToken(42L, 7L);
+        final String token = createAccessToken(42L, 7L, 10L);
 
         final UserContext userContext = jwtDecodeService.decode(token);
 
         assertThat(userContext.userId()).isEqualTo(new UserId(42L));
         assertThat(userContext.operatorId()).isEqualTo(OperatorId.of(7L));
+        assertThat(userContext.departmentId()).isEqualTo(new DepartmentId(10L));
     }
 
-    private String createAccessToken(final Long userId, final Long operatorId) {
+    private String createAccessToken(final Long userId, final Long operatorId, final Long departmentId) {
         final byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         final Key signingKey = Keys.hmacShaKeyFor(keyBytes);
         return Jwts.builder()
@@ -48,6 +50,7 @@ class JwtDecodeServiceTest {
                 .claim("tokenType", "access")
                 .claim("userId", userId)
                 .claim("operatorId", operatorId)
+                .claim("departmentId", departmentId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 60_000))
                 .signWith(signingKey, SignatureAlgorithm.forSigningKey(signingKey))
