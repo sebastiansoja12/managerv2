@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <property name="routeLogRequestType" value="MEDIUMTEXT" dbms="mysql"/>
+    <property name="routeLogRequestType" value="CLOB"/>
+
+    <changeSet id="001-create-route-log" author="codex">
+        <createTable tableName="route_log">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_route_log"/>
+            </column>
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="return_code" type="VARCHAR(255)"/>
+            <column name="fault_description" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addUniqueConstraint tableName="route_log"
+                             columnNames="shipment_id"
+                             constraintName="uk_route_log_shipment_id"/>
+    </changeSet>
+
+    <changeSet id="002-create-route-log-details" author="codex">
+        <createTable tableName="route_log_details">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_route_log_details"/>
+            </column>
+            <column name="route_log_record_id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_id" type="VARCHAR(255)"/>
+            <column name="version" type="VARCHAR(255)"/>
+            <column name="created" type="DATETIME"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="process_type" type="INTEGER"/>
+            <column name="request" type="${routeLogRequestType}"/>
+            <column name="shipment_status" type="INTEGER"/>
+            <column name="user_id" type="BIGINT"/>
+            <column name="department_id" type="BIGINT"/>
+            <column name="supplier_id" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="route_log_details"
+                                 baseColumnNames="route_log_record_id"
+                                 referencedTableName="route_log"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_route_log_details_route_log"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
