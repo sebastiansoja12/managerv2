@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +16,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
@@ -26,6 +29,8 @@ class RouteTrackerLogPortImplTest {
 
     private static final ShipmentId SHIPMENT_ID = new ShipmentId(100001L);
     private static final LocalDateTime OCCURRED_AT = LocalDateTime.of(2026, 8, 9, 12, 0);
+    private static final UserId USER_ID = new UserId(42L);
+    private static final DepartmentId DEPARTMENT_ID = new DepartmentId(10L);
 
     @Mock
     private RouteLogRepository repository;
@@ -39,27 +44,34 @@ class RouteTrackerLogPortImplTest {
 
     @Test
     void shouldCreateRouteLogWhenFirstShipmentEventIsReceived() {
-        when(this.repository.findOptional(SHIPMENT_ID)).thenReturn(Optional.empty());
+        when(this.repository.findById(SHIPMENT_ID)).thenReturn(Optional.empty());
 
-        this.routeTrackerLogPort.saveShipmentEvent(
-                SHIPMENT_ID, "ShipmentCreatedEvent", ParcelStatus.CREATED, OCCURRED_AT, "{}"
+        this.routeTrackerLogPort.createShipmentEvent(
+                SHIPMENT_ID, "ShipmentCreatedEvent", ShipmentStatus.CREATED, OCCURRED_AT, "{}",
+                USER_ID, DEPARTMENT_ID
         );
 
         final ArgumentCaptor<RouteLogRecord> recordCaptor = ArgumentCaptor.forClass(RouteLogRecord.class);
         verify(this.repository).save(recordCaptor.capture());
-        assertThat(recordCaptor.getValue().getParcelId()).isEqualTo(SHIPMENT_ID.value());
+        assertThat(recordCaptor.getValue().getShipmentId()).isEqualTo(SHIPMENT_ID);
         assertThat(recordCaptor.getValue().getRouteLogRecordDetails().getRouteLogRecordDetailSet()).hasSize(1);
+        final RouteLogRecordDetail detail = recordCaptor.getValue().getRouteLogRecordDetails()
+                .getRouteLogRecordDetailSet().iterator().next();
+        assertThat(detail.getDescription()).isEqualTo("ShipmentCreatedEvent");
+        assertThat(detail.getUserId()).isEqualTo(USER_ID);
+        assertThat(detail.getDepartmentId()).isEqualTo(DEPARTMENT_ID);
     }
 
     @Test
     void shouldUpdateRouteLogWhenNextShipmentEventIsReceived() {
         final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
-                .parcelId(SHIPMENT_ID.value())
+                .shipmentId(SHIPMENT_ID)
                 .build();
-        when(this.repository.findOptional(SHIPMENT_ID)).thenReturn(Optional.of(routeLogRecord));
+        when(this.repository.findById(SHIPMENT_ID)).thenReturn(Optional.of(routeLogRecord));
 
-        this.routeTrackerLogPort.saveShipmentEvent(
-                SHIPMENT_ID, "ShipmentSent", ParcelStatus.SENT, OCCURRED_AT, "{}"
+        this.routeTrackerLogPort.createShipmentEvent(
+                SHIPMENT_ID, "ShipmentSent", ShipmentStatus.SENT, OCCURRED_AT, "{}",
+                USER_ID, DEPARTMENT_ID
         );
 
         verify(this.repository).update(routeLogRecord);
@@ -69,7 +81,7 @@ class RouteTrackerLogPortImplTest {
     @Test
     void shouldFindRouteLogByShipmentId() {
         final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
-                .parcelId(SHIPMENT_ID.value())
+                .shipmentId(SHIPMENT_ID)
                 .build();
         when(this.repository.find(SHIPMENT_ID)).thenReturn(routeLogRecord);
 

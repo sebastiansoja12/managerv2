@@ -49,11 +49,11 @@ public class RouteTrackerIntegrationTest {
     @Test
     void shouldFindProcess() {
         // given
-        final Long parcelId = 1L;
+        final Long shipmentId = 1L;
         // when
         final ResponseEntity<RouteLogRecord> responseEntity = restClient
                 .get()
-                .uri("/v2/api/routes/{parcelId}", parcelId)
+                .uri("/v2/api/routes/{shipmentId}", shipmentId)
                 .retrieve()
                 .toEntity(RouteLogRecord.class);
         // then
