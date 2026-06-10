@@ -3,9 +3,19 @@ package com.warehouse.routetracker;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.configuration.RouteTrackerTestConfiguration;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteLogRecordReadRepository;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.RouteLogToEntityMapper;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +29,12 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
+import static org.mapstruct.factory.Mappers.getMapper;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
@@ -34,6 +48,28 @@ public class RouteLogRecordReadRepositoryTest {
     @Autowired
     private RouteLogRecordReadRepository repository;
 
+    private final RouteLogToEntityMapper entityMapper = getMapper(RouteLogToEntityMapper.class);
+
+    @Test
+    void shouldPersistDetailWithRouteLogRecordIdInInsert() {
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
+                .shipmentId(new ShipmentId(345678L))
+                .build();
+        routeLogRecord.createShipmentEvent(
+                "ShipmentCreated",
+                ShipmentStatus.CREATED,
+                LocalDateTime.now(),
+                "{\"event\":\"created\"}",
+                new UserId(3L),
+                new DepartmentId(30L));
+
+        final RouteLogRecordEntity saved = repository.saveAndFlush(entityMapper.map(routeLogRecord));
+        final RouteLogRecordDetailEntity detail = saved.getRouteLogRecordDetails().getFirst();
+
+        assertNotNull(saved.getId());
+        assertEquals(saved.getId(), detail.getRouteLogRecord().getId());
+    }
+
     @Test
     void shouldFindRouteLogRecordByProcessId() {
         // given
@@ -45,13 +81,30 @@ public class RouteLogRecordReadRepositoryTest {
     }
 
     @Test
-    void shouldFindRouteLogRecordByParcelId() {
+    void shouldFindRouteLogRecordByShipmentId() {
         // given
         final Long id = 123456L;
         // when
-        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByShipmentId(id);
+        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByShipmentId(new ShipmentId(id));
         // then
         assertTrue(routeLogRecord.isPresent());
+    }
+
+    @Test
+    void shouldLoadDetailIdentifiersWithoutEntityRelations() {
+        final RouteLogRecordEntity routeLogRecord = repository
+                .findByShipmentId(new ShipmentId(123456L))
+                .orElseThrow();
+
+        assertTrue(Hibernate.isInitialized(routeLogRecord.getRouteLogRecordDetails()));
+        assertEquals(new ShipmentId(123456L), routeLogRecord.getShipmentId());
+        final RouteLogRecordDetailEntity detail = routeLogRecord.getRouteLogRecordDetails().getFirst();
+
+        assertEquals(new RouteLogRecordDetailId(1L), detail.getId());
+        assertEquals(routeLogRecord.getId(), detail.getRouteLogRecord().getId());
+        assertEquals(new UserId(1L), detail.getUserId());
+        assertEquals(new DepartmentId(10L), detail.getDepartmentId());
+        assertEquals(new SupplierId(100L), detail.getSupplierId());
     }
 
     @Test
@@ -65,11 +118,11 @@ public class RouteLogRecordReadRepositoryTest {
     }
 
     @Test
-    void shouldNotFindRouteLogRecordByParcelId() {
+    void shouldNotFindRouteLogRecordByShipmentId() {
         // given
         final Long id = 2L;
         // when
-        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByShipmentId(id);
+        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findByShipmentId(new ShipmentId(id));
         // then
         assertTrue(routeLogRecord.isEmpty());
     }
@@ -80,5 +133,7 @@ public class RouteLogRecordReadRepositoryTest {
         final List<RouteLogRecordEntity> routeLogRecord = repository.findAll();
         // then
         assertFalse(routeLogRecord.isEmpty());
+        assertTrue(routeLogRecord.stream()
+                .allMatch(record -> Hibernate.isInitialized(record.getRouteLogRecordDetails())));
     }
 }
