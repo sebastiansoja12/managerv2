@@ -5,9 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import org.mapstruct.Mapper;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
@@ -23,7 +23,7 @@ public interface RouteLogToModelMapper {
                 .builder()
                 .id(UUID.fromString(routeLogRecord.getId()))
                 .returnCode(routeLogRecord.getReturnCode())
-                .parcelId(routeLogRecord.getParcelId())
+                .shipmentId(routeLogRecord.getShipmentId())
                 .faultDescription(routeLogRecord.getFaultDescription())
                 .routeLogRecordDetails(new RouteLogRecordDetails(map(routeLogRecord.getRouteLogRecordDetails())))
                 .build();
@@ -38,18 +38,15 @@ public interface RouteLogToModelMapper {
     default RouteLogRecordDetail mapToRouteLogRecordDetail(RouteLogRecordDetailEntity routeLogRecordDetailEntity) {
         return RouteLogRecordDetail
                 .builder()
-                .id(routeLogRecordDetailEntity.getId())
-                .parcelStatus(map(routeLogRecordDetailEntity.getParcelStatus()))
+                .id(routeLogRecordDetailEntity.getId().value())
+                .shipmentStatus(map(routeLogRecordDetailEntity.getShipmentStatus()))
                 .request(routeLogRecordDetailEntity.getRequest())
                 .processType(map(routeLogRecordDetailEntity.getProcessType()))
                 .description(routeLogRecordDetailEntity.getDescription())
                 .timestamp(routeLogRecordDetailEntity.getCreated())
-                .departmentCode(routeLogRecordDetailEntity.getDepartment() != null ?
-                        routeLogRecordDetailEntity.getDepartment().getDepartmentCode() : null)
-                .supplierCode(routeLogRecordDetailEntity.getSupplier() != null ? routeLogRecordDetailEntity
-                        .getSupplier().getSupplierCode() : null)
-                .username(routeLogRecordDetailEntity.getUser() != null ?
-                        routeLogRecordDetailEntity.getUser().getUsername() : null)
+                .departmentId(routeLogRecordDetailEntity.getDepartmentId())
+                .supplierId(routeLogRecordDetailEntity.getSupplierId())
+                .userId(routeLogRecordDetailEntity.getUserId())
                 .version(routeLogRecordDetailEntity.getVersion())
                 .terminalId(routeLogRecordDetailEntity.getDeviceId() != null ? new TerminalId(routeLogRecordDetailEntity.getDeviceId()) : null)
                 .build();
@@ -57,5 +54,5 @@ public interface RouteLogToModelMapper {
 
     ProcessType map(com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumeration.ProcessType processType);
 
-    ParcelStatus map(com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ParcelStatus parcelStatus);
+    ShipmentStatus map(com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ShipmentStatus shipmentStatus);
 }

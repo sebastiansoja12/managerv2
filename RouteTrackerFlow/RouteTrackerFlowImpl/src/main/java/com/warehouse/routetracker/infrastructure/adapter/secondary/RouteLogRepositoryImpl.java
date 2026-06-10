@@ -37,16 +37,17 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
 
     @Override
     public RouteProcess save(final RouteLogRecord routeLogRecord) {
-        validateNotExists(routeLogRecord.getParcelId());
+        validateNotExists(routeLogRecord.getShipmentId());
         final RouteLogRecordEntity entity = logToEntityMapper.map(routeLogRecord);
 		this.routeLogRecordReadRepository.save(entity);
-		log.info("Created route process {} for parcel {}", entity.getId(),
-				routeLogRecord.getParcelId());
+		log.info("Created route process {} for shipment {}", entity.getId(),
+				routeLogRecord.getShipmentId().value());
         return mapper.map(entity);
     }
 
-    private void validateNotExists(final Long id) {
-        final Optional<RouteLogRecordEntity> routeLogRecord = this.routeLogRecordReadRepository.findByShipmentId(id);
+    private void validateNotExists(final ShipmentId shipmentId) {
+        final Optional<RouteLogRecordEntity> routeLogRecord = this.routeLogRecordReadRepository
+                .findByShipmentId(shipmentId);
 
         if (routeLogRecord.isPresent()) {
             throw new RouteLogException("Route log record already exists");
@@ -55,14 +56,14 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
 
     @Override
     public RouteLogRecord find(final ShipmentId shipmentId) {
-		return this.findOptional(shipmentId)
+		return this.findById(shipmentId)
 				.orElseThrow(() -> new RouteLogException("Route log does not exist"));
     }
 
     @Override
-    public Optional<RouteLogRecord> findOptional(final ShipmentId shipmentId) {
+    public Optional<RouteLogRecord> findById(final ShipmentId shipmentId) {
         return this.routeLogRecordReadRepository
-                .findByShipmentId(shipmentId.value())
+                .findByShipmentId(shipmentId)
                 .map(this.logToModelMapper::map);
     }
 
