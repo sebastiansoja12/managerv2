@@ -1,8 +1,8 @@
 package com.warehouse.shipment.domain.port.primary;
 
 import java.util.List;
-import java.util.Set;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +46,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final SignatureService signatureService;
 
-    private final RouteLogServicePort routeLogServicePort;
+    private final RouteLogService routeLogService;
 
     private final ReturningServicePort returningServicePort;
 
@@ -66,7 +66,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final PriceService priceService,
                             final CountryServiceAvailabilityService countryServiceAvailabilityService,
                             final SignatureService signatureService,
-                            final RouteLogServicePort routeLogServicePort,
+                            final RouteLogService routeLogService,
                             final ReturningServicePort returningServicePort,
                             final MailNotificationServicePort mailNotificationServicePort,
                             final TrackingNumberService trackingNumberService) {
@@ -79,7 +79,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.priceService = priceService;
         this.countryServiceAvailabilityService = countryServiceAvailabilityService;
         this.signatureService = signatureService;
-        this.routeLogServicePort = routeLogServicePort;
+        this.routeLogService = routeLogService;
         this.returningServicePort = returningServicePort;
         this.mailNotificationServicePort = mailNotificationServicePort;
         this.trackingNumberService = trackingNumberService;
@@ -387,14 +387,17 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public ShipmentControlCenter loadShipmentControlCenter(final ShipmentId shipmentId) {
-        final Shipment shipment = loadShipment(shipmentId);
-        return new ShipmentControlCenter(shipment, this.routeLogServicePort.findByShipmentId(shipmentId));
+        return createShipmentControlCenter(loadShipment(shipmentId));
     }
 
     @Override
     public ShipmentControlCenter loadShipmentControlCenter(final TrackingNumber trackingNumber) {
-        final Shipment shipment = loadShipment(trackingNumber);
-        return new ShipmentControlCenter(shipment, this.routeLogServicePort.findByShipmentId(shipment.getShipmentId()));
+        return createShipmentControlCenter(loadShipment(trackingNumber));
+    }
+
+    private ShipmentControlCenter createShipmentControlCenter(final Shipment shipment) {
+        return new ShipmentControlCenter(shipment,
+                this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null));
     }
 
     @Override

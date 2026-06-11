@@ -43,7 +43,7 @@ class ShipmentPortImplTest {
     private PathFinderServicePort pathFinderServicePort;
 
     @Mock
-    private RouteLogServicePort routeLogServicePort;
+    private RouteLogService routeLogService;
 
     @Mock
     private ShipmentRepository shipmentRepository;
@@ -100,7 +100,7 @@ class ShipmentPortImplTest {
         final TrackingNumberService trackingNumberService = new TrackingNumberServiceImpl(Set.of());
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
 				shipmentStatusHandlers, countryDetermineService, priceService, countryServiceAvailabilityService,
-				signatureService, routeLogServicePort, returningServicePort, mailNotificationServicePort,
+				signatureService, routeLogService, returningServicePort, mailNotificationServicePort,
                 trackingNumberService);
 	}
 
