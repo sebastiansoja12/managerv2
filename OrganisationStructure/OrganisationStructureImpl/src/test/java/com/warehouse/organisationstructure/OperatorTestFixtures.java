@@ -3,18 +3,25 @@ package com.warehouse.organisationstructure;
 import java.time.Instant;
 import java.time.LocalDate;
 
+import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.TaxId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.organisationstructure.api.dto.CreateOperatorApiRequest;
+import com.warehouse.organisationstructure.api.dto.DeliveryTimeConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.FirstDepartmentDto;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.OperatorGeocodingConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorStatusDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
+import com.warehouse.organisationstructure.api.dto.ShippingCapabilitiesDto;
 import com.warehouse.organisationstructure.api.dto.UpdateOperatorApiRequest;
 import com.warehouse.organisationstructure.operator.domain.model.CreateOperatorCommand;
 import com.warehouse.organisationstructure.operator.domain.model.Operator;
 import com.warehouse.organisationstructure.operator.domain.model.OperatorStatus;
 import com.warehouse.organisationstructure.operator.domain.model.UpdateOperatorCommand;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorProvisioningDetails;
+import com.warehouse.organisationstructure.operator.domain.vo.OperatorGeocodingConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
 
 public final class OperatorTestFixtures {
@@ -135,6 +142,7 @@ public final class OperatorTestFixtures {
                 "secret",
                 "pl",
                 "jan.kowalski@example.com",
+                geocodingConfiguration(),
                 new OperatorProvisioningDetails.FirstDepartment(
                         "WRO-1",
                         "Wroclaw",
@@ -144,6 +152,19 @@ public final class OperatorTestFixtures {
                         "8-16",
                         "WAREHOUSE"
                 )
+        );
+    }
+
+    public static OperatorGeocodingConfiguration geocodingConfiguration() {
+        return new OperatorGeocodingConfiguration(
+                null,
+                null,
+                "position-stack-api-key",
+                null,
+                null,
+                null,
+                true,
+                GeocodingProvider.POSITION_STACK
         );
     }
 
@@ -168,6 +189,7 @@ public final class OperatorTestFixtures {
                 CONTRACT_END,
                 FOUNDED_DATE,
                 configuration(),
+                details.geocodingConfiguration(),
                 new CreateOperatorCommand.FirstDepartment(
                         department.departmentCode(),
                         department.city(),
@@ -199,7 +221,7 @@ public final class OperatorTestFixtures {
 
     public static OperatorConfigurationDto configurationDto() {
         return new OperatorConfigurationDto(
-                new OperatorConfigurationDto.ShippingCapabilitiesDto(
+                new ShippingCapabilitiesDto(
                         true,
                         true,
                         true,
@@ -214,7 +236,7 @@ public final class OperatorTestFixtures {
                         true,
                         true
                 ),
-                new OperatorConfigurationDto.ShipmentLimitsDto(
+                new ShipmentLimitsDto(
                         31.5,
                         0.2,
                         120.0,
@@ -222,7 +244,7 @@ public final class OperatorTestFixtures {
                         60.0,
                         5000.0
                 ),
-                new OperatorConfigurationDto.DeliveryTimeConfigurationDto(
+                new DeliveryTimeConfigurationDto(
                         1,
                         4,
                         1,
@@ -253,7 +275,17 @@ public final class OperatorTestFixtures {
                 CONTRACT_END,
                 FOUNDED_DATE,
                 configurationDto(),
-                new CreateOperatorApiRequest.FirstDepartmentDto(
+                new OperatorGeocodingConfigurationDto(
+                        details.geocodingConfiguration().apiUserName(),
+                        details.geocodingConfiguration().apiPassword(),
+                        details.geocodingConfiguration().apiKey(),
+                        details.geocodingConfiguration().clientNumber(),
+                        details.geocodingConfiguration().accessToken(),
+                        details.geocodingConfiguration().refreshToken(),
+                        details.geocodingConfiguration().enabled(),
+                        details.geocodingConfiguration().provider()
+                ),
+                new FirstDepartmentDto(
                         department.departmentCode(),
                         department.city(),
                         department.street(),

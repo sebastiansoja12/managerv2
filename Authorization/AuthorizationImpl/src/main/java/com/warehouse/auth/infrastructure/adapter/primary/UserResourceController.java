@@ -63,7 +63,7 @@ public class UserResourceController {
     }
 
     @PostMapping
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_CREATE})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_CREATE, UserPermission.ROLE_MANAGER_CREATE})
     public ResponseEntity<UserIdDto> createUser(
             @Valid @RequestBody final CreateUserApiRequest request) {
         final CreateUserCommand command = UserRequestMapper.toCommand(request);
