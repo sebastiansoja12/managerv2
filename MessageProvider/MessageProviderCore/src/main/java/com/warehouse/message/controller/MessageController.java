@@ -93,6 +93,8 @@ public class MessageController {
 	private ShipmentStatus determineShipmentStatus(final ShipmentStatusDto shipmentStatus) {
 		return switch (shipmentStatus) {
             case CREATED -> CREATED;
+            case PREPARED -> PREPARED;
+            case ACCEPTED -> ACCEPTED;
             case REROUTE -> REROUTE;
             case SENT -> SENT;
             case DELIVERY -> DELIVERY;

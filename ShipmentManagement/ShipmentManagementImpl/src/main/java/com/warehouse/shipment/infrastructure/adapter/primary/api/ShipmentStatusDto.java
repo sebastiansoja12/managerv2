@@ -5,6 +5,10 @@ import com.warehouse.commonassets.enumeration.ShipmentStatus;
 public enum ShipmentStatusDto {
     CREATED,
 
+    PREPARED,
+
+    ACCEPTED,
+
     REROUTE,
 
     SENT,

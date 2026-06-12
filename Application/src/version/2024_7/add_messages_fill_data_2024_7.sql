@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS messages (
                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
                           title VARCHAR(255) NOT NULL,
-                          shipment_status ENUM('CREATED', 'REROUTE', 'SENT', 'DELIVERY', 'RETURN', 'REDIRECT') NOT NULL,
+                          shipment_status ENUM('CREATED', 'PREPARED', 'ACCEPTED', 'REROUTE', 'SENT', 'DELIVERY', 'RETURN', 'REDIRECT') NOT NULL,
                           language VARCHAR(10) NOT NULL,
                           message_content TEXT NOT NULL,
                           created_at DATETIME NOT NULL,
