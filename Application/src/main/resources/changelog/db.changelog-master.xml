@@ -18,6 +18,7 @@
     <include file="/changelog/db/department.xml"/>
     <include file="/changelog/db/department_aud.xml"/>
     <include file="/changelog/db/department_id.xml"/>
+    <include file="/changelog/db/announcements.xml"/>
     <include file="/changelog/db/device_pair.xml"/>
     <include file="/changelog/db/device_settings.xml"/>
     <include file="/changelog/db/device_version.xml"/>
