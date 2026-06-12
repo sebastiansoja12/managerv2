@@ -1,9 +1,5 @@
 package com.warehouse.department.domain.model;
 
-import java.time.Instant;
-
-import org.apache.commons.lang3.Validate;
-
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
@@ -18,6 +14,9 @@ import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.Coordinates;
 import com.warehouse.department.domain.vo.DepartmentSnapshot;
 import com.warehouse.department.domain.vo.TaxId;
+import org.apache.commons.lang3.Validate;
+
+import java.time.Instant;
 
 public class Department extends BelongsToOperator {
 
@@ -110,6 +109,48 @@ public class Department extends BelongsToOperator {
         Validate.notNull(email, "Email cannot be null");
         Validate.notNull(countryCode, "Country code cannot be null");
         Validate.notNull(departmentType, "Department type cannot be null");
+        this.address = new Address(city, street, postalCode, countryCode);
+        this.departmentCode = departmentCode;
+        this.taxId = taxId;
+        this.telephoneNumber = telephoneNumber;
+        this.openingHours = openingHours;
+        this.email = email;
+        this.departmentType = departmentType;
+        this.status = Status.ACTIVE;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.adminUserId = null;
+        this.createdBy = DomainRegistry.authenticationService().currentUser();
+        this.lastModifiedBy = null;
+        this.coordinates = DomainRegistry.departmentCoordinatesServicePort()
+                .getCoordinates(getAddress());
+    }
+
+    public Department(
+            final DepartmentId departmentId,
+            final DepartmentCode departmentCode,
+            final String city,
+            final String street,
+            final String postalCode,
+            final TaxId taxId,
+            final String telephoneNumber,
+            final String openingHours,
+            final String email,
+            final CountryCode countryCode,
+            final DepartmentType departmentType
+    ) {
+        Validate.notNull(departmentId, "Department id cannot be null");
+        Validate.notNull(departmentCode, "Department code cannot be null");
+        Validate.notNull(city, "City cannot be null");
+        Validate.notNull(street, "Street cannot be null");
+        Validate.notNull(postalCode, "Postal code cannot be null");
+        Validate.notNull(taxId, "Tax ID cannot be null");
+        Validate.notNull(telephoneNumber, "Telephone number cannot be null");
+        Validate.notNull(openingHours, "Opening hours cannot be null");
+        Validate.notNull(email, "Email cannot be null");
+        Validate.notNull(countryCode, "Country code cannot be null");
+        Validate.notNull(departmentType, "Department type cannot be null");
+        this.departmentId = departmentId;
         this.address = new Address(city, street, postalCode, countryCode);
         this.departmentCode = departmentCode;
         this.taxId = taxId;
@@ -326,6 +367,12 @@ public class Department extends BelongsToOperator {
 
     public void markAsSuspended() {
         this.status = Status.SUSPENDED;
+        this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
+        markAsModified();
+    }
+
+    public void markAsActive() {
+        this.status = Status.ACTIVE;
         this.lastModifiedBy = DomainRegistry.authenticationService().currentUser();
         markAsModified();
     }

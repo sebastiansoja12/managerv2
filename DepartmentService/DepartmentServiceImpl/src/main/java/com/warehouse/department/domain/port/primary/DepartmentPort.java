@@ -18,6 +18,8 @@ public interface DepartmentPort {
 
     List<Department> findAll();
 
+    List<Department> findAllArchived();
+
     DepartmentCreateResponse createDepartments(final DepartmentCreateCommand command);
 
     IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeCommand command);
