@@ -2,7 +2,8 @@ package com.warehouse.returning.infrastructure.adapter.primary.kafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
+
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
@@ -15,26 +16,28 @@ import com.warehouse.returning.domain.vo.ReturnResponse;
 import com.warehouse.returning.domain.vo.ReturnToken;
 import com.warehouse.returning.domain.vo.ReturnTokenValidation;
 import com.warehouse.returning.domain.vo.ShipmentId;
+import com.warehouse.returning.domain.vo.UserId;
+import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.OperatorId;
+import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentReturnCanceled;
+import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentReturnCreated;
+import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentSnapshot;
 import org.junit.jupiter.api.Test;
 
 class ShipmentReturnKafkaListenerTest {
 
     private final CapturingReturnPort returnPort = new CapturingReturnPort();
-    private final ShipmentReturnKafkaListener listener =
-            new ShipmentReturnKafkaListener(new ObjectMapper(), this.returnPort);
+    private final ShipmentReturnKafkaListener listener = new ShipmentReturnKafkaListener(this.returnPort);
 
     @Test
-    void shouldProcessShipmentReturnMessage() {
-        this.listener.handle("""
-                {
-                  "shipmentId": 123,
-                  "reason": "RETURN",
-                  "reasonCode": "NO_LONGER_NEEDED",
-                  "departmentCode": "WRO",
-                  "userId": 0,
-                  "operatorId": 77
-                }
-                """);
+    void shouldProcessShipmentReturnCreatedEvent() {
+        this.listener.handle(new ShipmentReturnCreated(
+                new ShipmentSnapshot(new ShipmentId(123L), "RETURN"),
+                Instant.parse("2026-08-23T08:00:00Z"),
+                "NO_LONGER_NEEDED",
+                "RETURN",
+                new DepartmentCode("WRO"),
+                new UserId(0L),
+                new OperatorId(77L)));
 
         final ReturnRequest request = this.returnPort.request;
         assertThat(request.getIssuerDepartmentCode().value()).isEqualTo("WRO");
@@ -50,9 +53,21 @@ class ShipmentReturnKafkaListenerTest {
         assertThat(packageRequest.getUserId().value()).isZero();
     }
 
+    @Test
+    void shouldCancelReturnWhenShipmentReturnCanceledEventArrives() {
+        this.listener.handle(new ShipmentReturnCanceled(
+                new ShipmentSnapshot(new ShipmentId(123L), "DELIVERY"),
+                Instant.parse("2026-08-23T08:00:00Z"),
+                new UserId(0L),
+                new OperatorId(77L)));
+
+        assertThat(this.returnPort.canceledShipmentId.value()).isEqualTo(123L);
+    }
+
     private static final class CapturingReturnPort implements ReturnPort {
 
         private ReturnRequest request;
+        private ShipmentId canceledShipmentId;
 
         @Override
         public ReturnResponse process(final ReturnRequest request) {
@@ -68,6 +83,11 @@ class ShipmentReturnKafkaListenerTest {
         @Override
         public void complete(final ShipmentId shipmentId) {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void cancel(final ShipmentId shipmentId) {
+            this.canceledShipmentId = shipmentId;
         }
 
         @Override
