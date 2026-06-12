@@ -1,6 +1,8 @@
 package com.warehouse.shipment;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
@@ -13,7 +15,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -27,11 +28,13 @@ import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.domain.listener.ShipmentEventListener;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
+import com.warehouse.shipment.domain.port.secondary.PriceRepository;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.domain.port.secondary.SignatureRepository;
-import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ExternalFeignClient;
+import com.warehouse.shipment.infrastructure.adapter.secondary.PriceReadRepository;
+import com.warehouse.shipment.infrastructure.adapter.secondary.PriceRepositoryImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.tools.returning.ReturnProperties;
@@ -45,10 +48,14 @@ import com.warehouse.voronoi.VoronoiService;
 @DatabaseSetup("/dataset/shipment.xml")
 public class ShipmentReadRepositoryTest {
 
-    @ComponentScan(basePackages = { "com.warehouse.shipment"})
     @EntityScan(basePackages = { "com.warehouse.shipment"})
-    @EnableJpaRepositories(basePackages = { "com.warehouse.shipment"})
+    @EnableJpaRepositories(basePackages = { "com.warehouse.shipment.infrastructure.adapter.secondary"})
     public static class ShipmentReadRepositoryTestConfiguration {
+
+        @Bean
+        PriceRepository priceRepository(final PriceReadRepository repository) {
+            return new PriceRepositoryImpl(repository);
+        }
 
         @Bean
         MailService mailService() {
@@ -58,11 +65,6 @@ public class ShipmentReadRepositoryTest {
         @Bean
         RouteLogServicePort routeLogServicePort() {
             return Mockito.mock(RouteLogServicePort.class);
-        }
-
-        @Bean
-        SoftwareConfigurationServicePort softwareConfigurationServicePort() {
-            return Mockito.mock(SoftwareConfigurationServicePort.class);
         }
 
         @Bean
@@ -117,6 +119,17 @@ public class ShipmentReadRepositoryTest {
         final ShipmentId shipmentId = new ShipmentId(100001L);
         final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
         assertTrue(parcel.isPresent());
+        assertNull(parcel.orElseThrow().getDangerousGood());
+    }
+
+    @Test
+    void shouldReadEmbeddedDangerousGood() {
+        final ShipmentId shipmentId = new ShipmentId(100002L);
+        final ShipmentEntity shipment = repository.findById(shipmentId).orElseThrow();
+
+        assertEquals("UN3480", shipment.getDangerousGood().toDomain().getUnNumber());
+        assertEquals("Lithium ion batteries",
+                shipment.getDangerousGood().toDomain().getProperShippingName());
     }
 
     @Test

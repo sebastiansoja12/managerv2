@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="codex" id="20260811-1-department-id">
+        <addUniqueConstraint tableName="department"
+                             columnNames="department_code"
+                             constraintName="uk_department_code"/>
+        <dropPrimaryKey tableName="department"/>
+        <addColumn tableName="department">
+            <column name="department_id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_department"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="codex" id="20260811-2-department-read-id">
+        <addColumn tableName="department_rd">
+            <column name="department_id" type="BIGINT"/>
+        </addColumn>
+        <sql>
+            UPDATE department_rd
+            SET department_id = (
+                SELECT department.department_id
+                FROM department
+                WHERE department.department_code = department_rd.department_code
+            )
+        </sql>
+        <addNotNullConstraint tableName="department_rd"
+                              columnName="department_id"
+                              columnDataType="BIGINT"/>
+        <addUniqueConstraint tableName="department_rd"
+                             columnNames="department_code"
+                             constraintName="uk_department_rd_code"/>
+        <dropPrimaryKey tableName="department_rd"/>
+        <addPrimaryKey tableName="department_rd"
+                       columnNames="department_id"
+                       constraintName="pk_department_rd"/>
+    </changeSet>
+
+    <changeSet author="codex" id="20260811-3-department-audit-id">
+        <addColumn tableName="department_aud">
+            <column name="department_id" type="BIGINT"/>
+        </addColumn>
+        <sql>
+            UPDATE department_aud
+            SET department_id = (
+                SELECT department.department_id
+                FROM department
+                WHERE department.department_code = department_aud.department_code
+            )
+        </sql>
+        <addNotNullConstraint tableName="department_aud"
+                              columnName="department_id"
+                              columnDataType="BIGINT"/>
+        <dropPrimaryKey tableName="department_aud" constraintName="pk_department_aud"/>
+        <addPrimaryKey tableName="department_aud"
+                       columnNames="department_id, rev"
+                       constraintName="pk_department_aud"/>
+    </changeSet>
+
+    <changeSet author="codex" id="20260811-4-department-read-audit-id">
+        <addColumn tableName="department_rd_aud">
+            <column name="department_id" type="BIGINT"/>
+        </addColumn>
+        <sql>
+            UPDATE department_rd_aud
+            SET department_id = (
+                SELECT department_rd.department_id
+                FROM department_rd
+                WHERE department_rd.department_code = department_rd_aud.department_code
+            )
+        </sql>
+        <addNotNullConstraint tableName="department_rd_aud"
+                              columnName="department_id"
+                              columnDataType="BIGINT"/>
+        <dropPrimaryKey tableName="department_rd_aud" constraintName="pk_department_rd_aud"/>
+        <addPrimaryKey tableName="department_rd_aud"
+                       columnNames="department_id, rev"
+                       constraintName="pk_department_rd_aud"/>
+    </changeSet>
+
+</databaseChangeLog>

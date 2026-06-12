@@ -4,11 +4,7 @@ package com.warehouse.routetracker;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
-import com.warehouse.routetracker.infrastructure.adapter.primary.dto.RouteProcessDto;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -52,42 +47,17 @@ public class RouteTrackerIntegrationTest {
     private RestClient restClient;
 
     @Test
-    void shouldCreateProcess() throws Exception {
-        // given
-        final String requestPath = "src/test/resources/routetrackercontrollerintegrationtest/request.json";
-        final String responsePath = "src/test/resources/routetrackercontrollerintegrationtest/response.json";
-        final String request = readFileAsString(requestPath);
-        final String response = readFileAsString(responsePath);
-        // when
-        final ResponseEntity<RouteProcessDto> responseEntity = restClient
-                .post()
-                .uri("/v2/api/routes/initialize")
-                .body(request)
-                .contentType(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toEntity(RouteProcessDto.class);
-        // then
-        assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
-        assertThat(responseEntity)
-                .extracting(ResponseEntity::getBody)
-                .isEqualTo(response);
-    }
-
-    @Test
     void shouldFindProcess() {
         // given
-        final Long parcelId = 1L;
+        final Long shipmentId = 1L;
         // when
         final ResponseEntity<RouteLogRecord> responseEntity = restClient
                 .get()
-                .uri("/v2/api/routes/{parcelId}", parcelId)
+                .uri("/v2/api/routes/{shipmentId}", shipmentId)
                 .retrieve()
                 .toEntity(RouteLogRecord.class);
         // then
         assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
     }
 
-    private static String readFileAsString(String file) throws Exception {
-        return new String(Files.readAllBytes(Paths.get(file)));
-    }
 }

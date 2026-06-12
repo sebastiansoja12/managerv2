@@ -28,8 +28,8 @@ public class DeviceVersionInformation {
         return shipmentId;
     }
 
-    public void setShipmentId(final ShipmentId parcelId) {
-        this.shipmentId = parcelId;
+    public void setShipmentId(final ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
     }
 
     public ProcessType getProcessType() {

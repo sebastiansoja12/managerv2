@@ -3,6 +3,7 @@ package com.warehouse.department.infrastructure.adapter.primary;
 import java.util.List;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.department.api.dto.DepartmentDto;
 import com.warehouse.department.domain.model.Department;
@@ -28,6 +29,12 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     @Override
     public DepartmentDto getDepartmentByCode(final DepartmentCode departmentCode) {
         final Department department = this.departmentPort.findByDepartmentCode(departmentCode);
+        return ResponseMapper.mapToDto(department);
+    }
+
+    @Override
+    public DepartmentDto getDepartmentById(final DepartmentId departmentId) {
+        final Department department = this.departmentPort.findByDepartmentId(departmentId);
         return ResponseMapper.mapToDto(department);
     }
 

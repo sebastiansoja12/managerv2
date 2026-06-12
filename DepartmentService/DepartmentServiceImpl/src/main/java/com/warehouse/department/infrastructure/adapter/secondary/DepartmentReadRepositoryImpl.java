@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.department.domain.port.secondary.DepartmentReadRepository;
 import com.warehouse.department.domain.vo.DepartmentSnapshot;
@@ -32,7 +33,7 @@ public class DepartmentReadRepositoryImpl implements DepartmentReadRepository<De
     @Override
     public void sync(final DepartmentSnapshot snapshot) {
         final DepartmentReadEntity readEntity = factory.fromDepartmentSnapshot(snapshot);
-        if (exists(snapshot.departmentCode())) {
+        if (exists(snapshot.departmentId())) {
             repository.update(readEntity);
         } else {
             repository.create(readEntity);
@@ -47,7 +48,7 @@ public class DepartmentReadRepositoryImpl implements DepartmentReadRepository<De
     }
 
     @Override
-    public DepartmentReadEntity findById(final DepartmentCode departmentCode) {
+    public DepartmentReadEntity findByDepartmentCode(final DepartmentCode departmentCode) {
         return repository.createCriteria(DepartmentReadEntity.class)
                 .eq("departmentCode.value", departmentCode)
                 .notIn("status", EXCLUDED_STATUSES)
@@ -55,9 +56,18 @@ public class DepartmentReadRepositoryImpl implements DepartmentReadRepository<De
                 .orElse(null);
     }
 
-    private boolean exists(final DepartmentCode departmentCode) {
+    @Override
+    public DepartmentReadEntity findByDepartmentId(final DepartmentId departmentId) {
         return repository.createCriteria(DepartmentReadEntity.class)
-                .eq("departmentCode.value", departmentCode)
+                .eq("departmentId", departmentId.getValue())
+                .notIn("status", EXCLUDED_STATUSES)
+                .one()
+                .orElse(null);
+    }
+
+    private boolean exists(final DepartmentId departmentId) {
+        return repository.createCriteria(DepartmentReadEntity.class)
+                .eq("departmentId", departmentId.getValue())
                 .one()
                 .isPresent();
     }

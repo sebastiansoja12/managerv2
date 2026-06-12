@@ -9,7 +9,7 @@ public interface ReturnPort {
 
     void changeReasonCode(final ChangeReasonCodeRequest request);
 
-    void complete(final ReturnPackageId returnPackageId);
+    void complete(final ShipmentId shipmentId);
 
     ReturnPackage getReturn(final ReturnPackageId returnId);
 

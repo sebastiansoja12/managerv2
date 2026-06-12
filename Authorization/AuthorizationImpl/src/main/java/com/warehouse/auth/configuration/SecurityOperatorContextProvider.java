@@ -1,9 +1,10 @@
 package com.warehouse.auth.configuration;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -14,12 +15,25 @@ public class SecurityOperatorContextProvider implements OperatorContextProvider 
 
     @Override
     public Optional<OperatorId> currentOperatorId() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return currentAuthentication().map(UsernameTenantPasswordAuthenticationToken::getOperatorId);
+    }
 
-        if (authentication instanceof UsernameTenantPasswordAuthenticationToken token) {
-            return Optional.ofNullable(token.getOperatorId());
-        }
+    @Override
+    public Optional<UserId> currentUserId() {
+        return currentAuthentication()
+                .map(UsernameTenantPasswordAuthenticationToken::getPrincipal)
+                .filter(UserId.class::isInstance)
+                .map(UserId.class::cast);
+    }
 
-        return Optional.empty();
+    @Override
+    public Optional<DepartmentId> currentDepartmentId() {
+        return currentAuthentication().map(UsernameTenantPasswordAuthenticationToken::getDepartmentId);
+    }
+
+    private Optional<UsernameTenantPasswordAuthenticationToken> currentAuthentication() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(UsernameTenantPasswordAuthenticationToken.class::isInstance)
+                .map(UsernameTenantPasswordAuthenticationToken.class::cast);
     }
 }

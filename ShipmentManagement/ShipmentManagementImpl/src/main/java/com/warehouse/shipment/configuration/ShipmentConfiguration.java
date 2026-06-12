@@ -1,6 +1,5 @@
 package com.warehouse.shipment.configuration;
 
-import java.time.Duration;
 import java.util.Set;
 
 import org.mapstruct.factory.Mappers;
@@ -12,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.auth.UserApiService;
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.department.api.DepartmentApiService;
@@ -31,13 +32,10 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
-import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 import com.warehouse.voronoi.VoronoiService;
-
-import io.github.resilience4j.retry.RetryConfig;
 
 @Configuration
 public class ShipmentConfiguration {
@@ -70,11 +68,6 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public RouteTrackerHistoryNotifier routeTrackerNotifier() {
-		return new RouteTrackerHistoryNotifier();
-	}
-
-	@Bean
 	public CountryDetermineServicePort countryDetermineServicePort() {
 		return new CountryDetermineServiceAdapter();
 	}
@@ -94,13 +87,13 @@ public class ShipmentConfiguration {
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
 									 final SignatureService signatureService,
-									 final RouteLogServicePort routeLogServicePort,
+									 final RouteLogService routeLogService,
 									 final ReturningServicePort returningServicePort,
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberService trackingNumberService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
-				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort,
+				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
 				mailNotificationServicePort, trackingNumberService);
 	}
 
@@ -120,12 +113,6 @@ public class ShipmentConfiguration {
 		return new MailNotificationServiceAdapter(notificationEventPublisher);
 	}
 	
-	@Bean
-	public RouteTrackerService routeTrackerService(final RouteLogServicePort routeLogServicePort,
-			final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
-		return new RouteTrackerServiceImpl(routeLogServicePort, softwareConfigurationServicePort);
-	}
-
 	@Bean
 	public CountryRepository countryRepository(final CountryReadRepository repository) {
 		return new CountryRepositoryImpl(repository);
@@ -156,19 +143,6 @@ public class ShipmentConfiguration {
 				new ShipmentRedirectHandler(service), new ShipmentReturnHandler(service));
 	}
 
-	@Bean("shipment.softwareConfigurationServicePort")
-	public SoftwareConfigurationServicePort softwareConfigurationServicePort() {
-		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using software configuration");
-		final RetryConfig config = RetryConfig.custom()
-				.maxAttempts(4)
-				.waitDuration(Duration.ofSeconds(2))
-				.retryExceptions(RuntimeException.class)
-				.writableStackTraceEnabled(true)
-				.build();
-		return new SoftwareConfigurationServiceClient(config, softwareConfigurationProperties(),
-				routeTrackerLogProperties());
-	}
-
 	@Bean
 	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public RouteLogServicePort routeLogServiceMockPort() {
@@ -178,19 +152,12 @@ public class ShipmentConfiguration {
 
 	@Bean(name = "shipment.routeLogServicePort")
 	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
-	public RouteLogServicePort routeLogServicePort(final ExternalFeignClient externalFeignClient,
-												   final GenericFeignResourceService genericFeignResourceService,
-												   final RouteTrackerLogProperties routeTrackerLogProperties,
-												   final RouteLogRecordMapper routeLogRecordMapper) {
+	public RouteLogServicePort routeLogServicePort(final GenericFeignResourceService genericFeignResourceService,
+											   final RouteTrackerLogProperties routeTrackerLogProperties,
+											   final RouteLogRecordMapper routeLogRecordMapper) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Route log service port");
-		final RetryConfig config = RetryConfig.custom()
-				.maxAttempts(3)
-				.waitDuration(Duration.ofSeconds(2))
-				.retryExceptions(RuntimeException.class)
-				.writableStackTraceEnabled(true)
-				.build();
-		return new RouteLogServiceClient(config, externalFeignClient, genericFeignResourceService,
-				routeTrackerLogProperties, routeLogRecordMapper);
+		return new RouteLogServiceClient(genericFeignResourceService, routeTrackerLogProperties,
+				routeLogRecordMapper);
 	}
 
 	@Bean
@@ -206,6 +173,23 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
+	public DepartmentServicePort shipmentDepartmentServicePort(final DepartmentApiService departmentApiService) {
+		return new DepartmentServiceClient(departmentApiService);
+	}
+
+	@Bean
+	public UserServicePort shipmentUserServicePort(final UserApiService userApiService) {
+		return new UserServiceClient(userApiService);
+	}
+
+	@Bean
+	public RouteLogService routeLogService(final RouteLogServicePort routeLogServicePort,
+										 final DepartmentServicePort departmentServicePort,
+										 final UserServicePort userServicePort) {
+		return new RouteLogServiceImpl(routeLogServicePort, departmentServicePort, userServicePort);
+	}
+
+	@Bean
 	public RouteLogRecordMapper routeLogRecordMapper() {
 		return new RouteLogRecordMapper();
 	}
@@ -217,8 +201,18 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public SoftwareConfigurationProperties softwareConfigurationProperties() {
-		return new SoftwareConfigurationProperties();
+	public ShipmentReadModelRepository shipmentReadModelRepository(
+			final OperatorFilteredRepository<ShipmentReadEntity> repository) {
+		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment read model repository");
+		return new ShipmentReadModelRepositoryImpl(repository);
+	}
+
+	@Bean
+	public ShipmentReadModelSyncService shipmentReadModelSyncService(
+			final ShipmentReadModelRepository shipmentReadModelRepository,
+			final OperatorFilteredRepository<ShipmentEntity> shipmentRepository,
+			final OperatorContext operatorContext) {
+		return new ShipmentReadModelSyncServiceImpl(shipmentReadModelRepository, shipmentRepository, operatorContext);
 	}
 
 	@Bean
@@ -237,12 +231,14 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean(name = "shipment.shipmentService")
-	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository, final SpecificationRepository specificationShipmentRepository) {
+	public ShipmentService shipmentService(final ShipmentRepository shipmentRepository,
+										   final SpecificationRepository specificationShipmentRepository) {
 		return new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
 	}
 
 	@Bean
-	public SpecificationRepository specificationShipmentRepository(final OperatorFilteredRepository<ShipmentEntity> repository) {
+	public SpecificationRepository specificationShipmentRepository(
+			final OperatorFilteredRepository<ShipmentReadEntity> repository) {
 		return new SpecificationShipmentRepositoryImpl(repository);
 	}
 

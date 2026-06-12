@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="codex" id="create-tracking-integration-configurations-2026-08-12">
+        <createTable tableName="tracking_integration_configurations">
+            <column name="tracking_integration_configuration_id" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="provider" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_secret" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="tracking_integration_configurations"
+                             columnNames="operator_id, provider"
+                             constraintName="uk_tracking_integration_operator_provider"/>
+    </changeSet>
+
+    <changeSet author="codex" id="generalize-tracking-integration-configurations-2026-08-12">
+        <addColumn tableName="tracking_integration_configurations">
+            <column name="encrypted_configuration" type="VARCHAR(8192)"/>
+        </addColumn>
+        <dropNotNullConstraint tableName="tracking_integration_configurations"
+                               columnName="environment"
+                               columnDataType="VARCHAR(32)"/>
+        <dropNotNullConstraint tableName="tracking_integration_configurations"
+                               columnName="client_id"
+                               columnDataType="VARCHAR(512)"/>
+        <dropNotNullConstraint tableName="tracking_integration_configurations"
+                               columnName="client_secret"
+                               columnDataType="VARCHAR(2048)"/>
+    </changeSet>
+
+</databaseChangeLog>

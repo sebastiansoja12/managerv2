@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.DepartmentAlreadyExistsException;
@@ -51,6 +52,11 @@ public class DepartmentPortImpl implements DepartmentPort {
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
         return this.departmentRepository.findByDepartmentCode(departmentCode);
+    }
+
+    @Override
+    public Department findByDepartmentId(final DepartmentId departmentId) {
+        return this.departmentRepository.findByDepartmentId(departmentId);
     }
 
     @Override

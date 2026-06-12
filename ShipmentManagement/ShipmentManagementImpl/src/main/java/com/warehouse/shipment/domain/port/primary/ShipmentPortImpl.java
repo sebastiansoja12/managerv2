@@ -1,11 +1,13 @@
 package com.warehouse.shipment.domain.port.primary;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
@@ -44,7 +46,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final SignatureService signatureService;
 
-    private final RouteLogServicePort routeLogServicePort;
+    private final RouteLogService routeLogService;
 
     private final ReturningServicePort returningServicePort;
 
@@ -64,7 +66,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final PriceService priceService,
                             final CountryServiceAvailabilityService countryServiceAvailabilityService,
                             final SignatureService signatureService,
-                            final RouteLogServicePort routeLogServicePort,
+                            final RouteLogService routeLogService,
                             final ReturningServicePort returningServicePort,
                             final MailNotificationServicePort mailNotificationServicePort,
                             final TrackingNumberService trackingNumberService) {
@@ -77,7 +79,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.priceService = priceService;
         this.countryServiceAvailabilityService = countryServiceAvailabilityService;
         this.signatureService = signatureService;
-        this.routeLogServicePort = routeLogServicePort;
+        this.routeLogService = routeLogService;
         this.returningServicePort = returningServicePort;
         this.mailNotificationServicePort = mailNotificationServicePort;
         this.trackingNumberService = trackingNumberService;
@@ -125,11 +127,12 @@ public class ShipmentPortImpl implements ShipmentPort {
                 receiverCountryCode,
                 shipmentPrice.getMoney(),
                 false,
-                voronoiResponse.getSuccess().getValue(),
+                voronoiResponse.getSuccess().getDepartmentCodeResult(),
                 null,
                 command.getShipmentPriority(),
                 trackingNumber
         );
+        shipment.setDangerousGood(command.getDangerousGood());
 
         this.shipmentService.createShipment(shipment);
         logCreatedShipment(shipment);
@@ -165,7 +168,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(countryValidation.getFailure());
         }
 
-        final String destination = resolveDestination(command, shipment, configuration);
+        final DepartmentCode destination = resolveDestination(command, shipment, configuration);
 
         final Price shipmentPrice =
                 resolveShipmentPrice(command.getPrice(), command.getShipmentSize());
@@ -209,15 +212,18 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateCommand command) {
-        final ShipmentId shipmentId = command.getShipmentId();
-        if (!existsShipment(shipmentId)) {
-            return Result.failure(ErrorCode.SHIPMENT_202);
-        }
+    public Optional<DangerousGood> loadDangerousGood(final ShipmentId shipmentId) {
+        return this.shipmentService.findDangerousGood(shipmentId);
+    }
 
-        this.shipmentService.changeDangerousGoodTo(shipmentId, DangerousGood.from(command));
+    @Override
+    public void putDangerousGood(final ShipmentId shipmentId, final DangerousGood dangerousGood) {
+        this.shipmentService.changeDangerousGoodTo(shipmentId, dangerousGood);
+    }
 
-        return Result.success();
+    @Override
+    public void deleteDangerousGood(final ShipmentId shipmentId) {
+        this.shipmentService.removeDangerousGood(shipmentId);
     }
 
     @Override
@@ -272,6 +278,16 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient) {
         validateShipmentNotInStatus(shipmentId);
+        final Shipment shipment = this.shipmentService.find(shipmentId);
+        if (!shipment.recipientCityMatches(recipient.getCity())) {
+            final Result<VoronoiResponse, ErrorCode> voronoiResponse =
+                    this.pathFinderServicePort.determineDeliveryDepartment(Address.from(recipient));
+            if (voronoiResponse.isFailure()) {
+                logger.warn("Cannot determine delivery department for recipient {}, skipping...", recipient);
+            } else {
+                this.shipmentService.changeDestination(shipmentId, voronoiResponse.getSuccess().getDepartmentCodeResult());
+            }
+        }
         this.shipmentService.changeRecipientTo(shipmentId, recipient);
     }
 
@@ -279,9 +295,9 @@ public class ShipmentPortImpl implements ShipmentPort {
     public void changePersonTo(final Person person, final ShipmentId shipmentId) {
         validateShipmentNotInStatus(shipmentId);
         if (person.getType() == PersonType.SENDER) {
-            this.shipmentService.changeSenderTo(shipmentId, (Sender) person);
+            changeSenderTo(shipmentId, (Sender) person);
         } else if (person.getType() == PersonType.RECIPIENT) {
-            this.shipmentService.changeRecipientTo(shipmentId, (Recipient) person);
+            changeRecipientTo(shipmentId, (Recipient) person);
         }
     }
 
@@ -371,14 +387,17 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public ShipmentControlCenter loadShipmentControlCenter(final ShipmentId shipmentId) {
-        final Shipment shipment = loadShipment(shipmentId);
-        return new ShipmentControlCenter(shipment, this.routeLogServicePort.findByShipmentId(shipmentId));
+        return createShipmentControlCenter(loadShipment(shipmentId));
     }
 
     @Override
     public ShipmentControlCenter loadShipmentControlCenter(final TrackingNumber trackingNumber) {
-        final Shipment shipment = loadShipment(trackingNumber);
-        return new ShipmentControlCenter(shipment, this.routeLogServicePort.findByShipmentId(shipment.getShipmentId()));
+        return createShipmentControlCenter(loadShipment(trackingNumber));
+    }
+
+    private ShipmentControlCenter createShipmentControlCenter(final Shipment shipment) {
+        return new ShipmentControlCenter(shipment,
+                this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null));
     }
 
     @Override
@@ -401,6 +420,9 @@ public class ShipmentPortImpl implements ShipmentPort {
         if (shipment == null) {
             throw new RestException(404, "Shipment not found");
         }
+        if (shipmentStatuses.contains(shipment.getShipmentStatus())) {
+            throw new RestException(400, "Cannot modify shipment in current status");
+        }
         if (shipment.getShipmentRelatedId() != null) {
             final Shipment relatedShipment = loadShipment(shipment.getShipmentRelatedId());
             if (shipmentStatuses.contains(relatedShipment.getShipmentStatus())) {
@@ -413,7 +435,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         return !configuration.forceUpdate();
     }
 
-    private String resolveDestination(final ShipmentUpdateCommand command,
+    private DepartmentCode resolveDestination(final ShipmentUpdateCommand command,
                                       final Shipment shipment,
                                       final ShipmentConfiguration configuration) {
 
@@ -428,15 +450,11 @@ public class ShipmentPortImpl implements ShipmentPort {
                 this.pathFinderServicePort.determineDeliveryDepartment(address);
 
         return voronoiResult.isSuccess()
-                ? voronoiResult.getSuccess().getValue()
+                ? voronoiResult.getSuccess().getDepartmentCodeResult()
                 : shipment.getDestination();
     }
 
     private void publishIfNeeded(final ShipmentSnapshot snapshot, final ShipmentConfiguration configuration) {
-		if (configuration.publishInRouteTracker()) {
-			this.routeLogServicePort.notifyShipmentUpdated(snapshot);
-		}
-
 		if (configuration.publishInReturnManager()) {
 			this.returningServicePort.notifyShipmentUpdated(snapshot);
 		}

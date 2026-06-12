@@ -6,6 +6,7 @@ import org.apache.commons.lang3.Validate;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.department.domain.enumeration.DepartmentType;
@@ -19,6 +20,8 @@ import com.warehouse.department.domain.vo.DepartmentSnapshot;
 import com.warehouse.department.domain.vo.TaxId;
 
 public class Department extends BelongsToOperator {
+
+    private DepartmentId departmentId;
 
     private DepartmentCode departmentCode;
 
@@ -52,6 +55,7 @@ public class Department extends BelongsToOperator {
     }
 
     public Department(
+            final DepartmentId departmentId,
             final DepartmentCode departmentCode,
             final Address address,
             final TaxId taxId,
@@ -67,6 +71,7 @@ public class Department extends BelongsToOperator {
             final UserId createdBy,
             final UserId lastModifiedBy
     ) {
+        this.departmentId = departmentId;
         this.address = address;
         this.departmentCode = departmentCode;
         this.taxId = taxId;
@@ -123,7 +128,7 @@ public class Department extends BelongsToOperator {
     }
 
     public DepartmentSnapshot snapshot() {
-		return new DepartmentSnapshot(departmentCode, address, taxId, telephoneNumber, openingHours, email,
+		return new DepartmentSnapshot(departmentId, departmentCode, address, taxId, telephoneNumber, openingHours, email,
 				departmentType, status, coordinates, operatorId(), createdAt, updatedAt, adminUserId, createdBy,
 				lastModifiedBy);
     }
@@ -151,6 +156,14 @@ public class Department extends BelongsToOperator {
 
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
+    }
+
+    public DepartmentId getDepartmentId() {
+        return departmentId;
+    }
+
+    public void assignDepartmentId(final DepartmentId departmentId) {
+        this.departmentId = departmentId;
     }
 
     public void setDepartmentCode(final DepartmentCode departmentCode) {

@@ -1,5 +1,7 @@
 package com.warehouse.csv.infrastructure.adapter.secondary.entity;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
@@ -80,5 +82,46 @@ public class ParcelEntity {
 
     @Column(name = "shipment_related_id")
     private Long parcelRelatedId;
-}
 
+    @Column(name = "dangerous_good_un_number")
+    private String dangerousGoodUnNumber;
+
+    @Column(name = "dangerous_good_proper_shipping_name")
+    private String dangerousGoodProperShippingName;
+
+    @Column(name = "dangerous_good_hazard_class")
+    private String dangerousGoodHazardClass;
+
+    @Column(name = "dangerous_good_packing_group")
+    private String dangerousGoodPackingGroup;
+
+    @Column(name = "dangerous_good_quantity")
+    private BigDecimal dangerousGoodQuantity;
+
+    @Column(name = "dangerous_good_quantity_unit")
+    private String dangerousGoodQuantityUnit;
+
+    @Column(name = "dangerous_good_package_count")
+    private Integer dangerousGoodPackageCount;
+
+    @Column(name = "dangerous_good_packaging_type")
+    private String dangerousGoodPackagingType;
+
+    @Column(name = "dangerous_good_regulation_type")
+    private String dangerousGoodRegulationType;
+
+    @Column(name = "dangerous_good_transport_mode")
+    private String dangerousGoodTransportMode;
+
+    @Column(name = "dangerous_good_emergency_contact_24h")
+    private String dangerousGoodEmergencyContact24h;
+
+    @Column(name = "dangerous_good_limited_quantity")
+    private Boolean dangerousGoodLimitedQuantity;
+
+    @Column(name = "dangerous_good_marine_pollutant")
+    private Boolean dangerousGoodMarinePollutant;
+
+    @Column(name = "dangerous_good_corrosive")
+    private Boolean dangerousGoodCorrosive;
+}

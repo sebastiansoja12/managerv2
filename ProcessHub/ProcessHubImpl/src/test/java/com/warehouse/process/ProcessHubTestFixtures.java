@@ -1,6 +1,7 @@
 package com.warehouse.process;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.context.ApplicationEvent;
@@ -13,8 +14,10 @@ import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.process.domain.context.DomainContext;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.DeviceInformation;
@@ -23,6 +26,7 @@ import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 import com.warehouse.process.domain.vo.ProcessCommunication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public final class ProcessHubTestFixtures {
 
@@ -42,6 +46,21 @@ public final class ProcessHubTestFixtures {
             public void publishEvent(final Object event) {
             }
         });
+    }
+
+    public static void authenticateOperator() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernameTenantPasswordAuthenticationToken(
+                        "test",
+                        new OperatorId(1L),
+                        null,
+                        List.of()
+                )
+        );
+    }
+
+    public static void clearAuthentication() {
+        SecurityContextHolder.clearContext();
     }
 
     public static ProcessId processId() {

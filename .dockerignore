@@ -1,0 +1,17 @@
+.git
+.idea
+.vscode
+.DS_Store
+
+**/target
+**/build
+**/out
+**/.gradle
+**/node_modules
+
+*.log
+*.tmp
+*.swp
+
+docker/mysql/data
+docker/**/.env

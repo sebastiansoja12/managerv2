@@ -1,10 +1,9 @@
 package com.warehouse.routetracker.domain.model;
 
-
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
-import com.warehouse.routetracker.domain.vo.DepartmentCode;
 import com.warehouse.routetracker.domain.vo.DeviceId;
-import com.warehouse.routetracker.domain.vo.Username;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.DeviceInformationRequestDto;
 
@@ -12,23 +11,23 @@ public class DeviceInformationRequest {
     private ShipmentId shipmentId;
     private DeviceId deviceId;
     private String deviceType;
-    private Username username;
-    private DepartmentCode departmentCode;
+    private UserId userId;
+    private DepartmentId departmentId;
     private String version;
     private ProcessType processType;
 
     public DeviceInformationRequest(final ShipmentId shipmentId,
                                     final DeviceId deviceId,
                                     final String deviceType,
-                                    final Username username,
-                                    final DepartmentCode departmentCode,
+                                    final UserId userId,
+                                    final DepartmentId departmentId,
                                     final String version,
                                     final ProcessType processType) {
         this.shipmentId = shipmentId;
         this.deviceId = deviceId;
         this.deviceType = deviceType;
-        this.username = username;
-        this.departmentCode = departmentCode;
+        this.userId = userId;
+        this.departmentId = departmentId;
         this.version = version;
         this.processType = processType;
     }
@@ -37,11 +36,11 @@ public class DeviceInformationRequest {
         final ShipmentId shipmentId = new ShipmentId(device.shipmentId().getValue());
         final DeviceId deviceId = new DeviceId(device.deviceId().value());
         final String deviceType = device.deviceType().name();
-        final Username username = Username.from(device.username());
-        final DepartmentCode departmentCode = new DepartmentCode(device.departmentCode().value());
+        final UserId userId = new UserId(device.userId().value());
+        final DepartmentId departmentId = new DepartmentId(device.departmentId().value());
         final String version = device.deviceVersion().value();
         final ProcessType processType = ProcessType.valueOf(device.processType().name());
-        return new DeviceInformationRequest(shipmentId, deviceId, deviceType, username, departmentCode, version, processType);
+        return new DeviceInformationRequest(shipmentId, deviceId, deviceType, userId, departmentId, version, processType);
     }
 
     public ShipmentId getShipmentId() {
@@ -68,20 +67,20 @@ public class DeviceInformationRequest {
         this.deviceType = deviceType;
     }
 
-    public Username getUsername() {
-        return username;
+    public UserId getUserId() {
+        return userId;
     }
 
-    public void setUsername(final Username username) {
-        this.username = username;
+    public void setUserId(final UserId userId) {
+        this.userId = userId;
     }
 
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartmentCode(final DepartmentCode departmentCode) {
-        this.departmentCode = departmentCode;
+    public void setDepartmentId(final DepartmentId departmentId) {
+        this.departmentId = departmentId;
     }
 
     public String getVersion() {

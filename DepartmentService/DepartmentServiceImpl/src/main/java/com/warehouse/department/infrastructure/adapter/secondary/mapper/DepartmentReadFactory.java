@@ -14,6 +14,7 @@ public class DepartmentReadFactory {
 
     public DepartmentReadEntity fromDepartmentSnapshot(final DepartmentSnapshot snapshot) {
         final DepartmentReadEntity readEntity = new DepartmentReadEntity(
+                snapshot.departmentId().getValue(),
                 snapshot.departmentCode(),
                 map(snapshot.address()),
                 new TaxId(snapshot.taxId().value()),

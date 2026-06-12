@@ -1,5 +1,7 @@
 package com.warehouse.shipment.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.PersonApi;
@@ -19,8 +21,14 @@ public class Recipient implements Person {
     private final String postalCode;
     private final String street;
 
-	public Recipient(final String firstName, final String lastName, final String email, final String telephoneNumber,
-			final String city, final String postalCode, final String street) {
+	@JsonCreator
+	public Recipient(@JsonProperty("firstName") final String firstName,
+                     @JsonProperty("lastName") final String lastName,
+                     @JsonProperty("email") final String email,
+                     @JsonProperty("telephoneNumber") final String telephoneNumber,
+			         @JsonProperty("city") final String city,
+                     @JsonProperty("postalCode") final String postalCode,
+                     @JsonProperty("street") final String street) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

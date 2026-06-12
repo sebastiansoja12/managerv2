@@ -2,6 +2,8 @@ package com.warehouse.process.infrastructure.adapter.secondary;
 
 import static com.warehouse.process.ProcessHubTestFixtures.finishedProcessLog;
 import static com.warehouse.process.ProcessHubTestFixtures.processId;
+import static com.warehouse.process.ProcessHubTestFixtures.authenticateOperator;
+import static com.warehouse.process.ProcessHubTestFixtures.clearAuthentication;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -29,7 +32,13 @@ class ProcessLogReadModelRepositoryImplTest {
 
     @BeforeEach
     void setUp() {
+        authenticateOperator();
         repository = new ProcessLogReadModelRepositoryImpl(processLogReadRepository);
+    }
+
+    @AfterEach
+    void tearDown() {
+        clearAuthentication();
     }
 
     @Test

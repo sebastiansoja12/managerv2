@@ -5,18 +5,19 @@ services:
     restart: unless-stopped
     command: --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: dev
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-dev}
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      start_period: 40s
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 20
     networks:
       - manager_network
 
@@ -25,7 +26,7 @@ services:
     container_name: manager-mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "${MONGODB_PORT:-27017}:27017"
     volumes:
       - mongo_data:/data/db
     networks:
@@ -36,10 +37,10 @@ services:
     container_name: zookeeper
     restart: unless-stopped
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT:-2181}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME:-2000}
     ports:
-      - "2181:2181"
+      - "${ZOOKEEPER_PORT:-2181}:2181"
     networks:
       - manager_network
 
@@ -50,15 +51,15 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"
+      - "${KAFKA_PORT:-9092}:9092"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID:-1}
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT:-zookeeper:2181}
+      KAFKA_LISTENERS: ${KAFKA_LISTENERS:-PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS:-PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP:-PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT}
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${KAFKA_INTER_BROKER_LISTENER_NAME:-PLAINTEXT}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR:-1}
     networks:
       - manager_network
 
@@ -69,10 +70,10 @@ services:
     depends_on:
       - kafka
     ports:
-      - "8090:8080"
+      - "${KAFKA_UI_PORT:-8090}:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_NAME: ${KAFKA_UI_CLUSTER_NAME:-local}
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${KAFKA_UI_BOOTSTRAP_SERVERS:-kafka:29092}
     networks:
       - manager_network
 
@@ -84,41 +85,9 @@ services:
     container_name: eureka-server
     restart: unless-stopped
     ports:
-      - "8761:8761"
+      - "${EUREKA_PORT:-8761}:8761"
     environment:
-      EUREKA_INSTANCE_HOSTNAME: eureka-server
-    networks:
-      - manager_network
-
-  manager-application:
-    build:
-      context: .
-      dockerfile: Application/Dockerfile
-    env_file:
-      - .env
-    image: managerv2/application:local
-    container_name: manager-application
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: dev,docker
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: rootpassword
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/dev
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-    depends_on:
-      mysql:
-        condition: service_healthy
-      mongodb:
-        condition: service_started
-      kafka:
-        condition: service_started
-      eureka-server:
-        condition: service_started
+      EUREKA_INSTANCE_HOSTNAME: ${EUREKA_INSTANCE_HOSTNAME:-eureka-server}
     networks:
       - manager_network
 
@@ -130,40 +99,19 @@ services:
     container_name: manager-gateway
     restart: unless-stopped
     ports:
-      - "8088:8088"
+      - "${GATEWAY_PORT:-8088}:8088"
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
-      MANAGER_API_URL: http://manager-application:8080/v2/api
-      SOFTWARE_CONFIGURATION_URL: http://software-configuration:8081
-      DELIVERY_PROTECTION_URL: http://delivery-protection:8060/v2/api
-      RETURNING_TRACK_MANAGER_URL: http://returning-manager:8070/v2/api
-      ROUTE_TRACKER_FLOW_URL: http://route-tracker:8082/v2/api
-      PALLET_HANDLING_MANAGER_URL: http://pallet-handling-manager:8071
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
+      SOFTWARE_CONFIGURATION_URL: ${SOFTWARE_CONFIGURATION_URL:-http://software-configuration:8081}
+      RETURNING_TRACK_MANAGER_URL: ${RETURNING_TRACK_MANAGER_URL:-http://returning-manager:8070/v2/api}
+      ROUTE_TRACKER_FLOW_URL: ${ROUTE_TRACKER_FLOW_URL:-http://route-tracker:8082/v2/api}
     depends_on:
       eureka-server:
         condition: service_started
-      manager-application:
+      returning-manager:
         condition: service_started
-    networks:
-      - manager_network
-
-  manager-gui:
-    build:
-      context: ../managerv2gui
-      dockerfile: Dockerfile
-      args:
-        REACT_APP_SERVER_URL: http://localhost:8080/v2/api
-        REACT_APP_GATEWAY_URL: http://localhost:8080/v2/api
-        REACT_APP_VERSION: 2026.3
-        REACT_APP_ENVIRONMENT: development
-    image: managerv2/gui:local
-    container_name: manager-gui
-    restart: unless-stopped
-    ports:
-      - "3000:80"
-    depends_on:
-      manager-application:
+      route-tracker:
         condition: service_started
     networks:
       - manager_network
@@ -176,12 +124,12 @@ services:
     container_name: software-configuration
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "${SOFTWARE_CONFIGURATION_PORT:-8081}:8081"
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/warehouse
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      SPRING_DATA_MONGODB_URI: ${SOFTWARE_CONFIGURATION_MONGODB_URI:-mongodb://mongodb:27017/warehouse}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
     depends_on:
       mongodb:
         condition: service_started
@@ -200,16 +148,16 @@ services:
     container_name: returning-manager
     restart: unless-stopped
     ports:
-      - "8070:8070"
+      - "${RETURNING_MANAGER_PORT:-8070}:8070"
     environment:
-      SPRING_PROFILES_ACTIVE: dev,docker
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/rm
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: rootpassword
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      SPRING_PROFILES_ACTIVE: ${RETURNING_MANAGER_SPRING_PROFILES_ACTIVE:-dev,docker}
+      SPRING_DATASOURCE_URL: ${RETURNING_MANAGER_DATASOURCE_URL:-jdbc:mysql://mysql:3306/rm}
+      SPRING_DATASOURCE_USERNAME: ${RETURNING_MANAGER_DATASOURCE_USERNAME:-root}
+      SPRING_DATASOURCE_PASSWORD: ${RETURNING_MANAGER_DATASOURCE_PASSWORD:-rootpassword}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${RETURNING_MANAGER_JPA_HIBERNATE_DDL_AUTO:-update}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
     depends_on:
       mysql:
         condition: service_healthy
@@ -230,14 +178,14 @@ services:
     container_name: route-tracker
     restart: unless-stopped
     ports:
-      - "8082:8082"
+      - "${ROUTE_TRACKER_PORT:-8082}:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/rt
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: rootpassword
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      SPRING_DATASOURCE_URL: ${ROUTE_TRACKER_DATASOURCE_URL:-jdbc:mysql://mysql:3306/rt}
+      SPRING_DATASOURCE_USERNAME: ${ROUTE_TRACKER_DATASOURCE_USERNAME:-root}
+      SPRING_DATASOURCE_PASSWORD: ${ROUTE_TRACKER_DATASOURCE_PASSWORD:-rootpassword}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
     depends_on:
       mysql:
         condition: service_healthy

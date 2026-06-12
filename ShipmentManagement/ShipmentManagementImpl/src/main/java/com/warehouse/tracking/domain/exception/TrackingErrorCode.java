@@ -1,0 +1,14 @@
+package com.warehouse.tracking.domain.exception;
+
+public enum TrackingErrorCode {
+    NOT_FOUND,
+    INVALID_TRACKING_NUMBER,
+    CONFIGURATION_ERROR,
+    AUTHENTICATION_FAILURE,
+    MISSING_PERMISSION,
+    RATE_LIMIT,
+    TIMEOUT,
+    TEMPORARY_UNAVAILABLE,
+    INVALID_PROVIDER_RESPONSE,
+    UNKNOWN_PROVIDER
+}

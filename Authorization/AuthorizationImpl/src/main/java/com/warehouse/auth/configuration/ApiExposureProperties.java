@@ -14,7 +14,8 @@ public class ApiExposureProperties {
 
     private List<String> internalControllerPaths = new ArrayList<>(List.of(
             "/device-pairings",
-            "/device-pairing-verifications"
+            "/device-pairing-verifications",
+            "/shipments/read-sync"
     ));
 
     private List<String> pairKeyControllerPaths = new ArrayList<>(List.of(

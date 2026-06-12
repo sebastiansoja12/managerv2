@@ -10,7 +10,7 @@ public class ShipmentDto {
 
     private final ShipmentSizeDto shipmentSize;
 
-    private final String destination;
+    private final DepartmentCodeDto destination;
 
     private final ShipmentStatusDto shipmentStatus;
     
@@ -29,7 +29,7 @@ public class ShipmentDto {
     private final DangerousGoodApi dangerousGood;
 
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
-                       final ShipmentSizeDto shipmentSize, final String destination, final ShipmentStatusDto shipmentStatus,
+                       final ShipmentSizeDto shipmentSize, final DepartmentCodeDto destination, final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
                        final TrackingNumberDto trackingNumber,
                        final MoneyApi price, final Boolean locked,
@@ -65,7 +65,7 @@ public class ShipmentDto {
         return shipmentSize;
     }
 
-    public String getDestination() {
+    public DepartmentCodeDto getDestination() {
         return destination;
     }
 

@@ -1,27 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dataset>
 
-    <users
-            id="1"
-            username="s-soja"
-            password="$2a$10$m0ZdN0WH0B4O7FL9o1p.pejO4VF0yTlTB.aYJMd/GxyDtm05IAk4q"
-            first_name="Sebastian"
-            last_name="Soja"
-            email="sebastian5152@wp.pl"
-            role="ADMIN"
-            department_code="TST"
-    />
-
     <route_log
             id='7ecaa82b-eda9-4b5d-ae9f-933f9adaee27'
-            parcel_id="123456"
+            shipment_id="123456"
             return_code="ReturnCode1"
             fault_description="FaultDescription1"
     />
 
     <route_log
             id='7ecaa82b-eda9-4b5d-ae9f-933f9adaee28'
-            parcel_id="789012"
+            shipment_id="789012"
             return_code="ReturnCode2"
             fault_description="FaultDescription2"
     />
@@ -36,8 +25,10 @@
             description="Detail Description 1"
             process_type="0"
             request="Request Detail 1"
-            parcel_status="0"
-            username="s-soja"
+            shipment_status="0"
+            user_id="1"
+            department_id="10"
+            supplier_id="100"
     />
 
     <route_log_details
@@ -49,24 +40,10 @@
             description="Detail Description 2"
             process_type="0"
             request="Request Detail 2"
-            parcel_status="0"
-            username="s-soja"
-    />
-
-    <department
-            city="Test"
-            street="Test"
-            country="Test"
-            department_code="TST"
-    />
-
-    <supplier
-            supplier_code="TS_TST"
-            first_name="test"
-            last_name="test"
-            telephone="123"
-            department_code="TST"
-            active="1"
+            shipment_status="0"
+            user_id="2"
+            department_id="20"
+            supplier_id="200"
     />
 
 </dataset>

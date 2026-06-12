@@ -135,7 +135,7 @@ class ReturnIntegrationTest {
                 Instant.parse("2025-10-12T12:30:00Z")
         );
 
-        this.returnPort.complete(new ReturnPackageId(123L));
+        this.returnPort.complete(new ShipmentId(15L));
 
         assertEquals(Status.COMPLETED, entity.getReturnStatus());
     }
@@ -227,7 +227,7 @@ class ReturnIntegrationTest {
 
     @Test
     void shouldNotCompleteWhenIsCancelled() {
-        final ReturnPackageId returnPackageId = new ReturnPackageId(1001L);
+        final ShipmentId shipmentId = new ShipmentId(15L);
         final ReturnPackageEntity entity = createReturnPackageEntity(
                 1001L,
                 15L,
@@ -243,7 +243,7 @@ class ReturnIntegrationTest {
                 Instant.parse("2025-10-12T12:30:00Z")
         );
 
-        final Executable executable = () -> this.returnPort.complete(returnPackageId);
+        final Executable executable = () -> this.returnPort.complete(shipmentId);
         final ReturnPackageNotFoundException exception = assertThrows(ReturnPackageNotFoundException.class, executable);
 
         assertEquals("Return package not found", exception.getMessage());

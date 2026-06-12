@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="s-soja" id="20260801-01-drop-shipment-external-route-id">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="shipment" columnName="external_route_id"/>
+        </preConditions>
+        <dropColumn tableName="shipment" columnName="external_route_id"/>
+    </changeSet>
+
+    <changeSet author="s-soja" id="20260801-02-drop-shipment-rd-external-route-id">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="shipment_rd" columnName="external_route_id"/>
+        </preConditions>
+        <dropColumn tableName="shipment_rd" columnName="external_route_id"/>
+    </changeSet>
+
+    <changeSet author="s-soja" id="20260801-03-drop-shipment-aud-external-route-id">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="shipment_aud" columnName="external_route_id"/>
+        </preConditions>
+        <dropColumn tableName="shipment_aud" columnName="external_route_id"/>
+    </changeSet>
+
+</databaseChangeLog>

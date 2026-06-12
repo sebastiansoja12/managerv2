@@ -7,6 +7,8 @@
     <include file="/changelog/db/communication_log_details_rd.xml"/>
     <include file="/changelog/db/conf_position_stack.xml"/>
     <include file="/changelog/db/geocoding_configurations.xml"/>
+    <include file="/changelog/db/tracking_integration_configurations.xml"/>
+    <include file="/changelog/db/kafka_event_outbox.xml"/>
     <include file="/changelog/db/country.xml"/>
     <include file="/changelog/db/dangerous_good.xml"/>
     <include file="/changelog/db/delivery.xml"/>
@@ -15,6 +17,7 @@
     <include file="/changelog/db/delivery_missed_details.xml"/>
     <include file="/changelog/db/department.xml"/>
     <include file="/changelog/db/department_aud.xml"/>
+    <include file="/changelog/db/department_id.xml"/>
     <include file="/changelog/db/device_pair.xml"/>
     <include file="/changelog/db/device_settings.xml"/>
     <include file="/changelog/db/device_version.xml"/>
@@ -44,7 +47,10 @@
     <include file="/changelog/db/route_log_details.xml"/>
     <include file="/changelog/db/scanners.xml"/>
     <include file="/changelog/db/shipment.xml"/>
+    <include file="/changelog/db/shipment_rd.xml"/>
     <include file="/changelog/db/shipment_aud.xml"/>
+    <include file="/changelog/db/shipment_external_route_id.xml"/>
+    <include file="/changelog/db/shipment_external_return_id.xml"/>
     <include file="/changelog/db/signature.xml"/>
     <include file="/changelog/db/supplier.xml"/>
     <include file="/changelog/db/suppliers.xml"/>
@@ -56,6 +62,8 @@
     <include file="/changelog/db/users.xml"/>
     <include file="/changelog/db/users_role_permissions.xml"/>
     <include file="/changelog/db/foreign-keys.xml"/>
+    <include file="/changelog/db/route_log_detail_ids.xml"/>
     <include file="/changelog/db/initial-login.xml"/>
+    <include file="/changelog/db/shipment-dangerous-good-embedded.xml"/>
 
 </databaseChangeLog>

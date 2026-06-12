@@ -10,9 +10,9 @@ public class RouteLogRecordDetailDto {
     private Long id;
     private TerminalIdDto terminalId;
     private String version;
-    private String username;
-    private String supplierCode;
-    private String departmentCode;
+    private UserIdDto userId;
+    private SupplierIdDto supplierId;
+    private DepartmentIdDto departmentId;
     private ShipmentStatusDto shipmentStatus;
     private String description;
     private LocalDateTime timestamp;
@@ -22,16 +22,17 @@ public class RouteLogRecordDetailDto {
     public RouteLogRecordDetailDto() {
     }
 
-	public RouteLogRecordDetailDto(final Long id, final TerminalIdDto terminalId, final String version, final String username,
-                                   final String supplierCode, final String departmentCode, final ShipmentStatusDto shipmentStatus,
+    public RouteLogRecordDetailDto(final Long id, final TerminalIdDto terminalId, final String version,
+                                   final UserIdDto userId, final SupplierIdDto supplierId,
+                                   final DepartmentIdDto departmentId, final ShipmentStatusDto shipmentStatus,
                                    final String description, final LocalDateTime timestamp, final ProcessTypeDto processType,
                                    final String request) {
         this.id = id;
         this.terminalId = terminalId;
         this.version = version;
-        this.username = username;
-        this.supplierCode = supplierCode;
-        this.departmentCode = departmentCode;
+        this.userId = userId;
+        this.supplierId = supplierId;
+        this.departmentId = departmentId;
         this.shipmentStatus = shipmentStatus;
         this.description = description;
         this.timestamp = timestamp;
@@ -51,16 +52,16 @@ public class RouteLogRecordDetailDto {
         return version;
     }
 
-    public String getUsername() {
-        return username;
+    public UserIdDto getUserId() {
+        return userId;
     }
 
-    public String getSupplierCode() {
-        return supplierCode;
+    public SupplierIdDto getSupplierId() {
+        return supplierId;
     }
 
-    public String getDepartmentCode() {
-        return departmentCode;
+    public DepartmentIdDto getDepartmentId() {
+        return departmentId;
     }
 
     public ShipmentStatusDto getShipmentStatus() {
@@ -84,6 +85,6 @@ public class RouteLogRecordDetailDto {
     }
 
     public static TerminalIdDto from(final TerminalId terminalId) {
-        return new TerminalIdDto(terminalId.value());
+        return terminalId != null ? new TerminalIdDto(terminalId.value()) : null;
     }
 }
