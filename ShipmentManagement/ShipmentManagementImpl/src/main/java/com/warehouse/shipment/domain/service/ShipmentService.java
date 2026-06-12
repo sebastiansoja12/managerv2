@@ -51,7 +51,8 @@ public interface ShipmentService {
 
     void notifyShipmentSent(final ShipmentId shipmentId);
 
-    default void notifyShipmentReturned(final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode) {
+    default void notifyShipmentReturned(final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode,
+                                        final DepartmentCode departmentCode) {
         notifyShipmentReturned(shipmentId);
     }
 

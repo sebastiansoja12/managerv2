@@ -48,6 +48,9 @@ public class ReturnPackageEntity {
     @Enumerated(EnumType.STRING)
     private ReasonCode reasonCode;
 
+    @Column(name = "operator_id")
+    private Long operatorId;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -72,6 +75,25 @@ public class ReturnPackageEntity {
             final Instant createdAt,
             final Instant updatedAt
     ) {
+        this(returnId, shipmentId, reason, returnStatus, returnToken, assignedDepartmentCode,
+                returnedDepartmentCode, assignedTo, processedBy, reasonCode, null, createdAt, updatedAt);
+    }
+
+    public ReturnPackageEntity(
+            final ReturnId returnId,
+            final ShipmentId shipmentId,
+            final String reason,
+            final Status returnStatus,
+            final ReturnToken returnToken,
+            final DepartmentCode assignedDepartmentCode,
+            final DepartmentCode returnedDepartmentCode,
+            final UserId assignedTo,
+            final UserId processedBy,
+            final ReasonCode reasonCode,
+            final Long operatorId,
+            final Instant createdAt,
+            final Instant updatedAt
+    ) {
         this.returnId = returnId;
         this.shipmentId = shipmentId;
         this.reason = reason;
@@ -82,6 +104,7 @@ public class ReturnPackageEntity {
         this.assignedTo = assignedTo;
         this.processedBy = processedBy;
         this.reasonCode = reasonCode;
+        this.operatorId = operatorId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -108,6 +131,10 @@ public class ReturnPackageEntity {
 
     public ReasonCode getReasonCode() {
         return reasonCode;
+    }
+
+    public Long getOperatorId() {
+        return operatorId;
     }
 
     public DepartmentCode getReturnedDepartmentCode() {

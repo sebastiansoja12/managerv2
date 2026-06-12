@@ -32,6 +32,12 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     }
 
     @Override
+    public Department findByDepartmentCodeIncludingArchived(final DepartmentCode departmentCode) {
+        final DepartmentReadEntity department = readRepository.findByDepartmentCodeIncludingArchived(departmentCode);
+        return DepartmentToModelMapper.map(department);
+    }
+
+    @Override
     public Department findByDepartmentId(final DepartmentId departmentId) {
         final DepartmentReadEntity department = readRepository.findByDepartmentId(departmentId);
         return DepartmentToModelMapper.map(department);
@@ -40,6 +46,12 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     @Override
     public List<Department> findAll() {
         final List<DepartmentReadEntity> departments = readRepository.list();
+        return departments.stream().map(DepartmentToModelMapper::map).toList();
+    }
+
+    @Override
+    public List<Department> findAllArchived() {
+        final List<DepartmentReadEntity> departments = readRepository.listArchived();
         return departments.stream().map(DepartmentToModelMapper::map).toList();
     }
 

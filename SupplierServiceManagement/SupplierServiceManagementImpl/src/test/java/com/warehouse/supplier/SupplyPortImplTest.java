@@ -1,6 +1,8 @@
 package com.warehouse.supplier;
 
 import com.warehouse.commonassets.enumeration.PackageType;
+import com.warehouse.commonassets.helper.Result;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
@@ -73,6 +75,20 @@ public class SupplyPortImplTest {
         final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "test", "test", "test");
         final SupplierCreateResponse response = supplyPort.create(request);
         assertNotEquals(supplierCode, response.supplierCode());
+    }
+
+    @Test
+    @DisplayName("Create supplier with department code")
+    void shouldCreateSupplierWithDepartmentCode() {
+        final SupplierCode supplierCode = new SupplierCode("123456");
+        final DepartmentCode departmentCode = new DepartmentCode("GD1");
+        final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "test", "test", "test", departmentCode);
+        when(departmentServicePort.validateDepartmentCode(departmentCode)).thenReturn(Result.success());
+
+        final SupplierCreateResponse response = supplyPort.create(request);
+
+        assertEquals(supplierCode, response.supplierCode());
+        verify(supplierRepository).create(argThat(supplier -> departmentCode.equals(supplier.getDepartmentCode())));
     }
 
     @Test

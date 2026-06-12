@@ -18,6 +18,7 @@
 - Primary adapters are connected with primary ports
 - Secondary adapters are implementation of secondary ports
 - Maven config is manager_settings.xml
+- Liquibase changesets author as 's-soja'
 
 ---
 

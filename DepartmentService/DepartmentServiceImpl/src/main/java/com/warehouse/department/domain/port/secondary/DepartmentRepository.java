@@ -12,9 +12,13 @@ public interface DepartmentRepository {
 
     Department findByDepartmentCode(final DepartmentCode departmentCode);
 
+    Department findByDepartmentCodeIncludingArchived(final DepartmentCode departmentCode);
+
     Department findByDepartmentId(final DepartmentId departmentId);
 
     List<Department> findAll();
+
+    List<Department> findAllArchived();
 
     Boolean checkExists(final DepartmentCode departmentCode);
 }

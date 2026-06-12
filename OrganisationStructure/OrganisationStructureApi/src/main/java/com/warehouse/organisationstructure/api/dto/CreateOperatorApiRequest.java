@@ -19,14 +19,6 @@ public record CreateOperatorApiRequest(String userFirstName,
                                        LocalDate contractEndDate,
                                        LocalDate foundedDate,
                                        OperatorConfigurationDto configuration,
+                                       OperatorGeocodingConfigurationDto geocodingConfiguration,
                                        FirstDepartmentDto firstDepartment) {
-
-    public record FirstDepartmentDto(String departmentCode,
-                                     String city,
-                                     String street,
-                                     String postalCode,
-                                     String countryCode,
-                                     String openingHours,
-                                     String departmentType) {
-    }
 }

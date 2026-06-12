@@ -7,5 +7,5 @@ import com.warehouse.returning.infrastructure.adapter.primary.api.ReturnPackageI
 public record ReturnPackageApi(ReturnPackageIdApi returnPackageId, ShipmentIdApi shipmentId, String reason,
 		ReturnStatusApi returnStatus, ReturnTokenApi returnToken, DepartmentCodeApi assignedDepartmentCode,
 		DepartmentCodeApi returnedDepartmentCode, UserIdApi assignedTo, UserIdApi processedBy, ReasonCodeApi reasonCode,
-		Instant createdAt, Instant updatedAt) {
+		Long operatorId, Instant createdAt, Instant updatedAt) {
 }

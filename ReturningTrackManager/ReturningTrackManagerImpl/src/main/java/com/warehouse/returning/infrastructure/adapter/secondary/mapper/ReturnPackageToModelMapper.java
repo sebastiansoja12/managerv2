@@ -21,6 +21,7 @@ public class ReturnPackageToModelMapper {
                 .assignedTo(new com.warehouse.returning.domain.vo.UserId(entity.getAssignedTo().getValue()))
                 .processedBy(new com.warehouse.returning.domain.vo.UserId(entity.getProcessedBy().getValue()))
                 .reasonCode(entity.getReasonCode())
+                .operatorId(entity.getOperatorId())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

@@ -1,11 +1,13 @@
 package com.warehouse.organisationstructure.operator.domain.port.primary;
 
+import com.warehouse.commonassets.enumeration.GeocodingProvider.ConfigurationField;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.operator.domain.model.CreateOperatorCommand;
 import com.warehouse.organisationstructure.operator.domain.model.Operator;
 import com.warehouse.organisationstructure.operator.domain.model.OperatorStatus;
 import com.warehouse.organisationstructure.operator.domain.model.UpdateOperatorCommand;
 import com.warehouse.organisationstructure.operator.domain.service.OperatorService;
+import com.warehouse.organisationstructure.operator.domain.vo.OperatorGeocodingConfiguration;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorProvisioningDetails;
 
 import java.time.Instant;
@@ -66,6 +68,37 @@ public class OperatorPortImpl implements OperatorPort {
         if (command.firstDepartment().departmentCode() == null || command.firstDepartment().departmentCode().isBlank()) {
             throw new IllegalArgumentException("First department code is required to create operator");
         }
+        validateGeocodingConfiguration(command.geocodingConfiguration());
+    }
+
+    private void validateGeocodingConfiguration(final OperatorGeocodingConfiguration configuration) {
+        if (configuration == null || configuration.provider() == null) {
+            throw new IllegalArgumentException("Geocoding configuration is required to create operator");
+        }
+        if (!configuration.enabled()) {
+            throw new IllegalArgumentException("Geocoding configuration must be enabled to create operator");
+        }
+        for (final ConfigurationField field : configuration.provider().getActiveFields()) {
+            if (isBlank(valueFor(field, configuration))) {
+                throw new IllegalArgumentException("Geocoding field " + field + " is required for provider "
+                        + configuration.provider());
+            }
+        }
+    }
+
+    private String valueFor(final ConfigurationField field, final OperatorGeocodingConfiguration configuration) {
+        return switch (field) {
+            case API_USER_NAME -> configuration.apiUserName();
+            case API_PASSWORD -> configuration.apiPassword();
+            case API_KEY -> configuration.apiKey();
+            case CLIENT_NUMBER -> configuration.clientNumber();
+            case ACCESS_TOKEN -> configuration.accessToken();
+            case REFRESH_TOKEN -> configuration.refreshToken();
+        };
+    }
+
+    private boolean isBlank(final String value) {
+        return value == null || value.isBlank();
     }
 
     private void validateUpdateCommand(final UpdateOperatorCommand command) {
@@ -99,6 +132,7 @@ public class OperatorPortImpl implements OperatorPort {
                 command.password(),
                 command.language(),
                 command.email(),
+                command.geocodingConfiguration(),
                 provisioningDepartment
         );
     }

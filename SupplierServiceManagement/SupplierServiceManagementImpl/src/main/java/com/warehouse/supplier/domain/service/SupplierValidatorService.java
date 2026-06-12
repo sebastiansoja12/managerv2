@@ -19,5 +19,5 @@ public interface SupplierValidatorService {
     boolean validateSupplierExistsById(final SupplierId supplierId);
     Result<Void, String> validateSupplierForUpdate(final SupplierUpdateCommand supplierUpdateCommand);
 
-    Boolean validateDepartmentExistsByDeparmtneCode(final DepartmentCode departmentCode);
+    Boolean validateDepartmentExistsByDepartmentCode(final DepartmentCode departmentCode);
 }

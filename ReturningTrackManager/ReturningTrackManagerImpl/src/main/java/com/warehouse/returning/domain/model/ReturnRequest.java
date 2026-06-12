@@ -10,14 +10,21 @@ public class ReturnRequest {
     private List<ReturnPackageRequest> requests;
     private DepartmentCode issuerDepartmentCode;
     private UserId issuerUserId;
+    private Long operatorId;
 
     public ReturnRequest() {
     }
 
     public ReturnRequest(final DepartmentCode issuerDepartmentCode, final UserId issuerUserId,
                          final List<ReturnPackageRequest> requests) {
+        this(issuerDepartmentCode, issuerUserId, null, requests);
+    }
+
+    public ReturnRequest(final DepartmentCode issuerDepartmentCode, final UserId issuerUserId,
+                         final Long operatorId, final List<ReturnPackageRequest> requests) {
         this.issuerDepartmentCode = issuerDepartmentCode;
         this.issuerUserId = issuerUserId;
+        this.operatorId = operatorId;
         this.requests = requests;
     }
 
@@ -35,6 +42,14 @@ public class ReturnRequest {
 
     public void setIssuerUserId(final UserId issuerUserId) {
         this.issuerUserId = issuerUserId;
+    }
+
+    public Long getOperatorId() {
+        return operatorId;
+    }
+
+    public void setOperatorId(final Long operatorId) {
+        this.operatorId = operatorId;
     }
 
     public List<ReturnPackageRequest> getRequests() {

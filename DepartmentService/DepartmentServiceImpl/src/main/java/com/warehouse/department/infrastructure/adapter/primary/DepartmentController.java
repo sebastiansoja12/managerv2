@@ -112,7 +112,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/statuses")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE})
     public ResponseEntity<?> changeDepartmentStatus(
             @RequestBody final ChangeDepartmentStatusApi departmentStatusRequest) {
         final Result<Void, List<String>> result = this.getValidator(departmentStatusRequest.getResourceName())
@@ -123,6 +123,23 @@ public class DepartmentController {
         }
 		final ChangeDepartmentStatusCommand command = new ChangeDepartmentStatusCommand(
 				new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status());
+        this.departmentPort.changeStatus(command);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/statuses/archive")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    public ResponseEntity<?> archiveDepartment(
+            @RequestBody final ChangeDepartmentStatusApi departmentStatusRequest) {
+        final Result<Void, List<String>> result = this.getValidator(departmentStatusRequest.getResourceName())
+                .validateBody(departmentStatusRequest);
+
+        if (result.isFailure() || !Department.Status.ARCHIVED.name().equals(departmentStatusRequest.status())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final ChangeDepartmentStatusCommand command = new ChangeDepartmentStatusCommand(
+                new DepartmentCode(departmentStatusRequest.departmentCode().value()), departmentStatusRequest.status());
         this.departmentPort.changeStatus(command);
         return ResponseEntity.ok().build();
     }
@@ -164,6 +181,14 @@ public class DepartmentController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(this.departmentPort.findAll().stream().map(ResponseMapper::map).toList());
+    }
+
+    @GetMapping("/archived")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ})
+    public ResponseEntity<?> allArchivedDepartments() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(this.departmentPort.findAllArchived().stream().map(ResponseMapper::map).toList());
     }
 
     public DepartmentRequestValidator getValidator(final String resourceName) {

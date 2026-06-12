@@ -1,10 +1,13 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.organisationstructure.api.dto.DeliveryTimeConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorDto;
 import com.warehouse.organisationstructure.api.dto.OperatorIdDto;
 import com.warehouse.organisationstructure.api.dto.OperatorStatusDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
+import com.warehouse.organisationstructure.api.dto.ShippingCapabilitiesDto;
 import com.warehouse.organisationstructure.operator.domain.model.Operator;
 import com.warehouse.organisationstructure.operator.domain.model.OperatorStatus;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.entity.OperatorEntity;
@@ -98,7 +101,7 @@ public final class OperatorMapper {
         );
     }
 
-    private static OperatorConfigurationDto toDtoConfiguration(final OperatorConfiguration configuration) {
+    public static OperatorConfigurationDto toDtoConfiguration(final OperatorConfiguration configuration) {
         if (configuration == null) {
             return null;
         }
@@ -110,62 +113,62 @@ public final class OperatorMapper {
     }
 
     private static OperatorConfiguration.ShippingCapabilities toModelShippingCapabilities(
-            final OperatorConfigurationDto.ShippingCapabilitiesDto dto) {
-        if (dto == null) {
+            final ShippingCapabilitiesDto shippingCapabilities) {
+        if (shippingCapabilities == null) {
             return null;
         }
         return new OperatorConfiguration.ShippingCapabilities(
-                dto.supportsDomesticShipping(),
-                dto.supportsInternationalShipping(),
-                dto.supportsExpressShipping(),
-                dto.supportsSameDayDelivery(),
-                dto.supportsCashOnDelivery(),
-                dto.supportsParcelLockers(),
-                dto.supportsPickupPoints(),
-                dto.supportsHomeDelivery(),
-                dto.supportsSaturdayDelivery(),
-                dto.supportsSundayDelivery(),
-                dto.supportsReturnShipments(),
-                dto.providesTracking(),
-                dto.providesInsurance()
+                shippingCapabilities.supportsDomesticShipping(),
+                shippingCapabilities.supportsInternationalShipping(),
+                shippingCapabilities.supportsExpressShipping(),
+                shippingCapabilities.supportsSameDayDelivery(),
+                shippingCapabilities.supportsCashOnDelivery(),
+                shippingCapabilities.supportsParcelLockers(),
+                shippingCapabilities.supportsPickupPoints(),
+                shippingCapabilities.supportsHomeDelivery(),
+                shippingCapabilities.supportsSaturdayDelivery(),
+                shippingCapabilities.supportsSundayDelivery(),
+                shippingCapabilities.supportsReturnShipments(),
+                shippingCapabilities.providesTracking(),
+                shippingCapabilities.providesInsurance()
         );
     }
 
     private static OperatorConfiguration.ShipmentLimits toModelShipmentLimits(
-            final OperatorConfigurationDto.ShipmentLimitsDto dto) {
-        if (dto == null) {
+            final ShipmentLimitsDto shipmentLimits) {
+        if (shipmentLimits == null) {
             return null;
         }
         return new OperatorConfiguration.ShipmentLimits(
-                dto.maxWeight(),
-                dto.minWeight(),
-                dto.maxLength(),
-                dto.maxWidth(),
-                dto.maxHeight(),
-                dto.maxShipmentValue()
+                shipmentLimits.maxWeight(),
+                shipmentLimits.minWeight(),
+                shipmentLimits.maxLength(),
+                shipmentLimits.maxWidth(),
+                shipmentLimits.maxHeight(),
+                shipmentLimits.maxShipmentValue()
         );
     }
 
     private static OperatorConfiguration.DeliveryTimeConfiguration toModelDeliveryTimeConfiguration(
-            final OperatorConfigurationDto.DeliveryTimeConfigurationDto dto) {
-        if (dto == null) {
+            final DeliveryTimeConfigurationDto deliveryTimeConfiguration) {
+        if (deliveryTimeConfiguration == null) {
             return null;
         }
         return new OperatorConfiguration.DeliveryTimeConfiguration(
-                dto.minDeliveryDays(),
-                dto.maxDeliveryDays(),
-                dto.expressDeliveryDays(),
-                dto.sameDayDeliveryHours(),
-                dto.internationalDeliveryDays()
+                deliveryTimeConfiguration.minDeliveryDays(),
+                deliveryTimeConfiguration.maxDeliveryDays(),
+                deliveryTimeConfiguration.expressDeliveryDays(),
+                deliveryTimeConfiguration.sameDayDeliveryHours(),
+                deliveryTimeConfiguration.internationalDeliveryDays()
         );
     }
 
-    private static OperatorConfigurationDto.ShippingCapabilitiesDto toDtoShippingCapabilities(
+    private static ShippingCapabilitiesDto toDtoShippingCapabilities(
             final OperatorConfiguration.ShippingCapabilities capabilities) {
         if (capabilities == null) {
             return null;
         }
-        return new OperatorConfigurationDto.ShippingCapabilitiesDto(
+        return new ShippingCapabilitiesDto(
                 capabilities.isSupportsDomesticShipping(),
                 capabilities.isSupportsInternationalShipping(),
                 capabilities.isSupportsExpressShipping(),
@@ -182,12 +185,12 @@ public final class OperatorMapper {
         );
     }
 
-    private static OperatorConfigurationDto.ShipmentLimitsDto toDtoShipmentLimits(
+    private static ShipmentLimitsDto toDtoShipmentLimits(
             final OperatorConfiguration.ShipmentLimits limits) {
         if (limits == null) {
             return null;
         }
-        return new OperatorConfigurationDto.ShipmentLimitsDto(
+        return new ShipmentLimitsDto(
                 limits.getMaxWeight(),
                 limits.getMinWeight(),
                 limits.getMaxLength(),
@@ -197,12 +200,12 @@ public final class OperatorMapper {
         );
     }
 
-    private static OperatorConfigurationDto.DeliveryTimeConfigurationDto toDtoDeliveryTimeConfiguration(
+    private static DeliveryTimeConfigurationDto toDtoDeliveryTimeConfiguration(
             final OperatorConfiguration.DeliveryTimeConfiguration configuration) {
         if (configuration == null) {
             return null;
         }
-        return new OperatorConfigurationDto.DeliveryTimeConfigurationDto(
+        return new DeliveryTimeConfigurationDto(
                 configuration.getMinDeliveryDays(),
                 configuration.getMaxDeliveryDays(),
                 configuration.getExpressDeliveryDays(),

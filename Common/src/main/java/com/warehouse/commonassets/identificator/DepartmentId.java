@@ -1,8 +1,9 @@
 package com.warehouse.commonassets.identificator;
 
-import java.util.Objects;
-
 import jakarta.persistence.Embeddable;
+
+import java.util.Objects;
+import java.util.UUID;
 
 @Embeddable
 public class DepartmentId {
@@ -13,6 +14,10 @@ public class DepartmentId {
 
     public DepartmentId(final Long value) {
         this.value = value;
+    }
+
+    public static DepartmentId generate() {
+        return new DepartmentId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
 
     public Long getValue() {

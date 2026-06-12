@@ -49,8 +49,13 @@ public class SupplyPortImpl implements SupplyPort {
         final String firstName = supplierCreateCommand.firstName();
         final String lastName = supplierCreateCommand.lastName();
         final String telephoneNumber = supplierCreateCommand.telephoneNumber();
+        final DepartmentCode departmentCode = supplierCreateCommand.departmentCode();
+        if (!validatorService.validateDepartmentExistsByDepartmentCode(departmentCode)) {
+            throw new RestClientException("Department not found");
+        }
         final SupplierId supplierId = this.supplierService.nextSupplierId();
 		final Supplier supplier = new Supplier(supplierId, supplierCode, firstName, lastName, telephoneNumber);
+        supplier.changeDepartmentCode(departmentCode);
 
         this.supplierService.create(supplier);
 
@@ -129,7 +134,7 @@ public class SupplyPortImpl implements SupplyPort {
     public void changeDepartmentCode(final ChangeSupplierDepartmentCodeCommand command) {
         final SupplierCode supplierCode = command.supplierCode();
         final DepartmentCode departmentCode = command.departmentCode();
-        final Boolean departmentExists = validatorService.validateDepartmentExistsByDeparmtneCode(departmentCode);
+        final Boolean departmentExists = validatorService.validateDepartmentExistsByDepartmentCode(departmentCode);
 
         if (supplierService.findByCode(supplierCode) == null || !departmentExists) {
             throw new RestClientException("Supplier or department not found");

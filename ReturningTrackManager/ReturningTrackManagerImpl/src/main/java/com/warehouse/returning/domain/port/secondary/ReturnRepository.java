@@ -1,6 +1,8 @@
 package com.warehouse.returning.domain.port.secondary;
 
 import com.warehouse.returning.domain.model.ReturnPackage;
+import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId;
 
@@ -9,6 +11,9 @@ public interface ReturnRepository {
     ReturnPackage findById(final ReturnPackageId returnPackageId);
 
     ReturnPackage findByShipmentId(final ShipmentId shipmentId);
+
+    ReturnPage findByDepartmentCodeAndOperatorId(
+            final DepartmentCode departmentCode, final Long operatorId, final int page, final int size);
 
     void createOrUpdate(final ReturnPackage returnPackage);
 

@@ -1,6 +1,7 @@
 package com.warehouse.organisationstructure.operator.domain.model;
 
 import com.warehouse.commonassets.identificator.TaxId;
+import com.warehouse.organisationstructure.operator.domain.vo.OperatorGeocodingConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public record CreateOperatorCommand(
         LocalDate contractEndDate,
         LocalDate foundedDate,
         OperatorConfiguration configuration,
+        OperatorGeocodingConfiguration geocodingConfiguration,
         FirstDepartment firstDepartment
 ) {
 

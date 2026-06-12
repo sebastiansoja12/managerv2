@@ -8,6 +8,8 @@ import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.vo.ChangeReasonCodeRequest;
+import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 import com.warehouse.returning.domain.vo.ReturnToken;
@@ -29,13 +31,15 @@ class ShipmentReturnKafkaListenerTest {
                   "reason": "RETURN",
                   "reasonCode": "NO_LONGER_NEEDED",
                   "departmentCode": "WRO",
-                  "userId": 0
+                  "userId": 0,
+                  "operatorId": 77
                 }
                 """);
 
         final ReturnRequest request = this.returnPort.request;
         assertThat(request.getIssuerDepartmentCode().value()).isEqualTo("WRO");
         assertThat(request.getIssuerUserId().value()).isZero();
+        assertThat(request.getOperatorId()).isEqualTo(77L);
         assertThat(request.getRequests()).hasSize(1);
 
         final ReturnPackageRequest packageRequest = request.getRequests().getFirst();
@@ -68,6 +72,15 @@ class ShipmentReturnKafkaListenerTest {
 
         @Override
         public ReturnPackage getReturn(final ReturnPackageId returnId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public ReturnPage getReturns(
+                final DepartmentCode departmentCode,
+                final Long operatorId,
+                final int page,
+                final int size) {
             throw new UnsupportedOperationException();
         }
 

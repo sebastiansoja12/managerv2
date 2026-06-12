@@ -95,6 +95,40 @@ class ReturnIntegrationTest {
     }
 
     @Test
+    void shouldPersistOperatorIdWhenProcessingRequest() {
+        final DepartmentCode issuerDepartmentCode = new DepartmentCode("TST");
+        final UserId issuerUserId = new UserId(1L);
+        final Long operatorId = 77L;
+        final List<ReturnPackageRequest> requests = buildReturnPackageRequest(
+                issuerDepartmentCode, issuerUserId, new ShipmentId(9001L), "Zwrot", ReasonCode.DAMAGED);
+
+        final ReturnResponse response = this.returnPort.process(
+                new ReturnRequest(issuerDepartmentCode, issuerUserId, operatorId, requests));
+
+        final ReturnPackage persisted = returnRepository.findById(
+                new ReturnPackageId(response.processReturn().get(0).returnId().getValue()));
+        assertEquals(operatorId, persisted.getOperatorId());
+    }
+
+    @Test
+    void shouldListOnlyReturnsForDepartmentAndOperator() {
+        createReturnPackageEntity(
+                2001L, 6001L, "Zwrot operatora 77", Status.CREATED, "TOKEN77", "WAW01", "WAW01",
+                11L, 12L, ReasonCode.DAMAGED, 77L,
+                Instant.parse("2026-08-14T08:00:00Z"), Instant.parse("2026-08-14T09:00:00Z"));
+        createReturnPackageEntity(
+                2002L, 6002L, "Zwrot operatora 88", Status.CREATED, "TOKEN88", "WAW01", "WAW01",
+                21L, 22L, ReasonCode.DAMAGED, 88L,
+                Instant.parse("2026-08-14T10:00:00Z"), Instant.parse("2026-08-14T11:00:00Z"));
+
+        final ReturnPage result = this.returnPort.getReturns(new DepartmentCode("WAW01"), 77L, 0, 50);
+
+        assertEquals(1, result.totalElements());
+        assertEquals(2001L, result.content().get(0).getReturnPackageId().value());
+        assertEquals(77L, result.content().get(0).getOperatorId());
+    }
+
+    @Test
     void shouldSkipProcessingRequestWhenShipmentAlreadyIsRegistered() {
         final DepartmentCode issuerDepartmentCode = new DepartmentCode("TST");
         final UserId issuerUserId = new UserId(1L);
@@ -271,6 +305,25 @@ class ReturnIntegrationTest {
             final Instant createdAt,
             final Instant updatedAt
     ) {
+        return createReturnPackageEntity(returnId, shipmentId, reason, status, returnToken, assignedDepartment,
+                returnedDepartment, assignedTo, processedBy, reasonCode, null, createdAt, updatedAt);
+    }
+
+    private ReturnPackageEntity createReturnPackageEntity(
+            final Long returnId,
+            final Long shipmentId,
+            final String reason,
+            final Status status,
+            final String returnToken,
+            final String assignedDepartment,
+            final String returnedDepartment,
+            final Long assignedTo,
+            final Long processedBy,
+            final ReasonCode reasonCode,
+            final Long operatorId,
+            final Instant createdAt,
+            final Instant updatedAt
+    ) {
         final ReturnPackageEntity entity = new ReturnPackageEntity(
                 new ReturnId(returnId),
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(shipmentId),
@@ -282,6 +335,7 @@ class ReturnIntegrationTest {
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.UserId(assignedTo),
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.UserId(processedBy),
                 reasonCode,
+                operatorId,
                 createdAt,
                 updatedAt
         );

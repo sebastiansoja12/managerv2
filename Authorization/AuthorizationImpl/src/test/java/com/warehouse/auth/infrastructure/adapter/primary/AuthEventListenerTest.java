@@ -79,6 +79,7 @@ class AuthEventListenerTest {
 
     @Test
     void shouldCreateInitialAdminUserAfterOperatorCreatedEvent() {
+        final AtomicReference<UserId> reservedUserId = new AtomicReference<>();
         final AtomicReference<UserId> publishedUserId = new AtomicReference<>();
         final RegisteringUserDto registeringUser = new RegisteringUserDto(
                 "Sebastian",
@@ -90,7 +91,11 @@ class AuthEventListenerTest {
                 new DepartmentCodeDto("TST"),
                 new OperatorIdDto(500L)
         );
-        final OperatorCreatedEvent event = new OperatorCreatedEvent(registeringUser, publishedUserId::set);
+        final OperatorCreatedEvent event = new OperatorCreatedEvent(
+                registeringUser,
+                reservedUserId::set,
+                publishedUserId::set
+        );
 
         when(userService.nextUserId()).thenReturn(new UserId(77L));
         when(passwordEncoder.encode("raw-password")).thenReturn("encoded-password");
@@ -107,6 +112,7 @@ class AuthEventListenerTest {
         assertThat(createdUser.isInitial()).isTrue();
         assertThat(createdUser.getPassword()).isEqualTo("encoded-password");
         assertThat(createdUser.getApiKey()).isEqualTo("encoded-api-key");
+        assertThat(reservedUserId.get()).isEqualTo(new UserId(77L));
         assertThat(publishedUserId.get()).isEqualTo(new UserId(77L));
     }
 }

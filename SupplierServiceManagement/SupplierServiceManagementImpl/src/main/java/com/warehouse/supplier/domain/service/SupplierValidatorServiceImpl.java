@@ -97,7 +97,7 @@ public class SupplierValidatorServiceImpl implements SupplierValidatorService {
     }
 
     @Override
-    public Boolean validateDepartmentExistsByDeparmtneCode(final DepartmentCode departmentCode) {
+    public Boolean validateDepartmentExistsByDepartmentCode(final DepartmentCode departmentCode) {
         final Result<Void, Void> result = departmentServicePort.validateDepartmentCode(departmentCode);
         return result.isSuccess();
     }
