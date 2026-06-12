@@ -26,16 +26,19 @@ public class GeocodingConfigurationEntity extends BelongsToOperator {
     @Column(name = "api_user_name")
     private String apiUserName;
 
-    @Column(name = "api_password", length = 50)
+    @Column(name = "api_password", columnDefinition = "TEXT")
     private String apiPassword;
 
-    @Column(name = "api_key", length = 50)
+    @Column(name = "api_key", columnDefinition = "TEXT")
     private String apiKey;
 
-    @Column(name = "access_token", length = 50)
+    @Column(name = "client_number")
+    private String clientNumber;
+
+    @Column(name = "access_token", columnDefinition = "TEXT")
     private String accessToken;
 
-    @Column(name = "refresh_token", length = 50)
+    @Column(name = "refresh_token", columnDefinition = "TEXT")
     private String refreshToken;
 
     @Column(name = "enabled", nullable = false)
@@ -53,6 +56,7 @@ public class GeocodingConfigurationEntity extends BelongsToOperator {
                                          final String apiUserName,
                                          final String apiPassword,
                                          final String apiKey,
+                                         final String clientNumber,
                                          final String accessToken,
                                          final String refreshToken,
                                          final boolean enabled,
@@ -62,6 +66,7 @@ public class GeocodingConfigurationEntity extends BelongsToOperator {
         this.apiUserName = apiUserName;
         this.apiPassword = apiPassword;
         this.apiKey = apiKey;
+        this.clientNumber = clientNumber;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.enabled = enabled;
@@ -86,6 +91,10 @@ public class GeocodingConfigurationEntity extends BelongsToOperator {
 
     public String getApiKey() {
         return apiKey;
+    }
+
+    public String getClientNumber() {
+        return clientNumber;
     }
 
     public String getAccessToken() {

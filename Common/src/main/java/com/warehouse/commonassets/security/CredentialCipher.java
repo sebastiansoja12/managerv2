@@ -22,13 +22,13 @@ public class CredentialCipher {
 
     public CredentialCipher(final String encryptionKey) {
         this.encryptionKey = encryptionKey;
+        validateEncryptionKey();
     }
 
     public String encrypt(final String credential) {
         if (credential == null) {
             return null;
         }
-        validateEncryptionKey();
         try {
             final byte[] initializationVector = new byte[IV_LENGTH];
             SECURE_RANDOM.nextBytes(initializationVector);
@@ -51,7 +51,6 @@ public class CredentialCipher {
         if (encryptedCredential == null) {
             return null;
         }
-        validateEncryptionKey();
         try {
             final byte[] payload = Base64.getDecoder().decode(encryptedCredential);
             final ByteBuffer buffer = ByteBuffer.wrap(payload);

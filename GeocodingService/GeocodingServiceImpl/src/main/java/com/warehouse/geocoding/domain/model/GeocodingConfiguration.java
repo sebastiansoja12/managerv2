@@ -15,6 +15,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
     private String apiUserName;
     private String apiPassword;
     private String apiKey;
+    private String clientNumber;
     private String accessToken;
     private String refreshToken;
     private boolean enabled;
@@ -25,6 +26,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
                                   final String apiUserName,
                                   final String apiPassword,
                                   final String apiKey,
+                                  final String clientNumber,
                                   final String accessToken,
                                   final String refreshToken,
                                   final boolean enabled,
@@ -34,6 +36,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
         this.apiUserName = apiUserName;
         this.apiPassword = apiPassword;
         this.apiKey = apiKey;
+        this.clientNumber = clientNumber;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.enabled = enabled;
@@ -45,6 +48,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
         this.apiUserName = command.apiUserName();
         this.apiPassword = command.apiPassword();
         this.apiKey = command.apiKey();
+        this.clientNumber = command.clientNumber();
         this.accessToken = command.accessToken();
         this.refreshToken = command.refreshToken();
         this.enabled = command.enabled();
@@ -58,6 +62,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
                 apiUserName,
                 apiPassword,
                 apiKey,
+                clientNumber,
                 accessToken,
                 refreshToken,
                 enabled,
@@ -82,6 +87,10 @@ public class GeocodingConfiguration extends BelongsToOperator {
 
     public String getApiKey() {
         return apiKey;
+    }
+
+    public String getClientNumber() {
+        return clientNumber;
     }
 
     public String getAccessToken() {

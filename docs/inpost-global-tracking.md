@@ -8,7 +8,7 @@ backend API. Provider credentials are tenant-scoped.
 ## Configuration
 
 1. Set `CREDENTIALS_ENCRYPTION_KEY` to a stable, non-empty deployment secret. It encrypts credentials stored in the
-   database. The legacy `GEOCODING_ENCRYPTION_KEY` remains a fallback for backward compatibility.
+   database.
 2. Open **Global configuration → Integrations** in the warehouse GUI and select **Add integration**.
 3. Select InPost, choose Stage or Production, enter Client ID and Client Secret, and use **Test connection**. The test
    uses the values currently entered in the dialog, so the configuration does not need to be saved first.

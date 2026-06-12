@@ -7,6 +7,7 @@ public record GeocodingConfigurationUpdateCommand(GeocodingConfigurationId geoco
                                                   String apiUserName,
                                                   String apiPassword,
                                                   String apiKey,
+                                                  String clientNumber,
                                                   String accessToken,
                                                   String refreshToken,
                                                   boolean enabled,
