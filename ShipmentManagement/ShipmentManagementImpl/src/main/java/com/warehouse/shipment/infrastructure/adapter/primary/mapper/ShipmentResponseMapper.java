@@ -11,6 +11,8 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.vo.ShipmentControlCenter;
 import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
+import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
+import com.warehouse.shipment.domain.vo.ShipmentReturnPage;
 import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 
@@ -24,6 +26,44 @@ public interface ShipmentResponseMapper {
     default ShipmentCreateResponseDto map(final ShipmentCreateResponse response) {
         return new ShipmentCreateResponseDto(response.shipmentId().value().toString(),
                 response.trackingNumber());
+    }
+
+    default ShipmentReturnDetailsApi map(final ShipmentReturnDetails response) {
+        return new ShipmentReturnDetailsApi(
+                new ShipmentReturnDetailsApi.LongValueApi(response.returnPackageId().getId()),
+                map(response.shipmentId()),
+                response.reason(),
+                response.returnStatus(),
+                response.returnToken() == null
+                        ? null
+                        : new ShipmentReturnDetailsApi.StringValueApi(response.returnToken()),
+                response.assignedDepartmentCode() == null
+                        ? null
+                        : new DepartmentCodeDto(response.assignedDepartmentCode().value()),
+                response.returnedDepartmentCode() == null
+                        ? null
+                        : new DepartmentCodeDto(response.returnedDepartmentCode().value()),
+                response.assignedTo() == null
+                        ? null
+                        : new ShipmentReturnDetailsApi.LongValueApi(response.assignedTo().value()),
+                response.processedBy() == null
+                        ? null
+                        : new ShipmentReturnDetailsApi.LongValueApi(response.processedBy().value()),
+                response.reasonCode() == null
+                        ? null
+                        : new ShipmentReturnDetailsApi.StringValueApi(response.reasonCode().name()),
+                response.operatorId(),
+                response.createdAt(),
+                response.updatedAt());
+    }
+
+    default ShipmentReturnPageApi map(final ShipmentReturnPage response) {
+        return new ShipmentReturnPageApi(
+                response.content().stream().map(this::map).toList(),
+                response.page(),
+                response.size(),
+                response.totalElements(),
+                response.totalPages());
     }
 
     ShipmentDto map(final Shipment shipment);

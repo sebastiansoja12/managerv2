@@ -3,16 +3,20 @@ package com.warehouse.returning.configuration;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.warehouse.returning.domain.service.ApiKeyService;
 import com.warehouse.returning.domain.vo.DecodedApiOperator;
+import com.warehouse.returning.infrastructure.adapter.secondary.exception.RestException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +27,12 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
     private final ApiKeyService apiKeyService;
 
-    public TenantMdcFilter(final ApiKeyService apiKeyService) {
+    private final String accessTokenCookieName;
+
+    public TenantMdcFilter(final ApiKeyService apiKeyService,
+                           @Value("${auth.cookie.access-name:AUTH-TOKEN}") final String accessTokenCookieName) {
         this.apiKeyService = apiKeyService;
+        this.accessTokenCookieName = accessTokenCookieName;
     }
 
     @Override
@@ -51,16 +59,14 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                 return;
             }
 
-            final String authorization = request.getHeader("Authorization");
-            if (authorization == null || !authorization.startsWith("Bearer ")) {
+            final String token = resolveAccessToken(request);
+            if (token == null) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Missing or invalid Authorization header");
+                response.getWriter().write("Missing access token");
                 return;
             }
 
-            final String token = authorization.substring(7);
-
-            JwtContext.setToken(authorization.replace("Bearer ", ""));
+            JwtContext.setToken(token);
 
             try {
                 final DecodedApiOperator decodedApiOperator = this.apiKeyService.decodeJwt(token);
@@ -77,6 +83,11 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
                 log.info("Incoming {} request", requestMethod);
 
+            } catch (RestException e) {
+                log.warn("Unauthorized request: {}", e.getMessage());
+                response.setStatus(e.getCode());
+                response.getWriter().write(e.getMessage());
+                return;
             } catch (IllegalArgumentException e) {
                 log.warn("Unauthorized request", e);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -101,5 +112,24 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             MDC.clear();
             JwtContext.clear();
         }
+    }
+
+    private String resolveAccessToken(final HttpServletRequest request) {
+        final String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            return authorization.substring(7);
+        }
+
+        final Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+
+        return Arrays.stream(cookies)
+                .filter(cookie -> this.accessTokenCookieName.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .filter(value -> value != null && !value.isBlank())
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -29,6 +29,7 @@ public class ReturnPackageToEntityMapper {
         final Instant createdAt = returnPackage.getCreatedAt();
         final Instant updatedAt = returnPackage.getUpdatedAt();
 		return new ReturnPackageEntity(returnId, shipmentId, reason, status, returnToken, assignedDepartmentCode,
-				returnedDepartmentCode, assignedTo, processedBy, reasonCode, createdAt, updatedAt);
+				returnedDepartmentCode, assignedTo, processedBy, reasonCode, returnPackage.getOperatorId(),
+                createdAt, updatedAt);
     }
 }

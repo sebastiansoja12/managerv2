@@ -60,13 +60,14 @@ public class ShipmentReturnKafkaListener {
                 reasonCode
         );
 
-        return new ReturnRequest(departmentCode, userId, List.of(returnPackageRequest));
+        return new ReturnRequest(departmentCode, userId, message.operatorId(), List.of(returnPackageRequest));
     }
 
     private record ShipmentReturnMessage(Long shipmentId,
                                          String reason,
                                          String reasonCode,
                                          String departmentCode,
-                                         Long userId) {
+                                         Long userId,
+                                         Long operatorId) {
     }
 }

@@ -206,12 +206,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void notifyShipmentReturned(final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode) {
+    public void notifyShipmentReturned(final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode,
+                                       final DepartmentCode departmentCode) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.notifyShipmentReturned();
         this.shipmentRepository.createOrUpdate(shipment);
         DomainContext.eventPublisher().publishEvent(new ShipmentReturnCreated(shipment.snapshot(),
-                reasonCode, reason, Instant.now()));
+                reasonCode, reason, departmentCode, Instant.now()));
     }
 
     @Override

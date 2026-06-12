@@ -25,7 +25,8 @@ public abstract class OutputRequestMapper {
     public static ReturnRequestApi map(final ShipmentReturnedCommand command) {
         final List<ReturnPackageResponseApi> requests = new ArrayList<>();
         requests.add(new ReturnPackageResponseApi(new ShipmentIdDto(command.shipmentId().getValue()), command.reason(),
-                null, new UserIdApi(getCurrentUser().value()), new ReasonCodeApi(command.reasonCode().name()))
+                new DepartmentCodeApi(command.departmentCode().value()), new UserIdApi(getCurrentUser().value()),
+                new ReasonCodeApi(command.reasonCode().name()))
         );
         return new ReturnRequestApi(requests);
     }
