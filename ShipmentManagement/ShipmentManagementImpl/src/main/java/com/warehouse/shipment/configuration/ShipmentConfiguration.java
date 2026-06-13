@@ -19,6 +19,7 @@ import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
 import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
@@ -33,6 +34,7 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OperatorShipmentConfigurationMapper;
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
@@ -90,11 +92,24 @@ public class ShipmentConfiguration {
 									 final RouteLogService routeLogService,
 									 final ReturningServicePort returningServicePort,
 									 final MailNotificationServicePort mailNotificationServicePort,
-									 final TrackingNumberService trackingNumberService) {
+									 final TrackingNumberService trackingNumberService,
+									 final ShipmentConfigurationServicePort shipmentConfigurationServicePort) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
-				mailNotificationServicePort, trackingNumberService);
+				mailNotificationServicePort, trackingNumberService, shipmentConfigurationServicePort);
+	}
+
+	@Bean
+	public ShipmentConfigurationServicePort shipmentConfigurationServicePort(
+			final OperatorConfigurationApiService operatorConfigurationApiService,
+			final OperatorShipmentConfigurationMapper operatorShipmentConfigurationMapper) {
+		return new ShipmentConfigurationServiceAdapter(operatorConfigurationApiService, operatorShipmentConfigurationMapper);
+	}
+
+	@Bean
+	public OperatorShipmentConfigurationMapper operatorShipmentConfigurationMapper() {
+		return new OperatorShipmentConfigurationMapper();
 	}
 
 	@Bean

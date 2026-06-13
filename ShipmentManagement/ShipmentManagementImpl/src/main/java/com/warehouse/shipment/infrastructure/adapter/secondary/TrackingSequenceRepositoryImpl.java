@@ -1,10 +1,10 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import java.util.Optional;
-
 import com.warehouse.shipment.domain.model.TrackingSequence;
 import com.warehouse.shipment.domain.port.secondary.TrackingSequenceRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.TrackingSequenceEntity;
+
+import java.util.Optional;
 
 public class TrackingSequenceRepositoryImpl implements TrackingSequenceRepository {
     
@@ -17,19 +17,20 @@ public class TrackingSequenceRepositoryImpl implements TrackingSequenceRepositor
     @Override
     public Optional<TrackingSequence> findById(final String sequenceId) {
 		return repository.findById(sequenceId)
-				.map(sequence -> new TrackingSequence(sequence.getId(), sequence.getNextValue()));
+				.map(sequence -> new TrackingSequence(sequence.getId(), sequence.getNextValue(), sequence.getVersion()));
     }
 
     @Override
     public TrackingSequence save(final TrackingSequence trackingSequence) {
         final TrackingSequenceEntity entity = new TrackingSequenceEntity(
                 trackingSequence.getId(),
-                trackingSequence.getNextValue()
+                trackingSequence.getNextValue(),
+                trackingSequence.getVersion()
         );
 
-        final TrackingSequenceEntity savedEntity = repository.save(entity);
+        final TrackingSequenceEntity savedEntity = repository.saveAndFlush(entity);
 
-        return new TrackingSequence(savedEntity.getId(), savedEntity.getNextValue());
+        return new TrackingSequence(savedEntity.getId(), savedEntity.getNextValue(), savedEntity.getVersion());
     }
 
 }
