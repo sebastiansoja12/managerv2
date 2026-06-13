@@ -45,8 +45,7 @@ class RouteTrackerArchitectureTest {
         final String message = Files.readString(Path.of(
                 "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentCreatedIntegrationEvent.java"));
         assertThat(message)
-                .contains("event.snapshot.ShipmentSnapshot")
-                .contains("ShipmentSnapshot payload")
+                .contains("ShipmentChangedEventPayload payload")
                 .contains("extends ShipmentChangedIntegrationEvent")
                 .doesNotContain("UUID eventId")
                 .doesNotContain("Instant occurredAt")
@@ -57,11 +56,21 @@ class RouteTrackerArchitectureTest {
                 "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentChangedIntegrationEvent.java"));
         assertThat(changedMessage)
                 .contains("extends OperatorAwareContext")
-                .contains("ShipmentSnapshot payload")
+                .contains("ShipmentChangedEventPayload payload")
                 .doesNotContain("UUID eventId")
                 .doesNotContain("Instant occurredAt")
                 .doesNotContain("private final String eventType")
                 .doesNotContain("int version");
+        final String payload = Files.readString(Path.of(
+                "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentChangedEventPayload.java"));
+        assertThat(payload)
+                .contains("ShipmentId shipmentId")
+                .contains("String eventType")
+                .contains("ShipmentStatus shipmentStatus")
+                .contains("LocalDateTime changedAt")
+                .contains("OperatorId operatorId")
+                .contains("DepartmentId departmentId")
+                .contains("UserId userId");
         assertThat(Path.of(
                 "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/OperatorAwareContext.java"))
                 .exists();
@@ -69,7 +78,7 @@ class RouteTrackerArchitectureTest {
         final String listener = Files.readString(Path.of(
                 "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/ShipmentKafkaListener.java"));
         assertThat(listener)
-                .contains("handle(final ShipmentCreatedIntegrationEvent message)")
+                .contains("handle(final ShipmentChangedIntegrationEvent message)")
                 .contains("shipmentKafkaEventMapper.map(message)")
                 .doesNotContain("@Header")
                 .doesNotContain("ConsumerRecord")
