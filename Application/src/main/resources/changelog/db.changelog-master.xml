@@ -11,6 +11,7 @@
     <include file="/changelog/db/geocoding_default_provider.xml"/>
     <include file="/changelog/db/tracking_integration_configurations.xml"/>
     <include file="/changelog/db/kafka_event_outbox.xml"/>
+    <include file="/changelog/db/async_job.xml"/>
     <include file="/changelog/db/country.xml"/>
     <include file="/changelog/db/dangerous_good.xml"/>
     <include file="/changelog/db/delivery.xml"/>
