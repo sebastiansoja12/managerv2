@@ -11,6 +11,8 @@ public interface ReturnPort {
 
     void complete(final ShipmentId shipmentId);
 
+    void cancel(final ShipmentId shipmentId);
+
     ReturnPackage getReturn(final ReturnPackageId returnId);
 
     ReturnPage getReturns(final DepartmentCode departmentCode, final Long operatorId, final int page, final int size);

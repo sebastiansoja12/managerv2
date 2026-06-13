@@ -66,6 +66,11 @@ public class ReturnPortImpl implements ReturnPort {
     }
 
     @Override
+    public void cancel(final ShipmentId shipmentId) {
+        this.returnService.cancelReturn(shipmentId);
+    }
+
+    @Override
     public ReturnPackage getReturn(final ReturnPackageId returnId) {
         return this.returnService.getReturn(returnId);
     }

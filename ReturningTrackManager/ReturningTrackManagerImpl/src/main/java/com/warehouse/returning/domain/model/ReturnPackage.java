@@ -1,11 +1,11 @@
 package com.warehouse.returning.domain.model;
 
 
-import java.time.Instant;
-
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.exception.StatusChangeException;
 import com.warehouse.returning.domain.vo.*;
+
+import java.time.Instant;
 
 public class ReturnPackage {
     private ReturnPackageId returnPackageId;
@@ -140,7 +140,7 @@ public class ReturnPackage {
         return updatedAt;
     }
 
-    public void markAsDeleted() {
+    public void markAsCanceled() {
         if (this.returnStatus == ReturnStatus.COMPLETED) {
             throw new StatusChangeException("Return package is already completed, cannot override status");
         }
