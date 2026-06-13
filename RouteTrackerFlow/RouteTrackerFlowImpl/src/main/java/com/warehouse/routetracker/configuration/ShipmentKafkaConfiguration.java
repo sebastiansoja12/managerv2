@@ -22,6 +22,8 @@ public class ShipmentKafkaConfiguration {
         typeMapper.setIdClassMapping(Map.of(
                 "ShipmentCreated", ShipmentCreated.class,
                 "ShipmentReturned", ShipmentReturned.class,
+                "ShipmentReturnCreated", ShipmentReturned.class,
+                "ShipmentReturnCanceled", ShipmentChanged.class,
                 "ShipmentChanged", ShipmentChanged.class
         ));
         typeMapper.addTrustedPackages("com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event");
