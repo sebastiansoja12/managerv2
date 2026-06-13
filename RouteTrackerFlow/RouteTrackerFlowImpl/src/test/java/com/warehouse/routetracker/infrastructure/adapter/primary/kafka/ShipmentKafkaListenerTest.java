@@ -16,10 +16,9 @@ import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
 import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChangedEventPayload;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChangedIntegrationEvent;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentEventData;
 import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.mapper.ShipmentKafkaEventMapper;
-import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentKafkaListenerTest {
@@ -38,15 +37,12 @@ class ShipmentKafkaListenerTest {
 
     @Test
     void shouldMapLocalMessageToPrimaryCommand() {
-        final ShipmentCreatedIntegrationEvent message = new ShipmentCreatedIntegrationEvent(
-                new ShipmentChangedEventPayload(
-                        new ShipmentId(123L),
-                        "shipment.created",
-                        ShipmentStatus.CREATED,
-                        CHANGED_AT,
-                        new OperatorId(7L),
-                        new DepartmentId(10L),
-                        new UserId(42L))
+        final ShipmentChangedIntegrationEvent message = new ShipmentChangedIntegrationEvent(
+                shipmentEventData(),
+                "shipment.created",
+                new OperatorId(7L),
+                new DepartmentId(10L),
+                new UserId(42L)
         );
 
         this.listener.handle(message);
@@ -60,5 +56,31 @@ class ShipmentKafkaListenerTest {
                 new DepartmentId(10L),
                 new UserId(42L)
         ));
+    }
+
+    private ShipmentEventData shipmentEventData() {
+        return new ShipmentEventData(
+                new com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentId(123L),
+                null,
+                null,
+                null,
+                null,
+                null,
+                com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentStatus.CREATED,
+                null,
+                null,
+                null,
+                null,
+                CHANGED_AT,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 }
