@@ -2,10 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.kafka;
 
 import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
-import com.warehouse.shipment.domain.event.ShipmentCreatedEvent;
 import com.warehouse.shipment.domain.event.ShipmentEvent;
-import com.warehouse.shipment.domain.event.ShipmentReturnCreated;
-import com.warehouse.shipment.domain.event.ShipmentReturned;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -19,8 +16,6 @@ import java.util.Map;
 public class ShipmentKafkaEventPublisher {
 
     private static final String KAFKA_TYPE_ID = "__TypeId__";
-    private static final String SHIPMENT_CREATED = "ShipmentCreated";
-    private static final String SHIPMENT_RETURNED = "ShipmentReturned";
     private static final String SHIPMENT_CHANGED = "ShipmentChanged";
 
     private final KafkaTemplateClient kafkaTemplateClient;
@@ -40,19 +35,9 @@ public class ShipmentKafkaEventPublisher {
                 event.kafkaKey(),
                 event,
                 Map.of(
-                        KAFKA_TYPE_ID, this.typeId(event),
+                        KAFKA_TYPE_ID, SHIPMENT_CHANGED,
                         KafkaEventHeaders.EVENT_TYPE, event.getClass().getSimpleName()
                 )
         );
-    }
-
-    private String typeId(final ShipmentEvent event) {
-        if (event instanceof ShipmentCreatedEvent) {
-            return SHIPMENT_CREATED;
-        }
-        if (event instanceof ShipmentReturned || event instanceof ShipmentReturnCreated) {
-            return SHIPMENT_RETURNED;
-        }
-        return SHIPMENT_CHANGED;
     }
 }

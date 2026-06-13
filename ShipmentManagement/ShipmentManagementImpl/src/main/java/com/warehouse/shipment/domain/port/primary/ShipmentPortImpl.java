@@ -7,7 +7,6 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.exceptionhandler.exception.RestException;
-import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
@@ -16,12 +15,13 @@ import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.port.secondary.Logger;
-import com.warehouse.shipment.domain.port.secondary.MailNotificationServicePort;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
-import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
+import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
+import com.warehouse.shipment.domain.vo.conf.ShipmentLabelSettings;
+import com.warehouse.shipment.domain.vo.conf.ShipmentMetrics;
+import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -57,6 +57,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final TrackingNumberService trackingNumberService;
 
+    private final ShipmentConfigurationServicePort shipmentConfigurationServicePort;
+
     private final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT,
             ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
 
@@ -72,7 +74,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final RouteLogService routeLogService,
                             final ReturningServicePort returningServicePort,
                             final MailNotificationServicePort mailNotificationServicePort,
-                            final TrackingNumberService trackingNumberService) {
+                            final TrackingNumberService trackingNumberService,
+                            final ShipmentConfigurationServicePort shipmentConfigurationServicePort) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -86,19 +89,31 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.returningServicePort = returningServicePort;
         this.mailNotificationServicePort = mailNotificationServicePort;
         this.trackingNumberService = trackingNumberService;
+        this.shipmentConfigurationServicePort = shipmentConfigurationServicePort;
     }
 
     @Override
     @Transactional
     public Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand command) {
 
+        final OperatorShipmentConfiguration shipmentConfiguration =
+                this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration();
+
         final CountryCode issuerCountryCode = command.getIssuerCountryCode();
         final CountryCode receiverCountryCode = command.getReceiverCountryCode();
 
         final Result<Void, ErrorCode> countryValidation =
                 validateCountries(issuerCountryCode, receiverCountryCode);
+
         if (countryValidation.isFailure()) {
             return Result.failure(countryValidation.getFailure());
+        }
+
+        final Result<Void, String> shipmentLimitationValidationResult = new ShipmentStateValidatorServiceImpl()
+                .validateShipmentLimitations(shipmentConfiguration, ShipmentMetrics.from(command));
+
+        if (shipmentLimitationValidationResult.isFailure()) {
+            return Result.failure(ErrorCode.SHIPMENT_EXTENDED_LIMITATIONS);
         }
 
         final Sender sender = command.getSender();
@@ -107,6 +122,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final Result<VoronoiResponse, ErrorCode> voronoiResponse =
                 this.pathFinderServicePort.determineDeliveryDepartment(recipientAddress);
+
         if (voronoiResponse.isFailure()) {
             return Result.failure(voronoiResponse.getFailure());
         }
@@ -114,9 +130,11 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Price shipmentPrice =
                 resolveShipmentPrice(command.getPrice(), command.getShipmentSize());
 
-        final TrackingNumber trackingNumber = this.trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT);
+        final ShipmentWorkflowSettings workflowSettings = shipmentConfiguration.workflowSettings();
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
+        final TrackingNumber trackingNumber =
+                this.trackingNumberService.nextTrackingNumber(shipmentConfiguration.trackingNumberRule(), shipmentId);
 
         final Shipment shipment = new Shipment(
                 shipmentId,
@@ -131,12 +149,15 @@ public class ShipmentPortImpl implements ShipmentPort {
                 voronoiResponse.getSuccess().getDepartmentCodeResult(),
                 null,
                 command.getShipmentPriority(),
-                trackingNumber
+                trackingNumber,
+                workflowSettings.defaultStatus()
         );
         shipment.setDangerousGood(command.getDangerousGood());
 
         this.shipmentService.createShipment(shipment);
         logCreatedShipment(shipment);
+
+        final ShipmentLabelSettings shipmentLabelSettings = shipmentConfiguration.labelSettings();
 
         return Result.success(new ShipmentCreateResponse(shipment.getExternalShipmentId(),
                 shipment.getTrackingNumber().value()));
@@ -240,6 +261,17 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public void cancelShipmentReturn(final ReturnId returnId) {
+        final ShipmentReturnDetails returnDetails = this.returningServicePort.getReturn(returnId);
+        this.processShipmentReturn(new ShipmentReturnCommand(
+                returnDetails.assignedDepartmentCode(),
+                returnDetails.reason(),
+                returnDetails.shipmentId(),
+                ReturnStatus.CANCELLED,
+                returnDetails.reasonCode()));
+    }
+
+    @Override
     public ShipmentReturnDetails loadShipmentReturn(final ReturnId returnId) {
         return this.returningServicePort.getReturn(returnId);
     }
@@ -267,7 +299,6 @@ public class ShipmentPortImpl implements ShipmentPort {
             case RETURN -> changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.RETURN));
             case UNAVAILABLE, REJECTED, SENDER -> {
                 changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.REDIRECT));
-                this.shipmentService.redirectShipmentToSender(shipmentId);
             }
             case UNKNOWN, LOST -> changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.SENT));
             case DELIVERED -> this.shipmentService.notifyShipmentDelivered(shipmentId);
@@ -283,13 +314,11 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
-        validateShipmentNotInStatus(shipmentId);
         this.shipmentService.changeSenderTo(shipmentId, sender);
     }
 
     @Override
     public void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient) {
-        validateShipmentNotInStatus(shipmentId);
         final Shipment shipment = this.shipmentService.find(shipmentId);
         if (!shipment.recipientCityMatches(recipient.getCity())) {
             final Result<VoronoiResponse, ErrorCode> voronoiResponse =
@@ -329,12 +358,16 @@ public class ShipmentPortImpl implements ShipmentPort {
 
 		if (request.shipmentType() == ShipmentType.CHILD) {
 			final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
-            final TrackingNumber trackingNumber = this.trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT);
-			final Shipment newShipment = new Shipment(shipmentId, shipment.getSender(), shipment.getRecipient(),
-					shipment.getShipmentSize(), shipment.getShipmentId(), shipment.getOriginCountry(),
-					shipment.getDestinationCountry(), shipment.getPrice(), shipment.isLocked(),
-					shipment.getDestination(), shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber);
-			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, shipmentId);
+            final OperatorShipmentConfiguration shipmentConfiguration =
+                    this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration();
+            final TrackingNumber trackingNumber =
+                    this.trackingNumberService.nextTrackingNumber(shipmentConfiguration.trackingNumberRule(), shipmentId);
+			final Shipment newShipment = Shipment.parentShipment(shipmentId, shipment.getSender(),
+					shipment.getRecipient(), shipment.getShipmentSize(), shipment.getShipmentId(),
+					shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
+					shipment.getDestination(), shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber,
+					shipmentConfiguration.workflowSettings().defaultStatus());
+			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.CHILD, shipmentId);
 			this.shipmentService.createShipment(newShipment);
         } else {
 			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, null);
@@ -360,34 +393,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeIssuerCountryTo(final ShipmentCountryRequest request) {
-        final ShipmentId shipmentId = request.shipmentId();
-        this.shipmentService.changeShipmentIssuerCountryTo(shipmentId, request.issuerCountry());
-    }
-
-    @Override
-    public void changeReceiverCountryTo(final ShipmentCountryRequest request) {
-        final ShipmentId shipmentId = request.shipmentId();
-        this.shipmentService.changeShipmentReceiverCountryTo(shipmentId, request.receiverCountry());
-    }
-
-    @Override
-    public void changeShipmentCountries(final ShipmentCountryRequest request) {
-        validateShipmentNotInStatus(request.shipmentId());
-        final boolean issuerCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(request.issuerCountry());
-        final boolean receiverCountryAvailable = this.countryServiceAvailabilityService.isCountryAvailable(request.receiverCountry());
-
-        if (issuerCountryAvailable) {
-            final CountryCode country = request.issuerCountry();
-            this.shipmentService.changeShipmentIssuerCountryTo(request.shipmentId(), country);
-        }
-        if (receiverCountryAvailable) {
-            final CountryCode country = request.receiverCountry();
-            this.shipmentService.changeShipmentReceiverCountryTo(request.shipmentId(), country);
-        }
-    }
-
-    @Override
     public Shipment loadShipment(final ShipmentId shipmentId) {
         return this.shipmentService.find(shipmentId);
     }
@@ -398,17 +403,17 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public ShipmentControlCenter loadShipmentControlCenter(final ShipmentId shipmentId) {
-        return createShipmentControlCenter(loadShipment(shipmentId));
+    public ShipmentRouteLog getShipmentByShipmentId(final ShipmentId shipmentId) {
+        return listShipmentsWithTracking(loadShipment(shipmentId));
     }
 
     @Override
-    public ShipmentControlCenter loadShipmentControlCenter(final TrackingNumber trackingNumber) {
-        return createShipmentControlCenter(loadShipment(trackingNumber));
+    public ShipmentRouteLog getShipmenyByTrackingNumber(final TrackingNumber trackingNumber) {
+        return listShipmentsWithTracking(loadShipment(trackingNumber));
     }
 
-    private ShipmentControlCenter createShipmentControlCenter(final Shipment shipment) {
-        return new ShipmentControlCenter(shipment,
+    private ShipmentRouteLog listShipmentsWithTracking(final Shipment shipment) {
+        return new ShipmentRouteLog(shipment,
                 this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null));
     }
 
@@ -438,7 +443,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         if (shipment.getShipmentRelatedId() != null) {
             final Shipment relatedShipment = loadShipment(shipment.getShipmentRelatedId());
             if (shipmentStatuses.contains(relatedShipment.getShipmentStatus())) {
-                throw new RestException(400, "Cannot modify parent shipment");
+                throw new RestException(400, "Cannot modify child shipment");
             }
         }
     }

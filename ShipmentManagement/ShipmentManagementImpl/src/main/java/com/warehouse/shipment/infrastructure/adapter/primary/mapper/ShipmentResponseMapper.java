@@ -1,20 +1,15 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import org.mapstruct.Mapper;
-
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
-import com.warehouse.shipment.domain.vo.ShipmentControlCenter;
-import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
-import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
-import com.warehouse.shipment.domain.vo.ShipmentReturnPage;
-import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
+import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
+import org.mapstruct.Mapper;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Mapper
 public interface ShipmentResponseMapper {
@@ -89,7 +84,7 @@ public interface ShipmentResponseMapper {
         );
     }
 
-    default ShipmentControlCenterResponseApi map(final ShipmentControlCenter controlCenter) {
+    default ShipmentControlCenterResponseApi map(final ShipmentRouteLog controlCenter) {
         return new ShipmentControlCenterResponseApi(map(controlCenter.shipment()), controlCenter.routeLog());
     }
 

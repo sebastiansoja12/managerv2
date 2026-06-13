@@ -1,22 +1,12 @@
 package com.warehouse.shipment;
 
-import static com.warehouse.shipment.DataTestCreator.dangerousGood;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.math.BigDecimal;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DangerousGoodNotFoundException;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.domain.port.secondary.ShipmentConfigurationServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.DangerousGoodApi;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
@@ -30,6 +20,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import static com.warehouse.shipment.DataTestCreator.dangerousGood;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentInternalControllerDangerousGoodTest {
@@ -48,6 +47,9 @@ class ShipmentInternalControllerDangerousGoodTest {
     @Mock
     private ShipmentResponseMapper responseMapper;
 
+    @Mock
+    private ShipmentConfigurationServicePort shipmentConfigurationServicePort;
+
     private ShipmentInternalController controller;
 
     @BeforeEach
@@ -57,7 +59,8 @@ class ShipmentInternalControllerDangerousGoodTest {
                 shipmentRequestValidator,
                 requestMapper,
                 responseMapper,
-                new ObjectMapper()
+                new ObjectMapper(),
+                shipmentConfigurationServicePort
         );
     }
 

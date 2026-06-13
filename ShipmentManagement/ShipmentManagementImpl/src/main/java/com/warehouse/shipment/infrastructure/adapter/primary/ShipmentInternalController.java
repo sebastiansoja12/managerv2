@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ReturnId;
@@ -17,7 +16,9 @@ import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.domain.port.secondary.ShipmentConfigurationServicePort;
 import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.ShipmentValidationException;
@@ -52,23 +53,29 @@ public class ShipmentInternalController {
 
     private final ObjectMapper objectMapper;
 
+    private final ShipmentConfigurationServicePort shipmentConfigurationServicePort;
+
 	public ShipmentInternalController(final ShipmentPort shipmentPort,
                                       final ShipmentRequestValidator shipmentRequestValidator,
                                       final ShipmentRequestMapper requestMapper,
                                       final ShipmentResponseMapper responseMapper,
-                                      final ObjectMapper objectMapper) {
+                                      final ObjectMapper objectMapper,
+                                      final ShipmentConfigurationServicePort shipmentConfigurationServicePort) {
         this.shipmentPort = shipmentPort;
         this.shipmentRequestValidator = shipmentRequestValidator;
         this.requestMapper = requestMapper;
         this.responseMapper = responseMapper;
         this.objectMapper = objectMapper;
+        this.shipmentConfigurationServicePort = shipmentConfigurationServicePort;
     }
 
     @PostMapping
     @Counted(value = "controller.shipment.create")
     @Timed(value = "controller.shipment.create")
     public ResponseEntity<?> create(@RequestBody final ShipmentCreateRequestApi shipmentRequest) {
-        shipmentRequestValidator.validateBody(shipmentRequest);
+        final ShipmentValidationRules validationRules =
+                this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration().validationRules();
+        shipmentRequestValidator.validateRequest(shipmentRequest, validationRules);
         final ShipmentCreateCommand request = requestMapper.map(shipmentRequest);
         final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
 
@@ -109,7 +116,7 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.controlcenter.get")
     @Timed(value = "controller.shipment.controlcenter.get")
     public ResponseEntity<?> getControlCenter(@PathVariable final Long shipmentId) {
-        final ShipmentControlCenter controlCenter = shipmentPort.loadShipmentControlCenter(new ShipmentId(shipmentId));
+        final ShipmentRouteLog controlCenter = shipmentPort.getShipmentByShipmentId(new ShipmentId(shipmentId));
         return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(controlCenter));
     }
 
@@ -126,8 +133,8 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.trackingnumber.controlcenter.get")
     @Timed(value = "controller.shipment.trackingnumber.controlcenter.get")
     public ResponseEntity<?> getControlCenterByTrackingNumber(@PathVariable final String trackingNumber) {
-        final ShipmentControlCenter controlCenter = shipmentPort.loadShipmentControlCenter(new TrackingNumber(trackingNumber));
-        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(controlCenter));
+        final ShipmentRouteLog shipmentRouteLog = shipmentPort.getShipmenyByTrackingNumber(new TrackingNumber(trackingNumber));
+        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(shipmentRouteLog));
     }
 
     @PutMapping
@@ -162,6 +169,14 @@ public class ShipmentInternalController {
     public ResponseEntity<ShipmentReturnDetailsApi> getReturn(@PathVariable final Long returnPackageId) {
         final ShipmentReturnDetails response = this.shipmentPort.loadShipmentReturn(new ReturnId(returnPackageId));
         return ResponseEntity.ok(this.responseMapper.map(response));
+    }
+
+    @DeleteMapping("/returns/{returnPackageId}")
+    @Counted(value = "controller.shipment.return.cancel")
+    @Timed(value = "controller.shipment.return.cancel")
+    public ResponseEntity<ShipmentResponseInformation> cancelReturn(@PathVariable final Long returnPackageId) {
+        this.shipmentPort.cancelShipmentReturn(new ReturnId(returnPackageId));
+        return ResponseEntity.ok(new ShipmentResponseInformation(Status.OK));
     }
 
     @GetMapping("/returns")
@@ -300,18 +315,6 @@ public class ShipmentInternalController {
                                           @RequestParam("personType") final PersonType personType) {
         final Person person = personType == PersonType.SENDER ? Sender.from(personRequest) : Recipient.from(personRequest);
         this.shipmentPort.changePersonTo(person, new ShipmentId(shipmentId));
-        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
-    }
-
-    @PutMapping("/countries")
-    @Counted(value = "controller.country.update")
-    @Timed(value = "controller.country.update")
-    public ResponseEntity<?> updatePerson(@RequestBody final CountryRequestApi countryRequestApi,
-                                          @RequestParam("shipmentId") final Long shipmentId) {
-        final ShipmentId id = new ShipmentId(shipmentId);
-		final ShipmentCountryRequest request = new ShipmentCountryRequest(id,
-				CountryCode.valueOf(countryRequestApi.issuerCountryCode()), CountryCode.valueOf(countryRequestApi.receiverCountryCode()));
-        this.shipmentPort.changeShipmentCountries(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
     
