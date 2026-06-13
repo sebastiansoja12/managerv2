@@ -8,6 +8,7 @@ import com.warehouse.asyncjob.infrastructure.adapter.primary.dto.AsyncJobRespons
 import com.warehouse.asyncjob.infrastructure.adapter.primary.dto.CreateAsyncJobResponse;
 import com.warehouse.asyncjob.infrastructure.adapter.primary.dto.RebuildReadModelRequest;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/async-jobs")
+@Slf4j
 public class AsyncJobController {
 
     private final AsyncJobService asyncJobService;
@@ -29,6 +31,7 @@ public class AsyncJobController {
     public ResponseEntity<CreateAsyncJobResponse> rebuildReadModel(@PathVariable final ReadModelType type,
                                                                    @Valid @RequestBody final RebuildReadModelRequest request) {
         validateDateRange(request);
+        log.info("=====Async job for {} started=====", type);
         final AsyncJob job = this.asyncJobService.createReadModelRebuildJob(type, request.operatorId(),
                 request.dateFrom(), request.dateTo());
         return ResponseEntity.accepted().body(new CreateAsyncJobResponse(job.getId()));

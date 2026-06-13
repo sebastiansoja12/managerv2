@@ -1,15 +1,16 @@
 package com.warehouse.asyncjob.domain.service;
 
-import java.util.UUID;
-
+import com.warehouse.asyncjob.domain.model.AsyncJob;
+import com.warehouse.asyncjob.domain.port.secondary.AsyncJobRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.warehouse.asyncjob.domain.model.AsyncJob;
-import com.warehouse.asyncjob.domain.port.secondary.AsyncJobRepository;
+import java.util.UUID;
 
 @Service
+@Slf4j
 public class AsyncJobWorker {
 
     private final AsyncJobRepository asyncJobRepository;
@@ -31,8 +32,10 @@ public class AsyncJobWorker {
             this.rebuilderRegistry.rebuilder(job.getReadModelType())
                     .rebuild(job.getOperatorId(), job.getDateFrom(), job.getDateTo());
             markCompleted(jobId);
+            log.info("=====Async job for {} read model finished=====", job.getReadModelType());
         } catch (final Exception exception) {
             markFailed(jobId, exception);
+            log.info("=====Async job for {} read model failed=====", job.getReadModelType());
         }
     }
 
