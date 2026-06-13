@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.IgnoredShipmentEvent;
 import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentReturnCanceled;
 import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentReturnCreated;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -79,6 +80,33 @@ class ShipmentReturnKafkaConfigurationTest {
                 MESSAGE_TYPE);
 
         assertThat(message.getPayload()).isInstanceOf(ShipmentReturnCanceled.class);
+    }
+
+    @Test
+    void shouldConvertNonReturnShipmentTypeIdToIgnoredEventClass() {
+        final Message<?> message = this.converter.toMessage(
+                this.record("ShipmentCreatedEvent", """
+                        {
+                          "snapshot": {
+                            "shipmentId": {
+                              "value": 123
+                            },
+                            "shipmentStatus": "CREATED"
+                          },
+                          "userId": {
+                            "value": 0
+                          },
+                          "operatorId": {
+                            "value": 77
+                          },
+                          "timestamp": "2026-08-23T08:00:00Z"
+                        }
+                        """),
+                null,
+                null,
+                MESSAGE_TYPE);
+
+        assertThat(message.getPayload()).isInstanceOf(IgnoredShipmentEvent.class);
     }
 
     private ConsumerRecord<String, String> record(final String typeId, final String payload) {

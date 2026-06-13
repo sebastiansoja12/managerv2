@@ -1,9 +1,7 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
 import java.time.Instant;
-import java.util.Map;
 
-import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
 import com.warehouse.department.domain.port.secondary.UserClientServicePort;
 import com.warehouse.department.domain.vo.DepartmentSnapshot;
@@ -14,15 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserClientServiceAdapter implements UserClientServicePort {
 
-    private static final String KAFKA_TYPE_ID = "__TypeId__";
-
     private final KafkaTemplateClient kafkaTemplateClient;
-    private final String departmentUserEventsTopic;
 
-    public UserClientServiceAdapter(final KafkaTemplateClient kafkaTemplateClient,
-                                    final String departmentUserEventsTopic) {
+    public UserClientServiceAdapter(final KafkaTemplateClient kafkaTemplateClient) {
         this.kafkaTemplateClient = kafkaTemplateClient;
-        this.departmentUserEventsTopic = departmentUserEventsTopic;
     }
 
     @Override
@@ -46,14 +39,6 @@ public class UserClientServiceAdapter implements UserClientServicePort {
     }
 
     private void publish(final DepartmentSnapshot snapshot, final Object event) {
-        this.kafkaTemplateClient.publish(
-                this.departmentUserEventsTopic,
-                snapshot.departmentCode().getValue(),
-                event,
-                Map.of(
-                        KAFKA_TYPE_ID, event.getClass().getSimpleName(),
-                        KafkaEventHeaders.EVENT_TYPE, event.getClass().getSimpleName()
-                )
-        );
+        this.kafkaTemplateClient.publish(snapshot.departmentCode().getValue(), event);
     }
 }
