@@ -8,26 +8,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.shipment.application.service.ShipmentReadModelSyncService;
+import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 
 @RestController
 @RequestMapping("/internal/shipments/read-sync")
 class ShipmentReadSyncController {
 
-    private final ShipmentReadModelSyncService syncService;
+    private final ShipmentReadModelSyncPort syncPort;
 
     private final OperatorContext operatorContext;
 
-    ShipmentReadSyncController(final ShipmentReadModelSyncService syncService,
+    ShipmentReadSyncController(final ShipmentReadModelSyncPort syncPort,
                                final OperatorContext operatorContext) {
-        this.syncService = syncService;
+        this.syncPort = syncPort;
         this.operatorContext = operatorContext;
     }
 
     @PostMapping("/{operatorId}")
     ResponseEntity<ShipmentReadSyncResponse> sync(@PathVariable final Long operatorId) {
         return operatorContext.runAs(OperatorId.of(operatorId), () -> {
-            final int syncedShipments = syncService.syncReadModels();
+            final int syncedShipments = syncPort.syncReadModels();
             return ResponseEntity.ok(new ShipmentReadSyncResponse(operatorId, syncedShipments));
         });
     }

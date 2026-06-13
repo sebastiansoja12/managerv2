@@ -1,6 +1,7 @@
 package com.warehouse.shipment.application.port.primary;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -16,7 +17,6 @@ import com.warehouse.shipment.application.service.*;
 import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrategyResolver;
 import com.warehouse.shipment.application.service.returning.ShipmentReturnStrategyResolver;
 import com.warehouse.shipment.application.service.status.ShipmentStatusChangeStrategyResolver;
-import com.warehouse.shipment.domain.context.ShipmentEventContext;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
@@ -74,6 +74,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver;
 
+    private final DomainEventPublisher domainEventPublisher;
+
 	public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
                             final SpecificationRepository specificationShipmentRepository,
                             final Logger logger,
@@ -89,7 +91,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final OperatorContextProvider operatorContextProvider,
                             final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
                             final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
-                            final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver) {
+                            final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver,
+                            final DomainEventPublisher domainEventPublisher) {
 		this.shipmentRepository = shipmentRepository;
         this.specificationShipmentRepository = specificationShipmentRepository;
 		this.logger = logger;
@@ -106,6 +109,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentDeliveryStrategyResolver = shipmentDeliveryStrategyResolver;
         this.shipmentStatusChangeStrategyResolver = shipmentStatusChangeStrategyResolver;
         this.shipmentReturnStrategyResolver = shipmentReturnStrategyResolver;
+        this.domainEventPublisher = domainEventPublisher;
     }
 
     @Override
@@ -174,7 +178,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentRepository.createOrUpdate(shipment);
         logCreatedShipment(shipment);
 
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentCreated(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentCreated(shipment.snapshot(), Instant.now()));
 
         return Result.success(new ShipmentCreateResponse(shipment.getExternalShipmentId(),
                 shipment.getTrackingNumber().value()));
@@ -218,7 +222,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         );
 
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
 
         return Result.success();
     }
@@ -253,7 +257,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeDangerousGood(dangerousGood);
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentDangerousGoodUpdated(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentDangerousGoodUpdated(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -268,7 +272,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 .process(shipment, command)
                 .ifPresent(event -> {
                     this.shipmentRepository.createOrUpdate(shipment);
-                    ShipmentEventContext.eventPublisher().publishEvent(event);
+                    this.domainEventPublisher.publish(event);
                 });
     }
 
@@ -306,7 +310,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 .process(shipment)
                 .ifPresent(event -> {
                     this.shipmentRepository.createOrUpdate(shipment);
-                    ShipmentEventContext.eventPublisher().publishEvent(event);
+                    this.domainEventPublisher.publish(event);
                 });
     }
 
@@ -317,14 +321,14 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.cancel(settings, LocalDateTime.now());
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentCanceled(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentCanceled(shipment.snapshot(), Instant.now()));
     }
 
     public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeSender(sender);
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentSenderChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentSenderChanged(shipment.snapshot(), Instant.now()));
     }
 
     public void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient) {
@@ -340,7 +344,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
         shipment.changeRecipient(recipient);
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentRecipientChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentRecipientChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -379,7 +383,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 					shipmentConfiguration.workflowSettings().defaultStatus());
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.CHILD, shipmentId);
 			this.shipmentRepository.createOrUpdate(newShipment);
-            ShipmentEventContext.eventPublisher().publishEvent(new ShipmentCreated(shipment.snapshot(), Instant.now()));
+            this.domainEventPublisher.publish(new ShipmentCreated(shipment.snapshot(), Instant.now()));
         } else {
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, null);
 			this.lockShipment(shipment.getShipmentRelatedId());
@@ -387,13 +391,14 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
 	@Override
+	@Transactional
 	public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
 		final Shipment shipment = this.shipmentRepository.findById(request.shipmentId());
         this.shipmentStatusChangeStrategyResolver.resolve(request.shipmentStatus())
                 .process(shipment)
                 .ifPresent(event -> {
                     this.shipmentRepository.createOrUpdate(shipment);
-                    ShipmentEventContext.eventPublisher().publishEvent(event);
+                    this.domainEventPublisher.publish(event);
                 });
 	}
 
@@ -493,7 +498,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             shipment.changeShipmentTypeWithRelatedId(shipmentType, relatedShipmentId);
         }
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentTypeChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentTypeChanged(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -501,7 +506,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.removeDangerousGood();
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentDangerousGoodRemoved(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentDangerousGoodRemoved(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -509,7 +514,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.lockShipment();
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentLocked(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentLocked(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -521,7 +526,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 redirectedShipmentId);
         final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId, trackingNumber);
         this.shipmentRepository.createOrUpdate(redirectedShipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentUpdated(redirectedShipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentUpdated(redirectedShipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -530,6 +535,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeDestinationDepartment(destination);
         this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentDestinationChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentDestinationChanged(shipment.snapshot(), Instant.now()));
     }
 }

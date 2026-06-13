@@ -4,14 +4,16 @@ import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.warehouse.commonassets.event.domain.annotation.IntegrationEventType;
-import com.warehouse.commonassets.event.domain.model.IntegrationEvent;
+import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
+import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
+import com.warehouse.commonassets.event.integration.model.IntegrationEventKey;
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.kafka.domain.model.OperatorAwareContext;
+import com.warehouse.commonassets.event.integration.context.OperatorAwareContext;
 import com.warehouse.shipment.application.event.snapshot.ShipmentEventData;
 
 @IntegrationEventType(value = "shipment.return.created", version = 1)
-public class ShipmentReturnCreatedIntegrationEvent extends OperatorAwareContext implements IntegrationEvent {
+public class ShipmentReturnCreatedIntegrationEvent extends OperatorAwareContext
+        implements IntegrationEvent, IntegrationEventKey {
 
     private final ShipmentEventData snapshot;
     private final Instant timestamp;
@@ -51,5 +53,10 @@ public class ShipmentReturnCreatedIntegrationEvent extends OperatorAwareContext 
 
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
+    }
+
+    @Override
+    public String eventKey() {
+        return String.valueOf(this.snapshot.shipmentId().getValue());
     }
 }

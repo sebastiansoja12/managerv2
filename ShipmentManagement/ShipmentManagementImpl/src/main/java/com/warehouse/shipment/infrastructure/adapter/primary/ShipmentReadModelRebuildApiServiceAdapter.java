@@ -6,18 +6,18 @@ import org.springframework.stereotype.Service;
 
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.shipment.application.service.ShipmentReadModelSyncService;
+import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 import com.warehouse.shipment.infrastructure.ShipmentReadModelRebuildApiService;
 
 @Service
 public class ShipmentReadModelRebuildApiServiceAdapter implements ShipmentReadModelRebuildApiService {
 
-    private final ShipmentReadModelSyncService syncService;
+    private final ShipmentReadModelSyncPort syncPort;
     private final OperatorContext operatorContext;
 
-    public ShipmentReadModelRebuildApiServiceAdapter(final ShipmentReadModelSyncService syncService,
+    public ShipmentReadModelRebuildApiServiceAdapter(final ShipmentReadModelSyncPort syncPort,
                                                      final OperatorContext operatorContext) {
-        this.syncService = syncService;
+        this.syncPort = syncPort;
         this.operatorContext = operatorContext;
     }
 
@@ -25,6 +25,6 @@ public class ShipmentReadModelRebuildApiServiceAdapter implements ShipmentReadMo
     public int rebuildReadModels(final OperatorId operatorId,
                                  final LocalDate dateFrom,
                                  final LocalDate dateTo) {
-        return this.operatorContext.runAs(operatorId, this.syncService::syncReadModels);
+        return this.operatorContext.runAs(operatorId, this.syncPort::syncReadModels);
     }
 }

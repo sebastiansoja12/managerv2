@@ -26,7 +26,7 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
-import com.warehouse.shipment.application.listener.ShipmentEventListener;
+import com.warehouse.shipment.application.listener.ShipmentDomainEventListener;
 import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.application.port.secondary.PriceRepository;
 import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
@@ -73,8 +73,8 @@ public class ShipmentReadRepositoryTest {
         }
 
         @Bean
-        public ShipmentEventListener shipmentEventListener() {
-            return Mockito.mock(ShipmentEventListener.class);
+        public ShipmentDomainEventListener shipmentDomainEventListener() {
+            return Mockito.mock(ShipmentDomainEventListener.class);
         }
 
         @Bean
