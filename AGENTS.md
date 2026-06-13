@@ -54,21 +54,53 @@ External services / microservices:
 
 ## 3. Package Structure
 
-Use the following package responsibilities:
+Use the layered package structure established in `ShipmentManagement`. Each bounded context inside an implementation module must use the following top-level packages:
 
 | Package pattern | Responsibility |
 |---|---|
-| `*.domain` | Bounded context, domain model, domain services, business rules. |
-| `*.configuration` | Configuration for the given domain/module. |
-| `*.infrastructure.adapter` | Adapters, persistence entities, integration implementations. |
+| `*.domain` | Pure business model and rules: aggregates, entities, value objects, enumerations, domain services, domain events, and domain exceptions. |
+| `*.application` | Use-case orchestration: primary and secondary ports, commands, results, application services, event listeners, and integration-event contracts. |
+| `*.infrastructure` | Technology-specific adapters: HTTP/Kafka entry points, persistence, external clients, entities, framework repositories, and adapter mappers. |
+| `*.configuration` | Dependency composition and framework configuration for the bounded context. |
+
+Use these subpackages when the corresponding responsibility exists:
+
+| Package pattern | Responsibility |
+|---|---|
+| `*.domain.model` | Aggregates and domain entities. |
+| `*.domain.vo` | Domain value objects and snapshots used by domain events. |
+| `*.domain.enumeration` | Domain enumerations. |
+| `*.domain.service` | Business rules that operate only on domain concepts. |
+| `*.domain.event` | Domain events describing business changes that already happened. |
+| `*.domain.exception` | Domain failures and business exceptions. |
+| `*.application.port.primary` | Inbound use-case contracts and their application implementations. |
+| `*.application.port.primary.command` | Commands accepted by primary ports. |
+| `*.application.port.primary.result` | Results returned by primary ports. |
+| `*.application.port.secondary` | Outbound contracts required by application use cases, including persistence and integrations. |
+| `*.application.service` | Use-case orchestration shared by primary-port implementations. |
+| `*.application.listener` | Domain-event and integration-event listeners that coordinate application behavior. |
+| `*.application.event` | Integration events exposed outside the bounded context. Do not place domain events here. |
+| `*.application.event.snapshot` | Stable serializable payloads used by integration events. |
+| `*.infrastructure.adapter.primary` | Controllers, inbound messaging adapters, request validation, and inbound mapping. |
+| `*.infrastructure.adapter.secondary` | Persistence adapters, external service adapters, JPA entities, technical repositories, and outbound mapping. |
 
 Rules:
 
-- Keep bounded-context code in `*.domain`.
-- Keep domain configuration in `*.configuration`.
-- Keep adapters and entities in `*.infrastructure.adapter`.
+- The dependency direction is `infrastructure -> application -> domain`. Configuration may compose all three layers.
+- Domain code must not depend on application, infrastructure, Spring, JPA, Kafka, controllers, repositories from frameworks, or configuration classes.
+- Keep state changes and business invariants in domain models or domain services.
+- Keep transactions, persistence sequencing, event publication, calls to other modules, and use-case coordination in the application layer.
+- Put primary and secondary port interfaces in `*.application.port`, not in `*.domain.port`.
+- Put persistence contracts such as `ShipmentRepository` in `*.application.port.secondary`; framework repositories stay in `*.infrastructure.adapter.secondary`.
+- A primary adapter must call a primary port. It must not call repositories or mutate domain objects directly.
+- A secondary adapter must implement a secondary port owned by the application layer.
+- Mapping between transport/persistence models and domain or application models belongs in primary or secondary adapters only.
+- Domain events belong in `*.domain.event`; integration events and their serializable payloads belong in `*.application.event`.
+- Domain-event listeners and integration-event listeners belong in `*.application.listener`, because listeners coordinate use cases and integrations.
+- The separate `Api` Maven module contains cross-module contracts only. Implementations, controllers, entities, and application orchestration remain in the corresponding implementation module.
+- Apply this structure to all new bounded contexts and new features. Do not refactor a legacy context only to move packages unless the task explicitly includes that migration.
 - Do not break hexagonal boundaries by calling infrastructure directly from another domain.
-- Do not introduce reverse dependencies from domain code to infrastructure, controllers, or framework code.
+- Another bounded context must use the owning context's `Api` module or an application secondary port with an adapter; it must never import the owning context's implementation or infrastructure packages.
 
 ---
 
@@ -105,39 +137,39 @@ Domain events describe business changes that already happened in a bounded conte
 
 Location and structure:
 
-- Create domain event classes in the `Core` module, inside `*.domain.event`.
+- Create domain event classes in the implementation module, inside `*.domain.event`.
+- Create integration event classes and their serializable payloads inside `*.application.event` and `*.application.event.snapshot`.
 - Use one marker interface per event family when the domain already has one, for example `DeviceEvent`, `SupplierEvent`, or `ShipmentEvent`.
 - Prefer the existing local pattern: a base changed event with a snapshot and timestamp, plus specific events such as `DeviceCreated`, `DeviceUpdated`, or `SupplierUpdated`.
 - Event constructors must use `final` parameters.
 - Event payload should contain a domain snapshot/value object and an `Instant` timestamp, not mutable entities.
+- Integration-event listeners map domain snapshots to stable integration-event snapshots. Domain models must not depend on integration-event contracts or serialization annotations.
 
 Publishing rules:
 
-- Publish domain events from the domain service method that performs the state change.
-- For `create(...)`, publish the created event immediately after `repository.create(...)`.
-- For `update(...)` or a specific change method, mutate the aggregate, call `repository.update(...)`, then publish the matching event.
-- Use the `DomainContext` from the same bounded context/domain, never another module's `DomainContext`.
-- Prefer `DomainContext.publishAfterCommit(...)` when it exists in the module, especially when listeners trigger side effects or cross-module actions.
-- If the module does not provide `publishAfterCommit(...)`, follow the existing local pattern with `DomainContext.publish(...)` or `DomainContext.eventPublisher().publishEvent(...)`.
+- Publish domain events from the application use case that coordinates the state change and persistence.
+- Inject the shared `DomainEventPublisher` through the application-layer constructor. Do not access a static `DomainContext` from new code.
+- For `create(...)`, persist the aggregate and then publish the created domain event.
+- For `update(...)`, invoke the domain behavior, persist the changed aggregate, and then publish the matching domain event.
+- A domain method may return a domain event when the event depends on the result of a business transition; the application layer remains responsible for publishing it.
 - Do not publish events before persistence succeeds.
 - Do not publish an event when the method did not create or change domain state.
 
 Example:
 
 ```java
-public void updateDevice(final DeviceUpdateCommand command) {
-    this.deviceRepository.findById(command.deviceId()).ifPresent(device -> {
-        device.update(command);
-        this.deviceRepository.update(device);
-        DomainContext.publishAfterCommit(new DeviceUpdated(device.toSnapshot(), Instant.now()));
-    });
+public ShipmentId create(final ShipmentCreateCommand command) {
+    final Shipment shipment = shipmentFactory.create(command);
+    this.shipmentRepository.createOrUpdate(shipment);
+    this.domainEventPublisher.publish(new ShipmentCreated(shipment.snapshot(), Instant.now()));
+    return shipment.getShipmentId();
 }
 ```
 
 Listeners:
 
-- Put domain event listeners in `*.domain.listener` when they react to domain events.
-- Listener dependencies must be ports or domain services, injected through a constructor.
+- Put domain-event and integration-event listeners in `*.application.listener`.
+- Listener dependencies must be primary ports, secondary ports, application services, or event publishers, injected through a constructor.
 - Listeners must not call infrastructure adapters directly.
 
 ---
