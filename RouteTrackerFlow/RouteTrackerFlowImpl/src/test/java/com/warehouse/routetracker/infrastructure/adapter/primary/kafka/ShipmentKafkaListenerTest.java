@@ -1,28 +1,25 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.kafka;
 
-import static org.mockito.Mockito.verify;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.nio.charset.StandardCharsets;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
+import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChanged;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentSnapshot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
-import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChanged;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentCreated;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentReturned;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentSnapshot;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentKafkaListenerTest {
@@ -48,10 +45,10 @@ class ShipmentKafkaListenerTest {
 
     @Test
     void shouldHandleShipmentCreated() throws Exception {
-        final ShipmentCreated event = new ShipmentCreated(
+        final ShipmentChanged event = new ShipmentChanged(
                 this.snapshot("CREATED"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
 
-        this.listener.handle(event);
+        this.listener.handle(event, this.eventType("ShipmentCreated"));
 
         verify(this.routeTrackerLogPort).createShipmentEvent(
                 new ShipmentId(SHIPMENT_ID),
@@ -66,11 +63,9 @@ class ShipmentKafkaListenerTest {
 
     @Test
     void shouldHandleShipmentReturned() throws Exception {
-        final ShipmentReturned event = new ShipmentReturned(
-                this.snapshot("RETURN"), EVENT_TIME, "DAMAGED", "Damaged package",
-                USER_ID, DEPARTMENT_ID, OPERATOR_ID);
-
-        this.listener.handle(event);
+        final ShipmentChanged event = new ShipmentChanged(
+                this.snapshot("RETURN"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
+        this.listener.handle(event, this.eventType("ShipmentReturned"));
 
         verify(this.routeTrackerLogPort).createShipmentEvent(
                 new ShipmentId(SHIPMENT_ID),
@@ -90,7 +85,7 @@ class ShipmentKafkaListenerTest {
 
         this.listener.handle(
                 event,
-                "ShipmentSent".getBytes(StandardCharsets.UTF_8));
+                this.eventType("ShipmentSent"));
 
         verify(this.routeTrackerLogPort).createShipmentEvent(
                 new ShipmentId(SHIPMENT_ID),
@@ -110,7 +105,7 @@ class ShipmentKafkaListenerTest {
 
         this.listener.handle(
                 event,
-                "ShipmentReturnCanceled".getBytes(StandardCharsets.UTF_8));
+                this.eventType("ShipmentReturnCanceled"));
 
         verify(this.routeTrackerLogPort).createShipmentEvent(
                 new ShipmentId(SHIPMENT_ID),
@@ -125,5 +120,9 @@ class ShipmentKafkaListenerTest {
 
     private ShipmentSnapshot snapshot(final String shipmentStatus) {
         return new ShipmentSnapshot(new ShipmentId(SHIPMENT_ID), shipmentStatus);
+    }
+
+    private byte[] eventType(final String eventType) {
+        return eventType.getBytes(StandardCharsets.UTF_8);
     }
 }

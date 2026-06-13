@@ -83,4 +83,6 @@ public interface ShipmentService {
     void changeDestination(final ShipmentId shipmentId, final DepartmentCode value);
 
     Shipment findByExternalId(final ExternalId<String> externalId);
+
+    void cancel(final ShipmentId shipmentId);
 }

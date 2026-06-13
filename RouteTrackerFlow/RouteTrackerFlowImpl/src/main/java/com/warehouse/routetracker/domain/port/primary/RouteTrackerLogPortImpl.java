@@ -113,6 +113,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
             case RETURN -> ShipmentStatus.RETURN;
             case REROUTE -> ShipmentStatus.REROUTE;
             case REDIRECT, REJECT -> ShipmentStatus.REDIRECT;
+            case CANCELED ->  ShipmentStatus.CANCELED;
         };
     }
 }

@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.service;
 
+import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
@@ -281,4 +282,12 @@ public class ShipmentServiceImpl implements ShipmentService {
 		return this.shipmentRepository.findByExternalId(externalId).orElseThrow(
 				() -> new ShipmentNotFoundException(HttpStatusCode.valueOf(404).value(), "Shipment not found"));
 	}
+
+    @Override
+    public void cancel(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.cancel();
+        this.shipmentRepository.createOrUpdate(shipment);
+        DomainRegistry.eventPublisher().publishEvent(new ShipmentCanceled(shipment.snapshot(), Instant.now()));
+    }
 }

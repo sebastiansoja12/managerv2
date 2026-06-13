@@ -15,10 +15,8 @@ import java.util.Map;
 @ConditionalOnProperty(name = "manager.kafka.domain-events.enabled", havingValue = "true")
 public class ShipmentKafkaEventPublisher {
 
-    private static final String KAFKA_TYPE_ID = "__TypeId__";
-    private static final String SHIPMENT_CHANGED = "ShipmentChanged";
-
     private final KafkaTemplateClient kafkaTemplateClient;
+
     private final String shipmentEventsTopic;
 
     public ShipmentKafkaEventPublisher(final KafkaTemplateClient kafkaTemplateClient,
@@ -31,13 +29,10 @@ public class ShipmentKafkaEventPublisher {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void publish(final ShipmentEvent event) {
         this.kafkaTemplateClient.publish(
-                this.shipmentEventsTopic,
-                event.kafkaKey(),
+                shipmentEventsTopic,
+                String.valueOf(event.getSnapshot().shipmentId().getValue()),
                 event,
-                Map.of(
-                        KAFKA_TYPE_ID, SHIPMENT_CHANGED,
-                        KafkaEventHeaders.EVENT_TYPE, event.getClass().getSimpleName()
-                )
+                Map.of(KafkaEventHeaders.EVENT_TYPE, event.getClass().getSimpleName())
         );
     }
 }

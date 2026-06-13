@@ -92,6 +92,16 @@ public class ShipmentInternalController {
         return response;
     }
 
+    @PutMapping("/cancel/{id}")
+    @Counted(value = "controller.shipment.cancel")
+    @Timed(value = "controller.shipment.cancel")
+    public ResponseEntity<?> cancel(@PathVariable final Long id) {
+        final ShipmentId shipmentId = new ShipmentId(id);
+        this.shipmentPort.cancel(shipmentId);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/search")
     @Counted(value = "controller.shipment.list")
     @Timed(value = "controller.shipment.list")

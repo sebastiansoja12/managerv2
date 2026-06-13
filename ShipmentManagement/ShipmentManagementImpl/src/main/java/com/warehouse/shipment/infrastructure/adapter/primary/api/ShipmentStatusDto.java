@@ -17,7 +17,9 @@ public enum ShipmentStatusDto {
 
     RETURN,
 
-    REDIRECT;
+    REDIRECT,
+
+    CANCELED;
 
     public static ShipmentStatusDto from(final ShipmentStatus shipmentStatus) {
         return ShipmentStatusDto.valueOf(shipmentStatus.name());

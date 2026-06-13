@@ -1,21 +1,5 @@
 package com.warehouse.shipment;
 
-import static com.warehouse.shipment.DataTestCreator.shipment;
-import static com.warehouse.shipment.DataTestCreator.shipmentId;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
-
 import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
@@ -23,6 +7,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
@@ -41,6 +26,23 @@ import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
 import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
 import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
+
+import java.util.Set;
+
+import static com.warehouse.shipment.DataTestCreator.recipient;
+import static com.warehouse.shipment.DataTestCreator.sender;
+import static com.warehouse.shipment.DataTestCreator.shipment;
+import static com.warehouse.shipment.DataTestCreator.shipmentId;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentPortImplTest {
@@ -78,6 +80,9 @@ class ShipmentPortImplTest {
     @Mock
     private SpecificationRepository specificationShipmentRepository;
 
+    @Mock
+    private OperatorContextProvider operatorContextProvider;
+
     private Set<ShipmentStatusHandler> shipmentStatusHandlers;
 
     private ShipmentPortImpl shipmentPort;
@@ -108,7 +113,7 @@ class ShipmentPortImplTest {
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
 				shipmentStatusHandlers, countryDetermineService, priceService, countryServiceAvailabilityService,
 				signatureService, routeLogService, returningServicePort, mailNotificationServicePort,
-                trackingNumberService, shipmentConfigurationServicePort);
+                trackingNumberService, shipmentConfigurationServicePort, operatorContextProvider);
 	}
 
     @Test
@@ -199,7 +204,7 @@ class ShipmentPortImplTest {
         shipmentPort.cancelShipmentReturn(returnId);
 
         assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus());
-        assertFalse(shipment.getLocked());
+        assertTrue(shipment.getLocked());
         verify(returningServicePort).getReturn(returnId);
         verify(shipmentRepository).createOrUpdate(shipment);
     }
@@ -230,8 +235,10 @@ class ShipmentPortImplTest {
     @Test
     void shouldNotChangeSenderToWhenShipmentWasNotFound() {
         final ShipmentId shipmentId = shipmentId();
-        when(shipmentRepository.findById(shipmentId)).thenReturn(null);
-        final Executable executable = () -> shipmentPort.changeSenderTo(shipmentId, any());
+        doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
+                .when(shipmentRepository)
+                .findById(shipmentId);
+        final Executable executable = () -> shipmentPort.changeSenderTo(shipmentId, sender());
         final RestException exception = assertThrows(RestException.class, executable);
         assertEquals(SHIPMENT_WAS_NOT_FOUND, exception.getMessage());
     }
@@ -239,8 +246,10 @@ class ShipmentPortImplTest {
     @Test
     void shouldNotChangeRecipientToWhenShipmentWasNotFound() {
         final ShipmentId shipmentId = shipmentId();
-        when(shipmentRepository.findById(shipmentId)).thenReturn(null);
-        final Executable executable = () -> shipmentPort.changeRecipientTo(shipmentId, any());
+        doThrow(new ShipmentNotFoundException(SHIPMENT_WAS_NOT_FOUND))
+                .when(shipmentRepository)
+                .findById(shipmentId);
+        final Executable executable = () -> shipmentPort.changeRecipientTo(shipmentId, recipient());
         final RestException exception = assertThrows(RestException.class, executable);
         assertEquals(SHIPMENT_WAS_NOT_FOUND, exception.getMessage());
     }

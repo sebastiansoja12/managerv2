@@ -406,7 +406,7 @@ class ShipmentServiceImplTest {
         shipmentService.notifyReturnCanceled(shipmentId());
 
         assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus());
-        assertFalse(shipment.getLocked());
+        assertTrue(shipment.getLocked());
         verify(shipmentRepository).createOrUpdate(shipment);
         assertEventPublished(ShipmentReturnCanceled.class);
     }
@@ -456,7 +456,7 @@ class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldRedirectShipmentToSenderAndPublishEvent() {
+    void shouldRedirectShipmentToSenderAndPublishUpdatedEvent() {
         final ShipmentId relatedShipmentId = new ShipmentId(2L);
         final Shipment shipment = shipment(relatedShipmentId);
         final String originalSenderFirstName = shipment.getSender().getFirstName();
@@ -464,7 +464,7 @@ class ShipmentServiceImplTest {
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
         ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
         when(applicationContext.getBean(TrackingNumberService.class)).thenReturn(trackingNumberService);
-        when(trackingNumberService.nextTrackingNumber(any(), any())).thenReturn(trackingNumber());
+        when(trackingNumberService.nextTrackingNumber(any(ShipmentId.class))).thenReturn(trackingNumber());
 
         shipmentService.redirectShipmentToSender(shipmentId());
 
@@ -474,7 +474,7 @@ class ShipmentServiceImplTest {
         assertEquals(originalRecipientFirstName, shipment.getSender().getFirstName());
         assertEquals(originalSenderFirstName, shipment.getRecipient().getFirstName());
         verify(shipmentRepository).createOrUpdate(shipment);
-        assertEventPublished(ShipmentRedirected.class);
+        assertEventPublished(ShipmentUpdated.class);
     }
 
     @Test

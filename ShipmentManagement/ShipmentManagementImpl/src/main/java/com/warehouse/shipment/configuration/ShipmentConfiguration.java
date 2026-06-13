@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.department.api.DepartmentApiService;
@@ -93,11 +94,13 @@ public class ShipmentConfiguration {
 									 final ReturningServicePort returningServicePort,
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberService trackingNumberService,
-									 final ShipmentConfigurationServicePort shipmentConfigurationServicePort) {
+									 final ShipmentConfigurationServicePort shipmentConfigurationServicePort,
+                                     final OperatorContextProvider operatorContextProvider) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
-				mailNotificationServicePort, trackingNumberService, shipmentConfigurationServicePort);
+				mailNotificationServicePort, trackingNumberService, shipmentConfigurationServicePort,
+                operatorContextProvider);
 	}
 
 	@Bean

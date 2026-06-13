@@ -68,5 +68,6 @@
     <include file="/changelog/db/route_log_detail_ids.xml"/>
     <include file="/changelog/db/initial-login.xml"/>
     <include file="/changelog/db/shipment-dangerous-good-embedded.xml"/>
+    <include file="/changelog/db/shipment_origin_department_id.xml"/>
 
 </databaseChangeLog>

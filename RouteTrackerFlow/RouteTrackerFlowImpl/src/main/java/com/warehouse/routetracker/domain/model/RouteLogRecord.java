@@ -138,6 +138,7 @@ public class RouteLogRecord {
             case SENT, DELIVERY -> ProcessType.ROUTE;
             case RETURN -> ProcessType.RETURN;
             case REDIRECT -> ProcessType.REDIRECT;
+            case CANCELED -> ProcessType.CANCELED;
         };
     }
 }
