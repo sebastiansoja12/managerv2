@@ -1,5 +1,6 @@
 package com.warehouse.commonassets.kafka.domain.port;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,9 +10,15 @@ public interface KafkaOutboxPort {
 
     void save(KafkaOutboxRecord record);
 
-    List<KafkaOutboxRecord> findUnpublished(int limit);
+    List<KafkaOutboxRecord> claimPending(int limit, String workerId, Instant now, Instant lockedUntil);
 
-    void markPublished(UUID eventId);
+    boolean claim(UUID eventId, String workerId, Instant now, Instant lockedUntil);
 
-    void markFailed(UUID eventId, Throwable exception);
+    void markPublished(UUID eventId, String workerId);
+
+    void markFailed(UUID eventId,
+                    String workerId,
+                    Throwable exception,
+                    Instant nextAttemptAt,
+                    int maxAttempts);
 }

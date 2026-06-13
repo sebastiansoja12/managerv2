@@ -1,4 +1,4 @@
-package com.warehouse.commonassets.kafka.domain.model;
+package com.warehouse.commonassets.event.integration.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.warehouse.commonassets.identificator.DepartmentId;
