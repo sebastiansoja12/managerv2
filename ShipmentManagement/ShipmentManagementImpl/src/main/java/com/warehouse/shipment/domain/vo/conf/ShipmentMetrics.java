@@ -2,7 +2,6 @@ package com.warehouse.shipment.domain.vo.conf;
 
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
 
 public record ShipmentMetrics(double maxWeight,
                               double minWeight,
@@ -11,9 +10,7 @@ public record ShipmentMetrics(double maxWeight,
                               double maxHeight,
                               double maxShipmentValue) {
 
-    public static ShipmentMetrics from(final ShipmentCreateCommand createCommand) {
-        final ShipmentSize shipmentSize = createCommand.getShipmentSize();
-
+    public static ShipmentMetrics from(final ShipmentSize shipmentSize) {
         return switch (shipmentSize) {
             case SMALL -> new ShipmentMetrics(20.0, 1.0, 20.0, 20.0, 20.0, 1.0);
             case TINY -> new ShipmentMetrics(40.0, 1.0, 40.0, 40.0, 40.0, 2);

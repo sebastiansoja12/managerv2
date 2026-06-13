@@ -1,5 +1,8 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.shipment.application.port.primary.command.*;
+import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,13 +13,15 @@ import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
+import com.warehouse.shipment.domain.enumeration.ReasonCode;
+import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.exception.DangerousGoodNotFoundException;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import com.warehouse.shipment.domain.port.secondary.ShipmentConfigurationServicePort;
+import com.warehouse.shipment.application.port.primary.ShipmentPort;
+import com.warehouse.shipment.application.port.secondary.ShipmentConfigurationPort;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
@@ -53,14 +58,14 @@ public class ShipmentInternalController {
 
     private final ObjectMapper objectMapper;
 
-    private final ShipmentConfigurationServicePort shipmentConfigurationServicePort;
+    private final ShipmentConfigurationPort shipmentConfigurationServicePort;
 
 	public ShipmentInternalController(final ShipmentPort shipmentPort,
                                       final ShipmentRequestValidator shipmentRequestValidator,
                                       final ShipmentRequestMapper requestMapper,
                                       final ShipmentResponseMapper responseMapper,
                                       final ObjectMapper objectMapper,
-                                      final ShipmentConfigurationServicePort shipmentConfigurationServicePort) {
+                                      final ShipmentConfigurationPort shipmentConfigurationServicePort) {
         this.shipmentPort = shipmentPort;
         this.shipmentRequestValidator = shipmentRequestValidator;
         this.requestMapper = requestMapper;
@@ -168,7 +173,13 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.return")
     @Timed(value = "controller.shipment.return")
     public ResponseEntity<?> returnShipment(@RequestBody final ShipmentReturnRequestApi shipmentReturnRequest) {
-        final ShipmentReturnCommand request = ShipmentReturnCommand.from(shipmentReturnRequest);
+        final ShipmentReturnCommand request = new ShipmentReturnCommand(
+                shipmentReturnRequest.departmentCode(),
+                shipmentReturnRequest.reason(),
+                new ShipmentId(shipmentReturnRequest.shipmentId().getValue()),
+                ReturnStatus.valueOf(shipmentReturnRequest.returnStatus()),
+                ReasonCode.valueOf(shipmentReturnRequest.reasonCode().value())
+        );
         this.shipmentPort.processShipmentReturn(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
@@ -323,7 +334,7 @@ public class ShipmentInternalController {
     public ResponseEntity<?> updatePerson(@RequestBody final PersonApi personRequest,
                                           @RequestParam("shipmentId") final Long shipmentId,
                                           @RequestParam("personType") final PersonType personType) {
-        final Person person = personType == PersonType.SENDER ? Sender.from(personRequest) : Recipient.from(personRequest);
+        final Person person = this.requestMapper.map(personRequest, personType);
         this.shipmentPort.changePersonTo(person, new ShipmentId(shipmentId));
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }

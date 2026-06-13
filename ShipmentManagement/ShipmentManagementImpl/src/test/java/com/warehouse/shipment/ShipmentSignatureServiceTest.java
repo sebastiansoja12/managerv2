@@ -9,22 +9,20 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
+import com.warehouse.shipment.domain.context.ShipmentEventContext;
 import com.warehouse.shipment.domain.event.ShipmentUpdated;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
-import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
-import com.warehouse.shipment.domain.registry.DomainContext;
-import com.warehouse.shipment.domain.service.ShipmentSignatureService;
+import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
+import com.warehouse.shipment.application.service.ShipmentSignatureService;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentSignatureServiceTest {
@@ -37,12 +35,7 @@ class ShipmentSignatureServiceTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(DomainContext.class, "eventPublisher", eventPublisher);
-    }
-
-    @AfterEach
-    void tearDown() {
-        ReflectionTestUtils.setField(DomainContext.class, "eventPublisher", null);
+        new ShipmentEventContext().setApplicationEventPublisher(eventPublisher);
     }
 
     @Test

@@ -39,6 +39,9 @@ public interface RouteLogToModelMapper {
         return RouteLogRecordDetail
                 .builder()
                 .id(routeLogRecordDetailEntity.getId().value())
+                .eventId(routeLogRecordDetailEntity.getEventId() == null
+                        ? null
+                        : UUID.fromString(routeLogRecordDetailEntity.getEventId()))
                 .shipmentStatus(map(routeLogRecordDetailEntity.getShipmentStatus()))
                 .request(routeLogRecordDetailEntity.getRequest())
                 .processType(map(routeLogRecordDetailEntity.getProcessType()))

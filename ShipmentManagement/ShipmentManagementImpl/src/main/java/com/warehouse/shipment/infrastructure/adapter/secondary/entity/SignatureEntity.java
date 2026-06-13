@@ -2,7 +2,6 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
-import com.warehouse.shipment.domain.model.Signature;
 import jakarta.persistence.*;
 import org.hibernate.envers.Audited;
 
@@ -51,14 +50,6 @@ public class SignatureEntity {
         this.signature = signature;
     }
     
-    public static SignatureEntity from(final Signature signature) {
-        if (signature == null)
-            return null;
-
-		return new SignatureEntity(signature.getSignerName(), signature.getSignedAt(), signature.getSignatureMethod(),
-				signature.getDocumentReference(), signature.getShipmentId(), signature.getSignature());
-    }
-
     public String getDocumentReference() {
         return documentReference;
     }
@@ -83,4 +74,3 @@ public class SignatureEntity {
         return signature;
     }
 }
-

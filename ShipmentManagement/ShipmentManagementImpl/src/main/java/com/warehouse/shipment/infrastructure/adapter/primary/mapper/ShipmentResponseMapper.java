@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
+
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;

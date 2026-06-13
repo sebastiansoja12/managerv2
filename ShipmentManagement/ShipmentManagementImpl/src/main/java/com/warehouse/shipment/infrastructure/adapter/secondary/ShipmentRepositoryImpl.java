@@ -5,23 +5,28 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
+import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     private final OperatorFilteredRepository<ShipmentEntity> writeRepository;
+    private final ShipmentPersistenceMapper persistenceMapper;
 
-    public ShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentEntity> writeRepository) {
+    public ShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentEntity> writeRepository,
+                                  final ShipmentPersistenceMapper persistenceMapper) {
         this.writeRepository = writeRepository;
+        this.persistenceMapper = persistenceMapper;
     }
 
     @Override
     public void createOrUpdate(final Shipment shipment) {
-        final ShipmentEntity entity = ShipmentEntity.from(shipment);
+        final ShipmentEntity entity = this.persistenceMapper.toEntity(shipment);
         if (writeModelExists(shipment.getShipmentId())) {
             writeRepository.update(entity);
         } else {
@@ -34,7 +39,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("shipmentId.value", shipmentId.getValue())
                 .one()
-                .map(Shipment::from)
+                .map(this.persistenceMapper::toDomain)
                 .orElseThrow(() -> new ShipmentNotFoundException("Shipment was not found"));
     }
 
@@ -51,7 +56,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("externalId.value", externalId.value())
                 .one()
-                .map(Shipment::from);
+                .map(this.persistenceMapper::toDomain);
     }
 
     @Override
@@ -67,8 +72,17 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
         return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("trackingNumber.value", trackingNumber.value())
                 .one()
-                .map(Shipment::from)
+                .map(this.persistenceMapper::toDomain)
                 .orElseThrow(() -> new ShipmentNotFoundException("Shipment was not found"));
+    }
+
+    @Override
+    public List<Shipment> findAll() {
+        return this.writeRepository.createCriteria(ShipmentEntity.class)
+                .list()
+                .stream()
+                .map(this.persistenceMapper::toDomain)
+                .toList();
     }
 
     private boolean writeModelExists(final ShipmentId shipmentId) {

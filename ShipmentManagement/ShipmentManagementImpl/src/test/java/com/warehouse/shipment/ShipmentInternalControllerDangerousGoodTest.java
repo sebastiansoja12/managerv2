@@ -5,8 +5,8 @@ import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.exception.DangerousGoodNotFoundException;
 import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.port.primary.ShipmentPort;
-import com.warehouse.shipment.domain.port.secondary.ShipmentConfigurationServicePort;
+import com.warehouse.shipment.application.port.primary.ShipmentPort;
+import com.warehouse.shipment.application.port.secondary.ShipmentConfigurationPort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.DangerousGoodApi;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
@@ -48,7 +48,7 @@ class ShipmentInternalControllerDangerousGoodTest {
     private ShipmentResponseMapper responseMapper;
 
     @Mock
-    private ShipmentConfigurationServicePort shipmentConfigurationServicePort;
+    private ShipmentConfigurationPort shipmentConfigurationServicePort;
 
     private ShipmentInternalController controller;
 

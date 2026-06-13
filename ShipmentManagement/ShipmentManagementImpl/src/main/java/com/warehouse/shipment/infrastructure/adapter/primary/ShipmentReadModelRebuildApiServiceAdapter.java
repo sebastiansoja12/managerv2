@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.shipment.domain.service.ShipmentReadModelSyncService;
+import com.warehouse.shipment.application.service.ShipmentReadModelSyncService;
 import com.warehouse.shipment.infrastructure.ShipmentReadModelRebuildApiService;
 
 @Service

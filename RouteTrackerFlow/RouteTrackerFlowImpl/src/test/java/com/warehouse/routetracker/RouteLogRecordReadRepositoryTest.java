@@ -9,6 +9,7 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.configuration.RouteTrackerTestConfiguration;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
+import com.warehouse.routetracker.domain.model.CreateShipmentEventCommand;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteLogRecordReadRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
@@ -55,13 +56,15 @@ public class RouteLogRecordReadRepositoryTest {
         final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                 .shipmentId(new ShipmentId(345678L))
                 .build();
-        routeLogRecord.createShipmentEvent(
-                "ShipmentCreated",
+        routeLogRecord.createShipmentEvent(new CreateShipmentEventCommand(
+                UUID.randomUUID(),
+                routeLogRecord.getShipmentId(),
+                "shipment.created",
                 ShipmentStatus.CREATED,
                 LocalDateTime.now(),
                 "{\"event\":\"created\"}",
                 new UserId(3L),
-                new DepartmentId(30L));
+                new DepartmentId(30L)));
 
         final RouteLogRecordEntity saved = repository.saveAndFlush(entityMapper.map(routeLogRecord));
         final RouteLogRecordDetailEntity detail = saved.getRouteLogRecordDetails().getFirst();

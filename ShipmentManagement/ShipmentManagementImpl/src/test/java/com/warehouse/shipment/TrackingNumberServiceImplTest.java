@@ -3,14 +3,13 @@ package com.warehouse.shipment;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.model.TrackingSequence;
-import com.warehouse.shipment.domain.port.secondary.ShipmentConfigurationServicePort;
-import com.warehouse.shipment.domain.port.secondary.TrackingSequenceRepository;
+import com.warehouse.shipment.application.port.secondary.TrackingSequenceRepository;
+import com.warehouse.shipment.application.service.TrackingNumberSequenceService;
 import com.warehouse.shipment.domain.service.TrackingNumberServiceImpl;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberDateFormat;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberRule;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberSource;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -22,12 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TrackingNumberServiceImplTest {
 
-    @Mock
-    private ShipmentConfigurationServicePort shipmentConfigurationServicePort;
-
     private final InMemoryTrackingSequenceRepository sequenceRepository = new InMemoryTrackingSequenceRepository();
-    private final TrackingNumberServiceImpl service = new TrackingNumberServiceImpl(shipmentConfigurationServicePort,
-            sequenceRepository);
+    private final TrackingNumberServiceImpl service = new TrackingNumberServiceImpl();
+    private final TrackingNumberSequenceService sequenceService =
+            new TrackingNumberSequenceService(sequenceRepository);
 
     @Test
     void shouldGenerateTrackingNumberFromSequenceRule() {
@@ -42,7 +39,8 @@ class TrackingNumberServiceImplTest {
         );
         final String today = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
 
-        final TrackingNumber trackingNumber = service.nextTrackingNumber(rule);
+        final long sequenceValue = this.sequenceService.nextValue(rule);
+        final TrackingNumber trackingNumber = service.nextTrackingNumber(rule, null, sequenceValue);
 
         assertEquals("MGR-" + today + "-0001", trackingNumber.value());
     }

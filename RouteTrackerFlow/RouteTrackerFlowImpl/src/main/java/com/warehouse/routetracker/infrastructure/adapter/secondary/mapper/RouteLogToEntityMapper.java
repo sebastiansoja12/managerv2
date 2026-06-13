@@ -44,6 +44,7 @@ public interface RouteLogToEntityMapper {
 	default RouteLogRecordDetailEntity mapToRouteLogRecordDetailEntity(RouteLogRecordDetail routeLogRecordDetail) {
         final RouteLogRecordDetailEntity entity = new RouteLogRecordDetailEntity();
         entity.setId(this.map(routeLogRecordDetail.getId()));
+        entity.setEventId(routeLogRecordDetail.getEventId() == null ? null : routeLogRecordDetail.getEventId().toString());
         entity.setCreated(routeLogRecordDetail.getTimestamp());
         entity.setDepartmentId(routeLogRecordDetail.getDepartmentId());
         entity.setShipmentStatus(map(routeLogRecordDetail.getShipmentStatus()));
@@ -71,6 +72,7 @@ public interface RouteLogToEntityMapper {
     default RouteLogRecordDetailEntity map(Long id, RouteLogRecordDetail routeLogRecordDetail) {
         final RouteLogRecordDetailEntity entity = new RouteLogRecordDetailEntity();
         entity.setId(this.map(id));
+        entity.setEventId(routeLogRecordDetail.getEventId() == null ? null : routeLogRecordDetail.getEventId().toString());
         entity.setDepartmentId(routeLogRecordDetail.getDepartmentId());
         entity.setShipmentStatus(map(routeLogRecordDetail.getShipmentStatus()));
         entity.setRequest(routeLogRecordDetail.getRequest());

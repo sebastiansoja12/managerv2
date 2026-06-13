@@ -13,8 +13,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -32,6 +33,8 @@ import com.warehouse.commonassets.repository.OperatorContextProvider;
 @Component
 @ConditionalOnProperty(name = "manager.kafka.domain-events.enabled", havingValue = "true")
 public class KafkaDomainEventExternalizer {
+
+    private static final String KAFKA_TYPE_ID = "__TypeId__";
 
     private final Environment environment;
     private final ObjectMapper objectMapper;
@@ -51,7 +54,7 @@ public class KafkaDomainEventExternalizer {
         this.operatorContextProvider = operatorContextProvider;
     }
 
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT, fallbackExecution = true)
     public void publishIfRouted(final Object event) {
         final Set<KafkaDomainEvent> routedEvents = routedEvents(event);
         if (routedEvents.isEmpty()) {
@@ -81,9 +84,11 @@ public class KafkaDomainEventExternalizer {
     private KafkaOutboxRecord toOutboxRecord(final KafkaDomainEvent routedEvent, final Object event) {
         final UUID eventId = UUID.randomUUID();
         final String eventType = event.getClass().getName();
+        final String eventName = event.getClass().getSimpleName();
         final Instant occurredAt = occurredAt(event);
         final OperatorId operatorId = operatorId(event).orElse(null);
-        final Map<String, String> headers = headers(eventId, eventType, routedEvent.version(), occurredAt, operatorId);
+        final Map<String, String> headers = headers(eventId, eventType, eventName, routedEvent.version(), occurredAt,
+                operatorId);
         return new KafkaOutboxRecord(
                 eventId,
                 topic(routedEvent),
@@ -99,12 +104,15 @@ public class KafkaDomainEventExternalizer {
 
     private Map<String, String> headers(final UUID eventId,
                                         final String eventType,
+                                        final String eventName,
                                         final int eventVersion,
                                         final Instant occurredAt,
                                         final OperatorId operatorId) {
         final Map<String, String> headers = new LinkedHashMap<>();
+        headers.put(KAFKA_TYPE_ID, eventName);
         headers.put(KafkaEventHeaders.EVENT_ID, eventId.toString());
-        headers.put(KafkaEventHeaders.EVENT_TYPE, eventType);
+        headers.put(KafkaEventHeaders.EVENT_TYPE, eventName);
+        headers.put(KafkaEventHeaders.EVENT_CLASS, eventType);
         headers.put(KafkaEventHeaders.EVENT_VERSION, String.valueOf(eventVersion));
         headers.put(KafkaEventHeaders.OCCURRED_AT, occurredAt.toString());
         if (operatorId != null && operatorId.getValue() != null) {

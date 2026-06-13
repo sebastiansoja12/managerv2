@@ -1,35 +1,34 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.kafka;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
-import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
-import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChanged;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentSnapshot;
+import static org.mockito.Mockito.verify;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.LocalDateTime;
-
-import static org.mockito.Mockito.verify;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
+import com.warehouse.routetracker.domain.model.CreateShipmentEventCommand;
+import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentEventMessage;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentSnapshot;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentKafkaListenerTest {
 
-    private static final Long SHIPMENT_ID = 123L;
+    private static final UUID EVENT_ID = UUID.fromString("f783d37e-06e9-4efc-8f18-099343b150e8");
     private static final Instant EVENT_TIME = Instant.parse("2026-08-11T10:15:30Z");
-    private static final LocalDateTime OCCURRED_AT = LocalDateTime.of(2026, 8, 11, 10, 15, 30);
-    private static final UserId USER_ID = new UserId(42L);
-    private static final DepartmentId DEPARTMENT_ID = new DepartmentId(10L);
-    private static final OperatorId OPERATOR_ID = new OperatorId(7L);
 
     @Mock
     private RouteTrackerLogPort routeTrackerLogPort;
@@ -44,85 +43,50 @@ class ShipmentKafkaListenerTest {
     }
 
     @Test
-    void shouldHandleShipmentCreated() throws Exception {
-        final ShipmentChanged event = new ShipmentChanged(
-                this.snapshot("CREATED"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
+    void shouldMapLocalMessageToPrimaryCommand() throws Exception {
+        final ShipmentEventMessage message = new ShipmentEventMessage(
+                EVENT_ID,
+                "shipment.created",
+                1,
+                EVENT_TIME,
+                new ShipmentSnapshot(
+                        new com.warehouse.commonassets.identificator.ShipmentId(123L),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        com.warehouse.commonassets.enumeration.ShipmentStatus.CREATED,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        new TrackingNumber("TRACKING-123"),
+                        null),
+                new UserId(42L),
+                new DepartmentId(10L),
+                OperatorId.of(7L)
+        );
 
-        this.listener.handle(event, this.eventType("ShipmentCreated"));
+        this.listener.handle(message);
 
-        verify(this.routeTrackerLogPort).createShipmentEvent(
-                new ShipmentId(SHIPMENT_ID),
-                "ShipmentCreated",
+        verify(this.routeTrackerLogPort).createShipmentEvent(new CreateShipmentEventCommand(
+                EVENT_ID,
+                new ShipmentId(123L),
+                "shipment.created",
                 ShipmentStatus.CREATED,
-                OCCURRED_AT,
-                this.objectMapper.writeValueAsString(event),
-                USER_ID,
-                DEPARTMENT_ID
-        );
-    }
-
-    @Test
-    void shouldHandleShipmentReturned() throws Exception {
-        final ShipmentChanged event = new ShipmentChanged(
-                this.snapshot("RETURN"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
-        this.listener.handle(event, this.eventType("ShipmentReturned"));
-
-        verify(this.routeTrackerLogPort).createShipmentEvent(
-                new ShipmentId(SHIPMENT_ID),
-                "ShipmentReturned",
-                ShipmentStatus.RETURN,
-                OCCURRED_AT,
-                this.objectMapper.writeValueAsString(event),
-                USER_ID,
-                DEPARTMENT_ID
-        );
-    }
-
-    @Test
-    void shouldHandleOtherShipmentEvent() throws Exception {
-        final ShipmentChanged event = new ShipmentChanged(
-                this.snapshot("SENT"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
-
-        this.listener.handle(
-                event,
-                this.eventType("ShipmentSent"));
-
-        verify(this.routeTrackerLogPort).createShipmentEvent(
-                new ShipmentId(SHIPMENT_ID),
-                "ShipmentSent",
-                ShipmentStatus.SENT,
-                OCCURRED_AT,
-                this.objectMapper.writeValueAsString(event),
-                USER_ID,
-                DEPARTMENT_ID
-        );
-    }
-
-    @Test
-    void shouldHandleShipmentReturnCanceledEvent() throws Exception {
-        final ShipmentChanged event = new ShipmentChanged(
-                this.snapshot("DELIVERY"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
-
-        this.listener.handle(
-                event,
-                this.eventType("ShipmentReturnCanceled"));
-
-        verify(this.routeTrackerLogPort).createShipmentEvent(
-                new ShipmentId(SHIPMENT_ID),
-                "ShipmentReturnCanceled",
-                ShipmentStatus.DELIVERY,
-                OCCURRED_AT,
-                this.objectMapper.writeValueAsString(event),
-                USER_ID,
-                DEPARTMENT_ID
-        );
-    }
-
-    private ShipmentSnapshot snapshot(final String shipmentStatus) {
-        return new ShipmentSnapshot(new ShipmentId(SHIPMENT_ID), shipmentStatus);
-    }
-
-    private byte[] eventType(final String eventType) {
-        return eventType.getBytes(StandardCharsets.UTF_8);
+                LocalDateTime.of(2026, 8, 11, 10, 15, 30),
+                this.objectMapper.writeValueAsString(message),
+                new UserId(42L),
+                new DepartmentId(10L)
+        ));
     }
 }

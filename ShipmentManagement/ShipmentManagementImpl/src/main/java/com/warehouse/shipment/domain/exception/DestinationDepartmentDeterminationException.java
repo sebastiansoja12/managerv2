@@ -5,7 +5,7 @@ import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 
 public class DestinationDepartmentDeterminationException extends RestException {
 
-    public DestinationDepartmentDeterminationException(ErrorCode code) {
+    public DestinationDepartmentDeterminationException(final ErrorCode code) {
         super(code.getCode(), code.getMessage());
     }
 }
