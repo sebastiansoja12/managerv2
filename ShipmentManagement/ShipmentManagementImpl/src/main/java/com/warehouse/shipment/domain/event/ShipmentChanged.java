@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.event;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.kafka.domain.model.OperatorAwareContext;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
@@ -7,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 
-public class ShipmentChangedEvent extends OperatorAwareContext implements ShipmentEvent {
+public class ShipmentChanged extends OperatorAwareContext implements ShipmentEvent {
 
     @NotNull
     private final ShipmentSnapshot snapshot;
@@ -15,7 +16,7 @@ public class ShipmentChangedEvent extends OperatorAwareContext implements Shipme
     @NotNull
     private final Instant timestamp;
 
-    public ShipmentChangedEvent(final ShipmentSnapshot snapshot, final Instant timestamp) {
+    public ShipmentChanged(final ShipmentSnapshot snapshot, final Instant timestamp) {
         this.snapshot = snapshot;
         this.timestamp = timestamp;
     }
@@ -26,6 +27,10 @@ public class ShipmentChangedEvent extends OperatorAwareContext implements Shipme
 
     public Instant getTimestamp() {
         return timestamp;
+    }
+
+    public ShipmentId shipmentId() {
+        return snapshot.shipmentId();
     }
 
 }

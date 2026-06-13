@@ -24,6 +24,8 @@ import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.application.port.secondary.*;
 import com.warehouse.shipment.application.service.*;
 import com.warehouse.shipment.application.service.delivery.*;
+import com.warehouse.shipment.application.service.returning.*;
+import com.warehouse.shipment.application.service.status.*;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentApiServiceAdapter;
@@ -96,15 +98,18 @@ public class ShipmentConfiguration {
 									 final ReturningServicePort returningServicePort,
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberGenerationService trackingNumberGenerationService,
-									 final ShipmentConfigurationPort shipmentConfigurationServicePort,
+                                     final ShipmentConfigurationPort shipmentConfigurationServicePort,
                                      final OperatorContextProvider operatorContextProvider,
-                                     final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver) {
+                                     final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
+                                     final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
+                                     final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver) {
         return new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
-                operatorContextProvider, shipmentDeliveryStrategyResolver);
+                operatorContextProvider, shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
+                shipmentReturnStrategyResolver);
 	}
 
     @Bean
@@ -136,6 +141,73 @@ public class ShipmentConfiguration {
     public ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver(
             final List<ShipmentDeliveryStrategy> strategies) {
         return new ShipmentDeliveryStrategyResolver(strategies);
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentCreatedStatusChangeStrategy() {
+        return new ShipmentCreatedStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentRedirectedStatusChangeStrategy() {
+        return new ShipmentRedirectedStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentReroutedStatusChangeStrategy() {
+        return new ShipmentReroutedStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentSentStatusChangeStrategy() {
+        return new ShipmentSentStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentDeliveredStatusChangeStrategy() {
+        return new ShipmentDeliveredStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentReturnedStatusChangeStrategy() {
+        return new ShipmentReturnedStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentUnchangedStatusChangeStrategy() {
+        return new ShipmentUnchangedStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver(
+            final List<ShipmentStatusChangeStrategy> strategies) {
+        return new ShipmentStatusChangeStrategyResolver(strategies);
+    }
+
+    @Bean
+    public ShipmentReturnStrategy shipmentReturnCreatedStrategy() {
+        return new ShipmentReturnCreatedStrategy();
+    }
+
+    @Bean
+    public ShipmentReturnStrategy shipmentReturnCompletedStrategy() {
+        return new ShipmentReturnCompletedStrategy();
+    }
+
+    @Bean
+    public ShipmentReturnStrategy shipmentReturnCancelledStrategy() {
+        return new ShipmentReturnCancelledStrategy();
+    }
+
+    @Bean
+    public ShipmentReturnStrategy shipmentReturnUnchangedStrategy() {
+        return new ShipmentReturnUnchangedStrategy();
+    }
+
+    @Bean
+    public ShipmentReturnStrategyResolver shipmentReturnStrategyResolver(
+            final List<ShipmentReturnStrategy> strategies) {
+        return new ShipmentReturnStrategyResolver(strategies);
     }
 
 	@Bean

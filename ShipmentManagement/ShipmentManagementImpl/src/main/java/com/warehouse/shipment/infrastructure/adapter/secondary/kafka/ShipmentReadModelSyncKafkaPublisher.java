@@ -6,7 +6,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
-import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
+import com.warehouse.shipment.domain.event.ShipmentChanged;
 import com.warehouse.shipment.infrastructure.adapter.secondary.kafka.event.ShipmentReadModelChanged;
 
 @Component
@@ -20,7 +20,7 @@ public class ShipmentReadModelSyncKafkaPublisher {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
-    public void publish(final ShipmentChangedEvent event) {
+    public void publish(final ShipmentChanged event) {
         final ShipmentReadModelChanged readModelEvent = new ShipmentReadModelChanged(
                 event.getSnapshot(),
                 event.getTimestamp()

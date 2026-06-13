@@ -6,7 +6,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
-public class ShipmentReturnCreated extends ShipmentStatusChangedEvent implements ShipmentEvent {
+public class ShipmentReturnCreated extends ShipmentStatusChanged implements ShipmentEvent {
     
     private final ReasonCode reasonCode;
     private final String reason;

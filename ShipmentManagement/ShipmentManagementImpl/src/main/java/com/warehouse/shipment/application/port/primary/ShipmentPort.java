@@ -2,7 +2,6 @@ package com.warehouse.shipment.application.port.primary;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
-import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
@@ -19,10 +18,6 @@ public interface ShipmentPort {
     Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand request);
 
     Result<Void, ErrorCode> update(final ShipmentUpdateCommand request);
-
-    void changeSenderTo(final ShipmentId shipmentId, final Sender sender);
-
-    void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient);
 
     void changePersonTo(final Person person, final ShipmentId shipmentId);
 
@@ -62,8 +57,6 @@ public interface ShipmentPort {
 
     void cancel(final ShipmentId shipmentId);
 
-    void createShipment(final Shipment shipment);
-
     Shipment find(final ShipmentId shipmentId);
 
     Shipment find(final TrackingNumber trackingNumber);
@@ -74,28 +67,7 @@ public interface ShipmentPort {
                               final ShipmentType shipmentType,
                               final ShipmentId relatedShipmentId);
 
-    void changeDangerousGoodTo(final ShipmentId shipmentId, final DangerousGood dangerousGood);
-
-    Optional<DangerousGood> findDangerousGood(final ShipmentId shipmentId);
-
     void removeDangerousGood(final ShipmentId shipmentId);
-
-    void notifyRelatedShipmentRedirected(final ShipmentId shipmentId, final ShipmentId relatedShipmentId);
-
-    void notifyShipmentRerouted(final ShipmentId shipmentId);
-
-    void notifyShipmentSent(final ShipmentId shipmentId);
-
-    void notifyShipmentReturned(final ShipmentId shipmentId);
-
-    void notifyShipmentReturned(final ShipmentId shipmentId,
-                                final String reason,
-                                final ReasonCode reasonCode,
-                                final DepartmentCode departmentCode);
-
-    void notifyShipmentDelivered(final ShipmentId shipmentId);
-
-    void notifyReturnCanceled(final ShipmentId shipmentId);
 
     void lockShipment(final ShipmentId shipmentId);
 
