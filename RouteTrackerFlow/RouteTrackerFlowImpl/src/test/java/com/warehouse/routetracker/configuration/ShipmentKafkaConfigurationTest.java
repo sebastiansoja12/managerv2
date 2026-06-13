@@ -1,36 +1,21 @@
 package com.warehouse.routetracker.configuration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.*;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.messaging.Message;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.commonassets.enumeration.Currency;
-import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentEventMessage;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.MoneySnapshot;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.RecipientSnapshot;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.SenderSnapshot;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentSnapshot;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ShipmentKafkaConfigurationTest {
 
@@ -39,11 +24,7 @@ class ShipmentKafkaConfigurationTest {
         final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
         final RecordMessageConverter converter = new ShipmentKafkaConfiguration()
                 .shipmentKafkaRecordMessageConverter(objectMapper);
-        final ShipmentEventMessage expected = new ShipmentEventMessage(
-                UUID.fromString("f783d37e-06e9-4efc-8f18-099343b150e8"),
-                "shipment.created",
-                1,
-                Instant.parse("2026-08-11T10:15:30Z"),
+        final ShipmentCreatedIntegrationEvent expected = new ShipmentCreatedIntegrationEvent(
                 new ShipmentSnapshot(
                         new ShipmentId(123L),
                         new SenderSnapshot("Jan", "Kowalski", "jan@example.com", "123456789",
@@ -69,12 +50,12 @@ class ShipmentKafkaConfigurationTest {
                         new ExternalId<>(UUID.fromString("f211c97c-a4aa-4497-a7d9-92c9e5dc8bd6"))),
                 new UserId(42L),
                 new DepartmentId(10L),
-                OperatorId.of(7L)
+                new OperatorId(7L)
         );
         final String producerJson = """
                 {
                   "eventId": "f783d37e-06e9-4efc-8f18-099343b150e8",
-                  "eventType": "shipment.created",
+                  "eventType": "shipment.changed",
                   "version": 1,
                   "occurredAt": "2026-08-11T10:15:30Z",
                   "payload": {
@@ -119,9 +100,18 @@ class ShipmentKafkaConfigurationTest {
         final ConsumerRecord<String, String> record = new ConsumerRecord<>(
                 "shipment.events", 0, 0L, "123", producerJson);
 
-        final Message<?> converted = converter.toMessage(record, null, null, ShipmentEventMessage.class);
+        final Message<?> converted = converter.toMessage(
+                record,
+                null,
+                null,
+                ShipmentCreatedIntegrationEvent.class
+        );
 
-        assertThat(converted.getPayload()).isEqualTo(expected);
+        final ShipmentCreatedIntegrationEvent event = (ShipmentCreatedIntegrationEvent) converted.getPayload();
         assertThat(record.headers().lastHeader("__TypeId__")).isNull();
+        assertThat(event.payload()).isEqualTo(expected.payload());
+        assertThat(event.userId()).isEqualTo(expected.userId());
+        assertThat(event.departmentId()).isEqualTo(expected.departmentId());
+        assertThat(event.operatorId()).isEqualTo(expected.operatorId());
     }
 }

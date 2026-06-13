@@ -1,8 +1,8 @@
 package com.warehouse.routetracker.domain.model;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.vo.DeviceId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.DeviceInformationRequestDto;

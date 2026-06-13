@@ -1,16 +1,16 @@
 package com.warehouse.routetracker.domain.model;
 
+import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
+import com.warehouse.routetracker.domain.vo.TerminalId;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
+import com.warehouse.routetracker.domain.vo.identifier.SupplierId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
-import com.warehouse.routetracker.domain.enumeration.ProcessType;
-import com.warehouse.routetracker.domain.vo.TerminalId;
-
-import lombok.*;
 
 @Builder
 @Getter
@@ -23,6 +23,7 @@ public class RouteLogRecordDetail {
     private TerminalId terminalId;
     private String version;
     private UserId userId;
+    private OperatorId operatorId;
     private SupplierId supplierId;
     private DepartmentId departmentId;
     private ShipmentStatus shipmentStatus;

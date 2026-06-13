@@ -3,12 +3,13 @@ package com.warehouse.routetracker.domain.port.primary;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
-import com.warehouse.routetracker.domain.model.CreateShipmentEventCommand;
+import com.warehouse.routetracker.domain.model.ShipmentStatusStateChangeCommand;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
@@ -20,7 +21,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public void createShipmentEvent(final CreateShipmentEventCommand command) {
+    public void createOrChangeShipmentState(final ShipmentStatusStateChangeCommand command) {
         this.update(command.shipmentId(), routeLogRecord -> routeLogRecord.createShipmentEvent(command));
     }
 
@@ -87,6 +88,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
             this.repository.update(routeLogRecord);
         }, () -> {
             final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
+                    .id(UUID.randomUUID())
                     .shipmentId(shipmentId)
                     .build();
             change.accept(routeLogRecord);

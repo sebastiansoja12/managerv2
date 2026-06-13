@@ -3,8 +3,6 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.sn
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.warehouse.commonassets.enumeration.CountryCode;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record DangerousGoodSnapshot(
         String unNumber,

@@ -1,12 +1,9 @@
 package com.warehouse.shipment.domain.event;
 
-import java.time.Instant;
-
+import com.warehouse.commonassets.event.domain.model.DomainEvent;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
-public interface ShipmentEvent {
+public interface ShipmentEvent extends DomainEvent {
 
     ShipmentSnapshot getSnapshot();
-
-    Instant getTimestamp();
 }

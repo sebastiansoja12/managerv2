@@ -30,6 +30,7 @@ import com.warehouse.shipment.application.service.PriceServiceImpl;
 import com.warehouse.shipment.application.service.RouteLogService;
 import com.warehouse.shipment.application.service.SignatureService;
 import com.warehouse.shipment.application.service.TrackingNumberGenerationService;
+import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrategyResolver;
 import com.warehouse.shipment.domain.context.ShipmentEventContext;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
 import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
@@ -83,7 +84,7 @@ class ShipmentPortImplTest {
     private OperatorContextProvider operatorContextProvider;
 
     @Mock
-    private ShipmentIdGenerator shipmentIdGenerator;
+    private ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver;
 
     private ShipmentPortImpl shipmentPort;
 
@@ -102,11 +103,10 @@ class ShipmentPortImplTest {
         final SignatureService signatureService = new SignatureServiceImpl(signatureRepository, shipmentRepository);
         final Logger logger = mock(Logger.class);
 		shipmentPort = new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
-                shipmentIdGenerator,
 				logger, pathFinderServicePort, priceService, countryServiceAvailabilityService,
                 signatureService, routeLogService, returningServicePort, mailNotificationServicePort,
                 trackingNumberGenerationService, shipmentConfigurationServicePort,
-                operatorContextProvider);
+                operatorContextProvider, shipmentDeliveryStrategyResolver);
 	}
 
     @Test
@@ -119,7 +119,6 @@ class ShipmentPortImplTest {
     @Test
     void shouldChangeShipmentStatusToRedirected() {
         final ShipmentId shipmentId = shipmentId();
-        when(shipmentIdGenerator.nextId()).thenReturn(new ShipmentId(987654321L));
         final Shipment shipment = shipment();
         final ShipmentStatusRequest request = new ShipmentStatusRequest(shipmentId, ShipmentStatus.REDIRECT);
         doReturn(shipment)

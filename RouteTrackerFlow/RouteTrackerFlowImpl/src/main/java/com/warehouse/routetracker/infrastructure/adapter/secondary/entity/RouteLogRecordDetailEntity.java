@@ -1,8 +1,5 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumeration.ProcessType;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
 import jakarta.persistence.*;
@@ -12,11 +9,10 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "route_log_details")
 public class RouteLogRecordDetailEntity {
 
@@ -54,6 +50,10 @@ public class RouteLogRecordDetailEntity {
 
     @Column(name = "shipment_status")
     private ShipmentStatus shipmentStatus;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "operator_id"))
+    private OperatorId operatorId;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "user_id"))

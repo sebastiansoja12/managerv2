@@ -39,7 +39,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import static com.warehouse.shipment.infrastructure.adapter.primary.validator.SignatureValidator.validateSignatureMethod;
@@ -105,17 +104,6 @@ public class ShipmentInternalController {
         this.shipmentPort.cancel(shipmentId);
 
         return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/search")
-    @Counted(value = "controller.shipment.list")
-    @Timed(value = "controller.shipment.list")
-    public ResponseEntity<?> search(@RequestBody(required = false) final ShipmentSearchRequestApi request) {
-        final ShipmentSearchCriteria criteria = requestMapper.map(request);
-        final List<ShipmentDto> shipmentResponse = shipmentPort.searchShipments(criteria).stream()
-                .map(responseMapper::map)
-                .toList();
-        return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
 
     @GetMapping("/{shipmentId}")

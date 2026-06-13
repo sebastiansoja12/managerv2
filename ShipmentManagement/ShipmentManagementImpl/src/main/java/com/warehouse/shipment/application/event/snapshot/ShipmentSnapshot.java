@@ -1,18 +1,10 @@
 package com.warehouse.shipment.application.event.snapshot;
 
+import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
-import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
 
 public record ShipmentSnapshot(
         ShipmentId shipmentId,

@@ -1,7 +1,7 @@
 package com.warehouse.routetracker.domain.port.primary;
 
 import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
-import com.warehouse.routetracker.domain.model.CreateShipmentEventCommand;
+import com.warehouse.routetracker.domain.model.ShipmentStatusStateChangeCommand;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface RouteTrackerLogPort {
 
-    void createShipmentEvent(final CreateShipmentEventCommand command);
+    void createOrChangeShipmentState(final ShipmentStatusStateChangeCommand command);
 
     void saveDeliveryStatus(final DeliveryStatusRequest request);
 

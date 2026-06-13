@@ -1,18 +1,19 @@
 package com.warehouse.shipment.application.listener;
 
-import java.util.UUID;
-
-import com.warehouse.commonassets.kafka.application.IntegrationEventOutboxWriter;
+import com.warehouse.commonassets.event.domain.port.IntegrationEventPublisher;
 import com.warehouse.shipment.application.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.shipment.application.event.ShipmentDestinationChangedIntegrationEvent;
+import com.warehouse.shipment.application.event.ShipmentReturnCanceledIntegrationEvent;
+import com.warehouse.shipment.application.event.ShipmentReturnCreatedIntegrationEvent;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.vo.*;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
+import com.warehouse.shipment.domain.vo.Address;
+import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
+import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -20,53 +21,31 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class ShipmentEventListener {
 
-    private static final String SHIPMENT_CREATED_EVENT_TYPE = "shipment.created";
-    private static final int SHIPMENT_CREATED_EVENT_VERSION = 1;
-
     private final ShipmentPort shipmentPort;
 
     private final PathFinderServicePort pathFinderServicePort;
-    private final ObjectProvider<IntegrationEventOutboxWriter> integrationEventOutboxWriter;
-    private final String shipmentEventsTopic;
+    private final IntegrationEventPublisher integrationEventPublisher;
 
     public ShipmentEventListener(final ShipmentPort shipmentPort,
                                  final PathFinderServicePort pathFinderServicePort,
-                                 final ObjectProvider<IntegrationEventOutboxWriter> integrationEventOutboxWriter,
-                                 @Value("${manager.kafka.topics.shipment-events:shipment.events}")
-                                 final String shipmentEventsTopic) {
+                                 final IntegrationEventPublisher integrationEventPublisher) {
         this.shipmentPort = shipmentPort;
         this.pathFinderServicePort = pathFinderServicePort;
-        this.integrationEventOutboxWriter = integrationEventOutboxWriter;
-        this.shipmentEventsTopic = shipmentEventsTopic;
+        this.integrationEventPublisher = integrationEventPublisher;
     }
 
     @EventListener
     public void handle(final ShipmentCreatedEvent event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
         final ShipmentCreatedIntegrationEvent integrationEvent = new ShipmentCreatedIntegrationEvent(
-                UUID.randomUUID(),
-                SHIPMENT_CREATED_EVENT_TYPE,
-                SHIPMENT_CREATED_EVENT_VERSION,
-                event.getTimestamp(),
                 com.warehouse.shipment.application.event.snapshot.ShipmentSnapshot.from(snapshot)
         );
-        final IntegrationEventOutboxWriter outboxWriter = this.integrationEventOutboxWriter.getIfAvailable();
-        if (outboxWriter == null) {
-            return;
-        }
-        outboxWriter.write(
-                this.shipmentEventsTopic,
-                String.valueOf(snapshot.shipmentId().getValue()),
-                integrationEvent.eventId(),
-                integrationEvent.eventType(),
-                integrationEvent.version(),
-                integrationEvent.occurredAt(),
-                integrationEvent
-        );
+        this.integrationEventPublisher.publish(integrationEvent);
     }
 
     @EventListener
     public void handle(final ShipmentCanceled event) {
+
     }
 
     @EventListener
@@ -95,6 +74,11 @@ public class ShipmentEventListener {
 
     @EventListener
     public void handle(final ShipmentDestinationChanged event) {
+        final ShipmentSnapshot snapshot = event.getSnapshot();
+        final ShipmentDestinationChangedIntegrationEvent integrationEvent = new ShipmentDestinationChangedIntegrationEvent(
+                com.warehouse.shipment.application.event.snapshot.ShipmentSnapshot.from(snapshot)
+        );
+        this.integrationEventPublisher.publish(integrationEvent);
     }
 
     @EventListener
@@ -111,10 +95,19 @@ public class ShipmentEventListener {
 
     @EventListener
     public void handle(final ShipmentReturnCanceled event) {
+        this.integrationEventPublisher.publish(new ShipmentReturnCanceledIntegrationEvent(event.getSnapshot().shipmentId()));
     }
 
     @EventListener
     public void handle(final ShipmentReturnCreated event) {
+        final ShipmentReturnCreatedIntegrationEvent integrationEvent = new ShipmentReturnCreatedIntegrationEvent(
+                com.warehouse.shipment.application.event.snapshot.ShipmentSnapshot.from(event.getSnapshot()),
+                event.getTimestamp(),
+                event.getReasonCode().name(),
+                event.getReason(),
+                event.getDepartmentCode()
+        );
+        this.integrationEventPublisher.publish(integrationEvent);
     }
 
     @EventListener
@@ -135,10 +128,6 @@ public class ShipmentEventListener {
 
     @EventListener
     public void handle(final ShipmentUpdated event) {
-    }
-
-    @EventListener
-    public void handle(final SignatureSigned event) {
     }
 
     @TransactionalEventListener(fallbackExecution = true)

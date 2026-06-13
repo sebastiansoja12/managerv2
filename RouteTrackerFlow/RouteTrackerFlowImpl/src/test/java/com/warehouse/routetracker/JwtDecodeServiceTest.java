@@ -7,10 +7,10 @@ import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.configuration.JwtProperties;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.vo.UserContext;
 import com.warehouse.routetracker.infrastructure.adapter.primary.JwtDecodeService;
 
@@ -36,7 +36,7 @@ class JwtDecodeServiceTest {
         final UserContext userContext = jwtDecodeService.decode(token);
 
         assertThat(userContext.userId()).isEqualTo(new UserId(42L));
-        assertThat(userContext.operatorId()).isEqualTo(OperatorId.of(7L));
+        assertThat(userContext.operatorId()).isEqualTo(new OperatorId(7L));
         assertThat(userContext.departmentId()).isEqualTo(new DepartmentId(10L));
     }
 

@@ -23,6 +23,7 @@ import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.application.port.secondary.*;
 import com.warehouse.shipment.application.service.*;
+import com.warehouse.shipment.application.service.delivery.*;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentApiServiceAdapter;
@@ -39,6 +40,8 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.SignatureP
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
+
+import java.util.List;
 
 
 @Configuration
@@ -85,7 +88,6 @@ public class ShipmentConfiguration {
 	@Bean
 	public ShipmentPort shipmentPort(final ShipmentRepository shipmentRepository,
 									 final SpecificationRepository specificationShipmentRepository,
-									 final ShipmentIdGenerator shipmentIdGenerator,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
@@ -95,19 +97,46 @@ public class ShipmentConfiguration {
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberGenerationService trackingNumberGenerationService,
 									 final ShipmentConfigurationPort shipmentConfigurationServicePort,
-                                     final OperatorContextProvider operatorContextProvider) {
-		return new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository, shipmentIdGenerator,
+                                     final OperatorContextProvider operatorContextProvider,
+                                     final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver) {
+        return new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
-                operatorContextProvider);
+                operatorContextProvider, shipmentDeliveryStrategyResolver);
 	}
 
-	@Bean
-	public ShipmentIdGenerator shipmentIdGenerator() {
-		return new ShipmentIdGeneratorAdapter();
-	}
+    @Bean
+    public ShipmentDeliveryStrategy shipmentDeliveredStrategy() {
+        return new ShipmentDeliveredStrategy();
+    }
+
+    @Bean
+    public ShipmentDeliveryStrategy shipmentReturnedStrategy() {
+        return new ShipmentReturnedStrategy();
+    }
+
+    @Bean
+    public ShipmentDeliveryStrategy shipmentRedirectedStrategy() {
+        return new ShipmentRedirectedStrategy();
+    }
+
+    @Bean
+    public ShipmentDeliveryStrategy shipmentSentStrategy() {
+        return new ShipmentSentStrategy();
+    }
+
+    @Bean
+    public ShipmentDeliveryStrategy shipmentUnchangedStrategy() {
+        return new ShipmentUnchangedStrategy();
+    }
+
+    @Bean
+    public ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver(
+            final List<ShipmentDeliveryStrategy> strategies) {
+        return new ShipmentDeliveryStrategyResolver(strategies);
+    }
 
 	@Bean
 	public ShipmentConfigurationPort shipmentConfigurationServicePort(
