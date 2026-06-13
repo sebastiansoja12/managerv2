@@ -315,6 +315,7 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    @Transactional
     public void cancel(final ShipmentId shipmentId) {
         final ShipmentWorkflowSettings settings = this.shipmentConfigurationServicePort
                 .getCurrentOperatorShipmentConfiguration().workflowSettings();
