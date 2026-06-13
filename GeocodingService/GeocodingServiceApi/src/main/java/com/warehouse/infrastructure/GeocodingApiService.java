@@ -5,4 +5,6 @@ import com.warehouse.infrastructure.dto.GeocodingConfigurationDto;
 
 public interface GeocodingApiService {
     GeocodingConfigurationDto getGeocodingConfig(final GeocodingProvider geocodingProvider);
+
+    GeocodingConfigurationDto getDefaultGeocodingConfig();
 }

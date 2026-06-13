@@ -11,5 +11,6 @@ public record GeocodingConfigurationApiRequest(String apiUserName,
                                                String accessToken,
                                                String refreshToken,
                                                boolean enabled,
+                                               boolean defaultProvider,
                                                @NotNull GeocodingProvider provider) {
 }

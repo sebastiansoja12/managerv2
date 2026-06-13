@@ -29,6 +29,7 @@ public class GeocodingPortImpl implements GeocodingPort {
                 command.accessToken(),
                 command.refreshToken(),
                 command.enabled(),
+                command.defaultProvider(),
                 command.provider());
         this.geocodingService.create(configuration);
     }
@@ -51,6 +52,11 @@ public class GeocodingPortImpl implements GeocodingPort {
     @Override
     public GeocodingConfiguration getByProvider(final GeocodingProvider provider) {
         return geocodingService.getByProvider(provider);
+    }
+
+    @Override
+    public GeocodingConfiguration getDefault() {
+        return geocodingService.getDefault();
     }
 
     @Override

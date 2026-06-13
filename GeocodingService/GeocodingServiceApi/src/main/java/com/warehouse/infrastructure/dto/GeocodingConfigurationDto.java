@@ -12,5 +12,6 @@ public record GeocodingConfigurationDto(GeocodingConfigurationId geocodingConfig
                                         String accessToken,
                                         String refreshToken,
                                         boolean enabled,
+                                        boolean defaultProvider,
                                         GeocodingProvider provider) {
 }

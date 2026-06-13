@@ -21,6 +21,7 @@ import com.warehouse.voronoi.domain.port.secondary.GeocodingConfigServicePort;
 import com.warehouse.voronoi.domain.port.secondary.GeolocationServiceProvider;
 import com.warehouse.voronoi.domain.service.ComputeService;
 import com.warehouse.voronoi.domain.service.ComputeServiceImpl;
+import com.warehouse.voronoi.domain.vo.GeocodingAddress;
 import com.warehouse.voronoi.domain.vo.VoronoiResponse;
 import com.warehouse.voronoi.domain.vo.GeocodingConfig;
 import com.warehouse.commonassets.enumeration.GeocodingProvider;
@@ -42,10 +43,10 @@ public class VoronoiPortImplTest {
         final Set<GeolocationServiceProvider> providers = Set.of(geolocationServiceProvider);
         final GeocodingConfig config =
                 new GeocodingConfig(GeocodingProvider.POSITION_STACK, "test", "test", null, null);
-        when(geocodingConfigServicePort.findGeocodingConfig(GeocodingProvider.POSITION_STACK))
+        when(geocodingConfigServicePort.findDefaultGeocodingConfig())
                 .thenReturn(config);
         when(geolocationServiceProvider.canHandle(GeocodingProvider.POSITION_STACK)).thenReturn(true);
-        when(geolocationServiceProvider.obtainCoordinates("Gliwice", config))
+        when(geolocationServiceProvider.obtainCoordinates(new GeocodingAddress("Gliwice", null, null), config))
                 .thenReturn(new Coordinates(18.5795769, 50.3013283));
         final ComputeService computeService = new ComputeServiceImpl(providers, geocodingConfigServicePort);
         voronoiPort = new VoronoiPortImpl(computeService, providers, geocodingConfigServicePort);
@@ -63,7 +64,7 @@ public class VoronoiPortImplTest {
         final String requestCity = "Gliwice";
 
         // when
-        final VoronoiResponse nearestDepot = voronoiPort.findFastestRoute(new VoronoiRequest(requestCity, null,
+        final VoronoiResponse nearestDepot = voronoiPort.findFastestRoute(new VoronoiRequest(requestCity, null, null,
                 depotsList));
         // then
         assertEquals(expectedNearestDepot, nearestDepot.departmentCode().getValue());

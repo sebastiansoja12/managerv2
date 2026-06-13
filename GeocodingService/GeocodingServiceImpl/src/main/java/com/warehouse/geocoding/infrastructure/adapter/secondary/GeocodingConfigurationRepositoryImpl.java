@@ -62,6 +62,15 @@ public class GeocodingConfigurationRepositoryImpl implements GeocodingRepository
     }
 
     @Override
+    public Optional<GeocodingConfiguration> findDefault() {
+        return repository.createCriteria(GeocodingConfigurationEntity.class)
+                .isTrue("defaultProvider")
+                .maxResults(1)
+                .one()
+                .map(entity -> GeocodingConfigurationMapper.toModel(entity, credentialCipher));
+    }
+
+    @Override
     public List<GeocodingConfiguration> findAll() {
         return repository.createCriteria(GeocodingConfigurationEntity.class)
                 .list()
