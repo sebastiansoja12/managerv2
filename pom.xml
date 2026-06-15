@@ -18,6 +18,7 @@
 	<modules>
 		<module>Application</module>
 		<module>ShipmentManagement</module>
+		<module>DeliveryNetwork</module>
 		<module>MailService</module>
 		<module>DepartmentService</module>
         <module>AsyncJob</module>
@@ -51,6 +52,7 @@
 		<java.version>21</java.version>
 		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 		<org.projectlombok.version>1.18.30</org.projectlombok.version>
+		<org.apache.poi.version>5.5.1</org.apache.poi.version>
 		<spring-starter.version>3.5.5</spring-starter.version>
         <spring-cloud.version>2025.0.3</spring-cloud.version>
 		<spring-boot.run.skip>true</spring-boot.run.skip>
@@ -347,9 +349,14 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>${org.apache.poi.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.xmlbeans</groupId>
 				<artifactId>xmlbeans</artifactId>
-				<version>5.0.2</version>
+				<version>5.3.0</version>
 			</dependency>
 			<dependency>
 				<groupId>io.github.resilience4j</groupId>
