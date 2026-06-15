@@ -64,7 +64,7 @@ class OutboxIntegrationEventPublisherTest {
         assertThat(record.occurredAt()).isNotNull();
         assertThat(record.operatorId()).isEqualTo(OperatorId.of(7L));
         assertThat(record.headers())
-                .containsEntry(KafkaEventHeaders.TYPE_ID, ShipmentChangedIntegrationEvent.class.getSimpleName())
+                .containsEntry(KafkaEventHeaders.TYPE_ID, ShipmentChangedIntegrationEvent.class.getName())
                 .containsEntry(KafkaEventHeaders.EVENT_TYPE, "shipment.changed")
                 .containsEntry(KafkaEventHeaders.EVENT_VERSION, "1")
                 .containsEntry(KafkaEventHeaders.OPERATOR_ID, "7")
@@ -113,7 +113,7 @@ class OutboxIntegrationEventPublisherTest {
         assertThat(record.messageKey()).isEqualTo(String.valueOf(event.snapshot().shipmentId().getValue()));
         assertThat(record.eventType()).isEqualTo("shipment.read-model.changed");
         assertThat(record.headers())
-                .containsEntry(KafkaEventHeaders.TYPE_ID, ShipmentReadModelChanged.class.getSimpleName());
+                .containsEntry(KafkaEventHeaders.TYPE_ID, ShipmentReadModelChanged.class.getName());
         final JsonNode payload = new ObjectMapper().findAndRegisterModules().readTree(record.payload());
         assertThat(payload.path("snapshot").size()).isEqualTo(1);
         assertThat(payload.path("snapshot").path("shipmentId").path("value").asLong())

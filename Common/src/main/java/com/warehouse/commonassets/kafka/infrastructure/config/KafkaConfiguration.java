@@ -1,8 +1,6 @@
 package com.warehouse.commonassets.kafka.infrastructure.config;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,38 +29,17 @@ import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaOper
 public class KafkaConfiguration {
 
     @Bean
-    public RecordMessageConverter kafkaRecordMessageConverter(
-            final ObjectMapper objectMapper,
-            @Value("${manager.kafka.type-mappings:}") final String typeMappings) {
+    public RecordMessageConverter kafkaRecordMessageConverter(final ObjectMapper objectMapper) {
         final StringJsonMessageConverter converter = new StringJsonMessageConverter(objectMapper);
-        converter.setTypeMapper(this.kafkaTypeMapper(typeMappings));
+        converter.setTypeMapper(this.kafkaTypeMapper());
         return converter;
     }
 
-    private DefaultJackson2JavaTypeMapper kafkaTypeMapper(final String typeMappings) {
+    private DefaultJackson2JavaTypeMapper kafkaTypeMapper() {
         final DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
-        typeMapper.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.INFERRED);
-        final Map<String, Class<?>> mappings = new LinkedHashMap<>();
-        for (final String mapping : typeMappings.split(",")) {
-            if (mapping.isBlank()) {
-                continue;
-            }
-            final String[] mappingParts = mapping.split(":", 2);
-            if (mappingParts.length != 2) {
-                throw new IllegalArgumentException("Invalid Kafka type mapping: " + mapping);
-            }
-            mappings.put(mappingParts[0].trim(), this.classForName(mappingParts[1].trim()));
-        }
-        typeMapper.setIdClassMapping(mappings);
+        typeMapper.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.TYPE_ID);
+        typeMapper.addTrustedPackages("com.warehouse.*");
         return typeMapper;
-    }
-
-    private Class<?> classForName(final String className) {
-        try {
-            return Class.forName(className);
-        } catch (final ClassNotFoundException exception) {
-            throw new IllegalArgumentException("Invalid Kafka type mapping class: " + className, exception);
-        }
     }
 
     @Bean

@@ -94,7 +94,7 @@ public class KafkaTemplateClient {
         Objects.requireNonNull(headers, "Kafka headers cannot be null");
         final Map<String, String> eventHeaders = new LinkedHashMap<>(headers);
         final String eventType = event.getClass().getSimpleName();
-        eventHeaders.putIfAbsent(KafkaEventHeaders.TYPE_ID, eventType);
+        eventHeaders.putIfAbsent(KafkaEventHeaders.TYPE_ID, event.getClass().getName());
         eventHeaders.putIfAbsent(KafkaEventHeaders.EVENT_TYPE, eventType);
         if (event instanceof final OperatorAwareEvent operatorAwareEvent) {
             putIdentifier(eventHeaders, KafkaEventHeaders.OPERATOR_ID, operatorAwareEvent.operatorId());
