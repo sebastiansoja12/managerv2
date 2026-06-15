@@ -1,10 +1,10 @@
 package com.warehouse.shipment.infrastructure;
 
-import java.time.LocalDate;
-
 import com.warehouse.commonassets.identificator.OperatorId;
+
+import java.time.LocalDate;
 
 public interface ShipmentReadModelRebuildApiService {
 
-    int rebuildReadModels(OperatorId operatorId, LocalDate dateFrom, LocalDate dateTo);
+    int rebuildReadModels(final OperatorId operatorId, final LocalDate dateFrom, final LocalDate dateTo);
 }

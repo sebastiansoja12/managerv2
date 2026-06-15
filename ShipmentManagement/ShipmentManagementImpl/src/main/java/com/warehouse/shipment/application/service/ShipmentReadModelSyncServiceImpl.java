@@ -7,6 +7,7 @@ import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.model.Shipment;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncPort {
@@ -32,7 +33,19 @@ public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncPo
     @Override
     public int syncReadModels() {
         final List<Shipment> shipments = this.shipmentRepository.findAll();
+        return syncReadModels(shipments);
+    }
 
+    @Transactional
+    @Override
+    public int syncReadModels(final LocalDate dateFrom, final LocalDate dateTo) {
+        final List<Shipment> shipments = this.shipmentRepository.findAllCreatedBetween(
+                dateFrom.atStartOfDay(),
+                dateTo.plusDays(1).atStartOfDay());
+        return syncReadModels(shipments);
+    }
+
+    private int syncReadModels(final List<Shipment> shipments) {
         shipments.stream()
                 .map(Shipment::snapshot)
                 .forEach(this.readModelRepository::sync);
