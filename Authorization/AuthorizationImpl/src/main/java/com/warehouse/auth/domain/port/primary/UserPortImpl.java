@@ -117,7 +117,7 @@ public class UserPortImpl implements UserPort {
         log.info("Deleting data for department {}", departmentCode.getValue());
         final List<UserId> users = this.userService.findAllActiveUsersByDepartmentCode(departmentCode);
         for (final UserId user : users) {
-            log.debug("Deleting data for user {}", user.getValue());
+            log.info("Deleting data for user {}", user.getValue());
             this.userService.deleteDataForUser(user);
         }
     }
