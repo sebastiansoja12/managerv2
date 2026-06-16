@@ -10,6 +10,7 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.logistics.configuration.LogisticsSoapWebServiceConfiguration;
 import com.warehouse.logistics.domain.model.DeviceValidateCommand;
 import com.warehouse.logistics.domain.model.LogisticsRequest;
 import com.warehouse.logistics.domain.model.LogisticsResponse;
@@ -70,7 +71,7 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
         this.processInitializerPort = processInitializerPort;
     }
 
-    @PayloadRoot(namespace = "", localPart = "TerminalRequest")
+    @PayloadRoot(namespace = LogisticsSoapWebServiceConfiguration.TERMINAL_NAMESPACE, localPart = "TerminalRequest")
     @ResponsePayload
     public TerminalResponse processRequestWsdl(@RequestPayload final TerminalRequest terminalRequest) {
         final DeviceType device = terminalRequest.getDevice();

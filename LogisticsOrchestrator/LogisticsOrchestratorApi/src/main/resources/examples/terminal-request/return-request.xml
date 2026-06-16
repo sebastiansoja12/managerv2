@@ -1,4 +1,4 @@
-<TerminalRequest>
+<TerminalRequest xmlns="http://warehouse.com/logistics/terminal">
     <ProcessType>RETURN</ProcessType>
     <Device>
         <Version>1.3.0</Version>

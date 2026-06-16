@@ -10,7 +10,6 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
-import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
@@ -569,20 +568,19 @@ public class Shipment {
     }
 
     public void updateCountries(final ShipmentCountryRequest request) {
+        this.originCountry = request.issuerCountry();
+        this.destinationCountry = request.receiverCountry();
         markAsModified();
-        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeIssuerCountry(final CountryCode originCountry) {
         this.originCountry = originCountry;
         markAsModified();
-        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeReceiverCountry(final CountryCode destinationCountry) {
         this.destinationCountry = destinationCountry;
         markAsModified();
-        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
