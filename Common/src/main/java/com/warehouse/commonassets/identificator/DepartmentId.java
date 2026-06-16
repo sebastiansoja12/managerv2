@@ -21,6 +21,10 @@ public class DepartmentId implements Serializable {
         return new DepartmentId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
 
+    public Long value() {
+        return value;
+    }
+
     public Long getValue() {
         return value;
     }

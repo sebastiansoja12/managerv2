@@ -27,7 +27,7 @@ public class Supplier {
 
     private String telephoneNumber;
 
-    private DepartmentCode departmentCode;
+    private DepartmentId departmentId;
 
     private SupplierStatus status;
 
@@ -64,7 +64,7 @@ public class Supplier {
             final String firstName,
             final String lastName,
             final String telephoneNumber,
-            final DepartmentCode departmentCode,
+            final DepartmentId departmentId,
             final SupplierStatus status,
             final UserStatus userStatus,
             final VehicleId vehicleId,
@@ -84,7 +84,7 @@ public class Supplier {
         this.firstName = firstName;
         this.lastName = lastName;
         this.telephoneNumber = telephoneNumber;
-        this.departmentCode = departmentCode;
+        this.departmentId = departmentId;
         this.status = status;
         this.userStatus = userStatus;
         this.vehicleId = vehicleId;
@@ -118,7 +118,7 @@ public class Supplier {
         this.firstName = firstName;
         this.lastName = lastName;
         this.telephoneNumber = telephoneNumber;
-        this.departmentCode = null;
+        this.departmentId = null;
         this.status = SupplierStatus.INACTIVE;
         this.userStatus = UserStatus.USER_NOT_CREATED;
         this.vehicleId = null;
@@ -135,7 +135,7 @@ public class Supplier {
     }
     
 	public SupplierSnapshot snapshot() {
-		return new SupplierSnapshot(supplierId, supplierCode, firstName, lastName, telephoneNumber, departmentCode,
+		return new SupplierSnapshot(supplierId, supplierCode, firstName, lastName, telephoneNumber, departmentId,
 				status, userStatus, vehicleId, deviceId, dangerousGoodCertification, driverLicense, deliveryArea,
 				supportedPackageTypes, apiKey, termsAccepted, createdAt, updatedAt, createdUserId);
 	}
@@ -227,8 +227,8 @@ public class Supplier {
         markAsModified();
     }
 
-    public void changeDepartmentCode(final DepartmentCode departmentCode) {
-        this.departmentCode = departmentCode;
+    public void changeDepartment(final DepartmentId departmentId) {
+        this.departmentId = departmentId;
         markAsModified();
     }
 
@@ -243,8 +243,8 @@ public class Supplier {
     }
 
     public void updateData(final SupplierDto supp) {
-        if (supp.departmentCode() != null) {
-            changeDepartmentCode(supp.departmentCode());
+        if (supp.departmentId() != null) {
+            changeDepartment(supp.departmentId());
         }
 
         if (supp.deviceId() != null) {
@@ -291,7 +291,7 @@ public class Supplier {
         Validate.notNull(lastName, "Last name cannot be null");
         Validate.notNull(telephoneNumber, "Telephone number cannot be null");
 
-        Validate.notNull(departmentCode, "DepartmentCode must be specified for activation");
+        Validate.notNull(departmentId, "DepartmentId must be specified for activation");
         Validate.notNull(vehicleId, "VehicleId must be specified for activation");
         Validate.notNull(deviceId, "DeviceId must be specified for activation");
         Validate.notNull(dangerousGoodCertification, "Dangerous good certification must be provided");
@@ -348,8 +348,8 @@ public class Supplier {
         return deliveryArea;
     }
 
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 
     public DeviceId getDeviceId() {

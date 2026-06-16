@@ -194,18 +194,18 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public void changeDepartment(final SupplierId supplierId, final DepartmentCode departmentCode) {
+    public void changeDepartment(final SupplierId supplierId, final DepartmentId departmentId) {
         final Supplier supplier = this.findById(supplierId);
-        supplier.changeDepartmentCode(departmentCode);
+        supplier.changeDepartment(departmentId);
         this.supplierRepository.update(supplier);
         DomainContext.eventPublisher()
                 .publishEvent(new SupplierDepartmentChanged(supplier.snapshot(), Instant.now()));
     }
 
     @Override
-    public void changeDepartment(final SupplierCode supplierCode, final DepartmentCode departmentCode) {
+    public void changeDepartment(final SupplierCode supplierCode, final DepartmentId departmentId) {
         final Supplier supplier = this.findByCode(supplierCode);
-        supplier.changeDepartmentCode(departmentCode);
+        supplier.changeDepartment(departmentId);
         this.supplierRepository.update(supplier);
         DomainContext.eventPublisher()
                 .publishEvent(new SupplierDepartmentChanged(supplier.snapshot(), Instant.now()));

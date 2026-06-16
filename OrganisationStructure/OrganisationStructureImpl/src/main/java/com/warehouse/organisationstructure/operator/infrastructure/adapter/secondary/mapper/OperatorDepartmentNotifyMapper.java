@@ -1,6 +1,7 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.api.event.OperatorInitialDepartmentCreateEvent;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorProvisioningDetails;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
@@ -10,10 +11,12 @@ public final class OperatorDepartmentNotifyMapper {
     private OperatorDepartmentNotifyMapper() {
     }
 
-    public static OperatorInitialDepartmentCreateEvent toEvent(final OperatorSnapshot snapshot) {
+    public static OperatorInitialDepartmentCreateEvent toEvent(final OperatorSnapshot snapshot,
+                                                               final UserId adminUserId) {
         final OperatorProvisioningDetails.FirstDepartment firstDepartment = snapshot.provisioningDetails().firstDepartment();
         return new OperatorInitialDepartmentCreateEvent(
                 snapshot.operatorId(),
+                adminUserId,
                 new DepartmentCode(firstDepartment.departmentCode()),
                 snapshot.companyName(),
                 snapshot.taxId().value(),

@@ -9,6 +9,7 @@ import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.domain.vo.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
 
@@ -52,7 +53,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
             throw new AuthenticationErrorException("Invalid username or password");
         } else if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             throw new AuthenticationErrorException("Invalid username or password");
-        } else if (!departmentService.existsByDepartmentCode(user.getDepartmentCode())) {
+        } else if (!departmentService.existsByDepartmentId(user.getDepartmentId())) {
             throw new AuthenticationErrorException("Invalid username or password");
         }
 
@@ -94,9 +95,10 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         final String language = request.getLanguage();
 
         validateDepartmentCode(departmentCode);
+        final DepartmentId departmentId = departmentService.getDepartmentId(departmentCode);
 
         final User user = User.createWithRole(
-                userId, username, password, firstName, lastName, email, role, departmentCode,
+                userId, username, password, firstName, lastName, email, role, departmentId,
                 apiKeyEncoder.encode(userId, username).key(), language
         );
 
@@ -109,6 +111,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         final User.Role role = mapRole(command.role());
         final String password = passwordEncoder.encode(command.password());
         validateDepartmentCode(command.departmentCode());
+        final DepartmentId departmentId = departmentService.getDepartmentId(command.departmentCode());
         final User user = User.createWithRole(
                 userId,
                 command.username(),
@@ -117,7 +120,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 command.lastName(),
                 command.email(),
                 role,
-                command.departmentCode(),
+                departmentId,
                 apiKeyEncoder.encode(userId, command.username()).key(),
                 command.language()
         );
@@ -130,6 +133,8 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         final UserId userId = userService.nextUserId();
         final String password = passwordEncoder.encode(command.password());
         final User.Role role = mapRole(command.role());
+        validateDepartmentCode(command.departmentCode());
+        final DepartmentId departmentId = departmentService.getDepartmentId(command.departmentCode());
         final User user = User.createWithRole(
                 userId,
                 command.username(),
@@ -138,7 +143,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 command.lastName(),
                 command.email(),
                 role,
-                command.departmentCode(),
+                departmentId,
                 apiKeyEncoder.encode(userId, command.username()).key(),
                 command.language()
         );
@@ -167,8 +172,9 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         final String language = request.getLanguage();
 
         validateDepartmentCode(departmentCode);
+        final DepartmentId departmentId = departmentService.getDepartmentId(departmentCode);
 
-        final User user = User.createAdmin(userId, username, password, email, firstName, lastName, departmentCode,
+        final User user = User.createAdmin(userId, username, password, firstName, lastName, email, departmentId,
                 language, apiKeyEncoder.encode(userId, username).key());
 
         this.userService.create(user);

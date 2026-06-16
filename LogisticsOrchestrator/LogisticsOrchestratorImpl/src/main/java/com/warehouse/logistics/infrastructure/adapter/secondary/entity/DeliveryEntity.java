@@ -29,8 +29,8 @@ public class DeliveryEntity {
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
-    @Column(name = "department_code", nullable = false)
-    private String depotCode;
+    @Column(name = "department_id", nullable = false)
+    private Long departmentId;
 
     @Column(name = "supplier_code", nullable = false)
     private String supplierCode;

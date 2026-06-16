@@ -10,10 +10,12 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.service.DepartmentService;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.infrastructure.adapter.primary.event.AdminUserCommand;
 import com.warehouse.auth.infrastructure.dto.RegisteringUserDto;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 
@@ -33,16 +35,20 @@ public class AuthEventListener {
 
     private final ApiKeyEncoder apiKeyEncoder;
 
+    private final DepartmentService departmentService;
+
     public AuthEventListener(final AuthenticationPort authenticationPort,
                              final UserService userService,
                              final JwtService jwtService,
                              final PasswordEncoder passwordEncoder,
-                             final ApiKeyEncoder apiKeyEncoder) {
+                             final ApiKeyEncoder apiKeyEncoder,
+                             final DepartmentService departmentService) {
         this.authenticationPort = authenticationPort;
         this.userService = userService;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.apiKeyEncoder = apiKeyEncoder;
+        this.departmentService = departmentService;
     }
 
     @EventListener
@@ -62,13 +68,15 @@ public class AuthEventListener {
         final UserId userId = userService.nextUserId();
         final String password = passwordEncoder.encode(registeringUser.password());
         final String apiKey = apiKeyEncoder.encode(userId, registeringUser.username()).key();
+        event.getBeforeUserCreated().accept(userId);
+        final DepartmentId departmentId = departmentService.getDepartmentId(departmentCode);
 
         final User user = User.createAdmin(userId, registeringUser.username(), password, registeringUser.firstName(),
-                registeringUser.lastName(), registeringUser.email(), departmentCode, registeringUser.language(), apiKey);
+                registeringUser.lastName(), registeringUser.email(), departmentId,
+                registeringUser.language(), apiKey);
         user.assignOperator(operatorId);
         user.markAsInitial();
 
-        event.getBeforeUserCreated().accept(userId);
         userService.create(user);
         event.getUserCreatedId().accept(userId);
         log.info("Operator admin user created: {} for operator {}", userId.getValue(), operatorId.getValue());

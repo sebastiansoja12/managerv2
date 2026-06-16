@@ -3,12 +3,14 @@ package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -63,7 +65,12 @@ public interface ShipmentResponseMapper {
                 response.totalPages());
     }
 
-    ShipmentDto map(final Shipment shipment);
+    @Mapping(target = "destination", source = "departmentCode")
+    ShipmentDto map(final Shipment shipment, final DepartmentCode departmentCode);
+
+    default DepartmentCodeDto map(final DepartmentCode departmentCode) {
+        return departmentCode == null ? null : new DepartmentCodeDto(departmentCode.getValue());
+    }
 
     default DangerousGoodApi map(final com.warehouse.shipment.domain.model.DangerousGood dangerousGood) {
         if (dangerousGood == null) {
@@ -86,8 +93,10 @@ public interface ShipmentResponseMapper {
         );
     }
 
-    default ShipmentControlCenterResponseApi map(final ShipmentRouteLog controlCenter) {
-        return new ShipmentControlCenterResponseApi(map(controlCenter.shipment()), controlCenter.routeLog());
+    default ShipmentControlCenterResponseApi map(final ShipmentRouteLog controlCenter,
+                                                 final DepartmentCode departmentCode) {
+        return new ShipmentControlCenterResponseApi(map(controlCenter.shipment(), departmentCode),
+                controlCenter.routeLog());
     }
 
     default List<String> map(String value) {

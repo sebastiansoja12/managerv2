@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DepartmentEntity;
 
 @Repository("logistics.departmentReadRepository")
-public interface DepartmentReadRepository extends JpaRepository<DepartmentEntity, String> {
+public interface DepartmentReadRepository extends JpaRepository<DepartmentEntity, Long> {
     Optional<DepartmentEntity> findByDepartmentCode(final String departmentCode);
 }

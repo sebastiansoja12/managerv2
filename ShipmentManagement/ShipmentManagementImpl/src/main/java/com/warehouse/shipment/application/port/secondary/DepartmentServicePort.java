@@ -6,4 +6,6 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 public interface DepartmentServicePort {
 
 	DepartmentCode getDepartmentCode(final DepartmentId departmentId);
+
+	DepartmentId getDepartmentId(final DepartmentCode departmentCode);
 }

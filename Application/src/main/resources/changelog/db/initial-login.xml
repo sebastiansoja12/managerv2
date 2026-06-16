@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="s-soja" id="insert-initial-operator-department-and-user-2026-3">
+    <changeSet author="s-soja" id="2026-09-03-postgresql-initial-login">
         <insert tableName="operators">
             <column name="operator_id" valueNumeric="1"/>
             <column name="registering_user_id" valueNumeric="1"/>
@@ -20,6 +20,7 @@
         </insert>
 
         <insert tableName="department">
+            <column name="department_id" valueNumeric="1"/>
             <column name="department_code" value="KT1"/>
             <column name="city" value="Katowice"/>
             <column name="street" value="Testowa 1"/>
@@ -31,7 +32,7 @@
             <column name="country_code" value="PL"/>
             <column name="status" value="ACTIVE"/>
             <column name="email" value="kt1@manager.local"/>
-            <column name="department_type" value="BRANCH"/>
+            <column name="department_type" value="HEADQUARTER"/>
             <column name="latitude" valueNumeric="50.2649"/>
             <column name="longitude" valueNumeric="19.0238"/>
             <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
@@ -42,6 +43,8 @@
             <column name="operator_id" valueNumeric="1"/>
         </insert>
 
+        <sql>SELECT setval(pg_get_serial_sequence('department', 'department_id'), 1, true)</sql>
+
         <insert tableName="users">
             <column name="user_id" valueNumeric="1"/>
             <column name="username" value="a@a.pl"/>
@@ -50,7 +53,7 @@
             <column name="last_name" value="Manager"/>
             <column name="email" value="a@a.pl"/>
             <column name="role" value="ADMIN"/>
-            <column name="department_code" value="KT1"/>
+            <column name="department_id" valueNumeric="1"/>
             <column name="api_key" value="initial-admin-api-key"/>
             <column name="deleted" valueBoolean="false"/>
             <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
@@ -61,7 +64,7 @@
         </insert>
     </changeSet>
 
-    <changeSet author="s-soja" id="insert-initial-admin-permissions-2026-3">
+    <changeSet author="s-soja" id="2026-09-03-postgresql-initial-permissions">
         <insert tableName="role_permissions">
             <column name="id" valueNumeric="1"/>
             <column name="name" value="ROLE_ADMIN_READ"/>
@@ -100,6 +103,12 @@
             SELECT 1, id
             FROM role_permissions
             WHERE id BETWEEN 1 AND 8;
+        </sql>
+        <sql dbms="postgresql">
+            SELECT setval(
+                pg_get_serial_sequence('role_permissions', 'id'),
+                (SELECT MAX(id) FROM role_permissions)
+            );
         </sql>
     </changeSet>
 

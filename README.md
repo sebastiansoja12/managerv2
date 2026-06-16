@@ -14,7 +14,7 @@ under `/v2/api`.
 - Spring Boot 3.5.5
 - Spring Cloud 2025.0.3
 - Spring Web, Security, Validation, Actuator and OpenFeign
-- Spring Data JPA/JDBC, Liquibase and MySQL
+- Spring Data JPA/JDBC, Liquibase and PostgreSQL
 - Kafka for domain events and shipment read-model synchronization
 - Eureka service discovery and a lightweight Gateway service
 - Lombok, MapStruct and springdoc OpenAPI
@@ -54,14 +54,14 @@ Important defaults from `Application/src/main/resources`:
 
 - API port: `8080`
 - API context path: `/v2/api`
-- Database: `jdbc:mysql://localhost:3306/dev`
-- Database user/password: `root` / `rootpassword`
+- Database: `jdbc:postgresql://localhost:5432/dev`
+- Database user/password: `postgres` / `postgres`
 - Liquibase changelog: `classpath:/changelog/db.changelog-master.xml`
 - Eureka URL: `http://localhost:8761/eureka/`
 - Kafka bootstrap servers: `localhost:9092`
 - GUI CORS origin: `http://localhost:3000`
 
-The MySQL helper script in `docker/mysql/init/01-create-databases.sql` creates
+The PostgreSQL helper script in `docker/postgresql/init/01-create-databases.sql` creates
 the `dev`, `rm` and `rt` databases.
 
 Common environment variables:

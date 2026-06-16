@@ -105,14 +105,15 @@ public class ShipmentConfiguration {
                                      final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
                                      final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
                                      final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver,
-                                     final DomainEventPublisher domainEventPublisher) {
+                                     final DomainEventPublisher domainEventPublisher,
+                                     final DepartmentServicePort departmentServicePort) {
         return new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 operatorContextProvider, shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                shipmentReturnStrategyResolver, domainEventPublisher);
+                shipmentReturnStrategyResolver, domainEventPublisher, departmentServicePort);
 	}
 
     @Bean

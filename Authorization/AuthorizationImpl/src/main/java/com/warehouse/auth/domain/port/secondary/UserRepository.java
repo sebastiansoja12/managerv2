@@ -1,15 +1,14 @@
 package com.warehouse.auth.domain.port.secondary;
 
 import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.vo.UserResponse;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
 import java.util.List;
 
 public interface UserRepository {
 
-    UserResponse createOrUpdate(final User user);
+    void createOrUpdate(final User user);
 
     User findByUsername(final String username);
 
@@ -19,7 +18,7 @@ public interface UserRepository {
 
     List<User> findAll();
 
-    List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode);
+    List<UserId> findAllActiveUsersByDepartmentId(final DepartmentId departmentId);
 
     User findByEmail(final String email);
 

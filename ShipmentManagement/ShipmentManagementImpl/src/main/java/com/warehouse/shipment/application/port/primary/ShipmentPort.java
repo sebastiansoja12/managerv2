@@ -74,4 +74,6 @@ public interface ShipmentPort {
     void redirectShipmentToSender(final ShipmentId shipmentId);
 
     void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination);
+
+    DepartmentCode getDepartmentCode(final DepartmentId departmentId);
 }

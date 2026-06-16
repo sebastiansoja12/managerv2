@@ -51,4 +51,9 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     public Boolean checkIfDepartmentExists(final DepartmentCode departmentCode) {
         return this.departmentPort.checkExists(departmentCode);
     }
+
+    @Override
+    public Boolean checkIfDepartmentExists(final DepartmentId departmentId) {
+        return this.departmentPort.findByDepartmentId(departmentId) != null;
+    }
 }

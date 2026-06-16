@@ -8,6 +8,7 @@ import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
 public interface UserService {
@@ -45,4 +46,6 @@ public interface UserService {
     void updateDefaultDepartmentUser(final UserDepartmentUpdateRequest request);
 
     UserId findInitialUser();
+
+    DepartmentCode getDepartmentCode(final DepartmentId departmentId);
 }

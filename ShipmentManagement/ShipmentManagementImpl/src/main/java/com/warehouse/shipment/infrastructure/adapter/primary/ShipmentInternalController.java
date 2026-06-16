@@ -111,7 +111,7 @@ public class ShipmentInternalController {
     @Timed(value = "controller.shipment.get")
     public ResponseEntity<?> get(@PathVariable final Long shipmentId) {
         final Shipment shipment = shipmentPort.loadShipment(new ShipmentId(shipmentId));
-        final ShipmentDto shipmentResponse = responseMapper.map(shipment);
+        final ShipmentDto shipmentResponse = map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
 
@@ -120,7 +120,7 @@ public class ShipmentInternalController {
     @Timed(value = "controller.shipment.controlcenter.get")
     public ResponseEntity<?> getControlCenter(@PathVariable final Long shipmentId) {
         final ShipmentRouteLog controlCenter = shipmentPort.getShipmentByShipmentId(new ShipmentId(shipmentId));
-        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(controlCenter));
+        return ResponseEntity.status(HttpStatus.OK).body(map(controlCenter));
     }
 
     @GetMapping("/tracking-numbers/{trackingNumber}")
@@ -128,7 +128,7 @@ public class ShipmentInternalController {
     @Timed(value = "controller.shipment.trackingnumber.get")
     public ResponseEntity<?> getByTrackingNumber(@PathVariable final String trackingNumber) {
         final Shipment shipment = shipmentPort.loadShipment(new TrackingNumber(trackingNumber));
-        final ShipmentDto shipmentResponse = responseMapper.map(shipment);
+        final ShipmentDto shipmentResponse = map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
 
@@ -137,7 +137,7 @@ public class ShipmentInternalController {
     @Timed(value = "controller.shipment.trackingnumber.controlcenter.get")
     public ResponseEntity<?> getControlCenterByTrackingNumber(@PathVariable final String trackingNumber) {
         final ShipmentRouteLog shipmentRouteLog = shipmentPort.getShipmenyByTrackingNumber(new TrackingNumber(trackingNumber));
-        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.map(shipmentRouteLog));
+        return ResponseEntity.status(HttpStatus.OK).body(map(shipmentRouteLog));
     }
 
     @PutMapping
@@ -285,6 +285,17 @@ public class ShipmentInternalController {
         } catch (final JsonProcessingException exception) {
             throw new IllegalArgumentException("Invalid dangerous goods patch", exception);
         }
+    }
+
+    private ShipmentDto map(final Shipment shipment) {
+        final DepartmentCode departmentCode = shipmentPort.getDepartmentCode(shipment.getTargetDepartmentId());
+        return responseMapper.map(shipment, departmentCode);
+    }
+
+    private ShipmentControlCenterResponseApi map(final ShipmentRouteLog shipmentRouteLog) {
+        final DepartmentCode departmentCode = shipmentPort
+                .getDepartmentCode(shipmentRouteLog.shipment().getTargetDepartmentId());
+        return responseMapper.map(shipmentRouteLog, departmentCode);
     }
 
     @PutMapping("/status")

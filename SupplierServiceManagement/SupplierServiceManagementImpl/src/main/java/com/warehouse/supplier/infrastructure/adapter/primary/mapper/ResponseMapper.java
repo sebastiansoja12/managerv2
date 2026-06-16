@@ -4,6 +4,7 @@ import com.warehouse.supplier.domain.model.DeliveryArea;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.vo.*;
 import com.warehouse.supplier.infrastructure.adapter.primary.dto.*;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 
 public abstract class ResponseMapper {
 
@@ -11,7 +12,7 @@ public abstract class ResponseMapper {
         return new SupplierCreateApiResponse(response.supplierCode().value());
     }
 
-    public static SupplierApi map(final Supplier supplier) {
+    public static SupplierApi map(final Supplier supplier, final DepartmentCode departmentCode) {
         if (supplier == null) {
             return null;
         }
@@ -22,7 +23,7 @@ public abstract class ResponseMapper {
                 supplier.getFirstName(),
                 supplier.getLastName(),
                 supplier.getTelephoneNumber(),
-                supplier.getDepartmentCode() != null ? new DepartmentCodeApi(supplier.getDepartmentCode().getValue()) : null,
+                departmentCode != null ? new DepartmentCodeApi(departmentCode.getValue()) : null,
                 supplier.getStatus() != null ? supplier.getStatus().name() : null,
                 supplier.getUserStatus() != null ? supplier.getUserStatus().name() : null,
                 supplier.getVehicleId() != null ? new VehicleIdApi(supplier.getVehicleId().value()) : null,

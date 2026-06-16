@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-09-04-returning-postgresql-schema-objects" author="s-soja">
+        <createIndex tableName="returning_return_package"
+                     indexName="idx_return_operator_department_updated">
+            <column name="operator_id"/>
+            <column name="assigned_department"/>
+            <column name="updated_at"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

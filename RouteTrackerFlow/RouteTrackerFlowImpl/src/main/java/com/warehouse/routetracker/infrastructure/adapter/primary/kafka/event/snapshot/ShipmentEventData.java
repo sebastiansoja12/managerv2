@@ -13,7 +13,7 @@ public record ShipmentEventData(
         SenderSnapshot sender,
         RecipientSnapshot recipient,
         ShipmentSize shipmentSize,
-        DepartmentCode destination,
+        DepartmentId targetDepartmentId,
         DepartmentId originDepartmentId,
         ShipmentStatus shipmentStatus,
         ShipmentType shipmentType,

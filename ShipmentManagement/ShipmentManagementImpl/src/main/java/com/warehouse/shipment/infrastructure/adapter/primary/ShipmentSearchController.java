@@ -43,7 +43,8 @@ public class ShipmentSearchController {
             @RequestBody(required = false) final ShipmentSearchRequestApi request) {
         final ShipmentSearchCriteria criteria = requestMapper.map(request);
         final List<ShipmentDto> shipmentResponse = shipmentPort.searchShipments(criteria).stream()
-                .map(responseMapper::map)
+                .map(shipment -> responseMapper.map(shipment,
+                        shipmentPort.getDepartmentCode(shipment.getTargetDepartmentId())))
                 .toList();
         return ResponseEntity.ok(shipmentResponse);
     }

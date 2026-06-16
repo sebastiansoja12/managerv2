@@ -84,14 +84,14 @@ class AuthenticationPortImplTest {
         final ApiKeyProvider apiKeyProvider = new ApiKeyProvider();
         apiKeyProvider.setKey("test-api-key-secret");
 
-        final UserService userService = new UserServiceImpl(userRepository);
+        final UserService userService = new UserServiceImpl(userRepository, departmentServicePort);
         final RefreshTokenGenerator refreshTokenGenerator = new RefreshTokenGeneratorImpl(refreshTokenProvider);
         final AuthenticationService authenticationService = new AuthenticationServiceImpl(
                 refreshTokenRepository,
                 refreshTokenGenerator,
                 userRepository
         );
-        jwtService = new JwtServiceImpl(jwtProvider, departmentServicePort);
+        jwtService = new JwtServiceImpl(jwtProvider);
         final DepartmentService departmentService = new DepartmentService(departmentServicePort);
         final MailServicePort mailServicePort = emailNotification -> {
         };
@@ -163,7 +163,7 @@ class AuthenticationPortImplTest {
         assertThat(createdUser.operatorId()).isEqualTo(OperatorId.of(123L));
         assertThat(createdUser.getRole()).isEqualTo(User.Role.SUPPLIER);
         assertThat(passwordEncoder.matches("raw-password", createdUser.getPassword())).isTrue();
-        assertThat(createdUser.getDepartmentCode().getValue()).isEqualTo("TST");
+        assertThat(createdUser.getDepartmentId()).isEqualTo(new DepartmentId(10L));
         assertThat(createdUser.getApiKey()).isNotNull();
         assertThat(createdUser.getApiKey()).isNotEqualTo("dummy");
         assertThat(createdUser.getApiKey()).doesNotContain("operator-user");
@@ -201,7 +201,7 @@ class AuthenticationPortImplTest {
                 "Soja",
                 username + "@test.pl",
                 role,
-                new DepartmentCode("TST"),
+                new DepartmentId(10L),
                 "api-key-" + username,
                 "PL"
         );
@@ -213,15 +213,8 @@ class AuthenticationPortImplTest {
         private final Map<String, User> users = new HashMap<>();
 
         @Override
-        public UserResponse createOrUpdate(final User user) {
+        public void createOrUpdate(final User user) {
             users.put(user.getUsername(), user);
-            return UserResponse.builder()
-                    .username(user.getUsername())
-                    .departmentCode(user.getDepartmentCode())
-                    .enabled(true)
-                    .nonExpired(true)
-                    .nonLocked(true)
-                    .build();
         }
 
         @Override
@@ -251,9 +244,9 @@ class AuthenticationPortImplTest {
         }
 
         @Override
-        public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
+        public List<UserId> findAllActiveUsersByDepartmentId(final DepartmentId departmentId) {
             return users.values().stream()
-                    .filter(user -> departmentCode.getValue().equals(user.getDepartmentCode().getValue()))
+                    .filter(user -> departmentId.equals(user.getDepartmentId()))
                     .filter(user -> !Boolean.TRUE.equals(user.isDeleted()))
                     .map(User::getUserId)
                     .toList();
@@ -313,8 +306,18 @@ class AuthenticationPortImplTest {
         }
 
         @Override
+        public Boolean departmentExists(final DepartmentId departmentId) {
+            return departmentExists;
+        }
+
+        @Override
         public DepartmentId getDepartmentId(final DepartmentCode departmentCode) {
             return new DepartmentId(10L);
+        }
+
+        @Override
+        public DepartmentCode getDepartmentCode(final DepartmentId departmentId) {
+            return new DepartmentCode("TST");
         }
 
         private void setDepartmentExists(final boolean departmentExists) {

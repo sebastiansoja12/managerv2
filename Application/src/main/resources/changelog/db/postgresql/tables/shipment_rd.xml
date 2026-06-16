@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-04-postgresql-table-shipment-rd" author="s-soja">
+        <createTable tableName="shipment_rd">
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="sender_telephone" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="sender_email" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="sender_city" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="sender_street" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="sender_postal_code" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="recipient_email" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="recipient_telephone" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="recipient_first_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="recipient_last_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="recipient_city" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="recipient_street" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="recipient_postal_code" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="parcel_size" type="VARCHAR(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="target_department_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="VARCHAR(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="VARCHAR(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="shipment_related_id" type="BIGINT" />
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="locked" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+            <column name="origin_country" type="VARCHAR(10)">
+                <constraints nullable="false" />
+            </column>
+            <column name="destination_country" type="VARCHAR(10)">
+                <constraints nullable="false" />
+            </column>
+            <column name="shipment_priority" type="VARCHAR(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="dangerous_good_description" type="VARCHAR(1000)" />
+            <column name="dangerous_good_hazard_symbols" type="VARCHAR(255)" />
+            <column name="dangerous_good_storage_requirements" type="VARCHAR(64)" />
+            <column name="dangerous_good_handling_instructions" type="VARCHAR(2000)" />
+            <column name="dangerous_good_flammable" type="BOOLEAN" />
+            <column name="dangerous_good_corrosive" type="BOOLEAN" />
+            <column name="dangerous_good_toxic" type="BOOLEAN" />
+            <column name="dangerous_good_emergency_contact" type="VARCHAR(255)" />
+            <column name="dangerous_good_country_origin" type="VARCHAR(64)" />
+            <column name="price_amount" type="DECIMAL(19, 2)" />
+            <column name="price_currency" type="VARCHAR(10)" />
+            <column name="external_id" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="tracking_number" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="operator_id" type="BIGINT" />
+            <column name="dangerous_good_un_number" type="VARCHAR(16)" />
+            <column name="dangerous_good_proper_shipping_name" type="VARCHAR(255)" />
+            <column name="dangerous_good_hazard_class" type="VARCHAR(64)" />
+            <column name="dangerous_good_hazard_division" type="VARCHAR(64)" />
+            <column name="dangerous_good_subsidiary_risk" type="VARCHAR(64)" />
+            <column name="dangerous_good_packing_group" type="VARCHAR(8)" />
+            <column name="dangerous_good_quantity" type="DECIMAL(19, 3)" />
+            <column name="dangerous_good_quantity_unit" type="VARCHAR(32)" />
+            <column name="dangerous_good_package_count" type="INT" />
+            <column name="dangerous_good_packaging_type" type="VARCHAR(64)" />
+            <column name="dangerous_good_limited_quantity" type="BOOLEAN" />
+            <column name="dangerous_good_excepted_quantity" type="BOOLEAN" />
+            <column name="dangerous_good_environmentally_hazardous" type="BOOLEAN" />
+            <column name="dangerous_good_marine_pollutant" type="BOOLEAN" />
+            <column name="dangerous_good_transport_category" type="VARCHAR(64)" />
+            <column name="dangerous_good_tunnel_restriction_code" type="VARCHAR(32)" />
+            <column name="dangerous_good_flash_point" type="DECIMAL(10, 3)" />
+            <column name="dangerous_good_emergency_contact_24h" type="VARCHAR(255)" />
+            <column name="dangerous_good_safety_data_sheet_reference" type="VARCHAR(2000)" />
+            <column name="dangerous_good_declaration_document_reference" type="VARCHAR(2000)" />
+            <column name="dangerous_good_regulation_type" type="VARCHAR(64)" />
+            <column name="dangerous_good_transport_mode" type="VARCHAR(64)" />
+            <column name="origin_department_id" type="BIGINT" />
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

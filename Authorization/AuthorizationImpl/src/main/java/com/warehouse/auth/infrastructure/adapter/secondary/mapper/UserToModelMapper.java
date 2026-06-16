@@ -15,7 +15,7 @@ public abstract class UserToModelMapper {
         user.setLastName(entity.getLastName());
         user.setPassword(entity.getPassword());
         user.setRole(UserRoleMapper.map(entity.getRole()));
-        user.setDepartmentCode(entity.getDepartmentCode());
+        user.setDepartmentId(entity.getDepartmentId());
         user.setLanguage(entity.getLanguage());
         user.setPermissions(UserPermissionToModelMapper.map(entity.getPermissions()));
         user.setCreatedAt(entity.getCreatedAt());

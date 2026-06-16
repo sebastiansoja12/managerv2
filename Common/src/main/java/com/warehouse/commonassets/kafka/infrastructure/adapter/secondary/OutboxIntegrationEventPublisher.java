@@ -1,14 +1,5 @@
 package com.warehouse.commonassets.kafka.infrastructure.adapter.secondary;
 
-import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,6 +16,15 @@ import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorDetails;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 @ConditionalOnProperty(name = "manager.kafka.outbox.enabled", havingValue = "true")
@@ -48,6 +48,7 @@ public class OutboxIntegrationEventPublisher implements IntegrationEventPublishe
     }
 
     @Override
+    @Transactional
     public void publish(final IntegrationEvent event) {
         final IntegrationEventType eventType = event.getClass().getAnnotation(IntegrationEventType.class);
         if (eventType == null) {

@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import jakarta.persistence.*;
 
 
@@ -9,8 +10,12 @@ import jakarta.persistence.*;
 @Table(name = "department")
 public class DepartmentEntity {
 
-    @AttributeOverride(name = "value", column = @Column(name = "department_code"))
+    @AttributeOverride(name = "value", column = @Column(name = "department_id"))
     @EmbeddedId
+    private DepartmentId departmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "department_code", nullable = false, unique = true))
     private DepartmentCode departmentCode;
 
     @Column(name = "city", nullable = false)
@@ -39,10 +44,11 @@ public class DepartmentEntity {
     }
 
 	public DepartmentEntity(final Boolean active, final String city,
-			final DepartmentCode departmentCode, final String openingHours, final String postalCode,
+			final DepartmentId departmentId, final DepartmentCode departmentCode, final String openingHours, final String postalCode,
 			final String street, final String telephoneNumber, final CountryCode countryCode) {
         this.active = active;
         this.city = city;
+        this.departmentId = departmentId;
         this.departmentCode = departmentCode;
         this.openingHours = openingHours;
         this.postalCode = postalCode;
@@ -61,6 +67,10 @@ public class DepartmentEntity {
 
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
+    }
+
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 
     public String getOpeningHours() {

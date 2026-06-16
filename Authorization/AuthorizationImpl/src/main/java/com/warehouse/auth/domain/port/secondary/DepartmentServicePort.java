@@ -6,5 +6,9 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 public interface DepartmentServicePort {
     Boolean departmentExists(final DepartmentCode departmentCode);
 
+    Boolean departmentExists(final DepartmentId departmentId);
+
     DepartmentId getDepartmentId(final DepartmentCode departmentCode);
+
+    DepartmentCode getDepartmentCode(final DepartmentId departmentId);
 }

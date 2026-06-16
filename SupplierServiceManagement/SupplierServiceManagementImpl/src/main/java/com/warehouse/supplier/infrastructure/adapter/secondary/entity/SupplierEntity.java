@@ -26,7 +26,8 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
     private SupplierCode supplierCode;
 
     @Embedded
-    private DepartmentCode departmentCode;
+    @AttributeOverride(name = "value", column = @Column(name = "department_id", nullable = false))
+    private DepartmentId departmentId;
 
     @Column(name = "first_name")
     private String firstName;
@@ -90,7 +91,7 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
     public SupplierEntity(
             final SupplierId supplierId,
             final SupplierCode supplierCode,
-            final DepartmentCode departmentCode,
+            final DepartmentId departmentId,
             final String firstName,
             final String lastName,
             final String telephoneNumber,
@@ -110,7 +111,7 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
     ) {
         this.supplierId = supplierId;
         this.supplierCode = supplierCode;
-        this.departmentCode = departmentCode;
+        this.departmentId = departmentId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.telephoneNumber = telephoneNumber;
@@ -207,8 +208,8 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
         return supplierId;
     }
 
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
-}
 
+}

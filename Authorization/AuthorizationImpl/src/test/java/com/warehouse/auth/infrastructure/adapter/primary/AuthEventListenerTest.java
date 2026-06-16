@@ -1,28 +1,10 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.context.ApplicationContext;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.warehouse.auth.domain.model.RolePermission;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.registry.DomainRegistry;
-import com.warehouse.auth.domain.service.ApiKeyEncoder;
-import com.warehouse.auth.domain.service.JwtService;
-import com.warehouse.auth.domain.service.RolePermissionService;
-import com.warehouse.auth.domain.service.UserService;
+import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.RolePermissionId;
 import com.warehouse.auth.domain.vo.UserResponse;
@@ -31,8 +13,23 @@ import com.warehouse.auth.infrastructure.dto.DepartmentCodeDto;
 import com.warehouse.auth.infrastructure.dto.OperatorIdDto;
 import com.warehouse.auth.infrastructure.dto.RegisteringUserDto;
 import com.warehouse.commonassets.enumeration.UserPermission;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class AuthEventListenerTest {
 
@@ -40,6 +37,7 @@ class AuthEventListenerTest {
     private final UserService userService = mock(UserService.class);
     private final JwtService jwtService = mock(JwtService.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+    private final DepartmentService departmentService = mock(DepartmentService.class);
 
     private AuthEventListener listener;
 
@@ -72,11 +70,12 @@ class AuthEventListenerTest {
             }
         };
         listener = new AuthEventListener(authenticationPort, userService, jwtService, passwordEncoder,
-                apiKeyEncoder);
+                apiKeyEncoder, departmentService);
     }
 
     @Test
     void shouldCreateInitialAdminUserAfterOperatorCreatedEvent() {
+        final AtomicBoolean resourcesProvisioned = new AtomicBoolean();
         final AtomicReference<UserId> reservedUserId = new AtomicReference<>();
         final AtomicReference<UserId> publishedUserId = new AtomicReference<>();
         final RegisteringUserDto registeringUser = new RegisteringUserDto(
@@ -91,12 +90,19 @@ class AuthEventListenerTest {
         );
         final OperatorCreatedEvent event = new OperatorCreatedEvent(
                 registeringUser,
-                reservedUserId::set,
+                userId -> {
+                    reservedUserId.set(userId);
+                    resourcesProvisioned.set(true);
+                },
                 publishedUserId::set
         );
 
         when(userService.nextUserId()).thenReturn(new UserId(77L));
         when(passwordEncoder.encode("raw-password")).thenReturn("encoded-password");
+        when(departmentService.getDepartmentId(new DepartmentCode("TST"))).thenAnswer(invocation -> {
+            assertThat(resourcesProvisioned.get()).isTrue();
+            return new DepartmentId(91L);
+        });
         when(userService.create(any(User.class))).thenReturn(new RegisterResponse(UserResponse.builder().build()));
 
         listener.handle(event);
@@ -110,6 +116,7 @@ class AuthEventListenerTest {
         assertThat(createdUser.isInitial()).isTrue();
         assertThat(createdUser.getPassword()).isEqualTo("encoded-password");
         assertThat(createdUser.getApiKey()).isEqualTo("encoded-api-key");
+        assertThat(createdUser.getDepartmentId()).isEqualTo(new DepartmentId(91L));
         assertThat(reservedUserId.get()).isEqualTo(new UserId(77L));
         assertThat(publishedUserId.get()).isEqualTo(new UserId(77L));
     }

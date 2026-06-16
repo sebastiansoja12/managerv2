@@ -3,6 +3,7 @@ package com.warehouse.supplier;
 import com.warehouse.commonassets.enumeration.PackageType;
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
@@ -56,7 +57,8 @@ public class SupplyPortImplTest {
         final DomainContext domainContext = new DomainContext();
         domainContext.setApplicationEventPublisher(eventPublisher);
         domainContext.setApplicationContext(applicationContext);
-        supplyPort = new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort);
+        supplyPort = new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService,
+                deviceServicePort, departmentServicePort);
     }
 
     @Test
@@ -84,11 +86,12 @@ public class SupplyPortImplTest {
         final DepartmentCode departmentCode = new DepartmentCode("GD1");
         final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "test", "test", "test", departmentCode);
         when(departmentServicePort.validateDepartmentCode(departmentCode)).thenReturn(Result.success());
+        when(departmentServicePort.getDepartmentId(departmentCode)).thenReturn(new DepartmentId(10L));
 
         final SupplierCreateResponse response = supplyPort.create(request);
 
         assertEquals(supplierCode, response.supplierCode());
-        verify(supplierRepository).create(argThat(supplier -> departmentCode.equals(supplier.getDepartmentCode())));
+        verify(supplierRepository).create(argThat(supplier -> new DepartmentId(10L).equals(supplier.getDepartmentId())));
     }
 
     @Test

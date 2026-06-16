@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -19,7 +18,7 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                Sender sender,
                                Recipient recipient,
                                ShipmentSize shipmentSize,
-                               DepartmentCode destination,
+                               DepartmentId targetDepartmentId,
                                DepartmentId originDepartmentId,
                                ShipmentStatus shipmentStatus,
                                ShipmentType shipmentType,

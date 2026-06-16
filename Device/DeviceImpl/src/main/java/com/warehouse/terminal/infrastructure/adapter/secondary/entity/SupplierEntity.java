@@ -1,5 +1,6 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +13,6 @@ import lombok.NoArgsConstructor;
 @Entity(name = "device.SupplierEntity")
 @Builder
 @Table(name = "supplier")
-@NamedEntityGraph(name = "device.SupplierEntity.full", attributeNodes = {
-        @NamedAttributeNode("department")
-})
 public class SupplierEntity {
 
     @Id
@@ -33,8 +31,8 @@ public class SupplierEntity {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_code", referencedColumnName = "department_code")
-    private DepartmentEntity department;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "department_id"))
+    private DepartmentId departmentId;
 
 }

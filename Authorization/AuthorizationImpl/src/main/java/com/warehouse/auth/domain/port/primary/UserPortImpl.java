@@ -10,6 +10,7 @@ import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import lombok.extern.slf4j.Slf4j;
 
@@ -120,5 +121,10 @@ public class UserPortImpl implements UserPort {
             log.info("Deleting data for user {}", user.getValue());
             this.userService.deleteDataForUser(user);
         }
+    }
+
+    @Override
+    public DepartmentCode getDepartmentCode(final DepartmentId departmentId) {
+        return userService.getDepartmentCode(departmentId);
     }
 }

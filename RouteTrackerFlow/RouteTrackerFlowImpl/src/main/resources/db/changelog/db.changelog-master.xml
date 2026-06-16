@@ -4,6 +4,5 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="changes/001-reset-route-tracker-schema.xml" relativeToChangelogFile="true"/>
-    <include file="changes/002-add-route-log-operator-id.xml" relativeToChangelogFile="true"/>
+    <include file="postgresql/db.changelog-master.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

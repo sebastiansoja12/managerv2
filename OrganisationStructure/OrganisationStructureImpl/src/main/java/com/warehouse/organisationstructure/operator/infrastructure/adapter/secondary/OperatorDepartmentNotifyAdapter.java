@@ -2,6 +2,7 @@ package com.warehouse.organisationstructure.operator.infrastructure.adapter.seco
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.api.event.OperatorInitialDepartmentCreateEvent;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorDepartmentNotifyPort;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
@@ -16,8 +17,8 @@ public class OperatorDepartmentNotifyAdapter implements OperatorDepartmentNotify
     }
 
     @Override
-    public void notifyOperatorCreated(final OperatorSnapshot snapshot) {
-        final OperatorInitialDepartmentCreateEvent event = OperatorDepartmentNotifyMapper.toEvent(snapshot);
+    public void notifyOperatorCreated(final OperatorSnapshot snapshot, final UserId adminUserId) {
+        final OperatorInitialDepartmentCreateEvent event = OperatorDepartmentNotifyMapper.toEvent(snapshot, adminUserId);
         eventPublisher.publishEvent(event);
     }
 }
