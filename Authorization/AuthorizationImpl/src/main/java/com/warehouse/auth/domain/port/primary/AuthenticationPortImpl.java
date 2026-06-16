@@ -48,9 +48,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     public AuthenticationResponse login(final LoginRequest loginRequest) {
         final User user = userService.findUser(loginRequest.username());
 
-        if (user == null) {
+        if (user == null || user.isDeleted()) {
             throw new AuthenticationErrorException("Invalid username or password");
         } else if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
+            throw new AuthenticationErrorException("Invalid username or password");
+        } else if (!departmentService.existsByDepartmentCode(user.getDepartmentCode())) {
             throw new AuthenticationErrorException("Invalid username or password");
         }
 
