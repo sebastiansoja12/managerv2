@@ -21,15 +21,12 @@ public class NotificationMapperTest {
 
     @Test
     void shouldMapFromNotificationToMailNotification() {
-        // given
         final Notification notification = Notification.builder()
                 .body("body")
                 .recipient("recipient")
                 .subject("subject")
                 .build();
-        // when
         final com.warehouse.mail.domain.vo.Notification mail = mapper.map(notification);
-        // then
         assertThat(mail.getBody()).isEqualTo("body");
     }
 }

@@ -18,7 +18,6 @@ public class NotificationCreatorProviderTest {
 
     @Test
     void shouldBuildNotification() {
-        // given
         final String subject = "Została nadana do państwa przesyłka: ";
         final Recipient recipient = Recipient.builder()
                 .email("test@test.pl")
@@ -26,9 +25,7 @@ public class NotificationCreatorProviderTest {
         final Parcel parcel = Parcel.builder()
                 .recipient(recipient)
                 .build();
-        // when
         final Notification notification = notificationCreatorProvider.createNotification(parcel);
-        // then
         assertAll(
                 () -> assertEquals(subject, notification.getSubject()),
                 () -> assertEquals(recipient.getEmail(), notification.getRecipient())

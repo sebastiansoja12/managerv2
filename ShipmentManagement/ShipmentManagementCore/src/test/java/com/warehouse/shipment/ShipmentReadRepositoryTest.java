@@ -52,11 +52,6 @@ public class ShipmentReadRepositoryTest {
         }
 
         @Bean
-        ShipmentRepository shipmentRepository() {
-            return Mockito.mock(ShipmentRepository.class);
-        }
-
-        @Bean
         RouteLogServicePort routeLogServicePort() {
             return Mockito.mock(RouteLogServicePort.class);
         }
@@ -107,21 +102,15 @@ public class ShipmentReadRepositoryTest {
 
     @Test
     void shouldFindById() {
-        // given
         final ShipmentId shipmentId = new ShipmentId(100001L);
-        // when
         final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
-        // then
         assertTrue(parcel.isPresent());
     }
 
     @Test
     void shouldNotFindById() {
-        // given
         final ShipmentId shipmentId = new ShipmentId(1L);
-        // when
         final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
-        // then
         assertFalse(parcel.isPresent());
     }
 }
