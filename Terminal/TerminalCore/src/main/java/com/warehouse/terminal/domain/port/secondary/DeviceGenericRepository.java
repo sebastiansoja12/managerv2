@@ -24,6 +24,16 @@ public class DeviceGenericRepository {
         return Optional.ofNullable(repository.findById(deviceId));
     }
 
+    public Optional<Device> findByExternalSystemId(final String externalSystemId) {
+        for (final DeviceRepository repository : repositories) {
+            final Optional<Device> device = repository.findByExternalSystemId(externalSystemId);
+            if (device.isPresent()) {
+                return device;
+            }
+        }
+        return Optional.empty();
+    }
+
     public void create(final Device device) {
         final DeviceRepository repository = determineDeviceRepository(device.getDeviceType());
         repository.saveOrUpdate(device);

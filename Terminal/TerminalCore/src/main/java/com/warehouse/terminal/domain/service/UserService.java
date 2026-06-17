@@ -2,6 +2,7 @@ package com.warehouse.terminal.domain.service;
 
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.Username;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.terminal.domain.vo.User;
 import com.warehouse.terminal.domain.vo.UserToken;
 
@@ -10,5 +11,6 @@ public interface UserService {
     User findByUserId(final UserId userId);
     UserToken validateUser(final UserId userId);
     Boolean existsByUserId(final UserId userId);
+    Boolean existsByUserIdAndDepartmentCode(final UserId userId, final DepartmentCode departmentCode);
     Boolean existsByUsername(final Username username);
 }

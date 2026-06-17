@@ -23,14 +23,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
     private final ApiKeyService apiKeyService;
 
-    private static final List<String> API_KEY_ENDPOINTS = List.of(
-            "/v2/api/device-pairings"
-    );
-
-    private static final List<String> DEVICE_ENDPOINTS = List.of(
-            "/v2/api/deliveries",
-            "/v2/api/ws"
-    );
+    private final ApiExposureProperties apiExposureProperties;
 
     private static final List<String> WHITELIST = List.of(
             "/v2/api/swagger-ui",
@@ -40,8 +33,10 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/v2/api/auth/login"
     );
 
-    public TenantMdcFilter(final ApiKeyService apiKeyService) {
+    public TenantMdcFilter(final ApiKeyService apiKeyService,
+                           final ApiExposureProperties apiExposureProperties) {
         this.apiKeyService = apiKeyService;
+        this.apiExposureProperties = apiExposureProperties;
     }
 
     @Override
@@ -54,14 +49,12 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         try {
             final String uri = request.getRequestURI();
 
-            if (isWhitelisted(uri)) {
+            if (isWhitelisted(request)) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            final DecodedApiTenant tenantInfo = isApiKeyEndpoint(uri)
-                    ? authenticateWithApiKey(request, response)
-                    : authenticateWithJwt(request, response);
+            final DecodedApiTenant tenantInfo = authenticateWithJwt(request, response);
 
             if (tenantInfo == null) {
                 log.warn("Authentication failed for URI: {}", uri);
@@ -93,23 +86,6 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         MDC.put("uri", request.getRequestURL().toString());
         MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         MDC.put("method", request.getMethod());
-    }
-
-    private DecodedApiTenant authenticateWithApiKey(final HttpServletRequest request,
-                                                     final HttpServletResponse response) throws IOException, java.io.IOException {
-        final String apiKey = request.getHeader("X-API-KEY");
-        if (apiKey == null || apiKey.isBlank()) {
-            unauthorized(response, "Missing or invalid api key");
-            return null;
-        }
-        try {
-            return apiKeyService.decodeApiKey(apiKey);
-        } catch (final IllegalArgumentException e) {
-            unauthorized(response, e.getMessage());
-        } catch (final Exception e) {
-            internalError(response, "Failed to decode API Key");
-        }
-        return null;
     }
 
     private DecodedApiTenant authenticateWithJwt(final HttpServletRequest request,
@@ -150,20 +126,16 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         response.getWriter().write("Internal server error");
     }
 
-    private boolean isWhitelisted(final String uri) {
+    private boolean isWhitelisted(final HttpServletRequest request) {
+        final String uri = request.getRequestURI();
+        if (apiExposureProperties.isPublicEndpoint(request)) {
+            return true;
+        }
         return WHITELIST.stream().anyMatch(uri::startsWith);
-    }
-
-    private boolean isApiKeyEndpoint(final String uri) {
-        return API_KEY_ENDPOINTS.stream().anyMatch(uri::startsWith);
-    }
-
-    private boolean isDeviceEndpoint(final String uri) {
-        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith);
     }
 
     @Override
     protected boolean shouldNotFilter(final HttpServletRequest request) {
-        return isDeviceEndpoint(request.getRequestURI());
+        return apiExposureProperties.isPairKeyController(request);
     }
 }

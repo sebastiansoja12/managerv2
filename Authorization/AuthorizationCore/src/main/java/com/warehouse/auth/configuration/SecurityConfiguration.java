@@ -1,6 +1,7 @@
 package com.warehouse.auth.configuration;
 
-
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -26,10 +27,13 @@ public class SecurityConfiguration {
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter authenticationFilter;
+    private final ObjectProvider<DeviceTenantMdcFilter> deviceAuthenticationFilter;
     private final LogoutHandler logoutHandler;
+    private final ApiExposureProperties apiExposureProperties;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(final HttpSecurity http,
+                                                   @Value("${server.servlet.contextPath:}") final String contextPath) throws Exception {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -44,6 +48,7 @@ public class SecurityConfiguration {
                                 "/webjars/**"
                         ).permitAll()
                         .requestMatchers("/v2/api/returns").authenticated()
+                        .requestMatchers(apiExposureProperties.pairKeySecurityMatchers(contextPath)).authenticated()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -52,6 +57,9 @@ public class SecurityConfiguration {
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout.logoutUrl("/v2/api/auth/logout").addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
+
+        deviceAuthenticationFilter.ifAvailable(filter ->
+                http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class));
 
         return http.build();
     }

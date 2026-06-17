@@ -13,4 +13,5 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.entity.UserEntity
 public interface UserReadRepository extends JpaRepository<UserEntity, UserId> {
     Optional<UserEntity> findByUsername(final Username username);
     Boolean existsByUsername(final Username username);
+    Boolean existsByUserIdAndDepotCode(final UserId userId, final String depotCode);
 }

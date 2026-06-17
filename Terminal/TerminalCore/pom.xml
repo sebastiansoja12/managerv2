@@ -133,7 +133,6 @@
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-retry</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>

@@ -23,9 +23,14 @@ import com.warehouse.terminal.request.*;
 public interface TerminalRequestMapper {
 
     default DevicePairRequest map(final DevicePairRequestDto terminalPairRequest) {
-        final UserId userId = new UserId(terminalPairRequest.userId().value());
-        final DeviceId deviceId = new DeviceId(terminalPairRequest.terminalId().value());
-        return new DevicePairRequest(deviceId, userId);
+        final String externalSystemId = terminalPairRequest != null ? terminalPairRequest.externalSystemId() : null;
+        final UserId userId = terminalPairRequest != null && terminalPairRequest.userId() != null
+                ? new UserId(terminalPairRequest.userId().value())
+                : null;
+        final DepartmentCode departmentCode = terminalPairRequest != null && terminalPairRequest.departmentCode() != null
+                ? new DepartmentCode(terminalPairRequest.departmentCode().value())
+                : null;
+        return new DevicePairRequest(externalSystemId, departmentCode, userId);
     }
 
     default DeviceCreateCommand map(final DeviceCreateRequestDto request) {

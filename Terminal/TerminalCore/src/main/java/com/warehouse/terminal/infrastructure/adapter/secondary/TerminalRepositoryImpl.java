@@ -1,6 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
@@ -38,6 +39,12 @@ public class TerminalRepositoryImpl implements DeviceRepository<Terminal> {
         return repository.findById(deviceId)
                 .map(toModelMapper::map)
                 .orElseThrow();
+    }
+
+    @Override
+    public Optional<Terminal> findByExternalSystemId(final String externalSystemId) {
+        return repository.findByIdentityExternalSystemId(externalSystemId)
+                .map(toModelMapper::map);
     }
 
     @Override

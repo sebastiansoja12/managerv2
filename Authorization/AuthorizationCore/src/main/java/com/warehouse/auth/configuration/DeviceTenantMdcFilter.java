@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.List;
 
 import org.slf4j.MDC;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -30,17 +29,17 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnBean(DeviceApiService.class)
 public class DeviceTenantMdcFilter extends OncePerRequestFilter {
 
-    private static final List<String> DEVICE_ENDPOINTS = List.of(
-            "/v2/api/deliveries",
-            "/v2/api/ws"
-    );
-
     private static final String HEADER_DEVICE_PAIR_KEY = "X-DEVICE-PAIR-KEY";
+    private static final String PARAMETER_PAIR_KEY = "pairKey";
 
     private final DeviceApiService deviceApiService;
 
-    public DeviceTenantMdcFilter(final DeviceApiService deviceApiService) {
+    private final ApiExposureProperties apiExposureProperties;
+
+    public DeviceTenantMdcFilter(final DeviceApiService deviceApiService,
+                                 final ApiExposureProperties apiExposureProperties) {
         this.deviceApiService = deviceApiService;
+        this.apiExposureProperties = apiExposureProperties;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
 
         initMdc(request);
 
-        final String pairKey = request.getHeader(HEADER_DEVICE_PAIR_KEY);
+        final String pairKey = resolvePairKey(request);
         if (pairKey == null || pairKey.isBlank()) {
             unauthorized(response, "Missing device pair key");
             return;
@@ -100,7 +99,15 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
         if (uri.endsWith(".wsdl") || uri.endsWith(".xsd")) {
             return true;
         }
-        return DEVICE_ENDPOINTS.stream().noneMatch(uri::startsWith);
+        return !apiExposureProperties.isPairKeyController(request);
+    }
+
+    private String resolvePairKey(final HttpServletRequest request) {
+        final String headerPairKey = request.getHeader(HEADER_DEVICE_PAIR_KEY);
+        if (headerPairKey != null && !headerPairKey.isBlank()) {
+            return headerPairKey;
+        }
+        return request.getParameter(PARAMETER_PAIR_KEY);
     }
 
     private void initMdc(final HttpServletRequest request) {

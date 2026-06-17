@@ -22,23 +22,31 @@ public class DevicePair {
 
 	private String pairKey;
 
+	private Instant pairKeyExpiresAt;
+
 	public DevicePair(final DevicePairId devicePairId,
 					  final DeviceId deviceId,
 					  final boolean paired,
 					  final Instant loginTime,
                       final String errorDescription,
-					  final String pairKey) {
+					  final String pairKey,
+					  final Instant pairKeyExpiresAt) {
 		this.devicePairId = devicePairId;
 		this.deviceId = deviceId;
 		this.paired = paired;
 		this.loginTime = loginTime;
 		this.errorDescription = errorDescription;
         this.pairKey = pairKey;
+		this.pairKeyExpiresAt = pairKeyExpiresAt;
     }
 
-	public DevicePair(final DeviceId deviceId, final String pairKey, final DevicePairId devicePairId) {
+	public DevicePair(final DeviceId deviceId,
+					  final String pairKey,
+					  final Instant pairKeyExpiresAt,
+					  final DevicePairId devicePairId) {
 		this.pairKey = pairKey;
-		this.paired = false;
+		this.pairKeyExpiresAt = pairKeyExpiresAt;
+		this.paired = true;
 		this.deviceId = deviceId;
 		this.loginTime = Instant.now();
 		this.errorDescription = StringUtils.EMPTY;
@@ -53,8 +61,16 @@ public class DevicePair {
 		return pairKey;
 	}
 
-	public void setPairKey(String pairKey) {
+	public void setPairKey(final String pairKey) {
 		this.pairKey = pairKey;
+	}
+
+	public Instant getPairKeyExpiresAt() {
+		return pairKeyExpiresAt;
+	}
+
+	public void setPairKeyExpiresAt(final Instant pairKeyExpiresAt) {
+		this.pairKeyExpiresAt = pairKeyExpiresAt;
 	}
 
 	public DevicePairId getDevicePairId() {
@@ -82,6 +98,12 @@ public class DevicePair {
         updateLoginTime();
     }
 
+	public void pair(final String pairKey, final Instant pairKeyExpiresAt) {
+		this.pairKey = pairKey;
+		this.pairKeyExpiresAt = pairKeyExpiresAt;
+		pair();
+	}
+
     public void unpair() {
         this.paired = false;
     }
@@ -107,10 +129,13 @@ public class DevicePair {
         return new DevicePair(pairId, devicePairEntity.getDeviceId(),
                 devicePairEntity.isPaired(), devicePairEntity.getLoginTime(),
                 devicePairEntity.getErrorDescription(),
-                devicePairEntity.getPairKey());
+                devicePairEntity.getPairKey(),
+				devicePairEntity.getPairKeyExpiresAt());
     }
 
-	public boolean containsApiKey() {
-		return StringUtils.isNotBlank(pairKey);
+	public boolean containsValidPairKey(final Instant now) {
+		return StringUtils.isNotBlank(pairKey)
+				&& pairKeyExpiresAt != null
+				&& pairKeyExpiresAt.isAfter(now);
 	}
 }

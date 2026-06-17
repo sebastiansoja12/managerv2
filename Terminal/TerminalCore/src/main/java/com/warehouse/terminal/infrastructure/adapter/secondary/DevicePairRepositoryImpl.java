@@ -9,7 +9,6 @@ import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.secondary.DevicePairRepository;
-import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DevicePairEntity;
 
@@ -17,12 +16,8 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
 
     private final DevicePairReadRepository repository;
 
-    private final DeviceRepository<Terminal> deviceRepository;
-
-    public DevicePairRepositoryImpl(final DevicePairReadRepository repository,
-                                    final DeviceRepository<Terminal> deviceRepository) {
+    public DevicePairRepositoryImpl(final DevicePairReadRepository repository) {
         this.repository = repository;
-        this.deviceRepository = deviceRepository;
     }
 
     @Override
@@ -39,6 +34,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
                 false,
                 Instant.now(),
                 StringUtils.EMPTY,
+                null,
                 null);
         this.repository.save(devicePairEntity);
     }
@@ -74,9 +70,7 @@ public class DevicePairRepositoryImpl implements DevicePairRepository {
 
     @Override
     public void save(final DevicePair devicePair) {
-        final DevicePairEntity devicePairEntity = DevicePairEntity.from(
-                devicePair,
-                deviceRepository.findById(devicePair.getDeviceId()));
+        final DevicePairEntity devicePairEntity = DevicePairEntity.from(devicePair);
         this.repository.save(devicePairEntity);
     }
 }

@@ -48,8 +48,7 @@ public class DeviceServiceAdapter implements DeviceApiService {
             return DeviceAuthenticationResponseDto.invalid();
         }
 
-        return this.devicePairService.findByPairKey(pairKey)
-                .filter(DevicePair::isPaired)
+        return this.devicePairService.findValidByPairKey(pairKey)
                 .map(DevicePair::getDeviceId)
                 .flatMap(this::resolveDeviceContext)
                 .orElseGet(DeviceAuthenticationResponseDto::invalid);
