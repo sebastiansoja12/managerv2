@@ -14,6 +14,11 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>OrganizationChatImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>Application</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -145,6 +150,7 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
+            <version>1.3.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
