@@ -57,6 +57,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>PickupPointManagementImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>BarcodeGenerator</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -123,6 +128,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>MessageProviderCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>OrganizationChatImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
