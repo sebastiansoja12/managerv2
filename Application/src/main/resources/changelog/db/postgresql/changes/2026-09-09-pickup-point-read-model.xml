@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-09-09-postgresql-pickup-point-read-model" author="s-soja">
+        <update tableName="pickup_point">
+            <column name="status" value="SUSPENDED"/>
+            <where>status = 'DRAFT'</where>
+        </update>
+
+        <createTable tableName="pickup_point_rd">
+            <column name="pickup_point_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_pickup_point_rd"/>
+            </column>
+            <column name="operator_id" type="BIGINT"><constraints nullable="false"/></column>
+            <column name="code" type="VARCHAR(40)"><constraints nullable="false"/></column>
+            <column name="name" type="VARCHAR(160)"><constraints nullable="false"/></column>
+            <column name="type" type="VARCHAR(24)"><constraints nullable="false"/></column>
+            <column name="status" type="VARCHAR(16)"><constraints nullable="false"/></column>
+            <column name="capabilities" type="VARCHAR(120)"><constraints nullable="false"/></column>
+            <column name="country_code" type="VARCHAR(2)"/>
+            <column name="postal_code" type="VARCHAR(20)"/>
+            <column name="city" type="VARCHAR(120)"/>
+            <column name="street" type="VARCHAR(160)"/>
+            <column name="building_number" type="VARCHAR(30)"/>
+            <column name="unit_number" type="VARCHAR(30)"/>
+            <column name="latitude" type="DOUBLE PRECISION"/>
+            <column name="longitude" type="DOUBLE PRECISION"/>
+            <column name="department_id" type="BIGINT"/>
+            <column name="allowed_shipment_sizes" type="VARCHAR(160)"><constraints nullable="false"/></column>
+            <column name="accepts_dangerous_goods" type="BOOLEAN"/>
+            <column name="external_network_code" type="VARCHAR(60)"/>
+            <column name="version" type="BIGINT"><constraints nullable="false"/></column>
+        </createTable>
+
+        <addUniqueConstraint tableName="pickup_point_rd" columnNames="operator_id,code"
+                             constraintName="uk_pickup_point_rd_operator_code"/>
+        <createIndex tableName="pickup_point_rd" indexName="idx_pickup_point_rd_operator_status_type">
+            <column name="operator_id"/>
+            <column name="status"/>
+            <column name="type"/>
+        </createIndex>
+        <createIndex tableName="pickup_point_rd" indexName="idx_pickup_point_rd_operator_department">
+            <column name="operator_id"/>
+            <column name="department_id"/>
+        </createIndex>
+        <createIndex tableName="pickup_point_rd" indexName="idx_pickup_point_rd_operator_location">
+            <column name="operator_id"/>
+            <column name="country_code"/>
+            <column name="city"/>
+        </createIndex>
+
+        <sql>
+            INSERT INTO pickup_point_rd (
+                pickup_point_id, operator_id, code, name, type, status, capabilities,
+                country_code, postal_code, city, street, building_number, unit_number,
+                latitude, longitude, department_id, allowed_shipment_sizes,
+                accepts_dangerous_goods, external_network_code, version
+            )
+            SELECT
+                point.pickup_point_id,
+                point.operator_id,
+                point.code,
+                point.name,
+                point.type,
+                point.status,
+                COALESCE((
+                    SELECT string_agg(capability.capability, ',' ORDER BY capability.capability)
+                    FROM pickup_point_capability capability
+                    WHERE capability.pickup_point_id = point.pickup_point_id
+                ), ''),
+                point.country_code,
+                point.postal_code,
+                point.city,
+                point.street,
+                point.building_number,
+                point.unit_number,
+                point.latitude,
+                point.longitude,
+                point.department_id,
+                COALESCE((
+                    SELECT string_agg(shipment_size.shipment_size, ',' ORDER BY shipment_size.shipment_size)
+                    FROM pickup_point_allowed_size shipment_size
+                    WHERE shipment_size.pickup_point_id = point.pickup_point_id
+                ), ''),
+                point.accepts_dangerous_goods,
+                point.external_network_code,
+                point.version
+            FROM pickup_point point
+        </sql>
+    </changeSet>
+</databaseChangeLog>
