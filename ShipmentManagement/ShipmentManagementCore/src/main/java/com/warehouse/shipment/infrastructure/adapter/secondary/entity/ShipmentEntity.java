@@ -14,7 +14,6 @@ import com.warehouse.shipment.domain.model.Shipment;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -85,7 +84,6 @@ public class ShipmentEntity {
     private String recipientStreet;
 
     @Valid
-    @Pattern(regexp="\\d{2}-\\d{3}")
     @Column(name = "recipient_postal_code", nullable = false)
     private String recipientPostalCode;
 
