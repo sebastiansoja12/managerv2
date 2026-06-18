@@ -32,6 +32,8 @@
     <include file="tables/operators_aud.xml" relativeToChangelogFile="true"/>
     <include file="tables/delivery_network.xml" relativeToChangelogFile="true"/>
     <include file="tables/delivery_network_connection.xml" relativeToChangelogFile="true"/>
+    <include file="tables/pickup_point.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-09-pickup-point-read-model.xml" relativeToChangelogFile="true"/>
     <include file="tables/parcel.xml" relativeToChangelogFile="true"/>
     <include file="tables/price.xml" relativeToChangelogFile="true"/>
     <include file="tables/process_logs.xml" relativeToChangelogFile="true"/>
@@ -56,6 +58,11 @@
     <include file="tables/tracking_sequence.xml" relativeToChangelogFile="true"/>
     <include file="tables/users.xml" relativeToChangelogFile="true"/>
     <include file="tables/users_role_permissions.xml" relativeToChangelogFile="true"/>
+    <include file="tables/organization_chat.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-09-organization-chat-operator-filter.xml" relativeToChangelogFile="true"/>
     <include file="schema-objects.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-06-shipment-planned.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-10-shipment-target-department-required.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-10-shipment-delivery-pickup-point.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
