@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-09-09-postgresql-table-pickup-point" author="s-soja">
+        <createTable tableName="pickup_point">
+            <column name="pickup_point_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_pickup_point"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(40)"><constraints nullable="false"/></column>
+            <column name="name" type="VARCHAR(160)"><constraints nullable="false"/></column>
+            <column name="type" type="VARCHAR(24)"><constraints nullable="false"/></column>
+            <column name="status" type="VARCHAR(16)"><constraints nullable="false"/></column>
+            <column name="country_code" type="VARCHAR(2)"/>
+            <column name="postal_code" type="VARCHAR(20)"/>
+            <column name="city" type="VARCHAR(120)"/>
+            <column name="street" type="VARCHAR(160)"/>
+            <column name="building_number" type="VARCHAR(30)"/>
+            <column name="unit_number" type="VARCHAR(30)"/>
+            <column name="latitude" type="DOUBLE PRECISION"/>
+            <column name="longitude" type="DOUBLE PRECISION"/>
+            <column name="department_id" type="BIGINT"/>
+            <column name="telephone_number" type="VARCHAR(40)"/>
+            <column name="email" type="VARCHAR(254)"/>
+            <column name="access_instructions" type="VARCHAR(1000)"/>
+            <column name="opening_time_zone" type="VARCHAR(64)"/>
+            <column name="opening_schedule_mode" type="VARCHAR(24)"/>
+            <column name="accepts_dangerous_goods" type="BOOLEAN"/>
+            <column name="external_network_code" type="VARCHAR(60)"/>
+            <column name="external_point_code" type="VARCHAR(120)"/>
+            <column name="status_reason" type="VARCHAR(500)"/>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false"/></column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false"/></column>
+        </createTable>
+
+        <createTable tableName="pickup_point_capability">
+            <column name="pickup_point_id" type="UUID"><constraints nullable="false"/></column>
+            <column name="capability" type="VARCHAR(24)"><constraints nullable="false"/></column>
+        </createTable>
+
+        <createTable tableName="pickup_point_allowed_size">
+            <column name="pickup_point_id" type="UUID"><constraints nullable="false"/></column>
+            <column name="shipment_size" type="VARCHAR(24)"><constraints nullable="false"/></column>
+        </createTable>
+
+        <createTable tableName="pickup_point_opening_day">
+            <column name="opening_day_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_pickup_point_opening_day"/>
+            </column>
+            <column name="pickup_point_id" type="UUID"><constraints nullable="false"/></column>
+            <column name="day_of_week" type="VARCHAR(16)"><constraints nullable="false"/></column>
+            <column name="availability" type="VARCHAR(16)"><constraints nullable="false"/></column>
+        </createTable>
+
+        <createTable tableName="pickup_point_opening_interval">
+            <column name="opening_day_id" type="UUID"><constraints nullable="false"/></column>
+            <column name="interval_order" type="INTEGER"><constraints nullable="false"/></column>
+            <column name="start_minute" type="INTEGER"><constraints nullable="false"/></column>
+            <column name="end_minute" type="INTEGER"><constraints nullable="false"/></column>
+        </createTable>
+
+        <createTable tableName="pickup_point_schedule_exception">
+            <column name="schedule_exception_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_pickup_point_schedule_exception"/>
+            </column>
+            <column name="pickup_point_id" type="UUID"><constraints nullable="false"/></column>
+            <column name="exception_date" type="DATE"><constraints nullable="false"/></column>
+            <column name="availability" type="VARCHAR(16)"><constraints nullable="false"/></column>
+        </createTable>
+
+        <createTable tableName="pickup_point_exception_interval">
+            <column name="schedule_exception_id" type="UUID"><constraints nullable="false"/></column>
+            <column name="interval_order" type="INTEGER"><constraints nullable="false"/></column>
+            <column name="start_minute" type="INTEGER"><constraints nullable="false"/></column>
+            <column name="end_minute" type="INTEGER"><constraints nullable="false"/></column>
+        </createTable>
+
+        <addUniqueConstraint tableName="pickup_point" columnNames="operator_id,code"
+                             constraintName="uk_pickup_point_operator_code"/>
+        <addUniqueConstraint tableName="pickup_point" columnNames="operator_id,external_network_code,external_point_code"
+                             constraintName="uk_pickup_point_external_reference"/>
+        <addUniqueConstraint tableName="pickup_point_capability" columnNames="pickup_point_id,capability"
+                             constraintName="uk_pickup_point_capability"/>
+        <addUniqueConstraint tableName="pickup_point_allowed_size" columnNames="pickup_point_id,shipment_size"
+                             constraintName="uk_pickup_point_allowed_size"/>
+        <addUniqueConstraint tableName="pickup_point_opening_day" columnNames="pickup_point_id,day_of_week"
+                             constraintName="uk_pickup_point_opening_day"/>
+        <addUniqueConstraint tableName="pickup_point_opening_interval" columnNames="opening_day_id,interval_order"
+                             constraintName="uk_pickup_point_opening_interval"/>
+        <addUniqueConstraint tableName="pickup_point_schedule_exception" columnNames="pickup_point_id,exception_date"
+                             constraintName="uk_pickup_point_schedule_exception"/>
+        <addUniqueConstraint tableName="pickup_point_exception_interval" columnNames="schedule_exception_id,interval_order"
+                             constraintName="uk_pickup_point_exception_interval"/>
+
+        <addForeignKeyConstraint baseTableName="pickup_point" baseColumnNames="operator_id"
+                                 referencedTableName="operators" referencedColumnNames="operator_id"
+                                 constraintName="fk_pickup_point_operator" onDelete="RESTRICT"/>
+        <addForeignKeyConstraint baseTableName="pickup_point" baseColumnNames="department_id"
+                                 referencedTableName="department" referencedColumnNames="department_id"
+                                 constraintName="fk_pickup_point_department" onDelete="RESTRICT"/>
+        <addForeignKeyConstraint baseTableName="pickup_point_capability" baseColumnNames="pickup_point_id"
+                                 referencedTableName="pickup_point" referencedColumnNames="pickup_point_id"
+                                 constraintName="fk_pickup_point_capability_point" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_point_allowed_size" baseColumnNames="pickup_point_id"
+                                 referencedTableName="pickup_point" referencedColumnNames="pickup_point_id"
+                                 constraintName="fk_pickup_point_allowed_size_point" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_point_opening_day" baseColumnNames="pickup_point_id"
+                                 referencedTableName="pickup_point" referencedColumnNames="pickup_point_id"
+                                 constraintName="fk_pickup_point_opening_day_point" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_point_opening_interval" baseColumnNames="opening_day_id"
+                                 referencedTableName="pickup_point_opening_day" referencedColumnNames="opening_day_id"
+                                 constraintName="fk_pickup_point_opening_interval_day" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_point_schedule_exception" baseColumnNames="pickup_point_id"
+                                 referencedTableName="pickup_point" referencedColumnNames="pickup_point_id"
+                                 constraintName="fk_pickup_point_schedule_exception_point" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="pickup_point_exception_interval" baseColumnNames="schedule_exception_id"
+                                 referencedTableName="pickup_point_schedule_exception" referencedColumnNames="schedule_exception_id"
+                                 constraintName="fk_pickup_point_exception_interval_exception" onDelete="CASCADE"/>
+
+        <createIndex tableName="pickup_point" indexName="idx_pickup_point_operator_status_type">
+            <column name="operator_id"/><column name="status"/><column name="type"/>
+        </createIndex>
+        <createIndex tableName="pickup_point" indexName="idx_pickup_point_operator_department">
+            <column name="operator_id"/><column name="department_id"/>
+        </createIndex>
+        <createIndex tableName="pickup_point" indexName="idx_pickup_point_operator_location">
+            <column name="operator_id"/><column name="country_code"/><column name="city"/>
+        </createIndex>
+
+        <sql>
+            ALTER TABLE pickup_point ADD CONSTRAINT chk_pickup_point_coordinates
+            CHECK ((latitude IS NULL AND longitude IS NULL) OR (latitude BETWEEN -90 AND 90 AND longitude BETWEEN -180 AND 180));
+            ALTER TABLE pickup_point_opening_interval ADD CONSTRAINT chk_pickup_point_opening_interval
+            CHECK (start_minute BETWEEN 0 AND 1439 AND end_minute BETWEEN 1 AND 1440 AND start_minute &lt; end_minute);
+            ALTER TABLE pickup_point_exception_interval ADD CONSTRAINT chk_pickup_point_exception_interval
+            CHECK (start_minute BETWEEN 0 AND 1439 AND end_minute BETWEEN 1 AND 1440 AND start_minute &lt; end_minute);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
