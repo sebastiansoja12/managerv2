@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.device.Mobile;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.MobileEntity;
@@ -44,6 +45,14 @@ public class MobileRepositoryImpl implements DeviceRepository<Mobile> {
     public Optional<Mobile> findByExternalSystemId(final String externalSystemId) {
         return repository.findByIdentityExternalSystemId(externalSystemId)
                 .map(toModelMapper::map);
+    }
+
+    @Override
+    public List<Mobile> findByUserId(final UserId userId) {
+        return repository.findByUserId(userId)
+                .stream()
+                .map(toModelMapper::map)
+                .toList();
     }
 
     @Override

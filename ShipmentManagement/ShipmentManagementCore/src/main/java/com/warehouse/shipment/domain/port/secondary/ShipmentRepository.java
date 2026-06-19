@@ -1,11 +1,11 @@
 package com.warehouse.shipment.domain.port.secondary;
 
+import java.util.Optional;
+
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.commonassets.identificator.TrackingNumber;
-
-import java.util.Optional;
+import com.warehouse.shipment.domain.model.Shipment;
 
 public interface ShipmentRepository {
 

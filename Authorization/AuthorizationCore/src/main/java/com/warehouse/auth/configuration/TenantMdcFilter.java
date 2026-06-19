@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,15 +16,15 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
-@Slf4j
 public class TenantMdcFilter extends OncePerRequestFilter {
 
     private final ApiKeyService apiKeyService;
 
     private final ApiExposureProperties apiExposureProperties;
+
+    private final Logger log = org.slf4j.LoggerFactory.getLogger("");
 
     private static final List<String> WHITELIST = List.of(
             "/v2/api/swagger-ui",
@@ -44,8 +45,6 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                                     final HttpServletResponse response,
                                     final FilterChain filterChain) throws IOException, java.io.IOException {
 
-        initMdc(request);
-
         try {
             final String uri = request.getRequestURI();
 
@@ -55,7 +54,6 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             }
 
             final DecodedApiTenant tenantInfo = authenticateWithJwt(request, response);
-
             if (tenantInfo == null) {
                 log.warn("Authentication failed for URI: {}", uri);
                 if (!response.isCommitted()) {
@@ -64,8 +62,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                 }
                 return;
             }
-
-            setMdcFromTenant(tenantInfo);
+            initMdc(tenantInfo, request);
             log.info("Incoming {} request", request.getMethod());
             filterChain.doFilter(request, response);
 
@@ -79,10 +76,10 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         }
     }
 
-    private void initMdc(final HttpServletRequest request) {
-        MDC.put("tenant", "N/A");
-        MDC.put("user", "N/A");
-        MDC.put("username", "N/A");
+    private void initMdc(final DecodedApiTenant tenant, final HttpServletRequest request) {
+        MDC.put("tenant", tenant.departmentCode().value());
+        MDC.put("user", tenant.userId().value().toString());
+        MDC.put("username", tenant.username());
         MDC.put("uri", request.getRequestURL().toString());
         MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         MDC.put("method", request.getMethod());

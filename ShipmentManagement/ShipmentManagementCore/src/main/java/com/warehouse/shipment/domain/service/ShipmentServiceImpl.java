@@ -1,6 +1,7 @@
 package com.warehouse.shipment.domain.service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatusCode;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
@@ -18,13 +20,18 @@ import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
+import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 
 public class ShipmentServiceImpl implements ShipmentService {
 
     private final ShipmentRepository shipmentRepository;
 
-	public ShipmentServiceImpl(final ShipmentRepository shipmentRepository) {
+    private final SpecificationRepository specificationShipmentRepository;
+
+	public ShipmentServiceImpl(final ShipmentRepository shipmentRepository,
+                               final SpecificationRepository specificationShipmentRepository) {
         this.shipmentRepository = shipmentRepository;
+        this.specificationShipmentRepository = specificationShipmentRepository;
     }
 
     @Override
@@ -41,6 +48,11 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public Shipment find(final TrackingNumber trackingNumber) {
         return this.shipmentRepository.findByTrackingNumber(trackingNumber);
+    }
+
+    @Override
+    public List<Shipment> search(final ShipmentSearchCriteria criteria) {
+        return this.specificationShipmentRepository.list(criteria);
     }
 
     @Override

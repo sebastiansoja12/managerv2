@@ -49,6 +49,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void changePassword(final UserId userId, final String encodedPassword) {
+        final User user = this.userRepository.findById(userId);
+        user.changePassword(encodedPassword);
+        this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
+    }
+
+    @Override
     public void changeRole(final UserId userId, final User.Role role) {
         final User user = this.userRepository.findById(userId);
         user.changeRole(role);

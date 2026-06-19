@@ -190,4 +190,9 @@ public class DeviceGenericServiceImpl implements DeviceGenericService {
     public Optional<Device> findByExternalSystemId(final String externalSystemId) {
         return this.deviceRepository.findByExternalSystemId(externalSystemId);
     }
+
+    @Override
+    public List<Device> findByUserId(final UserId userId) {
+        return this.deviceRepository.findByUserId(userId);
+    }
 }

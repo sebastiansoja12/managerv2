@@ -8,11 +8,15 @@ import java.util.Locale;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.command.*;
+import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.port.primary.DevicePort;
 import com.warehouse.terminal.domain.vo.DeviceUserRequest;
 import com.warehouse.terminal.domain.vo.DeviceVersionRequest;
@@ -28,6 +32,10 @@ public class DeviceController {
 
     private final DevicePort devicePort;
 
+    private final DevicePairPort devicePairPort;
+
+    private final CurrentUserApiService currentUserApiService;
+
     private final DeviceRequestValidationService requestValidationService;
 
     private final TerminalRequestMapper requestMapper = getMapper(TerminalRequestMapper.class);
@@ -35,8 +43,12 @@ public class DeviceController {
     private final TerminalResponseMapper responseMapper = getMapper(TerminalResponseMapper.class);
 
     public DeviceController(final DevicePort devicePort,
+                            final DevicePairPort devicePairPort,
+                            final CurrentUserApiService currentUserApiService,
                             final DeviceRequestValidationService requestValidationService) {
         this.devicePort = devicePort;
+        this.devicePairPort = devicePairPort;
+        this.currentUserApiService = currentUserApiService;
         this.requestValidationService = requestValidationService;
     }
 
@@ -141,6 +153,29 @@ public class DeviceController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/current-user")
+    public ResponseEntity<?> getCurrentUserDevices() {
+        final UserId currentUserId = this.currentUserApiService.getCurrentUserId();
+        final List<DeviceDto> deviceResponse = this.devicePort.findDevicesByUserId(currentUserId)
+                .stream()
+                .map(responseMapper::mapToDeviceResponse)
+                .toList();
+        return ResponseEntity.ok().body(deviceResponse);
+    }
+
+    @PostMapping("/current-user/pairings")
+    public ResponseEntity<?> pairCurrentUserDevice(@RequestBody final CurrentUserDevicePairRequestDto requestDto) {
+        final UserId currentUserId = this.currentUserApiService.getCurrentUserId();
+        final DepartmentCode departmentCode = requestDto.departmentCode() != null
+                ? new DepartmentCode(requestDto.departmentCode().value())
+                : null;
+        final DevicePairRequest request = new DevicePairRequest(
+                requestDto.externalSystemId(),
+                departmentCode,
+                currentUserId);
+        return ResponseEntity.ok().body(responseMapper.map(this.devicePairPort.pair(request)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getDevice(@PathVariable final String id) {
         final DeviceId deviceId = new DeviceId(id);
@@ -157,4 +192,5 @@ public class DeviceController {
                 .toList();
         return ResponseEntity.ok().body(deviceResponse);
     }
+
 }

@@ -3,6 +3,7 @@ package com.warehouse.terminal.domain.port.primary;
 import java.util.List;
 
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.command.*;
 import com.warehouse.terminal.domain.vo.DeviceCreateResult;
@@ -16,6 +17,7 @@ public interface DevicePort {
     void updateDevice(final DeviceUpdateCommand request);
     void updateSettings(final DeviceSettingsRequest request);
     List<Device> allDevices();
+    List<Device> findDevicesByUserId(final UserId userId);
 
     Device getDevice(final DeviceId deviceId);
 

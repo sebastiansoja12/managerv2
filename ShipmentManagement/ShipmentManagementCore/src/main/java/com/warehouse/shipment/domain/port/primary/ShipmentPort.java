@@ -9,6 +9,8 @@ import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.model.ShipmentUpdateCommand;
 import com.warehouse.shipment.domain.vo.*;
 
+import java.util.List;
+
 public interface ShipmentPort {
 
     Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand request);
@@ -36,6 +38,8 @@ public interface ShipmentPort {
     Shipment loadShipment(final ShipmentId shipmentId);
 
     Shipment loadShipment(final TrackingNumber trackingNumber);
+
+    List<Shipment> searchShipments(final ShipmentSearchCriteria criteria);
 
     boolean existsShipment(final ShipmentId shipmentId);
 

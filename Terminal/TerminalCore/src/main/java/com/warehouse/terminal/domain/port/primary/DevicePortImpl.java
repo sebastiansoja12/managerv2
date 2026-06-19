@@ -129,6 +129,11 @@ public class DevicePortImpl implements DevicePort {
     }
 
     @Override
+    public List<Device> findDevicesByUserId(final UserId userId) {
+        return this.deviceGenericService.findByUserId(userId);
+    }
+
+    @Override
     public Device getDevice(final DeviceId deviceId) {
         return this.deviceGenericService.findByDeviceId(deviceId);
     }

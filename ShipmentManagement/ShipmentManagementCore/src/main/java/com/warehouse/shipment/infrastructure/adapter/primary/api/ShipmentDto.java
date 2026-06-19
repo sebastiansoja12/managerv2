@@ -18,6 +18,8 @@ public class ShipmentDto {
 
     private final ShipmentPriorityDto shipmentPriority;
 
+    private final TrackingNumberDto trackingNumber;
+
     private final MoneyApi price;
 
     private final Boolean locked;
@@ -29,6 +31,7 @@ public class ShipmentDto {
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
                        final ShipmentSizeDto shipmentSize, final String destination, final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
+                       final TrackingNumberDto trackingNumber,
                        final MoneyApi price, final Boolean locked,
                        final SignatureDto signature, final DangerousGoodApi dangerousGood) {
         this.shipmentId = shipmentId;
@@ -39,7 +42,8 @@ public class ShipmentDto {
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentPriority = shipmentPriority;
-		this.price = price;
+        this.trackingNumber = trackingNumber;
+        this.price = price;
         this.locked = locked;
         this.signature = signature;
         this.dangerousGood = dangerousGood;
@@ -95,5 +99,9 @@ public class ShipmentDto {
 
     public DangerousGoodApi getDangerousGood() {
         return dangerousGood;
+    }
+
+    public TrackingNumberDto getTrackingNumber() {
+        return trackingNumber;
     }
 }

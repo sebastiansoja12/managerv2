@@ -16,6 +16,8 @@ public interface UserPort {
 
     void updateFullName(final FullNameRequest request);
 
+    void changePassword(final UserId userId, final String encodedPassword);
+
     void changeRole(final UserId userId, final User.Role role);
 
     void changeAdminDepartmentInfo(final UserDepartmentUpdateRequest request);
