@@ -1,6 +1,8 @@
 package com.warehouse.commonassets.enumeration;
 
 public enum ShipmentStatus {
+    PLANNED,
+
     CREATED,
 
     PREPARED,
