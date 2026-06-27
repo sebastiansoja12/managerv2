@@ -39,6 +39,10 @@ public interface ShipmentPort {
 
     Shipment loadShipment(final TrackingNumber trackingNumber);
 
+    ShipmentControlCenter loadShipmentControlCenter(final ShipmentId shipmentId);
+
+    ShipmentControlCenter loadShipmentControlCenter(final TrackingNumber trackingNumber);
+
     List<Shipment> searchShipments(final ShipmentSearchCriteria criteria);
 
     boolean existsShipment(final ShipmentId shipmentId);

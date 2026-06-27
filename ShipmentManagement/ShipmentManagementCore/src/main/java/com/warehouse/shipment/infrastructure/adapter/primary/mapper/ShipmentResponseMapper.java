@@ -10,6 +10,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
+import com.warehouse.shipment.domain.vo.ShipmentControlCenter;
 import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
 import com.warehouse.shipment.domain.vo.ShipmentUpdateResponse;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
@@ -28,6 +29,10 @@ public interface ShipmentResponseMapper {
 
     @Mapping(target = "dangerousGood.weight.value", source = "dangerousGood.weight.weight")
     ShipmentDto map(final Shipment shipment);
+
+    default ShipmentControlCenterResponseApi map(final ShipmentControlCenter controlCenter) {
+        return new ShipmentControlCenterResponseApi(map(controlCenter.shipment()), controlCenter.routeLog());
+    }
 
     default List<String> map(String value) {
         return List.of(value);

@@ -34,10 +34,7 @@ public class AuthenticationController {
     private final AuthenticationResponseMapper responseMapper;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> create(
-            @RequestHeader("X-API-KEY") final String apiKey,
-            @RequestBody final RegisterRequestDto registerRequest) {
-        //apiKeyService.validateApiKey(apiKey);
+    public ResponseEntity<?> create(@RequestBody final RegisterRequestDto registerRequest) {
         final RegisterRequest request = RegisterRequest.from(registerRequest);
         final RegisterResponse registerResponse = this.authenticationPort.signup(request);
         return new ResponseEntity<>(responseMapper.map(registerResponse), HttpStatus.OK);

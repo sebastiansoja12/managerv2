@@ -57,6 +57,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void changeLanguage(final UserId userId, final String language) {
+        final User user = this.userRepository.findById(userId);
+        user.changeLanguage(language);
+        this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
+    }
+
+    @Override
     public void changeRole(final UserId userId, final User.Role role) {
         final User user = this.userRepository.findById(userId);
         user.changeRole(role);

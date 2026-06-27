@@ -14,6 +14,7 @@ public abstract class UserToEntityMapper {
                 .password(user.getPassword())
                 .role(UserRoleMapper.map(user.getRole()))
                 .departmentCode(user.getDepartmentCode())
+                .language(user.getLanguage())
                 .apiKey(user.getApiKey())
                 .permissions(UserPermissionToEntityMapper.map(user.getPermissions()))
                 .deleted(user.isDeleted())

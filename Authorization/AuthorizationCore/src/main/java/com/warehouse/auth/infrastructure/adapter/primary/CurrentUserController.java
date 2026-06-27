@@ -12,6 +12,7 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.CurrentUserAuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
+import com.warehouse.auth.infrastructure.dto.ChangeLanguageRequestDto;
 import com.warehouse.auth.infrastructure.dto.ChangePasswordRequestDto;
 
 @RestController
@@ -53,7 +54,23 @@ public class CurrentUserController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/language")
+    public ResponseEntity<?> changeLanguage(@RequestBody final ChangeLanguageRequestDto request) {
+        if (request == null || isBlank(request.language()) || !isSupportedLanguage(request.language())) {
+            return ResponseEntity.badRequest().body("Supported language is required");
+        }
+
+        final User user = currentUserAuthenticationPort.getCurrentUser();
+        userPort.changeLanguage(user.getUserId(), request.language());
+        final User changedUser = userPort.findUser(user.getUserId());
+        return ResponseEntity.ok(ResponseMapper.map(changedUser));
+    }
+
     private boolean isBlank(final String value) {
         return value == null || value.isBlank();
+    }
+
+    private boolean isSupportedLanguage(final String language) {
+        return "pl".equals(language) || "en".equals(language);
     }
 }

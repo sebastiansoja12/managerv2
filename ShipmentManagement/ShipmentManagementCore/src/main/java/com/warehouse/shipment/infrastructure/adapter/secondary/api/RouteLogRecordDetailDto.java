@@ -5,12 +5,9 @@ import java.time.LocalDateTime;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 
-import lombok.Builder;
-
-@Builder
-public record RouteLogRecordDetail(
+public record RouteLogRecordDetailDto(
         Long id,
-        TerminalId terminalId,
+        TerminalIdDto terminalId,
         String version,
         String username,
         String supplierCode,
@@ -20,4 +17,5 @@ public record RouteLogRecordDetail(
         LocalDateTime timestamp,
         ProcessType processType,
         String request
-) {}
+) {
+}

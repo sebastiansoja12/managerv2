@@ -51,6 +51,10 @@ public abstract class ProcessLogToEntityMapper {
     }
 
     public static DeviceInformationEmbeddable map(final DeviceInformation deviceInformation) {
+        if (deviceInformation == null) {
+            return null;
+        }
+
         return new DeviceInformationEmbeddable(deviceInformation.departmentCode(),
                 deviceInformation.deviceId(), deviceInformation.deviceType(), deviceInformation.deviceUserType(),
                 deviceInformation.userId(), deviceInformation.version());

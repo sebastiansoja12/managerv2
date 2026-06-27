@@ -3,6 +3,9 @@ package com.warehouse.process.domain.service;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.context.DomainContext;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
@@ -37,6 +40,17 @@ public class ProcessServiceImpl implements ProcessService {
     public ProcessLog findById(final ProcessId processId) {
         return this.processRepository.findById(processId)
                 .orElseThrow(() -> new ProcessLogNotFoundException("Process log not found"));
+    }
+
+    @Override
+    public ProcessLog findByIdForCurrentDepartment(final ProcessId processId) {
+        return this.processRepository.findByIdForCurrentDepartment(processId)
+                .orElseThrow(() -> new ProcessLogNotFoundException("Process log not found"));
+    }
+
+    @Override
+    public Page<ProcessLog> findAllForCurrentDepartment(final Pageable pageable) {
+        return this.processRepository.findAllForCurrentDepartment(pageable);
     }
 
     @Override

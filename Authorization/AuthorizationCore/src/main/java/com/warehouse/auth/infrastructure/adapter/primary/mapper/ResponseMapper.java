@@ -22,6 +22,7 @@ public abstract class ResponseMapper {
         final String email = user.getEmail();
         final String role = user.getRole().name();
         final String departmentCode = user.getDepartmentCode().getValue();
+        final String language = user.getLanguage();
         final Boolean deleted = user.isDeleted();
         final Instant createdAt = user.createdAt();
         final Instant updatedAt = user.updatedAt();
@@ -29,7 +30,7 @@ public abstract class ResponseMapper {
 				.map(rolePermission -> new RolePermissionApi(
 						rolePermission.getPermission().getPermission()))
 				.collect(Collectors.toSet());
-		return new UserDto(userId, username, firstName, lastName, email, role, departmentCode, rolePermissions, deleted,
+		return new UserDto(userId, username, firstName, lastName, email, role, departmentCode, language, rolePermissions, deleted,
 				createdAt, updatedAt);
     }
 }
