@@ -12,6 +12,8 @@ import com.warehouse.deliveryreject.DeliveryRejectService;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
 import com.warehouse.deliveryreject.dto.response.DeliveryRejectResponseDto;
 
+import static com.warehouse.commonassets.enumeration.ProcessType.REJECT;
+
 @Component
 public class ProcessRejectResolver implements ProcessHandler {
 
@@ -27,8 +29,7 @@ public class ProcessRejectResolver implements ProcessHandler {
 
     @Override
     public boolean supports(final ProcessType processType) {
-        // return REJECT.equals(processType);
-        return false;
+        return REJECT.equals(processType);
     }
 
     @Override

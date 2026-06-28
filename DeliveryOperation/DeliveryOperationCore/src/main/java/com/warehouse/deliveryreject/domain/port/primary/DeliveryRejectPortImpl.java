@@ -3,7 +3,6 @@ package com.warehouse.deliveryreject.domain.port.primary;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.warehouse.deliveryreject.domain.model.DeliveryReject;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectDetails;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
 import com.warehouse.deliveryreject.domain.model.ShipmentRejectRequest;
@@ -12,7 +11,10 @@ import com.warehouse.deliveryreject.domain.port.secondary.RejectShipmentServiceP
 import com.warehouse.deliveryreject.domain.port.secondary.RejectTrackerServicePort;
 import com.warehouse.deliveryreject.domain.service.DeliveryRejectConverterService;
 import com.warehouse.deliveryreject.domain.service.RejectService;
-import com.warehouse.deliveryreject.domain.vo.*;
+import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse;
+import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponseDetails;
+import com.warehouse.deliveryreject.domain.vo.RejectReasonId;
+import com.warehouse.deliveryreject.domain.vo.ShipmentRejectResponse;
 import com.warehouse.terminal.DeviceInformation;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,30 +51,19 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
 
         deliveryRejectRequest.validateStatuses();
 
-        deliveryRejectRequest.rewriteSupplierCodeFromDevice();
-
-        deliveryRejectRequest.getDeliveryRejectDetails().forEach(deliveryRejectDetail -> {
-            if (!deliveryRejectDetail.getDepartmentCode().equals(device.getDepartmentCode())) {
-                throw new RuntimeException("Invalid department code");
-            }
-        });
+        //deliveryRejectRequest.rewriteSupplierCodeFromDevice();
 
         deliveryRejectRequest.rewriteDepartmentCodeFromDevice();
 
-        final List<DeliveryRejectResponseDetails> deliveryRejectResponseDetails = Lists.newArrayList();
+        final List<DeliveryRejectResponseDetails> rejectResponseDetails = Lists.newArrayList();
+
         for (final DeliveryRejectDetails deliveryRejectDetail : deliveryRejectRequest.getDeliveryRejectDetails()) {
-            final Person recipient = this.personShipmentServicePort.getRecipient(deliveryRejectDetail.getShipmentId());
-            final DeliveryReject deliveryReject = deliveryRejectConverterService.convertToDeliveryReject(deliveryRejectDetail, recipient);
-            rejectService.createReject(deliveryReject);
-            final ShipmentRejectResponse shipmentRejectResponse = notifyShipmentReject(deliveryRejectDetail);
-            deliveryRejectResponseDetails.add(deliveryRejectConverterService.convertToDeliveryRejectResponseDetails(deliveryReject, shipmentRejectResponse));
+            rejectResponseDetails.add(new DeliveryRejectResponseDetails(new RejectReasonId(1L), deliveryRejectDetail.getShipmentId(),
+                    deliveryRejectDetail.getShipmentId(), deliveryRejectDetail.getSupplierCode(), deliveryRejectDetail.getDepartmentCode(),
+                    deliveryRejectDetail.getRejectReason(), deliveryRejectDetail.getDeliveryStatus()));
         }
 
-        final RejectTrackerRequest rejectTrackerRequest = RejectTrackerRequest.from(deliveryRejectRequest);
-        final RejectTrackerResponse rejectTrackerResponse = this.rejectTrackerServicePort.logRejectInTracker(rejectTrackerRequest);
-
-
-        return new DeliveryRejectResponse(deliveryRejectResponseDetails, deliveryRejectRequest.getDeviceInformation());
+        return new DeliveryRejectResponse(rejectResponseDetails, deliveryRejectRequest.getDeviceInformation());
     }
 
     private ShipmentRejectResponse notifyShipmentReject(final DeliveryRejectDetails deliveryRejectDetail) {

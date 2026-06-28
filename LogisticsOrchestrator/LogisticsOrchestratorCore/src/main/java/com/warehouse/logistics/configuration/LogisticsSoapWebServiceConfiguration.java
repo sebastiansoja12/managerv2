@@ -26,10 +26,19 @@ public class LogisticsSoapWebServiceConfiguration {
         return new ServletRegistrationBean<>(servlet, "/ws/*");
     }
 
+    @Bean(name = "TerminalService")
+    public DefaultWsdl11Definition terminalServiceWsdlDefinition(final XsdSchema terminalSchema) {
+        return terminalWsdlDefinition(terminalSchema);
+    }
+
     @Bean(name = "deliveries")
     public DefaultWsdl11Definition deliveriesWsdlDefinition(final XsdSchema terminalSchema) {
+        return terminalWsdlDefinition(terminalSchema);
+    }
+
+    private DefaultWsdl11Definition terminalWsdlDefinition(final XsdSchema terminalSchema) {
         final DefaultWsdl11Definition definition = new DefaultWsdl11Definition();
-        definition.setPortTypeName("LogisticsDispatchPort");
+        definition.setPortTypeName("TerminalPort");
         definition.setLocationUri("/ws");
         definition.setTargetNamespace(TERMINAL_NAMESPACE);
         definition.setRequestSuffix("Request");

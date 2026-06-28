@@ -3,14 +3,14 @@ package com.warehouse.process.infrastructure.event;
 import java.time.LocalDateTime;
 
 import com.warehouse.commonassets.enumeration.ServiceType;
-import com.warehouse.process.infrastructure.dto.ProcessLogId;
+import com.warehouse.commonassets.identificator.ProcessId;
 
 public class ProcessChangedEvent implements ProcessLogEvent {
-    private final ProcessLogId processLogId;
+    private final ProcessId processLogId;
     private final ServiceType serviceType;
     private final LocalDateTime createdAt;
 
-    public ProcessChangedEvent(final ProcessLogId processLogId,
+    public ProcessChangedEvent(final ProcessId processLogId,
                                final ServiceType serviceType,
                                final LocalDateTime createdAt) {
         this.processLogId = processLogId;
@@ -18,7 +18,7 @@ public class ProcessChangedEvent implements ProcessLogEvent {
         this.createdAt = createdAt;
     }
 
-    public ProcessLogId getProcessLogId() {
+    public ProcessId getProcessLogId() {
         return processLogId;
     }
 

@@ -31,7 +31,9 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/v2/api/v3/api-docs",
             "/v2/api/swagger-resources",
             "/v2/api/webjars",
-            "/v2/api/auth/login"
+            "/v2/api/auth/login",
+            "/v2/api/ws",
+            "/ws"
     );
 
     public TenantMdcFilter(final ApiKeyService apiKeyService,

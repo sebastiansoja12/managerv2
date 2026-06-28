@@ -33,6 +33,7 @@
             <xs:element name="DeviceID" type="xs:string" minOccurs="0"/>
             <xs:element name="ResponsibleUser" type="xs:string" minOccurs="0"/>
             <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="PairKey" type="xs:string" minOccurs="0"/>
             <xs:element name="DeviceUserType" type="DeviceUserTypeEnum" minOccurs="0"/>
             <xs:element name="DeviceType" type="xs:string" minOccurs="0"/>
             <xs:element name="DeviceUpToDate" type="DeviceUpToDateEnum" minOccurs="0"/>
