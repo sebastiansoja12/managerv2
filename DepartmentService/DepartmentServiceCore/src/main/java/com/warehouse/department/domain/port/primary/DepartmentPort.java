@@ -1,12 +1,13 @@
 package com.warehouse.department.domain.port.primary;
 
+import java.util.List;
+
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.model.DepartmentCreateCommand;
 import com.warehouse.department.domain.vo.*;
-
-import java.util.List;
 
 public interface DepartmentPort {
 
@@ -29,4 +30,6 @@ public interface DepartmentPort {
     void changeStatus(final ChangeDepartmentStatusCommand command);
 
     void changeEmail(final DepartmentCode departmentCode, final String email);
+
+    Boolean checkExists(final DepartmentCode departmentCode);
 }

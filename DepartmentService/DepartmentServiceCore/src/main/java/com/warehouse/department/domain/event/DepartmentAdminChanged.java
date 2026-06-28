@@ -1,7 +1,7 @@
 package com.warehouse.department.domain.event;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.department.domain.vo.DepartmentCode;
 
 public class DepartmentAdminChanged {
     private final DepartmentCode departmentCode;

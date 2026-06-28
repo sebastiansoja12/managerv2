@@ -1,16 +1,16 @@
 package com.warehouse.department.infrastructure.adapter.primary.mapper;
 
+import java.util.List;
+
 import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.DepartmentCreate;
 import com.warehouse.department.domain.model.DepartmentCreateCommand;
 import com.warehouse.department.domain.vo.Address;
-import com.warehouse.department.domain.vo.DepartmentCode;
 import com.warehouse.department.domain.vo.IdentificationNumberChangeCommand;
 import com.warehouse.department.domain.vo.UpdateAddressCommand;
 import com.warehouse.department.infrastructure.adapter.primary.api.dto.*;
-
-import java.util.List;
 
 public abstract class RequestMapper {
 
