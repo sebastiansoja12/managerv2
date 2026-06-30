@@ -13,6 +13,7 @@ import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.service.ProcessService;
 import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
 import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,16 +48,26 @@ public class ProcessPortImpl implements ProcessPort {
 
     @Override
     public void finishProcess(final ProcessId processId, final ProcessStatus processStatus) {
+        finishProcess(processId, processStatus, null);
+    }
+
+    @Override
+    public void finishProcess(final ProcessId processId, final ProcessStatus processStatus, final String faultDescription) {
         if (processStatus.equals(ProcessStatus.SUCCESS)) {
             this.processService.logFinishedProcess(processId);
         } else if (processStatus.equals(ProcessStatus.FAILURE)) {
-            this.processService.logFailedProcess(processId);
+            this.processService.logFailedProcess(processId, faultDescription);
         }
     }
 
     @Override
     public void assignShipmentUpdated(final ProcessId processId, final ShipmentUpdated shipmentUpdated) {
         this.processService.assignShipmentUpdated(processId, shipmentUpdated);
+    }
+
+    @Override
+    public void assignShipmentRejected(final ProcessId processId, final ShipmentRejected shipmentRejected) {
+        this.processService.assignShipmentRejected(processId, shipmentRejected);
     }
 
     @Override

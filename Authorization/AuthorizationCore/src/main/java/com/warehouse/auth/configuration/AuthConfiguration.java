@@ -100,7 +100,7 @@ public class AuthConfiguration  {
         return new AuthenticationResponseMapperImpl();
     }
 
-    @Bean
+    @Bean(name = "authentication.departmentServicePort")
     public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService) {
         return new DepartmentServiceAdapter(departmentApiService);
     }

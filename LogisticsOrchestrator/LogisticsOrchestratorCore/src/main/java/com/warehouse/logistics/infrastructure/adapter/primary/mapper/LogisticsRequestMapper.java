@@ -132,11 +132,17 @@ public class LogisticsRequestMapper {
     }
 
     public DeliveryRejectRequestDto mapToDeliveryRejectRequest(final Request request) {
+        return mapToDeliveryRejectRequest(request, null);
+    }
+
+    public DeliveryRejectRequestDto mapToDeliveryRejectRequest(final Request request,
+                                                               final com.warehouse.commonassets.identificator.ProcessId processId) {
         final DeviceInformationDto deviceInformation = map(request.getDeviceInformation());
         final DeliveryRejectRequest deliveryRejectRequest = request.getDeliveryRejectRequest();
         final ProcessTypeDto processType = map(request.getProcessType());
         final List<DeliveryRejectDetailsDto> details = mapToDeliveryRejectDetails(deliveryRejectRequest.getDeliveryRejectDetails());
-        return new DeliveryRejectRequestDto(details, deviceInformation, processType);
+        return new DeliveryRejectRequestDto(details, deviceInformation, processType,
+                processId == null ? null : processId.value());
     }
 
     public DeliveryMissedRequestDto mapToDeliveryMissedRequest(final Request request) {

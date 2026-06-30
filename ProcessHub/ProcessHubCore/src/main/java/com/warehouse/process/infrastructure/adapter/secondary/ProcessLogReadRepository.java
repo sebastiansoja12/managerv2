@@ -1,13 +1,13 @@
 package com.warehouse.process.infrastructure.adapter.secondary;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ProcessId;
@@ -36,4 +36,6 @@ public interface ProcessLogReadRepository extends JpaRepository<ProcessLogReadEn
             """)
     Optional<ProcessLogReadEntity> findByIdAndDepartmentCode(final ProcessId processId,
                                                              final DepartmentCode departmentCode);
+
+    Optional<ProcessLogReadEntity> findByProcessId(final ProcessId processId);
 }

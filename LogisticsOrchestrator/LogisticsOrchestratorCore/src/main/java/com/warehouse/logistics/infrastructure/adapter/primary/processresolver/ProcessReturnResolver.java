@@ -5,6 +5,7 @@ import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRe
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.logistics.domain.model.Request;
 import com.warehouse.logistics.domain.model.Response;
 import com.warehouse.logistics.infrastructure.adapter.primary.ProcessHandler;
@@ -31,7 +32,7 @@ public class ProcessReturnResolver implements ProcessHandler {
     }
 
     @Override
-    public Response processRequest(final Request request) {
+    public Response processRequest(final ProcessId processId, final Request request) {
         final DeliveryReturnRequestDto deliveryReturnRequest = requestMapper.mapToDeliveryReturnRequest(request);
 		final DeliveryReturnResponseDto deliveryReturnResponse = deliveryReturnService
 				.processDeliveryReturn(deliveryReturnRequest);

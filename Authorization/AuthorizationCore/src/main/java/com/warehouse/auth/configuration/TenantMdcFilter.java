@@ -9,7 +9,7 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.warehouse.auth.domain.service.ApiKeyService;
+import com.warehouse.auth.domain.service.JwtDecodeService;
 import com.warehouse.auth.domain.vo.DecodedApiTenant;
 
 import io.jsonwebtoken.io.IOException;
@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class TenantMdcFilter extends OncePerRequestFilter {
 
-    private final ApiKeyService apiKeyService;
+    private final JwtDecodeService jwtDecodeService;
 
     private final ApiExposureProperties apiExposureProperties;
 
@@ -36,9 +36,9 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/ws"
     );
 
-    public TenantMdcFilter(final ApiKeyService apiKeyService,
+    public TenantMdcFilter(final JwtDecodeService jwtDecodeService,
                            final ApiExposureProperties apiExposureProperties) {
-        this.apiKeyService = apiKeyService;
+        this.jwtDecodeService = jwtDecodeService;
         this.apiExposureProperties = apiExposureProperties;
     }
 
@@ -74,7 +74,6 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             response.getWriter().write("Internal server error");
         } finally {
             MDC.clear();
-            JwtContext.clear();
         }
     }
 
@@ -97,8 +96,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         }
         try {
             final String token = auth.substring(7);
-            JwtContext.setToken(token);
-            return apiKeyService.decodeJwt(token);
+            return jwtDecodeService.decodeJwt(token);
         } catch (final IllegalArgumentException e) {
             unauthorized(response, e.getMessage());
         } catch (final Exception e) {

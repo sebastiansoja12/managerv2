@@ -1,7 +1,8 @@
 package com.warehouse.logistics.domain.port.primary;
 
-import com.warehouse.logistics.domain.model.DeviceValidateCommand;
+import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.terminal.jaxb.TerminalRequest;
 
 public interface DeviceValidatorPort {
-    void validateDevice(final DeviceValidateCommand command);
+    void validateDevice(final ProcessId processId, final TerminalRequest terminalRequest);
 }

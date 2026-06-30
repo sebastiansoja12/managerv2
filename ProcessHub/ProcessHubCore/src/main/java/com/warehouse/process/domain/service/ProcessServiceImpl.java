@@ -16,6 +16,7 @@ import com.warehouse.process.domain.exception.ProcessLogNotFoundException;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
 import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 public class ProcessServiceImpl implements ProcessService {
@@ -64,6 +65,15 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
+    public void assignShipmentRejected(final ProcessId processId, final ShipmentRejected shipmentRejected) {
+        this.processRepository.findById(processId)
+                .ifPresent(processLog -> {
+                    processLog.applyShipmentRejected(shipmentRejected);
+                    this.processRepository.update(processLog);
+                });
+    }
+
+    @Override
     public void assignDeviceValidation(final ProcessId processId, final DeviceValidation deviceValidation) {
         this.processRepository.findById(processId)
                 .ifPresent(processLog -> {
@@ -92,8 +102,13 @@ public class ProcessServiceImpl implements ProcessService {
 
 	@Override
 	public void logFailedProcess(final ProcessId processId) {
+        logFailedProcess(processId, null);
+	}
+
+	@Override
+	public void logFailedProcess(final ProcessId processId, final String faultDescription) {
 		this.processRepository.findById(processId).ifPresent(processLog -> {
-			processLog.changeStatus(ProcessStatus.FAILURE);
+			processLog.changeStatus(ProcessStatus.FAILURE, faultDescription);
 			this.processRepository.update(processLog);
             DomainContext.eventPublisher().publishEvent(new ProcessFinished(processLog.snapshot(), Instant.now()));
 		});

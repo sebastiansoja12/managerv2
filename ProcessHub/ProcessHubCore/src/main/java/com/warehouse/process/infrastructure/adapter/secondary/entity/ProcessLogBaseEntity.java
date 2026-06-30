@@ -2,8 +2,6 @@ package com.warehouse.process.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
 
-import org.hibernate.annotations.Immutable;
-
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 
@@ -12,7 +10,6 @@ import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @Access(AccessType.FIELD)
-@Immutable
 @SuperBuilder
 public abstract class ProcessLogBaseEntity {
 
@@ -93,4 +90,3 @@ public abstract class ProcessLogBaseEntity {
         return 31;
     }
 }
-

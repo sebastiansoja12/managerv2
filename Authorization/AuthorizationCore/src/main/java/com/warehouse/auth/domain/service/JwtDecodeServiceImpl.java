@@ -4,7 +4,6 @@ import java.security.Key;
 
 import org.springframework.stereotype.Service;
 
-import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.vo.DecodedApiTenant;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -18,22 +17,12 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 
 @Service
-public class ApiKeyServiceImpl implements ApiKeyService {
-
-    private final UserRepository userRepository;
+public class JwtDecodeServiceImpl implements JwtDecodeService {
 
     private final JwtProvider jwtProvider;
 
-    public ApiKeyServiceImpl(final UserRepository userRepository, final JwtProvider jwtProvider) {
-        this.userRepository = userRepository;
+    public JwtDecodeServiceImpl(final JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
-    }
-
-    @Override
-    public void validateApiKey(final String key) {
-        if (userRepository.findByApiKey(key) == null) {
-            throw new IllegalArgumentException("Invalid API key");
-        }
     }
 
     @Override
@@ -54,11 +43,6 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         } catch (SignatureException | IllegalArgumentException e) {
             throw new RestException(401, "Invalid or expired JWT token");
         }
-    }
-
-    @Override
-    public DecodedApiTenant decodeApiKey(final String apiKey) {
-        return null;
     }
 
     private Key getSigningKey() {

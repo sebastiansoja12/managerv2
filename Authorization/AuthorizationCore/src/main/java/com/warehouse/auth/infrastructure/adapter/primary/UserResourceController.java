@@ -13,7 +13,7 @@ import com.warehouse.auth.domain.helper.Result;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.UserPort;
-import com.warehouse.auth.domain.service.ApiKeyService;
+import com.warehouse.auth.domain.service.JwtDecodeService;
 import com.warehouse.auth.infrastructure.dto.FullNameRequestApiDto;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.validator.RoleValidator;
@@ -29,11 +29,11 @@ public class UserResourceController {
 
     private final UserPort userPort;
 
-    private final ApiKeyService apiKeyService;
+    private final JwtDecodeService jwtDecodeService;
 
-    public UserResourceController(final UserPort userPort, final ApiKeyService apiKeyService) {
+    public UserResourceController(final UserPort userPort, final JwtDecodeService jwtDecodeService) {
         this.userPort = userPort;
-        this.apiKeyService = apiKeyService;
+        this.jwtDecodeService = jwtDecodeService;
     }
 
     @GetMapping("/{username}")

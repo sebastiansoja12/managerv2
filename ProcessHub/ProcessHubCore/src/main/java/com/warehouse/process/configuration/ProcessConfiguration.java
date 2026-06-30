@@ -30,9 +30,8 @@ public class ProcessConfiguration {
 
     @Bean
     public ProcessLogReadModelRepository processLogReadModelRepository(
-            final ProcessLogReadRepository processLogReadRepository,
-            final CommunicationLogReadRepository communicationLogReadRepository) {
-        return new ProcessLogReadModelRepositoryImpl(processLogReadRepository, communicationLogReadRepository);
+            final ProcessLogReadRepository processLogReadRepository) {
+        return new ProcessLogReadModelRepositoryImpl(processLogReadRepository);
     }
 
     @Bean

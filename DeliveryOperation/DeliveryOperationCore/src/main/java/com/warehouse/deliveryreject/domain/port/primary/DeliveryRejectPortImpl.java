@@ -1,8 +1,12 @@
 package com.warehouse.deliveryreject.domain.port.primary;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import com.warehouse.deliveryreject.domain.model.DeliveryReject;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectDetails;
 import com.warehouse.deliveryreject.domain.model.DeliveryRejectRequest;
 import com.warehouse.deliveryreject.domain.model.ShipmentRejectRequest;
@@ -51,24 +55,36 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
 
         deliveryRejectRequest.validateStatuses();
 
-        //deliveryRejectRequest.rewriteSupplierCodeFromDevice();
-
         deliveryRejectRequest.rewriteDepartmentCodeFromDevice();
 
-        final List<DeliveryRejectResponseDetails> rejectResponseDetails = Lists.newArrayList();
+        final List<DeliveryReject> deliveryRejects = Lists.newArrayList();
 
         for (final DeliveryRejectDetails deliveryRejectDetail : deliveryRejectRequest.getDeliveryRejectDetails()) {
-            rejectResponseDetails.add(new DeliveryRejectResponseDetails(new RejectReasonId(1L), deliveryRejectDetail.getShipmentId(),
-                    deliveryRejectDetail.getShipmentId(), deliveryRejectDetail.getSupplierCode(), deliveryRejectDetail.getDepartmentCode(),
-                    deliveryRejectDetail.getRejectReason(), deliveryRejectDetail.getDeliveryStatus()));
+            final DeliveryReject deliveryReject = new DeliveryReject(new RejectReasonId(null), deliveryRejectDetail.getShipmentId(),
+                    deliveryRejectDetail.getDepartmentCode(), deliveryRejectDetail.getSupplierCode(),
+                    device.getDeviceId(), deliveryRejectDetail.getDeliveryStatus(), deliveryRejectDetail.getRejectReason(),
+                    deliveryRejectDetail.getRecipient());
+
+            deliveryRejects.add(this.rejectService.createReject(deliveryReject));
         }
+
+        final Map<Long, ShipmentRejectResponse> shipmentRejectResponses = notifyShipmentReject(deliveryRejectRequest)
+                .stream()
+                .collect(Collectors.toMap(response -> response.shipmentId().getValue(), Function.identity()));
+
+        final List<DeliveryRejectResponseDetails> rejectResponseDetails = deliveryRejects.stream()
+                .map(deliveryReject -> deliveryRejectConverterService.convertToDeliveryRejectResponseDetails(
+                        deliveryReject,
+                        shipmentRejectResponses.get(deliveryReject.getShipmentId().getValue())))
+                .toList();
 
         return new DeliveryRejectResponse(rejectResponseDetails, deliveryRejectRequest.getDeviceInformation());
     }
 
-    private ShipmentRejectResponse notifyShipmentReject(final DeliveryRejectDetails deliveryRejectDetail) {
-        final ShipmentRejectRequest shipmentRejectRequest = ShipmentRejectRequest.from(deliveryRejectDetail);
-        final ShipmentRejectResponse shipmentRejectResponse = this.rejectShipmentServicePort.notifyShipmentRejection(shipmentRejectRequest);
-        return shipmentRejectResponse;
+    private List<ShipmentRejectResponse> notifyShipmentReject(final DeliveryRejectRequest deliveryRejectRequest) {
+        final List<ShipmentRejectRequest> shipmentRejectRequests = deliveryRejectRequest.getDeliveryRejectDetails().stream()
+                .map(deliveryRejectDetail -> ShipmentRejectRequest.from(deliveryRejectDetail, deliveryRejectRequest.getProcessId()))
+                .toList();
+        return this.rejectShipmentServicePort.notifyShipmentRejection(shipmentRejectRequests, deliveryRejectRequest.getProcessId());
     }
 }
