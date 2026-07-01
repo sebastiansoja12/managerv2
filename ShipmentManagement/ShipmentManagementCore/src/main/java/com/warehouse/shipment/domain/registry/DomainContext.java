@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.registry;
 
+import com.warehouse.shipment.domain.service.TrackingNumberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -26,6 +27,10 @@ public final class DomainContext implements ApplicationEventPublisherAware, Appl
 
     public static synchronized ShipmentService shipmentService() {
         return context.getBean(ShipmentService.class);
+    }
+
+    public static synchronized TrackingNumberService trackingNumberService() {
+        return context.getBean(TrackingNumberService.class);
     }
 
     @Override

@@ -23,9 +23,13 @@ public class RejectServiceImpl implements RejectService {
     }
 
     @Override
-    public void createReject(final DeliveryReject deliveryReject) {
+    public DeliveryReject createReject(final DeliveryReject deliveryReject) {
         final RejectReasonEntity rejectReason = RejectReasonEntity.from(deliveryReject);
-        rejectRepository.create(rejectReason);
-        deliveryReject.updateRejectReasonId(rejectReason.getId());
+        return rejectRepository.create(rejectReason);
+    }
+
+    @Override
+    public RejectReasonId nextRejectReasonId() {
+        return new RejectReasonId(null);
     }
 }

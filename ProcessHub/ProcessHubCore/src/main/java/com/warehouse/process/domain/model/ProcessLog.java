@@ -4,6 +4,9 @@ import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
+import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ProcessLogSnapshot;
+import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 import lombok.Builder;
@@ -69,8 +72,23 @@ public class ProcessLog {
 
     public void applyShipmentUpdate(final ShipmentUpdated shipmentUpdated) {
         final CommunicationLogDetail communicationLogDetail = getCommunicationLogDetails()
-                .getCommunicationLogDetail(shipmentUpdated.processType(), shipmentUpdated.serviceType());
+                .addCommunicationLogDetail(shipmentUpdated.processType(), shipmentUpdated.serviceType());
         communicationLogDetail.applyShipmentUpdate(shipmentUpdated);
+    }
+
+    public void applyDeviceValidation(final DeviceValidation deviceValidation) {
+        final CommunicationLogDetail communicationLogDetail = getCommunicationLogDetails()
+                .addCommunicationLogDetail(deviceValidation.processType(), deviceValidation.serviceType());
+        communicationLogDetail.applyDeviceValidation(deviceValidation);
+    }
+
+    public void applyShipmentRejected(final ShipmentRejected shipmentRejected) {
+        final CommunicationLogDetail communicationLogDetail = getCommunicationLogDetails()
+                .addCommunicationLogDetail(shipmentRejected.processType(), shipmentRejected.serviceType());
+        communicationLogDetail.changeRequest(shipmentRejected.request());
+        communicationLogDetail.changeResponse(shipmentRejected.response());
+        communicationLogDetail.changeFaultDescription(shipmentRejected.faultDescription());
+        communicationLogDetail.changeServices(shipmentRejected.serviceType().name(), "SHIPMENT_REJECTION");
     }
 
     public void changeResponse(final String response) {
@@ -80,6 +98,13 @@ public class ProcessLog {
 
     public void changeStatus(final ProcessStatus status) {
         this.status = status;
+        markAsModified();
+    }
+
+    public void changeStatus(final ProcessStatus status, final String faultDescription) {
+        this.status = status;
+        this.faultDescription = faultDescription;
+        markAsModified();
     }
 
     private void markAsModified() {
@@ -92,5 +117,30 @@ public class ProcessLog {
 
     public boolean failed() {
         return status != null && status.equals(ProcessStatus.FAILURE);
+    }
+
+    public ProcessLogSnapshot snapshot() {
+        return new ProcessLogSnapshot(
+                this.processId,
+                this.request,
+                this.response,
+                this.createdAt,
+                this.modifiedAt,
+                this.communicationLogDetails,
+                this.status,
+                this.faultDescription,
+                this.deviceInformation);
+    }
+
+    public void applySnapshot(final ProcessLogSnapshot snapshot) {
+        this.processId = snapshot.processId();
+        this.request = snapshot.request();
+        this.response = snapshot.response();
+        this.createdAt = snapshot.createdAt();
+        this.modifiedAt = snapshot.modifiedAt();
+        this.communicationLogDetails = snapshot.communicationLogDetails();
+        this.status = snapshot.status();
+        this.faultDescription = snapshot.faultDescription();
+        this.deviceInformation = snapshot.deviceInformation();
     }
 }

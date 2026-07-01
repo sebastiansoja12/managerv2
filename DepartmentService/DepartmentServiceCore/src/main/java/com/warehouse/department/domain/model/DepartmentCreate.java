@@ -1,8 +1,8 @@
 package com.warehouse.department.domain.model;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.department.domain.enumeration.DepartmentType;
-import com.warehouse.department.domain.vo.DepartmentCode;
 
 public class DepartmentCreate {
     private DepartmentCode departmentCode;

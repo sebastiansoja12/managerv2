@@ -57,7 +57,7 @@ public class RejectReasonEntity {
 
     public static RejectReasonEntity from(final DeliveryReject deliveryReject) {
         return new RejectReasonEntity(null, deliveryReject.getRejectReason().getValue(),
-                deliveryReject.getShipmentId(), deliveryReject.getRecipient().toString(),
+                deliveryReject.getShipmentId(), "Jan Kowalski",
                 deliveryReject.getDepartmentCode(),
                 deliveryReject.getSupplierCode(),
                 deliveryReject.getDeliveryStatus().toString());

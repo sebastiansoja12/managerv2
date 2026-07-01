@@ -6,7 +6,8 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>DeliveryProtection</artifactId>
-        <version>2026.1-SNAPSHOT</version>
+        <version>2026.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <packaging>jar</packaging>

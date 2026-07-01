@@ -9,6 +9,7 @@ import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
+import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
 import com.warehouse.terminal.domain.vo.*;
 
 public interface Device {
@@ -21,17 +22,17 @@ public interface Device {
 
     DeviceStatus getStatus();
 
-    IdentityInfo getIdentity();
+    DeviceIdentity getIdentity();
 
-    HardwareProfile getHardware();
+    DeviceHardware getHardware();
 
-    SoftwareProfile getSoftware();
+    DeviceSoftware getSoftware();
 
-    NetworkProfile getNetwork();
+    DeviceNetwork getNetwork();
 
     SecurityProfile getSecurity();
 
-    LocationProfile getLocation();
+    DeviceLocation getLocation();
 
     OwnershipProfile getOwnership();
 
@@ -41,21 +42,13 @@ public interface Device {
 
     DeviceSnapshot toSnapshot();
 
-    default UserId getUserId() {
-        throw new UnsupportedOperationException();
-    }
+    UserId getUserId();
 
-    default DepartmentCode getDepartmentCode() {
-        throw new UnsupportedOperationException();
-    }
+    DepartmentCode getDepartmentCode();
 
-    default String getVersion() {
-        throw new UnsupportedOperationException();
-    }
+    String getVersion();
 
-    default Instant getLastUpdate() {
-        return getUpdatedAt();
-    }
+    Instant getLastUpdate();
 
     default Boolean isActive() {
         return DeviceStatus.ACTIVE.equals(getStatus());
@@ -67,71 +60,39 @@ public interface Device {
 
     void assignUser(UserId userId);
 
-    default void updateUserId(final UserId userId) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateDepartmentCode(final DepartmentCode departmentCode) {
-        throw new UnsupportedOperationException();
-    }
+    void assignDepartmentCode(final DepartmentCode departmentCode);
 
     default void updateVersion(final String version) {
         throw new UnsupportedOperationException();
     }
 
-    default void updateExternalDeviceId(final ExternalId<String> externalDeviceId) {
+    void updateStatus(final DeviceStatus status);
+
+    void updateActive(final Boolean active);
+
+    void updateIdentity(final DeviceIdentity identity);
+
+    void updateHardware(final DeviceHardware hardware);
+
+    default void updateSoftware(final DeviceSoftware software) {
         throw new UnsupportedOperationException();
     }
 
-    default void updateStatus(final DeviceStatus status) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateCreatedAt(final Instant createdAt) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateUpdatedAt(final Instant updatedAt) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateLastUpdate(final Instant lastUpdate) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateActive(final Boolean active) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateIdentity(final IdentityInfo identity) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateHardware(final HardwareProfile hardware) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateSoftware(final SoftwareProfile software) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void updateNetwork(final NetworkProfile network) {
-        throw new UnsupportedOperationException();
-    }
+    void updateNetwork(final DeviceNetwork network);
 
     default void updateSecurity(final SecurityProfile security) {
         throw new UnsupportedOperationException();
     }
 
-    default void updateLocation(final LocationProfile location) {
+    default void updateLocation(final DeviceLocation location) {
         throw new UnsupportedOperationException();
     }
 
-    default void updateOwnership(final OwnershipProfile ownership) {
-        throw new UnsupportedOperationException();
-    }
+    void updateOwnership(final OwnershipProfile ownership);
 
-    void updateDeviceType(DeviceType deviceType);
+    void updateDeviceType(final DeviceType deviceType);
+
+    void update(final DeviceUpdateCommand request);
 
     default void changeVersion(final String version) {
         updateVersion(version);

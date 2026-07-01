@@ -18,7 +18,7 @@ public interface DeliveryEntityMapper {
         final DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setDeliveryStatus(map(delivery.getDeliveryStatus()));
         deliveryEntity.setCreated(LocalDateTime.now());
-        deliveryEntity.setToken(delivery.getDeliveryToken() == null ? delivery.getReturnToken().toString() : delivery.getDeliveryToken().getValue());
+        deliveryEntity.setToken(delivery.getDeliveryToken() == null ? "12345" : delivery.getDeliveryToken().getValue());
         deliveryEntity.setParcelId(delivery.getShipmentId().getValue());
         deliveryEntity.setDepotCode(delivery.getDepartmentCode().getValue());
         deliveryEntity.setSupplierCode(delivery.getSupplierCode().value());

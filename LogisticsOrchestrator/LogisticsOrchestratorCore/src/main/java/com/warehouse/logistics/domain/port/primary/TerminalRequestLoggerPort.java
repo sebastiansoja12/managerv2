@@ -1,6 +1,6 @@
 package com.warehouse.logistics.domain.port.primary;
 
-import com.warehouse.terminal.request.TerminalRequest;
+import com.warehouse.terminal.jaxb.TerminalRequest;
 
 public interface TerminalRequestLoggerPort {
     void logRequest(final TerminalRequest terminalRequest);

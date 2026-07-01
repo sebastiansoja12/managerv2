@@ -3,7 +3,7 @@ package com.warehouse.auth.infrastructure.adapter.primary.mapper;
 import org.mapstruct.Mapper;
 
 import com.warehouse.auth.domain.model.RefreshTokenRequest;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RefreshTokenRequestDto;
+import com.warehouse.auth.infrastructure.dto.RefreshTokenRequestDto;
 
 @Mapper
 public interface AuthenticationRequestMapper {

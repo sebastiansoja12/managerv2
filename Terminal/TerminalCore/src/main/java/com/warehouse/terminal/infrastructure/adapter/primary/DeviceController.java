@@ -3,13 +3,20 @@ package com.warehouse.terminal.infrastructure.adapter.primary;
 import static org.mapstruct.factory.Mappers.getMapper;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.Device;
-import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
+import com.warehouse.terminal.domain.model.command.*;
+import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.port.primary.DevicePort;
 import com.warehouse.terminal.domain.vo.DeviceUserRequest;
 import com.warehouse.terminal.domain.vo.DeviceVersionRequest;
@@ -17,16 +24,17 @@ import com.warehouse.terminal.dto.DeviceDto;
 import com.warehouse.terminal.infrastructure.adapter.primary.mapper.TerminalRequestMapper;
 import com.warehouse.terminal.infrastructure.adapter.primary.mapper.TerminalResponseMapper;
 import com.warehouse.terminal.infrastructure.adapter.primary.validation.DeviceRequestValidationService;
-import com.warehouse.terminal.request.DeviceCreateRequestDto;
-import com.warehouse.terminal.request.DeviceUpdateRequestDto;
-import com.warehouse.terminal.request.DeviceUserRequestDto;
-import com.warehouse.terminal.request.DeviceVersionRequestDto;
+import com.warehouse.terminal.request.*;
 
 @RestController
 @RequestMapping("/devices")
 public class DeviceController {
 
     private final DevicePort devicePort;
+
+    private final DevicePairPort devicePairPort;
+
+    private final CurrentUserApiService currentUserApiService;
 
     private final DeviceRequestValidationService requestValidationService;
 
@@ -35,8 +43,12 @@ public class DeviceController {
     private final TerminalResponseMapper responseMapper = getMapper(TerminalResponseMapper.class);
 
     public DeviceController(final DevicePort devicePort,
+                            final DevicePairPort devicePairPort,
+                            final CurrentUserApiService currentUserApiService,
                             final DeviceRequestValidationService requestValidationService) {
         this.devicePort = devicePort;
+        this.devicePairPort = devicePairPort;
+        this.currentUserApiService = currentUserApiService;
         this.requestValidationService = requestValidationService;
     }
 
@@ -69,6 +81,101 @@ public class DeviceController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}/device-types")
+    public ResponseEntity<?> updateDeviceType(@PathVariable final String id,
+                                              @RequestParam("value") final String value) {
+        this.devicePort.updateDeviceType(
+                new DeviceTypeUpdateCommand(new DeviceId(id), DeviceType.valueOf(value.toUpperCase(Locale.ROOT))));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/statuses")
+    public ResponseEntity<?> updateStatus(@PathVariable final String id,
+                                          @RequestParam("value") final String value) {
+        this.devicePort.updateStatusField(
+                new DeviceStatusUpdateCommand(new DeviceId(id), DeviceStatus.valueOf(value.toUpperCase(Locale.ROOT))));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/identities")
+    public ResponseEntity<?> updateIdentity(@PathVariable final String id,
+                                            @RequestBody final DeviceIdentityRequestDto request) {
+        this.devicePort.updateIdentityField(new DeviceIdentityUpdateCommand(new DeviceId(id), requestMapper.map(request)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/hardwares")
+    public ResponseEntity<?> updateHardware(@PathVariable final String id,
+                                            @RequestBody final DeviceHardwareRequestDto request) {
+        this.devicePort.updateHardwareField(new DeviceHardwareUpdateCommand(new DeviceId(id), requestMapper.map(request)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/softwares")
+    public ResponseEntity<?> updateSoftware(@PathVariable final String id,
+                                            @RequestBody final DeviceSoftwareRequestDto request) {
+        this.devicePort.updateSoftwareField(new DeviceSoftwareUpdateCommand(new DeviceId(id), requestMapper.map(request)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/networks")
+    public ResponseEntity<?> updateNetwork(@PathVariable final String id,
+                                           @RequestBody final DeviceNetworkRequestDto request) {
+        this.devicePort.updateNetworkField(new DeviceNetworkUpdateCommand(new DeviceId(id), requestMapper.map(request)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/securities")
+    public ResponseEntity<?> updateSecurity(@PathVariable final String id,
+                                            @RequestBody final DeviceSecurityRequestDto request) {
+        this.devicePort.updateSecurityField(new DeviceSecurityUpdateCommand(new DeviceId(id), requestMapper.map(request)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/locations")
+    public ResponseEntity<?> updateLocation(@PathVariable final String id,
+                                            @RequestBody final DeviceLocationRequestDto request) {
+        this.devicePort.updateLocationField(new DeviceLocationUpdateCommand(new DeviceId(id), requestMapper.map(request)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/ownerships")
+    public ResponseEntity<?> updateOwnership(@PathVariable final String id,
+                                             @RequestBody final DeviceOwnershipRequestDto request) {
+        this.devicePort.updateOwnershipField(new DeviceOwnershipUpdateCommand(new DeviceId(id), requestMapper.map(request)));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/versions")
+    public ResponseEntity<?> updateVersion(@PathVariable final String id,
+                                           @RequestParam("value") final String value) {
+        this.devicePort.updateVersionField(new DeviceVersionUpdateCommand(new DeviceId(id), value));
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/current-user")
+    public ResponseEntity<?> getCurrentUserDevices() {
+        final UserId currentUserId = this.currentUserApiService.getCurrentUserId();
+        final List<DeviceDto> deviceResponse = this.devicePort.findDevicesByUserId(currentUserId)
+                .stream()
+                .map(responseMapper::mapToDeviceResponse)
+                .toList();
+        return ResponseEntity.ok().body(deviceResponse);
+    }
+
+    @PostMapping("/current-user/pairings")
+    public ResponseEntity<?> pairCurrentUserDevice(@RequestBody final CurrentUserDevicePairRequestDto requestDto) {
+        final UserId currentUserId = this.currentUserApiService.getCurrentUserId();
+        final DepartmentCode departmentCode = requestDto.departmentCode() != null
+                ? new DepartmentCode(requestDto.departmentCode().value())
+                : null;
+        final DevicePairRequest request = new DevicePairRequest(
+                requestDto.externalSystemId(),
+                departmentCode,
+                currentUserId);
+        return ResponseEntity.ok().body(responseMapper.map(this.devicePairPort.pair(request)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getDevice(@PathVariable final String id) {
         final DeviceId deviceId = new DeviceId(id);
@@ -85,4 +192,5 @@ public class DeviceController {
                 .toList();
         return ResponseEntity.ok().body(deviceResponse);
     }
+
 }

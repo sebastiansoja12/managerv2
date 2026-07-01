@@ -7,6 +7,7 @@ import com.warehouse.shipment.domain.vo.*;
 
 public interface RouteLogServicePort {
     Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId, final SoftwareConfiguration softwareConfiguration);
+    RouteLogRecord findByShipmentId(final ShipmentId shipmentId);
     RouteProcess notifyRecipientChanged(final ShipmentId shipmentId, final Recipient recipient, final SoftwareConfiguration softwareConfiguration);
     RouteProcess notifyPersonChanged(final ShipmentId shipmentId, final Person person, final SoftwareConfiguration softwareConfiguration);
     void notifyShipmentUpdated(final ShipmentSnapshot snapshot);

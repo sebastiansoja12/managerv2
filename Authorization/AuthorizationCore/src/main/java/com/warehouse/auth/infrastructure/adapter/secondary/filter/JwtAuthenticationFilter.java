@@ -25,7 +25,8 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final List<String> DEVICE_ENDPOINTS = List.of(
-            "/v2/api/deliveries"
+            "/v2/api/deliveries",
+            "/v2/api/ws"
     );
 
     private final JwtService jwtService;

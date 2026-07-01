@@ -1,7 +1,7 @@
 package com.warehouse.auth.domain.vo;
 
 
-import com.warehouse.auth.infrastructure.adapter.primary.dto.LoginRequestDto;
+import com.warehouse.auth.infrastructure.dto.LoginRequestDto;
 
 
 public record LoginRequest(String username, String password) {

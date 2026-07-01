@@ -7,13 +7,10 @@ import java.util.UUID;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ReturnId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
-import com.warehouse.shipment.domain.event.ShipmentCountriesChanged;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
@@ -89,7 +86,7 @@ public class Shipment {
                     final DangerousGood dangerousGood,
                     final ExternalId<String> externalRouteId,
                     final ExternalId<Long> externalReturnId,
-                    final String trackingNumber,
+                    final TrackingNumber trackingNumber,
                     final ExternalId<UUID> externalShipmentId) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
@@ -111,7 +108,7 @@ public class Shipment {
         this.dangerousGood = dangerousGood;
         this.externalRouteId = externalRouteId;
         this.externalReturnId = externalReturnId;
-        this.trackingNumber = new TrackingNumber(trackingNumber);
+        this.trackingNumber = trackingNumber;
         this.externalShipmentId = externalShipmentId;
     }
 
@@ -572,20 +569,19 @@ public class Shipment {
     }
 
     public void updateCountries(final ShipmentCountryRequest request) {
+        this.originCountry = request.issuerCountry();
+        this.destinationCountry = request.receiverCountry();
         markAsModified();
-        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeIssuerCountry(final CountryCode originCountry) {
         this.originCountry = originCountry;
         markAsModified();
-        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeReceiverCountry(final CountryCode destinationCountry) {
         this.destinationCountry = destinationCountry;
         markAsModified();
-        DomainContext.publish(new ShipmentCountriesChanged(this.snapshot(), Instant.now()));
     }
 
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
@@ -642,6 +638,8 @@ public class Shipment {
         this.recipient = newRecipient;
 
         this.shipmentStatus = ShipmentStatus.CREATED;
+        this.externalShipmentId = ExternalId.randomUUID();
+        this.trackingNumber = DomainContext.trackingNumberService().nextTrackingNumber(CarrierOperator.DEFAULT);
 
         markAsModified();
 

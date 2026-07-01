@@ -51,6 +51,9 @@ public class UserEntity implements UserDetails {
     @AttributeOverride(name = "value", column = @Column(name = "department_code"))
     private DepartmentCode departmentCode;
 
+    @Column(name = "language", nullable = false)
+    private String language;
+
     @Column(name = "api_key", nullable = false)
     private String apiKey;
 

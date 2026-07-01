@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.warehouse</groupId>
-    <version>2026.1-SNAPSHOT</version>
+    <version>2026.2-SNAPSHOT</version>
     <name>RouteTracker</name>
     <description>Pom file route tracker service</description>
     <packaging>pom</packaging>
@@ -107,12 +107,6 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-migrationsupport</artifactId>
                 <version>5.8.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.14.2</version>
-                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>

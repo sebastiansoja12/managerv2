@@ -1,10 +1,12 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.TerminalEntity;
@@ -38,6 +40,20 @@ public class TerminalRepositoryImpl implements DeviceRepository<Terminal> {
         return repository.findById(deviceId)
                 .map(toModelMapper::map)
                 .orElseThrow();
+    }
+
+    @Override
+    public Optional<Terminal> findByExternalSystemId(final String externalSystemId) {
+        return repository.findByIdentityExternalSystemId(externalSystemId)
+                .map(toModelMapper::map);
+    }
+
+    @Override
+    public List<Terminal> findByUserId(final UserId userId) {
+        return repository.findByUserId(userId)
+                .stream()
+                .map(toModelMapper::map)
+                .toList();
     }
 
     @Override

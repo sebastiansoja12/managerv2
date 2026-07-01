@@ -2,13 +2,14 @@ package com.warehouse.terminal.configuration;
 
 import java.time.Duration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.warehouse.auth.UserApiService;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.terminal.DeviceApiService;
-import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.port.primary.DevicePairPortImpl;
 import com.warehouse.terminal.domain.port.primary.DevicePort;
@@ -25,23 +26,27 @@ import io.github.resilience4j.retry.RetryConfig;
 public class TerminalConfiguration {
 
     @Bean
-    public DevicePairPort terminalPairPort(final DeviceValidatorService deviceValidatorService,
-                                           final DeviceGenericService deviceGenericService,
+    public DevicePairPort terminalPairPort(final DeviceGenericService deviceGenericService,
                                            final UserService userService,
                                            final DevicePairService devicePairService,
-                                           final DeviceVersionService deviceVersionService) {
-        return new DevicePairPortImpl(deviceValidatorService, deviceGenericService, userService, devicePairService,
-                deviceVersionService);
+                                           final DeviceVersionService deviceVersionService,
+                                           final DevicePairValidationService devicePairValidationService) {
+        return new DevicePairPortImpl(deviceGenericService, userService, devicePairService, deviceVersionService,
+                devicePairValidationService);
+    }
+
+    @Bean
+    public DevicePairKeyService devicePairKeyService(@Value("${device.pair.key}") final String pairKeySecret) {
+        return new DevicePairKeyService(pairKeySecret);
     }
 
     @Bean
     public DeviceValidatorService terminalValidatorService(final DeviceVersionRepository deviceVersionRepository,
-                                                           final DepartmentRepository departmentRepository,
-                                                           final UserRepository userRepository,
-                                                           final SupplierRepository supplierRepository,
-                                                           final DeviceRepository<Terminal> deviceRepository) {
-        return new DeviceValidatorServiceImpl(deviceVersionRepository, departmentRepository,
-                userRepository, supplierRepository, deviceRepository);
+                                                           final DeviceGenericRepository deviceRepository,
+                                                           final DepartmentServicePort departmentServicePort,
+                                                           final UserServicePort userServicePort) {
+        return new DeviceValidatorServiceImpl(deviceVersionRepository, deviceRepository, departmentServicePort,
+                userServicePort);
     }
 
     @Bean("device.softwareConfigurationServicePort")
@@ -108,22 +113,34 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public DevicePairService devicePairService(final DevicePairRepository devicePairRepository) {
-        return new DevicePairServiceImpl(devicePairRepository);
+    public DevicePairService devicePairService(final DevicePairRepository devicePairRepository,
+                                               final DevicePairKeyService devicePairKeyService) {
+        return new DevicePairServiceImpl(devicePairRepository, devicePairKeyService);
     }
 
     @Bean
-    public DevicePairRepository devicePairRepository(final DevicePairReadRepository devicePairReadRepository,
-                                                     final DeviceRepository<Terminal> terminalRepository) {
-        return new DevicePairRepositoryImpl(devicePairReadRepository, terminalRepository);
+    public DevicePairValidationService devicePairValidationService(final DeviceGenericService deviceGenericService,
+                                                                   final UserService userService,
+                                                                   final DepartmentRepository departmentRepository) {
+        return new DevicePairValidationServiceImpl(deviceGenericService, userService, departmentRepository);
+    }
+
+    @Bean
+    public DevicePairRepository devicePairRepository(final DevicePairReadRepository devicePairReadRepository) {
+        return new DevicePairRepositoryImpl(devicePairReadRepository);
     }
 
     @Bean
     public DevicePort terminalPort(final DeviceGenericService deviceGenericService,
                                    final UserService userService,
-                                   final DeviceVersionService deviceVersionService,
-                                   final DepartmentServicePort departmentServicePort) {
-        return new DevicePortImpl(deviceGenericService, userService, deviceVersionService, departmentServicePort);
+                                   final DepartmentServicePort departmentServicePort,
+                                   final UserServicePort userServicePort) {
+        return new DevicePortImpl(deviceGenericService, userService, departmentServicePort, userServicePort);
+    }
+
+    @Bean
+    public UserServicePort userServicePort(final UserApiService userApiService) {
+        return new UserServiceAdapter(userApiService);
     }
 
     @Bean

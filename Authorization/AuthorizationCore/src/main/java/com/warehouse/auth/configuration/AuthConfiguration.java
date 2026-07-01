@@ -2,6 +2,7 @@ package com.warehouse.auth.configuration;
 
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
+import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
@@ -11,10 +12,8 @@ import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRe
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactory;
-import com.warehouse.auth.infrastructure.adapter.secondary.LoggerFactoryImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.MailServiceAdapter;
-import com.warehouse.auth.infrastructure.adapter.secondary.UserReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.*;
+import com.warehouse.department.api.DepartmentApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -99,6 +98,11 @@ public class AuthConfiguration  {
     @Bean(name = "authentication.responseMapper")
     public AuthenticationResponseMapper responseMapper() {
         return new AuthenticationResponseMapperImpl();
+    }
+
+    @Bean(name = "authentication.departmentServicePort")
+    public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService) {
+        return new DepartmentServiceAdapter(departmentApiService);
     }
 
 }

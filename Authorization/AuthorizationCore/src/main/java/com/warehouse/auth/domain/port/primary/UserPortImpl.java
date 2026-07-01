@@ -33,8 +33,23 @@ public class UserPortImpl implements UserPort {
     }
 
     @Override
+    public User findUser(final UserId userId) {
+        return userService.findUserById(userId);
+    }
+
+    @Override
     public void updateFullName(final FullNameRequest request) {
         this.userService.changeFullName(request);
+    }
+
+    @Override
+    public void changePassword(final UserId userId, final String encodedPassword) {
+        this.userService.changePassword(userId, encodedPassword);
+    }
+
+    @Override
+    public void changeLanguage(final UserId userId, final String language) {
+        this.userService.changeLanguage(userId, language);
     }
 
     @Override

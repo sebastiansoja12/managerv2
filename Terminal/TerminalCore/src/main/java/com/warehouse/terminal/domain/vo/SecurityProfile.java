@@ -128,37 +128,35 @@ public class SecurityProfile {
     }
 
     public void update(final SecurityProfile security) {
-        if (security != null) {
-            if (security.getEncrypted() != null) {
-                this.encrypted = security.getEncrypted();
-            }
-            if (security.getSecureBootEnabled() != null) {
-                this.secureBootEnabled = security.getSecureBootEnabled();
-            }
-            if (security.getTamperDetected() != null) {
-                this.tamperDetected = security.getTamperDetected();
-            }
-            if (security.getScreenLockEnabled() != null) {
-                this.screenLockEnabled = security.getScreenLockEnabled();
-            }
-            if (security.getBiometricEnabled() != null) {
-                this.biometricEnabled = security.getBiometricEnabled();
-            }
-            if (security.getCompromised() != null) {
-                this.compromised = security.getCompromised();
-            }
-            if (security.getFailedLoginAttempts() != null) {
-                this.failedLoginAttempts = security.getFailedLoginAttempts();
-            }
-            if (security.getLastSecurityScanAt() != null) {
-                this.lastSecurityScanAt = security.getLastSecurityScanAt();
-            }
-            if (security.getSecurityPolicyVersion() != null) {
-                this.securityPolicyVersion = security.getSecurityPolicyVersion();
-            }
-            if (security.getCertificateFingerprint() != null) {
-                this.certificateFingerprint = security.getCertificateFingerprint();
-            }
+        if (security.getEncrypted() != null) {
+            this.encrypted = security.getEncrypted();
+        }
+        if (security.getSecureBootEnabled() != null) {
+            this.secureBootEnabled = security.getSecureBootEnabled();
+        }
+        if (security.getTamperDetected() != null) {
+            this.tamperDetected = security.getTamperDetected();
+        }
+        if (security.getScreenLockEnabled() != null) {
+            this.screenLockEnabled = security.getScreenLockEnabled();
+        }
+        if (security.getBiometricEnabled() != null) {
+            this.biometricEnabled = security.getBiometricEnabled();
+        }
+        if (security.getCompromised() != null) {
+            this.compromised = security.getCompromised();
+        }
+        if (security.getFailedLoginAttempts() != null) {
+            this.failedLoginAttempts = security.getFailedLoginAttempts();
+        }
+        if (security.getLastSecurityScanAt() != null) {
+            this.lastSecurityScanAt = security.getLastSecurityScanAt();
+        }
+        if (security.getSecurityPolicyVersion() != null) {
+            this.securityPolicyVersion = security.getSecurityPolicyVersion();
+        }
+        if (security.getCertificateFingerprint() != null) {
+            this.certificateFingerprint = security.getCertificateFingerprint();
         }
     }
 

@@ -23,6 +23,9 @@ public class TerminalResponse {
 //    @XmlElement(name = "DeliveryMissedResponse")
 //    private List<DeliveryMissedResponse> deliveryMissedResponses;
 
+    @XmlElement(name = "ProcessId")
+    private String processId;
+
     @XmlElement(name = "DeliveryRejectResponse")
     private DeliveryRejectResponse deliveryRejectResponse;
 

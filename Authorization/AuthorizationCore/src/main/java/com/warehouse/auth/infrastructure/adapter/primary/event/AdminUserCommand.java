@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.primary.event;
 
+import com.warehouse.commonassets.enumeration.Language;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 
@@ -9,13 +10,15 @@ public class AdminUserCommand {
     private final DepartmentCode departmentCode;
     private final String telephoneNumber;
     private final String email;
+    private final Language language;
     private final Consumer<UserId> adminCreatedId;
 
     public AdminUserCommand(final DepartmentCode departmentCode, final String telephoneNumber, final String email,
-                            final Consumer<UserId> adminCreatedId) {
+                            final Language language, final Consumer<UserId> adminCreatedId) {
         this.departmentCode = departmentCode;
         this.telephoneNumber = telephoneNumber;
         this.email = email;
+        this.language = language;
         this.adminCreatedId = adminCreatedId;
     }
 
@@ -33,5 +36,9 @@ public class AdminUserCommand {
 
     public Consumer<UserId> getAdminCreatedId() {
         return adminCreatedId;
+    }
+
+    public Language getLanguage() {
+        return language;
     }
 }

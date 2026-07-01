@@ -1,7 +1,7 @@
 package com.warehouse.logistics.domain.port.primary;
 
-import com.warehouse.terminal.information.Device;
+import com.warehouse.terminal.DeviceInformation;
 
 public interface DepartmentValidatorPort {
-    void validateDepartment(final Device device);
+    void validateDepartment(final DeviceInformation deviceInformation);
 }

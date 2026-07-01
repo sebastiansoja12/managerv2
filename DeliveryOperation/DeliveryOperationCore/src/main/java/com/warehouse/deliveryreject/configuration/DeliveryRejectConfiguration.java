@@ -1,5 +1,7 @@
 package com.warehouse.deliveryreject.configuration;
 
+import com.warehouse.process.ProcessHubEventPublisher;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,6 +16,7 @@ import com.warehouse.deliveryreject.domain.service.DeliveryRejectConverterServic
 import com.warehouse.deliveryreject.domain.service.RejectService;
 import com.warehouse.deliveryreject.infrastructure.adapter.primary.DeliveryRejectAdapter;
 import com.warehouse.deliveryreject.infrastructure.adapter.secondary.*;
+import com.warehouse.deliveryreject.infrastructure.adapter.secondary.mapper.RejectShipmentServiceMapper;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 
 @Configuration
@@ -40,8 +43,15 @@ public class DeliveryRejectConfiguration {
     }
 
     @Bean
-    public RejectShipmentServicePort rejectShipmentServicePort() {
-        return new RejectShipmentServiceAdapter();
+    public RejectShipmentServicePort rejectShipmentServicePort(final ShipmentApiService shipmentApiService,
+                                                               final RejectShipmentServiceMapper mapper,
+                                                               final ProcessHubEventPublisher processHubEventPublisher) {
+        return new RejectShipmentServiceAdapter(shipmentApiService, mapper, processHubEventPublisher);
+    }
+
+    @Bean
+    public RejectShipmentServiceMapper rejectShipmentServiceMapper() {
+        return new RejectShipmentServiceMapper();
     }
 
     @Bean

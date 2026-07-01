@@ -19,6 +19,10 @@ public interface UserService {
 
     void changeFullName(final FullNameRequest request);
 
+    void changePassword(final UserId userId, final String encodedPassword);
+
+    void changeLanguage(final UserId userId, final String language);
+
     void changeRole(final UserId userId, final User.Role role);
 
     void addPermission(final UserId userId, final String permission);

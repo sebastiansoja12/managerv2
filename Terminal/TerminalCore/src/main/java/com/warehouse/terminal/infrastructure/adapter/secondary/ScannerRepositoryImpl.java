@@ -1,10 +1,12 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.ScannerEntity;
@@ -37,6 +39,20 @@ public class ScannerRepositoryImpl implements DeviceRepository<Scanner> {
     public Scanner findById(final DeviceId deviceId) {
         final ScannerEntity entity = repository.findById(deviceId).orElseThrow();
         return toModelMapper.map(entity);
+    }
+
+    @Override
+    public Optional<Scanner> findByExternalSystemId(final String externalSystemId) {
+        return repository.findByIdentityExternalSystemId(externalSystemId)
+                .map(toModelMapper::map);
+    }
+
+    @Override
+    public List<Scanner> findByUserId(final UserId userId) {
+        return repository.findByUserId(userId)
+                .stream()
+                .map(toModelMapper::map)
+                .toList();
     }
 
     @Override

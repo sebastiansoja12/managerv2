@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.warehouse</groupId>
 	<artifactId>warehouse</artifactId>
-	<version>2026.1-SNAPSHOT</version>
+	<version>2026.2-SNAPSHOT</version>
 	<name>warehouse</name>
 	<description>Pom file for all modules</description>
 	<packaging>pom</packaging>
@@ -128,6 +128,11 @@
                 <version>4.3.0</version>
             </dependency>
             <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+                <version>4.3.0</version>
+            </dependency>
+            <dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
 				<version>3.9.0</version>
@@ -181,12 +186,6 @@
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter-migrationsupport</artifactId>
 				<version>5.8.2</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>2.14.2</version>
-				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>

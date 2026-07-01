@@ -13,6 +13,7 @@ import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DeviceHandler;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
+import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
 import com.warehouse.terminal.domain.vo.*;
 
 public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
@@ -21,9 +22,9 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
     private ExternalId<String> externalDeviceId;
     private DeviceType deviceType;
     private DeviceStatus status;
-    private IdentityInfo identity;
-    private HardwareProfile hardware;
-    private NetworkProfile network;
+    private DeviceIdentity identity;
+    private DeviceHardware hardware;
+    private DeviceNetwork network;
     private OwnershipProfile ownership;
     private ScanType scanType;
     private ScannerType scannerType;
@@ -31,9 +32,9 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
     private Instant updatedAt;
 
     public Scanner(final DeviceId deviceId,
-                   final IdentityInfo identity,
-                   final HardwareProfile hardware,
-                   final NetworkProfile network,
+                   final DeviceIdentity identity,
+                   final DeviceHardware hardware,
+                   final DeviceNetwork network,
                    final OwnershipProfile ownership,
                    final ScanType scanType,
                    final ScannerType scannerType) {
@@ -55,30 +56,24 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
                    final ExternalId<String> externalDeviceId,
                    final DeviceType deviceType,
                    final DeviceStatus status,
-                   final IdentityInfo identity,
-                   final HardwareProfile hardware,
-                   final SoftwareProfile software,
-                   final NetworkProfile network,
-                   final SecurityProfile security,
-                   final LocationProfile location,
+                   final DeviceIdentity identity,
+                   final DeviceHardware hardware,
+                   final DeviceNetwork network,
                    final OwnershipProfile ownership,
                    final Instant createdAt,
                    final Instant updatedAt,
-                   final UserId userId,
-                   final DepartmentCode departmentCode,
-                   final Boolean active,
                    final ScanType scanType,
                    final ScannerType scannerType) {
         this.deviceId = deviceId;
-        this.externalDeviceId = externalDeviceId != null ? externalDeviceId : ExternalId.generateId();
-        this.deviceType = deviceType != null ? deviceType : DeviceType.SCANNER;
-        this.status = status != null ? status : (Boolean.TRUE.equals(active) ? DeviceStatus.ACTIVE : DeviceStatus.BLOCKED);
+        this.externalDeviceId = externalDeviceId;
+        this.deviceType = deviceType;
+        this.status = status;
         this.identity = identity;
         this.hardware = hardware;
         this.network = network;
-        this.ownership = ownership != null ? ownership : OwnershipProfile.initializeOwnership("", userId, departmentCode, null);
-        this.createdAt = createdAt != null ? createdAt : Instant.now();
-        this.updatedAt = updatedAt != null ? updatedAt : Instant.now();
+        this.ownership = ownership;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.scanType = scanType;
         this.scannerType = scannerType;
     }
@@ -104,22 +99,22 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
     }
 
     @Override
-    public IdentityInfo getIdentity() {
+    public DeviceIdentity getIdentity() {
         return identity;
     }
 
     @Override
-    public HardwareProfile getHardware() {
+    public DeviceHardware getHardware() {
         return hardware;
     }
 
     @Override
-    public SoftwareProfile getSoftware() {
+    public DeviceSoftware getSoftware() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public NetworkProfile getNetwork() {
+    public DeviceNetwork getNetwork() {
         return network;
     }
 
@@ -129,7 +124,7 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
     }
 
     @Override
-    public LocationProfile getLocation() {
+    public DeviceLocation getLocation() {
         throw new UnsupportedOperationException();
     }
 
@@ -162,8 +157,6 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
                 null,
                 null,
                 this.ownership,
-                getUserId(),
-                getDepartmentCode(),
                 null,
                 this.createdAt,
                 this.updatedAt,
@@ -203,6 +196,49 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
         return DeviceStatus.ACTIVE.equals(this.status);
     }
 
+    @Override
+    public void update(final DeviceUpdateCommand request) {
+        if (request.deviceType() != null) {
+            updateDeviceType(request.deviceType());
+        }
+        if (request.active() != null) {
+            updateActive(request.active());
+        }
+        if (request.status() != null) {
+            updateStatus(request.status());
+        }
+        if (request.identity() != null) {
+            updateIdentity(request.identity());
+        }
+        if (request.hardware() != null) {
+            updateHardware(request.hardware());
+        }
+        if (request.software() != null) {
+            updateSoftware(request.software());
+        }
+        if (request.network() != null) {
+            updateNetwork(request.network());
+        }
+        if (request.security() != null) {
+            updateSecurity(request.security());
+        }
+        if (request.location() != null) {
+            updateLocation(request.location());
+        }
+        if (request.ownership() != null) {
+            updateOwnership(request.ownership());
+        }
+        if (request.userId() != null) {
+            assignUser(request.userId());
+        }
+        if (request.departmentCode() != null) {
+            assignDepartmentCode(request.departmentCode());
+        }
+        if (request.version() != null) {
+            updateVersion(request.version());
+        }
+    }
+
     public void setScanType(final ScanType scanType) {
         this.scanType = scanType;
     }
@@ -216,13 +252,7 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
     }
 
     @Override
-    public void updateUserId(final UserId userId) {
-        ensureOwnership().setUserId(userId);
-        markAsModified();
-    }
-
-    @Override
-    public void updateDepartmentCode(final DepartmentCode departmentCode) {
+    public void assignDepartmentCode(final DepartmentCode departmentCode) {
         ensureOwnership().setDepartmentCode(departmentCode);
         markAsModified();
     }
@@ -231,27 +261,6 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
     public void updateStatus(final DeviceStatus status) {
         this.status = status;
         markAsModified();
-    }
-
-    @Override
-    public void updateExternalDeviceId(final ExternalId<String> externalDeviceId) {
-        this.externalDeviceId = externalDeviceId;
-        markAsModified();
-    }
-
-    @Override
-    public void updateCreatedAt(final Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public void updateUpdatedAt(final Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public void updateLastUpdate(final Instant lastUpdate) {
-        this.updatedAt = lastUpdate;
     }
 
     @Override
@@ -264,49 +273,44 @@ public class Scanner implements Device, DeviceHandler, ExecutionSourceResolver {
     }
 
     @Override
-    public void updateIdentity(final IdentityInfo identity) {
-        if (identity != null) {
-            if (this.identity == null) {
-                this.identity = identity;
-            } else {
-                this.identity.update(identity);
-            }
-            markAsModified();
+    public void updateIdentity(final DeviceIdentity identity) {
+        if (this.identity == null) {
+            this.identity = identity;
+        } else {
+            this.identity.update(identity);
         }
+        markAsModified();
     }
 
     @Override
-    public void updateHardware(final HardwareProfile hardware) {
-        if (hardware != null) {
-            if (this.hardware == null) {
-                this.hardware = hardware;
-            } else {
-                this.hardware.update(hardware);
-            }
-            markAsModified();
+    public void updateHardware(final DeviceHardware hardware) {
+        if (this.hardware == null) {
+            this.hardware = hardware;
+        } else {
+            this.hardware.update(hardware);
         }
+        markAsModified();
     }
 
     @Override
-    public void updateNetwork(final NetworkProfile network) {
+    public void updateNetwork(final DeviceNetwork network) {
         this.network.update(network);
     }
 
     @Override
     public void updateOwnership(final OwnershipProfile ownership) {
-        if (ownership != null) {
-            if (this.ownership == null) {
-                this.ownership = ownership;
-            } else {
-                this.ownership.update(ownership);
-            }
-            markAsModified();
+        if (this.ownership == null) {
+            this.ownership = ownership;
+        } else {
+            this.ownership.update(ownership);
         }
+        markAsModified();
     }
 
     @Override
     public void assignUser(final UserId userId) {
-        updateUserId(userId);
+        ensureOwnership().setUserId(userId);
+        markAsModified();
     }
 
     @Override

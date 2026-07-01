@@ -23,9 +23,14 @@ import com.warehouse.terminal.request.*;
 public interface TerminalRequestMapper {
 
     default DevicePairRequest map(final DevicePairRequestDto terminalPairRequest) {
-        final UserId userId = new UserId(terminalPairRequest.userId().value());
-        final DeviceId deviceId = new DeviceId(terminalPairRequest.terminalId().value());
-        return new DevicePairRequest(deviceId, userId);
+        final String externalSystemId = terminalPairRequest != null ? terminalPairRequest.externalSystemId() : null;
+        final UserId userId = terminalPairRequest != null && terminalPairRequest.userId() != null
+                ? new UserId(terminalPairRequest.userId().value())
+                : null;
+        final DepartmentCode departmentCode = terminalPairRequest != null && terminalPairRequest.departmentCode() != null
+                ? new DepartmentCode(terminalPairRequest.departmentCode().value())
+                : null;
+        return new DevicePairRequest(externalSystemId, departmentCode, userId);
     }
 
     default DeviceCreateCommand map(final DeviceCreateRequestDto request) {
@@ -81,7 +86,7 @@ public interface TerminalRequestMapper {
     @Mapping(target = "version", source = "version.value")
     DeviceVersionRequest map(final DeviceVersionRequestDto deviceVersionRequest);
 
-    default IdentityInfo map(final DeviceIdentityRequestDto request) {
+    default DeviceIdentity map(final DeviceIdentityRequestDto request) {
         if (request == null) {
             return null;
         }
@@ -89,7 +94,7 @@ public interface TerminalRequestMapper {
         if (request.hardwareUuid() != null && !request.hardwareUuid().isBlank()) {
             hardwareUuid = UUID.fromString(request.hardwareUuid());
         }
-        return new IdentityInfo(
+        return new DeviceIdentity(
                 request.assetTag(),
                 request.barcode(),
                 request.externalSystemId(),
@@ -101,11 +106,11 @@ public interface TerminalRequestMapper {
         );
     }
 
-    default HardwareProfile map(final DeviceHardwareRequestDto request) {
+    default DeviceHardware map(final DeviceHardwareRequestDto request) {
         if (request == null) {
             return null;
         }
-        return new HardwareProfile(
+        return new DeviceHardware(
                 request.cpu(),
                 request.hasCamera(),
                 request.hasGps(),
@@ -121,11 +126,11 @@ public interface TerminalRequestMapper {
         );
     }
 
-    default SoftwareProfile map(final DeviceSoftwareRequestDto request) {
+    default DeviceSoftware map(final DeviceSoftwareRequestDto request) {
         if (request == null) {
             return null;
         }
-        return new SoftwareProfile(
+        return new DeviceSoftware(
                 request.appVersion(),
                 request.bootloaderVersion(),
                 request.buildNumber(),
@@ -139,7 +144,7 @@ public interface TerminalRequestMapper {
         );
     }
 
-    default NetworkProfile map(final DeviceNetworkRequestDto request) {
+    default DeviceNetwork map(final DeviceNetworkRequestDto request) {
         if (request == null) {
             return null;
         }
@@ -150,7 +155,7 @@ public interface TerminalRequestMapper {
             try {
                 networkType = NetworkType.valueOf(request.networkType().toUpperCase());
             } catch (final IllegalArgumentException ex) {
-                return new NetworkProfile(
+                return new DeviceNetwork(
                         request.bluetoothMac(),
                         request.carrier(),
                         request.ipAddress(),
@@ -163,7 +168,7 @@ public interface TerminalRequestMapper {
                 );
             }
         }
-        return new NetworkProfile(
+        return new DeviceNetwork(
                 request.bluetoothMac(),
                 request.carrier(),
                 request.ipAddress(),
@@ -194,11 +199,11 @@ public interface TerminalRequestMapper {
         );
     }
 
-    default LocationProfile map(final DeviceLocationRequestDto request) {
+    default DeviceLocation map(final DeviceLocationRequestDto request) {
         if (request == null) {
             return null;
         }
-        return new LocationProfile(
+        return new DeviceLocation(
                 request.latitude(),
                 request.longitude(),
                 request.altitude(),

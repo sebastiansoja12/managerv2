@@ -1,23 +1,29 @@
 package com.warehouse.logistics.configuration;
 
-import com.warehouse.logistics.domain.port.primary.*;
-import com.warehouse.logistics.domain.port.secondary.*;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
-import com.warehouse.logistics.infrastructure.adapter.secondary.*;
-import org.mapstruct.factory.Mappers;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-
+import com.warehouse.auth.UserApiService;
+import com.warehouse.logistics.domain.port.primary.*;
+import com.warehouse.logistics.domain.port.secondary.*;
 import com.warehouse.logistics.domain.service.LogisticsService;
 import com.warehouse.logistics.domain.service.LogisticsServiceImpl;
+import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValidatorAspect;
+import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator;
+import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
-import com.warehouse.deliverytoken.infrastructure.adapter.primary.api.DeliveryTokenService;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
+import com.warehouse.logistics.infrastructure.adapter.secondary.*;
+import com.warehouse.process.ProcessHubApiService;
+import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.routelogger.infrastructure.adapter.secondary.RouteLogEventPublisherImpl;
+import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.DeviceEventPublisher;
+import com.warehouse.xmlconverter.XmlToStringService;
+import com.warehouse.xmlconverter.XmlToStringServiceImpl;
 
 @Configuration
 public class LogisticsConfiguration {
@@ -34,13 +40,47 @@ public class LogisticsConfiguration {
     }
 
     @Bean
-    public DeviceAgentServicePort deviceValidatorServicePort(final DeviceEventPublisher deviceEventPublisher) {
-        return new DeviceAgentServiceAdapter(deviceEventPublisher);
+    public DeviceAgentServicePort deviceValidatorServicePort(final DeviceEventPublisher deviceEventPublisher,
+                                                             final ProcessHubEventPublisher processHubEventPublisher) {
+        return new DeviceAgentServiceAdapter(deviceEventPublisher, processHubEventPublisher);
     }
 
     @Bean
     public DeviceAgentPort deviceAgentPort(final DeviceAgentServicePort deviceAgentServicePort) {
         return new DeviceAgentPortImpl(deviceAgentServicePort);
+    }
+
+    @Bean
+    public DeviceContextAuthenticator deviceContextAuthenticator(final DeviceApiService deviceApiService) {
+        return new DeviceContextAuthenticator(deviceApiService);
+    }
+
+    @Bean
+    public DeviceAccessValidatorAspect deviceAccessValidatorAspect(
+            final DeviceContextAuthenticator deviceContextAuthenticator) {
+        return new DeviceAccessValidatorAspect(deviceContextAuthenticator);
+    }
+
+    @Bean
+    public LogisticsProcessFinishAspect terminalResponseProcessFinishAspect(
+            final ProcessHubEventPublisher processHubEventPublisher) {
+        return new LogisticsProcessFinishAspect(processHubEventPublisher);
+    }
+
+    @Bean
+    public ProcessInitializerPort processInitializerPort(final ProcessHubServicePort processHubServicePort, final XmlToStringService xmlToStringService) {
+        return new ProcessInitializerPortImpl(processHubServicePort, xmlToStringService);
+    }
+
+    @Bean
+    public XmlToStringService xmlToStringService() {
+        return new XmlToStringServiceImpl();
+    }
+
+    @Bean
+    public ProcessHubServicePort processHubServicePort(final ProcessHubApiService processHubApiService,
+                                                       final UserApiService userApiService) {
+        return new ProcessHubServiceAdapter(processHubApiService, userApiService);
     }
 
     @Bean
@@ -76,8 +116,8 @@ public class LogisticsConfiguration {
     }
 
     @Bean(name = "logistics.supplierTokenServicePort")
-    public DeliveryTokenServicePort supplierTokenServicePort(DeliveryTokenService service) {
-        return new DeliveryTokenAdapter(service);
+    public DeliveryTokenServicePort supplierTokenServicePort() {
+        return new DeliveryTokenAdapter();
     }
 
     @Bean
@@ -100,14 +140,13 @@ public class LogisticsConfiguration {
         return new DepartmentRepositoryImpl(repository);
     }
 
-    // Mappers
     @Bean(name = "logistics.requestMapper")
     public LogisticsRequestMapper requestMapper() {
-        return Mappers.getMapper(LogisticsRequestMapper.class);
+        return new LogisticsRequestMapper();
     }
 
     @Bean(name = "logistics.responseMapper")
     public LogisticsResponseMapper responseMapper() {
-        return Mappers.getMapper(LogisticsResponseMapper.class);
+        return new LogisticsResponseMapper();
     }
 }

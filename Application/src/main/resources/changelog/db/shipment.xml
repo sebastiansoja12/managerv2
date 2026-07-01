@@ -119,6 +119,95 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="create-revinfo-table-for-shipment-audit-v2026-6" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="revinfo"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="revinfo">
+            <column name="rev" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="revtstmp" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-shipment-aud-table-v2026-6" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="shipment_aud"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="shipment_aud">
+            <column name="rev" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="revtype" type="TINYINT"/>
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="dangerous_good_id" type="BIGINT"/>
+            <column name="destination" type="VARCHAR(255)"/>
+            <column name="destination_country" type="VARCHAR(10)"/>
+            <column name="external_id" type="VARCHAR(255)"/>
+            <column name="external_return_id" type="BIGINT"/>
+            <column name="external_route_id" type="VARCHAR(255)"/>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="locked" type="BOOLEAN"/>
+            <column name="origin_country" type="VARCHAR(10)"/>
+            <column name="price_amount" type="DECIMAL(19,2)"/>
+            <column name="price_currency" type="VARCHAR(10)"/>
+            <column name="recipient_city" type="VARCHAR(255)"/>
+            <column name="recipient_email" type="VARCHAR(255)"/>
+            <column name="recipient_first_name" type="VARCHAR(255)"/>
+            <column name="recipient_last_name" type="VARCHAR(255)"/>
+            <column name="recipient_postal_code" type="VARCHAR(255)"/>
+            <column name="recipient_street" type="VARCHAR(255)"/>
+            <column name="recipient_telephone" type="VARCHAR(255)"/>
+            <column name="sender_city" type="VARCHAR(255)"/>
+            <column name="sender_email" type="VARCHAR(255)"/>
+            <column name="sender_postal_code" type="VARCHAR(255)"/>
+            <column name="sender_street" type="VARCHAR(255)"/>
+            <column name="sender_telephone" type="VARCHAR(255)"/>
+            <column name="shipment_priority" type="VARCHAR(32)"/>
+            <column name="shipment_related_id" type="BIGINT"/>
+            <column name="parcel_size" type="VARCHAR(64)"/>
+            <column name="status" type="VARCHAR(64)"/>
+            <column name="type" type="VARCHAR(64)"/>
+            <column name="tracking_number" type="VARCHAR(255)"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <addPrimaryKey tableName="shipment_aud"
+                       columnNames="shipment_id, rev"
+                       constraintName="pk_shipment_aud"/>
+    </changeSet>
+
+    <changeSet id="shipment-aud-add-revinfo-foreign-key-v2026-6" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="shipment_aud"/>
+                <tableExists tableName="revinfo"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_shipment_aud_revinfo"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="shipment_aud"
+                                 baseColumnNames="rev"
+                                 referencedTableName="revinfo"
+                                 referencedColumnNames="rev"
+                                 constraintName="fk_shipment_aud_revinfo"/>
+    </changeSet>
+
     <changeSet id="create-dangerous-good-table-v2026-3" author="s-soja">
         <preConditions onFail="MARK_RAN">
             <not>

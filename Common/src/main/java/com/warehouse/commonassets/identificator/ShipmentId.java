@@ -36,7 +36,4 @@ public class ShipmentId {
 		return Objects.hashCode(value);
 	}
 
-	public String toString() {
-		return "[" + value + "]";
-	}
 }

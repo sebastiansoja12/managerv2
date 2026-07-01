@@ -26,8 +26,12 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.domain.listener.ShipmentEventListener;
-import com.warehouse.shipment.domain.port.secondary.*;
+import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
+import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.shipment.domain.port.secondary.SignatureRepository;
+import com.warehouse.shipment.domain.port.secondary.SoftwareConfigurationServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
+import com.warehouse.shipment.infrastructure.adapter.secondary.ExternalFeignClient;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.tools.returning.ReturnProperties;
@@ -49,11 +53,6 @@ public class ShipmentReadRepositoryTest {
         @Bean
         MailService mailService() {
             return Mockito.mock(MailService.class);
-        }
-
-        @Bean
-        ShipmentRepository shipmentRepository() {
-            return Mockito.mock(ShipmentRepository.class);
         }
 
         @Bean
@@ -92,13 +91,21 @@ public class ShipmentReadRepositoryTest {
         }
 
         @Bean
-        public ReturnProperties returnProperties() {
-            return new ReturnProperties();
+        public ExternalFeignClient externalMicroserviceFeignClient() {
+            return Mockito.mock(ExternalFeignClient.class);
         }
 
         @Bean
         public NotificationEventPublisher notificationEventPublisher() {
             return Mockito.mock(NotificationEventPublisher.class);
+        }
+
+        @Bean
+        public ReturnProperties returnProperties() {
+            final ReturnProperties returnProperties = new ReturnProperties();
+            returnProperties.setUrl("http://localhost:8070");
+            returnProperties.setEndpoint("/v2/api/returns");
+            return returnProperties;
         }
     }
 
@@ -107,21 +114,15 @@ public class ShipmentReadRepositoryTest {
 
     @Test
     void shouldFindById() {
-        // given
         final ShipmentId shipmentId = new ShipmentId(100001L);
-        // when
         final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
-        // then
         assertTrue(parcel.isPresent());
     }
 
     @Test
     void shouldNotFindById() {
-        // given
         final ShipmentId shipmentId = new ShipmentId(1L);
-        // when
         final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
-        // then
         assertFalse(parcel.isPresent());
     }
 }

@@ -3,16 +3,17 @@ package com.warehouse.terminal.domain.model.device;
 import java.time.Instant;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.enumeration.ExecutionSourceType;
+import com.warehouse.commonassets.helper.ExecutionSourceResolver;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
-import com.warehouse.commonassets.enumeration.ExecutionSourceType;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DeviceHandler;
-import com.warehouse.commonassets.helper.ExecutionSourceResolver;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
+import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
 import com.warehouse.terminal.domain.vo.*;
 
 public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
@@ -20,34 +21,30 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
     private ExternalId<String> externalDeviceId;
     private DeviceType deviceType;
     private DeviceStatus status;
-    private IdentityInfo identity;
-    private HardwareProfile hardware;
-    private SoftwareProfile software;
-    private NetworkProfile network;
+    private DeviceIdentity identity;
+    private DeviceHardware hardware;
+    private DeviceSoftware software;
+    private DeviceNetwork network;
     private SecurityProfile security;
-    private LocationProfile location;
+    private DeviceLocation location;
     private OwnershipProfile ownership;
     private Instant createdAt;
     private Instant updatedAt;
 
-    private UserId userId;
-    private DepartmentCode departmentCode;
     private String version;
     private Instant lastUpdate;
-    private Boolean active;
 
     public Mobile(final DeviceId deviceId,
-                  final DeviceStatus status,
-                  final IdentityInfo identity,
-                  final HardwareProfile hardware,
-                  final SoftwareProfile software,
-                  final NetworkProfile network,
-                  final LocationProfile location,
+                  final DeviceIdentity identity,
+                  final DeviceHardware hardware,
+                  final DeviceSoftware software,
+                  final DeviceNetwork network,
+                  final DeviceLocation location,
                   final OwnershipProfile ownership) {
         this(deviceId,
                 ExternalId.generateId(),
                 DeviceType.MOBILE,
-                status,
+                DeviceStatus.ACTIVE,
                 identity,
                 hardware,
                 software,
@@ -57,31 +54,25 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
                 ownership,
                 Instant.now(),
                 Instant.now(),
-                ownership != null ? ownership.getUserId() : null,
-                ownership != null ? ownership.getDepartmentCode() : null,
                 software != null ? software.getAppVersion() : null,
-                Instant.now(),
-                DeviceStatus.ACTIVE.equals(status));
+                Instant.now());
     }
 
     public Mobile(final DeviceId deviceId,
                   final ExternalId<String> externalDeviceId,
                   final DeviceType deviceType,
                   final DeviceStatus status,
-                  final IdentityInfo identity,
-                  final HardwareProfile hardware,
-                  final SoftwareProfile software,
-                  final NetworkProfile network,
+                  final DeviceIdentity identity,
+                  final DeviceHardware hardware,
+                  final DeviceSoftware software,
+                  final DeviceNetwork network,
                   final SecurityProfile security,
-                  final LocationProfile location,
+                  final DeviceLocation location,
                   final OwnershipProfile ownership,
                   final Instant createdAt,
                   final Instant updatedAt,
-                  final UserId userId,
-                  final DepartmentCode departmentCode,
                   final String version,
-                  final Instant lastUpdate,
-                  final Boolean active) {
+                  final Instant lastUpdate) {
         this.deviceId = deviceId;
         this.externalDeviceId = externalDeviceId;
         this.deviceType = deviceType;
@@ -95,11 +86,8 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
         this.ownership = ownership;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.userId = userId;
-        this.departmentCode = departmentCode;
         this.version = version;
         this.lastUpdate = lastUpdate;
-        this.active = active;
     }
 
     @Override
@@ -123,22 +111,22 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
     }
 
     @Override
-    public IdentityInfo getIdentity() {
+    public DeviceIdentity getIdentity() {
         return identity;
     }
 
     @Override
-    public HardwareProfile getHardware() {
+    public DeviceHardware getHardware() {
         return hardware;
     }
 
     @Override
-    public SoftwareProfile getSoftware() {
+    public DeviceSoftware getSoftware() {
         return software;
     }
 
     @Override
-    public NetworkProfile getNetwork() {
+    public DeviceNetwork getNetwork() {
         return network;
     }
 
@@ -148,7 +136,7 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
     }
 
     @Override
-    public LocationProfile getLocation() {
+    public DeviceLocation getLocation() {
         return location;
     }
 
@@ -181,13 +169,11 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
                 this.security,
                 this.location,
                 this.ownership,
-                this.userId,
-                this.departmentCode,
                 this.version,
                 this.createdAt,
                 this.updatedAt,
                 this.lastUpdate,
-                this.active,
+                isActive(),
                 null,
                 null
         );
@@ -195,12 +181,12 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
 
     @Override
     public UserId getUserId() {
-        return userId;
+        return ownership.getUserId();
     }
 
     @Override
     public DepartmentCode getDepartmentCode() {
-        return departmentCode;
+        return ownership.getDepartmentCode();
     }
 
     @Override
@@ -214,62 +200,62 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
     }
 
     @Override
-    public Boolean isActive() {
-        return active;
+    public void update(final DeviceUpdateCommand request) {
+        if (request.deviceType() != null) {
+            updateDeviceType(request.deviceType());
+        }
+        if (request.active() != null) {
+            updateActive(request.active());
+        }
+        if (request.status() != null) {
+            updateStatus(request.status());
+        }
+        if (request.identity() != null) {
+            updateIdentity(request.identity());
+        }
+        if (request.hardware() != null) {
+            updateHardware(request.hardware());
+        }
+        if (request.software() != null) {
+            updateSoftware(request.software());
+        }
+        if (request.network() != null) {
+            updateNetwork(request.network());
+        }
+        if (request.security() != null) {
+            updateSecurity(request.security());
+        }
+        if (request.location() != null) {
+            updateLocation(request.location());
+        }
+        if (request.ownership() != null) {
+            updateOwnership(request.ownership());
+        }
+        if (request.userId() != null) {
+            assignUser(request.userId());
+        }
+        if (request.departmentCode() != null) {
+            assignDepartmentCode(request.departmentCode());
+        }
+        if (request.version() != null) {
+            updateVersion(request.version());
+        }
     }
 
     @Override
-    public void updateUserId(final UserId userId) {
-        this.userId = userId;
-        if (this.ownership != null) {
-            this.ownership.setUserId(userId);
-        }
-        markAsModified();
-    }
-
-    @Override
-    public void updateDepartmentCode(final DepartmentCode departmentCode) {
-        this.departmentCode = departmentCode;
-        if (this.ownership != null) {
-            this.ownership.setDepartmentCode(departmentCode);
-        }
+    public void assignDepartmentCode(final DepartmentCode departmentCode) {
+        ensureOwnership().setDepartmentCode(departmentCode);
         markAsModified();
     }
 
     @Override
     public void updateStatus(final DeviceStatus status) {
         this.status = status;
-        this.active = DeviceStatus.ACTIVE.equals(status);
         markAsModified();
-    }
-
-    @Override
-    public void updateExternalDeviceId(final ExternalId<String> externalDeviceId) {
-        this.externalDeviceId = externalDeviceId;
-        markAsModified();
-    }
-
-    @Override
-    public void updateCreatedAt(final Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public void updateUpdatedAt(final Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public void updateLastUpdate(final Instant lastUpdate) {
-        this.lastUpdate = lastUpdate;
-        if (lastUpdate != null) {
-            this.updatedAt = lastUpdate;
-        }
     }
 
     @Override
     public void updateActive(final Boolean active) {
-        this.active = active;
         if (Boolean.TRUE.equals(active)) {
             this.status = DeviceStatus.ACTIVE;
         } else if (Boolean.FALSE.equals(active)) {
@@ -279,96 +265,80 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
     }
 
     @Override
-    public void updateIdentity(final IdentityInfo identity) {
-        if (identity != null) {
-            if (this.identity == null) {
-                this.identity = identity;
-            } else {
-                this.identity.update(identity);
-            }
-            markAsModified();
+    public void updateIdentity(final DeviceIdentity identity) {
+        if (this.identity == null) {
+            this.identity = identity;
+        } else {
+            this.identity.update(identity);
         }
+        markAsModified();
     }
 
     @Override
-    public void updateHardware(final HardwareProfile hardware) {
-        if (hardware != null) {
-            if (this.hardware == null) {
-                this.hardware = hardware;
-            } else {
-                this.hardware.update(hardware);
-            }
-            markAsModified();
+    public void updateHardware(final DeviceHardware hardware) {
+        if (this.hardware == null) {
+            this.hardware = hardware;
+        } else {
+            this.hardware.update(hardware);
         }
+        markAsModified();
     }
 
     @Override
-    public void updateSoftware(final SoftwareProfile software) {
-        if (software != null) {
-            if (this.software == null) {
-                this.software = software;
-            } else {
-                this.software.update(software);
-            }
-            this.version = this.software.getAppVersion();
-            markAsModified();
+    public void updateSoftware(final DeviceSoftware software) {
+        if (this.software == null) {
+            this.software = software;
+        } else {
+            this.software.update(software);
         }
+        this.version = this.software.getAppVersion();
+        markAsModified();
     }
 
     @Override
-    public void updateNetwork(final NetworkProfile network) {
-        if (network != null) {
-            if (this.network == null) {
-                this.network = network;
-            } else {
-                this.network.update(network);
-            }
-            markAsModified();
+    public void updateNetwork(final DeviceNetwork network) {
+        if (this.network == null) {
+            this.network = network;
+        } else {
+            this.network.update(network);
         }
+        markAsModified();
     }
 
     @Override
     public void updateSecurity(final SecurityProfile security) {
-        if (security != null) {
-            if (this.security == null) {
-                this.security = security;
-            } else {
-                this.security.update(security);
-            }
-            markAsModified();
+        if (this.security == null) {
+            this.security = security;
+        } else {
+            this.security.update(security);
         }
+        markAsModified();
     }
 
     @Override
-    public void updateLocation(final LocationProfile location) {
-        if (location != null) {
-            if (this.location == null) {
-                this.location = location;
-            } else {
-                this.location.update(location);
-            }
-            markAsModified();
+    public void updateLocation(final DeviceLocation location) {
+        if (this.location == null) {
+            this.location = location;
+        } else {
+            this.location.update(location);
         }
+        markAsModified();
     }
 
     @Override
     public void updateOwnership(final OwnershipProfile ownership) {
-        if (ownership != null) {
-            if (this.ownership == null) {
-                this.ownership = ownership;
-            } else {
-                this.ownership.update(ownership);
-            }
-            this.userId = this.ownership.getUserId();
-            this.departmentCode = this.ownership.getDepartmentCode();
-            markAsModified();
+        if (this.ownership == null) {
+            this.ownership = ownership;
+        } else {
+            this.ownership.update(ownership);
         }
+        markAsModified();
     }
 
     @Override
     public void updateVersion(final String version) {
         if (this.software == null) {
-            this.software = new SoftwareProfile();
+            this.software = new DeviceSoftware();
         }
         this.software.setAppVersion(version);
         this.version = version;
@@ -377,7 +347,8 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
 
     @Override
     public void assignUser(final UserId userId) {
-        updateUserId(userId);
+        ensureOwnership().setUserId(userId);
+        markAsModified();
     }
 
     @Override
@@ -389,6 +360,13 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
     private void markAsModified() {
         this.lastUpdate = Instant.now();
         this.updatedAt = Instant.now();
+    }
+
+    private OwnershipProfile ensureOwnership() {
+        if (this.ownership == null) {
+            this.ownership = OwnershipProfile.initializeOwnership("", null, null, null);
+        }
+        return this.ownership;
     }
 
     @Override

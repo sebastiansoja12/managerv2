@@ -3,6 +3,7 @@ package com.warehouse.terminal.infrastructure.adapter.secondary;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.exception.UserNotFoundException;
@@ -34,6 +35,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Boolean existsById(final UserId userId) {
         return this.repository.existsById(userId);
+    }
+
+    @Override
+    public Boolean existsByIdAndDepartmentCode(final UserId userId, final DepartmentCode departmentCode) {
+        return this.repository.existsByUserIdAndDepotCode(userId, departmentCode.value());
     }
 
     @Override

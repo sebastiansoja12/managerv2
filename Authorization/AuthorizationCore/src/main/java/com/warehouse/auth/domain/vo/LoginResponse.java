@@ -1,8 +1,4 @@
 package com.warehouse.auth.domain.vo;
 
-import lombok.Value;
-
-@Value
-public class LoginResponse {
-    Token refreshToken;
+public record LoginResponse(Token refreshToken) {
 }

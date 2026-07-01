@@ -5,7 +5,7 @@
     <parent>
         <artifactId>DeliveryOperation</artifactId>
         <groupId>com.warehouse</groupId>
-        <version>2026.1-SNAPSHOT</version>
+        <version>2026.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>DeliveryOperationApi</artifactId>
@@ -17,6 +17,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>Common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ProcessHubApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

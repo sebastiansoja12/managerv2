@@ -9,12 +9,7 @@ import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
-import com.warehouse.terminal.domain.vo.HardwareProfile;
-import com.warehouse.terminal.domain.vo.IdentityInfo;
-import com.warehouse.terminal.domain.vo.LocationProfile;
-import com.warehouse.terminal.domain.vo.NetworkProfile;
-import com.warehouse.terminal.domain.vo.SecurityProfile;
-import com.warehouse.terminal.domain.vo.SoftwareProfile;
+import com.warehouse.terminal.domain.vo.*;
 
 public record DeviceUpdateCommand(
         DeviceId deviceId,
@@ -28,12 +23,12 @@ public record DeviceUpdateCommand(
         Instant updatedAt,
         Instant lastUpdate,
         Boolean active,
-        IdentityInfo identity,
-        HardwareProfile hardware,
-        SoftwareProfile software,
-        NetworkProfile network,
+        DeviceIdentity identity,
+        DeviceHardware hardware,
+        DeviceSoftware software,
+        DeviceNetwork network,
         SecurityProfile security,
-        LocationProfile location,
+        DeviceLocation location,
         OwnershipProfile ownership
 ) {
 }

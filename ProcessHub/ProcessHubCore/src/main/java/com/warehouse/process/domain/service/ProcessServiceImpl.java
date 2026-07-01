@@ -1,12 +1,22 @@
 package com.warehouse.process.domain.service;
 
+import java.time.Instant;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.process.domain.context.DomainContext;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
+import com.warehouse.process.domain.event.ProcessCreatedEvent;
+import com.warehouse.process.domain.event.ProcessFinished;
+import com.warehouse.process.domain.event.ProcessResponseUpdated;
 import com.warehouse.process.domain.exception.ProcessLogNotFoundException;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
+import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
 public class ProcessServiceImpl implements ProcessService {
@@ -25,12 +35,24 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void createProcess(final ProcessLog processLog) {
         this.processRepository.create(processLog);
+        DomainContext.eventPublisher().publishEvent(new ProcessCreatedEvent(processLog.snapshot(), Instant.now()));
     }
 
     @Override
     public ProcessLog findById(final ProcessId processId) {
         return this.processRepository.findById(processId)
                 .orElseThrow(() -> new ProcessLogNotFoundException("Process log not found"));
+    }
+
+    @Override
+    public ProcessLog findByIdForCurrentDepartment(final ProcessId processId) {
+        return this.processRepository.findByIdForCurrentDepartment(processId)
+                .orElseThrow(() -> new ProcessLogNotFoundException("Process log not found"));
+    }
+
+    @Override
+    public Page<ProcessLog> findAllForCurrentDepartment(final Pageable pageable) {
+        return this.processRepository.findAllForCurrentDepartment(pageable);
     }
 
     @Override
@@ -43,10 +65,29 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void updateResponse(final ProcessId processId, final String response) {
+    public void assignShipmentRejected(final ProcessId processId, final ShipmentRejected shipmentRejected) {
+        this.processRepository.findById(processId)
+                .ifPresent(processLog -> {
+                    processLog.applyShipmentRejected(shipmentRejected);
+                    this.processRepository.update(processLog);
+                });
+    }
+
+    @Override
+    public void assignDeviceValidation(final ProcessId processId, final DeviceValidation deviceValidation) {
+        this.processRepository.findById(processId)
+                .ifPresent(processLog -> {
+                    processLog.applyDeviceValidation(deviceValidation);
+                    this.processRepository.update(processLog);
+                });
+    }
+
+	@Override
+	public void updateResponse(final ProcessId processId, final String response) {
 		this.processRepository.findById(processId).ifPresent(processLog -> {
 			processLog.changeResponse(response);
 			this.processRepository.update(processLog);
+            DomainContext.eventPublisher().publishEvent(new ProcessResponseUpdated(processLog.snapshot(), Instant.now()));
 		});
     }
 
@@ -55,14 +96,21 @@ public class ProcessServiceImpl implements ProcessService {
 		this.processRepository.findById(processId).ifPresent(processLog -> {
 			processLog.changeStatus(ProcessStatus.SUCCESS);
 			this.processRepository.update(processLog);
-		});
+            DomainContext.eventPublisher().publishEvent(new ProcessFinished(processLog.snapshot(), Instant.now()));
+        });
 	}
 
 	@Override
 	public void logFailedProcess(final ProcessId processId) {
+        logFailedProcess(processId, null);
+	}
+
+	@Override
+	public void logFailedProcess(final ProcessId processId, final String faultDescription) {
 		this.processRepository.findById(processId).ifPresent(processLog -> {
-			processLog.changeStatus(ProcessStatus.FAILURE);
+			processLog.changeStatus(ProcessStatus.FAILURE, faultDescription);
 			this.processRepository.update(processLog);
+            DomainContext.eventPublisher().publishEvent(new ProcessFinished(processLog.snapshot(), Instant.now()));
 		});
 	}
 }

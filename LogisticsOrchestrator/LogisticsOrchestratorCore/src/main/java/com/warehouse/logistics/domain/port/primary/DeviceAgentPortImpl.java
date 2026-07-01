@@ -2,7 +2,6 @@ package com.warehouse.logistics.domain.port.primary;
 
 import com.warehouse.logistics.domain.port.secondary.DeviceAgentServicePort;
 import com.warehouse.terminal.DeviceInformation;
-import com.warehouse.terminal.information.Device;
 
 public class DeviceAgentPortImpl implements DeviceAgentPort {
 
@@ -13,8 +12,7 @@ public class DeviceAgentPortImpl implements DeviceAgentPort {
     }
 
     @Override
-    public void updateDeviceIfNeed(final Device device) {
-        final DeviceInformation deviceInformation = DeviceInformation.from(device);
+    public void updateDeviceIfNeed(final DeviceInformation deviceInformation) {
         deviceAgentServicePort.updateDevice(deviceInformation);
     }
 }

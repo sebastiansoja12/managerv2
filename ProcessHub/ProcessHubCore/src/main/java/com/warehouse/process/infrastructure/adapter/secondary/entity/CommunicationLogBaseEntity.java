@@ -2,8 +2,6 @@ package com.warehouse.process.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
 
-import org.hibernate.annotations.Immutable;
-
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -16,12 +14,10 @@ import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @Access(AccessType.FIELD)
-@Immutable
 @SuperBuilder
 public abstract class CommunicationLogBaseEntity {
 
     @EmbeddedId
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @AttributeOverride(name = "value", column = @Column(name = "communication_log_id", nullable = false))
     private CommunicationLogId communicationLogId;
 
@@ -101,4 +97,3 @@ public abstract class CommunicationLogBaseEntity {
         return 31;
     }
 }
-

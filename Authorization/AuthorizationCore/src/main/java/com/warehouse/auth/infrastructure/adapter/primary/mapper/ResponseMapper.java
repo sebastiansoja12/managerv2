@@ -1,10 +1,9 @@
 package com.warehouse.auth.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RolePermissionApi;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.RolePermissionIdApi;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.UserDto;
-import com.warehouse.auth.infrastructure.adapter.primary.dto.UserIdDto;
+import com.warehouse.auth.infrastructure.dto.RolePermissionApi;
+import com.warehouse.auth.infrastructure.dto.UserDto;
+import com.warehouse.auth.infrastructure.dto.UserIdDto;
 
 import java.time.Instant;
 import java.util.Set;
@@ -13,6 +12,9 @@ import java.util.stream.Collectors;
 public abstract class ResponseMapper {
 
     public static UserDto map(final User user) {
+        if (user == null) {
+            return null;
+        }
         final UserIdDto userId = new UserIdDto(user.getUserId().value());
         final String username = user.getUsername();
         final String firstName = user.getFirstName();
@@ -20,6 +22,7 @@ public abstract class ResponseMapper {
         final String email = user.getEmail();
         final String role = user.getRole().name();
         final String departmentCode = user.getDepartmentCode().getValue();
+        final String language = user.getLanguage();
         final Boolean deleted = user.isDeleted();
         final Instant createdAt = user.createdAt();
         final Instant updatedAt = user.updatedAt();
@@ -27,7 +30,7 @@ public abstract class ResponseMapper {
 				.map(rolePermission -> new RolePermissionApi(
 						rolePermission.getPermission().getPermission()))
 				.collect(Collectors.toSet());
-		return new UserDto(userId, username, firstName, lastName, email, role, departmentCode, rolePermissions, deleted,
+		return new UserDto(userId, username, firstName, lastName, email, role, departmentCode, language, rolePermissions, deleted,
 				createdAt, updatedAt);
     }
 }
