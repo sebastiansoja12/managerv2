@@ -1,5 +1,7 @@
 package com.warehouse.returning.domain.port.secondary;
 
+import java.util.Optional;
+
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.vo.DepartmentCode;
 import com.warehouse.returning.domain.vo.ReturnPage;
@@ -10,7 +12,11 @@ public interface ReturnRepository {
 
     ReturnPackage findById(final ReturnPackageId returnPackageId);
 
+    ReturnPackage findDetailsById(final ReturnPackageId returnPackageId);
+
     ReturnPackage findByShipmentId(final ShipmentId shipmentId);
+
+    Optional<ReturnPackage> findLatestByShipmentIdAndOperatorId(final ShipmentId shipmentId, final Long operatorId);
 
     ReturnPage findByDepartmentCodeAndOperatorId(
             final DepartmentCode departmentCode, final Long operatorId, final int page, final int size);
