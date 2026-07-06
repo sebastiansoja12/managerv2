@@ -1,5 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.secondary;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -21,6 +22,17 @@ public interface ReturnReadRepository extends JpaRepository<ReturnPackageEntity,
 
     @Query("SELECT r FROM ReturnPackageEntity r WHERE r.returnId = :returnId AND r.returnStatus <> 'CANCELLED'")
     Optional<ReturnPackageEntity> findById(@Param("returnId") final ReturnId returnId);
+
+    @Query("SELECT r FROM ReturnPackageEntity r WHERE r.returnId = :returnId")
+    Optional<ReturnPackageEntity> findDetailsById(@Param("returnId") final ReturnId returnId);
+
+    @Query("SELECT r FROM ReturnPackageEntity r "
+            + "WHERE r.shipmentId = :shipmentId AND r.operatorId = :operatorId "
+            + "ORDER BY r.createdAt DESC, r.returnId.value DESC")
+    List<ReturnPackageEntity> findLatestByShipmentIdAndOperatorId(
+            @Param("shipmentId") final ShipmentId shipmentId,
+            @Param("operatorId") final Long operatorId,
+            final Pageable pageable);
 
     @Query("SELECT r FROM ReturnPackageEntity r "
             + "WHERE r.assignedDepartmentCode.value = :departmentCode AND r.operatorId = :operatorId")
