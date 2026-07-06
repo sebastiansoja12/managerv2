@@ -5,6 +5,7 @@ import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
 import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
 import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChangedIntegrationEvent;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.PickupPointId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentEventData;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.messaging.Message;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,6 +45,7 @@ class ShipmentKafkaConfigurationTest {
                   "payload": {
                     "shipmentId": {"value": 123},
                     "shipmentStatus": "CREATED",
+                    "pickupPointId": {"value": "11111111-1111-1111-1111-111111111111"},
                     "updatedAt": "2026-08-11T10:15:30"
                   }
                 }
@@ -88,6 +91,9 @@ class ShipmentKafkaConfigurationTest {
                 null,
                 null,
                 null,
+                null,
+                null,
+                new PickupPointId(UUID.fromString("11111111-1111-1111-1111-111111111111")),
                 null
         );
     }
