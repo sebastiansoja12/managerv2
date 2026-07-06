@@ -29,6 +29,9 @@ public record ShipmentEventData(
         CountryCode destinationCountry,
         SignatureSnapshot signature,
         TrackingNumber trackingNumber,
+        PickupMethod pickupMethod,
+        DeliveryMethod deliveryMethod,
+        PickupPointId pickupPointId,
         ExternalId<UUID> externalShipmentId
 ) {
 }
