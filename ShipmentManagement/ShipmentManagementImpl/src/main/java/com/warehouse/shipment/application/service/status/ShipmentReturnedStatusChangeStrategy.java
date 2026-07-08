@@ -6,7 +6,6 @@ import com.warehouse.shipment.domain.event.ShipmentReturned;
 import com.warehouse.shipment.domain.model.Shipment;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.Set;
 
 public class ShipmentReturnedStatusChangeStrategy implements ShipmentStatusChangeStrategy {
@@ -17,8 +16,8 @@ public class ShipmentReturnedStatusChangeStrategy implements ShipmentStatusChang
     }
 
     @Override
-    public Optional<ShipmentEvent> process(final Shipment shipment) {
+    public ShipmentEvent process(final Shipment shipment) {
         shipment.notifyShipmentReturned();
-        return Optional.of(new ShipmentReturned(shipment.snapshot(), Instant.now()));
+        return new ShipmentReturned(shipment.snapshot(), Instant.now());
     }
 }
