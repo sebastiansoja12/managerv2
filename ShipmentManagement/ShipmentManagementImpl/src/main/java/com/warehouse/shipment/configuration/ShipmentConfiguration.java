@@ -85,8 +85,15 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ReturningServicePort returningServicePort(final ExternalFeignClient externalFeignClient,
-													 final ReturnProperties returnProperties) {
+											 final ReturnProperties returnProperties) {
 		return new ReturningServiceClient(externalFeignClient, returnProperties);
+	}
+
+	@Bean
+	public ShipmentResultFactory shipmentResultFactory(final DepartmentServicePort departmentServicePort,
+												 final RouteLogService routeLogService,
+												 final ReturningServicePort returningServicePort) {
+		return new ShipmentResultFactory(departmentServicePort, routeLogService, returningServicePort);
 	}
 
 	@Bean
@@ -96,7 +103,7 @@ public class ShipmentConfiguration {
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
 									 final SignatureService signatureService,
-									 final RouteLogService routeLogService,
+									 final ShipmentResultFactory shipmentResultFactory,
 									 final ReturningServicePort returningServicePort,
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberGenerationService trackingNumberGenerationService,
@@ -107,9 +114,9 @@ public class ShipmentConfiguration {
                                      final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver,
                                      final DomainEventPublisher domainEventPublisher,
                                      final DepartmentServicePort departmentServicePort) {
-        return new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
+		return new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort, priceService,
-				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
+				countryServiceAvailabilityService, signatureService, shipmentResultFactory, returningServicePort,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 operatorContextProvider, shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
@@ -153,6 +160,16 @@ public class ShipmentConfiguration {
     }
 
     @Bean
+    public ShipmentStatusChangeStrategy shipmentPlannedStatusChangeStrategy() {
+        return new ShipmentPlannedStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentAcceptedStatusChangeStrategy() {
+        return new ShipmentAcceptedStatusChangeStrategy();
+    }
+
+    @Bean
     public ShipmentStatusChangeStrategy shipmentRedirectedStatusChangeStrategy() {
         return new ShipmentRedirectedStatusChangeStrategy();
     }
@@ -178,8 +195,13 @@ public class ShipmentConfiguration {
     }
 
     @Bean
-    public ShipmentStatusChangeStrategy shipmentUnchangedStatusChangeStrategy() {
-        return new ShipmentUnchangedStatusChangeStrategy();
+    public ShipmentStatusChangeStrategy shipmentPreparedStatusChangeStrategy() {
+        return new ShipmentPreparedStatusChangeStrategy();
+    }
+
+    @Bean
+    public ShipmentStatusChangeStrategy shipmentCanceledStatusChangeStrategy() {
+        return new ShipmentCanceledStatusChangeStrategy();
     }
 
     @Bean
