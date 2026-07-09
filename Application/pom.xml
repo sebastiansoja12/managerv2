@@ -42,12 +42,12 @@
     <dependencies>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>TerminalCore</artifactId>
+            <artifactId>DeviceImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ShipmentManagementCore</artifactId>
+            <artifactId>ShipmentManagementImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -57,12 +57,12 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DeliveryOperationCore</artifactId>
+            <artifactId>DeliveryOperationImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DepartmentServiceCore</artifactId>
+            <artifactId>DepartmentServiceImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -82,7 +82,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>AuthorizationCore</artifactId>
+            <artifactId>AuthorizationImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -102,7 +102,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>LogisticsOrchestratorCore</artifactId>
+            <artifactId>LogisticsOrchestratorImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -112,12 +112,12 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>SupplierServiceManagementCore</artifactId>
+            <artifactId>SupplierServiceManagementImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>ProcessHubCore</artifactId>
+            <artifactId>ProcessHubImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

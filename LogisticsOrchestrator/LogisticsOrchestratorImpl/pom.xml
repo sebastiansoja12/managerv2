@@ -5,13 +5,21 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>warehouse</artifactId>
-        <version>2025.1-SNAPSHOT</version>
+        <artifactId>LogisticsOrchestrator</artifactId>
+        <version>2026.3-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>LogisticsOrchestrator</artifactId>
+    <artifactId>LogisticsOrchestratorImpl</artifactId>
+    <packaging>jar</packaging>
+
 
     <dependencies>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>LogisticsOrchestratorApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>DeliveryOperationApi</artifactId>
@@ -19,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DeliveryOperationCore</artifactId>
+            <artifactId>DeliveryOperationImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -32,12 +40,6 @@
             <artifactId>Common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>DeliveryProtectionCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>ExceptionHandler</artifactId>
@@ -62,8 +64,19 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>TerminalApi</artifactId>
+            <artifactId>DeviceApi</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ProcessHubApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>AuthorizationApi</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -72,6 +85,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
         <dependency>
             <groupId>wsdl4j</groupId>
@@ -193,15 +210,5 @@
             </properties>
         </profile>
     </profiles>
-
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
-    </build>
-
 
 </project>

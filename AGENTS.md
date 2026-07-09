@@ -34,8 +34,8 @@ Each business module should be split into:
 Rules:
 
 - The `Api` module is used only for internal communication between modules/domains.
-- The `Api` module calls ports/adapters exposed by the corresponding `Core` module.
-- Controllers belong to the `Core` module.
+- The `Api` module calls ports/adapters exposed by the corresponding `Impl` module.
+- Controllers belong to the `Impl` module.
 - Controllers are outside the `Api` module and are used for communication from outside the system.
 - `Application` is the main monolithic application module.
 - `ArchitectureTest` is the module used for architecture tests.

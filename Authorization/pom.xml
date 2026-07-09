@@ -13,7 +13,7 @@
     <artifactId>Authorization</artifactId>
 
     <modules>
-        <module>AuthorizationCore</module>
+        <module>AuthorizationImpl</module>
         <module>AuthorizationApi</module>
     </modules>
 

@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>LogisticsOrchestratorApi</module>
-        <module>LogisticsOrchestratorCore</module>
+        <module>LogisticsOrchestratorImpl</module>
     </modules>
 
 </project>

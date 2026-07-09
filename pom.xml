@@ -27,7 +27,7 @@
         <module>DestinationDetermination</module>
         <module>DocumentManager</module>
 		<module>ExceptionHandler</module>
-        <module>Terminal</module>
+        <module>Device</module>
         <module>ArchitectureTest</module>
         <module>ManagerTools</module>
         <module>E2E</module>

@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.warehouse</groupId>
-        <artifactId>Terminal</artifactId>
+        <artifactId>Device</artifactId>
         <version>2026.3-SNAPSHOT</version>
     </parent>
 
     <packaging>jar</packaging>
 
-    <artifactId>TerminalApi</artifactId>
+    <artifactId>DeviceApi</artifactId>
 
     <dependencies>
         <dependency>
