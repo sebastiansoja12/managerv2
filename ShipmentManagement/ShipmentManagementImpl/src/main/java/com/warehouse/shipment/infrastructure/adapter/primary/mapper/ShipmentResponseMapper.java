@@ -1,16 +1,16 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
+import com.warehouse.shipment.application.port.primary.result.ShipmentControlCenterResult;
+import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -65,8 +65,55 @@ public interface ShipmentResponseMapper {
                 response.totalPages());
     }
 
-    @Mapping(target = "destination", source = "departmentCode")
-    ShipmentDto map(final Shipment shipment, final DepartmentCode departmentCode);
+    default ShipmentDto map(final ShipmentSnapshot shipment, final DepartmentCode departmentCode) {
+        if (shipment == null) {
+            return null;
+        }
+        final ShipmentDto response = new ShipmentDto(
+                map(shipment.shipmentId()),
+                map(shipment.sender()),
+                map(shipment.recipient()),
+                shipment.shipmentSize() == null ? null : ShipmentSizeDto.valueOf(shipment.shipmentSize().name()),
+                map(departmentCode),
+                shipment.originDepartmentId(),
+                shipment.pickupPointId(),
+                shipment.pickupMethod() == null ? null : PickupMethodDto.valueOf(shipment.pickupMethod().name()),
+                shipment.deliveryMethod() == null ? null : DeliveryMethodDto.valueOf(shipment.deliveryMethod().name()),
+                shipment.originCountry(),
+                shipment.destinationCountry(),
+                shipment.shipmentStatus() == null ? null : ShipmentStatusDto.from(shipment.shipmentStatus()),
+                map(shipment.shipmentRelatedId()),
+                shipment.shipmentPriority() == null
+                        ? null
+                        : ShipmentPriorityDto.valueOf(shipment.shipmentPriority().name()),
+                shipment.trackingNumber() == null ? null : new TrackingNumberDto(shipment.trackingNumber().value()),
+                map(shipment.price()),
+                shipment.locked(),
+                map(shipment.signature()),
+                map(shipment.dangerousGood()),
+                shipment.createdAt(),
+                shipment.updatedAt());
+        response.setDeliveryPickupPointId(shipment.deliveryPickupPointId());
+        return response;
+    }
+
+    default ShipmentDto map(final ShipmentResult shipmentResult) {
+        return map(shipmentResult.snapshot(), shipmentResult.destination());
+    }
+
+    default PersonApi map(final Person person) {
+        if (person == null) {
+            return null;
+        }
+        return new PersonApi(
+                person.getFirstName(),
+                person.getLastName(),
+                person.getEmail(),
+                person.getTelephoneNumber(),
+                person.getCity(),
+                person.getPostalCode(),
+                person.getStreet());
+    }
 
     default DepartmentCodeDto map(final DepartmentCode departmentCode) {
         return departmentCode == null ? null : new DepartmentCodeDto(departmentCode.getValue());
@@ -93,10 +140,9 @@ public interface ShipmentResponseMapper {
         );
     }
 
-    default ShipmentControlCenterResponseApi map(final ShipmentRouteLog controlCenter,
-                                                 final DepartmentCode departmentCode) {
-        return new ShipmentControlCenterResponseApi(map(controlCenter.shipment(), departmentCode),
-                controlCenter.routeLog());
+    default ShipmentControlCenterResponseApi mapControlCenter(final ShipmentControlCenterResult controlCenter) {
+        return new ShipmentControlCenterResponseApi(map(controlCenter.shipment()), controlCenter.routeLog(),
+                controlCenter.returnPackage() == null ? null : map(controlCenter.returnPackage()));
     }
 
     default List<String> map(String value) {
@@ -116,7 +162,7 @@ public interface ShipmentResponseMapper {
     }
 
 	default MoneyApi map(final Money amount) {
-		return new MoneyApi(amount.getAmount(), amount.getCurrency().name());
+		return amount == null ? null : new MoneyApi(amount.getAmount(), amount.getCurrency().name());
 	}
 
     ShipmentUpdateResponseDto map(final ShipmentUpdateResponse response);
