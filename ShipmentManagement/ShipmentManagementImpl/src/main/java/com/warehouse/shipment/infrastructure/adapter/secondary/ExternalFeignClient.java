@@ -34,7 +34,7 @@ public interface ExternalFeignClient {
     ResponseEntity<ReturnResponseApi> processReturn(final URI uri, @RequestBody final ReturnRequestApi request);
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Void> completeReturn(final URI uri, @RequestBody final ChangeReturnStatusApiRequest request);
+    ResponseEntity<Void> changeReturnStatus(final URI uri, @RequestBody final ChangeReturnStatusApiRequest request);
 
     class Configuration {
 
