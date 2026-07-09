@@ -2,6 +2,8 @@ package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.shipment.application.port.primary.command.*;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
+import com.warehouse.shipment.application.port.primary.result.ShipmentControlCenterResult;
+import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,10 +21,12 @@ import com.warehouse.shipment.domain.exception.DangerousGoodNotFoundException;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.*;
+import com.warehouse.shipment.domain.model.DangerousGood;
+import com.warehouse.shipment.domain.vo.Person;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.secondary.ShipmentConfigurationPort;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
+import com.warehouse.shipment.domain.vo.ShipmentReturnPage;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
@@ -80,7 +84,7 @@ public class ShipmentInternalController {
         final ShipmentValidationRules validationRules =
                 this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration().validationRules();
         shipmentRequestValidator.validateRequest(shipmentRequest, validationRules);
-        final ShipmentCreateCommand request = requestMapper.map(shipmentRequest);
+        final ShipmentCreateCommand request = requestMapper.mapCreateRequest(shipmentRequest);
         final Result<ShipmentCreateResponse, ErrorCode> result = shipmentPort.ship(request);
 
         final ResponseEntity<?> response;
@@ -110,8 +114,8 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.get")
     @Timed(value = "controller.shipment.get")
     public ResponseEntity<?> get(@PathVariable final Long shipmentId) {
-        final Shipment shipment = shipmentPort.loadShipment(new ShipmentId(shipmentId));
-        final ShipmentDto shipmentResponse = map(shipment);
+        final ShipmentResult shipment = shipmentPort.loadShipment(new ShipmentId(shipmentId));
+        final ShipmentDto shipmentResponse = responseMapper.map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
 
@@ -119,16 +123,17 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.controlcenter.get")
     @Timed(value = "controller.shipment.controlcenter.get")
     public ResponseEntity<?> getControlCenter(@PathVariable final Long shipmentId) {
-        final ShipmentRouteLog controlCenter = shipmentPort.getShipmentByShipmentId(new ShipmentId(shipmentId));
-        return ResponseEntity.status(HttpStatus.OK).body(map(controlCenter));
+        final ShipmentControlCenterResult controlCenter = shipmentPort.loadShipmentControlCenter(
+                new ShipmentId(shipmentId));
+        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.mapControlCenter(controlCenter));
     }
 
     @GetMapping("/tracking-numbers/{trackingNumber}")
     @Counted(value = "controller.shipment.trackingnumber.get")
     @Timed(value = "controller.shipment.trackingnumber.get")
     public ResponseEntity<?> getByTrackingNumber(@PathVariable final String trackingNumber) {
-        final Shipment shipment = shipmentPort.loadShipment(new TrackingNumber(trackingNumber));
-        final ShipmentDto shipmentResponse = map(shipment);
+        final ShipmentResult shipment = shipmentPort.loadShipment(new TrackingNumber(trackingNumber));
+        final ShipmentDto shipmentResponse = responseMapper.map(shipment);
         return ResponseEntity.status(HttpStatus.OK).body(shipmentResponse);
     }
 
@@ -136,8 +141,9 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.trackingnumber.controlcenter.get")
     @Timed(value = "controller.shipment.trackingnumber.controlcenter.get")
     public ResponseEntity<?> getControlCenterByTrackingNumber(@PathVariable final String trackingNumber) {
-        final ShipmentRouteLog shipmentRouteLog = shipmentPort.getShipmenyByTrackingNumber(new TrackingNumber(trackingNumber));
-        return ResponseEntity.status(HttpStatus.OK).body(map(shipmentRouteLog));
+        final ShipmentControlCenterResult shipment = shipmentPort.loadShipmentControlCenter(
+                new TrackingNumber(trackingNumber));
+        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.mapControlCenter(shipment));
     }
 
     @PutMapping
@@ -185,6 +191,22 @@ public class ShipmentInternalController {
     @Timed(value = "controller.shipment.return.cancel")
     public ResponseEntity<ShipmentResponseInformation> cancelReturn(@PathVariable final Long returnPackageId) {
         this.shipmentPort.cancelShipmentReturn(new ReturnId(returnPackageId));
+        return ResponseEntity.ok(new ShipmentResponseInformation(Status.OK));
+    }
+
+    @PutMapping("/returns/{shipmentId}/process")
+    @Counted(value = "controller.shipment.return.process")
+    @Timed(value = "controller.shipment.return.process")
+    public ResponseEntity<ShipmentResponseInformation> startProcessingReturn(@PathVariable final Long shipmentId) {
+        this.shipmentPort.startProcessingShipmentReturn(new ShipmentId(shipmentId));
+        return ResponseEntity.ok(new ShipmentResponseInformation(Status.OK));
+    }
+
+    @PutMapping("/returns/{shipmentId}/complete")
+    @Counted(value = "controller.shipment.return.complete")
+    @Timed(value = "controller.shipment.return.complete")
+    public ResponseEntity<ShipmentResponseInformation> completeReturn(@PathVariable final Long shipmentId) {
+        this.shipmentPort.completeShipmentReturn(new ShipmentId(shipmentId));
         return ResponseEntity.ok(new ShipmentResponseInformation(Status.OK));
     }
 
@@ -285,17 +307,6 @@ public class ShipmentInternalController {
         } catch (final JsonProcessingException exception) {
             throw new IllegalArgumentException("Invalid dangerous goods patch", exception);
         }
-    }
-
-    private ShipmentDto map(final Shipment shipment) {
-        final DepartmentCode departmentCode = shipmentPort.getDepartmentCode(shipment.getTargetDepartmentId());
-        return responseMapper.map(shipment, departmentCode);
-    }
-
-    private ShipmentControlCenterResponseApi map(final ShipmentRouteLog shipmentRouteLog) {
-        final DepartmentCode departmentCode = shipmentPort
-                .getDepartmentCode(shipmentRouteLog.shipment().getTargetDepartmentId());
-        return responseMapper.map(shipmentRouteLog, departmentCode);
     }
 
     @PutMapping("/status")
