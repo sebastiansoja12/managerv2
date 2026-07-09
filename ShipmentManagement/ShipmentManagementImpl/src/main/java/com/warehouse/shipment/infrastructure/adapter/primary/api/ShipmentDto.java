@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.PickupPointId;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +19,14 @@ public class ShipmentDto {
     private final DepartmentCodeDto destination;
 
     private final DepartmentId originDepartmentId;
+
+    private final PickupPointId pickupPointId;
+
+    private PickupPointId deliveryPickupPointId;
+
+    private final PickupMethodDto pickupMethod;
+
+    private final DeliveryMethodDto deliveryMethod;
 
     private final CountryCode originCountry;
 
@@ -45,7 +54,9 @@ public class ShipmentDto {
 
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
                        final ShipmentSizeDto shipmentSize, final DepartmentCodeDto destination,
-                       final DepartmentId originDepartmentId, final CountryCode originCountry,
+                       final DepartmentId originDepartmentId, final PickupPointId pickupPointId,
+                       final PickupMethodDto pickupMethod, final DeliveryMethodDto deliveryMethod,
+                       final CountryCode originCountry,
                        final CountryCode destinationCountry, final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
                        final TrackingNumberDto trackingNumber,
@@ -56,8 +67,11 @@ public class ShipmentDto {
         this.sender = sender;
 		this.recipient = recipient;
 		this.shipmentSize = shipmentSize;
-		this.destination = destination;
+        this.destination = destination;
         this.originDepartmentId = originDepartmentId;
+        this.pickupPointId = pickupPointId;
+        this.pickupMethod = pickupMethod;
+        this.deliveryMethod = deliveryMethod;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
 		this.shipmentStatus = shipmentStatus;
@@ -94,6 +108,26 @@ public class ShipmentDto {
 
     public DepartmentId getOriginDepartmentId() {
         return originDepartmentId;
+    }
+
+    public PickupPointId getPickupPointId() {
+        return pickupPointId;
+    }
+
+    public PickupPointId getDeliveryPickupPointId() {
+        return deliveryPickupPointId;
+    }
+
+    public void setDeliveryPickupPointId(final PickupPointId deliveryPickupPointId) {
+        this.deliveryPickupPointId = deliveryPickupPointId;
+    }
+
+    public PickupMethodDto getPickupMethod() {
+        return pickupMethod;
+    }
+
+    public DeliveryMethodDto getDeliveryMethod() {
+        return deliveryMethod;
     }
 
     public CountryCode getOriginCountry() {
