@@ -12,7 +12,7 @@
     <artifactId>SupplierServiceManagement</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>SupplierServiceManagementCore</module>
+        <module>SupplierServiceManagementImpl</module>
     </modules>
 
     <properties>

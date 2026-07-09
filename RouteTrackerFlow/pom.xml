@@ -19,7 +19,7 @@
     <artifactId>RouteTrackerFlow</artifactId>
 
     <modules>
-        <module>RouteTrackerFlowCore</module>
+        <module>RouteTrackerFlowImpl</module>
     </modules>
 
     <properties>
