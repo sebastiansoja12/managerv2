@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +21,7 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
+import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
@@ -44,8 +44,7 @@ class ShipmentApiServiceAdapterTest {
 
     @Test
     void shouldRejectShipmentAndReturnOriginalIdWhenRelationIsMissing() {
-        final Shipment shipment = mock(Shipment.class);
-        when(this.shipmentPort.loadShipment(new ShipmentId(1L))).thenReturn(shipment);
+        when(this.shipmentPort.loadShipment(new ShipmentId(1L))).thenReturn(shipmentResult(null));
 
         final ShipmentRejectResponseItemDto response = reject(1L, "REJECTED").shipments().getFirst();
 
@@ -58,9 +57,8 @@ class ShipmentApiServiceAdapterTest {
 
     @Test
     void shouldReturnRelatedShipmentIdAfterRejection() {
-        final Shipment shipment = mock(Shipment.class);
-        when(shipment.getShipmentRelatedId()).thenReturn(new ShipmentId(99L));
-        when(this.shipmentPort.loadShipment(new ShipmentId(1L))).thenReturn(shipment);
+        when(this.shipmentPort.loadShipment(new ShipmentId(1L)))
+                .thenReturn(shipmentResult(new ShipmentId(99L)));
 
         final ShipmentRejectResponseItemDto response = reject(1L, "REJECTED").shipments().getFirst();
 
@@ -70,8 +68,7 @@ class ShipmentApiServiceAdapterTest {
 
     @Test
     void shouldMapRejectionRequestToDeliveryCommand() {
-        final Shipment shipment = mock(Shipment.class);
-        when(this.shipmentPort.loadShipment(new ShipmentId(7L))).thenReturn(shipment);
+        when(this.shipmentPort.loadShipment(new ShipmentId(7L))).thenReturn(shipmentResult(null));
         final ArgumentCaptor<ShipmentDeliveryCommand> commandCaptor =
                 ArgumentCaptor.forClass(ShipmentDeliveryCommand.class);
 
@@ -106,5 +103,12 @@ class ShipmentApiServiceAdapterTest {
                 "RETURN"
         );
         return this.adapter.rejectShipment(new ShipmentRejectRequestDto(List.of(item)));
+    }
+
+    private ShipmentResult shipmentResult(final ShipmentId relatedShipmentId) {
+        final Shipment shipment = new Shipment(
+                new ShipmentId(1L), null, null, null, relatedShipmentId, null, null, null,
+                false, null, null, null, null, null, null);
+        return new ShipmentResult(shipment.snapshot(), null);
     }
 }
