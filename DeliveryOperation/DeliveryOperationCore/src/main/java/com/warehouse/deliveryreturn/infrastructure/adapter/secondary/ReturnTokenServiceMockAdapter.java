@@ -8,6 +8,8 @@ import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort
 import com.warehouse.deliveryreturn.domain.vo.ReturnPackageRequest;
 import com.warehouse.deliveryreturn.domain.vo.ReturnPackageResponse;
 import com.warehouse.deliveryreturn.domain.vo.ReturnToken;
+import com.warehouse.deliveryreturn.domain.vo.ReturnTokenValidationRequest;
+import com.warehouse.deliveryreturn.domain.vo.ReturnTokenValidationResult;
 import com.warehouse.deliveryreturn.domain.vo.ReturnTokenResponse;
 
 import lombok.AllArgsConstructor;
@@ -22,6 +24,14 @@ public class ReturnTokenServiceMockAdapter implements ReturnTokenServicePort {
 		return new ReturnTokenResponse(map(returnTokenRequest.getReturnPackageRequests()),
                 returnTokenRequest.getSupplier());
 	}
+
+    @Override
+    public ReturnTokenValidationResult validate(final ReturnTokenValidationRequest request) {
+        if (request.returnToken() != null && TOKEN.equals(request.returnToken().value())) {
+            return ReturnTokenValidationResult.valid(request.shipmentId());
+        }
+        return ReturnTokenValidationResult.invalid(request.shipmentId());
+    }
     
     private List<ReturnPackageResponse> map(final List<ReturnPackageRequest> packageRequests) {
         return packageRequests.stream()

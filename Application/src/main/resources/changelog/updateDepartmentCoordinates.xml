@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+
+    <changeSet author="s-soja" id="update-department-city-coordinates-2026-07-04">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="department"/>
+            <columnExists tableName="department" columnName="latitude"/>
+            <columnExists tableName="department" columnName="longitude"/>
+        </preConditions>
+
+        <sql>
+            UPDATE department SET latitude = 49.8224, longitude = 19.0469 WHERE department_code = 'BBA';
+            UPDATE department SET latitude = 53.1325, longitude = 23.1688 WHERE department_code = 'BIA';
+            UPDATE department SET latitude = 52.5200, longitude = 13.4050 WHERE department_code = 'BR1';
+            UPDATE department SET latitude = 53.1235, longitude = 18.0084 WHERE department_code = 'BYD';
+            UPDATE department SET latitude = 50.8118, longitude = 19.1203 WHERE department_code = 'CZW';
+            UPDATE department SET latitude = 54.3520, longitude = 18.6466 WHERE department_code = 'GD1';
+            UPDATE department SET latitude = 54.5189, longitude = 18.5305 WHERE department_code = 'GD2';
+            UPDATE department SET latitude = 52.7368, longitude = 15.2288 WHERE department_code = 'GW1';
+            UPDATE department SET latitude = 51.7611, longitude = 18.0910 WHERE department_code = 'KAL';
+            UPDATE department SET latitude = 50.8661, longitude = 20.6286 WHERE department_code = 'KIE';
+            UPDATE department SET latitude = 50.4346, longitude = 16.6610 WHERE department_code = 'KLD';
+            UPDATE department SET latitude = 50.0647, longitude = 19.9450 WHERE department_code = 'KR1';
+            UPDATE department SET latitude = 54.1944, longitude = 16.1722 WHERE department_code = 'KSZ';
+            UPDATE department SET latitude = 50.2945, longitude = 18.6714 WHERE department_code = 'KT1';
+            UPDATE department SET latitude = 50.2863, longitude = 19.1041 WHERE department_code = 'KT2';
+            UPDATE department SET latitude = 50.2649, longitude = 19.0238 WHERE department_code = 'KT3';
+            UPDATE department SET latitude = 49.8397, longitude = 24.0297 WHERE department_code = 'LW1';
+            UPDATE department SET latitude = 53.1125, longitude = 20.3830 WHERE department_code = 'MLW';
+            UPDATE department SET latitude = 51.7592, longitude = 19.4550 WHERE department_code = 'NCS';
+            UPDATE department SET latitude = 50.6751, longitude = 17.9213 WHERE department_code = 'OPO';
+            UPDATE department SET latitude = 52.4064, longitude = 16.9252 WHERE department_code = 'POZ';
+            UPDATE department SET latitude = 50.0755, longitude = 14.4378 WHERE department_code = 'PRG';
+            UPDATE department SET latitude = 50.0412, longitude = 21.9991 WHERE department_code = 'RZE';
+            UPDATE department SET latitude = 54.4641, longitude = 17.0285 WHERE department_code = 'SLP';
+            UPDATE department SET latitude = 50.3170, longitude = 18.8596 WHERE department_code = 'SRS';
+            UPDATE department SET latitude = 53.4285, longitude = 14.5528 WHERE department_code = 'SZ1';
+            UPDATE department SET latitude = 53.0138, longitude = 18.5984 WHERE department_code = 'TOR';
+            UPDATE department SET latitude = 52.2297, longitude = 21.0122 WHERE department_code = 'WA1';
+            UPDATE department SET latitude = 52.2297, longitude = 21.0122 WHERE department_code = 'WA2';
+            UPDATE department SET latitude = 52.1743, longitude = 21.5724 WHERE department_code = 'WA3';
+            UPDATE department SET latitude = 54.6872, longitude = 25.2797 WHERE department_code = 'WL1';
+            UPDATE department SET latitude = 51.1079, longitude = 17.0385 WHERE department_code = 'WRO';
+            UPDATE department SET latitude = 45.8150, longitude = 15.9819 WHERE department_code = 'ZAG';
+            UPDATE department SET latitude = 50.7230, longitude = 23.2510 WHERE department_code = 'ZAM';
+            UPDATE department SET latitude = 51.9356, longitude = 15.5062 WHERE department_code = 'ZGR';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

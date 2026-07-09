@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.*;
 
+import java.util.List;
 import java.util.Optional;
 
 public class Criteria<T> {
@@ -65,6 +66,10 @@ public class Criteria<T> {
         }
     }
 
+    public List<T> getResultList() {
+        return em.createQuery(cq).getResultList();
+    }
+
     public CriteriaQuery<T> build() {
         return cq;
     }
@@ -77,4 +82,3 @@ public class Criteria<T> {
         return cb;
     }
 }
-

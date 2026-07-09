@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ProcessCommunication;
 import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 
@@ -24,4 +25,6 @@ public interface ProcessService {
     void assignShipmentRejected(final ProcessId processId, final ShipmentRejected shipmentRejected);
 
     void assignDeviceValidation(final ProcessId processId, final DeviceValidation deviceValidation);
+
+    void assignCommunication(final ProcessId processId, final ProcessCommunication communication);
 }

@@ -1,5 +1,5 @@
 package com.warehouse.commonassets.enumeration;
 
 public enum DeviceUserType {
-    SUPPLIER, OPERATOR
+    SUPPLIER, OPERATOR, MANAGER
 }

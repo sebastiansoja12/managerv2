@@ -71,6 +71,18 @@ public class ReturnPortImpl implements ReturnPort {
     }
 
     @Override
+    public ReturnTokenValidation validateReturnToken(final ShipmentId shipmentId, final ReturnToken returnToken) {
+        final ReturnPackage returnPackage = this.returnService.findByShipmentId(shipmentId);
+        if (returnPackage == null || returnPackage.getReturnToken() == null) {
+            return ReturnTokenValidation.invalid(shipmentId);
+        }
+        if (returnPackage.getReturnToken().value().equals(returnToken.value())) {
+            return ReturnTokenValidation.valid(shipmentId);
+        }
+        return ReturnTokenValidation.invalid(shipmentId);
+    }
+
+    @Override
     public void delete(final ReturnPackageId returnPackageId) {
         returnService.deleteReturn(returnPackageId);
     }

@@ -1,6 +1,7 @@
 package com.warehouse;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -13,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableConfigurationProperties
 @EnableCaching
 @EnableScheduling
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class},
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class},
         scanBasePackages = {"com.warehouse.returntoken", "com.warehouse.deliverytoken"})
 @EntityScan(basePackages = {"com.warehouse.returntoken", "com.warehouse.deliverytoken"})
 @EnableJpaRepositories(basePackages = {"com.warehouse.returntoken", "com.warehouse.deliverytoken"})

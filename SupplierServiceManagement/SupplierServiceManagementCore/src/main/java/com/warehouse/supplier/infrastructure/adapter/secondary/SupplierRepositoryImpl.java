@@ -10,6 +10,8 @@ import com.warehouse.supplier.infrastructure.adapter.secondary.entity.SupplierEn
 import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.EntityToModelMapper;
 import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.ModelToEntityMapper;
 
+import java.util.List;
+
 public class SupplierRepositoryImpl implements SupplierRepository {
 
     private final BaseRepository<SupplierEntity> supplierBaseRepository;
@@ -28,6 +30,16 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     public void update(final Supplier supplier) {
         final SupplierEntity supplierEntity = ModelToEntityMapper.map(supplier);
         this.supplierBaseRepository.update(supplierEntity);
+    }
+
+    @Override
+    public List<Supplier> findAllByCurrentDepartment() {
+        final Criteria<SupplierEntity> criteria = this.supplierBaseRepository.createCriteria(SupplierEntity.class);
+        return criteria
+                .getResultList()
+                .stream()
+                .map(EntityToModelMapper::map)
+                .toList();
     }
 
     @Override

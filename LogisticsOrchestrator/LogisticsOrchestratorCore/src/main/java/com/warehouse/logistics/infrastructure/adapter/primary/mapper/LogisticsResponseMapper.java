@@ -65,13 +65,17 @@ public class LogisticsResponseMapper {
         final String departmentCode = deliveryReturnResponseDetails.getDepartmentCode().getValue();
         final Long shipmentId = deliveryReturnResponseDetails.getShipmentId().getValue();
         final String deliveryStatus = deliveryReturnResponseDetails.getDeliveryStatus().name();
-        final String returnToken = deliveryReturnResponseDetails.getReturnToken().value();
+        final String returnToken = deliveryReturnResponseDetails.getReturnToken() != null
+                ? deliveryReturnResponseDetails.getReturnToken().value()
+                : null;
         final String deliveryId = deliveryReturnResponseDetails.getDeliveryId() != null
                 ? deliveryReturnResponseDetails.getDeliveryId().getId()
                 : null;
-        final String updateStatus = deliveryReturnResponseDetails.getUpdateStatus().name();
+        final String updateStatus = deliveryReturnResponseDetails.getUpdateStatus() != null
+                ? deliveryReturnResponseDetails.getUpdateStatus().name()
+                : null;
         return new DeliveryReturnResponseDetail(supplierCode, departmentCode, shipmentId, returnToken, updateStatus,
-                deliveryStatus, deliveryId);
+                deliveryStatus, deliveryId, deliveryReturnResponseDetails.getErrorMessage());
     }
 
     public DeliveryRejectResponse map(final com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponse response) {
@@ -217,7 +221,8 @@ public class LogisticsResponseMapper {
                 dto.getShipmentId() != null ? new ShipmentId(dto.getShipmentId().value()) : null,
                 DeliveryStatus.valueOf(dto.getDeliveryStatus().name()),
                 dto.getReturnToken() != null ? new ReturnToken(map(dto.getReturnToken())) : null,
-                dto.getUpdateStatus() != null ? UpdateStatus.valueOf(dto.getUpdateStatus().name()) : null);
+                dto.getUpdateStatus() != null ? UpdateStatus.valueOf(dto.getUpdateStatus().name()) : null,
+                dto.getErrorMessage());
     }
 
 }

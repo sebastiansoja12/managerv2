@@ -1,6 +1,6 @@
 package com.warehouse.dangerousgood.domain.vo;
 
-import com.warehouse.commonassets.enumeration.Country;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
 import com.warehouse.dangerousgood.domain.enumeration.ClassificationCode;
@@ -21,6 +21,6 @@ public record GoodSnapshot(DangerousGoodId dangerousGoodId,
                            boolean corrosive,
                            boolean toxic,
                            String emergencyContact,
-                           Country countryOfOrigin,
+                           CountryCode countryOfOrigin,
                            String safetyDataSheet
 ) {}

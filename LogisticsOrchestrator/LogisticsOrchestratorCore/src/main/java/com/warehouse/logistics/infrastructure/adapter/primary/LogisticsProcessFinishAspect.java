@@ -14,7 +14,10 @@ import com.warehouse.process.infrastructure.dto.ProcessStatusDto;
 import com.warehouse.process.infrastructure.event.ProcessFinishEvent;
 import com.warehouse.terminal.response.TerminalResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Aspect
+@Slf4j
 public class LogisticsProcessFinishAspect {
 
     private final ProcessHubEventPublisher processHubEventPublisher;
@@ -31,14 +34,30 @@ public class LogisticsProcessFinishAspect {
             if (terminalResponse == null || terminalResponse.getProcessId() == null || terminalResponse.getProcessId().isBlank()) {
                 return;
             }
+            final String faultDescription = resolveFaultDescription(terminalResponse);
             processHubEventPublisher.publish(new ProcessFinishEvent(
                     new ProcessId(UUID.fromString(terminalResponse.getProcessId())),
                     ServiceType.LOGISTICS_ORCHESTRATOR,
-                    ProcessStatusDto.SUCCESS,
-                    LocalDateTime.now()));
+                    faultDescription == null ? ProcessStatusDto.SUCCESS : ProcessStatusDto.FAILURE,
+                    LocalDateTime.now(),
+                    faultDescription));
         } finally {
             LogisticsProcessContext.clear();
         }
+    }
+
+    private String resolveFaultDescription(final TerminalResponse terminalResponse) {
+        if (terminalResponse.getDeliveryReturnResponse() == null
+                || terminalResponse.getDeliveryReturnResponse().getDeliveryReturnResponseDetails() == null) {
+            return null;
+        }
+        return terminalResponse.getDeliveryReturnResponse()
+                .getDeliveryReturnResponseDetails()
+                .stream()
+                .filter(detail -> detail.getErrorMessage() != null && !detail.getErrorMessage().isBlank())
+                .map(detail -> detail.getErrorMessage())
+                .findFirst()
+                .orElse(null);
     }
 
     @AfterThrowing(
@@ -47,6 +66,10 @@ public class LogisticsProcessFinishAspect {
     public void publishProcessFailureEvent(final Throwable exception) {
         try {
             final ProcessId processId = LogisticsProcessContext.getProcessId();
+            log.error("Logistics SOAP process failed. processId={}, message={}",
+                    processId != null ? processId.value() : "uninitialized",
+                    exception.getMessage(),
+                    exception);
             if (processId == null) {
                 return;
             }

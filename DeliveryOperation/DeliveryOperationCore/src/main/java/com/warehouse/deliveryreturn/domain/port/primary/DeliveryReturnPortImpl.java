@@ -12,6 +12,7 @@ import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsExcept
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
+import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.vo.*;
@@ -25,11 +26,15 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private final DeliveryReturnService deliveryReturnService;
 
+    private final ReturnTokenServicePort returnTokenServicePort;
+
     private final ShipmentStatusControlServicePort shipmentStatusControlServicePort;
 
     public DeliveryReturnPortImpl(final DeliveryReturnService deliveryReturnService,
+                                  final ReturnTokenServicePort returnTokenServicePort,
                                   final ShipmentStatusControlServicePort shipmentStatusControlServicePort) {
         this.deliveryReturnService = deliveryReturnService;
+        this.returnTokenServicePort = returnTokenServicePort;
         this.shipmentStatusControlServicePort = shipmentStatusControlServicePort;
     }
 
@@ -45,8 +50,6 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
         deliveryReturnRequest.validateStatuses();
 
-        deliveryReturnRequest.rewriteSupplierCodeFromDevice();
-
         deliveryReturnRequest.rewriteDepartmentCodeFromDevice();
 
         final Set<DeliveryReturnDetails> deliveryReturnRequests = deliveryReturnRequest.getDeliveryReturnDetails()
@@ -57,12 +60,23 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
         final DeviceInformation deviceInformation = deliveryReturnRequest.getDeviceInformation();
 
+        final DeliveryReturnResponseDetails invalidTokenResponse =
+                validateReturnTokens(deliveryReturnRequest, deliveryReturnRequests);
+        if (invalidTokenResponse != null) {
+            return DeliveryReturnResponse
+                    .builder()
+                    .deliveryReturnResponseDetails(List.of(invalidTokenResponse))
+                    .deviceInformation(deviceInformation)
+                    .build();
+        }
+
         final List<DeliveryReturn> deliveryReturns =
                 deliveryReturnService.deliverReturn(deliveryReturnRequests, deviceInformation);
 
 		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturns.stream()
                 .map(deliveryReturn -> {
 					final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(
+                            deliveryReturnRequest.getProcessId(),
 							deliveryReturn.getShipmentId());
 					final UpdateStatus updateStatus = shipmentStatusControlServicePort
 							.updateStatus(updateStatusShipmentRequest);
@@ -74,6 +88,28 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
                 .deliveryReturnResponseDetails(deliveryReturnResponseDetails)
                 .deviceInformation(deliveryReturnRequest.getDeviceInformation())
                 .build();
+    }
+
+    private DeliveryReturnResponseDetails validateReturnTokens(final DeliveryReturnRequest request,
+                                                               final Set<DeliveryReturnDetails> details) {
+        for (final DeliveryReturnDetails detail : details) {
+            final ReturnTokenValidationResult validationResult = returnTokenServicePort.validate(
+                    new ReturnTokenValidationRequest(
+                            request.getProcessId(),
+                            detail.getShipmentId(),
+                            detail.getReturnToken()));
+            if (!validationResult.valid()) {
+                return DeliveryReturnResponseDetails.wrongReturnToken(
+                        request.getProcessId(),
+                        detail.getShipmentId(),
+                        detail.getDepartmentCode(),
+                        detail.getSupplierCode(),
+                        detail.getDeliveryStatus(),
+                        detail.getReturnToken(),
+                        validationResult.message());
+            }
+        }
+        return null;
     }
 
     private void validateRequest(final DeliveryReturnRequest deliveryRequest) {

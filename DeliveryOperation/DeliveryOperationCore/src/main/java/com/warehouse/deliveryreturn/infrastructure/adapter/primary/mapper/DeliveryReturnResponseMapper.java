@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.enumeration.DeviceUserType;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
@@ -35,12 +36,14 @@ public interface DeliveryReturnResponseMapper {
         final SupplierCodeDto supplierCode = map(deliveryReturnResponseDetails.getSupplierCode());
         final UpdateStatusDto updateStatus = map(deliveryReturnResponseDetails.getUpdateStatus());
         return new DeliveryReturnResponseDetailsDto(processId, shipmentId, departmentCode, supplierCode,
-                deliveryStatus, returnToken, updateStatus);
+                deliveryStatus, returnToken, updateStatus, deliveryReturnResponseDetails.getErrorMessage());
     }
 
-    SupplierCodeDto map(final SupplierCode supplierCode);
+    DeviceUserTypeDto map(final DeviceUserType deviceUserType);
 
-    String map(Object value);
+    default SupplierCodeDto map(final SupplierCode supplierCode) {
+        return new SupplierCodeDto(supplierCode.value());
+    }
 
     DepartmentCodeDto map(final DepartmentCode departmentCode);
 
@@ -51,7 +54,9 @@ public interface DeliveryReturnResponseMapper {
 
     ReturnTokenDto map(final ReturnToken returnToken);
 
-    ShipmentIdDto map(final ShipmentId shipmentId);
+    default ShipmentIdDto map(final ShipmentId shipmentId) {
+        return new ShipmentIdDto(shipmentId.getValue());
+    }
 
     DeliveryStatusDto map(final DeliveryStatus deliveryStatus);
 

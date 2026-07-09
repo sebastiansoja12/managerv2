@@ -11,10 +11,16 @@ import com.warehouse.supplier.domain.vo.DangerousGoodCertification;
 import com.warehouse.supplier.domain.vo.DriverLicense;
 import com.warehouse.supplier.domain.vo.SupplierDto;
 
+import java.util.List;
+
 public interface SupplierService {
     void create(final Supplier supplier);
     void activate(final SupplierId supplierId);
+    void activate(final SupplierCode supplierCode);
     void deactivate(final SupplierId supplierId);
+    void deactivate(final SupplierCode supplierCode);
+    void updateBasicData(final SupplierCode supplierCode, final String firstName, final String lastName,
+                         final String telephoneNumber);
     void updateDriverLicense(final SupplierCode supplierCode, final DriverLicense driverLicense);
     void updateUserCreated(final SupplierId supplierId, final UserId createdUserId);
     void updateDeliveryArea(final SupplierId supplierId, final DeliveryArea deliveryArea);
@@ -24,6 +30,7 @@ public interface SupplierService {
 
     Supplier findById(final SupplierId supplierId);
     Supplier findByCode(final SupplierCode supplierCode);
+    List<Supplier> findAllByCurrentDepartment();
     SupplierId nextSupplierId();
 
     void invalidateDriverLicense(final SupplierCode supplierCode);

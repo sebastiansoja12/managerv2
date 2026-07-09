@@ -22,6 +22,7 @@ import com.warehouse.process.domain.model.InitializeProcessCommand;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
+import com.warehouse.process.domain.vo.ProcessCommunication;
 
 public final class ProcessHubTestFixtures {
 
@@ -118,6 +119,20 @@ public final class ProcessHubTestFixtures {
                 "SHIPMENT_MANAGEMENT",
                 request,
                 response
+        );
+    }
+
+    public static ProcessCommunication processCommunication(final ServiceType targetServiceType,
+                                                            final String request,
+                                                            final String response,
+                                                            final String faultDescription) {
+        return new ProcessCommunication(
+                ServiceType.DELIVERY_OPERATION,
+                targetServiceType,
+                ProcessType.RETURN,
+                request,
+                response,
+                faultDescription
         );
     }
 }

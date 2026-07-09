@@ -24,6 +24,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>AuthorizationApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>DepartmentServiceApi</artifactId>
             <version>${project.version}</version>
         </dependency>

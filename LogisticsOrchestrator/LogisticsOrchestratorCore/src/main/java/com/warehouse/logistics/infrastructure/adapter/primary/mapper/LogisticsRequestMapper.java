@@ -7,19 +7,10 @@ import java.util.stream.Collectors;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
-import com.warehouse.delivery.dto.DeliveryStatusDto;
-import com.warehouse.delivery.dto.DepartmentCodeDto;
-import com.warehouse.delivery.dto.DeviceIdDto;
-import com.warehouse.delivery.dto.DeviceInformationDto;
-import com.warehouse.delivery.dto.DeviceTypeDto;
-import com.warehouse.delivery.dto.DeviceUserTypeDto;
-import com.warehouse.delivery.dto.ProcessTypeDto;
-import com.warehouse.delivery.dto.ShipmentIdDto;
-import com.warehouse.delivery.dto.SupplierCodeDto;
-import com.warehouse.delivery.dto.UsernameDto;
-import com.warehouse.delivery.dto.VersionDto;
+import com.warehouse.delivery.dto.*;
 import com.warehouse.deliverymissed.dto.DeliveryMissedDetailsDto;
 import com.warehouse.deliverymissed.dto.DeliveryMissedRequestDto;
 import com.warehouse.deliveryreject.domain.vo.RejectReason;
@@ -28,24 +19,12 @@ import com.warehouse.deliveryreject.dto.RejectReasonDto;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetailsDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
-import com.warehouse.logistics.domain.model.DeliveryMissedDetails;
-import com.warehouse.logistics.domain.model.DeliveryMissedRequest;
-import com.warehouse.logistics.domain.model.DeliveryRejectDetails;
-import com.warehouse.logistics.domain.model.DeliveryRejectRequest;
-import com.warehouse.logistics.domain.model.DeliveryReturnDetails;
-import com.warehouse.logistics.domain.model.DeliveryReturnRequest;
-import com.warehouse.logistics.domain.model.Request;
+import com.warehouse.deliveryreturn.infrastructure.api.dto.ProcessIdDto;
+import com.warehouse.deliveryreturn.infrastructure.api.dto.ReturnTokenDto;
+import com.warehouse.logistics.domain.model.*;
+import com.warehouse.logistics.domain.vo.ReturnToken;
 import com.warehouse.terminal.DeviceInformation;
-import com.warehouse.terminal.jaxb.DeliveryMissedDetailType;
-import com.warehouse.terminal.jaxb.DeliveryMissedRequestType;
-import com.warehouse.terminal.jaxb.DeliveryRejectDetailType;
-import com.warehouse.terminal.jaxb.DeliveryRejectRequestType;
-import com.warehouse.terminal.jaxb.DeliveryReturnDetailType;
-import com.warehouse.terminal.jaxb.DeliveryReturnRequestType;
-import com.warehouse.terminal.jaxb.DeliveryStatusEnum;
-import com.warehouse.terminal.jaxb.DeviceType;
-import com.warehouse.terminal.jaxb.ProcessTypeEnum;
-import com.warehouse.terminal.jaxb.TerminalRequest;
+import com.warehouse.terminal.jaxb.*;
 
 public class LogisticsRequestMapper {
 
@@ -108,7 +87,8 @@ public class LogisticsRequestMapper {
                 new ShipmentId(deliveryReturnDetail.getShipmentID()),
                 new DepartmentCode(deliveryReturnDetail.getDepartmentCode()),
                 new SupplierCode(deliveryReturnDetail.getSupplierCode()),
-                map(deliveryReturnDetail.getDeliveryStatus()));
+                map(deliveryReturnDetail.getDeliveryStatus()),
+                new ReturnToken(deliveryReturnDetail.getReturnToken()));
     }
 
     public DeliveryMissedDetails map(final DeliveryMissedDetailType deliveryMissedDetail) {
@@ -155,13 +135,15 @@ public class LogisticsRequestMapper {
         return new DeliveryMissedRequestDto(null, deliveryMissedDetails, map(request.getDeviceInformation()));
     }
 
-    public DeliveryReturnRequestDto mapToDeliveryReturnRequest(final Request request) {
+    public DeliveryReturnRequestDto mapToDeliveryReturnRequest(final ProcessId id,
+                                                               final Request request) {
         final List<DeliveryReturnDetailsDto> deliveryReturnDetails = request.getDeliveryReturnRequest() == null
                 ? Collections.emptyList()
                 : mapToDeliveryReturnDetails(request.getDeliveryReturnRequest().getDeliveryReturnDetails());
         final ProcessTypeDto processType = map(request.getProcessType());
         final DeviceInformationDto deviceInformation = map(request.getDeviceInformation());
-        return new DeliveryReturnRequestDto(processType, deviceInformation, deliveryReturnDetails);
+        final ProcessIdDto processId = new ProcessIdDto(id.getValue(), null);
+        return new DeliveryReturnRequestDto(processId, processType, deviceInformation, deliveryReturnDetails);
     }
 
     private List<DeliveryRejectDetailsDto> mapToDeliveryRejectDetails(final List<DeliveryRejectDetails> deliveryRejectDetails) {
@@ -202,7 +184,12 @@ public class LogisticsRequestMapper {
                 map(detail.getShipmentId()),
                 map(detail.getDeliveryStatus()),
                 map(detail.getDepartmentCode()),
-                map(detail.getSupplierCode()));
+                map(detail.getSupplierCode()),
+                map(detail.getReturnToken()));
+    }
+
+    private ReturnTokenDto map(final ReturnToken returnToken) {
+        return returnToken == null ? null : new ReturnTokenDto(returnToken.value());
     }
 
     private DeviceInformationDto map(final DeviceInformation deviceInformation) {
