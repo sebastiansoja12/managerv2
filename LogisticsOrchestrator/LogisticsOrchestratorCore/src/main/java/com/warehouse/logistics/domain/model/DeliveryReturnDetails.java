@@ -4,21 +4,25 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.logistics.domain.vo.ReturnToken;
 
 public class DeliveryReturnDetails {
     private ShipmentId shipmentId;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
     private DeliveryStatus deliveryStatus;
+    private ReturnToken returnToken;
 
     public DeliveryReturnDetails(final ShipmentId shipmentId,
                                  final DepartmentCode departmentCode,
                                  final SupplierCode supplierCode,
-                                 final DeliveryStatus deliveryStatus) {
+                                 final DeliveryStatus deliveryStatus,
+                                 final ReturnToken returnToken) {
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deliveryStatus = deliveryStatus;
+        this.returnToken = returnToken;
     }
 
     public ShipmentId getShipmentId() {
@@ -51,5 +55,13 @@ public class DeliveryReturnDetails {
 
     public void setDeliveryStatus(final DeliveryStatus deliveryStatus) {
         this.deliveryStatus = deliveryStatus;
+    }
+
+    public ReturnToken getReturnToken() {
+        return returnToken;
+    }
+
+    public void setReturnToken(final ReturnToken returnToken) {
+        this.returnToken = returnToken;
     }
 }

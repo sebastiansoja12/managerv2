@@ -18,10 +18,6 @@ public class ProcessDispatcher {
         this.handlers = handlers;
     }
 
-    public Response process(final Request request) {
-        return process(null, request);
-    }
-
     public Response process(final ProcessId processId, final Request request) {
         final ProcessType processType = request.getProcessType();
         return handlers.stream()

@@ -7,10 +7,10 @@ import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.RestException;
@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/departments")
 @Slf4j
+@AccessUserControl
 public class DepartmentController {
 
     private final DepartmentPort departmentPort;
@@ -42,7 +43,7 @@ public class DepartmentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    @AccessUserControl("ROLE_ADMIN_CREATE")
     public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
 		final Result<Void, List<String>> result = this.getValidator(departmentCreateApiRequest.getResourceName()).validateBody(departmentCreateApiRequest);
 
@@ -61,7 +62,7 @@ public class DepartmentController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    @AccessUserControl("ROLE_ADMIN_CREATE")
     public ResponseEntity<?> updateAddress(@RequestBody final UpdateAddressApiRequest updateAddressApiRequest) {
         final Result<Void, List<String>> result = this.getValidator(updateAddressApiRequest.getResourceName()).validateBody(updateAddressApiRequest);
         if (result.isFailure()) {
@@ -74,7 +75,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/active-departments")
-    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    @AccessUserControl("ROLE_ADMIN_CREATE")
     public ResponseEntity<?> updateDepartmentActiveStatus(@RequestParam final Boolean active,
                                                           @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
@@ -83,7 +84,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/department-type")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> changeDepartmentType(@RequestParam final String departmentType,
                                                   @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
@@ -93,7 +94,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/identification-numbers")
-    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    @AccessUserControl("ROLE_ADMIN_CREATE")
     public ResponseEntity<?> updateIdentificationNumber(
 			@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
         final Result<Void, List<String>> result = this.getValidator(identificationNumberChangeRequest.getResourceName())
@@ -109,7 +110,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/statuses")
-    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    @AccessUserControl("ROLE_ADMIN_CREATE")
     public ResponseEntity<?> changeDepartmentStatus(
             @RequestBody final ChangeDepartmentStatusApi departmentStatusRequest) {
         final Result<Void, List<String>> result = this.getValidator(departmentStatusRequest.getResourceName())
@@ -125,7 +126,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/emails")
-    @PreAuthorize("hasRole('ROLE_ADMIN_CREATE')")
+    @AccessUserControl("ROLE_ADMIN_CREATE")
     public ResponseEntity<?> changeDepartmentEmail(
             @RequestBody final ChangeDepartmentEmailApiRequest changeDepartmentEmailRequest) {
         final Result<Void, List<String>> result = this.getValidator(changeDepartmentEmailRequest.getResourceName())

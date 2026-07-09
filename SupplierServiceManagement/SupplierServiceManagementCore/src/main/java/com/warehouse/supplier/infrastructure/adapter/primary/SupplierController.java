@@ -1,5 +1,6 @@
 package com.warehouse.supplier.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
@@ -13,11 +14,13 @@ import com.warehouse.supplier.infrastructure.adapter.primary.mapper.ResponseMapp
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.InfrastructureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/suppliers")
 @RestController
+@AccessUserControl
 public class SupplierController {
 
     private final SupplyPort supplyPort;
@@ -27,15 +30,24 @@ public class SupplierController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> create(@RequestBody final SupplierCreateApiRequest supplierCreateApiRequest) {
         final SupplierCreateCommand command = RequestMapper.map(supplierCreateApiRequest);
         final SupplierCreateResponse response = this.supplyPort.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMapper.map(response));
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllByCurrentDepartment() {
+        final List<SupplierApi> suppliers = this.supplyPort.getAllByCurrentDepartment()
+                .stream()
+                .map(ResponseMapper::map)
+                .toList();
+        return ResponseEntity.ok(suppliers);
+    }
+
     @PutMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> updateSupplier(@RequestBody final SupplierUpdateApiRequest supplierUpdateRequest) {
         final SupplierUpdateCommand command = RequestMapper.map(supplierUpdateRequest);
         final Result<Void, String> response = this.supplyPort.update(command);
@@ -49,8 +61,35 @@ public class SupplierController {
 		return responseEntity;
     }
 
+    @PatchMapping("/basic-data")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    public ResponseEntity<?> updateBasicData(@RequestBody final SupplierBasicDataUpdateApiRequest supplierUpdateRequest) {
+        final SupplierBasicDataUpdateCommand command = RequestMapper.map(supplierUpdateRequest);
+        final Result<Void, String> response = this.supplyPort.updateBasicData(command);
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(ResponseMapper.map(SupplierUpdateResponse.ok(command.supplierCode())));
+        }
+
+        return ResponseEntity.badRequest().body(ResponseMapper
+                .map(SupplierUpdateResponse.failure(command.supplierCode(), response.getFailure())));
+    }
+
+    @PutMapping("/{code}/activate")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    public ResponseEntity<?> activate(@PathVariable final String code) {
+        this.supplyPort.activate(new SupplierCode(code));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{code}/deactivate")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    public ResponseEntity<?> deactivate(@PathVariable final String code) {
+        this.supplyPort.deactivate(new SupplierCode(code));
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/certifications")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> updateCertification(@RequestBody final CertificationUpdateApiRequest certificationUpdateRequest) {
         final CertificationUpdateCommand command = RequestMapper.map(certificationUpdateRequest);
         final CertificationUpdateResponse response = this.supplyPort.updateCertification(command);
@@ -58,7 +97,7 @@ public class SupplierController {
     }
 
     @PutMapping("/driver-licenses")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> updateDriverLicense(@RequestBody final DriverLicenseApiRequest driverLicenseRequest) {
         final DriverLicenseCommand command = RequestMapper.map(driverLicenseRequest);
         final DriverLicenseResponse response = this.supplyPort.updateDriverLicense(command);
@@ -66,7 +105,7 @@ public class SupplierController {
     }
 
     @PutMapping("/supported-package-types")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> updatePackageTypes(
 			@RequestBody final ChangeSupportedPackageTypesApiRequest changeSupportedPackageTypeRequest) {
         final ChangeSupportedPackageTypeCommand command = RequestMapper.map(changeSupportedPackageTypeRequest);
@@ -75,7 +114,7 @@ public class SupplierController {
     }
 
     @PutMapping("/devices")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_CREATE', 'ROLE_MANAGER_CREATE')")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> updateDevice(
             @RequestBody final ChangeSupplierDeviceApiRequest changeSupplierDeviceRequest) {
         final ChangeSupplierDeviceCommand command = RequestMapper.map(changeSupplierDeviceRequest);
@@ -105,6 +144,11 @@ public class SupplierController {
 
     @ExceptionHandler(InfrastructureException.class)
     public ResponseEntity<?> handleException(final InfrastructureException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleException(final IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

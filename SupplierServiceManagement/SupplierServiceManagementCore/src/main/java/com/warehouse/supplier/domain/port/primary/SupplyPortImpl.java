@@ -14,6 +14,8 @@ import com.warehouse.supplier.domain.service.SupplierValidatorService;
 import com.warehouse.supplier.domain.vo.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
 
+import java.util.List;
+
 public class SupplyPortImpl implements SupplyPort {
 
     private final SupplierService supplierService;
@@ -54,6 +56,11 @@ public class SupplyPortImpl implements SupplyPort {
     }
 
     @Override
+    public List<Supplier> getAllByCurrentDepartment() {
+        return supplierService.findAllByCurrentDepartment();
+    }
+
+    @Override
     public Supplier getOneById(final SupplierId supplierId) {
         return supplierService.findById(supplierId);
     }
@@ -61,6 +68,29 @@ public class SupplyPortImpl implements SupplyPort {
     @Override
     public Supplier getOneByCode(final SupplierCode supplierCode) {
         return supplierService.findByCode(supplierCode);
+    }
+
+    @Override
+    public void activate(final SupplierCode supplierCode) {
+        validateExists(supplierCode);
+        supplierService.activate(supplierCode);
+    }
+
+    @Override
+    public void deactivate(final SupplierCode supplierCode) {
+        validateExists(supplierCode);
+        supplierService.deactivate(supplierCode);
+    }
+
+    @Override
+    public Result<Void, String> updateBasicData(final SupplierBasicDataUpdateCommand request) {
+        final SupplierCode supplierCode = request.supplierCode();
+        if (supplierService.findByCode(supplierCode) == null) {
+            return Result.failure("Supplier with code " + supplierCode + " does not exist");
+        }
+        this.supplierService.updateBasicData(supplierCode, request.firstName(), request.lastName(),
+                request.telephoneNumber());
+        return Result.success();
     }
 
     @Override
@@ -110,7 +140,7 @@ public class SupplyPortImpl implements SupplyPort {
     public CertificationUpdateResponse updateCertification(final CertificationUpdateCommand request) {
         final SupplierCode supplierCode = request.supplierCode();
         final DangerousGoodCertification certification = request.dangerousGoodCertification();
-        if (this.supplierService.findByCode(supplierCode) != null) {
+        if (this.supplierService.findByCode(supplierCode) == null) {
             return CertificationUpdateResponse.failure("Supplier with code " + supplierCode + " does not exist");
         }
 
@@ -122,6 +152,12 @@ public class SupplyPortImpl implements SupplyPort {
         final Result<Void, String> result = this.validatorService.validateSupplierCode(supplierCode);
         if (result.isFailure()) {
             throw new SupplierAlreadyExistsException(result.getFailure());
+        }
+    }
+
+    private void validateExists(final SupplierCode supplierCode) {
+        if (supplierService.findByCode(supplierCode) == null) {
+            throw new SupplierNotFoundException(supplierCode.value());
         }
     }
 }

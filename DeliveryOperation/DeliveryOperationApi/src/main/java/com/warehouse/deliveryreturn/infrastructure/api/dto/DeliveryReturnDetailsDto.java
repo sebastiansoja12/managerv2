@@ -10,15 +10,18 @@ public class DeliveryReturnDetailsDto {
     private final DeliveryStatusDto deliveryStatus;
     private final DepartmentCodeDto departmentCode;
     private final SupplierCodeDto supplierCode;
+    private final ReturnTokenDto returnToken;
 
     public DeliveryReturnDetailsDto(final ShipmentIdDto shipmentId,
                                     final DeliveryStatusDto deliveryStatus,
                                     final DepartmentCodeDto departmentCode,
-                                    final SupplierCodeDto supplierCode) {
+                                    final SupplierCodeDto supplierCode,
+                                    final ReturnTokenDto returnToken) {
         this.shipmentId = shipmentId;
         this.deliveryStatus = deliveryStatus;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
+        this.returnToken = returnToken;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -35,6 +38,10 @@ public class DeliveryReturnDetailsDto {
 
     public SupplierCodeDto getSupplierCode() {
         return supplierCode;
+    }
+
+    public ReturnTokenDto getReturnToken() {
+        return returnToken;
     }
 
 }

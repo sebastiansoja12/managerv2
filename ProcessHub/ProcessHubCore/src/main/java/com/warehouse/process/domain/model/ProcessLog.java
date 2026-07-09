@@ -5,6 +5,7 @@ import java.time.Instant;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.vo.DeviceValidation;
+import com.warehouse.process.domain.vo.ProcessCommunication;
 import com.warehouse.process.domain.vo.ProcessLogSnapshot;
 import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
@@ -89,6 +90,17 @@ public class ProcessLog {
         communicationLogDetail.changeResponse(shipmentRejected.response());
         communicationLogDetail.changeFaultDescription(shipmentRejected.faultDescription());
         communicationLogDetail.changeServices(shipmentRejected.serviceType().name(), "SHIPMENT_REJECTION");
+    }
+
+    public void applyCommunication(final ProcessCommunication communication) {
+        final CommunicationLogDetail communicationLogDetail = getCommunicationLogDetails()
+                .addCommunicationLogDetail(communication.processType(), communication.sourceServiceType());
+        communicationLogDetail.changeRequest(communication.request());
+        communicationLogDetail.changeResponse(communication.response());
+        communicationLogDetail.changeFaultDescription(communication.faultDescription());
+        communicationLogDetail.changeServices(
+                communication.sourceServiceType().name(),
+                communication.targetServiceType().name());
     }
 
     public void changeResponse(final String response) {

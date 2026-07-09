@@ -1,6 +1,11 @@
 package com.warehouse.dangerousgood.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.enumeration.Country;
+import java.util.Collections;
+import java.util.List;
+
+import org.hibernate.envers.Audited;
+
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Weight;
 import com.warehouse.dangerousgood.domain.enumeration.ClassificationCode;
@@ -8,11 +13,8 @@ import com.warehouse.dangerousgood.domain.enumeration.Packaging;
 import com.warehouse.dangerousgood.domain.enumeration.StorageRequirement;
 import com.warehouse.dangerousgood.domain.model.DangerousGood;
 import com.warehouse.dangerousgood.domain.vo.DangerousGoodId;
-import jakarta.persistence.*;
-import org.hibernate.envers.Audited;
 
-import java.util.Collections;
-import java.util.List;
+import jakarta.persistence.*;
 
 
 @Entity(name = "dangerousGood.DangerousGoodEntity")
@@ -62,7 +64,7 @@ public class DangerousGoodEntity {
     private String emergencyContact;
     @Enumerated(EnumType.STRING)
     @Column(name = "country_origin", nullable = false)
-    private Country countryOfOrigin;
+    private CountryCode countryOfOrigin;
     @Column(name = "safety_data_sheet", nullable = false)
     private String safetyDataSheet;
 
@@ -75,7 +77,7 @@ public class DangerousGoodEntity {
                                final StorageRequirement storageRequirements, final String handlingInstructions, final Weight weight,
                                final Packaging packaging, final boolean flammable, final boolean isCorrosive,
                                final boolean toxic, final String emergencyContact,
-                               final Country countryOfOrigin, final String safetyDataSheet) {
+                               final CountryCode countryOfOrigin, final String safetyDataSheet) {
         this.dangerousGoodId = dangerousGoodId;
         this.shipmentId = shipmentId;
         this.name = name;
@@ -117,7 +119,7 @@ public class DangerousGoodEntity {
         return corrosive;
     }
 
-    public Country getCountryOfOrigin() {
+    public CountryCode getCountryOfOrigin() {
         return countryOfOrigin;
     }
 

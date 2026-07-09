@@ -12,6 +12,7 @@ public class DeliveryReturnResponseDetailsDto {
     private final DeliveryStatusDto deliveryStatus;
     private final ReturnTokenDto returnToken;
     private final UpdateStatusDto updateStatus;
+    private final String errorMessage;
 
 
     public DeliveryReturnResponseDetailsDto(final ProcessIdDto processId,
@@ -20,7 +21,8 @@ public class DeliveryReturnResponseDetailsDto {
                                             final SupplierCodeDto supplierCode,
                                             final DeliveryStatusDto deliveryStatus,
                                             final ReturnTokenDto returnToken,
-                                            final UpdateStatusDto updateStatus) {
+                                            final UpdateStatusDto updateStatus,
+                                            final String errorMessage) {
         this.processId = processId;
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
@@ -28,6 +30,7 @@ public class DeliveryReturnResponseDetailsDto {
         this.deliveryStatus = deliveryStatus;
         this.returnToken = returnToken;
         this.updateStatus = updateStatus;
+        this.errorMessage = errorMessage;
     }
 
     public SupplierCodeDto getSupplierCode() {
@@ -56,5 +59,9 @@ public class DeliveryReturnResponseDetailsDto {
 
     public ReturnTokenDto getReturnToken() {
         return returnToken;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

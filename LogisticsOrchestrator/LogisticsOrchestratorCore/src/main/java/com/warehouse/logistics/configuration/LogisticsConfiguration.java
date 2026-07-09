@@ -12,6 +12,7 @@ import com.warehouse.logistics.domain.service.LogisticsService;
 import com.warehouse.logistics.domain.service.LogisticsServiceImpl;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValidatorAspect;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator;
+import com.warehouse.logistics.infrastructure.adapter.primary.LoggingSoapEndpointExceptionResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
@@ -65,6 +66,11 @@ public class LogisticsConfiguration {
     public LogisticsProcessFinishAspect terminalResponseProcessFinishAspect(
             final ProcessHubEventPublisher processHubEventPublisher) {
         return new LogisticsProcessFinishAspect(processHubEventPublisher);
+    }
+
+    @Bean
+    public LoggingSoapEndpointExceptionResolver loggingSoapEndpointExceptionResolver() {
+        return new LoggingSoapEndpointExceptionResolver();
     }
 
     @Bean

@@ -29,8 +29,10 @@ import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
+import com.warehouse.deliveryreturn.domain.vo.ReturnTokenValidationResult;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatusShipmentRequest;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
@@ -58,6 +60,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		@MockBean
 		public ShipmentRepositoryServicePort shipmentRepositoryServicePort;
+
+		@MockBean
+		public ReturnTokenServicePort returnTokenServicePort;
 
 		@MockBean
 		public MailServicePort mailServicePort;
@@ -93,6 +98,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 	private ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
 	@Autowired
+	private ReturnTokenServicePort returnTokenServicePort;
+
+	@Autowired
 	private MailServicePort mailServicePort;
 
 	private final DeviceInformation deviceInformation = DeviceInformation.builder()
@@ -115,9 +123,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN, deviceInformation,
 				deliveryReturnDetails);
 
-		final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(1L);
-
-		when(shipmentStatusControlServicePort.updateStatus(updateStatusShipmentRequest))
+		when(returnTokenServicePort.validate(any()))
+				.thenReturn(ReturnTokenValidationResult.valid(new ShipmentId(1L)));
+		when(shipmentStatusControlServicePort.updateStatus(any(UpdateStatusShipmentRequest.class)))
 				.thenReturn(UpdateStatus.NOT_OK);
 		doThrow(new BusinessException(404, "Parcel 1 was not found")).when(shipmentRepositoryServicePort)
 				.downloadShipment(new ShipmentId(1L));
@@ -136,9 +144,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 		final DeliveryReturnRequest request = buildDeliveryReturnRequest(ProcessType.RETURN, deviceInformation,
 				deliveryReturnDetails);
 
-		final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(1L);
-
-		when(shipmentStatusControlServicePort.updateStatus(updateStatusShipmentRequest)).thenReturn(UpdateStatus.OK);
+		when(returnTokenServicePort.validate(any()))
+				.thenReturn(ReturnTokenValidationResult.valid(new ShipmentId(1L)));
+		when(shipmentStatusControlServicePort.updateStatus(any(UpdateStatusShipmentRequest.class))).thenReturn(UpdateStatus.OK);
 		doThrow(new TechnicalException(500, "Could not establish connection")).when(shipmentRepositoryServicePort)
 				.downloadShipment(new ShipmentId(1L));
 		// when
@@ -150,7 +158,7 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 	private DeliveryReturnRequest buildDeliveryReturnRequest(ProcessType processType,
 			DeviceInformation deviceInformation, List<DeliveryReturnDetails> deliveryReturnDetails) {
-		return new DeliveryReturnRequest(processType, deviceInformation, deliveryReturnDetails);
+		return new DeliveryReturnRequest(null, processType, deviceInformation, deliveryReturnDetails);
 	}
 
 	private List<DeliveryReturnDetails> buildReturnDetails(Long parcelId, DeliveryStatus deliveryStatus,

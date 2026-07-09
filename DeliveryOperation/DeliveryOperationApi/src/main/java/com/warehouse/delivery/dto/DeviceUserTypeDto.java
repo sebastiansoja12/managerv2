@@ -1,5 +1,5 @@
 package com.warehouse.delivery.dto;
 
 public enum DeviceUserTypeDto {
-    SUPPLIER, MANAGER
+    SUPPLIER, MANAGER, OPERATOR
 }

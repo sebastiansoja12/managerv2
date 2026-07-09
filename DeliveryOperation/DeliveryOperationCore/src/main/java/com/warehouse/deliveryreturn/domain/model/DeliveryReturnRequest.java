@@ -9,12 +9,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.terminal.DeviceInformation;
 
 
 public class DeliveryReturnRequest {
     private ProcessType processType;
+    private ProcessId processId;
     private DeviceInformation deviceInformation;
     private List<DeliveryReturnDetails> deliveryReturnDetails;
 
@@ -42,9 +44,11 @@ public class DeliveryReturnRequest {
         this.deliveryReturnDetails = deliveryReturnDetails;
     }
 
-    public DeliveryReturnRequest(final ProcessType processType,
+    public DeliveryReturnRequest(final ProcessId processId,
+                                 final ProcessType processType,
                                  final DeviceInformation deviceInformation,
                                  final List<DeliveryReturnDetails> deliveryReturnDetails) {
+        this.processId = processId;
         this.processType = processType;
         this.deviceInformation = deviceInformation;
         this.deliveryReturnDetails = deliveryReturnDetails;
@@ -76,5 +80,13 @@ public class DeliveryReturnRequest {
 
     public String getDepartmentCode() {
         return deviceInformation != null ? deviceInformation.getDepartmentCode().getValue() : StringUtils.EMPTY;
+    }
+
+    public ProcessId getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(final ProcessId processId) {
+        this.processId = processId;
     }
 }

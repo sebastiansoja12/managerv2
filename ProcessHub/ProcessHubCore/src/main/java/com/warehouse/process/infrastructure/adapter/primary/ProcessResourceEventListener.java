@@ -11,6 +11,7 @@ import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.ProcessDeviceValidatedCommand;
 import com.warehouse.process.domain.port.primary.ProcessPort;
 import com.warehouse.process.domain.vo.ChangeResponseProcessCommand;
+import com.warehouse.process.domain.vo.ProcessCommunication;
 import com.warehouse.process.domain.vo.ShipmentRejected;
 import com.warehouse.process.domain.vo.ShipmentUpdated;
 import com.warehouse.process.infrastructure.adapter.primary.mapper.RequestMapper;
@@ -98,6 +99,20 @@ public class ProcessResourceEventListener {
         logEvent(event);
         final ProcessId processId = RequestMapper.map(event.getProcessLogId());
         this.processPort.changeResponse(new ChangeResponseProcessCommand(processId, event.getResponse()));
+    }
+
+    @EventListener
+    public void handle(final ProcessCommunicationEvent event) {
+        logEvent(event);
+        final ProcessId processId = RequestMapper.map(event.getProcessLogId());
+        this.processPort.assignCommunication(processId, new ProcessCommunication(
+                event.getServiceType(),
+                event.getTargetServiceType(),
+                event.getProcessType(),
+                event.getRequest(),
+                event.getResponse(),
+                event.getFaultDescription()
+        ));
     }
 
     private void logEvent(final ProcessLogEvent event) {

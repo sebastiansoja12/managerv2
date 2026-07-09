@@ -80,6 +80,7 @@
             <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
             <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
             <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="ReturnToken" type="xs:string" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -148,6 +149,7 @@
             <xs:element name="UpdateStatus" type="xs:string" minOccurs="0"/>
             <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
             <xs:element name="DeliveryID" type="xs:string" minOccurs="0"/>
+            <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

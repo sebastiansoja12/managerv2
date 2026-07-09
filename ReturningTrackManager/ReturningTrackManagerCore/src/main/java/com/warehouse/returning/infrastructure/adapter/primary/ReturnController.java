@@ -13,13 +13,8 @@ import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.service.ApiKeyService;
-import com.warehouse.returning.domain.vo.ChangeReasonCodeRequest;
-import com.warehouse.returning.domain.vo.DecodedApiTenant;
-import com.warehouse.returning.domain.vo.ReturnPackageId;
-import com.warehouse.returning.domain.vo.ReturnResponse;
-import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReasonCodeRequestApi;
-import com.warehouse.returning.infrastructure.adapter.primary.api.ChangeReturnStatusApiRequest;
-import com.warehouse.returning.infrastructure.adapter.primary.api.DeleteReturnResponse;
+import com.warehouse.returning.domain.vo.*;
+import com.warehouse.returning.infrastructure.adapter.primary.api.*;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnResponseApi;
@@ -131,6 +126,15 @@ public class ReturnController {
         final ReturnPackageId returnId = new ReturnPackageId(returnPackageId);
         final ReturnPackage returnModel = returnPort.getReturn(returnId);
         return new ResponseEntity<>(ResponseMapper.toResponseApi(returnModel), HttpStatus.OK);
+    }
+
+    @PostMapping("/token/validate")
+    public ResponseEntity<ReturnTokenValidationResponseApi> validateReturnToken(
+            @RequestBody final ReturnTokenValidationRequestApi request) {
+        final com.warehouse.returning.domain.vo.ShipmentId shipmentId =
+                new com.warehouse.returning.domain.vo.ShipmentId(request.shipmentId());
+        final ReturnTokenValidation validation = returnPort.validateReturnToken(shipmentId, new ReturnToken(request.returnToken()));
+        return ResponseEntity.ok(new ReturnTokenValidationResponseApi(validation.shipmentId().value(), validation.valid(), validation.message()));
     }
 
     @DeleteMapping("/{id}")

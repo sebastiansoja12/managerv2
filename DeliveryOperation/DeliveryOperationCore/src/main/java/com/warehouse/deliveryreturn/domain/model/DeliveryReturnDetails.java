@@ -6,6 +6,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
+import com.warehouse.deliveryreturn.domain.vo.ReturnToken;
 
 import lombok.Builder;
 
@@ -15,15 +16,18 @@ public class DeliveryReturnDetails {
     private DeliveryStatus deliveryStatus;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
+    private ReturnToken returnToken;
 
     public DeliveryReturnDetails(final ShipmentId shipmentId,
                                  final DeliveryStatus deliveryStatus,
                                  final DepartmentCode departmentCode,
-                                 final SupplierCode supplierCode) {
+                                 final SupplierCode supplierCode,
+                                 final ReturnToken returnToken) {
         this.shipmentId = shipmentId;
         this.deliveryStatus = deliveryStatus;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
+        this.returnToken = returnToken;
     }
 
     public ShipmentId getShipmentId() {
@@ -54,6 +58,14 @@ public class DeliveryReturnDetails {
         return supplierCode;
     }
 
+    public ReturnToken getReturnToken() {
+        return returnToken;
+    }
+
+    public void setReturnToken(final ReturnToken returnToken) {
+        this.returnToken = returnToken;
+    }
+
     public void setSupplierCode(final SupplierCode supplierCode) {
         this.supplierCode = supplierCode;
     }
@@ -70,6 +82,7 @@ public class DeliveryReturnDetails {
                 .shipmentId(shipmentId)
                 .supplierCode(supplierCode)
                 .departmentCode(departmentCode)
+                .returnToken(returnToken)
                 .build();
     }
 }

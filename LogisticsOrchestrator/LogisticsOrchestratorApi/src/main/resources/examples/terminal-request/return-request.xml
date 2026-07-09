@@ -16,12 +16,14 @@
                 <DeliveryStatus>RETURN</DeliveryStatus>
                 <DepartmentCode>KT1</DepartmentCode>
                 <SupplierCode>SUP-01</SupplierCode>
+                <ReturnToken>12345</ReturnToken>
             </DeliveryReturnDetail>
             <DeliveryReturnDetail>
                 <ShipmentID>1000000003</ShipmentID>
                 <DeliveryStatus>RETURN</DeliveryStatus>
                 <DepartmentCode>KT1</DepartmentCode>
                 <SupplierCode>SUP-01</SupplierCode>
+                <ReturnToken>12345</ReturnToken>
             </DeliveryReturnDetail>
         </DeliveryReturnDetails>
     </DeliveryReturnRequest>
