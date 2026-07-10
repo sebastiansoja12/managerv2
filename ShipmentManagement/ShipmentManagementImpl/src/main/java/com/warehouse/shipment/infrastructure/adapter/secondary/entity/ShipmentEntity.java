@@ -4,6 +4,8 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -100,6 +102,22 @@ public class ShipmentEntity extends BelongsToOperator {
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
     private DepartmentId originDepartmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "pickup_point_id", columnDefinition = "UUID"))
+    private PickupPointId pickupPointId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "delivery_pickup_point_id", columnDefinition = "UUID"))
+    private PickupPointId deliveryPickupPointId;
+
+    @Column(name = "pickup_method")
+    @Enumerated(EnumType.STRING)
+    private PickupMethod pickupMethod;
+
+    @Column(name = "delivery_method")
+    @Enumerated(EnumType.STRING)
+    private DeliveryMethod deliveryMethod;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
