@@ -38,6 +38,10 @@ public class ShipmentPersistenceMapper {
                 entity.getShipmentPriority(),
                 dangerousGood(entity.getDangerousGood()),
                 entity.getTrackingNumber(),
+                entity.getPickupMethod(),
+                entity.getDeliveryMethod(),
+                entity.getPickupPointId(),
+                entity.getDeliveryPickupPointId(),
                 new ExternalId<>(UUID.fromString(entity.getExternalId().value()))
         );
     }
@@ -68,6 +72,10 @@ public class ShipmentPersistenceMapper {
                 entity.getShipmentPriority(),
                 dangerousGood(entity.getDangerousGood()),
                 entity.getTrackingNumber(),
+                entity.getPickupMethod(),
+                entity.getDeliveryMethod(),
+                entity.getPickupPointId(),
+                entity.getDeliveryPickupPointId(),
                 new ExternalId<>(UUID.fromString(entity.getExternalId().value()))
         );
     }
@@ -92,6 +100,10 @@ public class ShipmentPersistenceMapper {
                 .shipmentSize(shipment.getShipmentSize())
                 .targetDepartmentId(shipment.getTargetDepartmentId())
                 .originDepartmentId(shipment.getOriginDepartmentId())
+                .pickupPointId(shipment.getPickupPointId())
+                .deliveryPickupPointId(shipment.getDeliveryPickupPointId())
+                .pickupMethod(shipment.getPickupMethod())
+                .deliveryMethod(shipment.getDeliveryMethod())
                 .shipmentStatus(shipment.getShipmentStatus())
                 .shipmentType(shipment.getShipmentType())
                 .shipmentRelatedId(shipment.getShipmentRelatedId())
@@ -129,6 +141,10 @@ public class ShipmentPersistenceMapper {
                 .shipmentSize(snapshot.shipmentSize())
                 .targetDepartmentId(snapshot.targetDepartmentId())
                 .originDepartmentId(snapshot.originDepartmentId())
+                .pickupPointId(snapshot.pickupPointId())
+                .deliveryPickupPointId(snapshot.deliveryPickupPointId())
+                .pickupMethod(snapshot.pickupMethod())
+                .deliveryMethod(snapshot.deliveryMethod())
                 .shipmentStatus(snapshot.shipmentStatus())
                 .shipmentType(snapshot.shipmentType())
                 .shipmentRelatedId(snapshot.shipmentRelatedId())
