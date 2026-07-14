@@ -35,7 +35,7 @@ class OperatorShipmentConfigurationMapperTest {
                 new ShipmentLabelConfigurationDto(true, true, true, ShipmentLabelFormatDto.ZPL),
                 new ShipmentLimitsDto(50.0, 1.0, 200.0, 100.0, 90.0, 5000.0, true),
                 new ShipmentWorkflowConfigurationDto(
-                        DefaultShipmentStatusDto.ACCEPTED,
+                        DefaultShipmentStatusDto.PREPARED,
                         ShipmentServiceLevelDto.EXPRESS,
                         true,
                         false,
@@ -63,7 +63,7 @@ class OperatorShipmentConfigurationMapperTest {
         assertThat(configuration.labelSettings().autoGenerateLabels()).isTrue();
         assertThat(configuration.limits().maxWeight()).isEqualTo(50.0);
         assertThat(configuration.limits().allowOversized()).isTrue();
-        assertThat(configuration.workflowSettings().defaultStatus()).isEqualTo(ShipmentStatus.ACCEPTED);
+        assertThat(configuration.workflowSettings().defaultStatus()).isEqualTo(ShipmentStatus.PREPARED);
         assertThat(configuration.workflowSettings().defaultServiceLevel()).isEqualTo(ShipmentServiceLevel.EXPRESS);
         assertThat(configuration.workflowSettings().pickupCutoffTime()).isEqualTo("18:30");
         assertThat(configuration.trackingNumberRule().key()).isEqualTo("FTM");
