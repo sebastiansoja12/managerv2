@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.process.domain.model.ProcessLog;
@@ -47,6 +47,7 @@ public class ProcessRepositoryImpl implements ProcessRepository {
             validateNotExists(processId);
             inFlight.put(processId, processLog);
             final ProcessLogWriteEntity writeEntity = ProcessLogToEntityMapper.map(processLog);
+            assignOperator(writeEntity, getOperatorId());
             writeRepository.save(writeEntity);
         } finally {
             lock.unlock();
@@ -88,16 +89,16 @@ public class ProcessRepositoryImpl implements ProcessRepository {
 
     @Override
     public Optional<ProcessLog> findByIdForCurrentDepartment(final ProcessId processId) {
-        final DepartmentCode departmentCode = getDepartmentCode();
-        return readRepository.findByIdAndDepartmentCode(processId, departmentCode)
+        final OperatorId operatorId = getOperatorId();
+        return readRepository.findByIdAndOperatorId(processId, operatorId)
                 .map(ProcessLogToModelMapper::map);
     }
 
     @Override
     public Page<ProcessLog> findAllForCurrentDepartment(final Pageable pageable) {
-        final DepartmentCode departmentCode = getDepartmentCode();
+        final OperatorId operatorId = getOperatorId();
 
-        return readRepository.findAllByDepartmentCode(departmentCode, pageable)
+        return readRepository.findAllByOperatorId(operatorId, pageable)
                 .map(ProcessLogToModelMapper::map);
     }
 
@@ -117,6 +118,7 @@ public class ProcessRepositoryImpl implements ProcessRepository {
             final ProcessLog current = inFlight.remove(processId);
             if (current != null) {
                 final ProcessLogWriteEntity writeEntity = ProcessLogToEntityMapper.map(current);
+                assignOperator(writeEntity, getOperatorId());
                 writeRepository.save(writeEntity);
             }
         } finally {
@@ -136,13 +138,18 @@ public class ProcessRepositoryImpl implements ProcessRepository {
         }
     }
 
-    private DepartmentCode getDepartmentCode() {
+    private OperatorId getOperatorId() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication instanceof UsernameTenantPasswordAuthenticationToken token) {
-            return token.getDepartmentCode();
+            return token.getOperatorId();
         }
 
-        throw new IllegalStateException("No department code found");
+        throw new IllegalStateException("No operator id found");
+    }
+
+    private void assignOperator(final ProcessLogWriteEntity entity, final OperatorId operatorId) {
+        entity.assignOperator(operatorId);
+        entity.getCommunicationLogs().forEach(log -> log.assignOperator(operatorId));
     }
 }
