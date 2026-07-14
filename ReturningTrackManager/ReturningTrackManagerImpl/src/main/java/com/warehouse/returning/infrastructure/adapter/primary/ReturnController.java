@@ -61,20 +61,20 @@ public class ReturnController {
         }
 
         final String token = authorizationHeader.substring(7);
-        final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
+        final DecodedApiOperator decodedApiOperator = this.apiKeyService.decodeJwt(token);
         
         ResponseEntity<?> responseEntity;
 
 		try {
 
-			log.info("Processing return request from user: {}", decodedApiTenant.userId().value());
+			log.info("Processing return request from user: {}", decodedApiOperator.userId().value());
 
-			final ReturnRequest request = RequestMapper.map(returnApiRequest, decodedApiTenant);
+			final ReturnRequest request = RequestMapper.map(returnApiRequest, decodedApiOperator);
 
 			final ReturnResponse response = this.returnPort.process(request);
 			final ReturnResponseApi responseApi = ResponseMapper.toResponseApi(response);
 
-			log.info("Return request processed successfully for user: {}", decodedApiTenant.userId().value());
+			log.info("Return request processed successfully for user: {}", decodedApiOperator.userId().value());
 			responseEntity = ResponseEntity.ok(responseApi);
 
         } catch (final SignatureException e) {

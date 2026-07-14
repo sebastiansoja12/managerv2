@@ -23,9 +23,9 @@ public abstract class RequestMapper {
         );
     }
 
-    public static ReturnRequest map(final ReturnRequestApi returnApiRequest, final DecodedApiTenant decodedApiTenant) {
-        final DepartmentCode departmentCode = decodedApiTenant.departmentCode();
-        final UserId userId = decodedApiTenant.userId();
+    public static ReturnRequest map(final ReturnRequestApi returnApiRequest, final DecodedApiOperator decodedApiOperator) {
+        final DepartmentCode departmentCode = decodedApiOperator.departmentCode();
+        final UserId userId = decodedApiOperator.userId();
         final List<ReturnPackageRequest> returnPackageRequests = returnApiRequest.requests()
                 .stream()
                 .map(ReturnPackageRequest::from)
