@@ -5,6 +5,7 @@ import java.time.Instant;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.event.DepartmentTypeChanged;
 import com.warehouse.department.domain.exception.ForbiddenDepartmentTypeException;
@@ -15,7 +16,7 @@ import com.warehouse.department.domain.vo.Coordinates;
 import com.warehouse.department.domain.vo.DepartmentSnapshot;
 import com.warehouse.department.domain.vo.TaxId;
 
-public class Department {
+public class Department extends BelongsToOperator {
 
     private DepartmentCode departmentCode;
 
