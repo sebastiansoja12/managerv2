@@ -12,13 +12,14 @@ import com.warehouse.auth.AccessUserControl;
 import com.warehouse.auth.domain.helper.Result;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.primary.CurrentOperatorPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.service.JwtDecodeService;
-import com.warehouse.auth.infrastructure.dto.FullNameRequestApiDto;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.validator.RoleValidator;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.auth.infrastructure.dto.FullNameRequestApiDto;
 import com.warehouse.commonassets.identificator.UserId;
 
 import jakarta.validation.Valid;
@@ -32,9 +33,13 @@ public class UserResourceController {
 
     private final JwtDecodeService jwtDecodeService;
 
-    public UserResourceController(final UserPort userPort, final JwtDecodeService jwtDecodeService) {
+    private final CurrentOperatorPort currentOperatorPort;
+
+    public UserResourceController(final UserPort userPort, final JwtDecodeService jwtDecodeService,
+                                  final CurrentOperatorPort currentOperatorPort) {
         this.userPort = userPort;
         this.jwtDecodeService = jwtDecodeService;
+        this.currentOperatorPort = currentOperatorPort;
     }
 
     @GetMapping("/{username}")

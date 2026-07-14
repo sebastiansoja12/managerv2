@@ -1,20 +1,5 @@
 package com.warehouse.auth.configuration;
 
-import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
-import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
-import com.warehouse.auth.domain.port.secondary.MailServicePort;
-import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
-import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.provider.JwtProvider;
-import com.warehouse.auth.domain.service.*;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
-import com.warehouse.auth.infrastructure.adapter.secondary.*;
-import com.warehouse.department.api.DepartmentApiService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +11,28 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.warehouse.auth.CurrentOperatorService;
+import com.warehouse.auth.OperatorUserEventPublisher;
+import com.warehouse.auth.domain.port.primary.AuthenticationPort;
+import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
+import com.warehouse.auth.domain.port.primary.CurrentOperatorPort;
+import com.warehouse.auth.domain.port.primary.CurrentOperatorPortImpl;
+import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
+import com.warehouse.auth.domain.port.secondary.MailServicePort;
+import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
+import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.domain.service.*;
+import com.warehouse.auth.infrastructure.adapter.primary.CurrentOperatorServiceAdapter;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
+import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
+import com.warehouse.auth.infrastructure.adapter.secondary.*;
+import com.warehouse.department.api.DepartmentApiService;
+
+import lombok.RequiredArgsConstructor;
 
 
 @Configuration
@@ -87,6 +94,21 @@ public class AuthConfiguration  {
     @Bean("auth.mailServicePort")
     public MailServicePort mailServicePort(final ApplicationEventPublisher eventPublisher) {
         return new MailServiceAdapter(eventPublisher);
+    }
+
+    @Bean
+    public OperatorUserEventPublisher operatorUserEventPublisher(final ApplicationEventPublisher eventPublisher) {
+        return new OperatorUserEventPublisherAdapter(eventPublisher);
+    }
+
+    @Bean
+    public CurrentOperatorService currentOperatorService(final CurrentOperatorPort currentOperatorPort) {
+        return new CurrentOperatorServiceAdapter(currentOperatorPort);
+    }
+
+    @Bean
+    public CurrentOperatorPort currentOperatorPort(final AuthenticationService authenticationService) {
+        return new CurrentOperatorPortImpl(authenticationService);
     }
 
     // request and response mappers
