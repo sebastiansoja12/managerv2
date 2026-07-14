@@ -21,8 +21,10 @@
     <include file="/changelog/db/device_profiles.xml"/>
     <include file="/changelog/db/additional_entities.xml"/>
     <include file="/changelog/db/device_id_string_migration.xml"/>
+    <include file="/changelog/db/operator.xml"/>
 
     <include file="/changelog/insertDepartments.xml"/>
+    <include file="/changelog/db/department_cleanup.xml"/>
     <include file="/changelog/updateDepartmentCoordinates.xml"/>
     <include file="/changelog/insertSuppliers.xml"/>
     <include file="/changelog/insertUser.xml"/>
