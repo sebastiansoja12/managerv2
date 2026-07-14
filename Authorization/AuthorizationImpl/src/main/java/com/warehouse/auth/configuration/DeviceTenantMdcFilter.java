@@ -12,7 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.terminal.DeviceApiService;
@@ -79,9 +79,10 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
         final Long userId = authentication.userId() != null ? authentication.userId().value() : null;
         final String deviceId = authentication.deviceId() != null ? authentication.deviceId().value() : null;
         final String username = authentication.username() != null ? authentication.username().value() : null;
+        final OperatorId operatorId = authentication.operatorId();
 
-        setMdcFromDevice(userId, deviceId, username, department);
-        setDeviceAuthentication(resolvePrincipal(userId, deviceId), department, pairKey);
+        setMdcFromDevice(userId, deviceId, username, operatorId);
+        setDeviceAuthentication(resolvePrincipal(userId, deviceId, operatorId), operatorId, pairKey);
         log.info("Incoming {} request (device-auth)", request.getMethod());
 
         try {
@@ -110,7 +111,7 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
     }
 
     private void initMdc(final HttpServletRequest request) {
-        MDC.put("tenant", "N/A");
+        MDC.put("operator", "N/A");
         MDC.put("user", "N/A");
         MDC.put("username", "N/A");
         MDC.put("uri", request.getRequestURL().toString());
@@ -118,8 +119,8 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
         MDC.put("method", request.getMethod());
     }
 
-    private void setMdcFromDevice(final Long userId, final String deviceId, final String username, final String department) {
-        MDC.put("tenant", department);
+    private void setMdcFromDevice(final Long userId, final String deviceId, final String username, final OperatorId operatorId) {
+        MDC.put("operator", operatorId.toString());
         if (userId != null) {
             MDC.put("user", userId.toString());
         } else if (deviceId != null) {
@@ -130,7 +131,7 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
         }
     }
 
-    private Object resolvePrincipal(final Long userId, final String deviceId) {
+    private Object resolvePrincipal(final Long userId, final String deviceId, final OperatorId operatorId) {
         if (userId != null) {
             return new UserId(userId);
         }
@@ -140,12 +141,12 @@ public class DeviceTenantMdcFilter extends OncePerRequestFilter {
         return "device:unknown";
     }
 
-    private void setDeviceAuthentication(final Object principal, final String departmentCode, final String pairKey) {
+    private void setDeviceAuthentication(final Object principal, final OperatorId operatorId, final String pairKey) {
         final SecurityContext context = SecurityContextHolder.createEmptyContext();
         final UsernameTenantPasswordAuthenticationToken authToken =
                 new UsernameTenantPasswordAuthenticationToken(
                         principal,
-                        new DepartmentCode(departmentCode),
+                        operatorId,
                         pairKey,
                         Collections.emptyList());
         context.setAuthentication(authToken);

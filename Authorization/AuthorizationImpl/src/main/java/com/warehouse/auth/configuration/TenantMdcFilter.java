@@ -78,7 +78,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
     }
 
     private void initMdc(final DecodedApiTenant tenant, final HttpServletRequest request) {
-        MDC.put("tenant", tenant.departmentCode().value());
+        MDC.put("operator", tenant.operatorId() != null ? tenant.operatorId().toString() : "N/A");
         MDC.put("user", tenant.userId().value().toString());
         MDC.put("username", tenant.username());
         MDC.put("uri", request.getRequestURL().toString());
@@ -106,7 +106,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
     }
 
     private void setMdcFromTenant(final DecodedApiTenant tenant) {
-        MDC.put("tenant", tenant.departmentCode().value());
+        MDC.put("operator", tenant.operatorId() != null ? tenant.operatorId().toString() : "N/A");
         MDC.put("user", tenant.userId().value().toString());
         MDC.put("username", tenant.username());
     }
