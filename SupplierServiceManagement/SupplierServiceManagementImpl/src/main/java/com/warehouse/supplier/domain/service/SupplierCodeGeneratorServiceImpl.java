@@ -1,10 +1,9 @@
 package com.warehouse.supplier.domain.service;
 
-import java.security.SecureRandom;
-
+import com.warehouse.commonassets.identificator.SupplierCode;
 import org.apache.commons.lang3.StringUtils;
 
-import com.warehouse.commonassets.identificator.SupplierCode;
+import java.security.SecureRandom;
 
 
 public class SupplierCodeGeneratorServiceImpl implements SupplierCodeGeneratorService {
@@ -25,8 +24,7 @@ public class SupplierCodeGeneratorServiceImpl implements SupplierCodeGeneratorSe
     @Override
     public SupplierCode generate(final SupplierCode supplierCode) {
         final SupplierCode generatedSupplierCode;
-		if (supplierCode != null && StringUtils.isNotBlank(supplierCode.value())
-				&& supplierCode.value().length() == SUPPLIER_CODE_LENGTH) {
+		if (supplierCode != null && StringUtils.isNotBlank(supplierCode.value())) {
             generatedSupplierCode = supplierCode;
         } else {
             generatedSupplierCode = new SupplierCode(generate());
