@@ -32,7 +32,7 @@ public class PathFinderAdapter implements PathFinderServicePort {
         final List<DepartmentDto> departments = departmentApiService.getAllDepartments()
                 .stream()
                 .map(dep -> new DepartmentDto(dep.departmentCode(),
-                        dep.city(), dep.street(), dep.zipCode(), dep.country(),
+                        dep.city(), dep.street(), dep.zipCode(), dep.countryCode(),
                         new CoordinatesDto(dep.coordinates().latitude(), dep.coordinates().longitude())))
                 .toList();
         final VoronoiRequestDto voronoiRequest = new VoronoiRequestDto(
