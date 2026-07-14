@@ -9,6 +9,7 @@ import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.LoginResponse;
 import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.vo.UsernamePasswordAuthentication;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -51,5 +52,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserId currentUserId() {
         return (UserId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    @Override
+    public OperatorId currentOperatorId() {
+        return (OperatorId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
