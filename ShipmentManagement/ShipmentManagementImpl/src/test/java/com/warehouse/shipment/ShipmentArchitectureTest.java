@@ -91,6 +91,34 @@ class ShipmentArchitectureTest {
     }
 
     @Test
+    void shipmentReadOperationsShouldNotExposeAggregateToPrimaryAdapters() throws IOException {
+        final String shipmentPortSource = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/application/port/primary/ShipmentPort.java"));
+        final String shipmentPortImplementationSource = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/application/port/primary/ShipmentPortImpl.java"));
+        final String shipmentControllerSource = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/infrastructure/adapter/primary/ShipmentInternalController.java"));
+
+        assertThat(shipmentPortSource)
+                .contains("ShipmentResult loadShipment(final ShipmentId shipmentId)")
+                .contains("ShipmentControlCenterResult loadShipmentControlCenter")
+                .doesNotContain("Shipment loadShipment")
+                .doesNotContain("List<Shipment> searchShipments");
+        final String shipmentResultFactorySource = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/application/service/ShipmentResultFactory.java"));
+        assertThat(shipmentResultFactorySource)
+                .contains("getDepartmentCode(shipment.getTargetDepartmentId())")
+                .doesNotContain("targetDepartmentId == null");
+        assertThat(shipmentPortImplementationSource)
+                .contains("shipmentResultFactory.create")
+                .contains("shipmentResultFactory.createControlCenter")
+                .doesNotContain("resolveDepartmentCode");
+        assertThat(shipmentControllerSource)
+                .doesNotContain("import com.warehouse.shipment.domain.model.Shipment;")
+                .doesNotContain("final Shipment shipment =");
+    }
+
+    @Test
     void shipmentStatusChangeShouldBeTransactional() throws NoSuchMethodException {
         assertThat(transactionPropagation(
                 ShipmentPortImpl.class,
