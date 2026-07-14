@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.warehouse.returning.domain.service.ApiKeyService;
-import com.warehouse.returning.domain.vo.DecodedApiTenant;
+import com.warehouse.returning.domain.vo.DecodedApiOperator;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,7 +32,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                                     final HttpServletResponse response,
                                     final FilterChain filterChain) throws IOException, ServletException {
 
-        MDC.put("tenant", "N/A");
+        MDC.put("operator", "N/A");
         MDC.put("user", "N/A");
         MDC.put("username", "N/A");
         MDC.put("uri", request.getRequestURL().toString());
@@ -63,13 +63,15 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             JwtContext.setToken(authorization.replace("Bearer ", ""));
 
             try {
-                final DecodedApiTenant decodedApiTenant = this.apiKeyService.decodeJwt(token);
-                final String tenant = decodedApiTenant.departmentCode().value();
-                final String user = decodedApiTenant.userId().value().toString();
-                final String username = decodedApiTenant.username();
+                final DecodedApiOperator decodedApiOperator = this.apiKeyService.decodeJwt(token);
+                final String operator = decodedApiOperator.operatorId() != null
+                        ? decodedApiOperator.operatorId().toString()
+                        : "N/A";
+                final String user = decodedApiOperator.userId().value().toString();
+                final String username = decodedApiOperator.username();
                 final String requestMethod = request.getMethod();
 
-                MDC.put("tenant", tenant);
+                MDC.put("operator", operator);
                 MDC.put("user", user);
                 MDC.put("username", username);
 
