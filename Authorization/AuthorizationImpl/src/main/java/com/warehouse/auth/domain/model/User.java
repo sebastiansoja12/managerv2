@@ -16,9 +16,10 @@ import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserSnapshot;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.BelongsToOperator;
 
 
-public class User {
+public class User extends BelongsToOperator {
 
     private UserId userId;
 
@@ -43,6 +44,8 @@ public class User {
     private Set<RolePermission> permissions;
 
     private Boolean deleted;
+
+    private Boolean initial;
 
     private Instant createdAt;
 
@@ -96,6 +99,7 @@ public class User {
         this.language = language;
         this.permissions = permissions;
         this.deleted = false;
+        this.initial = false;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
@@ -223,6 +227,10 @@ public class User {
         this.deleted = deleted;
     }
 
+    public void setInitial(final Boolean initial) {
+        this.initial = initial;
+    }
+
     public void setUpdatedAt(final Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
@@ -231,12 +239,24 @@ public class User {
         return deleted;
     }
 
+    public Boolean isInitial() {
+        return Boolean.TRUE.equals(initial);
+    }
+
+    public void markAsInitial() {
+        this.initial = true;
+    }
+
     public Instant createdAt() {
         return createdAt;
     }
 
     public Instant updatedAt() {
         return updatedAt;
+    }
+
+    public Long getOperatorIdValue() {
+        return this.operatorId().getValue();
     }
 
     public Set<RolePermission> getPermissions() {
