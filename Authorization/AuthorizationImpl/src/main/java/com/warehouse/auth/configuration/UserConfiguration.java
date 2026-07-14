@@ -16,6 +16,8 @@ import com.warehouse.auth.infrastructure.adapter.primary.CurrentUserApiServiceAd
 import com.warehouse.auth.infrastructure.adapter.primary.UserApiServiceAdapter;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
+import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 
 @Configuration
 public class UserConfiguration {
@@ -36,7 +38,7 @@ public class UserConfiguration {
     }
 
     @Bean
-    public UserRepository userRepository(UserReadRepository repository) {
+    public UserRepository userRepository(final OperatorFilteredRepository<UserEntity> repository) {
         return new UserRepositoryImpl(repository);
     }
 
