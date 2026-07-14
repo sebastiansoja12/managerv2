@@ -19,7 +19,8 @@
 		<module>Application</module>
 		<module>ShipmentManagement</module>
 		<module>MailService</module>
-		<module>DepartmentService</module>
+        <module>DepartmentService</module>
+        <module>OrganisationStructure</module>
 		<module>DeliveryOperation</module>
 		<module>PathFinder</module>
 		<module>Authorization</module>
