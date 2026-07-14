@@ -2,6 +2,7 @@ package com.warehouse.process.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
 
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 
@@ -19,6 +20,10 @@ public abstract class ProcessLogBaseEntity {
             column = @Column(name = "process_id", nullable = false, columnDefinition = "BINARY(16)")
     )
     private ProcessId processId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "operator_id"))
+    private OperatorId operatorId;
 
     @Column(name = "request")
     private String request;
@@ -47,6 +52,14 @@ public abstract class ProcessLogBaseEntity {
 
     public ProcessId getProcessId() {
         return processId;
+    }
+
+    public OperatorId getOperatorId() {
+        return operatorId;
+    }
+
+    public void assignOperator(final OperatorId operatorId) {
+        this.operatorId = operatorId;
     }
 
     public String getRequest() {
