@@ -9,14 +9,17 @@ import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToEntityMa
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToModelMapper;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
 
-    private final UserReadRepository repository;
+    private final OperatorFilteredRepository<UserEntity> repository;
 
-    public UserRepositoryImpl(final UserReadRepository repository) {
+    public UserRepositoryImpl(final OperatorFilteredRepository<UserEntity> repository) {
         this.repository = repository;
     }
 
@@ -24,38 +27,70 @@ public class UserRepositoryImpl implements UserRepository {
     public UserResponse createOrUpdate(final User user) {
         final UserEntity userEntity = UserToEntityMapper.map(user);
 
-        repository.saveAndFlush(userEntity);
+        if (findById(user.getUserId()) == null) {
+            repository.create(userEntity);
+        } else {
+            repository.update(userEntity);
+        }
 
         return UserResponse.from(userEntity);
     }
 
     @Override
     public User findByUsername(final String username) {
-        return repository.findByUsername(username).map(UserToModelMapper::map)
+        return repository.createCriteria(UserEntity.class)
+                .eq("username", username)
+                .one()
+                .map(UserToModelMapper::map)
                 .orElseThrow(() -> new UserNotFoundException("User was not found"));
     }
 
     @Override
     public User findByApiKey(final String apiKey) {
-        return repository.findByApiKey(apiKey).map(UserToModelMapper::map).orElse(null);
+        return repository.createCriteria(UserEntity.class)
+                .eq("apiKey", apiKey)
+                .one()
+                .map(UserToModelMapper::map)
+                .orElse(null);
     }
 
     @Override
     public User findById(final UserId userId) {
-        return repository.findById(userId).map(UserToModelMapper::map).orElse(null);
+        return repository.createCriteria(UserEntity.class)
+                .eq("userId.value", userId.value())
+                .one()
+                .map(UserToModelMapper::map)
+                .orElse(null);
     }
 
     @Override
     public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
-        return repository.findAll().stream().map(UserToModelMapper::map)
-                .filter(user -> !user.isDeleted())
-                .filter(user -> user.getDepartmentCode().equals(departmentCode))
+        return repository.createCriteria(UserEntity.class)
+                .eq("departmentCode.value", departmentCode)
+                .isFalse("deleted")
+                .list()
+                .stream()
+                .map(UserToModelMapper::map)
                 .map(User::getUserId)
                 .toList();
     }
 
     @Override
     public User findByEmail(final String email) {
-        return repository.findByEmail(email).map(UserToModelMapper::map).orElse(null);
+        return repository.createCriteria(UserEntity.class)
+                .eq("email", email)
+                .one()
+                .map(UserToModelMapper::map)
+                .orElse(null);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public UserId findInitialUser() {
+        return repository.createCriteria(UserEntity.class)
+                .isTrue("initial")
+                .one()
+                .map(UserEntity::getUserId)
+                .orElse(null);
     }
 }
