@@ -1,16 +1,23 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.warehouse.auth.event.OperatorCreatedEvent;
 import com.warehouse.auth.domain.model.AdminCreateRequest;
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
+import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.infrastructure.adapter.primary.event.AdminUserCommand;
 import com.warehouse.auth.infrastructure.adapter.primary.event.DepartmentUserChanged;
 import com.warehouse.auth.infrastructure.adapter.primary.event.DepartmentUserDeleted;
+import com.warehouse.auth.infrastructure.dto.RegisteringUserDto;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +30,22 @@ public class AuthEventListener {
 
     private final UserPort userPort;
 
+    private final UserService userService;
+
+    private final JwtService jwtService;
+
+    private final PasswordEncoder passwordEncoder;
+
     public AuthEventListener(final AuthenticationPort authenticationPort,
-                             final UserPort userPort) {
+                             final UserPort userPort,
+                             final UserService userService,
+                             final JwtService jwtService,
+                             final PasswordEncoder passwordEncoder) {
         this.authenticationPort = authenticationPort;
         this.userPort = userPort;
+        this.userService = userService;
+        this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @EventListener
@@ -36,6 +55,25 @@ public class AuthEventListener {
         final UserId userId = this.authenticationPort.createAdminUser(request);
         command.getAdminCreatedId().accept(userId);
         log.info("Admin user created: {}", userId.getValue());
+    }
+
+    @EventListener
+    public void handle(final OperatorCreatedEvent event) {
+        final RegisteringUserDto registeringUser = event.getRegisteringUser();
+        final DepartmentCode departmentCode = new DepartmentCode(registeringUser.departmentCode().value());
+        final OperatorId operatorId = OperatorId.of(registeringUser.operatorId().value());
+        final UserId userId = userService.nextUserId();
+        final String password = passwordEncoder.encode(registeringUser.password());
+
+        final User user = User.createAdmin(userId, registeringUser.username(), password, registeringUser.firstName(),
+                registeringUser.lastName(), registeringUser.email(), departmentCode, registeringUser.language(), null);
+        user.assignOperator(operatorId);
+        user.markAsInitial();
+        user.setApiKey(jwtService.generateToken(user));
+
+        userService.create(user);
+        event.getUserCreatedId().accept(userId);
+        log.info("Operator admin user created: {} for operator {}", userId.getValue(), operatorId.getValue());
     }
 
     @EventListener
