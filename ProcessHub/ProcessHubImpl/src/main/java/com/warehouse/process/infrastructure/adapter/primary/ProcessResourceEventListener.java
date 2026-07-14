@@ -6,6 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
+import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.ProcessDeviceValidatedCommand;
@@ -27,10 +28,13 @@ public class ProcessResourceEventListener {
 
     private final ProcessPort processPort;
 
+    private final CurrentOperatorService currentOperatorService;
+
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSSS");
 
-    public ProcessResourceEventListener(final ProcessPort processPort) {
+    public ProcessResourceEventListener(final ProcessPort processPort, final CurrentOperatorService currentOperatorService) {
         this.processPort = processPort;
+        this.currentOperatorService = currentOperatorService;
     }
 
     @EventListener
@@ -46,7 +50,7 @@ public class ProcessResourceEventListener {
         logEvent(event);
         final ProcessId processId = RequestMapper.map(event.getProcessLogId());
         final ShipmentUpdateDto shipmentUpdate = event.getShipmentUpdate();
-        final ShipmentUpdated shipmentUpdated = RequestMapper.map(shipmentUpdate);
+        final ShipmentUpdated shipmentUpdated = RequestMapper.map(shipmentUpdate, currentOperatorService.getCurrentOperatorId());
         this.processPort.assignShipmentUpdated(processId, shipmentUpdated);
     }
 
