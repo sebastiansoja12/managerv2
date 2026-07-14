@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>AuthorizationCore</artifactId>
+            <artifactId>AuthorizationImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
