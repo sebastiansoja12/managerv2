@@ -71,6 +71,23 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="users-add-initial-v2026-3" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="users"/>
+                <not>
+                    <columnExists tableName="users" columnName="initial"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="users">
+            <column name="initial" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
     <changeSet id="users-add-department-foreign-key-v2026-3" author="s-soja">
         <preConditions onFail="MARK_RAN">
             <and>
