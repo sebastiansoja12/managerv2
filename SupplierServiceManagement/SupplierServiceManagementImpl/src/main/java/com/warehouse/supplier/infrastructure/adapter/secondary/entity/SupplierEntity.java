@@ -207,7 +207,6 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
         return supplierId;
     }
 
-    @Override
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
     }
