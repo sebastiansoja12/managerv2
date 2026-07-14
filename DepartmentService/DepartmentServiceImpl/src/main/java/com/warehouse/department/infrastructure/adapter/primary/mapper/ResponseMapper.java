@@ -32,7 +32,7 @@ public abstract class ResponseMapper {
         final String departmentCode = department.getDepartmentCode().getValue();
         final CoordinatesDto coordinates = new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
         return new DepartmentDto(departmentCode, department.getCity(), department.getStreet(),
-                department.getCity(), department.getPostalCode(), coordinates);
+                department.getPostalCode(), department.getCountryCode().name(), coordinates);
     }
 
     public static IdentificationNumberChangeApiResponse map(final IdentificationNumberChangeResponse response) {

@@ -16,7 +16,7 @@ public abstract class DepartmentToModelMapper {
         if (department == null) {
             return null;
         } else {
-            return new Department(new DepartmentCode(department.getDepartmentCode().getValue()),
+            final Department model = new Department(new DepartmentCode(department.getDepartmentCode().getValue()),
 					map(department.getDepartmentAddress()), new TaxId(department.getTaxId().value()),
 					department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
 					DepartmentType.valueOf(department.getDepartmentType().name()),
@@ -24,6 +24,8 @@ public abstract class DepartmentToModelMapper {
                     map(department.getDepartmentCoordinates()), department.getCreatedAt(),
 					department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
 					department.getLastModifiedBy());
+            model.assignOperator(department.operatorId());
+            return model;
         }
     }
 
