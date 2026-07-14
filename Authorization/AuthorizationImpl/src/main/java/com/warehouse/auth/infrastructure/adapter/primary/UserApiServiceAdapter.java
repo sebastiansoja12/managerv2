@@ -5,6 +5,7 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.dto.UserDto;
+import com.warehouse.auth.infrastructure.dto.UserIdDto;
 import com.warehouse.commonassets.identificator.UserId;
 
 public class UserApiServiceAdapter implements UserApiService {
@@ -25,5 +26,11 @@ public class UserApiServiceAdapter implements UserApiService {
     public UserDto findByUsername(final String username) {
         final User user = userService.findUser(username);
         return ResponseMapper.map(user);
+    }
+
+    @Override
+    public UserIdDto findInitialUserForOperator() {
+        final UserId userId = userService.findInitialUser();
+        return new UserIdDto(userId.getValue());
     }
 }

@@ -1,5 +1,9 @@
 package com.warehouse.auth.domain.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.warehouse.auth.domain.event.*;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
@@ -10,9 +14,6 @@ import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -116,5 +117,10 @@ public class UserServiceImpl implements UserService {
         user.updateUserInfo(request);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
+    }
+
+    @Override
+    public UserId findInitialUser() {
+        return this.userRepository.findInitialUser();
     }
 }
