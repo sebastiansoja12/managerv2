@@ -1,6 +1,7 @@
 package com.warehouse.auth.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.infrastructure.dto.OperatorIdDto;
 import com.warehouse.auth.infrastructure.dto.RolePermissionApi;
 import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.auth.infrastructure.dto.UserIdDto;
@@ -30,7 +31,8 @@ public abstract class ResponseMapper {
 				.map(rolePermission -> new RolePermissionApi(
 						rolePermission.getPermission().getPermission()))
 				.collect(Collectors.toSet());
+        final OperatorIdDto operatorId = new OperatorIdDto(user.getOperatorIdValue());
 		return new UserDto(userId, username, firstName, lastName, email, role, departmentCode, language, rolePermissions, deleted,
-				createdAt, updatedAt);
+                operatorId, createdAt, updatedAt);
     }
 }

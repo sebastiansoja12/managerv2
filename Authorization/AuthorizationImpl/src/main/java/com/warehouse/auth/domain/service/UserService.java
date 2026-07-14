@@ -1,13 +1,13 @@
 package com.warehouse.auth.domain.service;
 
+import java.util.List;
+
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
-
-import java.util.List;
 
 public interface UserService {
 
@@ -38,4 +38,6 @@ public interface UserService {
     void deleteDataForUser(final UserId userId);
 
     void updateDefaultDepartmentUser(final UserDepartmentUpdateRequest request);
+
+    UserId findInitialUser();
 }
