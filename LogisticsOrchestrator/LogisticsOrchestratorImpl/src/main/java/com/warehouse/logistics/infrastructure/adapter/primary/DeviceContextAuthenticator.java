@@ -82,14 +82,14 @@ public class DeviceContextAuthenticator {
                         final Long userId,
                         final String username,
                         final String deviceId) {
-        MDC.put("tenant", departmentCode);
+        MDC.put("operator", "N/A");
         MDC.put("user", userId != null ? userId.toString() : fallback(deviceId));
         MDC.put("username", username != null ? username : "device:" + fallback(deviceId));
     }
 
     private void initRequestMdc() {
         final HttpServletRequest request = currentHttpRequest();
-        MDC.put("tenant", "N/A");
+        MDC.put("operator", "N/A");
         MDC.put("user", "N/A");
         MDC.put("username", "N/A");
         MDC.put("uri", request != null ? request.getRequestURL().toString() : "SOAP");
