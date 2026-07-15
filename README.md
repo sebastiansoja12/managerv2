@@ -1,6 +1,6 @@
 # Manager 2.0 Backend
 
-**Development Version 2026.3 - 6th July, 2026**
+**Development Version 2026.3 - 10th September, 2026**
 
 Manager 2.0 is a Java 21 / Spring Boot backend for warehouse and logistics
 operations. The repository is a multi-module Maven project. The main runtime is
@@ -27,14 +27,16 @@ under `/v2/api`.
 | `Authorization` | Login, JWT/cookie authentication, refresh tokens, current user/operator context and permissions. |
 | `OrganisationStructure` | Operator management, operator configuration and provisioning of initial operator data. |
 | `DepartmentService` | Departments, department identifiers, coordinates and read-model synchronization. |
-| `ShipmentManagement` | Shipments, dangerous goods, shipment status, tracking numbers and external tracking integrations. |
+| `ShipmentManagement` | Shipments, dangerous goods, pickup and delivery methods, pickup-point assignment, return summaries, shipment status and tracking integrations. |
+| `PickupPointManagement` | Pickup-point aggregate, lifecycle, address geocoding, operator-scoped persistence, Kafka-projected search model and REST API. |
+| `OrganizationChat` | Persistent direct conversations, organization-user discovery, WebSocket presence and message notifications. |
 | `DeliveryOperation` | Delivery, return and rejection process handling. |
 | `LogisticsOrchestrator` | Coordination layer for logistics flows. |
 | `ProcessHub` | Process logs and process details used by the GUI. |
 | `Device` | Device pairing, device verification and terminal/device access validation. |
 | `SupplierServiceManagement` | Suppliers, package types, delivery areas, vehicle data and supplier updates. |
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
-| `PathFinder` and `DestinationDetermination` | Routing, destination and area calculation support. |
+| `PathFinder` and `DestinationDetermination` | Routing, delivery-department determination, address coordinates and area calculation support. |
 | `DocumentManager` | Barcode and CSV generation utilities. |
 | `MessageProvider` and `MailService` | Message and mail infrastructure. |
 | `Common` | Shared value objects, enums, exceptions, repository helpers, operator context and security utilities. |
@@ -71,6 +73,11 @@ Common environment variables:
 - `SPRING_DATASOURCE_USERNAME`
 - `SPRING_DATASOURCE_PASSWORD`
 - `SPRING_KAFKA_BOOTSTRAP_SERVERS`
+- `MANAGER_KAFKA_PICKUP_POINT_READ_MODEL_SYNC_ENABLED`
+- `PICKUP_POINT_READ_MODEL_SYNC_TOPIC`
+- `PICKUP_POINT_READ_MODEL_SYNC_GROUP_ID`
+- `RETURNING_SERVICE_URL`
+- `RETURNING_SERVICE_ENDPOINT`
 - `JWT_SECRET_KEY`
 - `AUTH_CORS_ALLOWED_ORIGINS`
 - `CREDENTIALS_ENCRYPTION_KEY`
@@ -135,3 +142,34 @@ Separate Dockerfiles are available for:
 - Release notes are maintained in `CHANGELOG.md`
 - InPost tracking notes are in `docs/inpost-global-tracking.md`
 - Writerside documentation sources are in `Writerside`
+
+## Pickup Points
+
+Pickup points are managed under `/v2/api/pickup-points`. The API supports
+creation, editing, lifecycle changes, detail lookup and operator-scoped search.
+Search can be filtered by text, city, country, type, capability, department,
+network and map bounding box. `/pickup-points/eligible` additionally filters by
+shipment size and dangerous-goods requirements for shipment forms.
+
+Clients provide an address when creating or editing a point. Coordinates are
+resolved by the configured coordinates service, and the assigned department is
+validated before the point is saved. The write model publishes a domain event
+after persistence; the application layer converts it to the
+`pickup-point.read-model.changed` integration event, Kafka transports it, and a
+primary listener updates the separate `pickup_point_read_model` table used by
+search and map queries. Both write and read persistence use the shared
+operator-filtered repository infrastructure.
+
+## Shipment Pickup and Return Data
+
+Shipments store pickup and delivery methods together with separate sender and
+recipient pickup-point identifiers. Their target delivery department is required
+from creation and is determined through the existing routing services.
+Application ports return `ShipmentResult` and control-center results instead of
+exposing the mutable shipment model to REST controllers.
+
+Return details are fetched only for shipments in `RETURN` status. Optional
+return details degrade to an empty result when ReturningTrackManager is
+unavailable, so ordinary shipment details still load. Return list and status
+operations exposed by Manager use the generic external Feign client and proxy
+processing and completion to ReturningTrackManager.
