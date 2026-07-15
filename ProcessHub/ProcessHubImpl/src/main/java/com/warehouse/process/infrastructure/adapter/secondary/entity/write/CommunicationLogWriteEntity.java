@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 public class CommunicationLogWriteEntity extends CommunicationLogBaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "process_id", columnDefinition = "BINARY(16)")
+    @JoinColumn(name = "process_id", columnDefinition = "UUID")
     private ProcessLogWriteEntity processLog;
 
     protected CommunicationLogWriteEntity() {

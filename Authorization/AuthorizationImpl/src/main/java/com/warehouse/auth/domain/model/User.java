@@ -14,7 +14,7 @@ import com.warehouse.auth.domain.exception.UserDeletedException;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserSnapshot;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.BelongsToOperator;
 
@@ -35,7 +35,7 @@ public class User extends BelongsToOperator {
 
     private Role role;
 
-    private DepartmentCode departmentCode;
+    private DepartmentId departmentId;
 
     private String language;
 
@@ -62,7 +62,7 @@ public class User extends BelongsToOperator {
                 final String lastName,
                 final String email,
                 final Role role,
-                final DepartmentCode departmentCode,
+                final DepartmentId departmentId,
                 final String apiKey) {
         this.userId = userId;
         this.username = username;
@@ -71,7 +71,7 @@ public class User extends BelongsToOperator {
         this.lastName = lastName;
         this.email = email;
         this.role = role;
-        this.departmentCode = departmentCode;
+        this.departmentId = departmentId;
         this.apiKey = apiKey;
         this.permissions = new HashSet<>();
     }
@@ -83,7 +83,7 @@ public class User extends BelongsToOperator {
                 final String lastName,
                 final String email,
                 final Role role,
-                final DepartmentCode departmentCode,
+                final DepartmentId departmentId,
                 final String apiKey,
                 final String language,
                 final Set<RolePermission> permissions) {
@@ -94,7 +94,7 @@ public class User extends BelongsToOperator {
         this.lastName = lastName;
         this.email = email;
         this.role = role;
-        this.departmentCode = departmentCode;
+        this.departmentId = departmentId;
         this.apiKey = apiKey;
         this.language = language;
         this.permissions = permissions;
@@ -110,14 +110,14 @@ public class User extends BelongsToOperator {
                 final String lastName,
                 final String email,
                 final Role role,
-                final DepartmentCode departmentCode) {
+                final DepartmentId departmentId) {
         this.userId = userId;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.role = role;
-        this.departmentCode = departmentCode;
+        this.departmentId = departmentId;
     }
     
     public static User createAdmin(
@@ -127,12 +127,12 @@ public class User extends BelongsToOperator {
                             final String firstName,
                             final String lastName,
                             final String email,
-                            final DepartmentCode departmentCode,
+                            final DepartmentId departmentId,
                             final String language,
                             final String apiKey) {
         final Set<RolePermission> adminPermissions = DomainRegistry.rolePermissionService().findAllAdminPermissions();
-        return new User(userId, username, password, firstName, lastName, email, Role.ADMIN, departmentCode, apiKey,
-                language, adminPermissions);
+        return new User(userId, username, password, firstName, lastName, email, Role.ADMIN, departmentId,
+                apiKey, language, adminPermissions);
     }
 
     public static User createWithRole(final UserId userId,
@@ -142,23 +142,23 @@ public class User extends BelongsToOperator {
                                       final String lastName,
                                       final String email,
                                       final Role role,
-                                      final DepartmentCode departmentCode,
+                                      final DepartmentId departmentId,
                                       final String apiKey,
                                       final String language) {
         final User user = new User(
-                userId, username, password, firstName, lastName, email, role, departmentCode, apiKey,
+                userId, username, password, firstName, lastName, email, role, departmentId, apiKey,
                 language, new HashSet<>()
         );
         user.updatePermissionsForRole(role);
         return user;
     }
 
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartmentCode(final DepartmentCode departmentCode) {
-        this.departmentCode = departmentCode;
+    public void setDepartmentId(final DepartmentId departmentId) {
+        this.departmentId = departmentId;
     }
 
     public String getEmail() {
@@ -285,7 +285,7 @@ public class User extends BelongsToOperator {
     }
 
     public UserSnapshot snapshot() {
-        return new UserSnapshot(userId, username, password, email, role, departmentCode.getValue());
+        return new UserSnapshot(userId, username, password, email, role, departmentId);
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -306,12 +306,12 @@ public class User extends BelongsToOperator {
         markAsModified();
     }
 
-    public void update(final UpdateUserCommand command) {
+    public void update(final UpdateUserCommand command, final DepartmentId departmentId) {
         this.firstName = command.firstName();
         this.lastName = command.lastName();
         this.username = command.username();
         this.email = command.email();
-        this.departmentCode = command.departmentCode();
+        this.departmentId = departmentId;
         this.language = command.language();
         markAsModified();
     }

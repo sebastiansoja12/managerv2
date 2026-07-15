@@ -1,5 +1,7 @@
 package com.warehouse.returning.domain.port.primary;
 
+import java.util.Optional;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,8 +63,23 @@ public class ReturnPortImpl implements ReturnPort {
     }
 
     @Override
+    public void startProcessing(final ShipmentId shipmentId) {
+        this.returnService.startProcessingReturn(shipmentId);
+    }
+
+    @Override
     public void complete(final ShipmentId shipmentId) {
         this.returnService.completeReturn(shipmentId);
+    }
+
+    @Override
+    public void cancel(final ShipmentId shipmentId) {
+        this.returnService.cancelReturn(shipmentId);
+    }
+
+    @Override
+    public Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final Long operatorId) {
+        return this.returnService.findLatestReturn(shipmentId, operatorId);
     }
 
     @Override

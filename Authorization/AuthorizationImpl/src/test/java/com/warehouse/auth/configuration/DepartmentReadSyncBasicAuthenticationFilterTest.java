@@ -23,6 +23,7 @@ import com.warehouse.auth.infrastructure.adapter.secondary.UserReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RolePermissionEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
@@ -108,7 +109,7 @@ class DepartmentReadSyncBasicAuthenticationFilterTest {
                 .lastName("User")
                 .email("admin@test.pl")
                 .role(UserEntity.Role.ADMIN)
-                .departmentCode(new DepartmentCode("TST"))
+                .departmentId(new DepartmentId(10L))
                 .language("PL")
                 .apiKey("api-key")
                 .permissions(Set.of(new RolePermissionEntity(1L, "ROLE_ADMIN_UPDATE")))

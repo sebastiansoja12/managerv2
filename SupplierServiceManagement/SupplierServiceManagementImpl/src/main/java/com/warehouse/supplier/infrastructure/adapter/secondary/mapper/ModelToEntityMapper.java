@@ -16,7 +16,7 @@ public class ModelToEntityMapper {
         return new SupplierEntity(
                 supplier.getSupplierId(),
                 supplier.supplierCode(),
-                supplier.getDepartmentCode(),
+                supplier.getDepartmentId(),
                 supplier.getFirstName(),
                 supplier.getLastName(),
                 supplier.getTelephoneNumber(),
@@ -61,5 +61,4 @@ public class ModelToEntityMapper {
                 driverLicense.drivingLicenseExpiryDate());
     }
 }
-
 

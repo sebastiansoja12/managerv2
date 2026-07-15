@@ -6,6 +6,7 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
 import java.util.List;
@@ -36,4 +37,6 @@ public interface UserPort {
     Result<Void, String> removePermission(final UserId userId, final String permission);
 
     void deleteDataForDepartment(final DepartmentCode departmentCode);
+
+    DepartmentCode getDepartmentCode(final DepartmentId departmentId);
 }

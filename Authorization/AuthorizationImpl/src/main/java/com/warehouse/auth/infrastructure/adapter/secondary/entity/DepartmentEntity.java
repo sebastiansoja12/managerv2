@@ -1,15 +1,20 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Table(name = "department")
 @Entity(name = "user.DepartmentEntity")
 public class DepartmentEntity {
 
-    @Id
+    @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "department_id", nullable = false))
+    private DepartmentId departmentId;
+
     @Column(name = "department_code", nullable = false, unique = true)
     private String departmentCode;
 
@@ -19,7 +24,8 @@ public class DepartmentEntity {
     public DepartmentEntity() {
     }
 
-    public DepartmentEntity(final String status, final String departmentCode) {
+    public DepartmentEntity(final DepartmentId departmentId, final String status, final String departmentCode) {
+        this.departmentId = departmentId;
         this.status = status;
         this.departmentCode = departmentCode;
     }
@@ -30,5 +36,9 @@ public class DepartmentEntity {
 
     public String getDepartmentCode() {
         return departmentCode;
+    }
+
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 }

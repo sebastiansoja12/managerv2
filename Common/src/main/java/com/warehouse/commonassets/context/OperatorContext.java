@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 
@@ -16,18 +17,26 @@ import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToke
 public class OperatorContext {
 
     public <T> T runAs(final OperatorId operatorId, final Supplier<T> operation) {
-        return runWithPrincipal(operatorId, operatorId, operation);
+        return runWithPrincipal(operatorId, operatorId, null, operation);
     }
 
     public <T> T runAs(final OperatorId operatorId, final UserId userId, final Supplier<T> operation) {
-        return runWithPrincipal(operatorId, userId, operation);
+        return runWithPrincipal(operatorId, userId, null, operation);
+    }
+
+    public <T> T runAs(final OperatorId operatorId,
+                       final UserId userId,
+                       final DepartmentId departmentId,
+                       final Supplier<T> operation) {
+        return runWithPrincipal(operatorId, userId, departmentId, operation);
     }
 
     private <T> T runWithPrincipal(final OperatorId operatorId,
                                    final Object principal,
+                                   final DepartmentId departmentId,
                                    final Supplier<T> operation) {
         final Authentication previousAuthentication = SecurityContextHolder.getContext().getAuthentication();
-        login(principal, operatorId);
+        login(principal, operatorId, departmentId);
         try {
             return operation.get();
         } finally {
@@ -49,19 +58,38 @@ public class OperatorContext {
         });
     }
 
+    public void runAs(final OperatorId operatorId,
+                      final UserId userId,
+                      final DepartmentId departmentId,
+                      final Runnable operation) {
+        runAs(operatorId, userId, departmentId, () -> {
+            operation.run();
+            return null;
+        });
+    }
+
     public void assignOperator(final OperatorId operatorId) {
-        login(operatorId, operatorId);
+        assignOperatorContext(operatorId, null, null);
+    }
+
+    public void assignOperatorContext(final OperatorId operatorId,
+                                      final UserId userId,
+                                      final DepartmentId departmentId) {
+        login(userId == null ? operatorId : userId, operatorId, departmentId);
     }
 
     public void clear() {
         SecurityContextHolder.clearContext();
     }
 
-    private void login(final Object principal, final OperatorId operatorId) {
+    private void login(final Object principal,
+                       final OperatorId operatorId,
+                       final DepartmentId departmentId) {
         final SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(new UsernameTenantPasswordAuthenticationToken(
                 principal,
                 operatorId,
+                departmentId,
                 null,
                 Collections.emptyList()
         ));

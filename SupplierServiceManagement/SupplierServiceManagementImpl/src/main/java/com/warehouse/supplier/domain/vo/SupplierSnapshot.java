@@ -1,6 +1,6 @@
 package com.warehouse.supplier.domain.vo;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
@@ -20,7 +20,7 @@ public record SupplierSnapshot(
         String firstName,
         String lastName,
         String telephoneNumber,
-        DepartmentCode departmentCode,
+        DepartmentId departmentId,
         SupplierStatus status,
         UserStatus userStatus,
         VehicleId vehicleId,
@@ -35,4 +35,3 @@ public record SupplierSnapshot(
         Instant updatedAt,
         UserId createdUserId
 ) {}
-

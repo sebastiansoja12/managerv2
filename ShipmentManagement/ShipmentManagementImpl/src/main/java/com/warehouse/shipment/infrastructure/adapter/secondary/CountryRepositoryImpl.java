@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.shipment.domain.port.secondary.CountryRepository;
+import com.warehouse.shipment.application.port.secondary.CountryRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.CountryEntity;
 
 public class CountryRepositoryImpl implements CountryRepository {

@@ -1,9 +1,8 @@
 package com.warehouse.auth.configuration;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
+import com.warehouse.commonassets.repository.OperatorDetails;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -14,21 +13,11 @@ import java.util.Optional;
 public class SecurityOperatorContextProvider implements OperatorContextProvider {
 
     @Override
-    public Optional<OperatorId> currentOperatorId() {
-        return currentAuthentication().map(UsernameTenantPasswordAuthenticationToken::getOperatorId);
-    }
-
-    @Override
-    public Optional<UserId> currentUserId() {
-        return currentAuthentication()
-                .map(UsernameTenantPasswordAuthenticationToken::getPrincipal)
-                .filter(UserId.class::isInstance)
-                .map(UserId.class::cast);
-    }
-
-    @Override
-    public Optional<DepartmentId> currentDepartmentId() {
-        return currentAuthentication().map(UsernameTenantPasswordAuthenticationToken::getDepartmentId);
+    public Optional<OperatorDetails> currentContext() {
+        return currentAuthentication().map(authentication -> new OperatorDetails(
+                authentication.getOperatorId(),
+                authentication.getPrincipal() instanceof final UserId userId ? userId : null,
+                authentication.getDepartmentId()));
     }
 
     private Optional<UsernameTenantPasswordAuthenticationToken> currentAuthentication() {

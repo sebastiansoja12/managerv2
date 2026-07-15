@@ -12,12 +12,14 @@ import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.domain.model.ChangeReturnStatusRequest;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
+import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.service.ApiKeyService;
 import com.warehouse.returning.domain.vo.*;
 import com.warehouse.returning.infrastructure.adapter.primary.api.*;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnPageApi;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnPackageApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnResponseApi;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.RequestMapper;
@@ -124,6 +126,35 @@ public class ReturnController {
         final ChangeReturnStatusRequest request = RequestMapper.map(changeReturnStatusRequest);
         this.returnPort.complete(request.getShipmentId());
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/process")
+    public ResponseEntity<?> startProcessingReturn(
+            @RequestBody final ChangeReturnStatusApiRequest changeReturnStatusRequest) {
+        final Result validationResult = this.getValidator(changeReturnStatusRequest.getClassName())
+                .validateBody(changeReturnStatusRequest);
+        if (validationResult.isFailure()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
+        }
+
+        final ChangeReturnStatusRequest request = RequestMapper.map(changeReturnStatusRequest);
+        if (request.getReturnStatus() != ReturnStatus.PROCESSING) {
+            throw new IllegalArgumentException("Return status must be PROCESSING");
+        }
+        this.returnPort.startProcessing(request.getShipmentId());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/shipment/{shipmentId}")
+    public ResponseEntity<ReturnPackageApi> getByShipmentId(@PathVariable final Long shipmentId) {
+        final DecodedApiOperator decodedApiOperator = this.apiKeyService.decodeJwt(JwtContext.getToken());
+        if (decodedApiOperator.operatorId() == null) {
+            throw new IllegalArgumentException("Operator ID is required");
+        }
+        return this.returnPort.findLatestReturn(new ShipmentId(shipmentId), decodedApiOperator.operatorId())
+                .map(ResponseMapper::toResponseApi)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/{returnPackageId}")

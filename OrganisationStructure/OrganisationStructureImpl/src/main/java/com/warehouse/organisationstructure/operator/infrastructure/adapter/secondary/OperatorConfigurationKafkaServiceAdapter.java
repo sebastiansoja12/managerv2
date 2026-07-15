@@ -2,8 +2,7 @@ package com.warehouse.organisationstructure.operator.infrastructure.adapter.seco
 
 import java.time.Instant;
 
-import org.springframework.context.ApplicationEventPublisher;
-
+import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
 import com.warehouse.organisationstructure.api.event.OperatorCreatedIntegrationEvent;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorConfigurationEventServicePort;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
@@ -11,18 +10,19 @@ import com.warehouse.organisationstructure.operator.infrastructure.adapter.secon
 
 public class OperatorConfigurationKafkaServiceAdapter implements OperatorConfigurationEventServicePort {
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final KafkaTemplateClient kafkaTemplateClient;
 
-    public OperatorConfigurationKafkaServiceAdapter(final ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
+    public OperatorConfigurationKafkaServiceAdapter(final KafkaTemplateClient kafkaTemplateClient) {
+        this.kafkaTemplateClient = kafkaTemplateClient;
     }
 
     @Override
     public void publishOperatorCreated(final OperatorSnapshot snapshot, final Instant timestamp) {
-        eventPublisher.publishEvent(new OperatorCreatedIntegrationEvent(
+        final OperatorCreatedIntegrationEvent event = new OperatorCreatedIntegrationEvent(
                 snapshot.operatorId(),
                 OperatorMapper.toDtoConfiguration(snapshot.configuration()),
                 timestamp
-        ));
+        );
+        this.kafkaTemplateClient.publish(String.valueOf(snapshot.operatorId().getValue()), event);
     }
 }

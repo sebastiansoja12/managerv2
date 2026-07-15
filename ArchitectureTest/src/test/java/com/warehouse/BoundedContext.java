@@ -180,7 +180,7 @@ class BoundedContext {
 				portClasses.stream().filter(JavaClass::isTopLevelClass)
 						.map(javaClass -> dynamicTest(javaClass.getFullName() + " should have adapter implementation",
 								() -> assertTrue(adapterClasses.stream()
-										.anyMatch(adapterClass -> adapterClass.getAllInterfaces().stream()
+										.anyMatch(adapterClass -> adapterClass.getAllRawInterfaces().stream()
 												.anyMatch(adapterInterface -> adapterInterface.getFullName()
 														.equals(javaClass.getFullName())))))));
 	}

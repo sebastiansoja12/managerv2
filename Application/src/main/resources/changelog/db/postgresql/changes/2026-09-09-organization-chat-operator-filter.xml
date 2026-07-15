@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-09-09-chat-participant-operator-filter" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="chat_participants" columnName="operator_id" />
+            </not>
+        </preConditions>
+
+        <addColumn tableName="chat_participants">
+            <column name="operator_id" type="BIGINT" />
+        </addColumn>
+        <sql>
+            UPDATE chat_participants participant
+            SET operator_id = conversation.operator_id
+            FROM chat_conversations conversation
+            WHERE participant.conversation_id = conversation.id
+        </sql>
+        <addNotNullConstraint
+                tableName="chat_participants"
+                columnName="operator_id"
+                columnDataType="BIGINT" />
+        <dropUniqueConstraint
+                tableName="chat_participants"
+                constraintName="uk_chat_participant" />
+        <addUniqueConstraint
+                tableName="chat_participants"
+                columnNames="operator_id, conversation_id, user_id"
+                constraintName="uk_chat_participant" />
+        <dropIndex tableName="chat_participants" indexName="idx_chat_participant_user" />
+        <createIndex indexName="idx_chat_participant_user" tableName="chat_participants">
+            <column name="operator_id" />
+            <column name="user_id" />
+            <column name="conversation_id" />
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="chat_participants"
+                baseColumnNames="operator_id"
+                referencedTableName="operators"
+                referencedColumnNames="operator_id"
+                constraintName="fk_chat_participant_operator"
+                onDelete="CASCADE" />
+    </changeSet>
+
+    <changeSet id="2026-09-09-chat-message-operator-filter" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="chat_messages" columnName="operator_id" />
+            </not>
+        </preConditions>
+
+        <addColumn tableName="chat_messages">
+            <column name="operator_id" type="BIGINT" />
+        </addColumn>
+        <sql>
+            UPDATE chat_messages message
+            SET operator_id = conversation.operator_id
+            FROM chat_conversations conversation
+            WHERE message.conversation_id = conversation.id
+        </sql>
+        <addNotNullConstraint
+                tableName="chat_messages"
+                columnName="operator_id"
+                columnDataType="BIGINT" />
+        <dropUniqueConstraint
+                tableName="chat_messages"
+                constraintName="uk_chat_message_client_id" />
+        <addUniqueConstraint
+                tableName="chat_messages"
+                columnNames="operator_id, sender_user_id, client_message_id"
+                constraintName="uk_chat_message_client_id" />
+        <dropIndex tableName="chat_messages" indexName="idx_chat_message_history" />
+        <createIndex indexName="idx_chat_message_history" tableName="chat_messages">
+            <column name="operator_id" />
+            <column name="conversation_id" />
+            <column descending="true" name="id" />
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="chat_messages"
+                baseColumnNames="operator_id"
+                referencedTableName="operators"
+                referencedColumnNames="operator_id"
+                constraintName="fk_chat_message_operator"
+                onDelete="CASCADE" />
+    </changeSet>
+
+    <changeSet id="2026-09-09-drop-obsolete-chat-presence" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="chat_presence" />
+        </preConditions>
+
+        <dropTable tableName="chat_presence" cascadeConstraints="true" />
+    </changeSet>
+
+</databaseChangeLog>

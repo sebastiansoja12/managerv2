@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.shipment.domain.port.secondary.Logger;
-import com.warehouse.shipment.domain.port.secondary.LoggerFactory;
+import com.warehouse.shipment.application.port.secondary.Logger;
+import com.warehouse.shipment.application.port.secondary.LoggerFactory;
 
 public class LoggerFactoryImpl implements LoggerFactory {
 

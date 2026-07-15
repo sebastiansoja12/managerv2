@@ -13,7 +13,7 @@ public abstract class UserToEntityMapper {
                 .lastName(user.getLastName())
                 .password(user.getPassword())
                 .role(UserRoleMapper.map(user.getRole()))
-                .departmentCode(user.getDepartmentCode())
+                .departmentId(user.getDepartmentId())
                 .language(user.getLanguage())
                 .apiKey(user.getApiKey())
                 .permissions(UserPermissionToEntityMapper.map(user.getPermissions()))

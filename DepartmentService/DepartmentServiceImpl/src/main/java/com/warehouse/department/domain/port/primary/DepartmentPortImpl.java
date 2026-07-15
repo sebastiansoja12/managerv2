@@ -84,6 +84,7 @@ public class DepartmentPortImpl implements DepartmentPort {
 					new TaxId(departmentCreate.getTaxId()), departmentCreate.getTelephoneNumber(),
 					departmentCreate.getOpeningHours(), departmentCreate.getEmail(),
 					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
+            department.setAdminUserId(departmentCreate.getAdminUserId());
             this.departmentService.createDepartment(department);
 
             createdDepartments.put(department, true);
@@ -148,6 +149,7 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
+    @Transactional
     public void changeStatus(final ChangeDepartmentStatusCommand command) {
         final DepartmentCode departmentCode = command.departmentCode();
         final Department.Status status = Department.Status.valueOf(command.status());

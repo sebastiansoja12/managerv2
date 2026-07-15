@@ -41,7 +41,7 @@ class GenericDynamicTestUtils {
         return DynamicTest.dynamicTest(
                 javaClass.getFullName() + " should not have dependencies to package " + notAllowedPackage,
                 () -> {
-                    final ConditionEvents events = new ConditionEvents();
+                    final ConditionEvents events = ConditionEvents.Factory.create();
                     javaClass.getDirectDependenciesFromSelf()
                             .stream()
                             .filter(d -> d.getTargetClass().getPackageName().contains(notAllowedPackage))
@@ -68,9 +68,10 @@ class GenericDynamicTestUtils {
                             .forEach(d -> events.add(SimpleConditionEvent.violated(d, d.getDescription())));
 
                     assertFalse(events.containViolation(),
-                            events.getFailureMessages()
+                            events.getViolating()
                                     .stream()
-                                    .reduce(String::join)
+                                    .flatMap(event -> event.getDescriptionLines().stream())
+                                    .reduce(String::concat)
                                     .orElse(""));
                 });
     }
@@ -79,7 +80,7 @@ class GenericDynamicTestUtils {
         return DynamicTest.dynamicTest(
                 javaClass.getFullName() + " should have dependencies to package " + allowedPackage,
                 () -> {
-                    final ConditionEvents events = new ConditionEvents();
+                    final ConditionEvents events = ConditionEvents.Factory.create();
                     javaClass.getDirectDependenciesFromSelf()
                             .stream()
                             .filter(d -> !d.getTargetClass().getPackageName().contains(allowedPackage))
@@ -106,9 +107,10 @@ class GenericDynamicTestUtils {
                             .forEach(d -> events.add(SimpleConditionEvent.violated(d, d.getDescription())));
 
                     assertTrue(events.containViolation(),
-                            events.getFailureMessages()
+                            events.getViolating()
                                     .stream()
-                                    .reduce(String::join)
+                                    .flatMap(event -> event.getDescriptionLines().stream())
+                                    .reduce(String::concat)
                                     .orElse(""));
                 });
     }

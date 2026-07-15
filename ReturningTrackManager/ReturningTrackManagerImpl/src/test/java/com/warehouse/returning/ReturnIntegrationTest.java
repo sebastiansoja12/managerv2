@@ -5,6 +5,7 @@ import com.warehouse.returning.domain.exception.StatusChangeException;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
+import com.warehouse.returning.domain.model.ReturnStatus;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.*;
@@ -174,6 +175,50 @@ class ReturnIntegrationTest {
         assertEquals(Status.COMPLETED, entity.getReturnStatus());
     }
 
+    @Test
+    void shouldStartProcessingReturn() {
+        final ReturnPackageEntity entity = createReturnPackageEntity(
+                125L,
+                17L,
+                "Uszkodzony produkt",
+                Status.CREATED,
+                "PROCESS123TOKEN",
+                "KT2",
+                "KT3",
+                3L,
+                4L,
+                ReasonCode.DAMAGED,
+                Instant.parse("2025-10-12T12:10:00Z"),
+                Instant.parse("2025-10-12T12:30:00Z")
+        );
+
+        this.returnPort.startProcessing(new ShipmentId(17L));
+
+        assertEquals(Status.PROCESSING, entity.getReturnStatus());
+    }
+
+    @Test
+    void shouldCancelReturnByShipmentId() {
+        final ReturnPackageEntity entity = createReturnPackageEntity(
+                124L,
+                16L,
+                "Uszkodzony produkt",
+                Status.PROCESSING,
+                "XYZ789TOKEN",
+                "KT2",
+                "KT3",
+                3L,
+                4L,
+                ReasonCode.DAMAGED,
+                Instant.parse("2025-10-12T12:10:00Z"),
+                Instant.parse("2025-10-12T12:30:00Z")
+        );
+
+        this.returnPort.cancel(new ShipmentId(16L));
+
+        assertEquals(Status.CANCELLED, entity.getReturnStatus());
+    }
+
     @ParameterizedTest
     @CsvSource({"1001"})
     void shouldGetReturn(final String returnId) {
@@ -236,7 +281,7 @@ class ReturnIntegrationTest {
     }
 
     @Test
-    void shouldNotFindAnyReturnPackageWhenIsCancelled() {
+    void shouldReadCancelledReturnDetailsWithoutMakingItAvailableForOperations() {
         final ReturnPackageId returnPackageId = new ReturnPackageId(1001L);
         createReturnPackageEntity(
                 1001L,
@@ -253,7 +298,9 @@ class ReturnIntegrationTest {
                 Instant.parse("2025-10-12T12:30:00Z")
         );
 
-        final Executable executable = () -> this.returnPort.getReturn(returnPackageId);
+        assertEquals(ReturnStatus.CANCELLED, this.returnPort.getReturn(returnPackageId).getReturnStatus());
+
+        final Executable executable = () -> this.returnRepository.findById(returnPackageId);
         final ReturnPackageNotFoundException exception = assertThrows(ReturnPackageNotFoundException.class, executable);
 
         assertEquals("Return package not found", exception.getMessage());

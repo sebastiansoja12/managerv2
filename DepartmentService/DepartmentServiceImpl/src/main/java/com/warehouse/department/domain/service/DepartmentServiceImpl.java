@@ -46,6 +46,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeAddress(address);
         this.departmentRepository.createOrUpdate(department);
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentAddressChanged(department.snapshot(), Instant.now()));
     }
 
     @Override
@@ -53,6 +54,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeTaxId(newTaxId);
         this.departmentRepository.createOrUpdate(department);
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentTaxIdChanged(department.snapshot(), Instant.now()));
     }
 
     @Override
@@ -76,6 +78,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
         department.changeDepartmentType(departmentType);
         this.departmentRepository.createOrUpdate(department);
+        DomainRegistry.eventPublisher().publishEvent(new DepartmentTypeChanged(department.snapshot(), Instant.now()));
     }
 
     @Override

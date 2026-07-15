@@ -1,7 +1,13 @@
 package com.warehouse.deliverymissed.infrastructure.adapter.secondary.api.dto;
 
 public enum ShipmentStatusDto {
+    PLANNED,
+
     CREATED,
+
+    PREPARED,
+
+    ACCEPTED,
 
     REROUTE,
 
@@ -11,5 +17,7 @@ public enum ShipmentStatusDto {
 
     RETURN,
 
-    REDIRECT
+    REDIRECT,
+
+    CANCELED
 }

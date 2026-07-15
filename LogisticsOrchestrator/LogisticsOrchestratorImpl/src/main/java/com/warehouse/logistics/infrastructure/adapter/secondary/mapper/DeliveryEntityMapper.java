@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 
 @Mapper
 public interface DeliveryEntityMapper {
-    default DeliveryEntity map(final LogisticsRequest delivery) {
+    default DeliveryEntity map(final LogisticsRequest delivery, final Long departmentId) {
         final DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setDeliveryStatus(map(delivery.getDeliveryStatus()));
         deliveryEntity.setCreated(LocalDateTime.now());
         deliveryEntity.setToken(delivery.getDeliveryToken() == null ? "12345" : delivery.getDeliveryToken().getValue());
         deliveryEntity.setParcelId(delivery.getShipmentId().getValue());
-        deliveryEntity.setDepotCode(delivery.getDepartmentCode().getValue());
+        deliveryEntity.setDepartmentId(departmentId);
         deliveryEntity.setSupplierCode(delivery.getSupplierCode().value());
         return deliveryEntity;
     }

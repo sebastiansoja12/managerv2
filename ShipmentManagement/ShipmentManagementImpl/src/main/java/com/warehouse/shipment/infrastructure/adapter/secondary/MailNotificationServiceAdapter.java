@@ -6,7 +6,7 @@ import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEvent
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.port.secondary.MailNotificationServicePort;
+import com.warehouse.shipment.application.port.secondary.MailNotificationServicePort;
 
 import lombok.extern.slf4j.Slf4j;
 

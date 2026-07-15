@@ -9,22 +9,18 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.event.ShipmentUpdated;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
-import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
-import com.warehouse.shipment.domain.registry.DomainContext;
-import com.warehouse.shipment.domain.service.ShipmentSignatureService;
+import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
+import com.warehouse.shipment.application.service.ShipmentSignatureService;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentSignatureServiceTest {
@@ -33,21 +29,12 @@ class ShipmentSignatureServiceTest {
     private ShipmentRepository shipmentRepository;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(DomainContext.class, "eventPublisher", eventPublisher);
-    }
-
-    @AfterEach
-    void tearDown() {
-        ReflectionTestUtils.setField(DomainContext.class, "eventPublisher", null);
-    }
+    private DomainEventPublisher domainEventPublisher;
 
     @Test
     void shouldUpdateShipmentSignature() {
-        final ShipmentSignatureService service = new ShipmentSignatureService(shipmentRepository);
+        final ShipmentSignatureService service = new ShipmentSignatureService(
+                shipmentRepository, domainEventPublisher);
         final Shipment shipment = shipment();
         final Signature signature = new Signature("John Smith", Instant.now(), SignatureMethod.HANDWRITTEN,
                 "document-reference", shipmentId(), new byte[] {1, 2, 3});
@@ -57,6 +44,6 @@ class ShipmentSignatureServiceTest {
 
         assertEquals(signature, shipment.getSignature());
         verify(shipmentRepository).createOrUpdate(shipment);
-        verify(eventPublisher).publishEvent(any(ShipmentUpdated.class));
+        verify(domainEventPublisher).publish(any(ShipmentUpdated.class));
     }
 }

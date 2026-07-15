@@ -44,6 +44,9 @@ public class GeocodingConfigurationEntity extends BelongsToOperator {
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
 
+    @Column(name = "default_provider", nullable = false)
+    private boolean defaultProvider;
+
     @Column(name = "provider", nullable = false)
     @Enumerated(EnumType.STRING)
     private GeocodingProvider provider;
@@ -60,6 +63,7 @@ public class GeocodingConfigurationEntity extends BelongsToOperator {
                                          final String accessToken,
                                          final String refreshToken,
                                          final boolean enabled,
+                                         final boolean defaultProvider,
                                          final GeocodingProvider provider) {
         this.geocodingConfigurationId = geocodingConfigurationId;
         this.apiUrl = apiUrl;
@@ -70,6 +74,7 @@ public class GeocodingConfigurationEntity extends BelongsToOperator {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.enabled = enabled;
+        this.defaultProvider = defaultProvider;
         this.provider = provider;
     }
 
@@ -107,6 +112,10 @@ public class GeocodingConfigurationEntity extends BelongsToOperator {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isDefaultProvider() {
+        return defaultProvider;
     }
 
     public GeocodingProvider getProvider() {

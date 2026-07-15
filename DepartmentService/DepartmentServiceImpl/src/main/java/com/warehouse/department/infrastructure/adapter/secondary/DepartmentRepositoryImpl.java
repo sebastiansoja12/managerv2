@@ -1,7 +1,5 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
-import java.util.List;
-
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
@@ -13,7 +11,14 @@ import com.warehouse.department.infrastructure.adapter.secondary.entity.readmode
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepartmentToEntityMapper;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepartmentToModelMapper;
 
+import java.util.List;
+
 public class DepartmentRepositoryImpl implements DepartmentRepository {
+
+    private static final List<DepartmentEntity.Status> EXCLUDED_STATUSES = List.of(
+            DepartmentEntity.Status.ARCHIVED,
+            DepartmentEntity.Status.DELETED
+    );
 
     private final OperatorFilteredRepository<DepartmentEntity> repository;
 
@@ -27,20 +32,32 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
 
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
-        final DepartmentReadEntity department = readRepository.findByDepartmentCode(departmentCode);
-        return DepartmentToModelMapper.map(department);
+        return repository.createCriteria(DepartmentEntity.class)
+                .eq("departmentCode.value", departmentCode)
+                .notIn("status", EXCLUDED_STATUSES)
+                .one()
+                .map(DepartmentToModelMapper::map)
+                .orElse(null);
     }
 
     @Override
     public Department findByDepartmentCodeIncludingArchived(final DepartmentCode departmentCode) {
-        final DepartmentReadEntity department = readRepository.findByDepartmentCodeIncludingArchived(departmentCode);
-        return DepartmentToModelMapper.map(department);
+        return repository.createCriteria(DepartmentEntity.class)
+                .eq("departmentCode.value", departmentCode)
+                .notIn("status", List.of(DepartmentEntity.Status.DELETED))
+                .one()
+                .map(DepartmentToModelMapper::map)
+                .orElse(null);
     }
 
     @Override
     public Department findByDepartmentId(final DepartmentId departmentId) {
-        final DepartmentReadEntity department = readRepository.findByDepartmentId(departmentId);
-        return DepartmentToModelMapper.map(department);
+        return repository.createCriteria(DepartmentEntity.class)
+                .eq("departmentId.value", departmentId.getValue())
+                .notIn("status", EXCLUDED_STATUSES)
+                .one()
+                .map(DepartmentToModelMapper::map)
+                .orElse(null);
     }
 
     @Override

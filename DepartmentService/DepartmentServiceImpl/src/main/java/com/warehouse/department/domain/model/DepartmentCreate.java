@@ -3,6 +3,7 @@ package com.warehouse.department.domain.model;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 
 public class DepartmentCreate {
@@ -27,6 +28,8 @@ public class DepartmentCreate {
     private DepartmentType departmentType;
 
     private OperatorId operatorId;
+
+    private UserId adminUserId;
 
     public DepartmentCreate(final DepartmentCode departmentCode,
                             final String city,
@@ -60,10 +63,12 @@ public class DepartmentCreate {
                             final String email,
                             final CountryCode countryCode,
                             final DepartmentType departmentType,
-                            final OperatorId operatorId) {
+                            final OperatorId operatorId,
+                            final UserId adminUserId) {
         this(departmentCode, city, street, postalCode, taxId, telephoneNumber, openingHours, email, countryCode,
                 departmentType);
         this.operatorId = operatorId;
+        this.adminUserId = adminUserId;
     }
 
     public String getCity() {
@@ -146,11 +151,19 @@ public class DepartmentCreate {
         return operatorId;
     }
 
+    public UserId getAdminUserId() {
+        return adminUserId;
+    }
+
     public void setEmail(final String email) {
         this.email = email;
     }
 
     public void setOperatorId(final OperatorId operatorId) {
         this.operatorId = operatorId;
+    }
+
+    public void setAdminUserId(final UserId adminUserId) {
+        this.adminUserId = adminUserId;
     }
 }

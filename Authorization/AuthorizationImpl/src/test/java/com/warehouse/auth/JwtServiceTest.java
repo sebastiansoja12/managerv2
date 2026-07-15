@@ -5,7 +5,6 @@ import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.JwtServiceImpl;
-import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -40,10 +39,9 @@ public class JwtServiceTest {
 
     @BeforeEach
     void setup() {
-        jwtService = new JwtServiceImpl(jwtProvider, departmentServicePort);
+        jwtService = new JwtServiceImpl(jwtProvider);
         doReturn("manager-v2").when(jwtProvider).getIssuer();
         doReturn("manager-v2-gui").when(jwtProvider).getAudience();
-        doReturn(new DepartmentId(10L)).when(departmentServicePort).getDepartmentId(new DepartmentCode("TST"));
     }
 
     @Test
@@ -62,7 +60,6 @@ public class JwtServiceTest {
 
         assertTrue(StringUtils.isNotEmpty(jwtToken));
         assertTrue(jwtToken.startsWith("eyJhbGciOiJIUzM4NCJ9"));
-        verify(departmentServicePort).getDepartmentId(new DepartmentCode("TST"));
     }
 
     @Test
@@ -121,7 +118,7 @@ public class JwtServiceTest {
 
     private User user(final UserId userId, final String username, final User.Role role) {
         final User user = new User(userId, username, "test", "Test", "Test", "test@test.pl", role,
-                new DepartmentCode("TST"), "");
+                new DepartmentId(10L), "");
         user.assignOperator(OperatorId.of(10001L));
         return user;
     }

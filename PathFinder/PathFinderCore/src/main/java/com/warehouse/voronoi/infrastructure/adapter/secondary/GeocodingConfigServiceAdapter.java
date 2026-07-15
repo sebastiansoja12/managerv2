@@ -17,4 +17,9 @@ public class GeocodingConfigServiceAdapter implements GeocodingConfigServicePort
     public GeocodingConfig findGeocodingConfig(final GeocodingProvider provider) {
         return GeocodingConfig.from(geocodingApiService.getGeocodingConfig(provider));
     }
+
+    @Override
+    public GeocodingConfig findDefaultGeocodingConfig() {
+        return GeocodingConfig.from(geocodingApiService.getDefaultGeocodingConfig());
+    }
 }

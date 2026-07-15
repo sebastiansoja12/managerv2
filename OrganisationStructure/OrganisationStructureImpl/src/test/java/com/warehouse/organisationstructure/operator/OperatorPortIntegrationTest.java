@@ -231,7 +231,7 @@ class OperatorPortIntegrationTest {
         private final List<OperatorSnapshot> snapshots = new ArrayList<>();
 
         @Override
-        public void notifyOperatorCreated(final OperatorSnapshot snapshot) {
+        public void notifyOperatorCreated(final OperatorSnapshot snapshot, final UserId adminUserId) {
             snapshots.add(snapshot);
         }
     }

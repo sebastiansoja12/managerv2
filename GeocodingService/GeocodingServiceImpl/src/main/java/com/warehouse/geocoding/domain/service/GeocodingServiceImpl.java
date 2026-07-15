@@ -22,6 +22,7 @@ public class GeocodingServiceImpl implements GeocodingService {
 
     @Override
     public void create(final GeocodingConfiguration configuration) {
+        unsetPreviousDefault(configuration);
         geocodingRepository.create(configuration);
     }
 
@@ -29,6 +30,7 @@ public class GeocodingServiceImpl implements GeocodingService {
     public void update(final GeocodingConfigurationUpdateCommand command) {
         final GeocodingConfiguration configuration = get(command.geocodingConfigurationId());
         configuration.update(command);
+        unsetPreviousDefault(configuration);
         geocodingRepository.update(configuration);
     }
 
@@ -53,11 +55,33 @@ public class GeocodingServiceImpl implements GeocodingService {
     }
 
     @Override
+    public GeocodingConfiguration getDefault() {
+        return geocodingRepository.findDefault()
+                .or(() -> geocodingRepository.findAll().stream()
+                        .filter(GeocodingConfiguration::isEnabled)
+                        .findFirst())
+                .orElseThrow(() -> notFound("Default geocoding configuration was not found"));
+    }
+
+    @Override
     public List<GeocodingConfiguration> getAll() {
         return geocodingRepository.findAll();
     }
 
     private ProblemDetailsException notFound(final String detail) {
         return new ProblemDetailsException(NOT_FOUND_TYPE, NOT_FOUND_TITLE, 404, detail);
+    }
+
+    private void unsetPreviousDefault(final GeocodingConfiguration configuration) {
+        if (!configuration.isDefaultProvider()) {
+            return;
+        }
+        geocodingRepository.findDefault()
+                .filter(defaultConfiguration -> !defaultConfiguration.getGeocodingConfigurationId()
+                        .equals(configuration.getGeocodingConfigurationId()))
+                .ifPresent(defaultConfiguration -> {
+                    defaultConfiguration.unsetDefaultProvider();
+                    geocodingRepository.update(defaultConfiguration);
+                });
     }
 }

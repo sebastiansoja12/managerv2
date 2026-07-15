@@ -1,24 +1,23 @@
 package com.warehouse.auth.configuration.access;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.warehouse.auth.AccessUserControl;
+import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.service.UserService;
+import com.warehouse.commonassets.enumeration.UserPermission;
+import com.warehouse.commonassets.exception.ProblemDetailsException;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.department.api.DepartmentApiService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.warehouse.auth.AccessUserControl;
-import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.service.UserService;
-import com.warehouse.commonassets.exception.ProblemDetailsException;
-import com.warehouse.commonassets.enumeration.UserPermission;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.department.api.DepartmentApiService;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class AccessUserControlEvaluator {
@@ -43,7 +42,7 @@ public class AccessUserControlEvaluator {
         final UserId userId = resolveUserId(authentication);
         final User user = userService.findUserById(userId);
         validateActiveUser(user);
-        validateActiveDepartment(user.getDepartmentCode());
+        validateActiveDepartment(user.getDepartmentId());
         validatePermissions(user, accessUserControl);
     }
 
@@ -67,12 +66,12 @@ public class AccessUserControlEvaluator {
         }
     }
 
-    private void validateActiveDepartment(final DepartmentCode departmentCode) {
-        if (departmentCode == null || !StringUtils.hasText(departmentCode.getValue())) {
+    private void validateActiveDepartment(final DepartmentId departmentId) {
+        if (departmentId == null) {
             throw forbidden("User department is missing");
         }
 
-        if (departmentApiService.checkIfDepartmentExists(departmentCode) == null) {
+        if (departmentApiService.getDepartmentById(departmentId) == null) {
             throw forbidden("User department is inactive or deleted");
         }
     }

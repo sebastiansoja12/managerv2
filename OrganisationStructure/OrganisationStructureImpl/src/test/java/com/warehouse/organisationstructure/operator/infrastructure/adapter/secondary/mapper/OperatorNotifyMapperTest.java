@@ -14,10 +14,12 @@ class OperatorNotifyMapperTest {
     @Test
     void shouldMapOperatorSnapshotToDepartmentEvent() {
         final OperatorSnapshot snapshot = OperatorTestFixtures.operator().snapshot();
+        final UserId adminUserId = new UserId(4444L);
 
-        final OperatorInitialDepartmentCreateEvent event = OperatorDepartmentNotifyMapper.toEvent(snapshot);
+        final OperatorInitialDepartmentCreateEvent event = OperatorDepartmentNotifyMapper.toEvent(snapshot, adminUserId);
 
         assertEquals(OperatorTestFixtures.OPERATOR_ID, event.operatorId());
+        assertEquals(adminUserId, event.adminUserId());
         assertEquals("WRO-1", event.departmentCode().getValue());
         assertEquals("Example Logistics", event.companyName());
         assertEquals(OperatorTestFixtures.TAX_ID.value(), event.taxId());

@@ -12,25 +12,35 @@ public class UserApiServiceAdapter implements UserApiService {
 
     private final UserService userService;
 
-    public UserApiServiceAdapter(final UserService userService) {
+    private final ResponseMapper responseMapper;
+
+    public UserApiServiceAdapter(final UserService userService, final ResponseMapper responseMapper) {
         this.userService = userService;
+        this.responseMapper = responseMapper;
     }
 
     @Override
     public UserDto findById(final UserId userId) {
         final User user = userService.findUserById(userId);
-        return ResponseMapper.map(user);
+        return map(user);
     }
 
     @Override
     public UserDto findByUsername(final String username) {
         final User user = userService.findUser(username);
-        return ResponseMapper.map(user);
+        return map(user);
     }
 
     @Override
     public UserIdDto findInitialUserForOperator() {
         final UserId userId = userService.findInitialUser();
         return new UserIdDto(userId.getValue());
+    }
+
+    private UserDto map(final User user) {
+        if (user == null) {
+            return null;
+        }
+        return responseMapper.map(user, userService.getDepartmentCode(user.getDepartmentId()));
     }
 }

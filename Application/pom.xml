@@ -52,6 +52,16 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>DeliveryNetworkImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>PickupPointManagementImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>BarcodeGenerator</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -63,6 +73,11 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>DepartmentServiceImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>AsyncJob</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -117,6 +132,11 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>OrganizationChatImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>SupplierServiceManagementImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -151,11 +171,6 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
@@ -180,6 +195,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
@@ -204,9 +220,9 @@
                 </configuration>
                 <dependencies>
                     <dependency>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
-                        <version>8.0.33</version>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>42.6.0</version>
                     </dependency>
                 </dependencies>
             </plugin>

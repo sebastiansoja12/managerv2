@@ -14,6 +14,7 @@ import com.warehouse.commonassets.identificator.TaxId;
 import com.warehouse.organisationstructure.OperatorTestFixtures;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShippingCapabilities;
 
 class OperatorTest {
 
@@ -38,7 +39,7 @@ class OperatorTest {
                 OperatorTestFixtures.UPDATED_AT
         );
 
-        final OperatorConfiguration.ShippingCapabilities capabilities =
+        final ShippingCapabilities capabilities =
                 operator.getConfiguration().getShippingCapabilities();
 
         assertTrue(capabilities.isSupportsDomesticShipping());

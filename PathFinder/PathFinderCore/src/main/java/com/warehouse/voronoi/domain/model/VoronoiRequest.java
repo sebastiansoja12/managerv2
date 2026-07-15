@@ -6,17 +6,23 @@ import java.util.List;
 
 public class VoronoiRequest {
     private String city;
+    private String street;
     private String zipCode;
     private List<Department> departments;
 
-    public VoronoiRequest(final String city, final String zipCode, final List<Department> departments) {
+    public VoronoiRequest(final String city,
+                          final String street,
+                          final String zipCode,
+                          final List<Department> departments) {
         this.city = city;
+        this.street = street;
         this.zipCode = zipCode;
         this.departments = departments;
     }
 
     public static VoronoiRequest from(final VoronoiRequestDto voronoiRequest) {
-        return new VoronoiRequest(voronoiRequest.city(), voronoiRequest.zipCode(), voronoiRequest.departments()
+        return new VoronoiRequest(voronoiRequest.city(), voronoiRequest.street(), voronoiRequest.zipCode(),
+                voronoiRequest.departments()
                 .stream().map(dep -> new Department(dep.city(), dep.street(), dep.country(), dep.departmentCode(),
                         new Coordinates(dep.coordinates().latitude(), dep.coordinates().longitude())))
                 .toList());
@@ -28,6 +34,14 @@ public class VoronoiRequest {
 
     public void setCity(final String city) {
         this.city = city;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(final String street) {
+        this.street = street;
     }
 
     public String getZipCode() {

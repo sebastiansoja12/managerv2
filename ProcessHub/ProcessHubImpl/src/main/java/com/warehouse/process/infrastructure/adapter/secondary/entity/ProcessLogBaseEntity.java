@@ -17,7 +17,7 @@ public abstract class ProcessLogBaseEntity {
     @EmbeddedId
     @AttributeOverride(
             name = "value",
-            column = @Column(name = "process_id", nullable = false, columnDefinition = "BINARY(16)")
+            column = @Column(name = "process_id", nullable = false, columnDefinition = "UUID")
     )
     private ProcessId processId;
 

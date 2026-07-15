@@ -1,7 +1,6 @@
 package com.warehouse.auth.domain.service;
 
 import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
@@ -27,9 +26,6 @@ public class JwtServiceImpl implements JwtService {
 
     @NonNull
     private final JwtProvider jwtProvider;
-
-    @NonNull
-    private final DepartmentServicePort departmentServicePort;
 
     @Override
     public String extractUsername(final String token) {
@@ -66,7 +62,7 @@ public class JwtServiceImpl implements JwtService {
         claimsMap.put("username", user.getUsername());
         claimsMap.put("userId", user.getUserId().value());
         claimsMap.put("operatorId", user.operatorId().value());
-        claimsMap.put("departmentId", this.departmentServicePort.getDepartmentId(user.getDepartmentCode()).getValue());
+        claimsMap.put("departmentId", user.getDepartmentId().getValue());
         final Long expiration = jwtProvider.getExpiration();
         return generateToken(claimsMap, user, expiration);
     }

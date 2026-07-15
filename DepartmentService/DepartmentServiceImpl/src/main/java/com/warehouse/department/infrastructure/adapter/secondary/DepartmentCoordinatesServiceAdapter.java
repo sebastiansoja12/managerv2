@@ -19,7 +19,7 @@ public class DepartmentCoordinatesServiceAdapter implements DepartmentCoordinate
 
     @Override
     public Coordinates getCoordinates(final Address address) {
-        final VoronoiRequestDto request = new VoronoiRequestDto(address.city(), address.postalCode(),
+        final VoronoiRequestDto request = new VoronoiRequestDto(address.city(), address.street(), address.postalCode(),
                 Collections.emptyList());
         final CoordinatesDto coordinates = this.voronoiCoordinatesService.findCoordinates(request);
         return new Coordinates(coordinates.latitude(), coordinates.longitude());

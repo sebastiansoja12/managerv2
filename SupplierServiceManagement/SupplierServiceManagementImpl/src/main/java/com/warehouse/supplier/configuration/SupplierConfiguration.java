@@ -27,8 +27,10 @@ public class SupplierConfiguration {
                                  final SupplierCodeGeneratorService generatorService,
                                  final SupplierValidatorService validatorService,
                                  final DriverLicenseService driverLicenseService,
-                                 final DeviceServicePort deviceServicePort) {
-        return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort);
+                                 final DeviceServicePort deviceServicePort,
+                                 @Qualifier("supplier.departmentServicePort") final DepartmentServicePort departmentServicePort) {
+        return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort,
+                departmentServicePort);
     }
 
     @Bean

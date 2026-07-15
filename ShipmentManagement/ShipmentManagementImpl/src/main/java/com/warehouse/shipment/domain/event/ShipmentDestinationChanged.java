@@ -4,7 +4,7 @@ import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
 import java.time.Instant;
 
-public class ShipmentDestinationChanged extends ShipmentStatusChangedEvent implements ShipmentEvent {
+public class ShipmentDestinationChanged extends ShipmentStatusChanged implements ShipmentEvent {
     public ShipmentDestinationChanged(final ShipmentSnapshot snapshot, final Instant timestamp) {
         super(snapshot, timestamp);
     }

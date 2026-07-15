@@ -1,7 +1,6 @@
 package com.warehouse.department.configuration;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,7 +14,6 @@ import com.warehouse.department.domain.port.secondary.DepartmentCoordinatesServi
 import com.warehouse.department.domain.port.secondary.DepartmentReadRepository;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
-import com.warehouse.department.domain.port.secondary.UserClientServicePort;
 import com.warehouse.department.domain.service.AuthenticationService;
 import com.warehouse.department.domain.service.AuthenticationServiceImpl;
 import com.warehouse.department.domain.service.DepartmentService;
@@ -83,11 +81,6 @@ public class DepartmentConfiguration {
     @Bean
     public TenantAdminProvisioningPort tenantAdminProvisioningPort() {
         return new TenantAdminProvisioningAdapter();
-    }
-
-    @Bean
-    public UserClientServicePort userClientServicePort(final ApplicationEventPublisher eventPublisher) {
-        return new UserClientServiceAdapter(eventPublisher);
     }
 
     @Bean
