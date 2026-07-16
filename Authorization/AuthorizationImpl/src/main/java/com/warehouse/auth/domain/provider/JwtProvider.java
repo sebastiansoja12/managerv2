@@ -17,17 +17,23 @@ public class JwtProvider {
     private Long expiration;
 
     @NotNull
-    private String refreshTokenExpiration;
+    private Long refreshTokenExpiration;
 
-    public void setSecretKey(String secretKey) {
+    @NotNull
+    private String issuer;
+
+    @NotNull
+    private String audience;
+
+    public void setSecretKey(final String secretKey) {
         this.secretKey = secretKey;
     }
 
-    public void setExpiration(Long expiration) {
+    public void setExpiration(final Long expiration) {
         this.expiration = expiration;
     }
 
-    public void setRefreshTokenExpiration(String refreshTokenExpiration) {
+    public void setRefreshTokenExpiration(final Long refreshTokenExpiration) {
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
 }
