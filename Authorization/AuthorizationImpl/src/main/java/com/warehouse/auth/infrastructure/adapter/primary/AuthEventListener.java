@@ -66,10 +66,9 @@ public class AuthEventListener {
         final String password = passwordEncoder.encode(registeringUser.password());
 
         final User user = User.createAdmin(userId, registeringUser.username(), password, registeringUser.firstName(),
-                registeringUser.lastName(), registeringUser.email(), departmentCode, registeringUser.language(), null);
+                registeringUser.lastName(), registeringUser.email(), departmentCode, registeringUser.language(), "dummy");
         user.assignOperator(operatorId);
         user.markAsInitial();
-        user.setApiKey(jwtService.generateToken(user));
 
         userService.create(user);
         event.getUserCreatedId().accept(userId);
