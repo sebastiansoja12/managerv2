@@ -61,6 +61,14 @@ public class SupplierController {
 		return responseEntity;
     }
 
+    @PutMapping(value = "/department-codes")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    public ResponseEntity<?> updateSupplierDepartmentCode(@RequestBody final ChangeSupplierDepartmentCodeApiRequest departmentCodeApiRequest) {
+        final ChangeSupplierDepartmentCodeCommand command = RequestMapper.map(departmentCodeApiRequest);
+        this.supplyPort.changeDepartmentCode(command);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/basic-data")
     @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
     public ResponseEntity<?> updateBasicData(@RequestBody final SupplierBasicDataUpdateApiRequest supplierUpdateRequest) {
@@ -119,6 +127,24 @@ public class SupplierController {
             @RequestBody final ChangeSupplierDeviceApiRequest changeSupplierDeviceRequest) {
         final ChangeSupplierDeviceCommand command = RequestMapper.map(changeSupplierDeviceRequest);
         this.supplyPort.addDevice(command);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/vehicles")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    public ResponseEntity<?> updateVehicle(
+            @RequestBody final ChangeSupplierVehicleApiRequest changeSupplierVehicleRequest) {
+        final ChangeSupplierVehicleCommand command = RequestMapper.map(changeSupplierVehicleRequest);
+        this.supplyPort.assignVehicle(command);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/delivery-areas")
+    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    public ResponseEntity<?> updateDeliveryArea(
+            @RequestBody final ChangeSupplierDeliveryAreaApiRequest changeSupplierDeliveryAreaRequest) {
+        final ChangeSupplierDeliveryAreaCommand command = RequestMapper.map(changeSupplierDeliveryAreaRequest);
+        this.supplyPort.updateDeliveryArea(command);
         return ResponseEntity.ok().build();
     }
 
