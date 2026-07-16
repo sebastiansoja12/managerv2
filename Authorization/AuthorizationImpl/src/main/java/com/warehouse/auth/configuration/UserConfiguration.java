@@ -11,6 +11,7 @@ import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.RolePermissionRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
+import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.infrastructure.adapter.primary.CurrentUserApiServiceAdapter;
 import com.warehouse.auth.infrastructure.adapter.primary.UserApiServiceAdapter;
@@ -43,9 +44,10 @@ public class UserConfiguration {
     }
 
     @Bean
-    public RefreshTokenRepository refreshTokenRepository(RefreshTokenReadRepository repository) {
+    public RefreshTokenRepository refreshTokenRepository(final RefreshTokenReadRepository repository,
+                                                         final JwtProvider jwtProvider) {
         final RefreshTokenMapper refreshTokenMapper = Mappers.getMapper(RefreshTokenMapper.class);
-        return new RefreshTokenRepositoryImpl(repository, refreshTokenMapper);
+        return new RefreshTokenRepositoryImpl(repository, refreshTokenMapper, jwtProvider);
     }
 
     @Bean
