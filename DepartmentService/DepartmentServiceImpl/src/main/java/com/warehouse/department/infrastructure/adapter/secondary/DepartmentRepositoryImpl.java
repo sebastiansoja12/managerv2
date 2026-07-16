@@ -2,8 +2,6 @@ package com.warehouse.department.infrastructure.adapter.secondary;
 
 import java.util.List;
 
-import org.springframework.cache.annotation.Cacheable;
-
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.department.domain.model.Department;
@@ -30,7 +28,6 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     }
 
     @Override
-    @Cacheable("departmentsCache")
     public List<Department> findAll() {
         final List<DepartmentEntity> departments = repository.createCriteria(DepartmentEntity.class)
                 .list();
