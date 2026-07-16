@@ -4,7 +4,7 @@ import java.util.Set;
 
 public record SupplierUpdateApiRequest(
         SupplierCodeApi supplierCode, String firstName, String lastName,
-        String telephoneNumber, VehicleIdApi vehicleId, DeviceIdApi deviceId,
+        String telephoneNumber, DepartmentCodeApi departmentCode, VehicleIdApi vehicleId, DeviceIdApi deviceId,
         DangerousGoodCertificationApi dangerousGoodCertification, DriverLicenseApi driverLicense,
         DeliveryAreaApi deliveryArea, Set<PackageTypeApi> supportedPackageTypes
 ) {
