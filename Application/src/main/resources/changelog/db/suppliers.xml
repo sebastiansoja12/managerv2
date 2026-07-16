@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="create-suppliers-table-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="suppliers"/>
-            </not>
-        </preConditions>
-
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-44">
         <createTable tableName="suppliers">
             <column name="supplier_id" type="BIGINT">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="supplier_code" type="VARCHAR(50)"/>
             <column name="department_code" type="VARCHAR(255)"/>
@@ -23,15 +16,15 @@
             <column name="status" type="VARCHAR(50)"/>
             <column name="user_status" type="VARCHAR(50)"/>
             <column name="vehicle_id" type="BIGINT"/>
-            <column name="device_id" type="BIGINT"/>
+            <column name="device_id" type="VARCHAR(64)"/>
             <column name="certificate_number" type="VARCHAR(100)"/>
-            <column name="issue_date" type="TIMESTAMP"/>
-            <column name="expiry_date" type="TIMESTAMP"/>
+            <column name="issue_date" type="timestamp"/>
+            <column name="expiry_date" type="timestamp"/>
             <column name="authority" type="VARCHAR(100)"/>
-            <column name="valid" type="BOOLEAN"/>
+            <column name="valid" type="BIT(1)"/>
             <column name="driver_license_number" type="VARCHAR(50)"/>
-            <column name="acquired_date" type="TIMESTAMP"/>
-            <column name="driving_license_expiry_date" type="TIMESTAMP"/>
+            <column name="acquired_date" type="timestamp"/>
+            <column name="driving_license_expiry_date" type="timestamp"/>
             <column name="area_name" type="VARCHAR(100)"/>
             <column name="city" type="VARCHAR(100)"/>
             <column name="district" type="VARCHAR(100)"/>
@@ -39,277 +32,24 @@
             <column name="region" type="VARCHAR(100)"/>
             <column name="country" type="VARCHAR(100)"/>
             <column name="api_key" type="VARCHAR(255)"/>
-            <column name="terms_accepted" type="BOOLEAN"/>
+            <column name="terms_accepted" type="BIT(1)"/>
             <column name="created_user_id" type="BIGINT"/>
-            <column name="created_at" type="TIMESTAMP">
+            <column name="created_at" type="timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="operator_id" type="BIGINT"/>
         </createTable>
     </changeSet>
-
-    <changeSet id="suppliers-add-department-foreign-key-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="suppliers"/>
-                <tableExists tableName="department"/>
-                <columnExists tableName="suppliers" columnName="department_code"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_suppliers_department_code"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="suppliers"
-                                 baseColumnNames="department_code"
-                                 referencedTableName="department"
-                                 referencedColumnNames="department_code"
-                                 constraintName="fk_suppliers_department_code"/>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-74">
+        <createIndex associatedWith="" indexName="fk_suppliers_department_code" tableName="suppliers">
+            <column name="department_code"/>
+        </createIndex>
     </changeSet>
-
-    <changeSet id="create-suppliers-supported-package-types-table-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="suppliers_supported_package_types"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="suppliers_supported_package_types">
-            <column name="supplier_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="package_type" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addPrimaryKey tableName="suppliers_supported_package_types"
-                       columnNames="supplier_id, package_type"
-                       constraintName="pk_suppliers_supported_package_types"/>
-    </changeSet>
-
-    <changeSet id="suppliers-supported-package-types-add-supplier-foreign-key-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="suppliers_supported_package_types"/>
-                <tableExists tableName="suppliers"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_suppliers_supported_package_types_supplier"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="suppliers_supported_package_types"
-                                 baseColumnNames="supplier_id"
-                                 referencedTableName="suppliers"
-                                 referencedColumnNames="supplier_id"
-                                 constraintName="fk_suppliers_supported_package_types_supplier"/>
-    </changeSet>
-
-    <changeSet id="create-delivery-area-postal-codes-table-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="delivery_area_postal_codes"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="delivery_area_postal_codes">
-            <column name="delivery_area_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="postal_code" type="VARCHAR(20)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addPrimaryKey tableName="delivery_area_postal_codes"
-                       columnNames="delivery_area_id, postal_code"
-                       constraintName="pk_delivery_area_postal_codes"/>
-    </changeSet>
-
-    <changeSet id="delivery-area-postal-codes-add-supplier-foreign-key-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="delivery_area_postal_codes"/>
-                <tableExists tableName="suppliers"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_delivery_area_postal_codes_supplier"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="delivery_area_postal_codes"
-                                 baseColumnNames="delivery_area_id"
-                                 referencedTableName="suppliers"
-                                 referencedColumnNames="supplier_id"
-                                 constraintName="fk_delivery_area_postal_codes_supplier"/>
-    </changeSet>
-
-    <changeSet id="create-revinfo-table-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="revinfo"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="revinfo">
-            <column name="rev" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="revtstmp" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="create-suppliers-aud-table-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="suppliers_aud"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="suppliers_aud">
-            <column name="rev" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="revtype" type="TINYINT"/>
-            <column name="supplier_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="supplier_code" type="VARCHAR(50)"/>
-            <column name="department_code" type="VARCHAR(255)"/>
-            <column name="first_name" type="VARCHAR(100)"/>
-            <column name="last_name" type="VARCHAR(100)"/>
-            <column name="telephone_number" type="VARCHAR(20)"/>
-            <column name="status" type="VARCHAR(50)"/>
-            <column name="user_status" type="VARCHAR(50)"/>
-            <column name="vehicle_id" type="BIGINT"/>
-            <column name="device_id" type="BIGINT"/>
-            <column name="certificate_number" type="VARCHAR(100)"/>
-            <column name="issue_date" type="TIMESTAMP"/>
-            <column name="expiry_date" type="TIMESTAMP"/>
-            <column name="authority" type="VARCHAR(100)"/>
-            <column name="valid" type="BOOLEAN"/>
-            <column name="driver_license_number" type="VARCHAR(50)"/>
-            <column name="acquired_date" type="TIMESTAMP"/>
-            <column name="driving_license_expiry_date" type="TIMESTAMP"/>
-            <column name="area_name" type="VARCHAR(100)"/>
-            <column name="city" type="VARCHAR(100)"/>
-            <column name="district" type="VARCHAR(100)"/>
-            <column name="municipality" type="VARCHAR(100)"/>
-            <column name="region" type="VARCHAR(100)"/>
-            <column name="country" type="VARCHAR(100)"/>
-            <column name="api_key" type="VARCHAR(255)"/>
-            <column name="terms_accepted" type="BOOLEAN"/>
-            <column name="created_user_id" type="BIGINT"/>
-            <column name="created_at" type="TIMESTAMP"/>
-            <column name="updated_at" type="TIMESTAMP"/>
-        </createTable>
-
-        <addPrimaryKey tableName="suppliers_aud"
-                       columnNames="supplier_id, rev"
-                       constraintName="pk_suppliers_aud"/>
-    </changeSet>
-
-    <changeSet id="suppliers-aud-add-revinfo-foreign-key-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="suppliers_aud"/>
-                <tableExists tableName="revinfo"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_suppliers_aud_revinfo"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="suppliers_aud"
-                                 baseColumnNames="rev"
-                                 referencedTableName="revinfo"
-                                 referencedColumnNames="rev"
-                                 constraintName="fk_suppliers_aud_revinfo"/>
-    </changeSet>
-
-    <changeSet id="create-suppliers-supported-package-types-aud-table-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="suppliers_supported_package_types_aud"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="suppliers_supported_package_types_aud">
-            <column name="rev" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="revtype" type="TINYINT"/>
-            <column name="supplier_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="package_type" type="VARCHAR(50)"/>
-        </createTable>
-
-        <addPrimaryKey tableName="suppliers_supported_package_types_aud"
-                       columnNames="supplier_id, rev"
-                       constraintName="pk_suppliers_supported_package_types_aud"/>
-    </changeSet>
-
-    <changeSet id="suppliers-supported-package-types-aud-add-revinfo-foreign-key-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="suppliers_supported_package_types_aud"/>
-                <tableExists tableName="revinfo"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_suppliers_supported_package_types_aud_revinfo"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="suppliers_supported_package_types_aud"
-                                 baseColumnNames="rev"
-                                 referencedTableName="revinfo"
-                                 referencedColumnNames="rev"
-                                 constraintName="fk_suppliers_supported_package_types_aud_revinfo"/>
-    </changeSet>
-
-    <changeSet id="create-delivery-area-postal-codes-aud-table-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="delivery_area_postal_codes_aud"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="delivery_area_postal_codes_aud">
-            <column name="rev" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="revtype" type="TINYINT"/>
-            <column name="delivery_area_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="postal_code" type="VARCHAR(20)"/>
-        </createTable>
-
-        <addPrimaryKey tableName="delivery_area_postal_codes_aud"
-                       columnNames="delivery_area_id, rev"
-                       constraintName="pk_delivery_area_postal_codes_aud"/>
-    </changeSet>
-
-    <changeSet id="delivery-area-postal-codes-aud-add-revinfo-foreign-key-v2026-2" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="delivery_area_postal_codes_aud"/>
-                <tableExists tableName="revinfo"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_delivery_area_postal_codes_aud_revinfo"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="delivery_area_postal_codes_aud"
-                                 baseColumnNames="rev"
-                                 referencedTableName="revinfo"
-                                 referencedColumnNames="rev"
-                                 constraintName="fk_delivery_area_postal_codes_aud_revinfo"/>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-81">
+        <createIndex associatedWith="" indexName="idx_suppliers_operator_id" tableName="suppliers">
+            <column name="operator_id"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>
