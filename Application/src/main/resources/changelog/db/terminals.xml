@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-48">
+        <createTable tableName="terminals">
+            <column name="device_id" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="external_device_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(255)"/>
+            <column name="version" type="VARCHAR(255)"/>
+            <column name="last_update" type="timestamp"/>
+            <column name="active" type="BIT(1)"/>
+            <column name="hardware_uuid" type="BINARY(16)"/>
+            <column name="serial_number" type="VARCHAR(255)"/>
+            <column name="imei" type="VARCHAR(255)"/>
+            <column name="mac_address" type="VARCHAR(255)"/>
+            <column name="asset_tag" type="VARCHAR(255)"/>
+            <column name="barcode" type="VARCHAR(255)"/>
+            <column name="external_system_id" type="VARCHAR(255)"/>
+            <column name="mdm_device_id" type="VARCHAR(255)"/>
+            <column name="manufacturer" type="VARCHAR(255)"/>
+            <column name="model" type="VARCHAR(255)"/>
+            <column name="product_name" type="VARCHAR(255)"/>
+            <column name="cpu" type="VARCHAR(255)"/>
+            <column name="ram_mb" type="INT"/>
+            <column name="storage_mb" type="INT"/>
+            <column name="screen_resolution" type="VARCHAR(255)"/>
+            <column name="has_scanner" type="BIT(1)"/>
+            <column name="has_camera" type="BIT(1)"/>
+            <column name="has_nfc" type="BIT(1)"/>
+            <column name="has_gps" type="BIT(1)"/>
+            <column name="ruggedized" type="BIT(1)"/>
+            <column name="os_name" type="VARCHAR(255)"/>
+            <column name="os_version" type="VARCHAR(255)"/>
+            <column name="firmware_version" type="VARCHAR(255)"/>
+            <column name="kernel_version" type="VARCHAR(255)"/>
+            <column name="bootloader_version" type="VARCHAR(255)"/>
+            <column name="app_version" type="VARCHAR(255)"/>
+            <column name="build_number" type="VARCHAR(255)"/>
+            <column name="rooted" type="BIT(1)"/>
+            <column name="developer_mode_enabled" type="BIT(1)"/>
+            <column name="ip_address" type="VARCHAR(255)"/>
+            <column name="public_ip_address" type="VARCHAR(255)"/>
+            <column name="network_type" type="VARCHAR(50)"/>
+            <column name="carrier" type="VARCHAR(255)"/>
+            <column name="sim_serial" type="VARCHAR(255)"/>
+            <column name="roaming" type="BIT(1)"/>
+            <column name="vpn_connected" type="BIT(1)"/>
+            <column name="wifi_ssid" type="VARCHAR(255)"/>
+            <column name="bluetooth_mac" type="VARCHAR(255)"/>
+            <column name="encrypted" type="BIT(1)"/>
+            <column name="secure_boot_enabled" type="BIT(1)"/>
+            <column name="tamper_detected" type="BIT(1)"/>
+            <column name="screen_lock_enabled" type="BIT(1)"/>
+            <column name="biometric_enabled" type="BIT(1)"/>
+            <column name="compromised" type="BIT(1)"/>
+            <column name="failed_login_attempts" type="INT"/>
+            <column name="last_security_scan_at" type="timestamp"/>
+            <column name="security_policy_version" type="VARCHAR(255)"/>
+            <column name="certificate_fingerprint" type="VARCHAR(255)"/>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+            <column name="altitude" type="DOUBLE"/>
+            <column name="accuracy_meters" type="FLOAT(12)"/>
+            <column name="last_known_address" type="VARCHAR(255)"/>
+            <column name="geo_zone" type="VARCHAR(255)"/>
+            <column name="gps_enabled" type="BIT(1)"/>
+            <column name="last_location_update_at" type="timestamp"/>
+            <column name="previous_user_id" type="BIGINT"/>
+            <column name="team_id" type="BIGINT"/>
+            <column name="vehicle_id" type="BIGINT"/>
+            <column name="assigned_role" type="VARCHAR(255)"/>
+            <column name="assigned_at" type="timestamp"/>
+            <column name="unassigned_at" type="timestamp"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
