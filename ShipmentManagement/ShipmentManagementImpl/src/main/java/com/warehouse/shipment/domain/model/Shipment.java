@@ -717,6 +717,12 @@ public class Shipment {
         return this.recipient.getCity().equals(city);
     }
 
+    public void notifyShipmentReturnCompleted() {
+        this.shipmentStatus = ShipmentStatus.DELIVERY;
+        this.locked = true;
+        markAsModified();
+    }
+
     public Shipment redirectToSender(final ShipmentId shipmentId, final TrackingNumber trackingNumber) {
         ensureShipmentIsNotDelivered();
         this.shipmentId = shipmentId;
@@ -783,5 +789,4 @@ public class Shipment {
     private List<ShipmentStatus> draftStatuses() {
         return List.of(ShipmentStatus.PLANNED, ShipmentStatus.CREATED, ShipmentStatus.PREPARED);
     }
-
 }

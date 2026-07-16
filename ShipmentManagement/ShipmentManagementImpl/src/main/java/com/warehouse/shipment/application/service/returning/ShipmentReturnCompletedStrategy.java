@@ -3,7 +3,7 @@ package com.warehouse.shipment.application.service.returning;
 import com.warehouse.shipment.application.port.primary.command.ShipmentReturnCommand;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.event.ShipmentEvent;
-import com.warehouse.shipment.domain.event.ShipmentLocked;
+import com.warehouse.shipment.domain.event.ShipmentReturned;
 import com.warehouse.shipment.domain.model.Shipment;
 
 import java.time.Instant;
@@ -19,7 +19,7 @@ public class ShipmentReturnCompletedStrategy implements ShipmentReturnStrategy {
 
     @Override
     public Optional<ShipmentEvent> process(final Shipment shipment, final ShipmentReturnCommand command) {
-        shipment.lockShipment();
-        return Optional.of(new ShipmentLocked(shipment.snapshot(), Instant.now()));
+        shipment.notifyShipmentReturnCompleted();
+        return Optional.of(new ShipmentReturned(shipment.snapshot(), Instant.now()));
     }
 }
