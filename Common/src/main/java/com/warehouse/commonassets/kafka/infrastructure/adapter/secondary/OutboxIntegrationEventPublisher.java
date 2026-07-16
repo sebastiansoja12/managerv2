@@ -153,9 +153,15 @@ public class OutboxIntegrationEventPublisher implements IntegrationEventPublishe
             message.put("eventType", eventType);
             message.put("version", eventVersion);
             message.put("occurredAt", occurredAt.toString());
-            putIdentifier(message, "operatorId", operatorId == null ? null : operatorId.getValue());
-            putIdentifier(message, "userId", userId == null ? null : userId.getValue());
-            putIdentifier(message, "departmentId", departmentId == null ? null : departmentId.getValue());
+            if (operatorId != null || !message.has("operatorId")) {
+                putIdentifier(message, "operatorId", operatorId == null ? null : operatorId.getValue());
+            }
+            if (userId != null || !message.has("userId")) {
+                putIdentifier(message, "userId", userId == null ? null : userId.getValue());
+            }
+            if (departmentId != null || !message.has("departmentId")) {
+                putIdentifier(message, "departmentId", departmentId == null ? null : departmentId.getValue());
+            }
             return this.objectMapper.writeValueAsString(message);
         } catch (final JsonProcessingException exception) {
             throw new IllegalStateException("Cannot serialize event: " + event.getClass().getName(), exception);
