@@ -17,6 +17,7 @@ public abstract class ResponseMapper {
         }
 
         return new SupplierApi(
+                supplier.getSupplierId() != null ? supplier.getSupplierId().value() : null,
                 supplier.supplierCode() != null ? new SupplierCodeApi(supplier.supplierCode().value()) : null,
                 supplier.getFirstName(),
                 supplier.getLastName(),
