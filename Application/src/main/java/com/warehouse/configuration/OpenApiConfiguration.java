@@ -43,17 +43,16 @@ import io.swagger.v3.oas.annotations.servers.Server;
         },
         security = {
                 @SecurityRequirement(
-                        name = "bearerAuth"
+                        name = "cookieAuth"
                 )
         }
 )
 @SecurityScheme(
-        name = "bearerAuth",
-        description = "JWT auth description",
-        scheme = "bearer",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        in = SecuritySchemeIn.HEADER
+        name = "cookieAuth",
+        description = "HttpOnly access token cookie",
+        paramName = "AUTH-TOKEN",
+        type = SecuritySchemeType.APIKEY,
+        in = SecuritySchemeIn.COOKIE
 )
 public class OpenApiConfiguration {
 
