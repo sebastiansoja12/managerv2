@@ -15,25 +15,30 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @AllArgsConstructor
 public class JwtServiceImpl implements JwtService {
+
+    private static final String TOKEN_TYPE_CLAIM = "tokenType";
+    private static final String ACCESS_TOKEN_TYPE = "access";
 
     @NonNull
     private final JwtProvider jwtProvider;
 
     @Override
-    public String extractUsername(String token) {
+    public String extractUsername(final String token) {
         return getUsername(token);
     }
 
     @Override
-    public String generateToken(Map<String, Object> extraClaims, User user, Long expiration) {
+    public String generateToken(final Map<String, Object> extraClaims, final User user, final Long expiration) {
+        extraClaims.put(TOKEN_TYPE_CLAIM, ACCESS_TOKEN_TYPE);
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getUsername())
+                .setIssuer(jwtProvider.getIssuer())
+                .setAudience(jwtProvider.getAudience())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.forSigningKey(getSigningKey()))
@@ -41,7 +46,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateToken(User user) {
+    public String generateToken(final User user) {
         final Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("firstName", user.getFirstName());
         claimsMap.put("username", user.getUsername());
@@ -61,6 +66,9 @@ public class JwtServiceImpl implements JwtService {
                 .builder()
                 .setClaims(claimsMap)
                 .setSubject(username)
+                .setIssuer(jwtProvider.getIssuer())
+                .setAudience(jwtProvider.getAudience())
+                .claim(TOKEN_TYPE_CLAIM, "apiKey")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.forSigningKey(getSigningKey()))
@@ -68,33 +76,27 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean isTokenValid(String token, User user) {
-        final String username = extractUsername(token);
-        return (username.equals(user.getUsername())) && !isTokenExpired(token) && !user.isDeleted();
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public boolean isTokenValid(final String token, final User user) {
         final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        final String username = claims.getSubject();
+        final String tokenType = claims.get(TOKEN_TYPE_CLAIM, String.class);
+        return username.equals(user.getUsername())
+                && ACCESS_TOKEN_TYPE.equals(tokenType)
+                && !claims.getExpiration().before(new Date())
+                && !Boolean.TRUE.equals(user.isDeleted());
     }
 
-    private String getUsername(String token) {
+    private String getUsername(final String token) {
         final Claims claims = extractAllClaims(token);
         return claims.get("sub", String.class);
     }
 
-    private Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(final String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSigningKey())
+                .requireIssuer(jwtProvider.getIssuer())
+                .requireAudience(jwtProvider.getAudience())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
