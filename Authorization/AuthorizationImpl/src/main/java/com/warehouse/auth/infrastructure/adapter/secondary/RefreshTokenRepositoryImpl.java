@@ -2,15 +2,19 @@ package com.warehouse.auth.infrastructure.adapter.secondary;
 
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
+import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.RefreshTokenEntity;
-import com.warehouse.auth.infrastructure.adapter.secondary.exception.RefreshTokenNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
-import com.warehouse.commonassets.identificator.UserId;
 import lombok.AllArgsConstructor;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
+import java.util.HexFormat;
+import java.util.Optional;
 
 
 @AllArgsConstructor
@@ -20,37 +24,40 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
 
     private final RefreshTokenMapper refreshTokenMapper;
 
+    private final JwtProvider jwtProvider;
+
     @Override
-    public Token save(RefreshToken refreshToken) {
+    public Token save(final RefreshToken refreshToken) {
         final RefreshTokenEntity entity = refreshTokenMapper.map(refreshToken);
+        entity.setToken(hash(refreshToken.getToken()));
         entity.setCreatedDate(LocalDateTime.now());
-        entity.setExpiryDate(LocalDateTime.now().plus(ChronoUnit.HALF_DAYS.getDuration()));
+        entity.setExpiryDate(LocalDateTime.now().plus(Duration.ofMillis(jwtProvider.getRefreshTokenExpiration())));
         repository.save(entity);
 
-        return refreshTokenMapper.mapToToken(entity);
+        return new Token(refreshToken.getToken());
     }
 
     @Override
-    public RefreshToken validateRefreshToken(String token) {
-        return repository.findByToken(token).map(refreshTokenMapper::map)
-                .orElseThrow(() -> new RefreshTokenNotFoundException("Invalid refresh Token"));
+    public Optional<RefreshToken> find(final String token) {
+        return repository.findByToken(hash(token)).map(refreshTokenMapper::map);
     }
 
     @Override
-    public void delete(String refreshToken) {
-        repository.deleteByToken(refreshToken);
+    public void delete(final String refreshToken) {
+        repository.deleteByToken(hash(refreshToken));
     }
 
     @Override
-    public void delete(LocalDateTime time) {
+    public void delete(final LocalDateTime time) {
         repository.deleteAllExpiredSince(time);
     }
 
-    // TODO
-    @Override
-    public RefreshToken findByUserId(final UserId userId) {
-        return RefreshToken.builder()
-                .token("token")
-                .build();
+    private String hash(final String refreshToken) {
+        try {
+            final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return HexFormat.of().formatHex(digest.digest(refreshToken.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 algorithm is unavailable", exception);
+        }
     }
 }
