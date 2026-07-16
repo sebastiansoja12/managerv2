@@ -25,8 +25,6 @@ import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.infrastructure.adapter.primary.CurrentOperatorServiceAdapter;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapper;
-import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationRequestMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
@@ -39,8 +37,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthConfiguration  {
 
-    private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
-
     private final UserReadRepository repository;
     
 
@@ -52,7 +48,7 @@ public class AuthConfiguration  {
                                                  final DepartmentService departmentService,
                                                  final MailServicePort mailServicePort) {
 		return new AuthenticationPortImpl(authenticationService, userService, jwtService,
-				LOGGER_FACTORY.getLogger(AuthenticationPort.class), passwordEncoder, departmentService, mailServicePort);
+				passwordEncoder, departmentService, mailServicePort);
     }
 
     @Bean
@@ -109,12 +105,6 @@ public class AuthConfiguration  {
     @Bean
     public CurrentOperatorPort currentOperatorPort(final AuthenticationService authenticationService) {
         return new CurrentOperatorPortImpl(authenticationService);
-    }
-
-    // request and response mappers
-    @Bean(name = "authentication.requestMapper")
-    public AuthenticationRequestMapper requestMapper() {
-        return new AuthenticationRequestMapperImpl();
     }
 
     @Bean(name = "authentication.responseMapper")
