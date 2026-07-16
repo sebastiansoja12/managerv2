@@ -121,7 +121,7 @@ public class GatewayProperties {
 
         private List<String> allowedMethods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
 
-        private List<String> allowedHeaders = List.of("Authorization", "Content-Type", "X-Correlation-ID", "X-Requested-With");
+        private List<String> allowedHeaders = List.of("Content-Type", "X-XSRF-TOKEN", "X-Correlation-ID", "X-Requested-With");
 
         private List<String> exposedHeaders = List.of("X-Correlation-ID");
 
