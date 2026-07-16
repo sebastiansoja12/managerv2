@@ -1,36 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="create-country-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="country"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="country">
-            <column name="country_code" type="VARCHAR(50)">
-                <constraints primaryKey="true" nullable="false" unique="true"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="create-shipment-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="shipment"/>
-            </not>
-        </preConditions>
-
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-40">
         <createTable tableName="shipment">
             <column name="shipment_id" type="BIGINT">
-                <constraints primaryKey="true" nullable="false" unique="true"/>
+                <constraints nullable="false" primaryKey="true" unique="true"/>
             </column>
             <column name="first_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -87,13 +63,13 @@
                 <constraints nullable="false"/>
             </column>
             <column name="shipment_related_id" type="BIGINT"/>
-            <column name="created_at" type="TIMESTAMP">
+            <column name="created_at" type="timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="TIMESTAMP">
+            <column name="updated_at" type="timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="locked" type="BOOLEAN" defaultValueBoolean="false">
+            <column defaultValueNumeric="0" name="locked" type="BIT(1)">
                 <constraints nullable="false"/>
             </column>
             <column name="origin_country" type="VARCHAR(10)">
@@ -106,7 +82,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="dangerous_good_id" type="BIGINT"/>
-            <column name="price_amount" type="DECIMAL(19,2)"/>
+            <column name="price_amount" type="DECIMAL(19, 2)"/>
             <column name="price_currency" type="VARCHAR(10)"/>
             <column name="external_route_id" type="VARCHAR(255)"/>
             <column name="external_return_id" type="BIGINT"/>
@@ -116,280 +92,18 @@
             <column name="tracking_number" type="VARCHAR(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
+            <column name="operator_id" type="BIGINT"/>
         </createTable>
     </changeSet>
-
-    <changeSet id="create-revinfo-table-for-shipment-audit-v2026-6" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="revinfo"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="revinfo">
-            <column name="rev" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="revtstmp" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-71">
+        <createIndex associatedWith="" indexName="fk_shipment_dangerous_good" tableName="shipment">
+            <column name="dangerous_good_id"/>
+        </createIndex>
     </changeSet>
-
-    <changeSet id="create-shipment-aud-table-v2026-6" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="shipment_aud"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="shipment_aud">
-            <column name="rev" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="revtype" type="TINYINT"/>
-            <column name="shipment_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_at" type="TIMESTAMP"/>
-            <column name="dangerous_good_id" type="BIGINT"/>
-            <column name="destination" type="VARCHAR(255)"/>
-            <column name="destination_country" type="VARCHAR(10)"/>
-            <column name="external_id" type="VARCHAR(255)"/>
-            <column name="external_return_id" type="BIGINT"/>
-            <column name="external_route_id" type="VARCHAR(255)"/>
-            <column name="first_name" type="VARCHAR(255)"/>
-            <column name="last_name" type="VARCHAR(255)"/>
-            <column name="locked" type="BOOLEAN"/>
-            <column name="origin_country" type="VARCHAR(10)"/>
-            <column name="price_amount" type="DECIMAL(19,2)"/>
-            <column name="price_currency" type="VARCHAR(10)"/>
-            <column name="recipient_city" type="VARCHAR(255)"/>
-            <column name="recipient_email" type="VARCHAR(255)"/>
-            <column name="recipient_first_name" type="VARCHAR(255)"/>
-            <column name="recipient_last_name" type="VARCHAR(255)"/>
-            <column name="recipient_postal_code" type="VARCHAR(255)"/>
-            <column name="recipient_street" type="VARCHAR(255)"/>
-            <column name="recipient_telephone" type="VARCHAR(255)"/>
-            <column name="sender_city" type="VARCHAR(255)"/>
-            <column name="sender_email" type="VARCHAR(255)"/>
-            <column name="sender_postal_code" type="VARCHAR(255)"/>
-            <column name="sender_street" type="VARCHAR(255)"/>
-            <column name="sender_telephone" type="VARCHAR(255)"/>
-            <column name="shipment_priority" type="VARCHAR(32)"/>
-            <column name="shipment_related_id" type="BIGINT"/>
-            <column name="parcel_size" type="VARCHAR(64)"/>
-            <column name="status" type="VARCHAR(64)"/>
-            <column name="type" type="VARCHAR(64)"/>
-            <column name="tracking_number" type="VARCHAR(255)"/>
-            <column name="updated_at" type="TIMESTAMP"/>
-        </createTable>
-
-        <addPrimaryKey tableName="shipment_aud"
-                       columnNames="shipment_id, rev"
-                       constraintName="pk_shipment_aud"/>
-    </changeSet>
-
-    <changeSet id="shipment-aud-add-revinfo-foreign-key-v2026-6" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="shipment_aud"/>
-                <tableExists tableName="revinfo"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_shipment_aud_revinfo"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="shipment_aud"
-                                 baseColumnNames="rev"
-                                 referencedTableName="revinfo"
-                                 referencedColumnNames="rev"
-                                 constraintName="fk_shipment_aud_revinfo"/>
-    </changeSet>
-
-    <changeSet id="create-dangerous-good-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="dangerous_good"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="dangerous_good">
-            <column name="dangerous_good_id" type="BIGINT">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="shipment_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="VARCHAR(1000)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="classification_code" type="VARCHAR(64)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="hazard_symbols" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="storage_requirements" type="VARCHAR(64)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="handling_instructions" type="VARCHAR(2000)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="weight" type="DECIMAL(19,3)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="unit" type="VARCHAR(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="packaging" type="VARCHAR(64)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="flammable" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
-            <column name="corrosive" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
-            <column name="toxic" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
-            <column name="emergency_contact" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="country_origin" type="VARCHAR(64)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="safety_data_sheet" type="VARCHAR(2000)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="shipment-add-dangerous-good-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="shipment"/>
-                <tableExists tableName="dangerous_good"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_shipment_dangerous_good"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="shipment"
-                                 baseColumnNames="dangerous_good_id"
-                                 referencedTableName="dangerous_good"
-                                 referencedColumnNames="dangerous_good_id"
-                                 constraintName="fk_shipment_dangerous_good"/>
-    </changeSet>
-
-    <changeSet id="dangerous-good-add-shipment-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="dangerous_good"/>
-                <tableExists tableName="shipment"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_dangerous_good_shipment"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="dangerous_good"
-                                 baseColumnNames="shipment_id"
-                                 referencedTableName="shipment"
-                                 referencedColumnNames="shipment_id"
-                                 constraintName="fk_dangerous_good_shipment"/>
-    </changeSet>
-
-    <changeSet id="create-signature-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="signature"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="signature">
-            <column name="shipment_id" type="BIGINT">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="signer_name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="signed_at" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="signature_method" type="VARCHAR(64)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="document_reference" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="signature" type="BLOB">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="signature-add-shipment-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="signature"/>
-                <tableExists tableName="shipment"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_signature_shipment"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="signature"
-                                 baseColumnNames="shipment_id"
-                                 referencedTableName="shipment"
-                                 referencedColumnNames="shipment_id"
-                                 constraintName="fk_signature_shipment"/>
-    </changeSet>
-
-    <changeSet id="create-price-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="price"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="price">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="shipment_size" type="VARCHAR(64)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="price_amount" type="DECIMAL(19,2)"/>
-            <column name="price_currency_code" type="VARCHAR(10)"/>
-        </createTable>
-    </changeSet>
-
-    <changeSet id="create-tracking-sequence-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="tracking_sequence"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="tracking_sequence">
-            <column name="id" type="VARCHAR(255)">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="next_value" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-80">
+        <createIndex associatedWith="" indexName="idx_shipment_operator_id" tableName="shipment">
+            <column name="operator_id"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>
