@@ -8,6 +8,7 @@ import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
+import com.warehouse.supplier.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
 import com.warehouse.supplier.domain.registry.DomainContext;
@@ -23,6 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -36,12 +39,15 @@ public class SupplyPortImplTest {
     @Mock
     private DeviceServicePort deviceServicePort;
 
+    @Mock
+    private DepartmentServicePort departmentServicePort;
+
     private SupplyPortImpl supplyPort;
 
     @BeforeEach
     void setup() {
         final SupplierService service = new SupplierServiceImpl(supplierRepository);
-        final SupplierValidatorService validatorService = new SupplierValidatorServiceImpl(supplierRepository, deviceServicePort);
+        final SupplierValidatorService validatorService = new SupplierValidatorServiceImpl(supplierRepository, deviceServicePort, departmentServicePort);
         final SupplierCodeGeneratorService generatorService = new SupplierCodeGeneratorServiceImpl();
         final DriverLicenseService driverLicenseService = new DriverLicenseServiceImpl();
         final ApplicationContext applicationContext = mock(ApplicationContext.class);
@@ -108,7 +114,7 @@ public class SupplyPortImplTest {
 
     @Test
     void shouldAddPackageType() {
-        final ChangeSupportedPackageTypeCommand request = new ChangeSupportedPackageTypeCommand(new SupplierCode("123"), PackageType.LARGE);
+        final ChangeSupportedPackageTypeCommand request = new ChangeSupportedPackageTypeCommand(new SupplierCode("123"), Set.of(PackageType.LARGE));
         when(supplierRepository.findByCode(new SupplierCode("123"))).thenReturn(mock(Supplier.class));
         this.supplyPort.addPackageType(request);
         verify(supplierRepository).update(any());
