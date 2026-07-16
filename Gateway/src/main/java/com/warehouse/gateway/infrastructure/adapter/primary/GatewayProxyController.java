@@ -79,11 +79,11 @@ public class GatewayProxyController {
     }
 
     @GetMapping("/services/health")
-    public GatewayServicesHealthResponse servicesHealth(@RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) final String authorizationHeader,
+    public GatewayServicesHealthResponse servicesHealth(@RequestHeader(name = HttpHeaders.COOKIE, required = false) final String cookieHeader,
                                                         @RequestHeader(name = CorrelationIdFilter.CORRELATION_ID_HEADER, required = false) final String correlationId) {
         String requestCorrelationId = StringUtils.hasText(correlationId) ? correlationId : MDC.get(CorrelationIdFilter.MDC_KEY);
         List<GatewayServiceHealthResponse> services = this.gatewayProperties.getRoutes().stream()
-                .map(route -> checkServiceHealth(route, authorizationHeader, requestCorrelationId))
+                .map(route -> checkServiceHealth(route, cookieHeader, requestCorrelationId))
                 .toList();
 
         String status = services.stream().allMatch(service -> "UP".equals(service.status())) ? "UP" : "DEGRADED";
@@ -127,7 +127,7 @@ public class GatewayProxyController {
     }
 
     private GatewayServiceHealthResponse checkServiceHealth(final GatewayProperties.Route route,
-                                                            final String authorizationHeader,
+                                                            final String cookieHeader,
                                                             final String correlationId) {
         if (!route.isHealthCheckEnabled()) {
             return new GatewayServiceHealthResponse(route.getId(), route.getPathPrefix(), "DISABLED", null, 0);
@@ -139,8 +139,8 @@ public class GatewayProxyController {
                 .timeout(Duration.ofSeconds(route.getHealthTimeoutSeconds()))
                 .GET();
 
-        if (StringUtils.hasText(authorizationHeader)) {
-            requestBuilder.header(HttpHeaders.AUTHORIZATION, authorizationHeader);
+        if (StringUtils.hasText(cookieHeader)) {
+            requestBuilder.header(HttpHeaders.COOKIE, cookieHeader);
         }
         if (StringUtils.hasText(correlationId)) {
             requestBuilder.header(CorrelationIdFilter.CORRELATION_ID_HEADER, correlationId);
