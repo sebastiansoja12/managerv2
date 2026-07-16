@@ -1,16 +1,12 @@
 package com.warehouse.auth.domain.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.warehouse.auth.domain.event.*;
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
-import com.warehouse.auth.domain.model.FullNameRequest;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.FullNameChangeCommand;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
-import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
+import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
@@ -18,6 +14,9 @@ import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -69,8 +68,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changeFullName(final FullNameRequest request) {
-        final User user = this.userRepository.findByUsername(request.getUsername());
+    public void changeFullName(final FullNameChangeCommand request) {
+        final User user = this.userRepository.findById(request.getUserId());
         user.changeFullName(request);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserFullNameChangedEvent(user.snapshot()));
@@ -88,6 +87,14 @@ public class UserServiceImpl implements UserService {
     public void changeLanguage(final UserId userId, final String language) {
         final User user = this.userRepository.findById(userId);
         user.changeLanguage(language);
+        this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
+    }
+
+    @Override
+    public void changeApiKey(final UserId userId, final String apiKey) {
+        final User user = this.userRepository.findById(userId);
+        user.changeApiKey(apiKey);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
     }

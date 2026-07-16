@@ -1,14 +1,5 @@
 package com.warehouse.auth.domain.model;
 
-import java.time.Instant;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import com.warehouse.auth.domain.event.UserChangedEvent;
 import com.warehouse.auth.domain.exception.UserDeletedException;
 import com.warehouse.auth.domain.registry.DomainRegistry;
@@ -17,6 +8,15 @@ import com.warehouse.auth.domain.vo.UserSnapshot;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.BelongsToOperator;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class User extends BelongsToOperator {
@@ -300,9 +300,13 @@ public class User extends BelongsToOperator {
         return authorities;
     }
 
-    public void changeFullName(final FullNameRequest request) {
-        this.firstName = request.getFirstName();
-        this.lastName = request.getLastName();
+    public void changeFullName(final FullNameChangeCommand request) {
+        if (StringUtils.isNotBlank(request.getFirstName())) {
+            this.firstName = request.getFirstName();
+        }
+        if (StringUtils.isNotBlank(request.getLastName())) {
+            this.lastName = request.getLastName();
+        }
         markAsModified();
     }
 
@@ -323,6 +327,11 @@ public class User extends BelongsToOperator {
 
     public void changeLanguage(final String language) {
         this.language = language;
+        markAsModified();
+    }
+
+    public void changeApiKey(final String apiKey) {
+        this.apiKey = apiKey;
         markAsModified();
     }
 

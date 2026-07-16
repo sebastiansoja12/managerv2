@@ -64,5 +64,6 @@
     <include file="changes/2026-09-06-shipment-planned.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-10-shipment-target-department-required.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-10-shipment-delivery-pickup-point.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-11-user-api-key-optional.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

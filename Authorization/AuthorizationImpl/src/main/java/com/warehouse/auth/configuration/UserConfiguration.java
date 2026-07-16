@@ -26,7 +26,8 @@ import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 public class UserConfiguration {
 
     @Bean
-    public UserPort userPort(final UserService userService, final AuthenticationService authenticationService) {
+    public UserPort userPort(final UserService userService,
+                             final AuthenticationService authenticationService) {
         return new UserPortImpl(userService, authenticationService);
     }
 

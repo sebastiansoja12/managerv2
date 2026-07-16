@@ -51,9 +51,22 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findByApiKey(final String apiKey) {
+        if (apiKey == null || apiKey.isBlank()) {
+            return null;
+        }
+
+        final User userWithDisplayedApiKey = findByStoredApiKey(apiKey);
+        if (userWithDisplayedApiKey != null) {
+            return userWithDisplayedApiKey;
+        }
+
         final String encodedApiKey = apiKeyEncoder.decode(new ApiKey(null, apiKey)).key();
+        return findByStoredApiKey(encodedApiKey);
+    }
+
+    private User findByStoredApiKey(final String apiKey) {
         return repository.createCriteria(UserEntity.class)
-                .eq("apiKey", encodedApiKey)
+                .eq("apiKey", apiKey)
                 .one()
                 .map(UserToModelMapper::map)
                 .orElse(null);

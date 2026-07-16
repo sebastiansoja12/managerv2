@@ -1,19 +1,12 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.warehouse.auth.AccessUserControl;
 import com.warehouse.auth.domain.helper.Result;
-import com.warehouse.auth.domain.model.FullNameRequest;
-import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.model.CreateUserCommand;
-import com.warehouse.auth.domain.port.primary.AuthenticationPort;
+import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.CurrentOperatorPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.service.JwtDecodeService;
@@ -22,15 +15,18 @@ import com.warehouse.auth.infrastructure.adapter.primary.mapper.UserRequestMappe
 import com.warehouse.auth.infrastructure.adapter.primary.validator.RoleValidator;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.TechnicalException;
-import com.warehouse.auth.infrastructure.dto.FullNameRequestApiDto;
-import com.warehouse.auth.infrastructure.dto.UpdateUserApiRequest;
 import com.warehouse.auth.infrastructure.dto.CreateUserApiRequest;
+import com.warehouse.auth.infrastructure.dto.UpdateUserApiRequest;
 import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.auth.infrastructure.dto.UserIdDto;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.enumeration.UserPermission;
-
+import com.warehouse.commonassets.identificator.UserId;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -79,15 +75,6 @@ public class UserResourceController {
     public ResponseEntity<?> findUserByUsername(@PathVariable final String username) {
         final User user = userPort.findUser(username);
         return new ResponseEntity<>(map(user), HttpStatus.OK);
-    }
-
-    @PutMapping
-    public ResponseEntity<?> updateUser(@Valid @RequestBody final FullNameRequestApiDto fullNameRequest) {
-        final FullNameRequest request = new FullNameRequest(
-                fullNameRequest.firstName(), fullNameRequest.lastName(), fullNameRequest.username(), null
-        );
-        this.userPort.updateFullName(request);
-        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
