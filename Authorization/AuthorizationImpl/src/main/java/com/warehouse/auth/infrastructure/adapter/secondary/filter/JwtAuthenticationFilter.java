@@ -1,6 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.filter;
 
-
+import com.warehouse.auth.configuration.AuthCookieService;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.UserService;
@@ -33,34 +33,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserService userService;
 
+    private final AuthCookieService authCookieService;
+
 	@Override
 	protected void doFilterInternal(@NonNull final HttpServletRequest request,
                                     @NonNull final HttpServletResponse response,
                                     @NonNull final FilterChain filterChain) throws ServletException, IOException {
-		final String authHeader = request.getHeader("Authorization");
-		final String jwt;
-		final String username;
-
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+		final String jwt = authCookieService.readAccessToken(request).orElse(null);
+		if (jwt == null) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
-		jwt = authHeader.split(" ")[1].trim();
-		username = jwtService.extractUsername(jwt);
+		try {
+            final String username = jwtService.extractUsername(jwt);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                final User user = this.userService.findUser(username);
 
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			final User user = this.userService.findUser(username);
-
-			if (jwtService.isTokenValid(jwt, user)) {
-				final SecurityContext context = SecurityContextHolder.createEmptyContext();
-				final UsernameTenantPasswordAuthenticationToken authToken = new UsernameTenantPasswordAuthenticationToken(
-						user.getUserId(), user.operatorId(), jwt, user.getAuthorities());
-				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				context.setAuthentication(authToken);
-				SecurityContextHolder.setContext(context);
-			}
-		}
+                if (jwtService.isTokenValid(jwt, user)) {
+                    final SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    final UsernameTenantPasswordAuthenticationToken authToken = new UsernameTenantPasswordAuthenticationToken(
+                            user.getUserId(), user.operatorId(), jwt, user.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    context.setAuthentication(authToken);
+                    SecurityContextHolder.setContext(context);
+                }
+            }
+        } catch (RuntimeException exception) {
+            SecurityContextHolder.clearContext();
+        }
 		filterChain.doFilter(request, response);
 	}
 
