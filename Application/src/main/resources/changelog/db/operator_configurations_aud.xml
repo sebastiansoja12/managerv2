@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-20">
+        <createTable tableName="operator_configurations_aud">
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="rev" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="revtype" type="TINYINT(3)"/>
+            <column name="supports_domestic_shipping" type="BIT(1)"/>
+            <column name="supports_international_shipping" type="BIT(1)"/>
+            <column name="supports_express_shipping" type="BIT(1)"/>
+            <column name="supports_same_day_delivery" type="BIT(1)"/>
+            <column name="supports_cash_on_delivery" type="BIT(1)"/>
+            <column name="supports_parcel_lockers" type="BIT(1)"/>
+            <column name="supports_pickup_points" type="BIT(1)"/>
+            <column name="supports_home_delivery" type="BIT(1)"/>
+            <column name="supports_saturday_delivery" type="BIT(1)"/>
+            <column name="supports_sunday_delivery" type="BIT(1)"/>
+            <column name="supports_return_shipments" type="BIT(1)"/>
+            <column name="provides_tracking" type="BIT(1)"/>
+            <column name="provides_insurance" type="BIT(1)"/>
+            <column name="max_weight" type="DOUBLE"/>
+            <column name="min_weight" type="DOUBLE"/>
+            <column name="max_length" type="DOUBLE"/>
+            <column name="max_width" type="DOUBLE"/>
+            <column name="max_height" type="DOUBLE"/>
+            <column name="max_shipment_value" type="DOUBLE"/>
+            <column name="min_delivery_days" type="INT"/>
+            <column name="max_delivery_days" type="INT"/>
+            <column name="express_delivery_days" type="INT"/>
+            <column name="same_day_delivery_hours" type="INT"/>
+            <column name="international_delivery_days" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-61">
+        <createIndex associatedWith="" indexName="fk_operator_configurations_aud_revinfo" tableName="operator_configurations_aud">
+            <column name="rev"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
