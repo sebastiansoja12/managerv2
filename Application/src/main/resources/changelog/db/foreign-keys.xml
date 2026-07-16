@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-83">
+        <addForeignKeyConstraint baseColumnNames="returning_information_id" baseTableName="returning" constraintName="FK_returning_information_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="returning_information" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-84">
+        <addForeignKeyConstraint baseColumnNames="process_id" baseTableName="communication_log_details" constraintName="fk_communication_log_details_process_logs" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="process_id" referencedTableName="process_logs" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-85">
+        <addForeignKeyConstraint baseColumnNames="process_id" baseTableName="communication_log_details_rd" constraintName="fk_communication_log_details_rd_process_logs_rd" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="process_id" referencedTableName="process_logs_rd" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-86">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="dangerous_good" constraintName="fk_dangerous_good_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-87">
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="delivery_area_postal_codes_aud" constraintName="fk_delivery_area_postal_codes_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-88">
+        <addForeignKeyConstraint baseColumnNames="delivery_area_id" baseTableName="delivery_area_postal_codes" constraintName="fk_delivery_area_postal_codes_supplier" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="supplier_id" referencedTableName="suppliers" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-89">
+        <addForeignKeyConstraint baseColumnNames="department_code" baseTableName="delivery" constraintName="fk_delivery_department" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_code" referencedTableName="department" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-90">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="delivery" constraintName="fk_delivery_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-91">
+        <addForeignKeyConstraint baseColumnNames="supplier_code" baseTableName="delivery" constraintName="fk_delivery_supplier" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="supplier_code" referencedTableName="supplier" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-92">
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="department_aud" constraintName="fk_department_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-93">
+        <addForeignKeyConstraint baseColumnNames="device_id" baseTableName="mobile_installed_apps" constraintName="fk_mobile_installed_apps_mobile" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="device_id" referencedTableName="mobiles" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-94">
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="operator_configurations_aud" constraintName="fk_operator_configurations_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-95">
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="operators_aud" constraintName="fk_operators_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-96">
+        <addForeignKeyConstraint baseColumnNames="parcel_id" baseTableName="reroute_token" constraintName="fk_reroute_token_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-97">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="return_tokens" constraintName="fk_return_tokens_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-98">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="returning_return_package" constraintName="fk_returning_return_package_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-99">
+        <addForeignKeyConstraint baseColumnNames="department_code" baseTableName="route_log_details" constraintName="fk_route_log_details_department" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_code" referencedTableName="department" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-100">
+        <addForeignKeyConstraint baseColumnNames="route_log_record_id" baseTableName="route_log_details" constraintName="fk_route_log_details_route_log" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="route_log" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-101">
+        <addForeignKeyConstraint baseColumnNames="supplier_code" baseTableName="route_log_details" constraintName="fk_route_log_details_supplier" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="supplier_code" referencedTableName="supplier" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-102">
+        <addForeignKeyConstraint baseColumnNames="username" baseTableName="route_log_details" constraintName="fk_route_log_details_user" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="username" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-103">
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="shipment_aud" constraintName="fk_shipment_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-104">
+        <addForeignKeyConstraint baseColumnNames="dangerous_good_id" baseTableName="shipment" constraintName="fk_shipment_dangerous_good" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="dangerous_good_id" referencedTableName="dangerous_good" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-105">
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="signature" constraintName="fk_signature_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-106">
+        <addForeignKeyConstraint baseColumnNames="department_code" baseTableName="supplier" constraintName="fk_supplier_department_code" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_code" referencedTableName="department" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-107">
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="suppliers_aud" constraintName="fk_suppliers_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-108">
+        <addForeignKeyConstraint baseColumnNames="department_code" baseTableName="suppliers" constraintName="fk_suppliers_department_code" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_code" referencedTableName="department" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-109">
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="suppliers_supported_package_types_aud" constraintName="fk_suppliers_supported_package_types_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-110">
+        <addForeignKeyConstraint baseColumnNames="supplier_id" baseTableName="suppliers_supported_package_types" constraintName="fk_suppliers_supported_package_types_supplier" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="supplier_id" referencedTableName="suppliers" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-111">
+        <addForeignKeyConstraint baseColumnNames="department_code" baseTableName="users" constraintName="fk_users_department_code" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_code" referencedTableName="department" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-112">
+        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="users_role_permissions" constraintName="fk_users_role_permissions_permission_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="role_permissions" validate="true"/>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-113">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="users_role_permissions" constraintName="fk_users_role_permissions_user_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="users" validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>
