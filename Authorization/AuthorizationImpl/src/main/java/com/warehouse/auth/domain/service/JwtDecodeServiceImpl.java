@@ -11,13 +11,15 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.exceptionhandler.exception.RestException;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 
 @Service
 public class JwtDecodeServiceImpl implements JwtDecodeService {
+
+    private static final String ACCESS_TOKEN_TYPE = "access";
 
     private final JwtProvider jwtProvider;
 
@@ -31,16 +33,22 @@ public class JwtDecodeServiceImpl implements JwtDecodeService {
             final Claims claims = Jwts
                     .parserBuilder()
                     .setSigningKey(getSigningKey())
+                    .requireIssuer(jwtProvider.getIssuer())
+                    .requireAudience(jwtProvider.getAudience())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
 
+            if (!ACCESS_TOKEN_TYPE.equals(claims.get("tokenType", String.class))) {
+                throw new RestException(401, "Invalid access token type");
+            }
+
             final Long operatorId = extractLongClaim(claims, "operatorId", "operator_id");
             final UserId userId = new UserId(claims.get("userId", Long.class));
-            final String issuer = claims.get("username", String.class);
+            final String username = claims.get("username", String.class);
 
-            return new DecodedApiTenant(userId, OperatorId.of(operatorId), issuer);
-        } catch (SignatureException | IllegalArgumentException e) {
+            return new DecodedApiTenant(userId, OperatorId.of(operatorId), username);
+        } catch (JwtException | IllegalArgumentException e) {
             throw new RestException(401, "Invalid or expired JWT token");
         }
     }
