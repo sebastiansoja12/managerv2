@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-5">
+        <createTable tableName="dangerous_good">
+            <column name="dangerous_good_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="classification_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hazard_symbols" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="storage_requirements" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="handling_instructions" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight" type="DECIMAL(19, 3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="packaging" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="flammable" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="corrosive" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="toxic" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emergency_contact" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country_origin" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="safety_data_sheet" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-55">
+        <createIndex associatedWith="" indexName="fk_dangerous_good_shipment" tableName="dangerous_good">
+            <column name="shipment_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
