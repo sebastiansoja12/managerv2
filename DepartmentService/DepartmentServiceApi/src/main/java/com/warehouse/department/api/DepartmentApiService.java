@@ -1,11 +1,12 @@
 package com.warehouse.department.api;
 
-import java.util.List;
-
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.department.api.dto.DepartmentDirectoryEntryDto;
 import com.warehouse.department.api.dto.DepartmentDto;
+
+import java.util.List;
 
 public interface DepartmentApiService {
     List<DepartmentDto> getAllDepartments();
@@ -14,4 +15,5 @@ public interface DepartmentApiService {
     DepartmentDto getDepartmentById(final DepartmentId departmentId);
     Boolean checkIfDepartmentExists(final DepartmentCode departmentCode);
     Boolean checkIfDepartmentExists(final DepartmentId departmentId);
+    boolean checkIfAnyExistsWithCountryCode(final CountryCode countryCode);
 }
