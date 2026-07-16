@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="create-delivery-table-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="delivery"/>
-            </not>
-        </preConditions>
-
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-6">
         <createTable tableName="delivery">
             <column name="id" type="VARCHAR(255)">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="shipment_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="created" type="TIMESTAMP">
+            <column name="created" type="timestamp">
                 <constraints nullable="false"/>
             </column>
             <column name="department_code" type="VARCHAR(255)">
@@ -31,102 +24,23 @@
                 <constraints nullable="false"/>
             </column>
             <column name="token" type="VARCHAR(255)"/>
+            <column name="operator_id" type="BIGINT"/>
         </createTable>
     </changeSet>
-
-    <changeSet id="delivery-backfill-department-code-v2026-4" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="delivery"/>
-                <tableExists tableName="supplier"/>
-                <tableExists tableName="department"/>
-                <columnExists tableName="delivery" columnName="supplier_code"/>
-                <columnExists tableName="delivery" columnName="department_code"/>
-                <columnExists tableName="supplier" columnName="supplier_code"/>
-                <columnExists tableName="supplier" columnName="department_code"/>
-            </and>
-        </preConditions>
-
-        <sql>
-            UPDATE delivery
-            SET department_code = (
-                SELECT s.department_code
-                FROM supplier s
-                WHERE s.supplier_code = delivery.supplier_code
-            )
-            WHERE (department_code IS NULL
-                   OR NOT EXISTS (
-                        SELECT 1
-                        FROM department d
-                        WHERE d.department_code = delivery.department_code
-                   ))
-              AND EXISTS (
-                    SELECT 1
-                    FROM supplier s2
-                    JOIN department d2 ON d2.department_code = s2.department_code
-                    WHERE s2.supplier_code = delivery.supplier_code
-              );
-        </sql>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-57">
+        <createIndex associatedWith="" indexName="fk_delivery_department" tableName="delivery">
+            <column name="department_code"/>
+        </createIndex>
     </changeSet>
-
-    <changeSet id="delivery-add-department-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="delivery"/>
-                <tableExists tableName="department"/>
-                <sqlCheck expectedResult="0">
-                    SELECT COUNT(*)
-                    FROM delivery dv
-                    LEFT JOIN department dp ON dp.department_code = dv.department_code
-                    WHERE dp.department_code IS NULL
-                </sqlCheck>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_delivery_department"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="delivery"
-                                 baseColumnNames="department_code"
-                                 referencedTableName="department"
-                                 referencedColumnNames="department_code"
-                                 constraintName="fk_delivery_department"/>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-58">
+        <createIndex associatedWith="" indexName="fk_delivery_shipment" tableName="delivery">
+            <column name="shipment_id"/>
+        </createIndex>
     </changeSet>
-
-    <changeSet id="delivery-add-supplier-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="delivery"/>
-                <tableExists tableName="supplier"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_delivery_supplier"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="delivery"
-                                 baseColumnNames="supplier_code"
-                                 referencedTableName="supplier"
-                                 referencedColumnNames="supplier_code"
-                                 constraintName="fk_delivery_supplier"/>
-    </changeSet>
-
-    <changeSet id="delivery-add-shipment-foreign-key-v2026-3" author="s-soja">
-        <preConditions onFail="MARK_RAN">
-            <and>
-                <tableExists tableName="delivery"/>
-                <tableExists tableName="shipment"/>
-                <not>
-                    <foreignKeyConstraintExists foreignKeyName="fk_delivery_shipment"/>
-                </not>
-            </and>
-        </preConditions>
-
-        <addForeignKeyConstraint baseTableName="delivery"
-                                 baseColumnNames="shipment_id"
-                                 referencedTableName="shipment"
-                                 referencedColumnNames="shipment_id"
-                                 constraintName="fk_delivery_shipment"/>
+    <changeSet author="sebastiansoja (generated)" id="1784048035699-59">
+        <createIndex associatedWith="" indexName="fk_delivery_supplier" tableName="delivery">
+            <column name="supplier_code"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>
