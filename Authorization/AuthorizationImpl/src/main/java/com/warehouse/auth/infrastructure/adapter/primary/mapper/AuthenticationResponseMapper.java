@@ -1,9 +1,7 @@
 package com.warehouse.auth.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.auth.domain.vo.AuthenticationResponse;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.model.User;
-import com.warehouse.auth.infrastructure.dto.AuthenticationResponseDto;
 import com.warehouse.auth.infrastructure.dto.RegisterResponseDto;
 import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -12,8 +10,6 @@ import org.mapstruct.Mapping;
 
 @Mapper
 public interface AuthenticationResponseMapper {
-    AuthenticationResponseDto map(AuthenticationResponse response);
-
     @Mapping(target = "userResponse.departmentCode", source = "userResponse.departmentCode.value")
     RegisterResponseDto map(RegisterResponse response);
 
