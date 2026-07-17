@@ -1,6 +1,7 @@
 package com.warehouse.supplier.infrastructure.adapter.primary;
 
 import com.warehouse.auth.AccessUserControl;
+import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
@@ -30,7 +31,7 @@ public class SupplierController {
     }
 
     @PostMapping
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_CREATE, UserPermission.ROLE_MANAGER_CREATE})
     public ResponseEntity<?> create(@RequestBody final SupplierCreateApiRequest supplierCreateApiRequest) {
         final SupplierCreateCommand command = RequestMapper.map(supplierCreateApiRequest);
         final SupplierCreateResponse response = this.supplyPort.create(command);
@@ -47,7 +48,7 @@ public class SupplierController {
     }
 
     @PutMapping
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateSupplier(@RequestBody final SupplierUpdateApiRequest supplierUpdateRequest) {
         final SupplierUpdateCommand command = RequestMapper.map(supplierUpdateRequest);
         final Result<Void, String> response = this.supplyPort.update(command);
@@ -62,7 +63,7 @@ public class SupplierController {
     }
 
     @PutMapping(value = "/department-codes")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateSupplierDepartmentCode(@RequestBody final ChangeSupplierDepartmentCodeApiRequest departmentCodeApiRequest) {
         final ChangeSupplierDepartmentCodeCommand command = RequestMapper.map(departmentCodeApiRequest);
         this.supplyPort.changeDepartmentCode(command);
@@ -70,7 +71,7 @@ public class SupplierController {
     }
 
     @PatchMapping("/basic-data")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateBasicData(@RequestBody final SupplierBasicDataUpdateApiRequest supplierUpdateRequest) {
         final SupplierBasicDataUpdateCommand command = RequestMapper.map(supplierUpdateRequest);
         final Result<Void, String> response = this.supplyPort.updateBasicData(command);
@@ -83,21 +84,21 @@ public class SupplierController {
     }
 
     @PutMapping("/{code}/activate")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> activate(@PathVariable final String code) {
         this.supplyPort.activate(new SupplierCode(code));
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{code}/deactivate")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> deactivate(@PathVariable final String code) {
         this.supplyPort.deactivate(new SupplierCode(code));
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/certifications")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateCertification(@RequestBody final CertificationUpdateApiRequest certificationUpdateRequest) {
         final CertificationUpdateCommand command = RequestMapper.map(certificationUpdateRequest);
         final CertificationUpdateResponse response = this.supplyPort.updateCertification(command);
@@ -105,7 +106,7 @@ public class SupplierController {
     }
 
     @PutMapping("/driver-licenses")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateDriverLicense(@RequestBody final DriverLicenseApiRequest driverLicenseRequest) {
         final DriverLicenseCommand command = RequestMapper.map(driverLicenseRequest);
         final DriverLicenseResponse response = this.supplyPort.updateDriverLicense(command);
@@ -113,7 +114,7 @@ public class SupplierController {
     }
 
     @PutMapping("/supported-package-types")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updatePackageTypes(
 			@RequestBody final ChangeSupportedPackageTypesApiRequest changeSupportedPackageTypeRequest) {
         final ChangeSupportedPackageTypeCommand command = RequestMapper.map(changeSupportedPackageTypeRequest);
@@ -122,7 +123,7 @@ public class SupplierController {
     }
 
     @PutMapping("/devices")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateDevice(
             @RequestBody final ChangeSupplierDeviceApiRequest changeSupplierDeviceRequest) {
         final ChangeSupplierDeviceCommand command = RequestMapper.map(changeSupplierDeviceRequest);
@@ -131,7 +132,7 @@ public class SupplierController {
     }
 
     @PutMapping("/vehicles")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateVehicle(
             @RequestBody final ChangeSupplierVehicleApiRequest changeSupplierVehicleRequest) {
         final ChangeSupplierVehicleCommand command = RequestMapper.map(changeSupplierVehicleRequest);
@@ -140,7 +141,7 @@ public class SupplierController {
     }
 
     @PutMapping("/delivery-areas")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateDeliveryArea(
             @RequestBody final ChangeSupplierDeliveryAreaApiRequest changeSupplierDeliveryAreaRequest) {
         final ChangeSupplierDeliveryAreaCommand command = RequestMapper.map(changeSupplierDeliveryAreaRequest);
