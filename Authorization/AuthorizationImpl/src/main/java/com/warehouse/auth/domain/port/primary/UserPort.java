@@ -3,16 +3,23 @@ package com.warehouse.auth.domain.port.primary;
 import com.warehouse.auth.domain.helper.Result;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
 
+import java.util.List;
+
 
 public interface UserPort {
+
+    List<User> findAll();
 
     User findUser(String username);
 
     User findUser(UserId userId);
+
+    User update(final UpdateUserCommand command);
 
     void updateFullName(final FullNameRequest request);
 
