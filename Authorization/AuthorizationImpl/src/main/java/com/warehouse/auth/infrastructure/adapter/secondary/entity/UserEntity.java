@@ -141,7 +141,9 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
         ROLE_SUPPLIER_READ("supplier:read"),
         ROLE_SUPPLIER_UPDATE("supplier:update"),
         ROLE_SUPPLIER_CREATE("supplier:create"),
-        ROLE_SUPPLIER_DELETE("supplier:delete");
+        ROLE_SUPPLIER_DELETE("supplier:delete"),
+
+        ROLE_OPERATOR_CREATE("operator:create");
 
         @Getter
         private final String permission;
