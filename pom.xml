@@ -43,6 +43,7 @@
         <module>TransportAssets</module>
         <module>DriverHub</module>
         <module>ProcessHub</module>
+        <module>GeocodingService</module>
     </modules>
 
 	<properties>
