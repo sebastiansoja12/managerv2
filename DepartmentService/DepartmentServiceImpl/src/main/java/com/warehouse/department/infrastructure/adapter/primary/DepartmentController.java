@@ -11,6 +11,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import com.warehouse.auth.AccessUserControl;
+import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.RestException;
@@ -43,7 +44,7 @@ public class DepartmentController {
     }
 
     @PostMapping
-    @AccessUserControl("ROLE_ADMIN_CREATE")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> create(@RequestBody final DepartmentCreateApiRequest departmentCreateApiRequest) {
 		final Result<Void, List<String>> result = this.getValidator(departmentCreateApiRequest.getResourceName()).validateBody(departmentCreateApiRequest);
 
@@ -62,7 +63,7 @@ public class DepartmentController {
     }
 
     @PutMapping
-    @AccessUserControl("ROLE_ADMIN_CREATE")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateAddress(@RequestBody final UpdateAddressApiRequest updateAddressApiRequest) {
         final Result<Void, List<String>> result = this.getValidator(updateAddressApiRequest.getResourceName()).validateBody(updateAddressApiRequest);
         if (result.isFailure()) {
@@ -75,7 +76,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/active-departments")
-    @AccessUserControl("ROLE_ADMIN_CREATE")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateDepartmentActiveStatus(@RequestParam final Boolean active,
                                                           @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
@@ -84,7 +85,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/department-type")
-    @AccessUserControl(permissions = {"ROLE_ADMIN_CREATE", "ROLE_MANAGER_CREATE"})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> changeDepartmentType(@RequestParam final String departmentType,
                                                   @RequestParam final String departmentCode) {
         final DepartmentCode departmentCodeValue = new DepartmentCode(departmentCode);
@@ -94,7 +95,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/identification-numbers")
-    @AccessUserControl("ROLE_ADMIN_CREATE")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> updateIdentificationNumber(
 			@RequestBody final IdentificationNumberChangeApiRequest identificationNumberChangeRequest) {
         final Result<Void, List<String>> result = this.getValidator(identificationNumberChangeRequest.getResourceName())
@@ -110,7 +111,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/statuses")
-    @AccessUserControl("ROLE_ADMIN_CREATE")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> changeDepartmentStatus(
             @RequestBody final ChangeDepartmentStatusApi departmentStatusRequest) {
         final Result<Void, List<String>> result = this.getValidator(departmentStatusRequest.getResourceName())
@@ -126,7 +127,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/emails")
-    @AccessUserControl("ROLE_ADMIN_CREATE")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     public ResponseEntity<?> changeDepartmentEmail(
             @RequestBody final ChangeDepartmentEmailApiRequest changeDepartmentEmailRequest) {
         final Result<Void, List<String>> result = this.getValidator(changeDepartmentEmailRequest.getResourceName())
