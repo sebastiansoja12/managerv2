@@ -1,5 +1,6 @@
 package com.warehouse.voronoi.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.voronoi.domain.model.PositionStack;
 import com.warehouse.voronoi.domain.port.secondary.PositionStackRepository;
 import org.springframework.http.ResponseEntity;
@@ -9,13 +10,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.warehouse.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.port.secondary.VoronoiServiceConfiguration;
-import com.warehouse.voronoi.domain.port.secondary.VoronoiServicePort;
+import com.warehouse.voronoi.domain.port.secondary.GeolocationServiceProvider;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.exception.CoordinatesTechnicalException;
 
 import lombok.NonNull;
 
 
-public class VoronoiAdapter extends RestGatewaySupport implements VoronoiServicePort {
+public class GeolocationAdapter extends RestGatewaySupport implements GeolocationServiceProvider {
 
     @NonNull
     private final PositionStackProperties positionStackProperties;
@@ -28,10 +29,15 @@ public class VoronoiAdapter extends RestGatewaySupport implements VoronoiService
 
     private final String LONGITUDE = "longitude";
 
-    public VoronoiAdapter(final @NonNull PositionStackProperties positionStackProperties,
-                          final PositionStackRepository positionStackRepository) {
+    public GeolocationAdapter(final @NonNull PositionStackProperties positionStackProperties,
+                              final PositionStackRepository positionStackRepository) {
         this.positionStackProperties = positionStackProperties;
         this.positionStackRepository = positionStackRepository;
+    }
+
+    @Override
+    public boolean canHandle(final GeocodingProvider geocodingProvider) {
+        return GeocodingProvider.POSITION_STACK.equals(geocodingProvider);
     }
 
     @Override
