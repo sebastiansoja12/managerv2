@@ -64,6 +64,16 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<User> findAll() {
+        return repository.createCriteria(UserEntity.class)
+                .isFalse("deleted")
+                .list()
+                .stream()
+                .map(UserToModelMapper::map)
+                .toList();
+    }
+
+    @Override
     public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
         return repository.createCriteria(UserEntity.class)
                 .eq("departmentCode.value", departmentCode)
