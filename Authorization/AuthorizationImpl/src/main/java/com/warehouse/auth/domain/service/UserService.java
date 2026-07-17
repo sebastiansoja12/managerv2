@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -14,6 +15,10 @@ public interface UserService {
     RegisterResponse create(final User user);
 
     User findUser(final String username);
+
+    List<User> findAll();
+
+    User update(final UpdateUserCommand command);
 
     UserId nextUserId();
 

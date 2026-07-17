@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.warehouse.auth.domain.event.*;
+import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.RegisterResponse;
@@ -34,6 +36,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUser(final String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User update(final UpdateUserCommand command) {
+        final User user = userRepository.findById(command.userId());
+        if (user == null) {
+            throw new AuthenticationErrorException("User does not exist");
+        }
+        user.update(command);
+        userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
+        return user;
     }
 
     @Override
