@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="s-soja" id="create-geocoding-configurations-2026-07-16">
+        <createTable tableName="geocoding_configurations">
+            <column name="geocoding_configuration_id" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="api_url" type="VARCHAR(50)"/>
+            <column name="api_user_name" type="VARCHAR(50)"/>
+            <column name="api_password" type="VARCHAR(50)"/>
+            <column name="api_key" type="VARCHAR(2048)"/>
+            <column name="access_token" type="VARCHAR(50)"/>
+            <column name="refresh_token" type="VARCHAR(50)"/>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provider" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="geocoding_configurations"
+                             columnNames="operator_id, provider"
+                             constraintName="uk_geocoding_configurations_operator_provider"/>
+    </changeSet>
+
+</databaseChangeLog>
