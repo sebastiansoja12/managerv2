@@ -11,6 +11,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpassword"]
       interval: 10s
@@ -138,10 +139,10 @@ services:
       - "8070:8070"
     environment:
       SPRING_PROFILES_ACTIVE: dev,docker
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/rm
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/dev
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       mysql:
@@ -165,10 +166,9 @@ services:
     ports:
       - "8082:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/rt
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/dev
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       mysql:
