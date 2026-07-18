@@ -1,11 +1,8 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:21
+FROM eclipse-temurin:21-jre
 
-# Copy the Spring Boot application
-COPY  Application/target/Application-2026.3-SNAPSHOT.jar app.jar
+ARG JAR_FILE=Application/target/Application-2026.3-SNAPSHOT.jar
+COPY ${JAR_FILE} app.jar
 
-# Expose the default Spring Boot port
 EXPOSE 8080
 
-# Set the entry point to run the Spring Boot application
 ENTRYPOINT ["java", "-jar", "/app.jar"]
