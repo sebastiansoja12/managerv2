@@ -36,6 +36,6 @@ public class OperatorDepartmentEventListener {
                 DepartmentType.valueOf(event.departmentType()),
                 event.operatorId()
         );
-        departmentPort.createDepartments(new DepartmentCreateCommand(List.of(department)));
+        this.departmentPort.createDepartments(new DepartmentCreateCommand(List.of(department)));
     }
 }

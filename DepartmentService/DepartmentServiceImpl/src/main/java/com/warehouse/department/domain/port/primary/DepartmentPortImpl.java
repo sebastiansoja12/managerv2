@@ -74,8 +74,6 @@ public class DepartmentPortImpl implements DepartmentPort {
 					new TaxId(departmentCreate.getTaxId()), departmentCreate.getTelephoneNumber(),
 					departmentCreate.getOpeningHours(), departmentCreate.getEmail(),
 					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
-            department.assignOperator(departmentCreate.getOperatorId());
-
             this.departmentService.createDepartment(department);
 
             createdDepartments.put(department, true);
