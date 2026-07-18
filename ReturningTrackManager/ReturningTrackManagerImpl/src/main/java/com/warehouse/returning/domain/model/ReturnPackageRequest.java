@@ -1,44 +1,35 @@
 package com.warehouse.returning.domain.model;
 
+import com.warehouse.common.DepartmentId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
-import com.warehouse.returning.domain.vo.DepartmentCode;
 import com.warehouse.returning.domain.vo.ShipmentId;
 import com.warehouse.returning.domain.vo.UserId;
-import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnPackageRequestApi;
 
 public class ReturnPackageRequest {
     private ShipmentId shipmentId;
     private String reason;
-    private DepartmentCode departmentCode;
+    private DepartmentId departmentId;
     private UserId userId;
     private ReasonCode reasonCode;
 
-	public ReturnPackageRequest(final DepartmentCode departmentCode,
+	public ReturnPackageRequest(final DepartmentId departmentId,
                                 final String reason,
                                 final ShipmentId shipmentId,
                                 final UserId userId,
                                 final ReasonCode reasonCode) {
-        this.departmentCode = departmentCode;
+        this.departmentId = departmentId;
         this.reason = reason;
         this.shipmentId = shipmentId;
         this.userId = userId;
         this.reasonCode = reasonCode;
     }
 
-    public static ReturnPackageRequest from(final ReturnPackageRequestApi returnPackageRequest) {
-        final DepartmentCode departmentCode = DepartmentCode.of(returnPackageRequest.departmentCode());
-        final UserId userId = UserId.of(returnPackageRequest.userId());
-        final ShipmentId shipmentId = ShipmentId.of(returnPackageRequest.shipmentId());
-		return new ReturnPackageRequest(departmentCode, returnPackageRequest.reason(), shipmentId, userId,
-				ReasonCode.valueOf(returnPackageRequest.reasonCode().value()));
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
-    }
-
-    public void setDepartmentCode(final DepartmentCode departmentCode) {
-        this.departmentCode = departmentCode;
+    public void setDepartmentId(final DepartmentId departmentId) {
+        this.departmentId = departmentId;
     }
 
     public String getReason() {
