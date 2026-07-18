@@ -5,39 +5,34 @@ import java.util.List;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.department.domain.model.Department;
+import com.warehouse.department.domain.port.secondary.DepartmentReadRepository;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepartmentToEntityMapper;
 import com.warehouse.department.infrastructure.adapter.secondary.mapper.DepartmentToModelMapper;
 
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
-    private static final List<DepartmentEntity.Status> EXCLUDED_STATUSES = List.of(
-            DepartmentEntity.Status.ARCHIVED,
-            DepartmentEntity.Status.DELETED
-    );
-
     private final OperatorFilteredRepository<DepartmentEntity> repository;
 
-    public DepartmentRepositoryImpl(final OperatorFilteredRepository<DepartmentEntity> repository) {
+    private final DepartmentReadRepository<DepartmentReadEntity> readRepository;
+
+    public DepartmentRepositoryImpl(final OperatorFilteredRepository<DepartmentEntity> repository,
+                                    final DepartmentReadRepository<DepartmentReadEntity> readRepository) {
         this.repository = repository;
+        this.readRepository = readRepository;
     }
 
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
-        final DepartmentEntity department = repository.createCriteria(DepartmentEntity.class)
-                .eq("departmentCode.value", departmentCode)
-                .notIn("status", EXCLUDED_STATUSES)
-                .one()
-                .orElse(null);
+        final DepartmentReadEntity department = readRepository.findById(departmentCode);
         return DepartmentToModelMapper.map(department);
     }
 
     @Override
     public List<Department> findAll() {
-        final List<DepartmentEntity> departments = repository.createCriteria(DepartmentEntity.class)
-                .notIn("status", EXCLUDED_STATUSES)
-                .list();
+        final List<DepartmentReadEntity> departments = readRepository.list();
         return departments.stream().map(DepartmentToModelMapper::map).toList();
     }
 
