@@ -135,6 +135,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 "dummy",
                 command.language()
         );
+        user.assignOperator(command.operatorId());
         userService.create(user);
         return userId;
     }
