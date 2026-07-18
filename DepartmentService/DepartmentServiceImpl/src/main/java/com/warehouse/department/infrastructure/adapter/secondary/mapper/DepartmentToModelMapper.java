@@ -9,6 +9,7 @@ import com.warehouse.department.domain.vo.TaxId;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentAddress;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentCoordinates;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
 
 public abstract class DepartmentToModelMapper {
 
@@ -24,6 +25,23 @@ public abstract class DepartmentToModelMapper {
                     map(department.getDepartmentCoordinates()), department.getCreatedAt(),
 					department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
 					department.getLastModifiedBy());
+            model.assignOperator(department.operatorId());
+            return model;
+        }
+    }
+
+    public static Department map(final DepartmentReadEntity department) {
+        if (department == null) {
+            return null;
+        } else {
+            final Department model = new Department(new DepartmentCode(department.getDepartmentCode().getValue()),
+                    map(department.getDepartmentAddress()), new TaxId(department.getTaxId().value()),
+                    department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
+                    DepartmentType.valueOf(department.getDepartmentType().name()),
+                    Department.Status.valueOf(department.getStatus().name()),
+                    map(department.getDepartmentCoordinates()), department.getCreatedAt(),
+                    department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
+                    department.getLastModifiedBy());
             model.assignOperator(department.operatorId());
             return model;
         }
