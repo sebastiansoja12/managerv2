@@ -2,6 +2,8 @@ package com.warehouse.auth.infrastructure.adapter.secondary;
 
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.service.ApiKeyEncoder;
+import com.warehouse.auth.domain.vo.ApiKey;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
@@ -19,8 +21,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final OperatorFilteredRepository<UserEntity> repository;
 
-    public UserRepositoryImpl(final OperatorFilteredRepository<UserEntity> repository) {
+    private final ApiKeyEncoder apiKeyEncoder;
+
+    public UserRepositoryImpl(final OperatorFilteredRepository<UserEntity> repository,
+                              final ApiKeyEncoder apiKeyEncoder) {
         this.repository = repository;
+        this.apiKeyEncoder = apiKeyEncoder;
     }
 
     @Override
@@ -47,8 +53,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findByApiKey(final String apiKey) {
+        final String encodedApiKey = apiKeyEncoder.decode(new ApiKey(null, apiKey)).key();
         return repository.createCriteria(UserEntity.class)
-                .eq("apiKey", apiKey)
+                .eq("apiKey", encodedApiKey)
                 .one()
                 .map(UserToModelMapper::map)
                 .orElse(null);

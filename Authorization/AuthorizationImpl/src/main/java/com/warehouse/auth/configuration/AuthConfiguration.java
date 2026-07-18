@@ -46,9 +46,10 @@ public class AuthConfiguration  {
                                                  final JwtService jwtService,
                                                  final PasswordEncoder passwordEncoder,
                                                  final DepartmentService departmentService,
-                                                 final MailServicePort mailServicePort) {
+                                                 final MailServicePort mailServicePort,
+                                                 final ApiKeyEncoder apiKeyEncoder) {
 		return new AuthenticationPortImpl(authenticationService, userService, jwtService,
-				passwordEncoder, departmentService, mailServicePort);
+				passwordEncoder, departmentService, mailServicePort, apiKeyEncoder);
     }
 
     @Bean
