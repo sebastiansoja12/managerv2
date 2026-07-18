@@ -20,6 +20,7 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.registry.DomainRegistry;
+import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.RolePermissionService;
 import com.warehouse.auth.domain.service.UserService;
@@ -56,7 +57,24 @@ class AuthEventListenerTest {
         ));
         domainRegistry.setApplicationContext(applicationContext);
 
-        listener = new AuthEventListener(authenticationPort, userPort, userService, jwtService, passwordEncoder);
+        final ApiKeyEncoder apiKeyEncoder = new ApiKeyEncoder() {
+            @Override
+            public com.warehouse.auth.domain.vo.ApiKey encode(final User user) {
+                return new com.warehouse.auth.domain.vo.ApiKey(user.getUserId(), "encoded-api-key");
+            }
+
+            @Override
+            public com.warehouse.auth.domain.vo.ApiKey encode(final UserId userId, final String username) {
+                return new com.warehouse.auth.domain.vo.ApiKey(userId, "encoded-api-key");
+            }
+
+            @Override
+            public com.warehouse.auth.domain.vo.ApiKey decode(final com.warehouse.auth.domain.vo.ApiKey apiKey) {
+                return new com.warehouse.auth.domain.vo.ApiKey(apiKey.userId(), "encoded-api-key");
+            }
+        };
+        listener = new AuthEventListener(authenticationPort, userPort, userService, jwtService, passwordEncoder,
+                apiKeyEncoder);
     }
 
     @Test
@@ -88,6 +106,7 @@ class AuthEventListenerTest {
         assertThat(createdUser.getRole()).isEqualTo(User.Role.ADMIN);
         assertThat(createdUser.isInitial()).isTrue();
         assertThat(createdUser.getPassword()).isEqualTo("encoded-password");
+        assertThat(createdUser.getApiKey()).isEqualTo("encoded-api-key");
         assertThat(publishedUserId.get()).isEqualTo(new UserId(77L));
     }
 }

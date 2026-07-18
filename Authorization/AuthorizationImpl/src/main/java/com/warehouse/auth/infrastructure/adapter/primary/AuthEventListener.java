@@ -9,6 +9,7 @@ import com.warehouse.auth.domain.model.AdminCreateRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
+import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
@@ -36,16 +37,20 @@ public class AuthEventListener {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final ApiKeyEncoder apiKeyEncoder;
+
     public AuthEventListener(final AuthenticationPort authenticationPort,
                              final UserPort userPort,
                              final UserService userService,
                              final JwtService jwtService,
-                             final PasswordEncoder passwordEncoder) {
+                             final PasswordEncoder passwordEncoder,
+                             final ApiKeyEncoder apiKeyEncoder) {
         this.authenticationPort = authenticationPort;
         this.userPort = userPort;
         this.userService = userService;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.apiKeyEncoder = apiKeyEncoder;
     }
 
     @EventListener
@@ -64,9 +69,10 @@ public class AuthEventListener {
         final OperatorId operatorId = OperatorId.of(registeringUser.operatorId().value());
         final UserId userId = userService.nextUserId();
         final String password = passwordEncoder.encode(registeringUser.password());
+        final String apiKey = apiKeyEncoder.encode(userId, registeringUser.username()).key();
 
         final User user = User.createAdmin(userId, registeringUser.username(), password, registeringUser.firstName(),
-                registeringUser.lastName(), registeringUser.email(), departmentCode, registeringUser.language(), "dummy");
+                registeringUser.lastName(), registeringUser.email(), departmentCode, registeringUser.language(), apiKey);
         user.assignOperator(operatorId);
         user.markAsInitial();
 
