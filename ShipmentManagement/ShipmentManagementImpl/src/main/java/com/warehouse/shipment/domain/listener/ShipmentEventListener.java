@@ -20,6 +20,7 @@ import com.warehouse.shipment.domain.service.RouteTrackerService;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
+import com.warehouse.shipment.infrastructure.adapter.secondary.kafka.ShipmentReturnKafkaPublisher;
 import com.warehouse.shipment.infrastructure.adapter.secondary.notifier.RouteTrackerHistoryNotifier;
 
 @Component
@@ -35,16 +36,20 @@ public class ShipmentEventListener {
 
     private final PathFinderServicePort pathFinderServicePort;
 
+    private final ShipmentReturnKafkaPublisher shipmentReturnKafkaPublisher;
+
     public ShipmentEventListener(final RouteTrackerHistoryNotifier routeTrackerHistoryNotifier,
                                  final ShipmentService shipmentService,
                                  final RouteTrackerService routeTrackerService,
                                  final ReturningServicePort returningServicePort,
-                                 final PathFinderServicePort pathFinderServicePort) {
+                                 final PathFinderServicePort pathFinderServicePort,
+                                 final ShipmentReturnKafkaPublisher shipmentReturnKafkaPublisher) {
         this.routeTrackerHistoryNotifier = routeTrackerHistoryNotifier;
         this.shipmentService = shipmentService;
         this.routeTrackerService = routeTrackerService;
         this.returningServicePort = returningServicePort;
         this.pathFinderServicePort = pathFinderServicePort;
+        this.shipmentReturnKafkaPublisher = shipmentReturnKafkaPublisher;
     }
 
     @EventListener
@@ -89,6 +94,8 @@ public class ShipmentEventListener {
             throw new TechnicalException(HttpStatusCode.valueOf(result.getFailure().getCode()),
                     result.getFailure().getMessage());
         }
+
+        this.shipmentReturnKafkaPublisher.publish(snapshot, voronoiResponse.getValue());
     }
 
     @TransactionalEventListener(fallbackExecution = true)
