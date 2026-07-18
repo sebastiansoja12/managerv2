@@ -2,6 +2,8 @@ package com.warehouse.returning.domain.port.primary;
 
 import java.util.Optional;
 
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.vo.*;
@@ -11,17 +13,15 @@ public interface ReturnPort {
 
     void changeReasonCode(final ChangeReasonCodeRequest request);
 
-    void startProcessing(final ShipmentId shipmentId);
+    void startProcessing(final ReturnPackageId returnPackageId);
 
-    void complete(final ShipmentId shipmentId);
-
-    void cancel(final ShipmentId shipmentId);
+    void complete(final ReturnPackageId returnPackageId);
 
     ReturnPackage getReturn(final ReturnPackageId returnId);
 
-    Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final Long operatorId);
+    Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final OperatorId operatorId);
 
-    ReturnPage getReturns(final DepartmentCode departmentCode, final Long operatorId, final int page, final int size);
+    ReturnPage getReturns(final DepartmentId departmentId, final OperatorId operatorId, final int page, final int size);
 
     ReturnTokenValidation validateReturnToken(final ShipmentId shipmentId, final ReturnToken returnToken);
 
