@@ -41,4 +41,43 @@
         </createIndex>
     </changeSet>
 
+    <changeSet author="sebastiansoja" id="20260718-3-create-department-rd-aud">
+        <createTable tableName="department_rd_aud">
+            <column name="rev" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="revtype" type="TINYINT(3)"/>
+            <column name="department_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(255)"/>
+            <column name="country_code" type="VARCHAR(8)"/>
+            <column name="tax_id" type="VARCHAR(255)"/>
+            <column name="telephone_number" type="VARCHAR(255)"/>
+            <column name="opening_hours" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="department_type" type="VARCHAR(64)"/>
+            <column name="status" type="VARCHAR(32)"/>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="admin_user_id" type="BIGINT"/>
+            <column name="created_by" type="BIGINT"/>
+            <column name="last_modified_by" type="BIGINT"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+        <addPrimaryKey tableName="department_rd_aud"
+                       columnNames="department_code, rev"
+                       constraintName="pk_department_rd_aud"/>
+    </changeSet>
+
+    <changeSet author="sebastiansoja" id="20260718-4-index-department-rd-aud-rev">
+        <createIndex associatedWith="" indexName="fk_department_rd_aud_revinfo" tableName="department_rd_aud">
+            <column name="rev"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
