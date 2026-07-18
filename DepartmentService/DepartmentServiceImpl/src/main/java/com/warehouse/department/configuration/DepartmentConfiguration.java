@@ -10,6 +10,7 @@ import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.port.primary.DepartmentPortImpl;
 import com.warehouse.department.domain.port.secondary.DepartmentCoordinatesServicePort;
+import com.warehouse.department.domain.port.secondary.DepartmentReadRepository;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.department.domain.port.secondary.UserClientServicePort;
@@ -22,6 +23,7 @@ import com.warehouse.department.infrastructure.adapter.primary.DepartmentService
 import com.warehouse.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
 import com.warehouse.department.infrastructure.adapter.secondary.*;
 import com.warehouse.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
+import com.warehouse.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
 import com.warehouse.voronoi.VoronoiCoordinatesService;
 
 @Configuration
@@ -35,8 +37,9 @@ public class DepartmentConfiguration {
 
     @Bean(name = "department.departmentRepository")
     public DepartmentRepository departmentRepository(
-            final OperatorFilteredRepository<DepartmentEntity> repository) {
-        return new DepartmentRepositoryImpl(repository);
+            final OperatorFilteredRepository<DepartmentEntity> repository,
+            final DepartmentReadRepository<DepartmentReadEntity> readRepository) {
+        return new DepartmentRepositoryImpl(repository, readRepository);
     }
 
     @Bean
