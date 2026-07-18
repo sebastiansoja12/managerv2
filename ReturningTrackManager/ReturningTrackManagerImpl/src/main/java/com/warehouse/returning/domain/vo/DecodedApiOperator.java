@@ -1,4 +1,7 @@
 package com.warehouse.returning.domain.vo;
 
-public record DecodedApiOperator(UserId userId, DepartmentCode departmentCode, Long operatorId, String username) {
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
+
+public record DecodedApiOperator(UserId userId, DepartmentId departmentId, OperatorId operatorId, String username) {
 }
