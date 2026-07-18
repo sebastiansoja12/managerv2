@@ -82,7 +82,12 @@ public class DepartmentReadSyncBasicAuthenticationFilter extends OncePerRequestF
 
     @Override
     protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
-        return !request.getRequestURI().startsWith(request.getContextPath() + ENDPOINT_PREFIX);
+        final String uri = request.getRequestURI();
+        final String contextPath = request.getContextPath();
+        if (uri.startsWith(contextPath + ENDPOINT_PREFIX)) {
+            return false;
+        }
+        return !uri.startsWith("/v2/api" + ENDPOINT_PREFIX);
     }
 
     private boolean hasRefreshPermission(final UserEntity user) {
