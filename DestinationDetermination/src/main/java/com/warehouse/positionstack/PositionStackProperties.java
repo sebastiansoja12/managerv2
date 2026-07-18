@@ -20,8 +20,6 @@ public class PositionStackProperties extends Properties {
 
     private String stage;
 
-    private String token;
-
     public void setUrl(String url) {
         this.url = url;
     }
@@ -30,11 +28,7 @@ public class PositionStackProperties extends Properties {
         this.stage = stage;
     }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String createRequest(final String token, final String value) {
-        return getUrl() + DIVIDER + ACCESS_KEY + token + QUERY + value;
+    public String createRequest(final String url, final String token, final String value) {
+        return url + DIVIDER + ACCESS_KEY + token + QUERY + value;
     }
 }

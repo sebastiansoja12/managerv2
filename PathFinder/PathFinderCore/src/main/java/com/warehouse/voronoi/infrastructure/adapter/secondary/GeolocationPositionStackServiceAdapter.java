@@ -1,22 +1,22 @@
 package com.warehouse.voronoi.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.enumeration.GeocodingProvider;
-import com.warehouse.voronoi.domain.model.PositionStack;
-import com.warehouse.voronoi.domain.port.secondary.PositionStackRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.support.RestGatewaySupport;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.positionstack.PositionStackProperties;
 import com.warehouse.voronoi.domain.model.Coordinates;
-import com.warehouse.voronoi.domain.port.secondary.VoronoiServiceConfiguration;
 import com.warehouse.voronoi.domain.port.secondary.GeolocationServiceProvider;
+import com.warehouse.voronoi.domain.port.secondary.PositionStackRepository;
+import com.warehouse.voronoi.domain.port.secondary.VoronoiServiceConfiguration;
+import com.warehouse.voronoi.domain.vo.GeocodingConfig;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.exception.CoordinatesTechnicalException;
 
 import lombok.NonNull;
 
 
-public class GeolocationAdapter extends RestGatewaySupport implements GeolocationServiceProvider {
+public class GeolocationPositionStackServiceAdapter extends RestGatewaySupport implements GeolocationServiceProvider {
 
     @NonNull
     private final PositionStackProperties positionStackProperties;
@@ -29,8 +29,8 @@ public class GeolocationAdapter extends RestGatewaySupport implements Geolocatio
 
     private final String LONGITUDE = "longitude";
 
-    public GeolocationAdapter(final @NonNull PositionStackProperties positionStackProperties,
-                              final PositionStackRepository positionStackRepository) {
+    public GeolocationPositionStackServiceAdapter(final @NonNull PositionStackProperties positionStackProperties,
+                                                  final PositionStackRepository positionStackRepository) {
         this.positionStackProperties = positionStackProperties;
         this.positionStackRepository = positionStackRepository;
     }
@@ -41,13 +41,13 @@ public class GeolocationAdapter extends RestGatewaySupport implements Geolocatio
     }
 
     @Override
-    public Coordinates obtainCoordinates(final String requestCity) {
-        final VoronoiAdapterConfiguration voronoiAdapterConfiguration = new VoronoiAdapterConfiguration(positionStackRepository);
-        return calculate(requestCity, voronoiAdapterConfiguration);
+    public Coordinates obtainCoordinates(final String requestCity, final GeocodingConfig config) {
+        final PositionStackAdapterConfiguration positionStackAdapterConfiguration = new PositionStackAdapterConfiguration(config);
+        return calculate(requestCity, positionStackAdapterConfiguration);
     }
 
-    private Coordinates calculate(final String city, final VoronoiAdapterConfiguration voronoiAdapterConfiguration) {
-        final String url = voronoiAdapterConfiguration.requestUrl(city);
+    private Coordinates calculate(final String city, final PositionStackAdapterConfiguration positionStackAdapterConfiguration) {
+        final String url = positionStackAdapterConfiguration.requestUrl(city);
         final ResponseEntity<JsonNode> responseEntity = getRestTemplate().getForEntity(url, JsonNode.class);
         final JsonNode jsonNode = responseEntity.getBody();
 
@@ -67,12 +67,12 @@ public class GeolocationAdapter extends RestGatewaySupport implements Geolocatio
                 .build();
     }
 
-    private class VoronoiAdapterConfiguration implements VoronoiServiceConfiguration {
+    private class PositionStackAdapterConfiguration implements VoronoiServiceConfiguration {
 
-        private final PositionStackRepository positionStackRepository;
+        private final GeocodingConfig geocodingConfig;
 
-        private VoronoiAdapterConfiguration(final PositionStackRepository positionStackRepository) {
-            this.positionStackRepository = positionStackRepository;
+        private PositionStackAdapterConfiguration(final GeocodingConfig config) {
+            this.geocodingConfig = config;
         }
 
         @Override
@@ -87,8 +87,8 @@ public class GeolocationAdapter extends RestGatewaySupport implements Geolocatio
 
         @Override
         public String requestUrl(final String value) {
-            final PositionStack positionStack = this.positionStackRepository.findPositionStackConfiguration();
-            return positionStackProperties.createRequest(positionStack.getToken(), value);
+            return positionStackProperties.createRequest(geocodingConfig.baseUrl(),
+                    geocodingConfig.apiKey(), value);
         }
     }
 
