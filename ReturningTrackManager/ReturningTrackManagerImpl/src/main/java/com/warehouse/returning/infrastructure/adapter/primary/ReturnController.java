@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.common.DepartmentId;
 import com.warehouse.returning.configuration.JwtContext;
 import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.domain.model.ChangeReturnStatusRequest;
@@ -26,12 +27,13 @@ import com.warehouse.returning.infrastructure.adapter.primary.mapper.RequestMapp
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.returning.infrastructure.adapter.primary.validator.RequestValidator;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.BusinessException;
+import com.warehouse.returning.infrastructure.adapter.secondary.exception.RestException;
 
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -115,34 +117,16 @@ public class ReturnController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/complete")
-    public ResponseEntity<?> completeReturn(@RequestBody final ChangeReturnStatusApiRequest changeReturnStatusRequest) {
-        final Result validationResult = this.getValidator(changeReturnStatusRequest.getClassName())
-                .validateBody(changeReturnStatusRequest);
-        if (validationResult.isFailure()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
-        }
-
-        final ChangeReturnStatusRequest request = RequestMapper.map(changeReturnStatusRequest);
-        this.returnPort.complete(request.getShipmentId());
-        return ResponseEntity.ok().build();
+    @PutMapping("/{returnPackageId}/complete")
+    public ResponseEntity<Void> completeReturn(@PathVariable final Long returnPackageId) {
+        returnPort.complete(new ReturnPackageId(returnPackageId));
+        return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/process")
-    public ResponseEntity<?> startProcessingReturn(
-            @RequestBody final ChangeReturnStatusApiRequest changeReturnStatusRequest) {
-        final Result validationResult = this.getValidator(changeReturnStatusRequest.getClassName())
-                .validateBody(changeReturnStatusRequest);
-        if (validationResult.isFailure()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult.getFailure());
-        }
-
-        final ChangeReturnStatusRequest request = RequestMapper.map(changeReturnStatusRequest);
-        if (request.getReturnStatus() != ReturnStatus.PROCESSING) {
-            throw new IllegalArgumentException("Return status must be PROCESSING");
-        }
-        this.returnPort.startProcessing(request.getShipmentId());
-        return ResponseEntity.ok().build();
+    @PutMapping("/{returnPackageId}/process")
+    public ResponseEntity<Void> startProcessingReturn(@PathVariable final Long returnPackageId) {
+        returnPort.startProcessing(new ReturnPackageId(returnPackageId));
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/shipment/{shipmentId}")
@@ -166,7 +150,7 @@ public class ReturnController {
 
     @GetMapping
     public ResponseEntity<ReturnPageApi> getAll(
-            @RequestParam @NotBlank(message = "Department code is required") final String departmentCode,
+            @RequestParam @NotNull(message = "Department ID is required") final DepartmentId departmentId,
             @RequestParam(defaultValue = "0")
             @Min(value = 0, message = "Page must be non-negative") final int page,
             @RequestParam(defaultValue = "50")
@@ -177,7 +161,7 @@ public class ReturnController {
             throw new IllegalArgumentException("Operator ID is required");
         }
         final ReturnPage returnPage = this.returnPort.getReturns(
-                new DepartmentCode(departmentCode.trim().toUpperCase()),
+                departmentId,
                 decodedApiOperator.operatorId(), page, size);
         return ResponseEntity.ok(ResponseMapper.toResponseApi(returnPage));
     }
@@ -198,8 +182,8 @@ public class ReturnController {
         return new DeleteReturnResponse(ResponseStatus.OK);
     }
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handleRestException(final BusinessException ex) {
+    @ExceptionHandler(RestException.class)
+    public ResponseEntity<String> handleRestException(final RestException ex) {
         log.error("Business exception occurred: {}", ex.getMessage());
         return ResponseEntity
                 .status(ex.getCode())

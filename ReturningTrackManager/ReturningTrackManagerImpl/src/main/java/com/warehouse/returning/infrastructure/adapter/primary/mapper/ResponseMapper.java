@@ -2,6 +2,7 @@ package com.warehouse.returning.infrastructure.adapter.primary.mapper;
 
 import java.time.Instant;
 
+import com.warehouse.common.DepartmentId;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 import com.warehouse.returning.domain.vo.ReturnPage;
@@ -27,15 +28,15 @@ public abstract class ResponseMapper {
 		final String reason = returnPackage.getReason();
 		final ReturnStatusApi returnStatus = ReturnStatusApi.valueOf(returnPackage.getReturnStatus().name());
 		final ReturnTokenApi returnToken = new ReturnTokenApi(returnPackage.getReturnToken().value());
-		final DepartmentCodeApi assignedDepartmentCode = new DepartmentCodeApi(returnPackage.getAssignedDepartmentCode().value());
-		final DepartmentCodeApi returnedDepartmentCode = new DepartmentCodeApi(returnPackage.getReturnedDepartmentCode().value());
+		final DepartmentId assignedDepartmentId = returnPackage.getAssignedDepartmentId();
+		final DepartmentId returnedDepartmentId = returnPackage.getReturnedDepartmentId();
 		final UserIdApi assignedTo = new UserIdApi(returnPackage.getAssignedTo().value());
 		final UserIdApi processedBy = new UserIdApi(returnPackage.getProcessedBy().value());
 		final ReasonCodeApi reasonCode = new ReasonCodeApi(returnPackage.getReasonCode().name());
 		final Instant createdAt = returnPackage.getCreatedAt();
 		final Instant updatedAt = returnPackage.getUpdatedAt();
 		return new ReturnPackageApi(returnPackageId, shipmentId, reason, returnStatus, returnToken,
-				assignedDepartmentCode, returnedDepartmentCode, assignedTo, processedBy, reasonCode,
+				assignedDepartmentId, returnedDepartmentId, assignedTo, processedBy, reasonCode,
                 returnPackage.getOperatorId(), createdAt,
 				updatedAt);
 	}
