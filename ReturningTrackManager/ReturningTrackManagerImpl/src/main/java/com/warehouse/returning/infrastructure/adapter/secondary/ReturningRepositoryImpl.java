@@ -1,22 +1,22 @@
 package com.warehouse.returning.infrastructure.adapter.secondary;
 
-import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
-import com.warehouse.returning.domain.vo.DepartmentCode;
-import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
+import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnPackageEntity;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ReturnId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.ReturnPackageNotFoundException;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnPackageToEntityMapper;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnPackageToModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+import java.util.Optional;
 
 public class ReturningRepositoryImpl implements ReturnRepository {
 
@@ -24,6 +24,13 @@ public class ReturningRepositoryImpl implements ReturnRepository {
 
     public ReturningRepositoryImpl(final ReturnReadRepository repository) {
         this.repository = repository;
+    }
+
+    @Override
+    public ReturnPackage findForProcessing(final ReturnPackageId returnPackageId) {
+        return this.repository.findForProcessing(ReturnId.of(returnPackageId))
+                .map(ReturnPackageToModelMapper::map)
+                .orElseThrow(ReturnPackageNotFoundException::new);
     }
 
     @Override
@@ -49,17 +56,17 @@ public class ReturningRepositoryImpl implements ReturnRepository {
 
     @Override
     public Optional<ReturnPackage> findLatestByShipmentIdAndOperatorId(
-            final ShipmentId shipmentId, final Long operatorId) {
+            final ShipmentId shipmentId, final OperatorId operatorId) {
         return this.repository.findLatestByShipmentIdAndOperatorId(shipmentId, operatorId, PageRequest.of(0, 1))
                 .stream().findFirst().map(ReturnPackageToModelMapper::map);
     }
 
     @Override
-    public ReturnPage findByDepartmentCodeAndOperatorId(
-            final DepartmentCode departmentCode, final Long operatorId, final int page, final int size) {
+    public ReturnPage findByDepartmentIdAndOperatorId(
+            final DepartmentId departmentId, final OperatorId operatorId, final int page, final int size) {
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
-        final Page<ReturnPackageEntity> result = this.repository.findByDepartmentCodeAndOperatorId(
-                departmentCode.value(), operatorId, pageRequest);
+        final Page<ReturnPackageEntity> result = this.repository.findByDepartmentIdAndOperatorId(
+                departmentId, operatorId, pageRequest);
         return new ReturnPage(
                 result.getContent().stream().map(ReturnPackageToModelMapper::map).toList(),
                 result.getNumber(),
