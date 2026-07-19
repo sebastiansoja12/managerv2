@@ -8,7 +8,7 @@
         <createIndex tableName="returning_return_package"
                      indexName="idx_return_operator_department_updated">
             <column name="operator_id"/>
-            <column name="assigned_department"/>
+            <column name="assigned_department_id"/>
             <column name="updated_at"/>
         </createIndex>
     </changeSet>
