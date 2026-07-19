@@ -2,7 +2,6 @@ package com.warehouse.routetracker.domain.port.primary;
 
 import java.util.List;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.helper.Result;
@@ -11,6 +10,7 @@ import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.service.JsonToStringService;
 import com.warehouse.routetracker.domain.service.JsonToStringServiceImpl;
 import com.warehouse.routetracker.domain.vo.*;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 
 import lombok.AllArgsConstructor;
 
@@ -26,7 +26,7 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     public RouteProcess initializeRouteProcess(final ShipmentId shipmentId) {
         final RouteLogRecord routeLogRecord = RouteLogRecord
                 .builder()
-                .parcelId(shipmentId.getValue())
+                .parcelId(shipmentId.value())
                 .build();
         return this.repository.save(routeLogRecord);
     }

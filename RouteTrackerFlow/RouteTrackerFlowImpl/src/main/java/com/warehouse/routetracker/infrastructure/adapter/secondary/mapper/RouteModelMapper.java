@@ -8,12 +8,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TerminalId;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
+import com.warehouse.routetracker.domain.vo.TerminalId;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 

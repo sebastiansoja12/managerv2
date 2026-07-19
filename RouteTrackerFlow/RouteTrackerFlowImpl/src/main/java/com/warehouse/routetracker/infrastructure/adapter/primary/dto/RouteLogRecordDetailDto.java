@@ -1,8 +1,9 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.dto;
 
-import com.warehouse.commonassets.identificator.TerminalId;
 
 import java.time.LocalDateTime;
+
+import com.warehouse.routetracker.domain.vo.TerminalId;
 
 
 public class RouteLogRecordDetailDto {
@@ -83,6 +84,6 @@ public class RouteLogRecordDetailDto {
     }
 
     public static TerminalIdDto from(final TerminalId terminalId) {
-        return new TerminalIdDto(terminalId.getValue());
+        return new TerminalIdDto(terminalId.value());
     }
 }

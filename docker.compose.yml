@@ -79,13 +79,9 @@ services:
   manager-application:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Application/Dockerfile
       secrets:
         - maven_settings
-      args:
-        MAVEN_WORKDIR: .
-        MAVEN_PROJECT: Application
-        JAR_FILE: Application/target/Application-2026.3-SNAPSHOT.jar
     image: managerv2/application:local
     container_name: manager-application
     restart: unless-stopped
@@ -131,13 +127,9 @@ services:
   software-configuration:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: SoftwareConfiguration/SoftwareConfigurationCore/Dockerfile
       secrets:
         - maven_settings
-      args:
-        MAVEN_WORKDIR: SoftwareConfiguration
-        MAVEN_PROJECT: SoftwareConfigurationCore
-        JAR_FILE: SoftwareConfiguration/SoftwareConfigurationCore/target/SoftwareConfigurationCore-2026.3-SNAPSHOT.jar
     image: managerv2/software-configuration:local
     container_name: software-configuration
     restart: unless-stopped
@@ -157,13 +149,9 @@ services:
   returning-manager:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ReturningTrackManager/ReturningTrackManagerImpl/Dockerfile
       secrets:
         - maven_settings
-      args:
-        MAVEN_WORKDIR: ReturningTrackManager
-        MAVEN_PROJECT: ReturningTrackManagerImpl
-        JAR_FILE: ReturningTrackManager/ReturningTrackManagerImpl/target/ReturningTrackManagerImpl-2026.3-SNAPSHOT.jar
     image: managerv2/returning-manager:local
     container_name: returning-manager
     restart: unless-stopped
@@ -189,13 +177,9 @@ services:
   route-tracker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: RouteTrackerFlow/RouteTrackerFlowImpl/Dockerfile
       secrets:
         - maven_settings
-      args:
-        MAVEN_WORKDIR: RouteTrackerFlow
-        MAVEN_PROJECT: RouteTrackerFlowImpl
-        JAR_FILE: RouteTrackerFlow/RouteTrackerFlowImpl/target/RouteTrackerFlowImpl-2026.3-SNAPSHOT.jar
     image: managerv2/route-tracker:local
     container_name: route-tracker
     restart: unless-stopped
@@ -226,4 +210,4 @@ volumes:
 
 secrets:
   maven_settings:
-    file: ${HOME}/.m2/settings.xml
+    file: ${HOME}/.m2/manager_settings.xml
