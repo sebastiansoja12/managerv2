@@ -6,7 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.returning.domain.port.primary.ReturnPort;
-import com.warehouse.returning.domain.port.primary.ReturnPortImpl;
+import com.warehouse.returning.application.port.primary.ReturnPortImpl;
+import com.warehouse.returning.application.service.ReturnProcessingService;
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.commonassets.event.infrastructure.adapter.secondary.SpringDomainEventPublisher;
+import org.springframework.context.ApplicationEventPublisher;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.port.secondary.ShipmentNotifyClientPort;
 import com.warehouse.returning.domain.service.ReturnService;
@@ -22,8 +26,14 @@ import com.warehouse.returning.infrastructure.adapter.secondary.ShipmentNotifyCl
 public class ReturningConfiguration {
 
     @Bean
-    public ReturnPort returnPort(final ReturnService returnService) {
-        return new ReturnPortImpl(returnService, new ReturnTokenGeneratorServiceImpl());
+    public ReturnPort returnPort(final ReturnService returnService,
+                                 final ReturnProcessingService returnProcessingService) {
+        return new ReturnPortImpl(returnService, new ReturnTokenGeneratorServiceImpl(), returnProcessingService);
+    }
+
+    @Bean
+    public DomainEventPublisher domainEventPublisher(final ApplicationEventPublisher eventPublisher) {
+        return new SpringDomainEventPublisher(eventPublisher);
     }
 
     @Bean
