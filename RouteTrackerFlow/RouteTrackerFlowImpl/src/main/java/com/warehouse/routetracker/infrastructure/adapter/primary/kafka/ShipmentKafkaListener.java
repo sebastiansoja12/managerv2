@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentCreatedRequest;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.UserId;
@@ -32,7 +31,7 @@ public class ShipmentKafkaListener {
         final ShipmentCreatedMessage message = this.deserialize(payload);
         final ShipmentCreatedRequest request = this.toShipmentCreatedRequest(message);
 
-        this.routeTrackerLogPort.initializeRouteProcess(new ShipmentId(request.shipmentId().value()));
+        this.routeTrackerLogPort.initializeRouteProcess(request.shipmentId());
         log.info("Processed shipment creation event for {}", message.shipmentId());
     }
 

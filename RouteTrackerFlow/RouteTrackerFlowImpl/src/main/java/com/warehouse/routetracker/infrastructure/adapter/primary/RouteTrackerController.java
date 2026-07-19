@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.configuration.common.RestException;
 import com.warehouse.routetracker.domain.helper.Result;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
@@ -20,6 +19,7 @@ import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.PersonChangeRequest;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentCreatedRequest;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.deliveryreturn.DeliveryReturnRequestDto;
 import com.warehouse.routetracker.infrastructure.adapter.primary.mapper.RouteRequestMapper;
@@ -46,7 +46,7 @@ public class RouteTrackerController {
 
     @PostMapping("/shipments")
     public ResponseEntity<?> initialize(@RequestBody final ShipmentCreatedRequest request) {
-        final RouteProcess routeProcess = trackerLogPort.initializeRouteProcess(new ShipmentId(request.shipmentId().value()));
+        final RouteProcess routeProcess = trackerLogPort.initializeRouteProcess(request.shipmentId());
         return new ResponseEntity<>(responseMapper.map(routeProcess), HttpStatus.OK);
 
     }
@@ -150,7 +150,7 @@ public class RouteTrackerController {
 						Person.from(request, Person.PersonType.valueOf(personType)));
         if (result.isFailure()) {
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new RouteLogRecordDto(null, new ShipmentIdDto(request.shipmentId().getValue()), null,
+                    new RouteLogRecordDto(null, new ShipmentIdDto(request.shipmentId().value()), null,
                             new ReturnCodeDto(HttpStatus.NOT_FOUND.toString()), new FaultDescriptionDto(result.getFailure().getMessage())
             ));
         }

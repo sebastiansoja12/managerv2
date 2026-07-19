@@ -23,7 +23,7 @@ public interface RouteResponseMapper {
     RouteInformationDto map(final RouteInformation routeInformation);
 
     default RouteProcessDto map(final RouteProcess routeProcess) {
-        final ShipmentIdDto shipmentId = new ShipmentIdDto(routeProcess.getShipmentId().getValue());
+        final ShipmentIdDto shipmentId = new ShipmentIdDto(routeProcess.getShipmentId().value());
         return new RouteProcessDto(shipmentId, routeProcess.getProcessId());
     }
 

@@ -1,11 +1,12 @@
 package com.warehouse.routetracker.domain.model;
 
-import com.warehouse.commonassets.identificator.TerminalId;
+import java.time.LocalDateTime;
+
 import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
-import lombok.*;
+import com.warehouse.routetracker.domain.vo.TerminalId;
 
-import java.time.LocalDateTime;
+import lombok.*;
 
 @Builder
 @Getter
@@ -70,9 +71,9 @@ public class RouteLogRecordDetail {
     }
 
     public void updateDeviceInformation(final DeviceInformationRequest request) {
-        this.departmentCode = request.getDepartmentCode().getValue();
+        this.departmentCode = request.getDepartmentCode().value();
         this.username = request.getUsername().value();
-        this.terminalId = new TerminalId(request.getDeviceId().getValue());
+        this.terminalId = new TerminalId(request.getDeviceId().value());
         this.version = request.getVersion();
     }
 }

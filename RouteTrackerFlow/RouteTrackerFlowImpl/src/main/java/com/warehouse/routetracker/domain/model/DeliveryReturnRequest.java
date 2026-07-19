@@ -2,8 +2,8 @@ package com.warehouse.routetracker.domain.model;
 
 import java.util.UUID;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 
 
 public class DeliveryReturnRequest {

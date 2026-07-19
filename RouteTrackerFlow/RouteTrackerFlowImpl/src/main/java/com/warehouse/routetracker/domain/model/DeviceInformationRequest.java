@@ -1,17 +1,17 @@
 package com.warehouse.routetracker.domain.model;
 
-import com.warehouse.commonassets.enumeration.DeviceType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.DeviceId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
+import com.warehouse.routetracker.domain.vo.DepartmentCode;
+import com.warehouse.routetracker.domain.vo.DeviceId;
 import com.warehouse.routetracker.domain.vo.Username;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.DeviceInformationRequestDto;
 
 public class DeviceInformationRequest {
     private ShipmentId shipmentId;
     private DeviceId deviceId;
-    private DeviceType deviceType;
+    private String deviceType;
     private Username username;
     private DepartmentCode departmentCode;
     private String version;
@@ -19,7 +19,7 @@ public class DeviceInformationRequest {
 
     public DeviceInformationRequest(final ShipmentId shipmentId,
                                     final DeviceId deviceId,
-                                    final DeviceType deviceType,
+                                    final String deviceType,
                                     final Username username,
                                     final DepartmentCode departmentCode,
                                     final String version,
@@ -36,7 +36,7 @@ public class DeviceInformationRequest {
     public static DeviceInformationRequest from(final DeviceInformationRequestDto device) {
         final ShipmentId shipmentId = new ShipmentId(device.shipmentId().getValue());
         final DeviceId deviceId = new DeviceId(device.deviceId().value());
-        final DeviceType deviceType = DeviceType.valueOf(device.deviceType().name());
+        final String deviceType = device.deviceType().name();
         final Username username = Username.from(device.username());
         final DepartmentCode departmentCode = new DepartmentCode(device.departmentCode().value());
         final String version = device.deviceVersion().value();
@@ -60,11 +60,11 @@ public class DeviceInformationRequest {
         this.deviceId = deviceId;
     }
 
-    public DeviceType getDeviceType() {
+    public String getDeviceType() {
         return deviceType;
     }
 
-    public void setDeviceType(final DeviceType deviceType) {
+    public void setDeviceType(final String deviceType) {
         this.deviceType = deviceType;
     }
 
