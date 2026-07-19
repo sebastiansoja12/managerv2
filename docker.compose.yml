@@ -80,7 +80,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      secrets:
+        - maven_settings
       args:
+        MAVEN_WORKDIR: .
+        MAVEN_PROJECT: Application
         JAR_FILE: Application/target/Application-2026.3-SNAPSHOT.jar
     image: managerv2/application:local
     container_name: manager-application
@@ -128,7 +132,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      secrets:
+        - maven_settings
       args:
+        MAVEN_WORKDIR: SoftwareConfiguration
+        MAVEN_PROJECT: SoftwareConfigurationCore
         JAR_FILE: SoftwareConfiguration/SoftwareConfigurationCore/target/SoftwareConfigurationCore-2026.3-SNAPSHOT.jar
     image: managerv2/software-configuration:local
     container_name: software-configuration
@@ -150,7 +158,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      secrets:
+        - maven_settings
       args:
+        MAVEN_WORKDIR: ReturningTrackManager
+        MAVEN_PROJECT: ReturningTrackManagerImpl
         JAR_FILE: ReturningTrackManager/ReturningTrackManagerImpl/target/ReturningTrackManagerImpl-2026.3-SNAPSHOT.jar
     image: managerv2/returning-manager:local
     container_name: returning-manager
@@ -178,7 +190,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      secrets:
+        - maven_settings
       args:
+        MAVEN_WORKDIR: RouteTrackerFlow
+        MAVEN_PROJECT: RouteTrackerFlowImpl
         JAR_FILE: RouteTrackerFlow/RouteTrackerFlowImpl/target/RouteTrackerFlowImpl-2026.3-SNAPSHOT.jar
     image: managerv2/route-tracker:local
     container_name: route-tracker
@@ -207,3 +223,7 @@ networks:
 volumes:
   mysql_data:
   mongo_data:
+
+secrets:
+  maven_settings:
+    file: ${HOME}/.m2/settings.xml
