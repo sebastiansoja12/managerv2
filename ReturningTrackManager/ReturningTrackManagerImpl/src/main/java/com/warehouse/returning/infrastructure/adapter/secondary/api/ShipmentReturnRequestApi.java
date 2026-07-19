@@ -1,5 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.api;
 
-public record ShipmentReturnRequestApi(ShipmentIdApi shipmentId, String reason, DepartmentCodeApi departmentCode,
+import com.warehouse.common.DepartmentId;
+public record ShipmentReturnRequestApi(ShipmentIdApi shipmentId, String reason, DepartmentId departmentId,
                                        UserIdApi issuedBy, String returnStatus) {
 }
