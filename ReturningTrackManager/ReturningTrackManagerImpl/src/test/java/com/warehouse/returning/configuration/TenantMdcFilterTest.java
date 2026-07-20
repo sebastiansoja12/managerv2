@@ -14,7 +14,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.warehouse.returning.domain.service.ApiKeyService;
 import com.warehouse.returning.domain.vo.DecodedApiOperator;
-import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.common.DepartmentId;
 import com.warehouse.returning.domain.vo.UserId;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.RestException;
 
@@ -31,7 +31,7 @@ class TenantMdcFilterTest {
         final MockHttpServletResponse response = new MockHttpServletResponse();
         final AtomicBoolean filterChainInvoked = new AtomicBoolean(false);
         when(apiKeyService.decodeJwt("access-token")).thenReturn(new DecodedApiOperator(
-                new UserId(11L), new DepartmentCode("KT1"), 10001L, "operator"));
+                new UserId(11L), new DepartmentId(1L), new com.warehouse.common.OperatorId(10001L), "operator"));
 
         filter.doFilter(request, response, (servletRequest, servletResponse) -> filterChainInvoked.set(true));
 
