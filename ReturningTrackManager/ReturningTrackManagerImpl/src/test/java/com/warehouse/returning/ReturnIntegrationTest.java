@@ -1,5 +1,7 @@
 package com.warehouse.returning;
 
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.exception.StatusChangeException;
 import com.warehouse.returning.domain.model.ReturnPackage;
@@ -31,10 +33,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@SpringBootTest
+@SpringBootTest(classes = ReturnPersistenceTestConfiguration.class, properties = {
+        "spring.liquibase.enabled=false", "spring.sql.init.mode=never",
+        "manager.kafka.integration-events.routes.return.processing.started=return.processing.started",
+        "manager.kafka.integration-events.routes.return.cancelled=return.cancelled"
+})
 @Transactional
 class ReturnIntegrationTest {
-    
+
     @Autowired
     private ReturnPort returnPort;
 
@@ -52,8 +58,8 @@ class ReturnIntegrationTest {
                 "Zwrot — niepotrzebny",
                 Status.COMPLETED,
                 "ABC123TOKEN",
-                "KT1",
-                "KT1",
+                new DepartmentId(1L),
+                new DepartmentId(1L),
                 1L,
                 2L,
                 ReasonCode.NO_LONGER_NEEDED,
@@ -67,8 +73,8 @@ class ReturnIntegrationTest {
                 "Uszkodzony produkt",
                 Status.CANCELLED,
                 "XYZ789TOKEN",
-                "KT2",
-                "KT3",
+                new DepartmentId(2L),
+                new DepartmentId(3L),
                 3L,
                 4L,
                 ReasonCode.DAMAGED,
@@ -84,11 +90,11 @@ class ReturnIntegrationTest {
 
     @Test
     void shouldProcessRequest() {
-        final DepartmentCode issuerDepartmentCode = new DepartmentCode("TST");
+        final DepartmentId issuerDepartmentId = new DepartmentId(5L);
         final UserId issuerUserId = new UserId(1L);
-        final List<ReturnPackageRequest> requests = buildReturnPackageRequest(issuerDepartmentCode, issuerUserId, 
+        final List<ReturnPackageRequest> requests = buildReturnPackageRequest(issuerDepartmentId, issuerUserId,
                 new ShipmentId(1L), "Zwrot", ReasonCode.NO_LONGER_NEEDED);
-        final ReturnRequest request = new ReturnRequest(issuerDepartmentCode, issuerUserId, requests);
+        final ReturnRequest request = new ReturnRequest(issuerDepartmentId, issuerUserId, requests);
 
         final ReturnResponse response = this.returnPort.process(request);
 
@@ -97,14 +103,14 @@ class ReturnIntegrationTest {
 
     @Test
     void shouldPersistOperatorIdWhenProcessingRequest() {
-        final DepartmentCode issuerDepartmentCode = new DepartmentCode("TST");
+        final DepartmentId issuerDepartmentId = new DepartmentId(5L);
         final UserId issuerUserId = new UserId(1L);
-        final Long operatorId = 77L;
+        final OperatorId operatorId = new OperatorId(77L);
         final List<ReturnPackageRequest> requests = buildReturnPackageRequest(
-                issuerDepartmentCode, issuerUserId, new ShipmentId(9001L), "Zwrot", ReasonCode.DAMAGED);
+                issuerDepartmentId, issuerUserId, new ShipmentId(9001L), "Zwrot", ReasonCode.DAMAGED);
 
         final ReturnResponse response = this.returnPort.process(
-                new ReturnRequest(issuerDepartmentCode, issuerUserId, operatorId, requests));
+                new ReturnRequest(issuerDepartmentId, issuerUserId, operatorId, requests));
 
         final ReturnPackage persisted = returnRepository.findById(
                 new ReturnPackageId(response.processReturn().get(0).returnId().getValue()));
@@ -114,28 +120,28 @@ class ReturnIntegrationTest {
     @Test
     void shouldListOnlyReturnsForDepartmentAndOperator() {
         createReturnPackageEntity(
-                2001L, 6001L, "Zwrot operatora 77", Status.CREATED, "TOKEN77", "WAW01", "WAW01",
+                2001L, 6001L, "Zwrot operatora 77", Status.CREATED, "TOKEN77", new DepartmentId(4L), new DepartmentId(4L),
                 11L, 12L, ReasonCode.DAMAGED, 77L,
                 Instant.parse("2026-08-14T08:00:00Z"), Instant.parse("2026-08-14T09:00:00Z"));
         createReturnPackageEntity(
-                2002L, 6002L, "Zwrot operatora 88", Status.CREATED, "TOKEN88", "WAW01", "WAW01",
+                2002L, 6002L, "Zwrot operatora 88", Status.CREATED, "TOKEN88", new DepartmentId(4L), new DepartmentId(4L),
                 21L, 22L, ReasonCode.DAMAGED, 88L,
                 Instant.parse("2026-08-14T10:00:00Z"), Instant.parse("2026-08-14T11:00:00Z"));
 
-        final ReturnPage result = this.returnPort.getReturns(new DepartmentCode("WAW01"), 77L, 0, 50);
+        final ReturnPage result = this.returnPort.getReturns(new DepartmentId(4L), new OperatorId(77L), 0, 50);
 
         assertEquals(1, result.totalElements());
         assertEquals(2001L, result.content().get(0).getReturnPackageId().value());
-        assertEquals(77L, result.content().get(0).getOperatorId());
+        assertEquals(new OperatorId(77L), result.content().get(0).getOperatorId());
     }
 
     @Test
     void shouldSkipProcessingRequestWhenShipmentAlreadyIsRegistered() {
-        final DepartmentCode issuerDepartmentCode = new DepartmentCode("TST");
+        final DepartmentId issuerDepartmentId = new DepartmentId(5L);
         final UserId issuerUserId = new UserId(1L);
-        final List<ReturnPackageRequest> requests = buildReturnPackageRequest(issuerDepartmentCode, issuerUserId,
+        final List<ReturnPackageRequest> requests = buildReturnPackageRequest(issuerDepartmentId, issuerUserId,
                 new ShipmentId(5001L), "Zwrot", ReasonCode.NO_LONGER_NEEDED);
-        final ReturnRequest request = new ReturnRequest(issuerDepartmentCode, issuerUserId, requests);
+        final ReturnRequest request = new ReturnRequest(issuerDepartmentId, issuerUserId, requests);
 
         final ReturnResponse response = this.returnPort.process(request);
 
@@ -161,8 +167,8 @@ class ReturnIntegrationTest {
                 "Uszkodzony produkt",
                 Status.PROCESSING,
                 "XYZ789TOKEN",
-                "KT2",
-                "KT3",
+                new DepartmentId(2L),
+                new DepartmentId(3L),
                 3L,
                 4L,
                 ReasonCode.DAMAGED,
@@ -170,7 +176,8 @@ class ReturnIntegrationTest {
                 Instant.parse("2025-10-12T12:30:00Z")
         );
 
-        this.returnPort.complete(new ShipmentId(15L));
+
+        this.returnPort.complete(new ReturnPackageId(123L));
 
         assertEquals(Status.COMPLETED, entity.getReturnStatus());
     }
@@ -183,8 +190,8 @@ class ReturnIntegrationTest {
                 "Uszkodzony produkt",
                 Status.CREATED,
                 "PROCESS123TOKEN",
-                "KT2",
-                "KT3",
+                new DepartmentId(2L),
+                new DepartmentId(3L),
                 3L,
                 4L,
                 ReasonCode.DAMAGED,
@@ -192,21 +199,22 @@ class ReturnIntegrationTest {
                 Instant.parse("2025-10-12T12:30:00Z")
         );
 
-        this.returnPort.startProcessing(new ShipmentId(17L));
+
+        this.returnPort.startProcessing(new ReturnPackageId(125L));
 
         assertEquals(Status.PROCESSING, entity.getReturnStatus());
     }
 
     @Test
-    void shouldCancelReturnByShipmentId() {
+    void shouldCancelReturnByReturnPackageId() {
         final ReturnPackageEntity entity = createReturnPackageEntity(
                 124L,
                 16L,
                 "Uszkodzony produkt",
                 Status.PROCESSING,
                 "XYZ789TOKEN",
-                "KT2",
-                "KT3",
+                new DepartmentId(2L),
+                new DepartmentId(3L),
                 3L,
                 4L,
                 ReasonCode.DAMAGED,
@@ -214,7 +222,8 @@ class ReturnIntegrationTest {
                 Instant.parse("2025-10-12T12:30:00Z")
         );
 
-        this.returnPort.cancel(new ShipmentId(16L));
+
+        this.returnPort.delete(new ReturnPackageId(124L));
 
         assertEquals(Status.CANCELLED, entity.getReturnStatus());
     }
@@ -242,8 +251,8 @@ class ReturnIntegrationTest {
                 "Uszkodzony produkt",
                 Status.PROCESSING,
                 "XYZ789TOKEN",
-                "KT2",
-                "KT3",
+                new DepartmentId(2L),
+                new DepartmentId(3L),
                 3L,
                 4L,
                 ReasonCode.DAMAGED,
@@ -265,8 +274,8 @@ class ReturnIntegrationTest {
                 "Uszkodzony produkt",
                 Status.COMPLETED,
                 "XYZ789TOKEN",
-                "KT2",
-                "KT3",
+                new DepartmentId(2L),
+                new DepartmentId(3L),
                 3L,
                 4L,
                 ReasonCode.DAMAGED,
@@ -289,8 +298,8 @@ class ReturnIntegrationTest {
                 "Uszkodzony produkt",
                 Status.CANCELLED,
                 "XYZ789TOKEN",
-                "KT2",
-                "KT3",
+                new DepartmentId(2L),
+                new DepartmentId(3L),
                 3L,
                 4L,
                 ReasonCode.DAMAGED,
@@ -306,54 +315,20 @@ class ReturnIntegrationTest {
         assertEquals("Return package not found", exception.getMessage());
     }
 
-    @Test
-    void shouldNotCompleteWhenIsCancelled() {
-        final ShipmentId shipmentId = new ShipmentId(15L);
-        final ReturnPackageEntity entity = createReturnPackageEntity(
-                1001L,
-                15L,
-                "Uszkodzony produkt",
-                Status.CANCELLED,
-                "XYZ789TOKEN",
-                "KT2",
-                "KT3",
-                3L,
-                4L,
-                ReasonCode.DAMAGED,
-                Instant.parse("2025-10-12T12:10:00Z"),
-                Instant.parse("2025-10-12T12:30:00Z")
-        );
-
-        final Executable executable = () -> this.returnPort.complete(shipmentId);
-        final ReturnPackageNotFoundException exception = assertThrows(ReturnPackageNotFoundException.class, executable);
-
-        assertEquals("Return package not found", exception.getMessage());
-        assertEquals(Status.CANCELLED, entity.getReturnStatus());
-    }
-
-	private List<ReturnPackageRequest> buildReturnPackageRequest(final DepartmentCode departmentCode,
+	private List<ReturnPackageRequest> buildReturnPackageRequest(final DepartmentId departmentId,
 			final UserId userId, final ShipmentId shipmentId, final String reason, final ReasonCode reasonCode) {
-		final ReturnPackageRequest request = new ReturnPackageRequest(departmentCode, reason, shipmentId, userId,
+		final ReturnPackageRequest request = new ReturnPackageRequest(departmentId, reason, shipmentId, userId,
 				reasonCode);
 		return List.of(request);
 	}
 
     private ReturnPackageEntity createReturnPackageEntity(
-            final Long returnId,
-            final Long shipmentId,
-            final String reason,
-            final Status status,
-            final String returnToken,
-            final String assignedDepartment,
-            final String returnedDepartment,
-            final Long assignedTo,
-            final Long processedBy,
-            final ReasonCode reasonCode,
-            final Instant createdAt,
-            final Instant updatedAt
-    ) {
-        return createReturnPackageEntity(returnId, shipmentId, reason, status, returnToken, assignedDepartment,
-                returnedDepartment, assignedTo, processedBy, reasonCode, null, createdAt, updatedAt);
+            final Long returnId, final Long shipmentId, final String reason, final Status status,
+            final String returnToken, final DepartmentId assignedDepartment, final DepartmentId returnedDepartment,
+            final Long assignedTo, final Long processedBy, final ReasonCode reasonCode,
+            final Instant createdAt, final Instant updatedAt) {
+        return createReturnPackageEntity(returnId, shipmentId, reason, status, returnToken,
+                assignedDepartment, returnedDepartment, assignedTo, processedBy, reasonCode, 7L, createdAt, updatedAt);
     }
 
     private ReturnPackageEntity createReturnPackageEntity(
@@ -362,8 +337,8 @@ class ReturnIntegrationTest {
             final String reason,
             final Status status,
             final String returnToken,
-            final String assignedDepartment,
-            final String returnedDepartment,
+            final DepartmentId assignedDepartment,
+            final DepartmentId returnedDepartment,
             final Long assignedTo,
             final Long processedBy,
             final ReasonCode reasonCode,
@@ -377,12 +352,12 @@ class ReturnIntegrationTest {
                 reason,
                 status,
                 new ReturnToken(returnToken),
-                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.DepartmentCode(assignedDepartment),
-                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.DepartmentCode(returnedDepartment),
+                assignedDepartment,
+                returnedDepartment,
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.UserId(assignedTo),
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.UserId(processedBy),
                 reasonCode,
-                operatorId,
+                new OperatorId(operatorId),
                 createdAt,
                 updatedAt
         );
