@@ -8,30 +8,24 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import com.warehouse.gateway.configuration.GatewayProperties;
-import com.warehouse.gateway.infrastructure.filter.CorrelationIdFilter;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import com.warehouse.gateway.configuration.GatewayProperties;
+import com.warehouse.gateway.infrastructure.filter.CorrelationIdFilter;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/gateway")
@@ -59,11 +53,14 @@ public class GatewayProxyController {
 
     private final GatewayProperties gatewayProperties;
     private final HttpClient httpClient;
+    private final DiscoveryClient discoveryClient;
 
     public GatewayProxyController(final GatewayProperties gatewayProperties,
-                                  final HttpClient httpClient) {
+                                  final HttpClient httpClient,
+                                  final DiscoveryClient discoveryClient) {
         this.gatewayProperties = gatewayProperties;
         this.httpClient = httpClient;
+        this.discoveryClient = discoveryClient;
     }
 
     @GetMapping("/health")
@@ -74,19 +71,19 @@ public class GatewayProxyController {
     @GetMapping("/routes")
     public List<GatewayRouteResponse> routes() {
         return this.gatewayProperties.getRoutes().stream()
-                .map(route -> new GatewayRouteResponse(route.getId(), route.getPathPrefix(), route.getUri().toString(), route.isHealthCheckEnabled()))
+                .map(route -> new GatewayRouteResponse(route.getId(), route.getPathPrefix(), route.getUri().toString(), route.getServiceId(), route.isHealthCheckEnabled()))
                 .toList();
     }
 
     @GetMapping("/services/health")
     public GatewayServicesHealthResponse servicesHealth(@RequestHeader(name = HttpHeaders.COOKIE, required = false) final String cookieHeader,
                                                         @RequestHeader(name = CorrelationIdFilter.CORRELATION_ID_HEADER, required = false) final String correlationId) {
-        String requestCorrelationId = StringUtils.hasText(correlationId) ? correlationId : MDC.get(CorrelationIdFilter.MDC_KEY);
-        List<GatewayServiceHealthResponse> services = this.gatewayProperties.getRoutes().stream()
+        final String requestCorrelationId = StringUtils.hasText(correlationId) ? correlationId : MDC.get(CorrelationIdFilter.MDC_KEY);
+        final List<GatewayServiceHealthResponse> services = this.gatewayProperties.getRoutes().stream()
                 .map(route -> checkServiceHealth(route, cookieHeader, requestCorrelationId))
                 .toList();
 
-        String status = services.stream().allMatch(service -> "UP".equals(service.status())) ? "UP" : "DEGRADED";
+        final String status = services.stream().allMatch(service -> "UP".equals(service.status())) ? "UP" : "DEGRADED";
         return new GatewayServicesHealthResponse(status, services);
     }
 
@@ -105,16 +102,16 @@ public class GatewayProxyController {
     public ResponseEntity<byte[]> proxy(final HttpServletRequest request,
                                         @PathVariable final String service,
                                         @RequestBody(required = false) final byte[] body) {
-        Optional<GatewayProperties.Route> route = this.gatewayProperties.findRouteByPathPrefix(service);
+        final Optional<GatewayProperties.Route> route = this.gatewayProperties.findRouteByPathPrefix(service);
         if (route.isEmpty()) {
             return textResponse(HttpStatus.NOT_FOUND, "Gateway route not found: " + service);
         }
 
-        URI targetUri = buildTargetUri(route.get(), request, service);
-        HttpRequest proxyRequest = buildProxyRequest(request, targetUri, service, body);
+        final URI targetUri = buildTargetUri(route.get(), request, service);
+        final HttpRequest proxyRequest = buildProxyRequest(request, targetUri, service, body);
 
         try {
-            HttpResponse<byte[]> proxyResponse = this.httpClient.send(proxyRequest, HttpResponse.BodyHandlers.ofByteArray());
+            final HttpResponse<byte[]> proxyResponse = this.httpClient.send(proxyRequest, HttpResponse.BodyHandlers.ofByteArray());
             return buildProxyResponse(proxyResponse);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
@@ -133,8 +130,8 @@ public class GatewayProxyController {
             return new GatewayServiceHealthResponse(route.getId(), route.getPathPrefix(), "DISABLED", null, 0);
         }
 
-        URI healthUri = buildTargetUri(route.getUri(), route.getHealthPath(), null);
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final URI healthUri = buildTargetUri(resolveBaseUri(route), route.getHealthPath(), null);
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .uri(healthUri)
                 .timeout(Duration.ofSeconds(route.getHealthTimeoutSeconds()))
                 .GET();
@@ -146,11 +143,11 @@ public class GatewayProxyController {
             requestBuilder.header(CorrelationIdFilter.CORRELATION_ID_HEADER, correlationId);
         }
 
-        Instant startedAt = Instant.now();
+        final Instant startedAt = Instant.now();
         try {
-            HttpResponse<byte[]> response = this.httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofByteArray());
+            final HttpResponse<byte[]> response = this.httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofByteArray());
             long responseTimeMillis = Duration.between(startedAt, Instant.now()).toMillis();
-            String status = response.statusCode() >= 200 && response.statusCode() < 400 ? "UP" : "DOWN";
+            final String status = response.statusCode() >= 200 && response.statusCode() < 400 ? "UP" : "DOWN";
             return new GatewayServiceHealthResponse(route.getId(), route.getPathPrefix(), status, response.statusCode(), responseTimeMillis);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
@@ -185,10 +182,10 @@ public class GatewayProxyController {
     private void addForwardedHeaders(final HttpRequest.Builder requestBuilder,
                                      final HttpServletRequest request,
                                      final String service) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        String remoteAddress = request.getRemoteAddr();
-        String forwardedForValue = StringUtils.hasText(forwardedFor) ? forwardedFor + ", " + remoteAddress : remoteAddress;
-        String forwardedHost = StringUtils.hasText(request.getHeader(HttpHeaders.HOST))
+        final String forwardedFor = request.getHeader("X-Forwarded-For");
+        final String remoteAddress = request.getRemoteAddr();
+        final String forwardedForValue = StringUtils.hasText(forwardedFor) ? forwardedFor + ", " + remoteAddress : remoteAddress;
+        final String forwardedHost = StringUtils.hasText(request.getHeader(HttpHeaders.HOST))
                 ? request.getHeader(HttpHeaders.HOST)
                 : request.getServerName();
 
@@ -224,15 +221,38 @@ public class GatewayProxyController {
         String requestUri = request.getRequestURI();
         String gatewayRoutePrefix = request.getContextPath() + "/gateway/" + service;
         String downstreamPath = requestUri.substring(gatewayRoutePrefix.length());
-        return buildTargetUri(route.getUri(), downstreamPath, request.getQueryString());
+        return buildTargetUri(resolveBaseUri(route), downstreamPath, request.getQueryString());
+    }
+
+    private URI resolveBaseUri(final GatewayProperties.Route route) {
+        if (!StringUtils.hasText(route.getServiceId())) {
+            return route.getUri();
+        }
+
+        final List<ServiceInstance> instances = this.discoveryClient.getInstances(route.getServiceId());
+        if (instances.isEmpty()) {
+            LOGGER.debug("No Eureka instances found for service {}, using configured URI {}", route.getServiceId(), route.getUri());
+            return route.getUri();
+        }
+
+        final URI instanceUri = instances.getFirst().getUri();
+        return appendConfiguredPath(instanceUri, route.getUri().getRawPath());
+    }
+
+    private URI appendConfiguredPath(final URI instanceUri,
+                                     final String configuredPath) {
+        if (!StringUtils.hasText(configuredPath) || "/".equals(configuredPath)) {
+            return instanceUri;
+        }
+        return URI.create(trimTrailingSlash(instanceUri.toString()) + normalizePath(configuredPath));
     }
 
     private URI buildTargetUri(final URI baseUri,
                                final String downstreamPath,
                                final String queryString) {
-        String base = trimTrailingSlash(baseUri.toString());
-        String normalizedPath = normalizePath(downstreamPath);
-        String query = StringUtils.hasText(queryString) ? "?" + queryString : "";
+        final String base = trimTrailingSlash(baseUri.toString());
+        final String normalizedPath = normalizePath(downstreamPath);
+        final String query = StringUtils.hasText(queryString) ? "?" + queryString : "";
         return URI.create(base + normalizedPath + query);
     }
 
@@ -271,7 +291,7 @@ public class GatewayProxyController {
     public record GatewayHealthResponse(String status, int routes) {
     }
 
-    public record GatewayRouteResponse(String id, String pathPrefix, String uri, boolean healthCheckEnabled) {
+    public record GatewayRouteResponse(String id, String pathPrefix, String uri, String serviceId, boolean healthCheckEnabled) {
     }
 
     public record GatewayServicesHealthResponse(String status, List<GatewayServiceHealthResponse> services) {

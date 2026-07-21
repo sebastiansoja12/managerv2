@@ -76,6 +76,20 @@ services:
     networks:
       - manager_network
 
+  eureka-server:
+    build:
+      context: .
+      dockerfile: EurekaServer/Dockerfile
+    image: managerv2/eureka-server:local
+    container_name: eureka-server
+    restart: unless-stopped
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_INSTANCE_HOSTNAME: eureka-server
+    networks:
+      - manager_network
+
   manager-application:
     build:
       context: .
@@ -94,12 +108,42 @@ services:
       SPRING_DATASOURCE_PASSWORD: rootpassword
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/dev
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
     depends_on:
       mysql:
         condition: service_healthy
       mongodb:
         condition: service_started
       kafka:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - manager_network
+
+  manager-gateway:
+    build:
+      context: .
+      dockerfile: Gateway/Dockerfile
+    image: managerv2/gateway:local
+    container_name: manager-gateway
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      MANAGER_API_URL: http://manager-application:8080/v2/api
+      SOFTWARE_CONFIGURATION_URL: http://software-configuration:8081
+      DELIVERY_PROTECTION_URL: http://delivery-protection:8060/v2/api
+      RETURNING_TRACK_MANAGER_URL: http://returning-manager:8070/v2/api
+      ROUTE_TRACKER_FLOW_URL: http://route-tracker:8082/v2/api
+      PALLET_HANDLING_MANAGER_URL: http://pallet-handling-manager:8071
+    depends_on:
+      eureka-server:
+        condition: service_started
+      manager-application:
         condition: service_started
     networks:
       - manager_network
@@ -136,10 +180,14 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/warehouse
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
     depends_on:
       mongodb:
         condition: service_started
       kafka:
+        condition: service_started
+      eureka-server:
         condition: service_started
     networks:
       - manager_network
@@ -160,12 +208,16 @@ services:
       SPRING_DATASOURCE_PASSWORD: rootpassword
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
     depends_on:
       mysql:
         condition: service_healthy
       mongodb:
         condition: service_started
       kafka:
+        condition: service_started
+      eureka-server:
         condition: service_started
     networks:
       - manager_network
@@ -184,12 +236,16 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
     depends_on:
       mysql:
         condition: service_healthy
       mongodb:
         condition: service_started
       kafka:
+        condition: service_started
+      eureka-server:
         condition: service_started
     networks:
       - manager_network

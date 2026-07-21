@@ -8,12 +8,14 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableConfigurationProperties
 @EnableCaching
 @EnableScheduling
+@EnableDiscoveryClient
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class},
         scanBasePackages = {"com.warehouse.returntoken", "com.warehouse.deliverytoken"})
 @EntityScan(basePackages = {"com.warehouse.returntoken", "com.warehouse.deliverytoken"})
