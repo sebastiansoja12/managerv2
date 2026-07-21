@@ -6,12 +6,14 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.modulith.Modulith;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableConfigurationProperties
 @EnableCaching
 @EnableScheduling
+@EnableDiscoveryClient
 @SpringBootApplication(scanBasePackages = "com.warehouse.pallet")
 @EntityScan(basePackages = {"com.warehouse.pallet"})
 @ConfigurationPropertiesScan("com.warehouse.pallet")
