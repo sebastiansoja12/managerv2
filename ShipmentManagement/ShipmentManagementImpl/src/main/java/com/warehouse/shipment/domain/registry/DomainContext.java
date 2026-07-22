@@ -59,4 +59,5 @@ public final class DomainContext implements ApplicationEventPublisherAware, Appl
     public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         context = applicationContext;
     }
+
 }
