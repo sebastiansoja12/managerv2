@@ -14,11 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
@@ -28,6 +30,7 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
+import com.warehouse.shipment.domain.service.TrackingNumberService;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
@@ -42,6 +45,12 @@ class ShipmentServiceImplTest {
     private ApplicationEventPublisher eventPublisher;
 
     @Mock
+    private ApplicationContext applicationContext;
+
+    @Mock
+    private TrackingNumberService trackingNumberService;
+
+    @Mock
     private SpecificationRepository specificationShipmentRepository;
 
     private ShipmentServiceImpl shipmentService;
@@ -49,6 +58,7 @@ class ShipmentServiceImplTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(DomainContext.class, "eventPublisher", eventPublisher);
+        ReflectionTestUtils.setField(DomainContext.class, "context", null);
         shipmentService = new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
     }
 
@@ -421,6 +431,9 @@ class ShipmentServiceImplTest {
         final String originalSenderFirstName = shipment.getSender().getFirstName();
         final String originalRecipientFirstName = shipment.getRecipient().getFirstName();
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+        ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
+        when(applicationContext.getBean(TrackingNumberService.class)).thenReturn(trackingNumberService);
+        when(trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT)).thenReturn(trackingNumber());
 
         shipmentService.redirectShipmentToSender(shipmentId());
 
