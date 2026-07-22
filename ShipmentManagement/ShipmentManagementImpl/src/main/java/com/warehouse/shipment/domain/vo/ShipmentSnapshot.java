@@ -1,10 +1,12 @@
 package com.warehouse.shipment.domain.vo;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Signature;
@@ -28,5 +30,7 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                CountryCode destinationCountry,
                                Signature signature,
                                ExternalId<String> routeExternalId,
-                               ExternalId<Long> returnExternalId) {
+                               ExternalId<Long> returnExternalId,
+                               TrackingNumber trackingNumber,
+                               ExternalId<UUID> externalShipmentId) {
 }

@@ -1,7 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import java.util.Optional;
-
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
@@ -11,30 +9,29 @@ import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 
+import java.util.Optional;
+
 public class ShipmentRepositoryImpl implements ShipmentRepository {
 
-    private final OperatorFilteredRepository<ShipmentEntity> repository;
+    private final OperatorFilteredRepository<ShipmentEntity> writeRepository;
 
-    public ShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentEntity> repository) {
-        this.repository = repository;
+    public ShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentEntity> writeRepository) {
+        this.writeRepository = writeRepository;
     }
 
     @Override
     public void createOrUpdate(final Shipment shipment) {
         final ShipmentEntity entity = ShipmentEntity.from(shipment);
-        if (exists(shipment.getShipmentId())) {
-            repository.update(entity);
+        if (writeModelExists(shipment.getShipmentId())) {
+            writeRepository.update(entity);
         } else {
-            repository.create(entity);
+            writeRepository.create(entity);
         }
     }
 
     @Override
     public Shipment findById(final ShipmentId shipmentId) {
-        if (shipmentId == null) {
-            return null;
-        }
-        return repository.createCriteria(ShipmentEntity.class)
+        return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("shipmentId.value", shipmentId.getValue())
                 .one()
                 .map(Shipment::from)
@@ -43,7 +40,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     @Override
     public boolean exists(final ShipmentId shipmentId) {
-        return shipmentId != null && repository.createCriteria(ShipmentEntity.class)
+        return shipmentId != null && writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("shipmentId.value", shipmentId.getValue())
                 .one()
                 .isPresent();
@@ -51,7 +48,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     @Override
     public Optional<Shipment> findByExternalId(final ExternalId<String> externalId) {
-        return repository.createCriteria(ShipmentEntity.class)
+        return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("externalId.value", externalId.value())
                 .one()
                 .map(Shipment::from);
@@ -59,7 +56,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     @Override
     public Optional<ShipmentId> findIdByExternalId(final ExternalId<String> externalId) {
-        return repository.createCriteria(ShipmentEntity.class)
+        return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("externalId.value", externalId.value())
                 .one()
                 .map(ShipmentEntity::getShipmentId);
@@ -67,11 +64,17 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     @Override
     public Shipment findByTrackingNumber(final TrackingNumber trackingNumber) {
-        return repository.createCriteria(ShipmentEntity.class)
+        return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("trackingNumber.value", trackingNumber.value())
                 .one()
-                .map(Shipment::from).orElseThrow(
-                () -> new ShipmentNotFoundException("Shipment was not found")
-        );
+                .map(Shipment::from)
+                .orElseThrow(() -> new ShipmentNotFoundException("Shipment was not found"));
+    }
+
+    private boolean writeModelExists(final ShipmentId shipmentId) {
+        return shipmentId != null && writeRepository.createCriteria(ShipmentEntity.class)
+                .eq("shipmentId.value", shipmentId.getValue())
+                .one()
+                .isPresent();
     }
 }

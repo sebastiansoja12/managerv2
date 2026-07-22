@@ -1,12 +1,14 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import java.net.URI;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.springframework.http.ResponseEntity;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
@@ -49,9 +51,10 @@ public class RouteLogServiceClient implements RouteLogServicePort {
     }
 
 	private ResponseEntity<RouteProcessDto> sendRouteProcessRequest(final ShipmentId shipmentId,
-                                                                    final SoftwareConfiguration softwareConfiguration) {
+                                                                    final SoftwareConfiguration softwareConfiguration,
+                                                                    final UserId createdBy) {
         log.info("Trying to send route process request for shipment {}", shipmentId.getValue());
-        final ShipmentCreatedRequest request = new ShipmentCreatedRequest(shipmentId, null);
+        final ShipmentCreatedRequest request = new ShipmentCreatedRequest(shipmentId, createdBy);
         return externalFeignClient.createShipmentRoute(
                 URI.create(softwareConfiguration.getUrl() + softwareConfiguration.getValue()),
                 request
@@ -61,10 +64,11 @@ public class RouteLogServiceClient implements RouteLogServicePort {
     // TODO
     @Override
     public Result<RouteProcess, ErrorCode> notifyShipmentCreated(final ShipmentId shipmentId,
-                                                                 final SoftwareConfiguration softwareConfiguration) {
+                                                                 final SoftwareConfiguration softwareConfiguration,
+                                                                 final UserId createdBy) {
         try {
             final Supplier<ResponseEntity<RouteProcessDto>> retryableSupplier = Retry
-                    .decorateSupplier(retry, () -> sendRouteProcessRequest(shipmentId, softwareConfiguration));
+                    .decorateSupplier(retry, () -> sendRouteProcessRequest(shipmentId, softwareConfiguration, createdBy));
 
             final ResponseEntity<RouteProcessDto> process = retryableSupplier.get();
 
@@ -118,14 +122,14 @@ public class RouteLogServiceClient implements RouteLogServicePort {
 			final SoftwareConfiguration softwareConfiguration) {
         final PersonChangedRequest request = new PersonChangedRequest(shipmentId, person);
 
-        final ResponseEntity<RouteLogRecordDto> responseEntity = externalFeignClient.updateRoutePerson(
-                URI.create(softwareConfiguration.getUrl() + softwareConfiguration.getValue()
-                        + "/persons?personType=" + person.getType().name()),
-                softwareConfiguration.getApiKey(),
-                request
-        );
+//        final ResponseEntity<RouteLogRecordDto> responseEntity = externalFeignClient.updateRoutePerson(
+//                URI.create(softwareConfiguration.getUrl() + softwareConfiguration.getValue()
+//                        + "/persons?personType=" + person.getType().name()),
+//                softwareConfiguration.getApiKey(),
+//                request
+//        );
 
-        return RouteProcess.from(routeLogRecordMapper.map(responseEntity.getBody()), responseEntity.getStatusCode(), shipmentId);
+        return RouteProcess.from(shipmentId, new ProcessId(UUID.randomUUID()), "", "");
     }
 
     @Override

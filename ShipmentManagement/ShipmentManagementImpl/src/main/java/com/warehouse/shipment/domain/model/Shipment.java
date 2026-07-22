@@ -1,6 +1,5 @@
 package com.warehouse.shipment.domain.model;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -10,10 +9,10 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
-import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 
 
 public class Shipment {
@@ -149,7 +148,8 @@ public class Shipment {
 	public ShipmentSnapshot snapshot() {
 		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destination, shipmentStatus,
 				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
-				shipmentPriority, originCountry, destinationCountry, signature, externalRouteId, externalReturnId);
+				shipmentPriority, originCountry, destinationCountry, signature, externalRouteId, externalReturnId,
+                trackingNumber, externalShipmentId);
 	}
 
     public static Shipment from(final ShipmentEntity shipmentEntity) {
@@ -195,6 +195,45 @@ public class Shipment {
                 dangerousGood,
                 externalRouteId,
                 externalReturnId,
+                shipmentEntity.getTrackingNumber(),
+                new ExternalId<>(UUID.fromString(shipmentEntity.getExternalId().value()))
+        );
+    }
+
+    public static Shipment from(final ShipmentReadEntity shipmentEntity) {
+        final ShipmentId shipmentId = shipmentEntity.getShipmentId();
+        final Sender sender = new Sender(shipmentEntity.getFirstName(), shipmentEntity.getLastName(),
+                shipmentEntity.getSenderEmail(), shipmentEntity.getSenderTelephone(), shipmentEntity.getSenderCity(),
+                shipmentEntity.getSenderPostalCode(), shipmentEntity.getSenderStreet());
+        final Recipient recipient = new Recipient(shipmentEntity.getRecipientFirstName(),
+                shipmentEntity.getRecipientLastName(), shipmentEntity.getRecipientEmail(),
+                shipmentEntity.getRecipientTelephone(), shipmentEntity.getRecipientCity(),
+                shipmentEntity.getRecipientPostalCode(), shipmentEntity.getRecipientStreet());
+        final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
+        final boolean signatureRequired = signature != null;
+        final DangerousGood dangerousGood = shipmentEntity.dangerousGood();
+
+        return new Shipment(
+                shipmentId,
+                sender,
+                recipient,
+                shipmentEntity.getShipmentSize(),
+                shipmentEntity.getShipmentStatus(),
+                shipmentEntity.getShipmentType(),
+                shipmentEntity.getShipmentRelatedId(),
+                shipmentEntity.getPrice(),
+                shipmentEntity.getCreatedAt(),
+                shipmentEntity.getUpdatedAt(),
+                shipmentEntity.getLocked(),
+                shipmentEntity.getOriginCountry(),
+                shipmentEntity.getDestinationCountry(),
+                shipmentEntity.getDestination(),
+                signature,
+                signatureRequired,
+                shipmentEntity.getShipmentPriority(),
+                dangerousGood,
+                shipmentEntity.getExternalRouteId(),
+                shipmentEntity.getExternalReturnId(),
                 shipmentEntity.getTrackingNumber(),
                 new ExternalId<>(UUID.fromString(shipmentEntity.getExternalId().value()))
         );
@@ -369,7 +408,6 @@ public class Shipment {
         this.shipmentRelatedId = newRelatedShipmentId;
         markAsModified();
         lockShipment();
-        DomainContext.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void lockShipment() {
@@ -588,6 +626,7 @@ public class Shipment {
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = relatedShipmentId;
         this.locked = true;
+        changeShipmentStatus(ShipmentStatus.REDIRECT);
         markAsModified();
     }
 
@@ -608,6 +647,10 @@ public class Shipment {
 
     public boolean isFullyDelivered() {
         return isLocked() && ShipmentStatus.DELIVERY.equals(this.shipmentStatus);
+    }
+
+    public boolean recipientCityMatches(final String city) {
+        return this.recipient != null && this.recipient.getCity().equals(city);
     }
 
     public Shipment redirectToSender(final ShipmentId shipmentId) {
