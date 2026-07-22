@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="s-soja" id="20260721-04-drop-shipment-rd">
+        <sql>DROP TABLE IF EXISTS shipment_rd;</sql>
+    </changeSet>
+
+    <changeSet author="s-soja" id="20260721-05-create-shipment-rd">
+        <createTable tableName="shipment_rd">
+            <column name="shipment_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_telephone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_city" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_street" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_postal_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_telephone" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_city" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_street" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_postal_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parcel_size" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_related_id" type="BIGINT"/>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="locked" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="origin_country" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination_country" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipment_priority" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dangerous_good_id" type="BIGINT"/>
+            <column name="dangerous_good_shipment_id" type="BIGINT"/>
+            <column name="dangerous_good_name" type="VARCHAR(255)"/>
+            <column name="dangerous_good_description" type="VARCHAR(1000)"/>
+            <column name="dangerous_good_classification_code" type="VARCHAR(64)"/>
+            <column name="dangerous_good_hazard_symbols" type="VARCHAR(255)"/>
+            <column name="dangerous_good_storage_requirements" type="VARCHAR(64)"/>
+            <column name="dangerous_good_handling_instructions" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_weight" type="DECIMAL(19, 3)"/>
+            <column name="dangerous_good_weight_unit" type="VARCHAR(32)"/>
+            <column name="dangerous_good_packaging" type="VARCHAR(64)"/>
+            <column name="dangerous_good_flammable" type="BIT(1)"/>
+            <column name="dangerous_good_corrosive" type="BIT(1)"/>
+            <column name="dangerous_good_toxic" type="BIT(1)"/>
+            <column name="dangerous_good_emergency_contact" type="VARCHAR(255)"/>
+            <column name="dangerous_good_country_origin" type="VARCHAR(64)"/>
+            <column name="dangerous_good_safety_data_sheet" type="VARCHAR(2000)"/>
+            <column name="price_amount" type="DECIMAL(19, 2)"/>
+            <column name="price_currency" type="VARCHAR(10)"/>
+            <column name="external_route_id" type="VARCHAR(255)"/>
+            <column name="external_return_id" type="BIGINT"/>
+            <column name="external_id" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="tracking_number" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="s-soja" id="20260721-06-index-shipment-rd">
+        <createIndex associatedWith="" indexName="idx_shipment_rd_dangerous_good_id" tableName="shipment_rd">
+            <column name="dangerous_good_id"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="idx_shipment_rd_operator_id" tableName="shipment_rd">
+            <column name="operator_id"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="idx_shipment_rd_status" tableName="shipment_rd">
+            <column name="status"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="idx_shipment_rd_created_at" tableName="shipment_rd">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="s-soja" id="20260721-07-backfill-shipment-rd">
+        <sql>
+            INSERT INTO shipment_rd (
+                shipment_id,
+                first_name,
+                last_name,
+                sender_telephone,
+                sender_email,
+                sender_city,
+                sender_street,
+                sender_postal_code,
+                recipient_email,
+                recipient_telephone,
+                recipient_first_name,
+                recipient_last_name,
+                recipient_city,
+                recipient_street,
+                recipient_postal_code,
+                parcel_size,
+                destination,
+                status,
+                type,
+                shipment_related_id,
+                created_at,
+                updated_at,
+                locked,
+                origin_country,
+                destination_country,
+                shipment_priority,
+                dangerous_good_id,
+                dangerous_good_shipment_id,
+                dangerous_good_name,
+                dangerous_good_description,
+                dangerous_good_classification_code,
+                dangerous_good_hazard_symbols,
+                dangerous_good_storage_requirements,
+                dangerous_good_handling_instructions,
+                dangerous_good_weight,
+                dangerous_good_weight_unit,
+                dangerous_good_packaging,
+                dangerous_good_flammable,
+                dangerous_good_corrosive,
+                dangerous_good_toxic,
+                dangerous_good_emergency_contact,
+                dangerous_good_country_origin,
+                dangerous_good_safety_data_sheet,
+                price_amount,
+                price_currency,
+                external_route_id,
+                external_return_id,
+                external_id,
+                tracking_number,
+                operator_id
+            )
+            SELECT
+                s.shipment_id,
+                s.first_name,
+                s.last_name,
+                s.sender_telephone,
+                s.sender_email,
+                s.sender_city,
+                s.sender_street,
+                s.sender_postal_code,
+                s.recipient_email,
+                s.recipient_telephone,
+                s.recipient_first_name,
+                s.recipient_last_name,
+                s.recipient_city,
+                s.recipient_street,
+                s.recipient_postal_code,
+                s.parcel_size,
+                s.destination,
+                s.status,
+                s.type,
+                s.shipment_related_id,
+                s.created_at,
+                s.updated_at,
+                s.locked,
+                s.origin_country,
+                s.destination_country,
+                s.shipment_priority,
+                dg.dangerous_good_id,
+                dg.shipment_id,
+                dg.name,
+                dg.description,
+                dg.classification_code,
+                dg.hazard_symbols,
+                dg.storage_requirements,
+                dg.handling_instructions,
+                dg.weight,
+                dg.unit,
+                dg.packaging,
+                dg.flammable,
+                dg.corrosive,
+                dg.toxic,
+                dg.emergency_contact,
+                dg.country_origin,
+                dg.safety_data_sheet,
+                s.price_amount,
+                s.price_currency,
+                s.external_route_id,
+                s.external_return_id,
+                s.external_id,
+                s.tracking_number,
+                s.operator_id
+            FROM shipment s
+            LEFT JOIN dangerous_good dg ON dg.dangerous_good_id = s.dangerous_good_id;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
