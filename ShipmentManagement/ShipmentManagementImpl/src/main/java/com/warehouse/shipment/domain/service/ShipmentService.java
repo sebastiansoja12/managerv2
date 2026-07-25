@@ -1,10 +1,7 @@
 package com.warehouse.shipment.domain.service;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ReturnId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -12,7 +9,6 @@ import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
-import com.warehouse.commonassets.identificator.TrackingNumber;
 
 import java.util.List;
 
@@ -82,7 +78,7 @@ public interface ShipmentService {
 
     void redirectShipmentToSender(final ShipmentId shipmentId);
 
-    void changeDestination(final ShipmentId shipmentId, final String value);
+    void changeDestination(final ShipmentId shipmentId, final DepartmentCode value);
 
     Shipment findByExternalId(final ExternalId<String> externalId);
 }

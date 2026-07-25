@@ -8,6 +8,7 @@ import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OutputResponseMapper;
 import com.warehouse.voronoi.VoronoiRequestDto;
 import com.warehouse.voronoi.VoronoiResponseDto;
 import com.warehouse.voronoi.VoronoiService;
@@ -39,6 +40,6 @@ public class PathFinderAdapter implements PathFinderServicePort {
                 address.getCity(), address.getPostalCode(), departments
         );
         final VoronoiResponseDto voronoiResponse = voronoiService.findFastestRoute(voronoiRequest);
-        return Result.success(new VoronoiResponse(voronoiResponse.departmentCode()));
+        return Result.success(OutputResponseMapper.map(voronoiResponse));
     }
 }

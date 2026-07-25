@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
@@ -15,7 +16,7 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                Sender sender,
                                Recipient recipient,
                                ShipmentSize shipmentSize,
-                               String destination,
+                               DepartmentCode destination,
                                ShipmentStatus shipmentStatus,
                                ShipmentType shipmentType,
                                ShipmentId shipmentRelatedId,

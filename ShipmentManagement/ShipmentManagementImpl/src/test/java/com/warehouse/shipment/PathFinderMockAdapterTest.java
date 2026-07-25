@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.vo.Address;
@@ -40,6 +41,6 @@ class PathFinderMockAdapterTest {
         final Result<VoronoiResponse, ErrorCode> result =
                 pathFinderMockAdapter.determineDeliveryDepartment(address);
         assertTrue(result.isSuccess());
-        assertEquals(expectedDepot, result.getSuccess().getValue());
+        assertEquals(new DepartmentCode(expectedDepot), result.getSuccess().getDepartmentCodeResult());
     }
 }

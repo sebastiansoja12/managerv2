@@ -20,8 +20,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
-import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
+import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
@@ -451,7 +451,7 @@ class ShipmentServiceImplTest {
         final Shipment shipment = shipment();
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
-        shipmentService.changeDestination(shipmentId(), "KR1");
+        shipmentService.changeDestination(shipmentId(), new DepartmentCode("KR1"));
 
         assertEquals("KR1", shipment.getDestination());
         verify(shipmentRepository).createOrUpdate(shipment);
