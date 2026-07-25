@@ -39,7 +39,11 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 @Server(
                         description = "Development environment",
                         url = "https://inparcel-dev-v2.herokuapp.com/v2/api"
-                )
+                ),
+                @Server(
+                        description = "Render environment",
+                        url = "https://managerv2-1.onrender.com/v2/api"
+                ),
         },
         security = {
                 @SecurityRequirement(
