@@ -571,10 +571,10 @@ public class Shipment {
     }
 
     public void changeDangerousGood(final DangerousGood dangerousGood) {
+        ensureCanBeModified();
         if (Objects.equals(this.dangerousGood, dangerousGood)) {
             return;
         }
-        ensureCanBeModified();
         this.dangerousGood = dangerousGood;
         markAsModified();
     }
@@ -630,15 +630,36 @@ public class Shipment {
         markAsModified();
     }
 
-    public void notifyShipmentReturned() {
-        if (!this.shipmentStatus.equals(ShipmentStatus.DELIVERY)) {
-            throw new ShipmentModificationException("Cannot return for not delivered shipment");
+    private void validateReturnRequest() {
+        if (this.shipmentStatus != ShipmentStatus.DELIVERY
+                && this.shipmentStatus != ShipmentStatus.UNDELIVERABLE) {
+            throw new ShipmentModificationException("Cannot return shipment in current status");
         }
+    }
+
+    public void notifyShipmentReturned() {
+        validateReturnRequest();
         this.shipmentStatus = ShipmentStatus.RETURN;
         markAsModified();
     }
 
-    public void notifyShipmentDelivered() {
+    public void notifyShipmentReturned(final ShipmentId shipmentRelatedId) {
+        validateReturnRequest();
+        this.shipmentStatus = ShipmentStatus.RETURN;
+        this.shipmentRelatedId = shipmentRelatedId;
+        markAsModified();
+    }
+
+    public void markAsUndeliverable() {
+        if (this.shipmentStatus != ShipmentStatus.SENT
+                && this.shipmentStatus != ShipmentStatus.ACCEPTED) {
+            throw new ShipmentModificationException("Cannot mark shipment as undeliverable in current status");
+        }
+        this.shipmentStatus = ShipmentStatus.UNDELIVERABLE;
+        markAsModified();
+    }
+
+    public void markAsDelivered() {
         this.shipmentStatus = ShipmentStatus.DELIVERY;
         this.locked = true;
         markAsModified();
@@ -649,6 +670,8 @@ public class Shipment {
             throw new ShipmentModificationException("Cannot undone return for not returned shipment");
         }
         this.shipmentStatus = ShipmentStatus.DELIVERY;
+        this.shipmentRelatedId = null;
+        this.locked = false;
         markAsModified();
     }
 
@@ -723,7 +746,8 @@ public class Shipment {
         markAsModified();
     }
 
-    public Shipment redirectToSender(final ShipmentId shipmentId, final TrackingNumber trackingNumber) {
+    public Shipment redirectToSender(final ShipmentId shipmentId, final TrackingNumber trackingNumber,
+                                     final ExternalId<UUID> externalShipmentId, final ShipmentWorkflowSettings shipmentWorkflowSettings) {
         ensureShipmentIsNotDelivered();
         this.shipmentId = shipmentId;
         this.shipmentType = ShipmentType.PARENT;
@@ -751,9 +775,53 @@ public class Shipment {
         this.sender = newSender;
         this.recipient = newRecipient;
 
-        this.shipmentStatus = ShipmentStatus.CREATED;
-        this.externalShipmentId = ExternalId.randomUUID();
+        this.shipmentStatus = shipmentWorkflowSettings.defaultStatus();
+        this.shipmentPriority = shipmentWorkflowSettings.defaultShipmentPriority();
+        this.externalShipmentId = externalShipmentId;
         this.trackingNumber = trackingNumber;
+        this.shipmentRelatedId = null;
+
+        markAsModified();
+
+        return this;
+    }
+
+    public Shipment returnToSender(final ShipmentId shipmentId, final TrackingNumber trackingNumber,
+                                   final ShipmentWorkflowSettings shipmentWorkflowSettings,
+                                   final ExternalId<UUID> externalShipmentId) {
+        ensureShipmentIsNotDelivered();
+        this.shipmentId = shipmentId;
+        this.shipmentType = ShipmentType.PARENT;
+
+        final Sender newSender = new Sender(
+                recipient.getFirstName(),
+                recipient.getLastName(),
+                recipient.getEmail(),
+                recipient.getTelephoneNumber(),
+                recipient.getCity(),
+                recipient.getPostalCode(),
+                recipient.getStreet()
+        );
+
+        final Recipient newRecipient = new Recipient(
+                sender.getFirstName(),
+                sender.getLastName(),
+                sender.getEmail(),
+                sender.getTelephoneNumber(),
+                sender.getCity(),
+                sender.getPostalCode(),
+                sender.getStreet()
+        );
+
+        this.sender = newSender;
+        this.recipient = newRecipient;
+
+        this.shipmentStatus = shipmentWorkflowSettings.defaultStatus();
+        this.shipmentPriority = shipmentWorkflowSettings.defaultShipmentPriority();
+        this.externalShipmentId = externalShipmentId;
+        this.trackingNumber = trackingNumber;
+        this.targetDepartmentId = originDepartmentId;
+        this.shipmentRelatedId = null;
 
         markAsModified();
 
@@ -773,6 +841,12 @@ public class Shipment {
         if (isCancellationWindowExpired(config.cancellationWindowMinutes(), currentTime)) {
             throw new ShipmentModificationException("Shipment cancellation window expired");
         }
+        this.locked = true;
+        this.shipmentStatus = ShipmentStatus.CANCELED;
+        markAsModified();
+    }
+
+    public void markAsCanceledWithoutPolicy() {
         this.locked = true;
         this.shipmentStatus = ShipmentStatus.CANCELED;
         markAsModified();
