@@ -1,222 +1,281 @@
 package com.warehouse.shipment.domain.model;
 
-import java.util.Collections;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.model.Weight;
-import com.warehouse.shipment.domain.vo.DangerousGoodId;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.DangerousGoodEntity;
 
-public class DangerousGood {
+public final class DangerousGood {
 
-    private DangerousGoodId dangerousGoodId;
-    private ShipmentId shipmentId;
-    private String name;
-    private String description;
-    private String classificationCode;
-    private String hazardSymbols;
-    private String storageRequirements;
-    private String handlingInstructions;
-    private Weight weight;
-    private String packaging;
-    private boolean flammable;
-    private boolean corrosive;
-    private boolean toxic;
-    private String emergencyContact;
-    private CountryCode countryOfOrigin;
-    private String safetyDataSheet;
+    private static final Pattern UN_NUMBER_PATTERN = Pattern.compile("UN\\d{4}");
+    private static final Set<String> PACKING_GROUPS = Set.of("I", "II", "III");
+    private static final Set<String> QUANTITY_UNITS =
+            Set.of("MILLIGRAM", "GRAM", "KILOGRAM", "TONNE", "OUNCE", "POUND", "LITRE");
+    private static final Set<String> REGULATION_TYPES = Set.of("ADR", "IATA", "IMDG", "RID");
+    private static final Set<String> TRANSPORT_MODES = Set.of("ROAD", "AIR", "SEA", "RAIL");
+    private static final Set<String> TRANSPORT_MODES_REQUIRING_24H_CONTACT = Set.of("AIR", "SEA");
+    private static final Set<String> REGULATIONS_REQUIRING_24H_CONTACT = Set.of("IATA", "IMDG");
 
-	public DangerousGood(final DangerousGoodId dangerousGoodId, final ShipmentId shipmentId, final String name,
-			final String description, final String classificationCode, final List<String> hazardSymbols,
-			final String storageRequirements, final String handlingInstructions, final Weight weight,
-			final String packaging, final boolean flammable, final boolean isCorrosive, final boolean toxic,
-			final String emergencyContact, final CountryCode countryOfOrigin, final String safetyDataSheet) {
-        this.dangerousGoodId = dangerousGoodId;
-        this.shipmentId = shipmentId;
-        this.name = name;
-        this.description = description;
-        this.classificationCode = classificationCode;
-        this.hazardSymbols = String.join(" ", hazardSymbols);
-        this.storageRequirements = storageRequirements;
-        this.handlingInstructions = handlingInstructions;
-        this.weight = weight;
-        this.packaging = packaging;
+    private final String unNumber;
+    private final String properShippingName;
+    private final String description;
+    private final String hazardClass;
+    private final String hazardDivision;
+    private final String subsidiaryRisk;
+    private final String packingGroup;
+    private final BigDecimal quantity;
+    private final String quantityUnit;
+    private final Integer packageCount;
+    private final String packagingType;
+    private final boolean limitedQuantity;
+    private final boolean exceptedQuantity;
+    private final boolean environmentallyHazardous;
+    private final boolean marinePollutant;
+    private final String transportCategory;
+    private final String tunnelRestrictionCode;
+    private final BigDecimal flashPoint;
+    private final String emergencyContact;
+    private final String emergencyContact24h;
+    private final String safetyDataSheetReference;
+    private final String declarationDocumentReference;
+    private final String regulationType;
+    private final String transportMode;
+    private final boolean flammable;
+    private final boolean corrosive;
+    private final boolean toxic;
+    private final String hazardSymbols;
+    private final String storageRequirements;
+    private final String handlingInstructions;
+    private final CountryCode countryOfOrigin;
+
+    public DangerousGood(
+            final String unNumber,
+            final String properShippingName,
+            final String description,
+            final String hazardClass,
+            final String hazardDivision,
+            final String subsidiaryRisk,
+            final String packingGroup,
+            final BigDecimal quantity,
+            final String quantityUnit,
+            final Integer packageCount,
+            final String packagingType,
+            final boolean limitedQuantity,
+            final boolean exceptedQuantity,
+            final boolean environmentallyHazardous,
+            final boolean marinePollutant,
+            final String transportCategory,
+            final String tunnelRestrictionCode,
+            final BigDecimal flashPoint,
+            final String emergencyContact,
+            final String emergencyContact24h,
+            final String safetyDataSheetReference,
+            final String declarationDocumentReference,
+            final String regulationType,
+            final String transportMode,
+            final boolean flammable,
+            final boolean corrosive,
+            final boolean toxic,
+            final String hazardSymbols,
+            final String storageRequirements,
+            final String handlingInstructions,
+            final CountryCode countryOfOrigin
+    ) {
+        this.unNumber = normalize(unNumber);
+        this.properShippingName = normalize(properShippingName);
+        this.description = normalize(description);
+        this.hazardClass = normalize(hazardClass);
+        this.hazardDivision = normalize(hazardDivision);
+        this.subsidiaryRisk = normalize(subsidiaryRisk);
+        this.packingGroup = normalizeUppercase(packingGroup);
+        this.quantity = quantity;
+        this.quantityUnit = normalizeUppercase(quantityUnit);
+        this.packageCount = packageCount;
+        this.packagingType = normalize(packagingType);
+        this.limitedQuantity = limitedQuantity;
+        this.exceptedQuantity = exceptedQuantity;
+        this.environmentallyHazardous = environmentallyHazardous;
+        this.marinePollutant = marinePollutant;
+        this.transportCategory = normalize(transportCategory);
+        this.tunnelRestrictionCode = normalize(tunnelRestrictionCode);
+        this.flashPoint = flashPoint;
+        this.emergencyContact = normalize(emergencyContact);
+        this.emergencyContact24h = normalize(emergencyContact24h);
+        this.safetyDataSheetReference = normalize(safetyDataSheetReference);
+        this.declarationDocumentReference = normalize(declarationDocumentReference);
+        this.regulationType = normalizeUppercase(regulationType);
+        this.transportMode = normalizeUppercase(transportMode);
         this.flammable = flammable;
-        this.corrosive = isCorrosive;
-        this.toxic = toxic;
-        this.emergencyContact = emergencyContact;
-        this.countryOfOrigin = countryOfOrigin;
-        this.safetyDataSheet = safetyDataSheet;
-    }
-
-    @JsonCreator
-    public static DangerousGood fromJson(@JsonProperty("dangerousGoodId") final DangerousGoodId dangerousGoodId,
-                                         @JsonProperty("shipmentId") final ShipmentId shipmentId,
-                                         @JsonProperty("name") final String name,
-                                         @JsonProperty("description") final String description,
-                                         @JsonProperty("classificationCode") final String classificationCode,
-                                         @JsonProperty("hazardSymbols") final String hazardSymbols,
-                                         @JsonProperty("storageRequirements") final String storageRequirements,
-                                         @JsonProperty("handlingInstructions") final String handlingInstructions,
-                                         @JsonProperty("weight") final Weight weight,
-                                         @JsonProperty("packaging") final String packaging,
-                                         @JsonProperty("flammable") final boolean flammable,
-                                         @JsonProperty("corrosive") final boolean corrosive,
-                                         @JsonProperty("toxic") final boolean toxic,
-                                         @JsonProperty("emergencyContact") final String emergencyContact,
-                                         @JsonProperty("countryOfOrigin") final CountryCode countryOfOrigin,
-                                         @JsonProperty("safetyDataSheet") final String safetyDataSheet) {
-        return new DangerousGood(dangerousGoodId, shipmentId, name, description, classificationCode,
-                hazardSymbols == null ? Collections.emptyList() : Collections.singletonList(hazardSymbols),
-                storageRequirements, handlingInstructions, weight, packaging, flammable, corrosive, toxic,
-                emergencyContact, countryOfOrigin, safetyDataSheet);
-    }
-
-    public static DangerousGood from(final DangerousGoodCreateCommand request) {
-        return new DangerousGood(
-                request.getDangerousGoodId(),
-                request.getShipmentId(),
-                request.getName(),
-                request.getDescription(),
-                request.getClassificationCode(),
-                request.getHazardSymbols(),
-                request.getStorageRequirements(),
-                request.getHandlingInstructions(),
-                request.getWeight(),
-                request.getPackaging(),
-                request.isFlammable(),
-                request.isCorrosive(),
-                request.isToxic(),
-                request.getEmergencyContact(),
-                request.getCountryOfOrigin(),
-                request.getSafetyDataSheet()
-        );
-    }
-
-    public static DangerousGood from(final DangerousGoodEntity entity) {
-        return new DangerousGood(
-                entity.getDangerousGoodId(),
-                entity.getShipmentId(),
-                entity.getName(),
-                entity.getDescription(),
-                entity.getClassificationCode().name(),
-                Collections.singletonList(entity.getHazardSymbols()),
-                entity.getStorageRequirements().name(),
-                entity.getHandlingInstructions(),
-                entity.getWeight(),
-                entity.getPackaging().name(),
-                entity.isFlammable(),
-                entity.isCorrosive(),
-                entity.isToxic(),
-                entity.getEmergencyContact(),
-                entity.getCountryOfOrigin(),
-                entity.getSafetyDataSheet()
-        );
-    }
-
-
-    public DangerousGoodId getDangerousGoodId() {
-        return dangerousGoodId;
-    }
-
-    public ShipmentId getShipmentId() {
-        return shipmentId;
-    }
-
-    public void setShipmentId(final ShipmentId shipmentId) {
-        this.shipmentId = shipmentId;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public void setClassificationCode(final String classificationCode) {
-        this.classificationCode = classificationCode;
-    }
-
-    public void setHazardSymbols(final String hazardSymbols) {
-        this.hazardSymbols = hazardSymbols;
-    }
-
-    public void setStorageRequirements(final String storageRequirements) {
-        this.storageRequirements = storageRequirements;
-    }
-
-    public void setHandlingInstructions(final String handlingInstructions) {
-        this.handlingInstructions = handlingInstructions;
-    }
-
-    public void setWeight(final Weight weight) {
-        this.weight = weight;
-    }
-
-    public void setPackaging(final String packaging) {
-        this.packaging = packaging;
-    }
-
-    public void setFlammable(final boolean flammable) {
-        this.flammable = flammable;
-    }
-
-    public void setCorrosive(final boolean corrosive) {
         this.corrosive = corrosive;
-    }
-
-    public void setToxic(final boolean toxic) {
         this.toxic = toxic;
-    }
-
-    public void setEmergencyContact(final String emergencyContact) {
-        this.emergencyContact = emergencyContact;
-    }
-
-    public void setCountryOfOrigin(final CountryCode countryOfOrigin) {
+        this.hazardSymbols = normalize(hazardSymbols);
+        this.storageRequirements = normalize(storageRequirements);
+        this.handlingInstructions = normalize(handlingInstructions);
         this.countryOfOrigin = countryOfOrigin;
+        validate();
     }
 
-    public void setSafetyDataSheet(final String safetyDataSheet) {
-        this.safetyDataSheet = safetyDataSheet;
+    private void validate() {
+        final List<String> errors = new ArrayList<>();
+        if (unNumber == null || !UN_NUMBER_PATTERN.matcher(unNumber).matches()) {
+            errors.add("UN number must use the UN followed by four digits format, for example UN1203");
+        }
+        if (properShippingName == null) {
+            errors.add("Proper shipping name is required");
+        }
+        if (hazardClass == null) {
+            errors.add("Hazard class is required");
+        }
+        if (quantity == null || quantity.signum() <= 0) {
+            errors.add("Dangerous goods quantity must be greater than zero");
+        }
+        if (quantityUnit == null) {
+            errors.add("Dangerous goods quantity unit is required");
+        } else if (!QUANTITY_UNITS.contains(quantityUnit.toUpperCase())) {
+            errors.add("Dangerous goods quantity unit is not supported");
+        }
+        if (packageCount == null || packageCount <= 0) {
+            errors.add("Dangerous goods package count must be greater than zero");
+        }
+        if (packagingType == null) {
+            errors.add("Dangerous goods packaging type is required");
+        }
+        if (packingGroup != null && !PACKING_GROUPS.contains(packingGroup)) {
+            errors.add("Packing group must be one of I, II or III");
+        }
+        if (regulationType == null) {
+            errors.add("Dangerous goods regulation type is required");
+        } else if (!REGULATION_TYPES.contains(regulationType)) {
+            errors.add("Dangerous goods regulation type is not supported");
+        }
+        if (transportMode == null) {
+            errors.add("Dangerous goods transport mode is required");
+        } else if (!TRANSPORT_MODES.contains(transportMode)) {
+            errors.add("Dangerous goods transport mode is not supported");
+        }
+        if (requires24HourContact() && emergencyContact24h == null) {
+            errors.add("24-hour emergency contact is required for the selected transport mode or regulation");
+        }
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException(String.join(", ", errors));
+        }
     }
 
-    public String getName() {
-        return name;
+    private boolean requires24HourContact() {
+        return TRANSPORT_MODES_REQUIRING_24H_CONTACT.contains(transportMode)
+                || REGULATIONS_REQUIRING_24H_CONTACT.contains(regulationType);
+    }
+
+    private static String normalize(final String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
+    }
+
+    private static String normalizeUppercase(final String value) {
+        final String normalized = normalize(value);
+        return normalized == null ? null : normalized.toUpperCase();
+    }
+
+    public String getUnNumber() {
+        return unNumber;
+    }
+
+    public String getProperShippingName() {
+        return properShippingName;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public String getClassificationCode() {
-        return classificationCode;
+    public String getHazardClass() {
+        return hazardClass;
     }
 
-    public String getHazardSymbols() {
-        return hazardSymbols;
+    public String getHazardDivision() {
+        return hazardDivision;
     }
 
-    public String getStorageRequirements() {
-        return storageRequirements;
+    public String getSubsidiaryRisk() {
+        return subsidiaryRisk;
     }
 
-    public String getHandlingInstructions() {
-        return handlingInstructions;
+    public String getPackingGroup() {
+        return packingGroup;
     }
 
-    public Weight getWeight() {
-        return weight;
+    public BigDecimal getQuantity() {
+        return quantity;
     }
 
-    public String getPackaging() {
-        return packaging;
+    public String getQuantityUnit() {
+        return quantityUnit;
+    }
+
+    public Integer getPackageCount() {
+        return packageCount;
+    }
+
+    public String getPackagingType() {
+        return packagingType;
+    }
+
+    public boolean isLimitedQuantity() {
+        return limitedQuantity;
+    }
+
+    public boolean isExceptedQuantity() {
+        return exceptedQuantity;
+    }
+
+    public boolean isEnvironmentallyHazardous() {
+        return environmentallyHazardous;
+    }
+
+    public boolean isMarinePollutant() {
+        return marinePollutant;
+    }
+
+    public String getTransportCategory() {
+        return transportCategory;
+    }
+
+    public String getTunnelRestrictionCode() {
+        return tunnelRestrictionCode;
+    }
+
+    public BigDecimal getFlashPoint() {
+        return flashPoint;
+    }
+
+    public String getEmergencyContact() {
+        return emergencyContact;
+    }
+
+    public String getEmergencyContact24h() {
+        return emergencyContact24h;
+    }
+
+    public String getSafetyDataSheetReference() {
+        return safetyDataSheetReference;
+    }
+
+    public String getDeclarationDocumentReference() {
+        return declarationDocumentReference;
+    }
+
+    public String getRegulationType() {
+        return regulationType;
+    }
+
+    public String getTransportMode() {
+        return transportMode;
     }
 
     public boolean isFlammable() {
@@ -231,15 +290,73 @@ public class DangerousGood {
         return toxic;
     }
 
-    public String getEmergencyContact() {
-        return emergencyContact;
+    public String getHazardSymbols() {
+        return hazardSymbols;
+    }
+
+    public String getStorageRequirements() {
+        return storageRequirements;
+    }
+
+    public String getHandlingInstructions() {
+        return handlingInstructions;
     }
 
     public CountryCode getCountryOfOrigin() {
         return countryOfOrigin;
     }
 
-    public String getSafetyDataSheet() {
-        return safetyDataSheet;
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof DangerousGood that)) {
+            return false;
+        }
+        return limitedQuantity == that.limitedQuantity
+                && exceptedQuantity == that.exceptedQuantity
+                && environmentallyHazardous == that.environmentallyHazardous
+                && marinePollutant == that.marinePollutant
+                && flammable == that.flammable
+                && corrosive == that.corrosive
+                && toxic == that.toxic
+                && Objects.equals(unNumber, that.unNumber)
+                && Objects.equals(properShippingName, that.properShippingName)
+                && Objects.equals(description, that.description)
+                && Objects.equals(hazardClass, that.hazardClass)
+                && Objects.equals(hazardDivision, that.hazardDivision)
+                && Objects.equals(subsidiaryRisk, that.subsidiaryRisk)
+                && Objects.equals(packingGroup, that.packingGroup)
+                && Objects.equals(quantity, that.quantity)
+                && Objects.equals(quantityUnit, that.quantityUnit)
+                && Objects.equals(packageCount, that.packageCount)
+                && Objects.equals(packagingType, that.packagingType)
+                && Objects.equals(transportCategory, that.transportCategory)
+                && Objects.equals(tunnelRestrictionCode, that.tunnelRestrictionCode)
+                && Objects.equals(flashPoint, that.flashPoint)
+                && Objects.equals(emergencyContact, that.emergencyContact)
+                && Objects.equals(emergencyContact24h, that.emergencyContact24h)
+                && Objects.equals(safetyDataSheetReference, that.safetyDataSheetReference)
+                && Objects.equals(declarationDocumentReference, that.declarationDocumentReference)
+                && Objects.equals(regulationType, that.regulationType)
+                && Objects.equals(transportMode, that.transportMode)
+                && Objects.equals(hazardSymbols, that.hazardSymbols)
+                && Objects.equals(storageRequirements, that.storageRequirements)
+                && Objects.equals(handlingInstructions, that.handlingInstructions)
+                && countryOfOrigin == that.countryOfOrigin;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                unNumber, properShippingName, description, hazardClass, hazardDivision, subsidiaryRisk,
+                packingGroup, quantity, quantityUnit, packageCount, packagingType, limitedQuantity,
+                exceptedQuantity, environmentallyHazardous, marinePollutant, transportCategory,
+                tunnelRestrictionCode, flashPoint, emergencyContact, emergencyContact24h,
+                safetyDataSheetReference, declarationDocumentReference, regulationType, transportMode,
+                flammable, corrosive, toxic, hazardSymbols, storageRequirements, handlingInstructions,
+                countryOfOrigin
+        );
     }
 }

@@ -1,18 +1,19 @@
 package com.warehouse.shipment.domain.model;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import org.apache.commons.lang3.ObjectUtils;
-
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
+import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
+import org.apache.commons.lang3.ObjectUtils;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.UUID;
 
 
 public class Shipment {
@@ -170,7 +171,9 @@ public class Shipment {
         final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
         final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
-        final DangerousGood dangerousGood = shipmentEntity.getDangerousGood() != null ? DangerousGood.from(shipmentEntity.getDangerousGood()) : null;
+        final DangerousGood dangerousGood = shipmentEntity.getDangerousGood() != null
+                ? shipmentEntity.getDangerousGood().toDomain()
+                : null;
         final ExternalId<String> externalRouteId = shipmentEntity.getExternalRouteId();
         final ExternalId<Long> externalReturnId = shipmentEntity.getExternalReturnId();
 
@@ -466,15 +469,14 @@ public class Shipment {
                        final ShipmentPriority shipmentPriority, final ShipmentSize shipmentSize,
                        final Money price, final DangerousGood dangerousGood,
                        final DepartmentCode destination, final Boolean signatureRequired) {
+        ensureCanBeModified();
         this.recipient = recipient;
         this.sender = sender;
         this.shipmentStatus = shipmentStatus;
         this.shipmentPriority = shipmentPriority;
         this.shipmentSize = shipmentSize;
         this.price = price;
-        if (dangerousGood != null) {
-            this.dangerousGood = dangerousGood;
-        }
+        this.dangerousGood = dangerousGood;
         this.destination = destination;
         this.signatureRequired = signatureRequired;
         markAsModified();
@@ -510,8 +512,31 @@ public class Shipment {
     }
 
     public void changeDangerousGood(final DangerousGood dangerousGood) {
+        if (Objects.equals(this.dangerousGood, dangerousGood)) {
+            return;
+        }
+        ensureCanBeModified();
         this.dangerousGood = dangerousGood;
         markAsModified();
+    }
+
+    public void removeDangerousGood() {
+        ensureCanBeModified();
+        this.dangerousGood = null;
+        markAsModified();
+    }
+
+    private void ensureCanBeModified() {
+        if (Boolean.TRUE.equals(locked)) {
+            throw new ShipmentModificationException(
+                    "Shipment cannot be changed because the it is locked");
+        }
+        if (ShipmentStatus.SENT.equals(shipmentStatus)
+                || ShipmentStatus.DELIVERY.equals(shipmentStatus)
+                || ShipmentStatus.RETURN.equals(shipmentStatus)) {
+            throw new ShipmentModificationException(
+                    "Shipment cannot be changed after it has been sent");
+        }
     }
 
     public void changeShipmentPriority(final ShipmentPriority shipmentPriority) {
