@@ -1,9 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ExternalId;
@@ -11,9 +8,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.commonassets.model.Weight;
 import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.vo.DangerousGoodId;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
 import jakarta.persistence.*;
@@ -132,59 +127,7 @@ public class ShipmentReadEntity extends BelongsToOperator {
     private ShipmentPriority shipmentPriority;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "dangerous_good_id"))
-    private DangerousGoodId dangerousGoodId;
-
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "dangerous_good_shipment_id"))
-    private ShipmentId dangerousGoodShipmentId;
-
-    @Column(name = "dangerous_good_name")
-    private String dangerousGoodName;
-
-    @Column(name = "dangerous_good_description", length = 1000)
-    private String dangerousGoodDescription;
-
-    @Column(name = "dangerous_good_classification_code")
-    private String dangerousGoodClassificationCode;
-
-    @Column(name = "dangerous_good_hazard_symbols")
-    private String dangerousGoodHazardSymbols;
-
-    @Column(name = "dangerous_good_storage_requirements")
-    private String dangerousGoodStorageRequirements;
-
-    @Column(name = "dangerous_good_handling_instructions", length = 2000)
-    private String dangerousGoodHandlingInstructions;
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "weight", column = @Column(name = "dangerous_good_weight")),
-            @AttributeOverride(name = "unit", column = @Column(name = "dangerous_good_weight_unit")),
-    })
-    private Weight dangerousGoodWeight;
-
-    @Column(name = "dangerous_good_packaging")
-    private String dangerousGoodPackaging;
-
-    @Column(name = "dangerous_good_flammable")
-    private Boolean dangerousGoodFlammable;
-
-    @Column(name = "dangerous_good_corrosive")
-    private Boolean dangerousGoodCorrosive;
-
-    @Column(name = "dangerous_good_toxic")
-    private Boolean dangerousGoodToxic;
-
-    @Column(name = "dangerous_good_emergency_contact")
-    private String dangerousGoodEmergencyContact;
-
-    @Column(name = "dangerous_good_country_origin")
-    @Enumerated(EnumType.STRING)
-    private CountryCode dangerousGoodCountryOfOrigin;
-
-    @Column(name = "dangerous_good_safety_data_sheet", length = 2000)
-    private String dangerousGoodSafetyDataSheet;
+    private DangerousGoodEmbeddable dangerousGood;
 
     @Embedded
     @AttributeOverrides({
@@ -242,22 +185,7 @@ public class ShipmentReadEntity extends BelongsToOperator {
                 .destinationCountry(snapshot.destinationCountry())
                 .shipmentPriority(snapshot.shipmentPriority())
                 .price(snapshot.price())
-                .dangerousGoodId(dangerousGoodId(snapshot.dangerousGood()))
-                .dangerousGoodShipmentId(dangerousGoodShipmentId(snapshot.dangerousGood()))
-                .dangerousGoodName(dangerousGoodName(snapshot.dangerousGood()))
-                .dangerousGoodDescription(dangerousGoodDescription(snapshot.dangerousGood()))
-                .dangerousGoodClassificationCode(dangerousGoodClassificationCode(snapshot.dangerousGood()))
-                .dangerousGoodHazardSymbols(dangerousGoodHazardSymbols(snapshot.dangerousGood()))
-                .dangerousGoodStorageRequirements(dangerousGoodStorageRequirements(snapshot.dangerousGood()))
-                .dangerousGoodHandlingInstructions(dangerousGoodHandlingInstructions(snapshot.dangerousGood()))
-                .dangerousGoodWeight(dangerousGoodWeight(snapshot.dangerousGood()))
-                .dangerousGoodPackaging(dangerousGoodPackaging(snapshot.dangerousGood()))
-                .dangerousGoodFlammable(dangerousGoodFlammable(snapshot.dangerousGood()))
-                .dangerousGoodCorrosive(dangerousGoodCorrosive(snapshot.dangerousGood()))
-                .dangerousGoodToxic(dangerousGoodToxic(snapshot.dangerousGood()))
-                .dangerousGoodEmergencyContact(dangerousGoodEmergencyContact(snapshot.dangerousGood()))
-                .dangerousGoodCountryOfOrigin(dangerousGoodCountryOfOrigin(snapshot.dangerousGood()))
-                .dangerousGoodSafetyDataSheet(dangerousGoodSafetyDataSheet(snapshot.dangerousGood()))
+                .dangerousGood(DangerousGoodEmbeddable.from(snapshot.dangerousGood()))
                 .externalRouteId(snapshot.routeExternalId())
                 .externalReturnId(snapshot.returnExternalId())
                 .externalId(new ExternalId<>(snapshot.externalShipmentId().value().toString()))
@@ -266,81 +194,6 @@ public class ShipmentReadEntity extends BelongsToOperator {
     }
 
     public DangerousGood dangerousGood() {
-        if (dangerousGoodId == null) {
-            return null;
-        }
-        final List<String> hazardSymbols = dangerousGoodHazardSymbols == null
-                ? Collections.emptyList()
-                : Collections.singletonList(dangerousGoodHazardSymbols);
-        return new DangerousGood(dangerousGoodId, dangerousGoodShipmentId, dangerousGoodName,
-                dangerousGoodDescription, dangerousGoodClassificationCode, hazardSymbols,
-                dangerousGoodStorageRequirements, dangerousGoodHandlingInstructions, dangerousGoodWeight,
-                dangerousGoodPackaging, Boolean.TRUE.equals(dangerousGoodFlammable),
-                Boolean.TRUE.equals(dangerousGoodCorrosive), Boolean.TRUE.equals(dangerousGoodToxic),
-                dangerousGoodEmergencyContact, dangerousGoodCountryOfOrigin, dangerousGoodSafetyDataSheet);
-    }
-
-    private static DangerousGoodId dangerousGoodId(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getDangerousGoodId() : null;
-    }
-
-    private static ShipmentId dangerousGoodShipmentId(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getShipmentId() : null;
-    }
-
-    private static String dangerousGoodName(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getName() : null;
-    }
-
-    private static String dangerousGoodDescription(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getDescription() : null;
-    }
-
-    private static String dangerousGoodClassificationCode(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getClassificationCode() : null;
-    }
-
-    private static String dangerousGoodHazardSymbols(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getHazardSymbols() : null;
-    }
-
-    private static String dangerousGoodStorageRequirements(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getStorageRequirements() : null;
-    }
-
-    private static String dangerousGoodHandlingInstructions(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getHandlingInstructions() : null;
-    }
-
-    private static Weight dangerousGoodWeight(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getWeight() : null;
-    }
-
-    private static String dangerousGoodPackaging(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getPackaging() : null;
-    }
-
-    private static Boolean dangerousGoodFlammable(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.isFlammable() : null;
-    }
-
-    private static Boolean dangerousGoodCorrosive(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.isCorrosive() : null;
-    }
-
-    private static Boolean dangerousGoodToxic(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.isToxic() : null;
-    }
-
-    private static String dangerousGoodEmergencyContact(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getEmergencyContact() : null;
-    }
-
-    private static CountryCode dangerousGoodCountryOfOrigin(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getCountryOfOrigin() : null;
-    }
-
-    private static String dangerousGoodSafetyDataSheet(final DangerousGood dangerousGood) {
-        return dangerousGood != null ? dangerousGood.getSafetyDataSheet() : null;
+        return dangerousGood == null ? null : dangerousGood.toDomain();
     }
 }

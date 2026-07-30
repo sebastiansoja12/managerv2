@@ -131,9 +131,8 @@ public class ShipmentEntity extends BelongsToOperator {
     @Enumerated(EnumType.STRING)
     private ShipmentPriority shipmentPriority;
 
-    @OneToOne
-    @JoinColumn(name = "dangerous_good_id", referencedColumnName = "dangerous_good_id")
-    private DangerousGoodEntity dangerousGood;
+    @Embedded
+    private DangerousGoodEmbeddable dangerousGood;
 
     @Embedded
     @AttributeOverrides({
@@ -170,7 +169,7 @@ public class ShipmentEntity extends BelongsToOperator {
 			final DepartmentCode destination, final ShipmentStatus shipmentStatus, final ShipmentType shipmentType,
 			final ShipmentId shipmentRelatedId, final LocalDateTime createdAt, final LocalDateTime updatedAt,
 			final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
-			final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEntity dangerousGood,
+			final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEmbeddable dangerousGood,
 			final ExternalId<String> externalRouteId, final ExternalId<Long> externalReturnId,
             final ExternalId<String> externalId, final TrackingNumber trackingNumber) {
         this.shipmentId = shipmentId;
@@ -222,7 +221,8 @@ public class ShipmentEntity extends BelongsToOperator {
         final String recipientStreet = shipment.getRecipient().getStreet();
         final String recipientPostalCode = shipment.getRecipient().getPostalCode();
         final String recipientTelephoneNumber = shipment.getRecipient().getTelephoneNumber();
-        final DangerousGoodEntity dangerousGoodEntity = DangerousGoodEntity.from(shipment.getDangerousGood());
+        final DangerousGoodEmbeddable dangerousGoodEmbeddable =
+                DangerousGoodEmbeddable.from(shipment.getDangerousGood());
         return new ShipmentEntity(shipment.getShipmentId(), senderFirstName, senderLastName,
                 senderEmail, senderCity, senderStreet, senderPostalCode, senderTelephoneNumber,
                 recipientFirstName, recipientLastName, recipientEmail, recipientCity, recipientStreet,
@@ -230,7 +230,7 @@ public class ShipmentEntity extends BelongsToOperator {
                 shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
                 shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
 				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
-				shipment.getShipmentPriority(), dangerousGoodEntity, shipment.getExternalRouteId(),
+				shipment.getShipmentPriority(), dangerousGoodEmbeddable, shipment.getExternalRouteId(),
                 shipment.getExternalReturnId(), new ExternalId<>(shipment.getExternalShipmentId().value().toString()),
                 shipment.getTrackingNumber());
     }

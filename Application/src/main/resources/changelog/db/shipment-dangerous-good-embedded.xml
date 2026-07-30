@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="codex" id="20260730-01-embed-dangerous-good-in-shipment">
+        <addColumn tableName="shipment">
+            <column name="dangerous_good_un_number" type="VARCHAR(16)"/>
+            <column name="dangerous_good_proper_shipping_name" type="VARCHAR(255)"/>
+            <column name="dangerous_good_description" type="VARCHAR(1000)"/>
+            <column name="dangerous_good_hazard_class" type="VARCHAR(64)"/>
+            <column name="dangerous_good_hazard_division" type="VARCHAR(64)"/>
+            <column name="dangerous_good_subsidiary_risk" type="VARCHAR(64)"/>
+            <column name="dangerous_good_packing_group" type="VARCHAR(8)"/>
+            <column name="dangerous_good_quantity" type="DECIMAL(19, 3)"/>
+            <column name="dangerous_good_quantity_unit" type="VARCHAR(32)"/>
+            <column name="dangerous_good_package_count" type="INT"/>
+            <column name="dangerous_good_packaging_type" type="VARCHAR(64)"/>
+            <column name="dangerous_good_limited_quantity" type="BIT(1)"/>
+            <column name="dangerous_good_excepted_quantity" type="BIT(1)"/>
+            <column name="dangerous_good_environmentally_hazardous" type="BIT(1)"/>
+            <column name="dangerous_good_marine_pollutant" type="BIT(1)"/>
+            <column name="dangerous_good_transport_category" type="VARCHAR(64)"/>
+            <column name="dangerous_good_tunnel_restriction_code" type="VARCHAR(32)"/>
+            <column name="dangerous_good_flash_point" type="DECIMAL(10, 3)"/>
+            <column name="dangerous_good_emergency_contact" type="VARCHAR(255)"/>
+            <column name="dangerous_good_emergency_contact_24h" type="VARCHAR(255)"/>
+            <column name="dangerous_good_safety_data_sheet_reference" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_declaration_document_reference" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_regulation_type" type="VARCHAR(64)"/>
+            <column name="dangerous_good_transport_mode" type="VARCHAR(64)"/>
+            <column name="dangerous_good_flammable" type="BIT(1)"/>
+            <column name="dangerous_good_corrosive" type="BIT(1)"/>
+            <column name="dangerous_good_toxic" type="BIT(1)"/>
+            <column name="dangerous_good_hazard_symbols" type="VARCHAR(255)"/>
+            <column name="dangerous_good_storage_requirements" type="VARCHAR(255)"/>
+            <column name="dangerous_good_handling_instructions" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_country_origin" type="VARCHAR(64)"/>
+        </addColumn>
+
+        <sql>
+            UPDATE shipment s
+            JOIN dangerous_good dg ON dg.dangerous_good_id = s.dangerous_good_id
+            SET s.dangerous_good_un_number = 'UN0000',
+                s.dangerous_good_proper_shipping_name = dg.name,
+                s.dangerous_good_description = dg.description,
+                s.dangerous_good_hazard_class = dg.classification_code,
+                s.dangerous_good_quantity = dg.weight,
+                s.dangerous_good_quantity_unit = dg.unit,
+                s.dangerous_good_package_count = 1,
+                s.dangerous_good_packaging_type = dg.packaging,
+                s.dangerous_good_limited_quantity = 0,
+                s.dangerous_good_excepted_quantity = 0,
+                s.dangerous_good_environmentally_hazardous = 0,
+                s.dangerous_good_marine_pollutant = 0,
+                s.dangerous_good_emergency_contact = dg.emergency_contact,
+                s.dangerous_good_safety_data_sheet_reference = dg.safety_data_sheet,
+                s.dangerous_good_regulation_type = 'ADR',
+                s.dangerous_good_transport_mode = 'ROAD',
+                s.dangerous_good_flammable = dg.flammable,
+                s.dangerous_good_corrosive = dg.corrosive,
+                s.dangerous_good_toxic = dg.toxic,
+                s.dangerous_good_hazard_symbols = dg.hazard_symbols,
+                s.dangerous_good_storage_requirements = dg.storage_requirements,
+                s.dangerous_good_handling_instructions = dg.handling_instructions,
+                s.dangerous_good_country_origin = dg.country_origin;
+        </sql>
+
+        <dropForeignKeyConstraint baseTableName="shipment" constraintName="fk_shipment_dangerous_good"/>
+        <dropForeignKeyConstraint baseTableName="dangerous_good" constraintName="fk_dangerous_good_shipment"/>
+        <dropIndex tableName="shipment" indexName="fk_shipment_dangerous_good"/>
+        <dropIndex tableName="dangerous_good" indexName="fk_dangerous_good_shipment"/>
+        <dropColumn tableName="shipment" columnName="dangerous_good_id"/>
+        <dropTable tableName="dangerous_good"/>
+
+        <createIndex tableName="shipment" indexName="idx_shipment_dangerous_good_un_number">
+            <column name="dangerous_good_un_number"/>
+        </createIndex>
+        <createIndex tableName="shipment" indexName="idx_shipment_dangerous_good_hazard_class">
+            <column name="dangerous_good_hazard_class"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="codex" id="20260730-02-update-shipment-dangerous-good-audit">
+        <addColumn tableName="shipment_aud">
+            <column name="dangerous_good_un_number" type="VARCHAR(16)"/>
+            <column name="dangerous_good_proper_shipping_name" type="VARCHAR(255)"/>
+            <column name="dangerous_good_description" type="VARCHAR(1000)"/>
+            <column name="dangerous_good_hazard_class" type="VARCHAR(64)"/>
+            <column name="dangerous_good_hazard_division" type="VARCHAR(64)"/>
+            <column name="dangerous_good_subsidiary_risk" type="VARCHAR(64)"/>
+            <column name="dangerous_good_packing_group" type="VARCHAR(8)"/>
+            <column name="dangerous_good_quantity" type="DECIMAL(19, 3)"/>
+            <column name="dangerous_good_quantity_unit" type="VARCHAR(32)"/>
+            <column name="dangerous_good_package_count" type="INT"/>
+            <column name="dangerous_good_packaging_type" type="VARCHAR(64)"/>
+            <column name="dangerous_good_limited_quantity" type="BIT(1)"/>
+            <column name="dangerous_good_excepted_quantity" type="BIT(1)"/>
+            <column name="dangerous_good_environmentally_hazardous" type="BIT(1)"/>
+            <column name="dangerous_good_marine_pollutant" type="BIT(1)"/>
+            <column name="dangerous_good_transport_category" type="VARCHAR(64)"/>
+            <column name="dangerous_good_tunnel_restriction_code" type="VARCHAR(32)"/>
+            <column name="dangerous_good_flash_point" type="DECIMAL(10, 3)"/>
+            <column name="dangerous_good_emergency_contact" type="VARCHAR(255)"/>
+            <column name="dangerous_good_emergency_contact_24h" type="VARCHAR(255)"/>
+            <column name="dangerous_good_safety_data_sheet_reference" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_declaration_document_reference" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_regulation_type" type="VARCHAR(64)"/>
+            <column name="dangerous_good_transport_mode" type="VARCHAR(64)"/>
+            <column name="dangerous_good_flammable" type="BIT(1)"/>
+            <column name="dangerous_good_corrosive" type="BIT(1)"/>
+            <column name="dangerous_good_toxic" type="BIT(1)"/>
+            <column name="dangerous_good_hazard_symbols" type="VARCHAR(255)"/>
+            <column name="dangerous_good_storage_requirements" type="VARCHAR(255)"/>
+            <column name="dangerous_good_handling_instructions" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_country_origin" type="VARCHAR(64)"/>
+        </addColumn>
+        <dropColumn tableName="shipment_aud" columnName="dangerous_good_id"/>
+        <sql>DROP TABLE IF EXISTS dangerous_good_aud;</sql>
+    </changeSet>
+
+    <changeSet author="codex" id="20260730-03-update-shipment-read-model-dangerous-good">
+        <addColumn tableName="shipment_rd">
+            <column name="dangerous_good_un_number" type="VARCHAR(16)"/>
+            <column name="dangerous_good_proper_shipping_name" type="VARCHAR(255)"/>
+            <column name="dangerous_good_hazard_class" type="VARCHAR(64)"/>
+            <column name="dangerous_good_hazard_division" type="VARCHAR(64)"/>
+            <column name="dangerous_good_subsidiary_risk" type="VARCHAR(64)"/>
+            <column name="dangerous_good_packing_group" type="VARCHAR(8)"/>
+            <column name="dangerous_good_quantity" type="DECIMAL(19, 3)"/>
+            <column name="dangerous_good_quantity_unit" type="VARCHAR(32)"/>
+            <column name="dangerous_good_package_count" type="INT"/>
+            <column name="dangerous_good_packaging_type" type="VARCHAR(64)"/>
+            <column name="dangerous_good_limited_quantity" type="BIT(1)"/>
+            <column name="dangerous_good_excepted_quantity" type="BIT(1)"/>
+            <column name="dangerous_good_environmentally_hazardous" type="BIT(1)"/>
+            <column name="dangerous_good_marine_pollutant" type="BIT(1)"/>
+            <column name="dangerous_good_transport_category" type="VARCHAR(64)"/>
+            <column name="dangerous_good_tunnel_restriction_code" type="VARCHAR(32)"/>
+            <column name="dangerous_good_flash_point" type="DECIMAL(10, 3)"/>
+            <column name="dangerous_good_emergency_contact_24h" type="VARCHAR(255)"/>
+            <column name="dangerous_good_safety_data_sheet_reference" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_declaration_document_reference" type="VARCHAR(2000)"/>
+            <column name="dangerous_good_regulation_type" type="VARCHAR(64)"/>
+            <column name="dangerous_good_transport_mode" type="VARCHAR(64)"/>
+        </addColumn>
+        <sql>
+            UPDATE shipment_rd
+            SET dangerous_good_un_number = 'UN0000',
+                dangerous_good_proper_shipping_name = dangerous_good_name,
+                dangerous_good_hazard_class = dangerous_good_classification_code,
+                dangerous_good_quantity = dangerous_good_weight,
+                dangerous_good_quantity_unit = dangerous_good_weight_unit,
+                dangerous_good_package_count = 1,
+                dangerous_good_packaging_type = dangerous_good_packaging,
+                dangerous_good_limited_quantity = 0,
+                dangerous_good_excepted_quantity = 0,
+                dangerous_good_environmentally_hazardous = 0,
+                dangerous_good_marine_pollutant = 0,
+                dangerous_good_safety_data_sheet_reference = dangerous_good_safety_data_sheet,
+                dangerous_good_regulation_type = 'ADR',
+                dangerous_good_transport_mode = 'ROAD'
+            WHERE dangerous_good_id IS NOT NULL;
+        </sql>
+        <dropIndex tableName="shipment_rd" indexName="idx_shipment_rd_dangerous_good_id"/>
+        <dropColumn tableName="shipment_rd" columnName="dangerous_good_id"/>
+        <dropColumn tableName="shipment_rd" columnName="dangerous_good_shipment_id"/>
+        <dropColumn tableName="shipment_rd" columnName="dangerous_good_name"/>
+        <dropColumn tableName="shipment_rd" columnName="dangerous_good_classification_code"/>
+        <dropColumn tableName="shipment_rd" columnName="dangerous_good_weight"/>
+        <dropColumn tableName="shipment_rd" columnName="dangerous_good_weight_unit"/>
+        <dropColumn tableName="shipment_rd" columnName="dangerous_good_packaging"/>
+        <dropColumn tableName="shipment_rd" columnName="dangerous_good_safety_data_sheet"/>
+        <createIndex tableName="shipment_rd" indexName="idx_shipment_rd_dangerous_good_un_number">
+            <column name="dangerous_good_un_number"/>
+        </createIndex>
+        <createIndex tableName="shipment_rd" indexName="idx_shipment_rd_dangerous_good_hazard_class">
+            <column name="dangerous_good_hazard_class"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
