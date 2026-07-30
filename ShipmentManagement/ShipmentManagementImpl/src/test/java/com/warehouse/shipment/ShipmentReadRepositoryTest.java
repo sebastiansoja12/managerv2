@@ -1,6 +1,8 @@
 package com.warehouse.shipment;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
@@ -123,6 +125,17 @@ public class ShipmentReadRepositoryTest {
         final ShipmentId shipmentId = new ShipmentId(100001L);
         final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
         assertTrue(parcel.isPresent());
+        assertNull(parcel.orElseThrow().getDangerousGood());
+    }
+
+    @Test
+    void shouldReadEmbeddedDangerousGood() {
+        final ShipmentId shipmentId = new ShipmentId(100002L);
+        final ShipmentEntity shipment = repository.findById(shipmentId).orElseThrow();
+
+        assertEquals("UN3480", shipment.getDangerousGood().toDomain().getUnNumber());
+        assertEquals("Lithium ion batteries",
+                shipment.getDangerousGood().toDomain().getProperShippingName());
     }
 
     @Test

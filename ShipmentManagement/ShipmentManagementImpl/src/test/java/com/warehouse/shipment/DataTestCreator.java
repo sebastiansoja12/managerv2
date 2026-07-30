@@ -1,17 +1,14 @@
 package com.warehouse.shipment;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.commonassets.model.Weight;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.vo.DangerousGoodId;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
@@ -94,23 +91,42 @@ public class DataTestCreator {
     }
 
     static DangerousGood dangerousGood() {
+        return dangerousGood("Rechargeable battery");
+    }
+
+    static DangerousGood dangerousGood(final String description) {
         return new DangerousGood(
-                new DangerousGoodId(1L),
-                shipmentId(),
-                "Lithium battery",
-                "Rechargeable battery",
+                "UN3480",
+                "Lithium ion batteries",
+                description,
                 "9",
-                List.of("flammable"),
-                "KEEP_DRY",
-                "Handle with care",
-                new Weight(BigDecimal.ONE, WeightUnit.KILOGRAM),
+                null,
+                null,
+                "II",
+                BigDecimal.ONE,
+                "KILOGRAM",
+                1,
                 "BOX",
+                false,
+                false,
+                false,
+                false,
+                "2",
+                null,
+                null,
+                "112",
+                null,
+                "sds",
+                null,
+                "ADR",
+                "ROAD",
                 true,
                 false,
                 false,
-                "112",
-                CountryCode.PL,
-                "sds"
+                "flammable",
+                "KEEP_DRY",
+                "Handle with care",
+                CountryCode.PL
         );
     }
 }
