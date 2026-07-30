@@ -1,18 +1,19 @@
 package com.warehouse.shipment.application.port.primary;
 
-import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.*;
+import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.shipment.application.port.primary.command.*;
+import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
+import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
+import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.application.port.primary.command.*;
-import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
-import com.warehouse.shipment.application.port.primary.result.ShipmentControlCenterResult;
-import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
-import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.model.DangerousGood;
+import com.warehouse.shipment.domain.vo.Person;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ShipmentPort {
@@ -33,11 +34,10 @@ public interface ShipmentPort {
 
     ShipmentResult loadShipment(final TrackingNumber trackingNumber);
 
-    ShipmentControlCenterResult loadShipmentControlCenter(final ShipmentId shipmentId);
+    ShipmentRouteLog loadShipmentWithRouteLog(final ShipmentId shipmentId);
 
-    ShipmentControlCenterResult loadShipmentControlCenter(final TrackingNumber trackingNumber);
+    ShipmentRouteLog loadShipmentWithRouteLog(final TrackingNumber trackingNumber);
 
-    List<ShipmentResult> searchShipments(final ShipmentSearchCriteria criteria);
 
     boolean existsShipment(final ShipmentId shipmentId);
 
@@ -46,18 +46,6 @@ public interface ShipmentPort {
     void putDangerousGood(final ShipmentId shipmentId, final DangerousGood dangerousGood);
 
     void deleteDangerousGood(final ShipmentId shipmentId);
-
-    void processShipmentReturn(final ShipmentReturnCommand request);
-
-    void startProcessingShipmentReturn(final ShipmentId shipmentId);
-
-    void completeShipmentReturn(final ShipmentId shipmentId);
-
-    void cancelShipmentReturn(final ReturnId returnId);
-
-    ShipmentReturnDetails loadShipmentReturn(final ReturnId returnId);
-
-    ShipmentReturnPage loadShipmentReturns(final DepartmentCode departmentCode, final int page, final int size);
 
     void processShipmentDelivery(final ShipmentDeliveryCommand command);
 
@@ -75,4 +63,13 @@ public interface ShipmentPort {
 
     void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination);
 
+    void markReturned(final ShipmentId shipmentId);
+
+    void restoreAfterReturnCancellation(final ShipmentId shipmentId);
+
+    void notifyShipmentReturnCompleted(final ShipmentId shipmentId);
+
+    void notifyShipmentReturnCanceled(final ShipmentId shipmentId);
+
+    void returnToSender(final ShipmentId shipmentId);
 }
