@@ -3,11 +3,14 @@ package com.warehouse.process.infrastructure.adapter.secondary;
 import static com.warehouse.process.ProcessHubTestFixtures.processId;
 import static com.warehouse.process.ProcessHubTestFixtures.processLog;
 import static com.warehouse.process.ProcessHubTestFixtures.shipmentRejected;
+import static com.warehouse.process.ProcessHubTestFixtures.authenticateOperator;
+import static com.warehouse.process.ProcessHubTestFixtures.clearAuthentication;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -31,7 +34,13 @@ class ProcessRepositoryImplTest {
 
     @BeforeEach
     void setUp() {
+        authenticateOperator();
         repository = new ProcessRepositoryImpl(readRepository, writeRepository);
+    }
+
+    @AfterEach
+    void tearDown() {
+        clearAuthentication();
     }
 
     @Test

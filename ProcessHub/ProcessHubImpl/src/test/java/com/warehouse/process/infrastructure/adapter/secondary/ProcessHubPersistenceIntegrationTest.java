@@ -4,9 +4,13 @@ import static com.warehouse.process.ProcessHubTestFixtures.finishedProcessLog;
 import static com.warehouse.process.ProcessHubTestFixtures.processId;
 import static com.warehouse.process.ProcessHubTestFixtures.processLog;
 import static com.warehouse.process.ProcessHubTestFixtures.shipmentRejected;
+import static com.warehouse.process.ProcessHubTestFixtures.authenticateOperator;
+import static com.warehouse.process.ProcessHubTestFixtures.clearAuthentication;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -36,6 +40,16 @@ class ProcessHubPersistenceIntegrationTest {
 
     @Autowired
     private TestEntityManager entityManager;
+
+    @BeforeEach
+    void setUp() {
+        authenticateOperator();
+    }
+
+    @AfterEach
+    void tearDown() {
+        clearAuthentication();
+    }
 
     @Test
     void shouldSyncReadModelWithAllCommunicationLogsUsingRealDatabase() {
