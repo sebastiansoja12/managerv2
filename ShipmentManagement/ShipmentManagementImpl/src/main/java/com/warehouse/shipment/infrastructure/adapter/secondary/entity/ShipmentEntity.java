@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -93,11 +92,6 @@ public class ShipmentEntity extends BelongsToOperator {
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
     private DepartmentId targetDepartmentId;
-
-    @NotAudited
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_department_id", referencedColumnName = "department_id", insertable = false, updatable = false)
-    private DepartmentEntity targetDepartment;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
