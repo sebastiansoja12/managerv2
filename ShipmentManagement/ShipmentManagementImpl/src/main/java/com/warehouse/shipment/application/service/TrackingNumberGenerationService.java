@@ -3,7 +3,10 @@ package com.warehouse.shipment.application.service;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.service.TrackingNumberService;
+import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberRule;
+
+import java.util.UUID;
 
 public class TrackingNumberGenerationService {
 
@@ -22,5 +25,15 @@ public class TrackingNumberGenerationService {
                     rule, shipmentId, this.trackingNumberSequenceService.nextValue(rule));
             case SHIPMENT_ID, RANDOM -> this.trackingNumberService.nextTrackingNumber(rule, shipmentId);
         };
+    }
+
+    public TrackingNumber generate(final ShipmentWorkflowSettings shipmentWorkflowSettings,
+                                   final TrackingNumberRule rule, final ShipmentId shipmentId) {
+
+        if (!shipmentWorkflowSettings.generateTrackingNumber()) {
+            return new TrackingNumber(UUID.randomUUID().toString());
+        } else {
+            return generate(rule, shipmentId);
+        }
     }
 }
