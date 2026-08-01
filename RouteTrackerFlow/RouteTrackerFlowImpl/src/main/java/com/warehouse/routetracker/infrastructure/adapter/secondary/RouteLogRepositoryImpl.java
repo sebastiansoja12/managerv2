@@ -55,10 +55,15 @@ public class RouteLogRepositoryImpl implements RouteLogRepository {
 
     @Override
     public RouteLogRecord find(final ShipmentId shipmentId) {
-		return routeLogRecordReadRepository
-                .findByShipmentId(shipmentId.value())
-                .map(logToModelMapper::map)
+		return this.findOptional(shipmentId)
 				.orElseThrow(() -> new RouteLogException("Route log does not exist"));
+    }
+
+    @Override
+    public Optional<RouteLogRecord> findOptional(final ShipmentId shipmentId) {
+        return this.routeLogRecordReadRepository
+                .findByShipmentId(shipmentId.value())
+                .map(this.logToModelMapper::map);
     }
 
     @Override
