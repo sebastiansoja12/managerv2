@@ -77,10 +77,6 @@ public interface ShipmentService {
 
     void update(final Shipment shipment);
 
-    void changeRouteProcessId(final ProcessId processId, final ShipmentId shipmentId);
-
-    void assignExternalReturnId(final ShipmentId shipmentId, final ReturnId returnId);
-
     void redirectShipmentToSender(final ShipmentId shipmentId);
 
     void changeDestination(final ShipmentId shipmentId, final DepartmentCode value);
