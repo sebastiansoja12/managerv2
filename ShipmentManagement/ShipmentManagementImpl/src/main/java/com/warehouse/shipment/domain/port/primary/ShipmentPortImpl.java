@@ -452,10 +452,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     private void publishIfNeeded(final ShipmentSnapshot snapshot, final ShipmentConfiguration configuration) {
-		if (configuration.publishInRouteTracker()) {
-			this.routeLogServicePort.notifyShipmentUpdated(snapshot);
-		}
-
 		if (configuration.publishInReturnManager()) {
 			this.returningServicePort.notifyShipmentUpdated(snapshot);
 		}
