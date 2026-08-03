@@ -1,8 +1,9 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
 import com.warehouse.shipment.application.port.primary.command.*;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
-import com.warehouse.shipment.application.port.primary.result.ShipmentControlCenterResult;
+import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,13 +11,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
-import com.warehouse.shipment.domain.enumeration.ReasonCode;
-import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.exception.DangerousGoodNotFoundException;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
@@ -25,8 +22,6 @@ import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.vo.Person;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.secondary.ShipmentConfigurationPort;
-import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
-import com.warehouse.shipment.domain.vo.ShipmentReturnPage;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
@@ -63,18 +58,23 @@ public class ShipmentInternalController {
 
     private final ShipmentConfigurationPort shipmentConfigurationServicePort;
 
+    private final DepartmentServicePort departmentServicePort;
+
+
 	public ShipmentInternalController(final ShipmentPort shipmentPort,
                                       final ShipmentRequestValidator shipmentRequestValidator,
                                       final ShipmentRequestMapper requestMapper,
                                       final ShipmentResponseMapper responseMapper,
                                       final ObjectMapper objectMapper,
-                                      final ShipmentConfigurationPort shipmentConfigurationServicePort) {
+                                      final ShipmentConfigurationPort shipmentConfigurationServicePort,
+                                      final DepartmentServicePort departmentServicePort) {
         this.shipmentPort = shipmentPort;
         this.shipmentRequestValidator = shipmentRequestValidator;
         this.requestMapper = requestMapper;
         this.responseMapper = responseMapper;
         this.objectMapper = objectMapper;
         this.shipmentConfigurationServicePort = shipmentConfigurationServicePort;
+        this.departmentServicePort = departmentServicePort;
     }
 
     @PostMapping
@@ -123,9 +123,9 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.controlcenter.get")
     @Timed(value = "controller.shipment.controlcenter.get")
     public ResponseEntity<?> getControlCenter(@PathVariable final Long shipmentId) {
-        final ShipmentControlCenterResult controlCenter = shipmentPort.loadShipmentControlCenter(
+        final ShipmentRouteLog controlCenter = shipmentPort.loadShipmentWithRouteLog(
                 new ShipmentId(shipmentId));
-        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.mapControlCenter(controlCenter));
+        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.mapShipmentRouteLog(controlCenter, departmentServicePort));
     }
 
     @GetMapping("/tracking-numbers/{trackingNumber}")
@@ -141,9 +141,9 @@ public class ShipmentInternalController {
     @Counted(value = "controller.shipment.trackingnumber.controlcenter.get")
     @Timed(value = "controller.shipment.trackingnumber.controlcenter.get")
     public ResponseEntity<?> getControlCenterByTrackingNumber(@PathVariable final String trackingNumber) {
-        final ShipmentControlCenterResult shipment = shipmentPort.loadShipmentControlCenter(
+        final ShipmentRouteLog shipment = shipmentPort.loadShipmentWithRouteLog(
                 new TrackingNumber(trackingNumber));
-        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.mapControlCenter(shipment));
+        return ResponseEntity.status(HttpStatus.OK).body(responseMapper.mapShipmentRouteLog(shipment, departmentServicePort));
     }
 
     @PutMapping
@@ -161,71 +161,6 @@ public class ShipmentInternalController {
             response = ResponseEntity.badRequest().body(result.getFailure());
         }
         return response;
-    }
-
-    @PutMapping("/returns")
-    @Counted(value = "controller.shipment.return")
-    @Timed(value = "controller.shipment.return")
-    public ResponseEntity<?> returnShipment(@RequestBody final ShipmentReturnRequestApi shipmentReturnRequest) {
-        final ShipmentReturnCommand request = new ShipmentReturnCommand(
-                shipmentReturnRequest.departmentCode(),
-                shipmentReturnRequest.reason(),
-                new ShipmentId(shipmentReturnRequest.shipmentId().getValue()),
-                ReturnStatus.valueOf(shipmentReturnRequest.returnStatus()),
-                ReasonCode.valueOf(shipmentReturnRequest.reasonCode().value())
-        );
-        this.shipmentPort.processShipmentReturn(request);
-        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
-    }
-
-    @GetMapping("/returns/{returnPackageId}")
-    @Counted(value = "controller.shipment.return.get")
-    @Timed(value = "controller.shipment.return.get")
-    public ResponseEntity<ShipmentReturnDetailsApi> getReturn(@PathVariable final Long returnPackageId) {
-        final ShipmentReturnDetails response = this.shipmentPort.loadShipmentReturn(new ReturnId(returnPackageId));
-        return ResponseEntity.ok(this.responseMapper.map(response));
-    }
-
-    @DeleteMapping("/returns/{returnPackageId}")
-    @Counted(value = "controller.shipment.return.cancel")
-    @Timed(value = "controller.shipment.return.cancel")
-    public ResponseEntity<ShipmentResponseInformation> cancelReturn(@PathVariable final Long returnPackageId) {
-        this.shipmentPort.cancelShipmentReturn(new ReturnId(returnPackageId));
-        return ResponseEntity.ok(new ShipmentResponseInformation(Status.OK));
-    }
-
-    @PutMapping("/returns/{shipmentId}/process")
-    @Counted(value = "controller.shipment.return.process")
-    @Timed(value = "controller.shipment.return.process")
-    public ResponseEntity<ShipmentResponseInformation> startProcessingReturn(@PathVariable final Long shipmentId) {
-        this.shipmentPort.startProcessingShipmentReturn(new ShipmentId(shipmentId));
-        return ResponseEntity.ok(new ShipmentResponseInformation(Status.OK));
-    }
-
-    @PutMapping("/returns/{shipmentId}/complete")
-    @Counted(value = "controller.shipment.return.complete")
-    @Timed(value = "controller.shipment.return.complete")
-    public ResponseEntity<ShipmentResponseInformation> completeReturn(@PathVariable final Long shipmentId) {
-        this.shipmentPort.completeShipmentReturn(new ShipmentId(shipmentId));
-        return ResponseEntity.ok(new ShipmentResponseInformation(Status.OK));
-    }
-
-    @GetMapping("/returns")
-    @Counted(value = "controller.shipment.returns.get")
-    @Timed(value = "controller.shipment.returns.get")
-    public ResponseEntity<ShipmentReturnPageApi> getReturns(
-            @RequestParam final String departmentCode,
-            @RequestParam(defaultValue = "0") final int page,
-            @RequestParam(defaultValue = "50") final int size) {
-        if (departmentCode.isBlank()) {
-            throw new IllegalArgumentException("Department code is required");
-        }
-        if (page < 0 || size < 1 || size > 100) {
-            throw new IllegalArgumentException("Page must be non-negative and size must be between 1 and 100");
-        }
-        final ShipmentReturnPage response = this.shipmentPort.loadShipmentReturns(
-                new DepartmentCode(departmentCode.trim().toUpperCase()), page, size);
-        return ResponseEntity.ok(this.responseMapper.map(response));
     }
 
     @PutMapping("/deliveries")
