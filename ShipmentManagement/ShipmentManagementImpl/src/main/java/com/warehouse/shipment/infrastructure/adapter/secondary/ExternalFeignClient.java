@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.infrastructure.dto.CurrentUserAuthenticationDto;
@@ -29,14 +28,6 @@ public interface ExternalFeignClient {
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Void> completeReturn(final URI uri, @RequestBody final ChangeReturnStatusApiRequest request);
-
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<RouteProcessDto> createShipmentRoute(final URI uri, @RequestBody final ShipmentCreatedRequest request);
-
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<RouteLogRecordDto> updateRoutePerson(final URI uri,
-                                                        @RequestHeader("X-API-KEY") final String apiKey,
-                                                        @RequestBody final PersonChangedRequest request);
 
     class Configuration {
 
