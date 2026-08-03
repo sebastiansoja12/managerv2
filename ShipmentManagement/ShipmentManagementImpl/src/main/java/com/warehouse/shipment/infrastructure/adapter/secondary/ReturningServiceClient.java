@@ -76,7 +76,7 @@ public class ReturningServiceClient implements ReturningServicePort {
     public void notifyShipmentReturnCompleted(final ShipmentSnapshot snapshot) {
         log.info("Finishing shipment return in return manager {}", snapshot.shipmentId().toString());
         final ChangeReturnStatusApiRequest request = new ChangeReturnStatusApiRequest(
-                new ReturnIdDto(snapshot.returnExternalId().value()), "COMPLETED"
+                new ShipmentIdDto(snapshot.shipmentId().getValue()), "COMPLETED"
         );
         this.externalFeignClient.completeReturn(completeReturnUri(), request);
     }
