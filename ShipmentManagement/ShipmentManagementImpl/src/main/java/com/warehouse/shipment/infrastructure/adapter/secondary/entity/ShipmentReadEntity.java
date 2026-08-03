@@ -140,14 +140,6 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id", insertable = false, updatable = false)
     private SignatureEntity signature;
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "external_route_id"))
-    private ExternalId<String> externalRouteId;
-
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "external_return_id"))
-    private ExternalId<Long> externalReturnId;
-
     @Column(name = "external_id", nullable = false)
     @AttributeOverride(name = "value", column = @Column(name = "external_id"))
     private ExternalId<String> externalId;
@@ -186,8 +178,6 @@ public class ShipmentReadEntity extends BelongsToOperator {
                 .shipmentPriority(snapshot.shipmentPriority())
                 .price(snapshot.price())
                 .dangerousGood(DangerousGoodEmbeddable.from(snapshot.dangerousGood()))
-                .externalRouteId(snapshot.routeExternalId())
-                .externalReturnId(snapshot.returnExternalId())
                 .externalId(new ExternalId<>(snapshot.externalShipmentId().value().toString()))
                 .trackingNumber(snapshot.trackingNumber())
                 .build();

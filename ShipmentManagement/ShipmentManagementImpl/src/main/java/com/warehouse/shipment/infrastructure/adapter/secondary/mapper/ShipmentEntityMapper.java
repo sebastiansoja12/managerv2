@@ -41,8 +41,6 @@ public interface ShipmentEntityMapper {
                 .shipmentPriority(shipment.getShipmentPriority())
                 .signature(SignatureEntity.from(shipment.getSignature()))
                 .dangerousGood(DangerousGoodEmbeddable.from(shipment.getDangerousGood()))
-                .externalRouteId(shipment.getExternalRouteId())
-                .externalReturnId(shipment.getExternalReturnId())
                 .build();
     }
 }
