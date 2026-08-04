@@ -1,27 +1,27 @@
 package com.warehouse.returning.domain.model;
 
-import com.warehouse.returning.domain.vo.ReturnPackageId;
+import com.warehouse.returning.domain.vo.ShipmentId;
 
 public class ChangeReturnStatusRequest {
-    private ReturnPackageId returnPackageId;
+    private ShipmentId shipmentId;
     private ReturnStatus returnStatus;
 
-    public ChangeReturnStatusRequest(final ReturnPackageId returnPackageId,
+    public ChangeReturnStatusRequest(final ShipmentId shipmentId,
                                      final ReturnStatus returnStatus) {
-        this.returnPackageId = returnPackageId;
+        this.shipmentId = shipmentId;
         this.returnStatus = returnStatus;
     }
 
-    public ReturnPackageId getReturnPackageId() {
-        return returnPackageId;
+    public ShipmentId getShipmentId() {
+        return shipmentId;
     }
 
     public ReturnStatus getReturnStatus() {
         return returnStatus;
     }
 
-    public void setReturnPackageId(final ReturnPackageId returnPackageId) {
-        this.returnPackageId = returnPackageId;
+    public void setShipmentId(final ShipmentId shipmentId) {
+        this.shipmentId = shipmentId;
     }
 
     public void setReturnStatus(final ReturnStatus returnStatus) {
