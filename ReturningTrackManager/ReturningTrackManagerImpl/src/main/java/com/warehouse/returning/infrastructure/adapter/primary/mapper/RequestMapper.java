@@ -34,8 +34,7 @@ public abstract class RequestMapper {
     }
 
     public static ChangeReturnStatusRequest map(final ChangeReturnStatusApiRequest request) {
-        return new ChangeReturnStatusRequest(new ReturnPackageId(request.returnPackageId().value()),
+        return new ChangeReturnStatusRequest(new ShipmentId(request.shipmentId().value()),
                 ReturnStatus.valueOf(request.returnStatus()));
     }
 }
-
