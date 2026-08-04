@@ -11,6 +11,7 @@ import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.registry.DomainRegistry;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ShipmentId;
+import com.warehouse.returning.infrastructure.adapter.secondary.exception.ReturnPackageNotFoundException;
 
 public class ReturnServiceImpl implements ReturnService {
 
@@ -58,8 +59,11 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
-    public void completeReturn(final ReturnPackageId returnPackageId) {
-        final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
+    public void completeReturn(final ShipmentId shipmentId) {
+        final ReturnPackage returnPackage = this.findByShipmentId(shipmentId);
+        if (returnPackage == null) {
+            throw new ReturnPackageNotFoundException();
+        }
         returnPackage.markAsCompleted();
         this.saveOrUpdate(returnPackage);
         DomainRegistry.publish(new ReturnPackageCompleted(returnPackage.toSnapshot(), Instant.now()));
