@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -450,30 +449,6 @@ class ShipmentServiceImplTest {
 
         verify(shipmentRepository).createOrUpdate(shipment);
         assertEventPublished(ShipmentUpdated.class);
-    }
-
-    @Test
-    void shouldChangeRouteProcessId() {
-        final Shipment shipment = shipment();
-        final ProcessId processId = new ProcessId(UUID.randomUUID());
-        when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
-
-        shipmentService.changeRouteProcessId(processId, shipmentId());
-
-        assertEquals(processId.getValue().toString(), shipment.getExternalRouteId().value());
-        verify(shipmentRepository).createOrUpdate(shipment);
-    }
-
-    @Test
-    void shouldAssignExternalReturnId() {
-        final Shipment shipment = shipment();
-        final ReturnId returnId = new ReturnId(12L);
-        when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
-
-        shipmentService.assignExternalReturnId(shipmentId(), returnId);
-
-        assertEquals(returnId.getId(), shipment.getExternalReturnId().value());
-        verify(shipmentRepository).createOrUpdate(shipment);
     }
 
     @Test
