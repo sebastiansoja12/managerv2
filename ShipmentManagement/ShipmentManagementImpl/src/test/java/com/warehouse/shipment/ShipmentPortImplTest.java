@@ -49,9 +49,6 @@ class ShipmentPortImplTest {
     private ShipmentRepository shipmentRepository;
 
     @Mock
-    private SoftwareConfigurationServicePort softwareConfigurationServicePort;
-
-    @Mock
     private CountryDetermineServicePort countryDetermineServicePort;
 
     @Mock
