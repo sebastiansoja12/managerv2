@@ -62,7 +62,7 @@ class ShipmentReturnKafkaListenerTest {
         }
 
         @Override
-        public void complete(final ReturnPackageId returnPackageId) {
+        public void complete(final ShipmentId shipmentId) {
             throw new UnsupportedOperationException();
         }
 
