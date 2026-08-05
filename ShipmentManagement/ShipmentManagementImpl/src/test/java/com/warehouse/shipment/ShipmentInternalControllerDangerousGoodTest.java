@@ -1,5 +1,8 @@
 package com.warehouse.shipment;
 
+import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
+import static org.mockito.Mockito.mock;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -60,7 +63,8 @@ class ShipmentInternalControllerDangerousGoodTest {
                 requestMapper,
                 responseMapper,
                 new ObjectMapper(),
-                shipmentConfigurationServicePort
+                shipmentConfigurationServicePort,
+                mock(DepartmentServicePort.class)
         );
     }
 
