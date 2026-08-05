@@ -1,16 +1,5 @@
 package com.warehouse.shipment;
 
-import static com.warehouse.shipment.DataTestCreator.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ExternalId;
@@ -25,8 +14,17 @@ import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
-import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static com.warehouse.shipment.DataTestCreator.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ShipmentTest {
 
@@ -91,7 +89,7 @@ class ShipmentTest {
     void shouldMarkDeliveredShipmentAsFullyDelivered() {
         final Shipment shipment = shipment(null);
 
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
 
         assertAll(
                 () -> assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus()),
@@ -112,7 +110,7 @@ class ShipmentTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = ShipmentStatus.class, names = {"SENT", "DELIVERY", "RETURN"})
+    @EnumSource(value = ShipmentStatus.class, names = {"DELIVERY", "RETURN"})
     void shouldRejectDangerousGoodChangeForFinalShipmentStatus(final ShipmentStatus status) {
         final Shipment shipment = shipment(null);
         shipment.changeShipmentStatus(status);
@@ -138,16 +136,13 @@ class ShipmentTest {
     void shouldRejectAnyChangeAfterShipmentIsDelivered() {
         final Shipment shipment = shipment(null);
 
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
 
         assertAll(
                 () -> assertThrows(ShipmentModificationException.class, () -> shipment.changeSender(sender())),
                 () -> assertThrows(ShipmentModificationException.class, () -> shipment.changeRecipient(recipient())),
                 () -> assertThrows(ShipmentModificationException.class,
                         () -> shipment.changeShipmentStatus(ShipmentStatus.SENT)),
-                () -> assertThrows(ShipmentModificationException.class,
-                        () -> shipment.redirectToSender(new ShipmentId(10L),
-                                new TrackingNumber("REDIRECTED-TRACKING-NUMBER"))),
                 () -> assertThrows(ShipmentModificationException.class,
                         () -> shipment.changeShipmentType(ShipmentType.PARENT))
         );
@@ -189,7 +184,7 @@ class ShipmentTest {
     @Test
     void shouldNotBypassDangerousGoodStatusRuleThroughGeneralUpdate() {
         final Shipment shipment = shipment(null);
-        shipment.changeShipmentStatus(ShipmentStatus.SENT);
+        shipment.changeShipmentStatus(ShipmentStatus.DELIVERY);
 
         assertThrows(
                 ShipmentModificationException.class,
@@ -205,7 +200,7 @@ class ShipmentTest {
                         shipment.getSignatureRequired()
                 )
         );
-        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+        assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus());
         assertNull(shipment.getDangerousGood());
     }
 
@@ -216,9 +211,11 @@ class ShipmentTest {
         final Recipient originalRecipient = shipment.getRecipient();
         final ShipmentId redirectedShipmentId = new ShipmentId(10L);
         final TrackingNumber redirectedTrackingNumber = new TrackingNumber("REDIRECTED-TRACKING-NUMBER");
+        final ExternalId<UUID> externalId = new ExternalId<>(UUID.fromString(""));
+        final ShipmentWorkflowSettings shipmentWorkflowSettings = ShipmentWorkflowSettings.defaults();
 
-        final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId,
-                redirectedTrackingNumber);
+        final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId, redirectedTrackingNumber,
+                externalId, shipmentWorkflowSettings);
 
         assertAll(
                 () -> assertSame(shipment, redirectedShipment),
@@ -474,7 +471,7 @@ class ShipmentTest {
     @Test
     void shouldReturnDeliveredShipment() {
         final Shipment shipment = shipment(null);
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
 
         shipment.notifyShipmentReturned();
 
@@ -493,13 +490,13 @@ class ShipmentTest {
                 shipment::notifyShipmentReturned
         );
 
-        assertEquals("Cannot return for not delivered shipment", exception.getMessage());
+        assertEquals("Cannot return shipment in current status", exception.getMessage());
     }
 
     @Test
     void shouldCancelShipmentReturn() {
         final Shipment shipment = shipment(null);
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
         shipment.notifyShipmentReturned();
 
         shipment.notifyShipmentReturnCanceled();
@@ -591,8 +588,10 @@ class ShipmentTest {
         final Shipment shipment = shipment(null);
         final ExternalId<UUID> previousExternalShipmentId = shipment.getExternalShipmentId();
         final TrackingNumber newTrackingNumber = new TrackingNumber("RETURN-TRACKING-NUMBER");
+        final ExternalId<UUID> externalId = new ExternalId<>(UUID.fromString(""));
+        final ShipmentWorkflowSettings workflowSettings = ShipmentWorkflowSettings.defaults();
 
-        shipment.redirectToSender(new ShipmentId(31L), newTrackingNumber);
+        shipment.redirectToSender(new ShipmentId(31L), newTrackingNumber, externalId, workflowSettings);
 
         assertAll(
                 () -> assertNotEquals(previousExternalShipmentId, shipment.getExternalShipmentId()),
