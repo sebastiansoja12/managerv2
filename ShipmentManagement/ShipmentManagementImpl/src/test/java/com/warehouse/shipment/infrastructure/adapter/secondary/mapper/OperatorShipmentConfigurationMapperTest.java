@@ -3,6 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.organisationstructure.api.dto.DefaultShipmentStatusDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLabelConfigurationDto;
@@ -14,6 +15,7 @@ import com.warehouse.organisationstructure.api.dto.ShipmentServiceLevelDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentValidationConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentWorkflowConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberDateFormatDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberPrefixModeDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberRuleDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberSourceDto;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
@@ -21,6 +23,7 @@ import com.warehouse.shipment.domain.vo.conf.ShipmentLabelFormat;
 import com.warehouse.shipment.domain.vo.conf.ShipmentNotificationChannel;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberDateFormat;
+import com.warehouse.shipment.domain.vo.conf.TrackingNumberPrefixMode;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberSource;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +47,7 @@ class OperatorShipmentConfigurationMapperTest {
                         "18:30"
                 ),
                 new TrackingNumberRuleDto(
+                        TrackingNumberPrefixModeDto.DEPARTMENT_CODE,
                         "FTM",
                         "/",
                         TrackingNumberSourceDto.RANDOM,
@@ -55,7 +59,7 @@ class OperatorShipmentConfigurationMapperTest {
                 new ShipmentNotificationConfigurationDto(false, true, false, true, ShipmentNotificationChannelDto.BOTH)
         );
 
-        final OperatorShipmentConfiguration configuration = mapper.map(dto);
+        final OperatorShipmentConfiguration configuration = mapper.map(dto, new DepartmentCode("PO1"));
 
         assertThat(configuration.validationRules().validateAddressData()).isFalse();
         assertThat(configuration.validationRules().requireRecipientPhone()).isTrue();
@@ -66,7 +70,9 @@ class OperatorShipmentConfigurationMapperTest {
         assertThat(configuration.workflowSettings().defaultStatus()).isEqualTo(ShipmentStatus.PREPARED);
         assertThat(configuration.workflowSettings().defaultServiceLevel()).isEqualTo(ShipmentServiceLevel.EXPRESS);
         assertThat(configuration.workflowSettings().pickupCutoffTime()).isEqualTo("18:30");
-        assertThat(configuration.trackingNumberRule().key()).isEqualTo("FTM");
+        assertThat(configuration.trackingNumberRule().prefixMode())
+                .isEqualTo(TrackingNumberPrefixMode.DEPARTMENT_CODE);
+        assertThat(configuration.trackingNumberRule().key()).isEqualTo("PO1");
         assertThat(configuration.trackingNumberRule().source()).isEqualTo(TrackingNumberSource.RANDOM);
         assertThat(configuration.trackingNumberRule().dateFormat()).isEqualTo(TrackingNumberDateFormat.YYMMDD);
         assertThat(configuration.notificationSettings().notificationChannel()).isEqualTo(ShipmentNotificationChannel.BOTH);
@@ -74,7 +80,7 @@ class OperatorShipmentConfigurationMapperTest {
 
     @Test
     void shouldReturnDefaultsWhenDtoIsNull() {
-        final OperatorShipmentConfiguration configuration = mapper.map(null);
+        final OperatorShipmentConfiguration configuration = mapper.map(null, null);
 
         assertThat(configuration).isEqualTo(OperatorShipmentConfiguration.defaults());
     }
