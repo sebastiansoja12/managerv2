@@ -5,8 +5,8 @@
     <springProfile name="docker">
         <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="org.springframework.boot.logging.logback.StructuredLogEncoder">
-                <format>${CONSOLE_LOG_STRUCTURED_FORMAT}</format>
-                <charset>${CONSOLE_LOG_CHARSET}</charset>
+                <format>${CONSOLE_LOG_STRUCTURED_FORMAT:-ecs}</format>
+                <charset>${CONSOLE_LOG_CHARSET:-UTF-8}</charset>
             </encoder>
         </appender>
     </springProfile>
