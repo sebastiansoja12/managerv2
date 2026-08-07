@@ -122,6 +122,32 @@ mvn -pl ShipmentManagement/ShipmentManagementImpl -am test
 
 ## Docker
 
+Run the Compose stack from the repository root:
+
+```bash
+docker compose -f docker.compose.yml up -d
+```
+
+Stop all services together, keeping their containers and database volumes:
+
+```bash
+docker compose -f docker.compose.yml stop
+```
+
+Start the existing containers again with `docker compose -f docker.compose.yml start`. To stop and
+remove the stack's containers and network, use `docker compose -f docker.compose.yml down`; named
+database volumes are retained unless `--volumes` is explicitly supplied.
+
+The stack is defined in `docker.compose.yml`. The project name remains
+`managerv2`, matching the existing containers and Docker Desktop configuration.
+
+The stack contains PostgreSQL, MongoDB, ZooKeeper, Kafka, Kafka UI, Eureka,
+Gateway, Software Configuration, Returning Manager and Route Tracker. Run the
+main `Application` separately using the instructions above.
+
+Older Elasticsearch and Kibana containers may still appear in Docker Desktop
+under this project, but they are no longer defined in this Compose configuration.
+
 The root `Dockerfile` and `Application/Dockerfile` both build the main
 `Application` jar and expose port `8080`.
 
@@ -135,6 +161,24 @@ Separate Dockerfiles are available for:
 - `EurekaServer` on port `8761`
 
 ## API and Documentation
+
+Return operations are exposed by `ReturnPackageController` under `/v2/api/returns/packages`.
+Creation accepts a shipment ID; processing (`PUT /{returnId}/process`), completion
+(`PUT /{returnId}/complete`) and cancellation (`DELETE /{returnId}`) use the return package ID.
+The same controller provides the return details and paginated department list. The returning
+context calls `ShipmentApiService` for shipment changes; shipment summaries read return details
+through `ReturningApiService`.
+
+RTM publishes `return.cancelled` through its transactional outbox. Manager handles it in the
+returning context, restores the original shipment to `DELIVERY` and cancels its linked return
+shipment. The Manager `return_processing_state` changeset stores terminal cancellation markers
+so duplicate or delayed processing events cannot undo cancellation. No RTM schema change is required.
+
+Shipment search uses `ShipmentQueryPort` through the existing `/v2/api/shipments/read-model/search` endpoint.
+
+`ReturnConsumedEventTransactionTest` requires an isolated PostgreSQL database. Enable it with
+`RETURN_TEST_POSTGRES=true` and set `RETURN_TEST_JDBC_URL`, `RETURN_TEST_JDBC_USER` and
+`RETURN_TEST_JDBC_PASSWORD`. It creates and removes its own test schema.
 
 - Runtime API prefix: `/v2/api`
 - Actuator health endpoint: `/v2/api/actuator/health`
