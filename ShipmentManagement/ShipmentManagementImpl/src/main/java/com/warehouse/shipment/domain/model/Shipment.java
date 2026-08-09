@@ -235,7 +235,8 @@ public class Shipment {
                     final PickupPointId pickupPointId) {
         this(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
                 price, locked, targetDepartmentId, originDepartmentId, signature, shipmentPriority,
-                trackingNumber, status, dangerousGood, pickupMethod, deliveryMethod, pickupPointId, null);
+                trackingNumber, status, dangerousGood, pickupMethod, deliveryMethod, pickupPointId, null,
+                null, null, null, null, null);
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -257,7 +258,12 @@ public class Shipment {
                     final PickupMethod pickupMethod,
                     final DeliveryMethod deliveryMethod,
                     final PickupPointId pickupPointId,
-                    final PickupPointId deliveryPickupPointId) {
+                    final PickupPointId deliveryPickupPointId,
+                    final Dimensions dimensions,
+                    final Weight weight,
+                    final CustomerReference customerReference,
+                    final String contentDescription,
+                    final Money declaredValue) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
@@ -283,6 +289,11 @@ public class Shipment {
         this.deliveryMethod = deliveryMethod;
         this.pickupPointId = pickupPointId;
         this.deliveryPickupPointId = deliveryPickupPointId;
+        this.dimensions = dimensions;
+        this.weight = weight;
+        this.customerReference = customerReference;
+        this.contentDescription = contentDescription;
+        this.declaredValue = declaredValue;
     }
 
     public static Shipment parentShipment(final ShipmentId shipmentId,
@@ -571,18 +582,6 @@ public class Shipment {
         markAsModified();
     }
 
-    public void changeShipmentDetails(final Dimensions dimensions, final Weight weight,
-                                     final CustomerReference customerReference,
-                                     final String contentDescription, final Money declaredValue) {
-        ensureCanBeModified();
-        this.dimensions = dimensions;
-        this.weight = weight;
-        this.customerReference = customerReference;
-        this.contentDescription = contentDescription;
-        this.declaredValue = declaredValue;
-        markAsModified();
-    }
-
     public void markAsModified() {
         this.updatedAt = LocalDateTime.now();
     }
@@ -603,7 +602,10 @@ public class Shipment {
     public void update(final Sender sender, final Recipient recipient, final ShipmentStatus shipmentStatus,
                        final ShipmentPriority shipmentPriority, final ShipmentSize shipmentSize,
                        final Money price, final DangerousGood dangerousGood,
-                       final DepartmentId targetDepartmentId, final Boolean signatureRequired) {
+                       final DepartmentId targetDepartmentId, final Boolean signatureRequired,
+                       final Dimensions dimensions, final Weight weight,
+                       final CustomerReference customerReference, final String contentDescription,
+                       final Money declaredValue) {
         ensureCanBeModified();
         this.recipient = recipient;
         this.sender = sender;
@@ -614,6 +616,11 @@ public class Shipment {
         this.dangerousGood = dangerousGood;
         this.destinationDepartmentId = targetDepartmentId;
         this.signatureRequired = signatureRequired;
+        this.dimensions = dimensions;
+        this.weight = weight;
+        this.customerReference = customerReference;
+        this.contentDescription = contentDescription;
+        this.declaredValue = declaredValue;
         markAsModified();
     }
 

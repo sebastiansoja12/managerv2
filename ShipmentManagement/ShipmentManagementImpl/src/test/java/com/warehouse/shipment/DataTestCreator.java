@@ -9,9 +9,16 @@ import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.domain.vo.CustomerReference;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.LengthUnit;
 import com.warehouse.shipment.domain.vo.Parcel;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
 
 public class DataTestCreator {
 
@@ -89,6 +96,20 @@ public class DataTestCreator {
                 ShipmentPriority.MEDIUM,
                 trackingNumber(),
                 ShipmentStatus.CREATED
+        );
+    }
+
+    static Shipment shipmentWithParcelDetails() {
+        return new Shipment(
+                shipmentId(), sender(), recipient(), ShipmentSize.SMALL, null,
+                CountryCode.PL, CountryCode.DE, money(), false,
+                new DepartmentId(10L), new DepartmentId(9L), null,
+                ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
+                null, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,
+                new Dimensions(new BigDecimal("40"), new BigDecimal("30"), new BigDecimal("20"), LengthUnit.CM),
+                new Weight(new BigDecimal("5.5"), WeightUnit.KG),
+                new CustomerReference("ORDER-2026-12345"), "Electronics",
+                new Money(new BigDecimal("2500.00"), Currency.PLN)
         );
     }
 

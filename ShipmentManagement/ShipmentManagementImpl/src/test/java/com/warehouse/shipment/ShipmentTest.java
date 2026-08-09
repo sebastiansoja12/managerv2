@@ -14,6 +14,11 @@ import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
+import com.warehouse.shipment.domain.vo.CustomerReference;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.LengthUnit;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,6 +32,32 @@ import static com.warehouse.shipment.DataTestCreator.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ShipmentTest {
+
+    @Test
+    void shouldCreateShipmentWithParcelDetailsInConstructor() {
+        final Dimensions dimensions = new Dimensions(
+                BigDecimal.valueOf(40), BigDecimal.valueOf(30), BigDecimal.valueOf(20), LengthUnit.CM);
+        final Weight weight = new Weight(BigDecimal.valueOf(5.5), WeightUnit.KG);
+        final CustomerReference customerReference = new CustomerReference("ORDER-123");
+        final Money declaredValue = new Money(BigDecimal.valueOf(2500), Currency.PLN);
+
+        final Shipment shipment = new Shipment(
+                shipmentId(), sender(), recipient(), ShipmentSize.SMALL, null,
+                CountryCode.PL, CountryCode.DE, money(), false,
+                new DepartmentId(10L), new DepartmentId(9L), null,
+                ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
+                null, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,
+                dimensions, weight, customerReference, "Electronics", declaredValue
+        );
+
+        assertAll(
+                () -> assertEquals(dimensions, shipment.getDimensions()),
+                () -> assertEquals(weight, shipment.getWeight()),
+                () -> assertEquals(customerReference, shipment.getCustomerReference()),
+                () -> assertEquals("Electronics", shipment.getContentDescription()),
+                () -> assertEquals(declaredValue, shipment.getDeclaredValue())
+        );
+    }
 
     @Test
     void shouldCreateParentShipmentWhenRelatedShipmentIsMissing() {
@@ -226,7 +257,9 @@ class ShipmentTest {
                         shipment.getPrice(),
                         dangerousGood(),
                         shipment.getTargetDepartmentId(),
-                        shipment.getSignatureRequired()
+                        shipment.getSignatureRequired(),
+                        shipment.getDimensions(), shipment.getWeight(), shipment.getCustomerReference(),
+                        shipment.getContentDescription(), shipment.getDeclaredValue()
                 )
         );
         assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus());
@@ -415,6 +448,11 @@ class ShipmentTest {
         final Recipient newRecipient = Recipient.builder().firstName("updated recipient").build();
         final Money newPrice = new Money(BigDecimal.valueOf(99), Currency.GBP);
         final DepartmentId newDestination = new DepartmentId(11L);
+        final Dimensions newDimensions = new Dimensions(
+                BigDecimal.valueOf(40), BigDecimal.valueOf(30), BigDecimal.valueOf(20), LengthUnit.CM);
+        final Weight newWeight = new Weight(BigDecimal.valueOf(5.5), WeightUnit.KG);
+        final CustomerReference newCustomerReference = new CustomerReference("ORDER-123");
+        final Money newDeclaredValue = new Money(BigDecimal.valueOf(2500), Currency.PLN);
 
         shipment.update(
                 newSender,
@@ -425,7 +463,12 @@ class ShipmentTest {
                 newPrice,
                 dangerousGood(),
                 newDestination,
-                true
+                true,
+                newDimensions,
+                newWeight,
+                newCustomerReference,
+                "Electronics",
+                newDeclaredValue
         );
 
         assertAll(
@@ -437,7 +480,12 @@ class ShipmentTest {
                 () -> assertSame(newPrice, shipment.getPrice()),
                 () -> assertNotNull(shipment.getDangerousGood()),
                 () -> assertEquals(newDestination, shipment.getTargetDepartmentId()),
-                () -> assertTrue(shipment.getSignatureRequired())
+                () -> assertTrue(shipment.getSignatureRequired()),
+                () -> assertEquals(newDimensions, shipment.getDimensions()),
+                () -> assertEquals(newWeight, shipment.getWeight()),
+                () -> assertEquals(newCustomerReference, shipment.getCustomerReference()),
+                () -> assertEquals("Electronics", shipment.getContentDescription()),
+                () -> assertEquals(newDeclaredValue, shipment.getDeclaredValue())
         );
     }
 

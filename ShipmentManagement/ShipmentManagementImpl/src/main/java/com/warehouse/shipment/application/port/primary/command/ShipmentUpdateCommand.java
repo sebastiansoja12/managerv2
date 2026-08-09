@@ -13,6 +13,9 @@ import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.CustomerReference;
 
 import lombok.Builder;
 
@@ -42,6 +45,16 @@ public class ShipmentUpdateCommand {
     private ShipmentStatus shipmentStatus;
 
     private ShipmentConfiguration shipmentConfiguration;
+
+    private Dimensions dimensions;
+
+    private Weight weight;
+
+    private String contentDescription;
+
+    private Money declaredValue;
+
+    private CustomerReference customerReference;
 
     public ShipmentUpdateCommand() {
     }
@@ -156,6 +169,26 @@ public class ShipmentUpdateCommand {
     public void setShipmentConfiguration(final ShipmentConfiguration shipmentConfiguration) {
         this.shipmentConfiguration = shipmentConfiguration;
     }
+
+    public Dimensions getDimensions() { return dimensions; }
+
+    public void setDimensions(final Dimensions dimensions) { this.dimensions = dimensions; }
+
+    public Weight getWeight() { return weight; }
+
+    public void setWeight(final Weight weight) { this.weight = weight; }
+
+    public String getContentDescription() { return contentDescription; }
+
+    public void setContentDescription(final String contentDescription) { this.contentDescription = contentDescription; }
+
+    public Money getDeclaredValue() { return declaredValue; }
+
+    public void setDeclaredValue(final Money declaredValue) { this.declaredValue = declaredValue; }
+
+    public CustomerReference getCustomerReference() { return customerReference; }
+
+    public void setCustomerReference(final CustomerReference customerReference) { this.customerReference = customerReference; }
 
     public ShipmentStatus getShipmentStatus() {
         return shipmentStatus;
