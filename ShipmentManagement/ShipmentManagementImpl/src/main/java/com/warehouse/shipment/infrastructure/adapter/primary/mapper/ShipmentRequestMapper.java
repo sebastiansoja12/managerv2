@@ -23,6 +23,11 @@ import com.warehouse.shipment.application.port.primary.command.SignatureChangeRe
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.Person;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.LengthUnit;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
+import com.warehouse.shipment.domain.vo.CustomerReference;
 import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.application.port.primary.command.ShipmentStatusRequest;
@@ -65,6 +70,25 @@ public interface ShipmentRequestMapper {
             return null;
         }
         return new Money(money.getAmount(), Currency.valueOf(money.getCurrency()));
+    }
+
+    default Dimensions map(final DimensionsApi dimensions) {
+        if (dimensions == null) {
+            return null;
+        }
+        return new Dimensions(dimensions.length(), dimensions.width(), dimensions.height(),
+                dimensions.unit() == null ? null : LengthUnit.valueOf(dimensions.unit().name()));
+    }
+
+    default Weight map(final WeightApi weight) {
+        if (weight == null) {
+            return null;
+        }
+        return new Weight(weight.value(), weight.unit() == null ? null : WeightUnit.valueOf(weight.unit().name()));
+    }
+
+    default CustomerReference mapCustomerReference(final String customerReference) {
+        return customerReference == null ? null : new CustomerReference(customerReference);
     }
 
     ShipmentUpdateCommand map(final ShipmentUpdateRequestApi request);

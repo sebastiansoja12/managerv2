@@ -56,7 +56,12 @@ public interface ShipmentResponseMapper {
                 map(shipment.signature()),
                 map(shipment.dangerousGood()),
                 shipment.createdAt(),
-                shipment.updatedAt());
+                shipment.updatedAt(),
+                map(shipment.dimensions()),
+                map(shipment.weight()),
+                shipment.customerReference() == null ? null : shipment.customerReference().value(),
+                shipment.contentDescription(),
+                map(shipment.declaredValue()));
         response.setDeliveryPickupPointId(shipment.deliveryPickupPointId());
         return response;
     }
@@ -129,6 +134,16 @@ public interface ShipmentResponseMapper {
 	default MoneyApi map(final Money amount) {
 		return amount == null ? null : new MoneyApi(amount.getAmount(), amount.getCurrency().name());
 	}
+
+    default DimensionsApi map(final Dimensions dimensions) {
+        return dimensions == null ? null : new DimensionsApi(dimensions.length(), dimensions.width(), dimensions.height(),
+                dimensions.unit() == null ? null : LengthUnitDto.valueOf(dimensions.unit().name()));
+    }
+
+    default WeightApi map(final Weight weight) {
+        return weight == null ? null : new WeightApi(weight.value(),
+                weight.unit() == null ? null : WeightUnitDto.valueOf(weight.unit().name()));
+    }
 
     ShipmentUpdateResponseDto map(final ShipmentUpdateResponse response);
 

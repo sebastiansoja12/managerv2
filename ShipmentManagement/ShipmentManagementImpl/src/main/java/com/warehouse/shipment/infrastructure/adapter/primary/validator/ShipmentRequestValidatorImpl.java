@@ -33,14 +33,36 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.addAll(validatePerson(request.recipient()));
 		}
 
-        if (Objects.isNull(request.shipmentSize())) {
-            errors.add("Shipment size cannot be empty");
+        if (request.dimensions() == null) {
+            errors.add("Dimensions are required");
         } else {
-            validateShipmentStatus(request.shipmentSize(), errors);
+            validatePositive(request.dimensions().length(), "Length", errors);
+            validatePositive(request.dimensions().width(), "Width", errors);
+            validatePositive(request.dimensions().height(), "Height", errors);
+            if (request.dimensions().unit() == null) {
+                errors.add("Dimensions unit is required");
+            }
+        }
+
+        if (request.weight() == null) {
+            errors.add("Weight is required");
+        } else {
+            validatePositive(request.weight().value(), "Weight", errors);
+            if (request.weight().unit() == null) {
+                errors.add("Weight unit is required");
+            }
+        }
+
+        if (request.customerReference() != null && StringUtils.isBlank(request.customerReference())) {
+            errors.add("Customer reference cannot be blank");
         }
 
         if (validateShipmentPrice(request.price())) {
             errors.add("Invalid price");
+        }
+
+        if (request.declaredValue() != null && validateShipmentPrice(request.declaredValue())) {
+            errors.add("Invalid declared value");
         }
 
         if (request.deliveryMethod() != null
@@ -62,7 +84,14 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     }
 
     private boolean validateShipmentPrice(final MoneyApi price) {
-        return price != null && price.getAmount() == null && price.getCurrency() == null;
+        return price == null || price.getAmount() == null || StringUtils.isBlank(price.getCurrency());
+    }
+
+    private void validatePositive(final java.math.BigDecimal value, final String fieldName,
+                                  final List<String> errors) {
+        if (value == null || value.signum() <= 0) {
+            errors.add(fieldName + " must be greater than 0");
+        }
     }
 
     private List<String> validatePerson(final PersonApi person) {
@@ -172,14 +201,6 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.add("Document reference is required");
         }
         return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
-    }
-
-    private void validateShipmentStatus(final ShipmentSizeDto shipmentSize, final List<String> errors) {
-        if (Objects.isNull(shipmentSize)) {
-            errors.add("Shipment size cannot be empty");
-        } else if (ShipmentSizeDto.TEST.equals(shipmentSize)) {
-            errors.add("Shipment size not allowed");
-        }
     }
 
     private void validateRequestObj(final Object obj) {

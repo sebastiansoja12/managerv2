@@ -71,4 +71,5 @@
     <include file="changes/2026-09-28-tracking-number-prefix-mode.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-29-shipment-lifecycle-timestamps.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-29-shipment-parcel-details.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-29-shipment-parcel-size-optional.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
