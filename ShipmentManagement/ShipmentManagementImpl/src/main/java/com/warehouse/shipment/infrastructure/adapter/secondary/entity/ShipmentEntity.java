@@ -16,6 +16,7 @@ import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Getter
 @Builder
@@ -131,6 +132,49 @@ public class ShipmentEntity extends BelongsToOperator {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "length", precision = 19, scale = 3)
+    private BigDecimal length;
+
+    @Column(name = "width", precision = 19, scale = 3)
+    private BigDecimal width;
+
+    @Column(name = "height", precision = 19, scale = 3)
+    private BigDecimal height;
+
+    @Column(name = "length_unit")
+    @Enumerated(EnumType.STRING)
+    private LengthUnit lengthUnit;
+
+    @Column(name = "weight_value", precision = 19, scale = 3)
+    private BigDecimal weightValue;
+
+    @Column(name = "weight_unit")
+    @Enumerated(EnumType.STRING)
+    private WeightUnit weightUnit;
+
+    @Column(name = "customer_reference")
+    private String customerReference;
+
+    @Column(name = "content_description", length = 1000)
+    private String contentDescription;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "declared_value_amount")),
+            @AttributeOverride(name = "currency", column = @Column(name = "declared_value_currency"))
+    })
+    private Money declaredValue;
+
+    @Column(name = "accepted_at")
+    private LocalDateTime acceptedAt;
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
+
+    @Column(name = "cancellation_reason")
+    @Enumerated(EnumType.STRING)
+    private CancellationReason cancellationReason;
 
     @Column(name = "locked", nullable = false)
     private Boolean locked;
