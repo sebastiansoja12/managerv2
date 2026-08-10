@@ -24,7 +24,7 @@ public class BaseRepository<T extends BelongsToOperator> implements OperatorFilt
     @Transactional
     public void create(final T object) {
         if (object.operatorId() == null) {
-            final OperatorId operatorId = currentOperatorIdRequired();
+            final OperatorId operatorId = operatorContextProvider.currentOperatorId();
             object.assignOperator(operatorId);
         }
         this.entityManager.persist(object);
@@ -34,7 +34,7 @@ public class BaseRepository<T extends BelongsToOperator> implements OperatorFilt
     @Transactional
     public void update(final T object) {
         if (object.operatorId() == null) {
-            final OperatorId operatorId = currentOperatorIdRequired();
+            final OperatorId operatorId = operatorContextProvider.currentOperatorId();
             object.assignOperator(operatorId);
         }
         this.entityManager.merge(object);
@@ -48,19 +48,9 @@ public class BaseRepository<T extends BelongsToOperator> implements OperatorFilt
     @Override
     public Criteria<T> createCriteria(final Class<T> clazz) {
         final Criteria<T> criteria = new Criteria<>(entityManager, clazz);
-        final OperatorId operatorId = currentOperatorId();
-        if (operatorId != null) {
-            criteria.eq("operatorId.value", operatorId.getValue());
-        }
+        operatorContextProvider.currentContext()
+                .map(OperatorDetails::operatorId)
+                .ifPresent(operatorId -> criteria.eq("operatorId.value", operatorId.getValue()));
         return criteria;
-    }
-
-    private OperatorId currentOperatorId() {
-        return operatorContextProvider.currentOperatorId().orElse(null);
-    }
-
-    private OperatorId currentOperatorIdRequired() {
-        return operatorContextProvider.currentOperatorId()
-                .orElseThrow(() -> new IllegalStateException("No operator id found"));
     }
 }
