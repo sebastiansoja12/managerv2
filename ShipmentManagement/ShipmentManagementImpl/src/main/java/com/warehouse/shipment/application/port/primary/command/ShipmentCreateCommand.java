@@ -2,7 +2,6 @@ package com.warehouse.shipment.application.port.primary.command;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
@@ -20,8 +19,6 @@ public class ShipmentCreateCommand {
 
 	private Recipient recipient;
 
-	private ShipmentSize shipmentSize;
-	
 	private Money price;
 	
 	private DangerousGood dangerousGood;
@@ -58,11 +55,10 @@ public class ShipmentCreateCommand {
 								 final Money price,
 								 final Recipient recipient,
 								 final Sender sender,
-								 final ShipmentSize shipmentSize,
 								 final CountryCode issuerCountryCode,
 								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority) {
-		this(dangerousGood, price, recipient, sender, shipmentSize, issuerCountryCode,
+		this(dangerousGood, price, recipient, sender, issuerCountryCode,
 				receiverCountryCode, shipmentPriority, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null);
 	}
 
@@ -70,14 +66,13 @@ public class ShipmentCreateCommand {
 								 final Money price,
 								 final Recipient recipient,
 								 final Sender sender,
-								 final ShipmentSize shipmentSize,
 								 final CountryCode issuerCountryCode,
 								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority,
 								 final PickupMethod pickupMethod,
 								 final DeliveryMethod deliveryMethod,
 								 final PickupPointId pickupPointId) {
-		this(dangerousGood, price, recipient, sender, shipmentSize, issuerCountryCode, receiverCountryCode,
+		this(dangerousGood, price, recipient, sender, issuerCountryCode, receiverCountryCode,
 				shipmentPriority, pickupMethod, deliveryMethod, pickupPointId, null);
 	}
 
@@ -85,7 +80,6 @@ public class ShipmentCreateCommand {
 								 final Money price,
 								 final Recipient recipient,
 								 final Sender sender,
-								 final ShipmentSize shipmentSize,
 								 final CountryCode issuerCountryCode,
 								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority,
@@ -97,7 +91,6 @@ public class ShipmentCreateCommand {
 		this.price = price;
 		this.recipient = recipient;
 		this.sender = sender;
-		this.shipmentSize = shipmentSize;
 		this.issuerCountryCode = issuerCountryCode;
 		this.receiverCountryCode = receiverCountryCode;
 		this.shipmentPriority = shipmentPriority;
@@ -137,14 +130,6 @@ public class ShipmentCreateCommand {
 
 	public void setSender(final Sender sender) {
 		this.sender = sender;
-	}
-
-	public ShipmentSize getShipmentSize() {
-		return shipmentSize;
-	}
-
-	public void setShipmentSize(final ShipmentSize shipmentSize) {
-		this.shipmentSize = shipmentSize;
 	}
 
 	public CountryCode getIssuerCountryCode() {

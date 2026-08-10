@@ -2,7 +2,6 @@ package com.warehouse.shipment.domain.vo;
 
 import java.time.LocalDateTime;
 
-import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -17,8 +16,6 @@ public class Parcel {
     private final Sender sender;
 
     private final Recipient recipient;
-
-    private final ShipmentSize shipmentSize;
 
     private final DepartmentId targetDepartmentId;
 
@@ -38,7 +35,6 @@ public class Parcel {
 
 	public Parcel(final Sender sender,
                   final Recipient recipient,
-                  final ShipmentSize shipmentSize,
                   final DepartmentId targetDepartmentId,
                   final ShipmentStatus shipmentStatus,
                   final ShipmentType shipmentType,
@@ -49,7 +45,6 @@ public class Parcel {
                   final Boolean locked) {
 		this.sender = sender;
 		this.recipient = recipient;
-		this.shipmentSize = shipmentSize;
 		this.targetDepartmentId = targetDepartmentId;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentType = shipmentType;
@@ -66,10 +61,6 @@ public class Parcel {
 
     public Recipient getRecipient() {
         return recipient;
-    }
-
-    public ShipmentSize getShipmentSize() {
-        return shipmentSize;
     }
 
     public DepartmentId getTargetDepartmentId() {

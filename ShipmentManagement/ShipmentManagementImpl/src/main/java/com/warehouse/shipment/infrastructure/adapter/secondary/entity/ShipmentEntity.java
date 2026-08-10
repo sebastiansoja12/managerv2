@@ -86,10 +86,6 @@ public class ShipmentEntity extends BelongsToOperator {
     @Column(name = "recipient_postal_code", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "parcel_size")
-    @Enumerated(EnumType.STRING)
-    private ShipmentSize shipmentSize;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
     private DepartmentId targetDepartmentId;
@@ -217,7 +213,7 @@ public class ShipmentEntity extends BelongsToOperator {
 			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode,
 			final String senderTelephone, final String recipientFirstName, final String recipientLastName,
 			final String recipientEmail, final String recipientCity, final String recipientStreet,
-			final String recipientPostalCode, final String recipientTelephone, final ShipmentSize shipmentSize,
+			final String recipientPostalCode, final String recipientTelephone,
 			final DepartmentId targetDepartmentId, final DepartmentId originDepartmentId, final ShipmentStatus shipmentStatus,
             final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
             final LocalDateTime updatedAt, final Boolean locked, final CountryCode originCountry,
@@ -239,7 +235,6 @@ public class ShipmentEntity extends BelongsToOperator {
         this.recipientStreet = recipientStreet;
         this.recipientPostalCode = recipientPostalCode;
         this.recipientTelephone = recipientTelephone;
-        this.shipmentSize = shipmentSize;
         this.targetDepartmentId = targetDepartmentId;
         this.originDepartmentId = originDepartmentId;
         this.shipmentStatus = shipmentStatus;

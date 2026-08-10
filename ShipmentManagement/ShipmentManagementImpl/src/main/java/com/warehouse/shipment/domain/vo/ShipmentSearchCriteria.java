@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.searchobject.SearchCriteria;
 
@@ -19,7 +18,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
     private final Long shipmentId;
     private final String trackingNumber;
     private final List<ShipmentStatus> shipmentStatuses;
-    private final List<ShipmentSize> shipmentSizes;
     private final List<ShipmentPriority> shipmentPriorities;
     private final String senderName;
     private final String recipientName;
@@ -42,7 +40,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
             final Long shipmentId,
             final String trackingNumber,
             final List<ShipmentStatus> shipmentStatuses,
-            final List<ShipmentSize> shipmentSizes,
             final List<ShipmentPriority> shipmentPriorities,
             final String senderName,
             final String recipientName,
@@ -64,7 +61,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
         this.shipmentId = shipmentId;
         this.trackingNumber = trackingNumber;
         this.shipmentStatuses = shipmentStatuses;
-        this.shipmentSizes = shipmentSizes;
         this.shipmentPriorities = shipmentPriorities;
         this.senderName = senderName;
         this.recipientName = recipientName;
@@ -105,10 +101,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
 
     public List<ShipmentStatus> shipmentStatuses() {
         return shipmentStatuses;
-    }
-
-    public List<ShipmentSize> shipmentSizes() {
-        return shipmentSizes;
     }
 
     public List<ShipmentPriority> shipmentPriorities() {

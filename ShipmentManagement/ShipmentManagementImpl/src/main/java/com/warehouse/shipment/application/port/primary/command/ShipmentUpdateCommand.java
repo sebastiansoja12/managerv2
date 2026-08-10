@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -29,8 +28,6 @@ public class ShipmentUpdateCommand {
     private Recipient recipient;
 
     private DepartmentCode destination;
-
-    private ShipmentSize shipmentSize;
 
     private Money price;
 
@@ -64,7 +61,6 @@ public class ShipmentUpdateCommand {
             final Sender sender,
             final Recipient recipient,
             final DepartmentCode destination,
-            final ShipmentSize shipmentSize,
             final Money price,
             final DangerousGood dangerousGood,
             final CountryCode issuerCountryCode,
@@ -77,7 +73,6 @@ public class ShipmentUpdateCommand {
         this.sender = sender;
         this.recipient = recipient;
         this.destination = destination;
-        this.shipmentSize = shipmentSize;
         this.price = price;
         this.dangerousGood = dangerousGood;
         this.issuerCountryCode = issuerCountryCode;
@@ -149,14 +144,6 @@ public class ShipmentUpdateCommand {
 
     public void setShipmentPriority(final ShipmentPriority shipmentPriority) {
         this.shipmentPriority = shipmentPriority;
-    }
-
-    public ShipmentSize getShipmentSize() {
-        return shipmentSize;
-    }
-
-    public void setShipmentSize(final ShipmentSize shipmentSize) {
-        this.shipmentSize = shipmentSize;
     }
 
     public ShipmentConfiguration getShipmentConfiguration() {

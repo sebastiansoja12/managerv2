@@ -37,7 +37,6 @@ public interface ShipmentResponseMapper {
                 map(shipment.shipmentId()),
                 map(shipment.sender()),
                 map(shipment.recipient()),
-                shipment.shipmentSize() == null ? null : ShipmentSizeDto.valueOf(shipment.shipmentSize().name()),
                 map(departmentCode),
                 shipment.originDepartmentId(),
                 shipment.pickupPointId(),

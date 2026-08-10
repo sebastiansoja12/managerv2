@@ -82,10 +82,6 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Column(name = "recipient_postal_code", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "parcel_size")
-    @Enumerated(EnumType.STRING)
-    private ShipmentSize shipmentSize;
-
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
     private DepartmentId targetDepartmentId;

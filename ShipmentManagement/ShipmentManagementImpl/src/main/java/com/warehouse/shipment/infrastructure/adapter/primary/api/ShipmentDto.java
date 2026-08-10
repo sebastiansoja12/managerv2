@@ -14,8 +14,6 @@ public class ShipmentDto {
 
     private final PersonApi recipient;
 
-    private final ShipmentSizeDto shipmentSize;
-
     private final DepartmentCodeDto destination;
 
     private final DepartmentId originDepartmentId;
@@ -63,7 +61,7 @@ public class ShipmentDto {
     private final MoneyApi declaredValue;
 
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
-                       final ShipmentSizeDto shipmentSize, final DepartmentCodeDto destination,
+                       final DepartmentCodeDto destination,
                        final DepartmentId originDepartmentId, final PickupPointId pickupPointId,
                        final PickupMethodDto pickupMethod, final DeliveryMethodDto deliveryMethod,
                        final CountryCode originCountry,
@@ -79,7 +77,6 @@ public class ShipmentDto {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
-		this.shipmentSize = shipmentSize;
         this.destination = destination;
         this.originDepartmentId = originDepartmentId;
         this.pickupPointId = pickupPointId;
@@ -114,10 +111,6 @@ public class ShipmentDto {
 
     public PersonApi getRecipient() {
         return recipient;
-    }
-
-    public ShipmentSizeDto getShipmentSize() {
-        return shipmentSize;
     }
 
     public DepartmentCodeDto getDestination() {

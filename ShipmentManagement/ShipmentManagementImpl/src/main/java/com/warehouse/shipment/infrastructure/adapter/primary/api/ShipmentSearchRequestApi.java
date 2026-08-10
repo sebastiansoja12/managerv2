@@ -8,7 +8,6 @@ public record ShipmentSearchRequestApi(
         Long shipmentId,
         String trackingNumber,
         List<ShipmentStatusDto> shipmentStatuses,
-        List<ShipmentSizeDto> shipmentSizes,
         List<ShipmentPriorityDto> shipmentPriorities,
         String senderName,
         String recipientName,

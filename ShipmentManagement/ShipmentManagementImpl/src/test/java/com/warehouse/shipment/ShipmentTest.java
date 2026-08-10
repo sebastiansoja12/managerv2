@@ -42,7 +42,7 @@ class ShipmentTest {
         final Money declaredValue = new Money(BigDecimal.valueOf(2500), Currency.PLN);
 
         final Shipment shipment = new Shipment(
-                shipmentId(), sender(), recipient(), ShipmentSize.SMALL, null,
+                shipmentId(), sender(), recipient(), null,
                 CountryCode.PL, CountryCode.DE, money(), false,
                 new DepartmentId(10L), new DepartmentId(9L), null,
                 ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
@@ -253,7 +253,6 @@ class ShipmentTest {
                         shipment.getRecipient(),
                         ShipmentStatus.CREATED,
                         shipment.getShipmentPriority(),
-                        shipment.getShipmentSize(),
                         shipment.getPrice(),
                         dangerousGood(),
                         shipment.getTargetDepartmentId(),
@@ -385,15 +384,6 @@ class ShipmentTest {
     }
 
     @Test
-    void shouldChangeShipmentSize() {
-        final Shipment shipment = shipment(null);
-
-        shipment.changeShipmentSize(ShipmentSize.BIG);
-
-        assertEquals(ShipmentSize.BIG, shipment.getShipmentSize());
-    }
-
-    @Test
     void shouldChangePrice() {
         final Shipment shipment = shipment(null);
         final Money newPrice = new Money(BigDecimal.valueOf(25), Currency.EUR);
@@ -459,7 +449,6 @@ class ShipmentTest {
                 newRecipient,
                 ShipmentStatus.ACCEPTED,
                 ShipmentPriority.EXPRESS,
-                ShipmentSize.CUSTOM,
                 newPrice,
                 dangerousGood(),
                 newDestination,
@@ -476,7 +465,6 @@ class ShipmentTest {
                 () -> assertSame(newRecipient, shipment.getRecipient()),
                 () -> assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus()),
                 () -> assertEquals(ShipmentPriority.EXPRESS, shipment.getShipmentPriority()),
-                () -> assertEquals(ShipmentSize.CUSTOM, shipment.getShipmentSize()),
                 () -> assertSame(newPrice, shipment.getPrice()),
                 () -> assertNotNull(shipment.getDangerousGood()),
                 () -> assertEquals(newDestination, shipment.getTargetDepartmentId()),
@@ -681,7 +669,6 @@ class ShipmentTest {
                 shipmentId(),
                 sender(),
                 recipient(),
-                ShipmentSize.SMALL,
                 relatedShipmentId,
                 CountryCode.PL,
                 CountryCode.DE,

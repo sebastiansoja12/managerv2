@@ -27,7 +27,6 @@ public class ShipmentPersistenceMapper {
                 entity.getShipmentId(),
                 sender(entity),
                 recipient(entity),
-                entity.getShipmentSize(),
                 entity.getShipmentStatus(),
                 entity.getShipmentType(),
                 entity.getShipmentRelatedId(),
@@ -69,7 +68,6 @@ public class ShipmentPersistenceMapper {
                 new Recipient(entity.getRecipientFirstName(), entity.getRecipientLastName(),
                         entity.getRecipientEmail(), entity.getRecipientTelephone(), entity.getRecipientCity(),
                         entity.getRecipientPostalCode(), entity.getRecipientStreet()),
-                entity.getShipmentSize(),
                 entity.getShipmentStatus(),
                 entity.getShipmentType(),
                 entity.getShipmentRelatedId(),
@@ -119,7 +117,6 @@ public class ShipmentPersistenceMapper {
                 .recipientCity(shipment.getRecipient().getCity())
                 .recipientStreet(shipment.getRecipient().getStreet())
                 .recipientPostalCode(shipment.getRecipient().getPostalCode())
-                .shipmentSize(shipment.getShipmentSize())
                 .targetDepartmentId(shipment.getTargetDepartmentId())
                 .originDepartmentId(shipment.getOriginDepartmentId())
                 .pickupPointId(shipment.getPickupPointId())
@@ -172,7 +169,6 @@ public class ShipmentPersistenceMapper {
                 .recipientCity(snapshot.recipient().getCity())
                 .recipientStreet(snapshot.recipient().getStreet())
                 .recipientPostalCode(snapshot.recipient().getPostalCode())
-                .shipmentSize(snapshot.shipmentSize())
                 .targetDepartmentId(snapshot.destinationDepartmentId())
                 .originDepartmentId(snapshot.originDepartmentId())
                 .pickupPointId(snapshot.pickupPointId())

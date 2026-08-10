@@ -52,7 +52,6 @@ class ShipmentCreateRequestMapperTest {
         assertThat(command.getContentDescription()).isEqualTo("Electronics");
         assertThat(command.getDeclaredValue().getAmount()).isEqualByComparingTo("2500");
         assertThat(command.getDeclaredValue().getCurrency()).isEqualTo(Currency.PLN);
-        assertThat(command.getShipmentSize()).isNull();
     }
 
     @Test
