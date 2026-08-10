@@ -47,6 +47,8 @@
     <include file="/changelog/db/shipment.xml"/>
     <include file="/changelog/db/shipment_rd.xml"/>
     <include file="/changelog/db/shipment_aud.xml"/>
+    <include file="/changelog/db/shipment_external_route_id.xml"/>
+    <include file="/changelog/db/shipment_external_return_id.xml"/>
     <include file="/changelog/db/signature.xml"/>
     <include file="/changelog/db/supplier.xml"/>
     <include file="/changelog/db/suppliers.xml"/>
