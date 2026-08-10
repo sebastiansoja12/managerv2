@@ -67,11 +67,6 @@ public class TerminalConfiguration {
         return new SoftwareConfigurationServiceMockAdapter();
     }
 
-    @Bean("device.softwareConfigurationProperties")
-    public SoftwareConfigurationProperties softwareConfigurationProperties() {
-        return new SoftwareConfigurationProperties();
-    }
-
     @Bean("terminal.supplierRepository")
     public SupplierRepository supplierRepository(final SupplierReadRepository repository) {
         return new SupplierRepositoryImpl(repository);
