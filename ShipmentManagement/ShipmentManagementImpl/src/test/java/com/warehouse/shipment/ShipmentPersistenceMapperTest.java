@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 import com.warehouse.commonassets.enumeration.CancellationReason;
 import com.warehouse.commonassets.enumeration.Currency;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.vo.CustomerReference;
 import com.warehouse.shipment.domain.vo.Dimensions;
@@ -37,6 +38,8 @@ class ShipmentPersistenceMapperTest {
         assertThat(rehydrated.getUpdatedAt()).isEqualTo(original.getUpdatedAt());
         assertThat(rehydrated.getExternalShipmentId()).isEqualTo(original.getExternalShipmentId());
         assertThat(rehydrated.getTrackingNumber()).isEqualTo(original.getTrackingNumber());
+        assertThat(rehydrated.getSender().getAddress().getCountryCode()).isEqualTo(CountryCode.PL);
+        assertThat(rehydrated.getRecipient().getAddress().getCountryCode()).isEqualTo(CountryCode.DE);
     }
 
     @Test
@@ -88,6 +91,8 @@ class ShipmentPersistenceMapperTest {
         assertThat(rehydrated.getWeight()).isEqualTo(weight);
         assertThat(rehydrated.getCustomerReference()).isEqualTo(new CustomerReference("ORDER-2026-12345"));
         assertThat(rehydrated.getContentDescription()).isEqualTo("Electronics");
+        assertThat(rehydrated.getSender().getAddress().getCountryCode()).isEqualTo(CountryCode.PL);
+        assertThat(rehydrated.getRecipient().getAddress().getCountryCode()).isEqualTo(CountryCode.DE);
         assertThat(rehydrated.getDeclaredValue()).isEqualTo(declaredValue);
         assertThat(rehydrated.getPrice()).isNotEqualTo(declaredValue);
     }

@@ -9,8 +9,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.Weight;
@@ -23,9 +22,9 @@ public class ShipmentUpdateCommand {
     
     private ShipmentId shipmentId;
     
-    private Sender sender;
+    private Party sender;
 
-    private Recipient recipient;
+    private Party recipient;
 
     private DepartmentCode destination;
 
@@ -58,8 +57,8 @@ public class ShipmentUpdateCommand {
 
     public ShipmentUpdateCommand(
             final ShipmentId shipmentId,
-            final Sender sender,
-            final Recipient recipient,
+            final Party sender,
+            final Party recipient,
             final DepartmentCode destination,
             final Money price,
             final DangerousGood dangerousGood,
@@ -114,19 +113,19 @@ public class ShipmentUpdateCommand {
         this.receiverCountryCode = receiverCountryCode;
     }
 
-    public Recipient getRecipient() {
+    public Party getRecipient() {
         return recipient;
     }
 
-    public void setRecipient(final Recipient recipient) {
+    public void setRecipient(final Party recipient) {
         this.recipient = recipient;
     }
 
-    public Sender getSender() {
+    public Party getSender() {
         return sender;
     }
 
-    public void setSender(final Sender sender) {
+    public void setSender(final Party sender) {
         this.sender = sender;
     }
 

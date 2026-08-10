@@ -122,8 +122,8 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(ErrorCode.SHIPMENT_EXTENDED_LIMITATIONS);
         }
 
-        final Sender sender = command.getSender();
-        final Recipient recipient = command.getRecipient();
+        final Party sender = command.getSender().withCountryCode(issuerCountryCode);
+        final Party recipient = command.getRecipient().withCountryCode(receiverCountryCode);
         final Address recipientAddress = Address.from(recipient);
 
         final PickupMethod pickupMethod = command.getPickupMethod();
@@ -162,8 +162,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                 sender,
                 recipient,
                 null,
-                issuerCountryCode,
-                receiverCountryCode,
                 shipmentPrice,
                 false,
                 targetDepartmentId,
@@ -218,8 +216,8 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Money shipmentPrice = command.getPrice();
 
         shipment.update(
-                command.getSender(),
-                command.getRecipient(),
+                command.getSender().withCountryCode(issuerCountryCode),
+                command.getRecipient().withCountryCode(receiverCountryCode),
                 command.getShipmentStatus(),
                 command.getShipmentPriority(),
                 shipmentPrice,
@@ -295,14 +293,14 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.domainEventPublisher.publish(new ShipmentCanceled(shipment.snapshot(), Instant.now()));
     }
 
-    public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
+    public void changeSenderTo(final ShipmentId shipmentId, final Party sender) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeSender(sender);
         this.shipmentRepository.createOrUpdate(shipment);
         this.domainEventPublisher.publish(new ShipmentSenderChanged(shipment.snapshot(), Instant.now()));
     }
 
-    public void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient) {
+    public void changeRecipientTo(final ShipmentId shipmentId, final Party recipient) {
         final Shipment shipment = this.find(shipmentId);
         if (!shipment.recipientCityMatches(recipient.getCity())) {
             final Result<VoronoiResponse, ErrorCode> voronoiResponse =
@@ -319,11 +317,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changePersonTo(final Person person, final ShipmentId shipmentId) {
-        if (person.getType() == PersonType.SENDER) {
-            changeSenderTo(shipmentId, (Sender) person);
-        } else if (person.getType() == PersonType.RECIPIENT) {
-            changeRecipientTo(shipmentId, (Recipient) person);
+    public void changePersonTo(final Party party, final PersonType personType, final ShipmentId shipmentId) {
+        if (personType == PersonType.SENDER) {
+            changeSenderTo(shipmentId, party);
+        } else if (personType == PersonType.RECIPIENT) {
+            changeRecipientTo(shipmentId, party);
         }
     }
 
@@ -347,9 +345,9 @@ public class ShipmentPortImpl implements ShipmentPort {
                     this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration();
             final TrackingNumber trackingNumber = this.trackingNumberGenerationService.generate(
                     shipmentConfiguration.trackingNumberRule(), shipmentId);
-			final Shipment newShipment = Shipment.parentShipment(shipmentId, shipment.getSender(),
-					shipment.getRecipient(), shipment.getShipmentId(),
-					shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
+            final Shipment newShipment = Shipment.parentShipment(shipmentId, shipment.getSender(),
+                    shipment.getRecipient(), shipment.getShipmentId(),
+                    shipment.getPrice(),
 					shipment.getTargetDepartmentId(), shipment.getOriginDepartmentId(),
                     shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber,
 					shipmentConfiguration.workflowSettings().defaultStatus());

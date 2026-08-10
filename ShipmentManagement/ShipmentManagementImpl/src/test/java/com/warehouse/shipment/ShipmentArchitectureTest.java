@@ -255,8 +255,7 @@ class ShipmentArchitectureTest {
                 .doesNotContain("record SignatureSnapshot(");
         final Path snapshotPackage = Path.of(
                 "src/main/java/com/warehouse/shipment/application/event/snapshot");
-        assertThat(snapshotPackage.resolve("SenderSnapshot.java")).exists();
-        assertThat(snapshotPackage.resolve("RecipientSnapshot.java")).exists();
+        assertThat(snapshotPackage.resolve("PartySnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("MoneySnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("DangerousGoodSnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("SignatureSnapshot.java")).exists();

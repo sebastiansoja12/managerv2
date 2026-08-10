@@ -12,7 +12,8 @@ import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.vo.Person;
+import com.warehouse.shipment.domain.enumeration.PersonType;
+import com.warehouse.shipment.domain.vo.Party;
 
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public interface ShipmentPort {
 
     Result<Void, ErrorCode> update(final ShipmentUpdateCommand request);
 
-    void changePersonTo(final Person person, final ShipmentId shipmentId);
+    void changePersonTo(final Party party, final PersonType personType, final ShipmentId shipmentId);
 
     void changeShipmentTypeTo(final ChangeShipmentTypeRequest request);
 

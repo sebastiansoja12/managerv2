@@ -171,13 +171,13 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Column(name = "locked", nullable = false)
     private Boolean locked;
 
-    @Column(name = "origin_country", nullable = false)
+    @Column(name = "sender_country_code")
     @Enumerated(EnumType.STRING)
-    private CountryCode originCountry;
+    private CountryCode senderCountryCode;
 
-    @Column(name = "destination_country", nullable = false)
+    @Column(name = "recipient_country_code")
     @Enumerated(EnumType.STRING)
-    private CountryCode destinationCountry;
+    private CountryCode recipientCountryCode;
 
     @Column(name = "shipment_priority", nullable = false)
     @Enumerated(EnumType.STRING)

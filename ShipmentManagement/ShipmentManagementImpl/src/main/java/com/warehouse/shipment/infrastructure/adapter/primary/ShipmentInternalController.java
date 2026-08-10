@@ -19,7 +19,7 @@ import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.vo.Person;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.secondary.ShipmentConfigurationPort;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
@@ -279,8 +279,10 @@ public class ShipmentInternalController {
     public ResponseEntity<?> updatePerson(@RequestBody final PersonApi personRequest,
                                           @RequestParam("shipmentId") final Long shipmentId,
                                           @RequestParam("personType") final PersonType personType) {
-        final Person person = this.requestMapper.map(personRequest, personType);
-        this.shipmentPort.changePersonTo(person, new ShipmentId(shipmentId));
+        final Party party = this.requestMapper.mapToParty(personRequest);
+        this.shipmentPort.changePersonTo(party,
+                com.warehouse.shipment.domain.enumeration.PersonType.valueOf(personType.name()),
+                new ShipmentId(shipmentId));
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
     

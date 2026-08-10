@@ -1,5 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
+import com.warehouse.commonassets.enumeration.CountryCode;
+
 public class PersonApi {
     private final String firstName;
     private final String lastName;
@@ -8,9 +10,15 @@ public class PersonApi {
     private final String city;
     private final String postalCode;
     private final String street;
+    private final CountryCode countryCode;
 
 	public PersonApi(final String firstName, final String lastName, final String email, final String telephoneNumber,
                      final String city, final String postalCode, final String street) {
+		this(firstName, lastName, email, telephoneNumber, city, postalCode, street, null);
+	}
+
+	public PersonApi(final String firstName, final String lastName, final String email, final String telephoneNumber,
+                     final String city, final String postalCode, final String street, final CountryCode countryCode) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
@@ -18,6 +26,7 @@ public class PersonApi {
 		this.city = city;
 		this.postalCode = postalCode;
 		this.street = street;
+		this.countryCode = countryCode;
 	}
 
     public String getFirstName() {
@@ -46,5 +55,9 @@ public class PersonApi {
 
     public String getStreet() {
         return street;
+    }
+
+    public CountryCode getCountryCode() {
+        return countryCode;
     }
 }

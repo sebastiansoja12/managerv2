@@ -13,9 +13,9 @@ import lombok.Builder;
 @Builder
 public class Parcel {
     
-    private final Sender sender;
+    private final Party sender;
 
-    private final Recipient recipient;
+    private final Party recipient;
 
     private final DepartmentId targetDepartmentId;
 
@@ -33,8 +33,8 @@ public class Parcel {
 
     private final Boolean locked;
 
-	public Parcel(final Sender sender,
-                  final Recipient recipient,
+	public Parcel(final Party sender,
+                  final Party recipient,
                   final DepartmentId targetDepartmentId,
                   final ShipmentStatus shipmentStatus,
                   final ShipmentType shipmentType,
@@ -55,11 +55,11 @@ public class Parcel {
 		this.locked = locked;
 	}
     
-    public Sender getSender() {
+    public Party getSender() {
         return sender;
     }
 
-    public Recipient getRecipient() {
+    public Party getRecipient() {
         return recipient;
     }
 

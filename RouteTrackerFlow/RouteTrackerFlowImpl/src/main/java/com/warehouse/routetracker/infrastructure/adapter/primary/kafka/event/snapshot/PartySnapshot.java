@@ -3,13 +3,14 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.sn
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record RecipientSnapshot(
+public record PartySnapshot(
         String firstName,
         String lastName,
         String email,
         String telephoneNumber,
         String city,
         String postalCode,
-        String street
+        String street,
+        String countryCode
 ) {
 }

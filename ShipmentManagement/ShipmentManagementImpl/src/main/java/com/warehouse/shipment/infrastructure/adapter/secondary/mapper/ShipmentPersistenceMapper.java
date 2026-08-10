@@ -7,8 +7,7 @@ import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;
@@ -34,8 +33,6 @@ public class ShipmentPersistenceMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getLocked(),
-                entity.getOriginCountry(),
-                entity.getDestinationCountry(),
                 entity.getTargetDepartmentId(),
                 entity.getOriginDepartmentId(),
                 signature(entity.getSignature()),
@@ -62,12 +59,12 @@ public class ShipmentPersistenceMapper {
     public Shipment toDomain(final ShipmentReadEntity entity) {
         return Shipment.rehydrate(
                 entity.getShipmentId(),
-                new Sender(entity.getFirstName(), entity.getLastName(), entity.getSenderEmail(),
+                new Party(entity.getFirstName(), entity.getLastName(), entity.getSenderEmail(),
                         entity.getSenderTelephone(), entity.getSenderCity(), entity.getSenderPostalCode(),
-                        entity.getSenderStreet()),
-                new Recipient(entity.getRecipientFirstName(), entity.getRecipientLastName(),
+                        entity.getSenderStreet(), entity.getSenderCountryCode()),
+                new Party(entity.getRecipientFirstName(), entity.getRecipientLastName(),
                         entity.getRecipientEmail(), entity.getRecipientTelephone(), entity.getRecipientCity(),
-                        entity.getRecipientPostalCode(), entity.getRecipientStreet()),
+                        entity.getRecipientPostalCode(), entity.getRecipientStreet(), entity.getRecipientCountryCode()),
                 entity.getShipmentStatus(),
                 entity.getShipmentType(),
                 entity.getShipmentRelatedId(),
@@ -75,8 +72,6 @@ public class ShipmentPersistenceMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getLocked(),
-                entity.getOriginCountry(),
-                entity.getDestinationCountry(),
                 entity.getTargetDepartmentId(),
                 entity.getOriginDepartmentId(),
                 signature(entity.getSignature()),
@@ -141,8 +136,8 @@ public class ShipmentPersistenceMapper {
                 .cancelledAt(shipment.getCancelledAt())
                 .cancellationReason(shipment.getCancellationReason())
                 .locked(shipment.getLocked())
-                .originCountry(shipment.getOriginCountry())
-                .destinationCountry(shipment.getDestinationCountry())
+                .senderCountryCode(shipment.getSender().getCountryCode())
+                .recipientCountryCode(shipment.getRecipient().getCountryCode())
                 .shipmentPriority(shipment.getShipmentPriority())
                 .dangerousGood(DangerousGoodEmbeddable.from(shipment.getDangerousGood()))
                 .price(shipment.getPrice())
@@ -193,8 +188,8 @@ public class ShipmentPersistenceMapper {
                 .cancelledAt(snapshot.cancelledAt())
                 .cancellationReason(snapshot.cancellationReason())
                 .locked(snapshot.locked())
-                .originCountry(snapshot.originCountry())
-                .destinationCountry(snapshot.destinationCountry())
+                .senderCountryCode(snapshot.sender().getCountryCode())
+                .recipientCountryCode(snapshot.recipient().getCountryCode())
                 .shipmentPriority(snapshot.shipmentPriority())
                 .dangerousGood(DangerousGoodEmbeddable.from(snapshot.dangerousGood()))
                 .price(snapshot.price())
@@ -203,16 +198,16 @@ public class ShipmentPersistenceMapper {
                 .build();
     }
 
-    private Sender sender(final ShipmentEntity entity) {
-        return new Sender(entity.getFirstName(), entity.getLastName(), entity.getSenderEmail(),
+    private Party sender(final ShipmentEntity entity) {
+        return new Party(entity.getFirstName(), entity.getLastName(), entity.getSenderEmail(),
                 entity.getSenderTelephone(), entity.getSenderCity(), entity.getSenderPostalCode(),
-                entity.getSenderStreet());
+                entity.getSenderStreet(), entity.getSenderCountryCode());
     }
 
-    private Recipient recipient(final ShipmentEntity entity) {
-        return new Recipient(entity.getRecipientFirstName(), entity.getRecipientLastName(),
+    private Party recipient(final ShipmentEntity entity) {
+        return new Party(entity.getRecipientFirstName(), entity.getRecipientLastName(),
                 entity.getRecipientEmail(), entity.getRecipientTelephone(), entity.getRecipientCity(),
-                entity.getRecipientPostalCode(), entity.getRecipientStreet());
+                entity.getRecipientPostalCode(), entity.getRecipientStreet(), entity.getRecipientCountryCode());
     }
 
     private Signature signature(final SignatureEntity entity) {

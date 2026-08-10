@@ -7,17 +7,16 @@ import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.Weight;
 import com.warehouse.shipment.domain.vo.CustomerReference;
 
 public class ShipmentCreateCommand {
 
-	private Sender sender;
+	private Party sender;
 
-	private Recipient recipient;
+	private Party recipient;
 
 	private Money price;
 	
@@ -53,8 +52,8 @@ public class ShipmentCreateCommand {
 
 	public ShipmentCreateCommand(final DangerousGood dangerousGood,
 								 final Money price,
-								 final Recipient recipient,
-								 final Sender sender,
+								 final Party recipient,
+								 final Party sender,
 								 final CountryCode issuerCountryCode,
 								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority) {
@@ -64,8 +63,8 @@ public class ShipmentCreateCommand {
 
 	public ShipmentCreateCommand(final DangerousGood dangerousGood,
 								 final Money price,
-								 final Recipient recipient,
-								 final Sender sender,
+								 final Party recipient,
+								 final Party sender,
 								 final CountryCode issuerCountryCode,
 								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority,
@@ -78,8 +77,8 @@ public class ShipmentCreateCommand {
 
 	public ShipmentCreateCommand(final DangerousGood dangerousGood,
 								 final Money price,
-								 final Recipient recipient,
-								 final Sender sender,
+								 final Party recipient,
+								 final Party sender,
 								 final CountryCode issuerCountryCode,
 								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority,
@@ -116,19 +115,19 @@ public class ShipmentCreateCommand {
 		this.price = price;
 	}
 
-	public Recipient getRecipient() {
+	public Party getRecipient() {
 		return recipient;
 	}
 
-	public void setRecipient(final Recipient recipient) {
+	public void setRecipient(final Party recipient) {
 		this.recipient = recipient;
 	}
 
-	public Sender getSender() {
+	public Party getSender() {
 		return sender;
 	}
 
-	public void setSender(final Sender sender) {
+	public void setSender(final Party sender) {
 		this.sender = sender;
 	}
 

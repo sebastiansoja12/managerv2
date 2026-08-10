@@ -1,6 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.PickupPointId;
 
@@ -25,10 +24,6 @@ public class ShipmentDto {
     private final PickupMethodDto pickupMethod;
 
     private final DeliveryMethodDto deliveryMethod;
-
-    private final CountryCode originCountry;
-
-    private final CountryCode destinationCountry;
 
     private final ShipmentStatusDto shipmentStatus;
     
@@ -64,8 +59,7 @@ public class ShipmentDto {
                        final DepartmentCodeDto destination,
                        final DepartmentId originDepartmentId, final PickupPointId pickupPointId,
                        final PickupMethodDto pickupMethod, final DeliveryMethodDto deliveryMethod,
-                       final CountryCode originCountry,
-                       final CountryCode destinationCountry, final ShipmentStatusDto shipmentStatus,
+                       final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
                        final TrackingNumberDto trackingNumber,
                        final MoneyApi price, final Boolean locked,
@@ -82,8 +76,6 @@ public class ShipmentDto {
         this.pickupPointId = pickupPointId;
         this.pickupMethod = pickupMethod;
         this.deliveryMethod = deliveryMethod;
-        this.originCountry = originCountry;
-        this.destinationCountry = destinationCountry;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentPriority = shipmentPriority;
@@ -139,14 +131,6 @@ public class ShipmentDto {
 
     public DeliveryMethodDto getDeliveryMethod() {
         return deliveryMethod;
-    }
-
-    public CountryCode getOriginCountry() {
-        return originCountry;
-    }
-
-    public CountryCode getDestinationCountry() {
-        return destinationCountry;
     }
 
     public ShipmentStatusDto getShipmentStatus() {

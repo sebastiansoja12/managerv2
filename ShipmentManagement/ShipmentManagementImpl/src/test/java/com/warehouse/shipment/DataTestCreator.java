@@ -15,8 +15,7 @@ import com.warehouse.shipment.domain.vo.CustomerReference;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;
 import com.warehouse.shipment.domain.vo.Parcel;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.Weight;
 import com.warehouse.shipment.domain.vo.WeightUnit;
 
@@ -26,8 +25,8 @@ public class DataTestCreator {
         return new ShipmentId(1L);
     }
 
-    static Recipient recipient() {
-        return Recipient.builder()
+    static Party recipient() {
+        return Party.builder()
                 .firstName("test")
                 .lastName("test")
                 .city("test")
@@ -35,11 +34,12 @@ public class DataTestCreator {
                 .postalCode("00-000")
                 .telephoneNumber("123")
                 .email("test@test.pl")
+                .countryCode(CountryCode.DE)
                 .build();
     }
 
-    static Sender sender() {
-        return Sender.builder()
+    static Party sender() {
+        return Party.builder()
                 .firstName("updatedTest")
                 .lastName("test")
                 .city("test")
@@ -47,6 +47,7 @@ public class DataTestCreator {
                 .postalCode("00-000")
                 .telephoneNumber("123")
                 .email("test@test.pl")
+                .countryCode(CountryCode.PL)
                 .build();
     }
 
@@ -84,8 +85,6 @@ public class DataTestCreator {
                 sender(),
                 recipient(),
                 relatedShipmentId,
-                CountryCode.PL,
-                CountryCode.DE,
                 money(),
                 locked,
                 new DepartmentId(10L),
@@ -100,7 +99,7 @@ public class DataTestCreator {
     static Shipment shipmentWithParcelDetails() {
         return new Shipment(
                 shipmentId(), sender(), recipient(), null,
-                CountryCode.PL, CountryCode.DE, money(), false,
+                money(), false,
                 new DepartmentId(10L), new DepartmentId(9L), null,
                 ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
                 null, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,

@@ -42,8 +42,6 @@ public interface ShipmentResponseMapper {
                 shipment.pickupPointId(),
                 shipment.pickupMethod() == null ? null : PickupMethodDto.valueOf(shipment.pickupMethod().name()),
                 shipment.deliveryMethod() == null ? null : DeliveryMethodDto.valueOf(shipment.deliveryMethod().name()),
-                shipment.originCountry(),
-                shipment.destinationCountry(),
                 shipment.shipmentStatus() == null ? null : ShipmentStatusDto.from(shipment.shipmentStatus()),
                 map(shipment.shipmentRelatedId()),
                 shipment.shipmentPriority() == null
@@ -69,7 +67,7 @@ public interface ShipmentResponseMapper {
         return map(shipmentResult.snapshot(), shipmentResult.destination());
     }
 
-    default PersonApi map(final Person person) {
+    default PersonApi map(final Party person) {
         if (person == null) {
             return null;
         }
@@ -80,7 +78,8 @@ public interface ShipmentResponseMapper {
                 person.getTelephoneNumber(),
                 person.getCity(),
                 person.getPostalCode(),
-                person.getStreet());
+                person.getStreet(),
+                person.getAddress().getCountryCode());
     }
 
     default DepartmentCodeDto map(final DepartmentCode departmentCode) {
