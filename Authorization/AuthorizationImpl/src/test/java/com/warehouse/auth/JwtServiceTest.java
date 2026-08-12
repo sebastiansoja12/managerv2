@@ -2,9 +2,11 @@ package com.warehouse.auth;
 
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.JwtProvider;
+import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.JwtServiceImpl;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -18,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -25,6 +28,9 @@ public class JwtServiceTest {
 
     @Mock
     private JwtProvider jwtProvider;
+
+    @Mock
+    private DepartmentServicePort departmentServicePort;
 
     private JwtService jwtService;
 
@@ -34,9 +40,10 @@ public class JwtServiceTest {
 
     @BeforeEach
     void setup() {
-        jwtService = new JwtServiceImpl(jwtProvider);
+        jwtService = new JwtServiceImpl(jwtProvider, departmentServicePort);
         doReturn("manager-v2").when(jwtProvider).getIssuer();
         doReturn("manager-v2-gui").when(jwtProvider).getAudience();
+        doReturn(new DepartmentId(10L)).when(departmentServicePort).getDepartmentId(new DepartmentCode("TST"));
     }
 
     @Test
@@ -52,8 +59,10 @@ public class JwtServiceTest {
                 .getSecretKey();
 
         final String jwtToken = jwtService.generateToken(user);
+
         assertTrue(StringUtils.isNotEmpty(jwtToken));
         assertTrue(jwtToken.startsWith("eyJhbGciOiJIUzM4NCJ9"));
+        verify(departmentServicePort).getDepartmentId(new DepartmentCode("TST"));
     }
 
     @Test
