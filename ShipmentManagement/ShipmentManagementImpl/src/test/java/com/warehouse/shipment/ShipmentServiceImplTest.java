@@ -2,9 +2,7 @@ package com.warehouse.shipment;
 
 import static com.warehouse.shipment.DataTestCreator.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -241,7 +239,7 @@ class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldChangeDangerousGood() {
+    void shouldChangeDangerousGoodAndPublishUpdatedEvent() {
         final Shipment shipment = shipment();
         final DangerousGood dangerousGood = dangerousGood();
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
@@ -250,7 +248,7 @@ class ShipmentServiceImplTest {
 
         assertEquals(dangerousGood, shipment.getDangerousGood());
         verify(shipmentRepository).createOrUpdate(shipment);
-        assertEventPublished(ShipmentDangerousGoodAdded.class);
+        assertEventPublished(ShipmentDangerousGoodUpdated.class);
     }
 
     @Test
@@ -281,25 +279,28 @@ class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldDeleteMissingDangerousGoodIdempotently() {
+    void shouldRemoveMissingDangerousGoodAndPublishEvent() {
         final Shipment shipment = shipment();
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
         shipmentService.removeDangerousGood(shipmentId());
 
-        verify(shipmentRepository, org.mockito.Mockito.never()).createOrUpdate(shipment);
+        assertNull(shipment.getDangerousGood());
+        verify(shipmentRepository).createOrUpdate(shipment);
+        assertEventPublished(ShipmentDangerousGoodRemoved.class);
     }
 
     @Test
-    void shouldPutEqualDangerousGoodIdempotently() {
+    void shouldPutEqualDangerousGoodAndPublishUpdatedEvent() {
         final Shipment shipment = shipment();
         shipment.changeDangerousGood(dangerousGood());
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
         shipmentService.changeDangerousGoodTo(shipmentId(), dangerousGood());
 
-        verify(shipmentRepository, never()).createOrUpdate(shipment);
-        verify(eventPublisher, never()).publishEvent(any(ShipmentDangerousGoodUpdated.class));
+        assertEquals(dangerousGood(), shipment.getDangerousGood());
+        verify(shipmentRepository).createOrUpdate(shipment);
+        assertEventPublished(ShipmentDangerousGoodUpdated.class);
     }
 
     @Test
