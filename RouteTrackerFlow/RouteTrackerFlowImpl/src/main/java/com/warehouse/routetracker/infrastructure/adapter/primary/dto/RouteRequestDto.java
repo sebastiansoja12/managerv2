@@ -9,7 +9,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class RouteRequestDto {
-    Long parcelId;
+    Long shipmentId;
     String username;
     String supplierCode;
     String depotCode;
