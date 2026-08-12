@@ -1,12 +1,13 @@
 package com.warehouse.csv.infrastructure.adapter.secondary.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.csv.domain.vo.ParcelCsv;
 import com.warehouse.csv.infrastructure.adapter.secondary.entity.ParcelEntity;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface ParcelMapper {
 
     @Mapping(target = "senderTelephoneNumber", source = "senderTelephone")

@@ -11,13 +11,11 @@ import com.warehouse.deliveryreject.domain.port.primary.DeliveryRejectPortImpl;
 import com.warehouse.deliveryreject.domain.port.secondary.PersonShipmentServicePort;
 import com.warehouse.deliveryreject.domain.port.secondary.RejectRepository;
 import com.warehouse.deliveryreject.domain.port.secondary.RejectShipmentServicePort;
-import com.warehouse.deliveryreject.domain.port.secondary.RejectTrackerServicePort;
 import com.warehouse.deliveryreject.domain.service.DeliveryRejectConverterService;
 import com.warehouse.deliveryreject.domain.service.RejectService;
 import com.warehouse.deliveryreject.infrastructure.adapter.primary.DeliveryRejectAdapter;
 import com.warehouse.deliveryreject.infrastructure.adapter.secondary.*;
 import com.warehouse.deliveryreject.infrastructure.adapter.secondary.mapper.RejectShipmentServiceMapper;
-import com.warehouse.routelogger.RouteLogEventPublisher;
 
 @Configuration
 public class DeliveryRejectConfiguration {
@@ -26,15 +24,9 @@ public class DeliveryRejectConfiguration {
     public DeliveryRejectPort deliveryRejectPort(final RejectService rejectService,
                                                  final RejectShipmentServicePort rejectShipmentServicePort,
                                                  final PersonShipmentServicePort personShipmentServicePort,
-                                                 final DeliveryRejectConverterService deliveryRejectConverterService,
-                                                 final RejectTrackerServicePort rejectTrackerServicePort) {
+                                                 final DeliveryRejectConverterService deliveryRejectConverterService) {
         return new DeliveryRejectPortImpl(rejectService, rejectShipmentServicePort, personShipmentServicePort,
-                deliveryRejectConverterService, rejectTrackerServicePort);
-    }
-
-    @Bean
-    public RejectTrackerServicePort rejectTrackerServicePort(final RouteLogEventPublisher routeLogEventPublisher) {
-        return new RejectTrackerServiceAdapter(routeLogEventPublisher);
+                deliveryRejectConverterService);
     }
 
     @Bean

@@ -1,139 +1,86 @@
 package com.warehouse.routetracker.domain.port.primary;
 
-import java.util.List;
-
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
-import com.warehouse.routetracker.domain.helper.Result;
-import com.warehouse.routetracker.domain.model.*;
+import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
-import com.warehouse.routetracker.domain.service.JsonToStringService;
-import com.warehouse.routetracker.domain.service.JsonToStringServiceImpl;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
 
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.Consumer;
 
-
-@AllArgsConstructor
 public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
-
-    private final JsonToStringService jsonToStringService = new JsonToStringServiceImpl();
 
     private final RouteLogRepository repository;
 
-    @Override
-    public RouteProcess initializeRouteProcess(final ShipmentId shipmentId) {
-        final RouteLogRecord routeLogRecord = RouteLogRecord
-                .builder()
-                .parcelId(shipmentId.value())
-                .build();
-        return this.repository.save(routeLogRecord);
+    public RouteTrackerLogPortImpl(final RouteLogRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public void saveDeviceIdInformation(final DeviceIdInformation information) {
-        final RouteLogRecord routeLogRecord = this.repository.find(information.getShipmentId());
-        routeLogRecord.saveTerminalId(information.getProcessType(), information.getTerminalId());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveDeviceVersionInformation(final DeviceVersionInformation information) {
-        final RouteLogRecord routeLogRecord = this.repository.find(information.getShipmentId());
-        routeLogRecord.saveDeviceVersion(information.getProcessType(), information.getVersion());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveReturnErrorCode(final ErrorInformation information) {
-        final RouteLogRecord routeLogRecord = this.repository.find(information.getShipmentId());
-        routeLogRecord.saveErrorReturnCode(information.getError());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveFaultDescription(final FaultDescription faultDescription) {
-        final RouteLogRecord routeLogRecord = this.repository.find(faultDescription.getShipmentId());
-        routeLogRecord.saveFaultDescription(faultDescription.getDescription());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveDescription(final DescriptionRequest request) {
-        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
-        routeLogRecord.saveDescription(request.getProcessType(), request.getValue());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveSupplierCode(final SupplierCodeRequest request) {
-        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
-        routeLogRecord.saveSupplierCode(request.getProcessType(), request.getSupplierCode());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveUsername(final UsernameRequest request) {
-        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
-        routeLogRecord.saveUsername(request.getProcessType(), request.getUsername());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveDepotCode(final DepotCodeRequest request) {
-        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
-        routeLogRecord.saveDepotCode(request.getProcessType(), request.getDepotCode());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveTerminalRequest(final TerminalRequest terminalRequest) {
-        final RouteLogRecord routeLogRecord = this.repository.find(terminalRequest.getShipmentId());
-        routeLogRecord.updateRequest(terminalRequest.getProcessType(), terminalRequest.getRequestAsJson());
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveReturnTrackRequest(final ReturnTrackRequest request) {
-        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
-        routeLogRecord.updateRequest(request.getProcessType(), this.jsonToStringService.convertToString(request));
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public void saveDeliveryReturnRequest(final DeliveryReturnRequest request) {
-        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
-        routeLogRecord.updateRequest(request.getProcessType(), this.jsonToStringService.convertToString(request));
-        this.repository.update(routeLogRecord);
+    public void createShipmentEvent(final ShipmentId shipmentId,
+                                    final String eventType,
+                                    final ShipmentStatus shipmentStatus,
+                                    final LocalDateTime occurredAt,
+                                    final String payload,
+                                    final UserId userId,
+                                    final DepartmentId departmentId) {
+        this.update(shipmentId, routeLogRecord -> {
+            routeLogRecord.createShipmentEvent(
+                    eventType, shipmentStatus, occurredAt, payload, userId, departmentId);
+        });
     }
 
     @Override
     public void saveDeliveryStatus(final DeliveryStatusRequest request) {
-        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
-        routeLogRecord.updateShipmentStatus(request.getProcessType(), determineParcelStatus(request));
-        this.repository.update(routeLogRecord);
+        this.update(request.getShipmentId(), routeLogRecord -> routeLogRecord.updateShipmentStatus(
+                request.getProcessType(), this.determineShipmentStatus(request.getProcessType())));
+    }
+
+    @Override
+    public void saveDepartmentId(final DepartmentIdRequest request) {
+        this.update(request.shipmentId(), routeLogRecord ->
+                routeLogRecord.saveDepartmentId(request.processType(), request.departmentId()));
+    }
+
+    @Override
+    public void saveSupplierId(final SupplierIdRequest request) {
+        this.update(request.shipmentId(), routeLogRecord ->
+                routeLogRecord.saveSupplierId(request.processType(), request.supplierId()));
+    }
+
+    @Override
+    public void saveTerminalRequest(final TerminalRequest request) {
+        this.update(request.getShipmentId(), routeLogRecord ->
+                routeLogRecord.updateRequest(request.getProcessType(), request.getRequestAsJson()));
+    }
+
+    @Override
+    public void saveDeviceIdInformation(final DeviceIdInformation information) {
+        this.update(information.getShipmentId(), routeLogRecord ->
+                routeLogRecord.saveTerminalId(information.getProcessType(), information.getTerminalId()));
+    }
+
+    @Override
+    public void saveDeviceVersionInformation(final DeviceVersionInformation information) {
+        this.update(information.getShipmentId(), routeLogRecord ->
+                routeLogRecord.saveDeviceVersion(information.getProcessType(), information.getVersion()));
+    }
+
+    @Override
+    public void saveUserId(final UserIdRequest request) {
+        this.update(request.shipmentId(), routeLogRecord ->
+                routeLogRecord.saveUserId(request.processType(), request.userId()));
     }
 
     @Override
     public void saveDeviceInformation(final DeviceInformationRequest request) {
-        final RouteLogRecord routeLogRecord = this.repository.find(request.getShipmentId());
-        routeLogRecord.updateDeviceInformation(request);
-        this.repository.update(routeLogRecord);
-    }
-
-    @Override
-    public Result<RouteLogRecord, Exception> changePerson(final ShipmentId shipmentId, final Person person) {
-        final RouteLogRecord routeLogRecord;
-        try {
-            routeLogRecord = this.repository.find(shipmentId);
-            routeLogRecord.changePerson(person);
-            this.repository.update(routeLogRecord);
-        } catch (final Exception e) {
-            return Result.failure(e);
-        }
-
-        return Result.success(routeLogRecord);
+        this.update(request.getShipmentId(), routeLogRecord -> routeLogRecord.updateDeviceInformation(request));
     }
 
     @Override
@@ -146,14 +93,26 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
         return this.repository.findAll();
     }
 
-    private ParcelStatus determineParcelStatus(DeliveryStatusRequest request) {
-        final ProcessType processType = request.getProcessType();
+    private void update(final ShipmentId shipmentId, final Consumer<RouteLogRecord> change) {
+        this.repository.findById(shipmentId).ifPresentOrElse(routeLogRecord -> {
+            change.accept(routeLogRecord);
+            this.repository.update(routeLogRecord);
+        }, () -> {
+            final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
+                    .shipmentId(shipmentId)
+                    .build();
+            change.accept(routeLogRecord);
+            this.repository.save(routeLogRecord);
+        });
+    }
+
+    private ShipmentStatus determineShipmentStatus(final ProcessType processType) {
         return switch (processType) {
-            case CREATED -> ParcelStatus.CREATED;
-            case ROUTE, MISS -> ParcelStatus.DELIVERY;
-            case RETURN -> ParcelStatus.RETURN;
-            case REROUTE -> ParcelStatus.REROUTE;
-            case REDIRECT, REJECT -> ParcelStatus.REDIRECT;
+            case CREATED -> ShipmentStatus.CREATED;
+            case ROUTE, MISS -> ShipmentStatus.DELIVERY;
+            case RETURN -> ShipmentStatus.RETURN;
+            case REROUTE -> ShipmentStatus.REROUTE;
+            case REDIRECT, REJECT -> ShipmentStatus.REDIRECT;
         };
     }
 }

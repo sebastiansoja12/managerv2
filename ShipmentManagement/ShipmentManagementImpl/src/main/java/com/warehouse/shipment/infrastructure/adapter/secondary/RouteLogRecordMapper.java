@@ -3,6 +3,8 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.shipment.domain.vo.FaultDescription;
 import com.warehouse.shipment.domain.vo.ReturnCode;
 import com.warehouse.shipment.domain.vo.RouteLogRecord;
@@ -54,9 +56,11 @@ public class RouteLogRecordMapper {
 				dto.id(),
 				dto.terminalId() == null ? null : new TerminalId(dto.terminalId().value()),
 				dto.version(),
-				dto.username(),
+				dto.userId() == null ? null : new UserId(dto.userId().value()),
+				null,
 				dto.supplierCode(),
-				dto.departmentCode(),
+				dto.departmentId() == null ? null : new DepartmentId(dto.departmentId().value()),
+				null,
 				dto.shipmentStatus(),
 				dto.description(),
 				dto.timestamp(),

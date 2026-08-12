@@ -2,7 +2,7 @@
 
 <dataset>
     <shipment
-            id = "1"
+            shipment_id = "1"
             first_name="test"
             last_name="test"
             sender_telephone="12345"
@@ -18,5 +18,18 @@
             recipient_street="test"
             recipient_postal_code="00-000"
             destination="KT1"
+            dangerous_good_un_number="UN3480"
+            dangerous_good_proper_shipping_name="Lithium ion batteries"
+            dangerous_good_hazard_class="9"
+            dangerous_good_packing_group="II"
+            dangerous_good_quantity="2.500"
+            dangerous_good_quantity_unit="KILOGRAM"
+            dangerous_good_package_count="2"
+            dangerous_good_packaging_type="BOX"
+            dangerous_good_regulation_type="ADR"
+            dangerous_good_transport_mode="ROAD"
+            dangerous_good_limited_quantity="false"
+            dangerous_good_marine_pollutant="false"
+            dangerous_good_corrosive="false"
     />
 </dataset>

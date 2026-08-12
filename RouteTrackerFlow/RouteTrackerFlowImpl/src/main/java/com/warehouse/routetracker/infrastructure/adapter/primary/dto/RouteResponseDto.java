@@ -11,5 +11,5 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class RouteResponseDto {
     UUID id;
-    Long parcelId;
+    Long shipmentId;
 }

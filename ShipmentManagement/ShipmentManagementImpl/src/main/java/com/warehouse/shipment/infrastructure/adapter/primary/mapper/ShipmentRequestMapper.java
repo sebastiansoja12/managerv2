@@ -16,6 +16,7 @@ import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
 import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
+import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.ShipmentDeliveryCommand;
 import com.warehouse.shipment.domain.model.ShipmentUpdateCommand;
 import com.warehouse.shipment.domain.model.SignatureChangeRequest;
@@ -30,6 +31,27 @@ import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 public interface ShipmentRequestMapper {
 
     ShipmentCreateCommand map(final ShipmentCreateRequestApi requestDto);
+
+    default DangerousGood map(final DangerousGoodApi dangerousGood) {
+        if (dangerousGood == null) {
+            return null;
+        }
+        return new DangerousGood(
+                dangerousGood.unNumber(), dangerousGood.properShippingName(), dangerousGood.description(),
+                dangerousGood.hazardClass(), dangerousGood.hazardDivision(), dangerousGood.subsidiaryRisk(),
+                dangerousGood.packingGroup(), dangerousGood.quantity(), dangerousGood.quantityUnit(),
+                dangerousGood.packageCount(), dangerousGood.packagingType(), dangerousGood.limitedQuantity(),
+                dangerousGood.exceptedQuantity(), dangerousGood.environmentallyHazardous(),
+                dangerousGood.marinePollutant(), dangerousGood.transportCategory(),
+                dangerousGood.tunnelRestrictionCode(), dangerousGood.flashPoint(),
+                dangerousGood.emergencyContact(), dangerousGood.emergencyContact24h(),
+                dangerousGood.safetyDataSheetReference(), dangerousGood.declarationDocumentReference(),
+                dangerousGood.regulationType(), dangerousGood.transportMode(), dangerousGood.flammable(),
+                dangerousGood.corrosive(), dangerousGood.toxic(), dangerousGood.hazardSymbols(),
+                dangerousGood.storageRequirements(), dangerousGood.handlingInstructions(),
+                dangerousGood.countryOfOrigin()
+        );
+    }
 
     default Money map(final MoneyApi money) {
         if (money == null) {
@@ -70,8 +92,10 @@ public interface ShipmentRequestMapper {
 
     default ShipmentSearchCriteria map(final ShipmentSearchRequestApi request) {
         if (request == null) {
-            return new ShipmentSearchCriteria(null, null, List.of(), List.of(), List.of(), null, null, null,
-                    null, null, null, null, null, null, null, null);
+            return new ShipmentSearchCriteria(
+                    null, null, List.of(), List.of(), List.of(), null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null, null
+            );
         }
 
         return new ShipmentSearchCriteria(
@@ -89,6 +113,11 @@ public interface ShipmentRequestMapper {
                 request.locked(),
                 request.createdFrom(),
                 request.createdTo(),
+                request.hasDangerousGoods(),
+                request.unNumber(),
+                request.hazardClass(),
+                request.regulationType(),
+                request.transportMode(),
                 request.page(),
                 request.size()
         );

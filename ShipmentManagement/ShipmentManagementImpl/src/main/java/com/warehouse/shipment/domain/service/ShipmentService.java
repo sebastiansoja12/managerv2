@@ -1,10 +1,7 @@
 package com.warehouse.shipment.domain.service;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ReturnId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -12,9 +9,9 @@ import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
-import com.warehouse.commonassets.identificator.TrackingNumber;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ShipmentService {
 
@@ -41,6 +38,10 @@ public interface ShipmentService {
     void changeSignatureRequiredTo(final ShipmentId shipmentId, final boolean signatureRequired);
 
     void changeDangerousGoodTo(final ShipmentId shipmentId, final DangerousGood dangerousGood);
+
+    Optional<DangerousGood> findDangerousGood(final ShipmentId shipmentId);
+
+    void removeDangerousGood(final ShipmentId shipmentId);
 
     void notifyRelatedShipmentRedirected(final ShipmentId shipmentId, final ShipmentId relatedShipmentId);
 
@@ -76,13 +77,9 @@ public interface ShipmentService {
 
     void update(final Shipment shipment);
 
-    void changeRouteProcessId(final ProcessId processId, final ShipmentId shipmentId);
-
-    void assignExternalReturnId(final ShipmentId shipmentId, final ReturnId returnId);
-
     void redirectShipmentToSender(final ShipmentId shipmentId);
 
-    void changeDestination(final ShipmentId shipmentId, final String value);
+    void changeDestination(final ShipmentId shipmentId, final DepartmentCode value);
 
     Shipment findByExternalId(final ExternalId<String> externalId);
 }

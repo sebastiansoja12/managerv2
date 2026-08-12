@@ -1,6 +1,7 @@
 package com.warehouse.department.domain.service;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
@@ -11,6 +12,8 @@ public interface DepartmentService {
     void createDepartment(final Department department);
 
     Department findByDepartmentCode(final DepartmentCode departmentCode);
+
+    Department findByDepartmentId(final DepartmentId departmentId);
 
     void changeAddress(final DepartmentCode departmentCode, final Address address);
 

@@ -9,16 +9,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import com.warehouse.deliverymissed.DeliveryMissedService;
 import com.warehouse.deliveryreject.DeliveryRejectService;
 import com.warehouse.deliveryreturn.infrastructure.api.DeliveryReturnService;
-import com.warehouse.routelogger.RouteLogEventPublisher;
 
 @ComponentScan(basePackages = { "com.warehouse.delivery", "com.warehouse.deliverytoken" })
 @EntityScan(basePackages = { "com.warehouse.delivery", "com.warehouse.deliverytoken" })
 @EnableJpaRepositories(basePackages = { "com.warehouse.delivery", "com.warehouse.deliverytoken" })
 @AutoConfigureDataJpa
 public class DeliveryTestConfiguration {
-
-    @MockBean
-    private RouteLogEventPublisher routeLogEventPublisher;
 
     @MockBean
     DeliveryMissedService deliveryMissedService;

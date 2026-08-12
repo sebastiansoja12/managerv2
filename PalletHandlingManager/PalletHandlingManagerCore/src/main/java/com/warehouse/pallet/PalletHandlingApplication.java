@@ -3,6 +3,7 @@ package com.warehouse.pallet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -14,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 @EnableScheduling
 @EnableDiscoveryClient
-@SpringBootApplication(scanBasePackages = "com.warehouse.pallet")
+@SpringBootApplication(scanBasePackages = "com.warehouse.pallet", exclude = DataSourceAutoConfiguration.class)
 @EntityScan(basePackages = {"com.warehouse.pallet"})
 @ConfigurationPropertiesScan("com.warehouse.pallet")
 @Modulith(useFullyQualifiedModuleNames = true)

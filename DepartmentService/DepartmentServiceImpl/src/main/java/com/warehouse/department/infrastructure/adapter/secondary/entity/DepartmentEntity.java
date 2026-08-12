@@ -1,6 +1,7 @@
 package com.warehouse.department.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import jakarta.persistence.*;
@@ -14,9 +15,13 @@ import java.time.Instant;
 @Audited
 public class DepartmentEntity extends BelongsToOperator {
 
-    @EmbeddedId
-    @Column(name = "department_code", nullable = false, unique = true)
-    @AttributeOverride(name = "value", column = @Column(name = "department_code"))
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @AttributeOverride(name = "value", column = @Column(name = "department_id", nullable = false))
+    private DepartmentId departmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "department_code", nullable = false, unique = true))
     private DepartmentCode departmentCode;
 
     @Embedded
@@ -76,7 +81,8 @@ public class DepartmentEntity extends BelongsToOperator {
     public DepartmentEntity() {
     }
 
-    public DepartmentEntity(final DepartmentCode departmentCode,
+    public DepartmentEntity(final DepartmentId departmentId,
+                            final DepartmentCode departmentCode,
                             final DepartmentAddress departmentAddress,
                             final TaxId taxId,
                             final String telephoneNumber,
@@ -90,6 +96,7 @@ public class DepartmentEntity extends BelongsToOperator {
                             final UserId adminUserId,
                             final UserId createdBy,
                             final UserId lastModifiedBy) {
+        this.departmentId = departmentId;
         this.departmentCode = departmentCode;
         this.departmentAddress = departmentAddress;
         this.taxId = taxId;
@@ -108,6 +115,10 @@ public class DepartmentEntity extends BelongsToOperator {
 
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
+    }
+
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 
     public TaxId getTaxId() {

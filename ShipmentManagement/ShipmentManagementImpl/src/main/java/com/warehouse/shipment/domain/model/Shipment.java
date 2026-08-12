@@ -1,19 +1,19 @@
 package com.warehouse.shipment.domain.model;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import org.apache.commons.lang3.ObjectUtils;
-
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.CarrierOperator;
-import com.warehouse.shipment.domain.event.ShipmentChangedEvent;
+import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
+import org.apache.commons.lang3.ObjectUtils;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.UUID;
 
 
 public class Shipment {
@@ -26,7 +26,7 @@ public class Shipment {
 
     private ShipmentSize shipmentSize;
 
-    private String destination;
+    private DepartmentCode destination;
 
     private ShipmentStatus shipmentStatus;
 
@@ -54,10 +54,6 @@ public class Shipment {
 
     private Signature signature;
 
-    private ExternalId<String> externalRouteId;
-
-    private ExternalId<Long> externalReturnId;
-
     private TrackingNumber trackingNumber;
 
     private ExternalId<UUID> externalShipmentId;
@@ -79,13 +75,11 @@ public class Shipment {
                     final Boolean locked,
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
-                    final String destination,
+                    final DepartmentCode destination,
                     final Signature signature,
                     final boolean signatureRequired,
                     final ShipmentPriority shipmentPriority,
                     final DangerousGood dangerousGood,
-                    final ExternalId<String> externalRouteId,
-                    final ExternalId<Long> externalReturnId,
                     final TrackingNumber trackingNumber,
                     final ExternalId<UUID> externalShipmentId) {
         this.shipmentId = shipmentId;
@@ -106,8 +100,6 @@ public class Shipment {
         this.signatureRequired = signatureRequired;
         this.shipmentPriority = shipmentPriority;
         this.dangerousGood = dangerousGood;
-        this.externalRouteId = externalRouteId;
-        this.externalReturnId = externalReturnId;
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = externalShipmentId;
     }
@@ -121,7 +113,7 @@ public class Shipment {
                     final CountryCode destinationCountry,
                     final Money price,
                     final Boolean locked,
-                    final String destination,
+                    final DepartmentCode destination,
                     final Signature signature,
                     final ShipmentPriority shipmentPriority,
                     final TrackingNumber trackingNumber) {
@@ -149,7 +141,8 @@ public class Shipment {
 	public ShipmentSnapshot snapshot() {
 		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destination, shipmentStatus,
 				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
-				shipmentPriority, originCountry, destinationCountry, signature, externalRouteId, externalReturnId);
+				shipmentPriority, originCountry, destinationCountry, signature,
+                trackingNumber, externalShipmentId);
 	}
 
     public static Shipment from(final ShipmentEntity shipmentEntity) {
@@ -166,14 +159,13 @@ public class Shipment {
         final Boolean locked = shipmentEntity.getLocked();
         final CountryCode originCountry = shipmentEntity.getOriginCountry();
         final CountryCode destinationCountry = shipmentEntity.getDestinationCountry();
-        final String destination = shipmentEntity.getDestination();
+        final DepartmentCode destination = shipmentEntity.getDestination();
         final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
         final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
-        final DangerousGood dangerousGood = shipmentEntity.getDangerousGood() != null ? DangerousGood.from(shipmentEntity.getDangerousGood()) : null;
-        final ExternalId<String> externalRouteId = shipmentEntity.getExternalRouteId();
-        final ExternalId<Long> externalReturnId = shipmentEntity.getExternalReturnId();
-
+        final DangerousGood dangerousGood = shipmentEntity.getDangerousGood() != null
+                ? shipmentEntity.getDangerousGood().toDomain()
+                : null;
         return new Shipment(
                 shipmentId,
                 sender,
@@ -193,8 +185,43 @@ public class Shipment {
                 signatureRequired,
                 shipmentPriority,
                 dangerousGood,
-                externalRouteId,
-                externalReturnId,
+                shipmentEntity.getTrackingNumber(),
+                new ExternalId<>(UUID.fromString(shipmentEntity.getExternalId().value()))
+        );
+    }
+
+    public static Shipment from(final ShipmentReadEntity shipmentEntity) {
+        final ShipmentId shipmentId = shipmentEntity.getShipmentId();
+        final Sender sender = new Sender(shipmentEntity.getFirstName(), shipmentEntity.getLastName(),
+                shipmentEntity.getSenderEmail(), shipmentEntity.getSenderTelephone(), shipmentEntity.getSenderCity(),
+                shipmentEntity.getSenderPostalCode(), shipmentEntity.getSenderStreet());
+        final Recipient recipient = new Recipient(shipmentEntity.getRecipientFirstName(),
+                shipmentEntity.getRecipientLastName(), shipmentEntity.getRecipientEmail(),
+                shipmentEntity.getRecipientTelephone(), shipmentEntity.getRecipientCity(),
+                shipmentEntity.getRecipientPostalCode(), shipmentEntity.getRecipientStreet());
+        final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
+        final boolean signatureRequired = signature != null;
+        final DangerousGood dangerousGood = shipmentEntity.dangerousGood();
+
+        return new Shipment(
+                shipmentId,
+                sender,
+                recipient,
+                shipmentEntity.getShipmentSize(),
+                shipmentEntity.getShipmentStatus(),
+                shipmentEntity.getShipmentType(),
+                shipmentEntity.getShipmentRelatedId(),
+                shipmentEntity.getPrice(),
+                shipmentEntity.getCreatedAt(),
+                shipmentEntity.getUpdatedAt(),
+                shipmentEntity.getLocked(),
+                shipmentEntity.getOriginCountry(),
+                shipmentEntity.getDestinationCountry(),
+                shipmentEntity.getDestination(),
+                signature,
+                signatureRequired,
+                shipmentEntity.getShipmentPriority(),
+                dangerousGood,
                 shipmentEntity.getTrackingNumber(),
                 new ExternalId<>(UUID.fromString(shipmentEntity.getExternalId().value()))
         );
@@ -212,7 +239,7 @@ public class Shipment {
         return shipmentSize;
     }
 
-    public String getDestination() {
+    public DepartmentCode getDestination() {
         return destination;
     }
 
@@ -252,7 +279,7 @@ public class Shipment {
         this.shipmentSize = parcelShipmentSize;
     }
 
-    public void setDestination(final String destination) {
+    public void setDestination(final DepartmentCode destination) {
         this.destination = destination;
     }
 
@@ -324,22 +351,6 @@ public class Shipment {
         return destinationCountry;
     }
 
-    public ExternalId<Long> getExternalReturnId() {
-        return externalReturnId;
-    }
-
-    public void setExternalReturnId(final ExternalId<Long> externalReturnId) {
-        this.externalReturnId = externalReturnId;
-    }
-
-    public ExternalId<String> getExternalRouteId() {
-        return externalRouteId;
-    }
-
-    public void setExternalRouteId(final ExternalId<String> externalRouteId) {
-        this.externalRouteId = externalRouteId;
-    }
-
     public TrackingNumber getTrackingNumber() {
         return trackingNumber;
     }
@@ -369,7 +380,6 @@ public class Shipment {
         this.shipmentRelatedId = newRelatedShipmentId;
         markAsModified();
         lockShipment();
-        DomainContext.publish(new ShipmentChangedEvent(snapshot(), Instant.now()));
     }
 
     public void lockShipment() {
@@ -412,8 +422,8 @@ public class Shipment {
     }
 
     public void updateDestination(final VoronoiResponse voronoiResponse) {
-        if (ObjectUtils.isNotEmpty(voronoiResponse) && voronoiResponse.getValue() != null) {
-            this.destination = voronoiResponse.getValue();
+        if (ObjectUtils.isNotEmpty(voronoiResponse) && voronoiResponse.getDepartmentCodeResult() != null) {
+            this.destination = voronoiResponse.getDepartmentCodeResult();
             markAsModified();
         }
     }
@@ -427,16 +437,15 @@ public class Shipment {
     public void update(final Sender sender, final Recipient recipient, final ShipmentStatus shipmentStatus,
                        final ShipmentPriority shipmentPriority, final ShipmentSize shipmentSize,
                        final Money price, final DangerousGood dangerousGood,
-                       final String destination, final Boolean signatureRequired) {
+                       final DepartmentCode destination, final Boolean signatureRequired) {
+        ensureCanBeModified();
         this.recipient = recipient;
         this.sender = sender;
         this.shipmentStatus = shipmentStatus;
         this.shipmentPriority = shipmentPriority;
         this.shipmentSize = shipmentSize;
         this.price = price;
-        if (dangerousGood != null) {
-            this.dangerousGood = dangerousGood;
-        }
+        this.dangerousGood = dangerousGood;
         this.destination = destination;
         this.signatureRequired = signatureRequired;
         markAsModified();
@@ -472,8 +481,31 @@ public class Shipment {
     }
 
     public void changeDangerousGood(final DangerousGood dangerousGood) {
+        if (Objects.equals(this.dangerousGood, dangerousGood)) {
+            return;
+        }
+        ensureCanBeModified();
         this.dangerousGood = dangerousGood;
         markAsModified();
+    }
+
+    public void removeDangerousGood() {
+        ensureCanBeModified();
+        this.dangerousGood = null;
+        markAsModified();
+    }
+
+    private void ensureCanBeModified() {
+        if (Boolean.TRUE.equals(locked)) {
+            throw new ShipmentModificationException(
+                    "Shipment cannot be changed because the it is locked");
+        }
+        if (ShipmentStatus.SENT.equals(shipmentStatus)
+                || ShipmentStatus.DELIVERY.equals(shipmentStatus)
+                || ShipmentStatus.RETURN.equals(shipmentStatus)) {
+            throw new ShipmentModificationException(
+                    "Shipment cannot be changed after it has been sent");
+        }
     }
 
     public void changeShipmentPriority(final ShipmentPriority shipmentPriority) {
@@ -520,14 +552,7 @@ public class Shipment {
         markAsModified();
     }
 
-    public void notifyShipmentReturnCreated(final ExternalId<String> externalRouteId,
-                                            final ExternalId<Long> externalReturnId) {
-        this.externalRouteId = externalRouteId;
-        this.externalReturnId = externalReturnId;
-        markAsModified();
-    }
-
-    public void changeDestinationDepartment(final String destination) {
+    public void changeDestinationDepartment(final DepartmentCode destination) {
         this.destination = destination;
         markAsModified();
     }
@@ -588,6 +613,7 @@ public class Shipment {
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = relatedShipmentId;
         this.locked = true;
+        changeShipmentStatus(ShipmentStatus.REDIRECT);
         markAsModified();
     }
 
@@ -596,18 +622,12 @@ public class Shipment {
         lockShipment();
     }
 
-    public void assignRouteProcessId(final ProcessId processId) {
-        this.externalRouteId = new ExternalId<>(processId.getValue().toString());
-        markAsModified();
-    }
-
-    public void assignReturnId(final ReturnId returnId) {
-        this.externalReturnId = new ExternalId<>(returnId.getId());
-        markAsModified();
-    }
-
     public boolean isFullyDelivered() {
         return isLocked() && ShipmentStatus.DELIVERY.equals(this.shipmentStatus);
+    }
+
+    public boolean recipientCityMatches(final String city) {
+        return this.recipient != null && this.recipient.getCity().equals(city);
     }
 
     public Shipment redirectToSender(final ShipmentId shipmentId) {

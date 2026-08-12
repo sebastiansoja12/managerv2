@@ -1,7 +1,6 @@
 package com.warehouse.supplier;
 
 import com.warehouse.commonassets.enumeration.PackageType;
-import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
@@ -124,7 +123,6 @@ public class SupplyPortImplTest {
     void shouldAddDevice() {
         final DeviceId deviceId = new DeviceId("");
         final ChangeSupplierDeviceCommand request = new ChangeSupplierDeviceCommand(new SupplierCode("123"), deviceId);
-        when(deviceServicePort.validateDevice(deviceId)).thenReturn(Result.success(null));
         when(supplierRepository.findByCode(new SupplierCode("123"))).thenReturn(mock(Supplier.class));
         this.supplyPort.addDevice(request);
         verify(supplierRepository).update(any());

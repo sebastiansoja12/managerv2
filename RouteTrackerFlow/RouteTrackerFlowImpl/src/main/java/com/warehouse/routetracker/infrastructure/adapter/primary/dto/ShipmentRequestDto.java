@@ -9,5 +9,5 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class ShipmentRequestDto {
 
-    Long parcelId;
+    Long shipmentId;
 }

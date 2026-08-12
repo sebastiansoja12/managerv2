@@ -61,8 +61,8 @@ public class ReturnPortImpl implements ReturnPort {
     }
 
     @Override
-    public void complete(final ReturnPackageId returnPackageId) {
-        this.returnService.completeReturn(returnPackageId);
+    public void complete(final ShipmentId shipmentId) {
+        this.returnService.completeReturn(shipmentId);
     }
 
     @Override

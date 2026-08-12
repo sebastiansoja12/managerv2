@@ -19,9 +19,12 @@ import jakarta.persistence.*;
 @Audited
 public class DepartmentReadEntity extends BelongsToOperator {
 
-    @EmbeddedId
-    @Column(name = "department_code", nullable = false, unique = true)
-    @AttributeOverride(name = "value", column = @Column(name = "department_code"))
+    @Id
+    @Column(name = "department_id", nullable = false)
+    private Long departmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "department_code", nullable = false, unique = true))
     private DepartmentCode departmentCode;
 
     @Embedded
@@ -81,7 +84,8 @@ public class DepartmentReadEntity extends BelongsToOperator {
     public DepartmentReadEntity() {
     }
 
-    public DepartmentReadEntity(final DepartmentCode departmentCode,
+    public DepartmentReadEntity(final Long departmentId,
+                                final DepartmentCode departmentCode,
                                 final DepartmentAddress departmentAddress,
                                 final TaxId taxId,
                                 final String telephoneNumber,
@@ -95,6 +99,7 @@ public class DepartmentReadEntity extends BelongsToOperator {
                                 final UserId adminUserId,
                                 final UserId createdBy,
                                 final UserId lastModifiedBy) {
+        this.departmentId = departmentId;
         this.departmentCode = departmentCode;
         this.departmentAddress = departmentAddress;
         this.taxId = taxId;
@@ -113,6 +118,10 @@ public class DepartmentReadEntity extends BelongsToOperator {
 
     public DepartmentCode getDepartmentCode() {
         return departmentCode;
+    }
+
+    public Long getDepartmentId() {
+        return departmentId;
     }
 
     public TaxId getTaxId() {

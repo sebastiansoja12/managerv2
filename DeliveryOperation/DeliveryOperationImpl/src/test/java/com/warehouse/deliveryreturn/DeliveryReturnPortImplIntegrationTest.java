@@ -37,9 +37,7 @@ import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatusShipmentRequest;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
-import com.warehouse.routelogger.RouteLogEventPublisher;
 import com.warehouse.terminal.DeviceInformation;
-import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
 import com.warehouse.tools.supplier.SupplierValidatorProperties;
 
@@ -69,12 +67,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		@MockBean
 		public SupplierValidatorProperties supplierValidatorProperties;
-
-		@MockBean
-		public RouteTrackerLogProperties routeTrackerLogProperties;
-
-		@MockBean
-		public RouteLogEventPublisher routeLogEventPublisher;
 
 		@Bean
 		public RestClient restClient(RestClient.Builder builder) {

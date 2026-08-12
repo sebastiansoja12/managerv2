@@ -2,25 +2,21 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.mapper;
 
 import java.util.List;
 
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
-import com.warehouse.routetracker.domain.vo.RouteInformation;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
 
 @Mapper
 public interface RouteResponseMapper {
-
-    List<RouteInformationDto> map(final List<RouteInformation> routes);
-
-    @Mapping(target = "status", source = "parcelStatus")
-    RouteInformationDto map(final RouteInformation routeInformation);
 
     default RouteProcessDto map(final RouteProcess routeProcess) {
         final ShipmentIdDto shipmentId = new ShipmentIdDto(routeProcess.getShipmentId().value());
@@ -29,7 +25,7 @@ public interface RouteResponseMapper {
 
     default RouteLogRecordDto map(final RouteLogRecord routeLogRecord) {
         final ProcessIdDto processId = new ProcessIdDto(routeLogRecord.getId());
-        final ShipmentIdDto shipmentId = new ShipmentIdDto(routeLogRecord.getParcelId());
+        final ShipmentIdDto shipmentId = new ShipmentIdDto(routeLogRecord.getShipmentId().value());
         final RouteLogRecordDetailsDto routeLogRecordDetailsDto = map(routeLogRecord.getRouteLogRecordDetails());
         final ReturnCodeDto returnCode = new ReturnCodeDto(routeLogRecord.getReturnCode());
         final FaultDescriptionDto faultDescription = new FaultDescriptionDto(routeLogRecord.getFaultDescription());
@@ -40,12 +36,12 @@ public interface RouteResponseMapper {
 
     default RouteLogRecordDetailDto map(final RouteLogRecordDetail routeLogRecordDetail) {
         return new RouteLogRecordDetailDto(routeLogRecordDetail.getId(),
-                TerminalIdDto.from(routeLogRecordDetail.getTerminalId()),
+                        TerminalIdDto.from(routeLogRecordDetail.getTerminalId()),
                         routeLogRecordDetail.getVersion(),
-                        routeLogRecordDetail.getUsername(),
-                        routeLogRecordDetail.getSupplierCode(),
-                        routeLogRecordDetail.getDepartmentCode(),
-                        map(routeLogRecordDetail.getParcelStatus()),
+                        map(routeLogRecordDetail.getUserId()),
+                        map(routeLogRecordDetail.getSupplierId()),
+                        map(routeLogRecordDetail.getDepartmentId()),
+                        map(routeLogRecordDetail.getShipmentStatus()),
                         routeLogRecordDetail.getDescription(),
                         routeLogRecordDetail.getTimestamp(),
                         map(routeLogRecordDetail.getProcessType()),
@@ -53,9 +49,21 @@ public interface RouteResponseMapper {
                 );
     }
 
-    ShipmentStatusDto map(final ParcelStatus parcelStatus);
+    ShipmentStatusDto map(final ShipmentStatus shipmentStatus);
 
-    ProcessTypeDto map(final ProcessType parcelType);
+    default UserIdDto map(final UserId userId) {
+        return userId != null ? new UserIdDto(userId.value()) : null;
+    }
+
+    default SupplierIdDto map(final SupplierId supplierId) {
+        return supplierId != null ? new SupplierIdDto(supplierId.value()) : null;
+    }
+
+    default DepartmentIdDto map(final DepartmentId departmentId) {
+        return departmentId != null ? new DepartmentIdDto(departmentId.getValue()) : null;
+    }
+
+    ProcessTypeDto map(final ProcessType processType);
 
     List<RouteLogRecordDto> mapToLogRecord(final List<RouteLogRecord> routeLogRecords);
 }

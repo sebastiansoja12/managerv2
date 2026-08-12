@@ -3,23 +3,35 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
-import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.*;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailId;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 
 @Mapper
 public interface RouteLogToEntityMapper {
 
-    @Mapping(target = "routeLogRecordDetails", source = "routeLogRecordDetails")
-    RouteLogRecordEntity map(RouteLogRecord routeLogRecord);
+    @Mapping(target = "routeLogRecordDetails", ignore = true)
+    RouteLogRecordEntity mapWithoutDetails(RouteLogRecord routeLogRecord);
+
+    default RouteLogRecordEntity map(final RouteLogRecord routeLogRecord) {
+        if (routeLogRecord == null) {
+            return null;
+        }
+
+        final RouteLogRecordEntity entity = mapWithoutDetails(routeLogRecord);
+        final List<RouteLogRecordDetailEntity> details = map(routeLogRecord.getRouteLogRecordDetails());
+        details.forEach(detail -> detail.setRouteLogRecord(entity));
+        entity.setRouteLogRecordDetails(details);
+        return entity;
+    }
 
 	default List<RouteLogRecordDetailEntity> map(RouteLogRecordDetails routeLogRecordDetails) {
         return routeLogRecordDetails
@@ -31,68 +43,43 @@ public interface RouteLogToEntityMapper {
 
 	default RouteLogRecordDetailEntity mapToRouteLogRecordDetailEntity(RouteLogRecordDetail routeLogRecordDetail) {
         final RouteLogRecordDetailEntity entity = new RouteLogRecordDetailEntity();
-        entity.setId(routeLogRecordDetail.getId());
+        entity.setId(this.map(routeLogRecordDetail.getId()));
         entity.setCreated(routeLogRecordDetail.getTimestamp());
-        entity.setDepartment(mapDepartmentEntity(routeLogRecordDetail));
-        entity.setParcelStatus(map(routeLogRecordDetail.getParcelStatus()));
+        entity.setDepartmentId(routeLogRecordDetail.getDepartmentId());
+        entity.setShipmentStatus(map(routeLogRecordDetail.getShipmentStatus()));
         entity.setRequest(routeLogRecordDetail.getRequest());
         entity.setDescription(routeLogRecordDetail.getDescription());
-        entity.setUser(mapUserEntity(routeLogRecordDetail));
+        entity.setUserId(routeLogRecordDetail.getUserId());
         entity.setVersion(routeLogRecordDetail.getVersion());
-        entity.setSupplier(mapSupplierEntity(routeLogRecordDetail));
+        entity.setSupplierId(routeLogRecordDetail.getSupplierId());
         entity.setProcessType(map(routeLogRecordDetail.getProcessType()));
         entity.setDeviceId(routeLogRecordDetail.getTerminalId() != null ? routeLogRecordDetail.getTerminalId().value() : null);
         return entity;
     }
 
-    default UserEntity mapUserEntity(RouteLogRecordDetail routeLogRecord) {
-        final Long id = 1L;
-        if (ObjectUtils.isNotEmpty(id)) {
-            return UserEntity.builder()
-                    .id(id)
-                    .username("s-soja")
-                    .build();
-        }
-        return null;
-    }
-
-    default DepartmentEntity mapDepartmentEntity(RouteLogRecordDetail routeLogRecord) {
-        final String departmentCode = routeLogRecord.getDepartmentCode();
-        if (StringUtils.isNotEmpty(departmentCode)) {
-            return DepartmentEntity.builder()
-                    .departmentCode(departmentCode)
-                    .build();
-        }
-        return null;
-    }
-
-    default SupplierEntity mapSupplierEntity(RouteLogRecordDetail routeLogRecord) {
-        final String supplierCode = routeLogRecord.getSupplierCode();
-        if (StringUtils.isNotEmpty(supplierCode)) {
-            return SupplierEntity.builder()
-                    .supplierCode(supplierCode)
-                    .build();
-        }
-        return null;
-    }
-
 	com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumeration.ProcessType map(
 			ProcessType processType);
 
-	com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ParcelStatus map(ParcelStatus parcelStatus);
+	com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ShipmentStatus map(ShipmentStatus shipmentStatus);
+
+    default RouteLogRecordDetailId map(final Long routeLogRecordDetailId) {
+        return routeLogRecordDetailId != null
+                ? new RouteLogRecordDetailId(routeLogRecordDetailId)
+                : RouteLogRecordDetailId.generate();
+    }
 
     default RouteLogRecordDetailEntity map(Long id, RouteLogRecordDetail routeLogRecordDetail) {
         final RouteLogRecordDetailEntity entity = new RouteLogRecordDetailEntity();
-        entity.setId(id);
-        entity.setDepartment(mapDepartmentEntity(routeLogRecordDetail));
-        entity.setParcelStatus(map(routeLogRecordDetail.getParcelStatus()));
+        entity.setId(this.map(id));
+        entity.setDepartmentId(routeLogRecordDetail.getDepartmentId());
+        entity.setShipmentStatus(map(routeLogRecordDetail.getShipmentStatus()));
         entity.setRequest(routeLogRecordDetail.getRequest());
         entity.setDescription(routeLogRecordDetail.getDescription());
-        entity.setUser(mapUserEntity(routeLogRecordDetail));
+        entity.setUserId(routeLogRecordDetail.getUserId());
         entity.setVersion(routeLogRecordDetail.getVersion());
-        entity.setSupplier(mapSupplierEntity(routeLogRecordDetail));
+        entity.setSupplierId(routeLogRecordDetail.getSupplierId());
         entity.setProcessType(map(routeLogRecordDetail.getProcessType()));
-        entity.setDeviceId(routeLogRecordDetail.getTerminalId().value());
+        entity.setDeviceId(routeLogRecordDetail.getTerminalId() != null ? routeLogRecordDetail.getTerminalId().value() : null);
         return entity;
     }
 }

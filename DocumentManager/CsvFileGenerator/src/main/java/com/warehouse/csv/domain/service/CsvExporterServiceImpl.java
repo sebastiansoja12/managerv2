@@ -25,10 +25,13 @@ public class CsvExporterServiceImpl implements CsvExporterService {
         final ParcelCsv parcelCsv = parcelRepository.find(id);
 
         final String[] csvHeader = {"Kod paczki", "Imie nadawcy", "Nazwisko nadawcy", "Numer tel nadawcy",
-                "Imie odbiorcy", "Nazwisko odbiorcy", "Numer tel odbiorcy", "Miasto", "Ulica", "Email"};
+                "Imie odbiorcy", "Nazwisko odbiorcy", "Numer tel odbiorcy", "Miasto", "Ulica", "Email",
+                "Numer UN", "Prawidlowa nazwa przewozowa", "Klasa zagrozenia", "Grupa pakowania",
+                "Ilosc", "Jednostka", "Liczba opakowan", "Typ opakowania", "Regulacja", "Typ transportu",
+                "Kontakt alarmowy 24h", "Ilosc ograniczona", "Zanieczyszczenie morskie", "Korozyjny"};
 
         final String[] nameMapping = {
-                "id",
+                "shipmentId",
                 "firstName",
                 "lastName",
                 "senderTelephoneNumber",
@@ -37,7 +40,21 @@ public class CsvExporterServiceImpl implements CsvExporterService {
                 "recipientTelephoneNumber",
                 "recipientCity",
                 "recipientStreet",
-                "recipientEmail"
+                "recipientEmail",
+                "dangerousGoodUnNumber",
+                "dangerousGoodProperShippingName",
+                "dangerousGoodHazardClass",
+                "dangerousGoodPackingGroup",
+                "dangerousGoodQuantity",
+                "dangerousGoodQuantityUnit",
+                "dangerousGoodPackageCount",
+                "dangerousGoodPackagingType",
+                "dangerousGoodRegulationType",
+                "dangerousGoodTransportMode",
+                "dangerousGoodEmergencyContact24h",
+                "dangerousGoodLimitedQuantity",
+                "dangerousGoodMarinePollutant",
+                "dangerousGoodCorrosive"
         };
 
         csvWriter.writeHeader(csvHeader);

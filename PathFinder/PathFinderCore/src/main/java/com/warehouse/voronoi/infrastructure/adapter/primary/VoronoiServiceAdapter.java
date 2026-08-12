@@ -9,6 +9,7 @@ import com.warehouse.voronoi.domain.model.VoronoiRequest;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
 import com.warehouse.voronoi.domain.vo.VoronoiResponse;
 import com.warehouse.voronoi.dto.CoordinatesDto;
+import com.warehouse.voronoi.dto.DepartmentCodeDto;
 
 
 public class VoronoiServiceAdapter implements VoronoiService, VoronoiCoordinatesService {
@@ -23,7 +24,8 @@ public class VoronoiServiceAdapter implements VoronoiService, VoronoiCoordinates
     public VoronoiResponseDto findFastestRoute(final VoronoiRequestDto voronoiRequest) {
         final VoronoiRequest request = VoronoiRequest.from(voronoiRequest);
         final VoronoiResponse voronoiResponse = voronoiPort.findFastestRoute(request);
-        return new VoronoiResponseDto(voronoiResponse.departmentCode().getValue(), voronoiResponse.city());
+        return new VoronoiResponseDto(
+                new DepartmentCodeDto(voronoiResponse.departmentCode().getValue()), voronoiResponse.city());
     }
 
     @Override

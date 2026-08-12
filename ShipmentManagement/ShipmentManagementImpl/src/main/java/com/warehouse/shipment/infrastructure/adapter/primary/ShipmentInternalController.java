@@ -3,7 +3,13 @@ package com.warehouse.shipment.infrastructure.adapter.primary;
 import static com.warehouse.shipment.infrastructure.adapter.primary.validator.SignatureValidator.validateSignatureMethod;
 
 import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +21,8 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
+import com.warehouse.shipment.domain.exception.ShipmentModificationException;
+import com.warehouse.shipment.domain.exception.DangerousGoodNotFoundException;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
@@ -24,7 +32,6 @@ import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequ
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.ShipmentValidationException;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
-import com.warehouse.shipment.infrastructure.adapter.primary.validator.DangerousGoodValidator;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
 
@@ -39,22 +46,22 @@ public class ShipmentInternalController {
     
     private final ShipmentRequestValidator shipmentRequestValidator;
 
-    private final DangerousGoodValidator dangerousGoodValidator;
-
     private final ShipmentRequestMapper requestMapper;
 
     private final ShipmentResponseMapper responseMapper;
 
+    private final ObjectMapper objectMapper;
+
 	public ShipmentInternalController(final ShipmentPort shipmentPort,
                                       final ShipmentRequestValidator shipmentRequestValidator,
-                                      final DangerousGoodValidator dangerousGoodValidator,
                                       final ShipmentRequestMapper requestMapper,
-                                      final ShipmentResponseMapper responseMapper) {
+                                      final ShipmentResponseMapper responseMapper,
+                                      final ObjectMapper objectMapper) {
         this.shipmentPort = shipmentPort;
         this.shipmentRequestValidator = shipmentRequestValidator;
-        this.dangerousGoodValidator = dangerousGoodValidator;
         this.requestMapper = requestMapper;
         this.responseMapper = responseMapper;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping
@@ -158,23 +165,76 @@ public class ShipmentInternalController {
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
     
-	// disabled
-    @Counted(value = "controller.dangerousgood.add")
-    @Timed(value = "controller.dangerousgood.add")
-	public ResponseEntity<?> addDangerousGood(
-			@RequestBody final DangerousGoodCreateRequestApi dangerousGoodCreateRequest) {
-        dangerousGoodValidator.validateDangerousGood(dangerousGoodCreateRequest);
+    @GetMapping("/{shipmentId}/dangerous-good")
+    @Counted(value = "controller.shipment.dangerousgood.get")
+    @Timed(value = "controller.shipment.dangerousgood.get")
+    public ResponseEntity<DangerousGoodApi> getDangerousGood(@PathVariable final Long shipmentId) {
+        return shipmentPort.loadDangerousGood(new ShipmentId(shipmentId))
+                .map(responseMapper::map)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-        final DangerousGoodCreateCommand request = DangerousGoodCreateCommand.from(dangerousGoodCreateRequest);
-        final Result<Void, ErrorCode> result = shipmentPort.addDangerousGood(request);
-
-        final ResponseEntity<?> response;
-        if (result.isSuccess()) {
-            response = ResponseEntity.status(HttpStatus.OK).build();
-        } else {
-            response = ResponseEntity.badRequest().body(result.getFailure());
+    @PutMapping("/{shipmentId}/dangerous-good")
+    @Counted(value = "controller.shipment.dangerousgood.put")
+    @Timed(value = "controller.shipment.dangerousgood.put")
+    public ResponseEntity<DangerousGoodApi> putDangerousGood(
+            @PathVariable final Long shipmentId,
+            @RequestBody final DangerousGoodApi dangerousGoodRequest) {
+        if (dangerousGoodRequest == null) {
+            throw new IllegalArgumentException("Dangerous goods request body is required");
         }
-        return response;
+        final DangerousGood dangerousGood = requestMapper.map(dangerousGoodRequest);
+        shipmentPort.putDangerousGood(new ShipmentId(shipmentId), dangerousGood);
+        return ResponseEntity.ok(responseMapper.map(dangerousGood));
+    }
+
+    @PatchMapping("/{shipmentId}/dangerous-good")
+    @Counted(value = "controller.shipment.dangerousgood.patch")
+    @Timed(value = "controller.shipment.dangerousgood.patch")
+    public ResponseEntity<DangerousGoodApi> patchDangerousGood(
+            @PathVariable final Long shipmentId,
+            @RequestBody final JsonNode dangerousGoodPatch) {
+        if (dangerousGoodPatch == null || !dangerousGoodPatch.isObject()) {
+            throw new IllegalArgumentException("Dangerous goods patch must be a JSON object");
+        }
+        final ShipmentId id = new ShipmentId(shipmentId);
+        final DangerousGood current = shipmentPort.loadDangerousGood(id)
+                .orElseThrow(() -> new DangerousGoodNotFoundException(
+                        "Dangerous goods were not found for shipment " + shipmentId));
+        if (dangerousGoodPatch.isEmpty()) {
+            return ResponseEntity.ok(responseMapper.map(current));
+        }
+        final DangerousGoodApi mergedRequest = mergeDangerousGoodPatch(current, dangerousGoodPatch);
+        final DangerousGood updated = requestMapper.map(mergedRequest);
+        shipmentPort.putDangerousGood(id, updated);
+        return ResponseEntity.ok(responseMapper.map(updated));
+    }
+
+    @DeleteMapping("/{shipmentId}/dangerous-good")
+    @Counted(value = "controller.shipment.dangerousgood.delete")
+    @Timed(value = "controller.shipment.dangerousgood.delete")
+    public ResponseEntity<Void> deleteDangerousGood(@PathVariable final Long shipmentId) {
+        shipmentPort.deleteDangerousGood(new ShipmentId(shipmentId));
+        return ResponseEntity.noContent().build();
+    }
+
+    private DangerousGoodApi mergeDangerousGoodPatch(
+            final DangerousGood current,
+            final JsonNode dangerousGoodPatch
+    ) {
+        final ObjectNode merged = objectMapper.valueToTree(responseMapper.map(current));
+        final Iterator<Map.Entry<String, JsonNode>> fields = dangerousGoodPatch.fields();
+        while (fields.hasNext()) {
+            final Map.Entry<String, JsonNode> field = fields.next();
+            final String fieldName = "corosive".equals(field.getKey()) ? "corrosive" : field.getKey();
+            merged.set(fieldName, field.getValue());
+        }
+        try {
+            return objectMapper.treeToValue(merged, DangerousGoodApi.class);
+        } catch (final JsonProcessingException exception) {
+            throw new IllegalArgumentException("Invalid dangerous goods patch", exception);
+        }
     }
 
     @PutMapping("/status")
@@ -252,5 +312,20 @@ public class ShipmentInternalController {
     @ExceptionHandler(TechnicalException.class)
     public ResponseEntity<?> handleException(final TechnicalException exception) {
         return ResponseEntity.status(exception.getCode()).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleException(final IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
+    }
+
+    @ExceptionHandler(ShipmentModificationException.class)
+    public ResponseEntity<?> handleException(final ShipmentModificationException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(DangerousGoodNotFoundException.class)
+    public ResponseEntity<?> handleException(final DangerousGoodNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
 }

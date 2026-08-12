@@ -1,13 +1,15 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 
-import java.time.LocalDateTime;
-
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumeration.ProcessType;
-
-import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ParcelStatus;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,9 +20,14 @@ import lombok.*;
 @Table(name = "route_log_details")
 public class RouteLogRecordDetailEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false))
+    private RouteLogRecordDetailId id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "route_log_record_id", nullable = false)
+    @EqualsAndHashCode.Exclude
+    private RouteLogRecordEntity routeLogRecord;
 
     @Column(name = "device_id")
     private String deviceId;
@@ -38,21 +45,22 @@ public class RouteLogRecordDetailEntity {
     private ProcessType processType;
 
     @Column(name = "request")
+    @Lob
     @Size(min = 5, max = 65555)
     private String request;
 
-    @Column(name = "parcel_status")
-    private ParcelStatus parcelStatus;
+    @Column(name = "shipment_status")
+    private ShipmentStatus shipmentStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "username", referencedColumnName = "username")
-    private UserEntity user;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "user_id"))
+    private UserId userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_code", referencedColumnName = "department_code")
-    private DepartmentEntity department;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "department_id"))
+    private DepartmentId departmentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supplier_code", referencedColumnName = "supplier_code")
-    private SupplierEntity supplier;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "supplier_id"))
+    private SupplierId supplierId;
 }

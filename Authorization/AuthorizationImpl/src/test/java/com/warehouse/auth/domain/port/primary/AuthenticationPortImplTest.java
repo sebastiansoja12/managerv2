@@ -52,6 +52,7 @@ import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 
@@ -90,7 +91,7 @@ class AuthenticationPortImplTest {
                 refreshTokenGenerator,
                 userRepository
         );
-        jwtService = new JwtServiceImpl(jwtProvider);
+        jwtService = new JwtServiceImpl(jwtProvider, departmentServicePort);
         final DepartmentService departmentService = new DepartmentService(departmentServicePort);
         final MailServicePort mailServicePort = emailNotification -> {
         };
@@ -309,6 +310,11 @@ class AuthenticationPortImplTest {
         @Override
         public Boolean departmentExists(final DepartmentCode departmentCode) {
             return departmentExists;
+        }
+
+        @Override
+        public DepartmentId getDepartmentId(final DepartmentCode departmentCode) {
+            return new DepartmentId(10L);
         }
 
         private void setDepartmentExists(final boolean departmentExists) {

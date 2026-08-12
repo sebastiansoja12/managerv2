@@ -7,19 +7,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
+import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
@@ -28,6 +29,7 @@ import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.service.ShipmentServiceImpl;
+import com.warehouse.shipment.domain.service.TrackingNumberService;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
@@ -42,6 +44,12 @@ class ShipmentServiceImplTest {
     private ApplicationEventPublisher eventPublisher;
 
     @Mock
+    private ApplicationContext applicationContext;
+
+    @Mock
+    private TrackingNumberService trackingNumberService;
+
+    @Mock
     private SpecificationRepository specificationShipmentRepository;
 
     private ShipmentServiceImpl shipmentService;
@@ -49,6 +57,7 @@ class ShipmentServiceImplTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(DomainContext.class, "eventPublisher", eventPublisher);
+        ReflectionTestUtils.setField(DomainContext.class, "context", null);
         shipmentService = new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
     }
 
@@ -230,7 +239,7 @@ class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldChangeDangerousGood() {
+    void shouldChangeDangerousGoodAndPublishUpdatedEvent() {
         final Shipment shipment = shipment();
         final DangerousGood dangerousGood = dangerousGood();
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
@@ -239,6 +248,59 @@ class ShipmentServiceImplTest {
 
         assertEquals(dangerousGood, shipment.getDangerousGood());
         verify(shipmentRepository).createOrUpdate(shipment);
+        assertEventPublished(ShipmentDangerousGoodUpdated.class);
+    }
+
+    @Test
+    void shouldUpdateDangerousGoodAndPublishEvent() {
+        final Shipment shipment = shipment();
+        shipment.changeDangerousGood(dangerousGood());
+        final DangerousGood replacement = dangerousGood("Replacement battery");
+        when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+
+        shipmentService.changeDangerousGoodTo(shipmentId(), replacement);
+
+        assertEquals(replacement, shipment.getDangerousGood());
+        verify(shipmentRepository).createOrUpdate(shipment);
+        assertEventPublished(ShipmentDangerousGoodUpdated.class);
+    }
+
+    @Test
+    void shouldRemoveDangerousGoodAndPublishEvent() {
+        final Shipment shipment = shipment();
+        shipment.changeDangerousGood(dangerousGood());
+        when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+
+        shipmentService.removeDangerousGood(shipmentId());
+
+        assertNull(shipment.getDangerousGood());
+        verify(shipmentRepository).createOrUpdate(shipment);
+        assertEventPublished(ShipmentDangerousGoodRemoved.class);
+    }
+
+    @Test
+    void shouldRemoveMissingDangerousGoodAndPublishEvent() {
+        final Shipment shipment = shipment();
+        when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+
+        shipmentService.removeDangerousGood(shipmentId());
+
+        assertNull(shipment.getDangerousGood());
+        verify(shipmentRepository).createOrUpdate(shipment);
+        assertEventPublished(ShipmentDangerousGoodRemoved.class);
+    }
+
+    @Test
+    void shouldPutEqualDangerousGoodAndPublishUpdatedEvent() {
+        final Shipment shipment = shipment();
+        shipment.changeDangerousGood(dangerousGood());
+        when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+
+        shipmentService.changeDangerousGoodTo(shipmentId(), dangerousGood());
+
+        assertEquals(dangerousGood(), shipment.getDangerousGood());
+        verify(shipmentRepository).createOrUpdate(shipment);
+        assertEventPublished(ShipmentDangerousGoodUpdated.class);
     }
 
     @Test
@@ -391,36 +453,15 @@ class ShipmentServiceImplTest {
     }
 
     @Test
-    void shouldChangeRouteProcessId() {
-        final Shipment shipment = shipment();
-        final ProcessId processId = new ProcessId(UUID.randomUUID());
-        when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
-
-        shipmentService.changeRouteProcessId(processId, shipmentId());
-
-        assertEquals(processId.getValue().toString(), shipment.getExternalRouteId().value());
-        verify(shipmentRepository).createOrUpdate(shipment);
-    }
-
-    @Test
-    void shouldAssignExternalReturnId() {
-        final Shipment shipment = shipment();
-        final ReturnId returnId = new ReturnId(12L);
-        when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
-
-        shipmentService.assignExternalReturnId(shipmentId(), returnId);
-
-        assertEquals(returnId.getId(), shipment.getExternalReturnId().value());
-        verify(shipmentRepository).createOrUpdate(shipment);
-    }
-
-    @Test
     void shouldRedirectShipmentToSenderAndPublishEvent() {
         final ShipmentId relatedShipmentId = new ShipmentId(2L);
         final Shipment shipment = shipment(relatedShipmentId);
         final String originalSenderFirstName = shipment.getSender().getFirstName();
         final String originalRecipientFirstName = shipment.getRecipient().getFirstName();
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
+        ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
+        when(applicationContext.getBean(TrackingNumberService.class)).thenReturn(trackingNumberService);
+        when(trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT)).thenReturn(trackingNumber());
 
         shipmentService.redirectShipmentToSender(shipmentId());
 
@@ -438,9 +479,9 @@ class ShipmentServiceImplTest {
         final Shipment shipment = shipment();
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
-        shipmentService.changeDestination(shipmentId(), "KR1");
+        shipmentService.changeDestination(shipmentId(), new DepartmentCode("KR1"));
 
-        assertEquals("KR1", shipment.getDestination());
+        assertEquals(new DepartmentCode("KR1"), shipment.getDestination());
         verify(shipmentRepository).createOrUpdate(shipment);
     }
 

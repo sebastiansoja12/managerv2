@@ -45,19 +45,15 @@ public class RerouteConfiguration {
 	}
 
 	@Bean
-	public SoftwareConfigurationServicePort softwareConfigurationServicePort() {
+	public SoftwareConfigurationServicePort softwareConfigurationServicePort(
+			final SoftwareConfigurationProperties softwareConfigurationProperties) {
 		final RetryConfig config = RetryConfig.custom()
 				.maxAttempts(4)
 				.waitDuration(Duration.ofSeconds(2))
 				.retryExceptions(RuntimeException.class)
 				.writableStackTraceEnabled(true)
 				.build();
-		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties());
-	}
-
-	@Bean("reroute.softwareConfigurationProperties")
-	public SoftwareConfigurationProperties softwareConfigurationProperties() {
-		return new SoftwareConfigurationProperties();
+		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties);
 	}
 
 	@Bean

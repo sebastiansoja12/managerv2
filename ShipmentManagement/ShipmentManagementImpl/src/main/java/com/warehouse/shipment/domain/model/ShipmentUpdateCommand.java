@@ -6,6 +6,7 @@ import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.vo.Recipient;
@@ -23,7 +24,7 @@ public class ShipmentUpdateCommand {
 
     private Recipient recipient;
 
-    private String destination;
+    private DepartmentCode destination;
 
     private ShipmentSize shipmentSize;
 
@@ -48,7 +49,7 @@ public class ShipmentUpdateCommand {
             final ShipmentId shipmentId,
             final Sender sender,
             final Recipient recipient,
-            final String destination,
+            final DepartmentCode destination,
             final ShipmentSize shipmentSize,
             final Money price,
             final DangerousGood dangerousGood,
@@ -163,11 +164,11 @@ public class ShipmentUpdateCommand {
         this.shipmentStatus = shipmentStatus;
     }
 
-    public String getDestination() {
+    public DepartmentCode getDestination() {
         return destination;
     }
 
-    public void setDestination(final String destination) {
+    public void setDestination(final DepartmentCode destination) {
         this.destination = destination;
     }
 }

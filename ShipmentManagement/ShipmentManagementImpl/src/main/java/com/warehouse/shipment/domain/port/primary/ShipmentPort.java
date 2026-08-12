@@ -10,6 +10,7 @@ import com.warehouse.shipment.domain.model.ShipmentUpdateCommand;
 import com.warehouse.shipment.domain.vo.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ShipmentPort {
 
@@ -47,7 +48,11 @@ public interface ShipmentPort {
 
     boolean existsShipment(final ShipmentId shipmentId);
 
-    Result<Void, ErrorCode> addDangerousGood(final DangerousGoodCreateCommand request);
+    Optional<DangerousGood> loadDangerousGood(final ShipmentId shipmentId);
+
+    void putDangerousGood(final ShipmentId shipmentId, final DangerousGood dangerousGood);
+
+    void deleteDangerousGood(final ShipmentId shipmentId);
 
     void processShipmentReturn(final ShipmentReturnCommand request);
 

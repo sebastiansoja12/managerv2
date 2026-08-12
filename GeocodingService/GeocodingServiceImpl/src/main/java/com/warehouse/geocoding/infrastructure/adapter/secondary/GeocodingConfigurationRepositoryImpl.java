@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.commonassets.identificator.GeocodingConfigurationId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
+import com.warehouse.commonassets.security.CredentialCipher;
 import com.warehouse.geocoding.domain.model.GeocodingConfiguration;
 import com.warehouse.geocoding.domain.port.secondary.GeocodingRepository;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.entity.GeocodingConfigurationEntity;
@@ -15,23 +16,23 @@ import com.warehouse.geocoding.infrastructure.adapter.secondary.entity.Geocoding
 public class GeocodingConfigurationRepositoryImpl implements GeocodingRepository {
 
     private final OperatorFilteredRepository<GeocodingConfigurationEntity> repository;
-    private final GeocodingPasswordCipher passwordCipher;
+    private final CredentialCipher credentialCipher;
 
     public GeocodingConfigurationRepositoryImpl(
             final OperatorFilteredRepository<GeocodingConfigurationEntity> repository,
-            final GeocodingPasswordCipher passwordCipher) {
+            final CredentialCipher credentialCipher) {
         this.repository = repository;
-        this.passwordCipher = passwordCipher;
+        this.credentialCipher = credentialCipher;
     }
 
     @Override
     public void create(final GeocodingConfiguration configuration) {
-        repository.create(GeocodingConfigurationMapper.toEntity(configuration, passwordCipher));
+        repository.create(GeocodingConfigurationMapper.toEntity(configuration, credentialCipher));
     }
 
     @Override
     public void update(final GeocodingConfiguration configuration) {
-        repository.update(GeocodingConfigurationMapper.toEntity(configuration, passwordCipher));
+        repository.update(GeocodingConfigurationMapper.toEntity(configuration, credentialCipher));
     }
 
     @Override
@@ -49,7 +50,7 @@ public class GeocodingConfigurationRepositoryImpl implements GeocodingRepository
         return repository.createCriteria(GeocodingConfigurationEntity.class)
                 .eq("geocodingConfigurationId.value", geocodingConfigurationId.value())
                 .one()
-                .map(entity -> GeocodingConfigurationMapper.toModel(entity, passwordCipher));
+                .map(entity -> GeocodingConfigurationMapper.toModel(entity, credentialCipher));
     }
 
     @Override
@@ -57,7 +58,7 @@ public class GeocodingConfigurationRepositoryImpl implements GeocodingRepository
         return repository.createCriteria(GeocodingConfigurationEntity.class)
                 .eq("provider", provider)
                 .one()
-                .map(entity -> GeocodingConfigurationMapper.toModel(entity, passwordCipher));
+                .map(entity -> GeocodingConfigurationMapper.toModel(entity, credentialCipher));
     }
 
     @Override
@@ -65,7 +66,7 @@ public class GeocodingConfigurationRepositoryImpl implements GeocodingRepository
         return repository.createCriteria(GeocodingConfigurationEntity.class)
                 .list()
                 .stream()
-                .map(entity -> GeocodingConfigurationMapper.toModel(entity, passwordCipher))
+                .map(entity -> GeocodingConfigurationMapper.toModel(entity, credentialCipher))
                 .toList();
     }
 }
