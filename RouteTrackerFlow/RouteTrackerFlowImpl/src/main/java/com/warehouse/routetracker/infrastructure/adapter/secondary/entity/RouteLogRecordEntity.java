@@ -3,6 +3,7 @@ package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,8 +20,9 @@ public class RouteLogRecordEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "parcel_id", nullable = false)
-    private Long parcelId;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "shipment_id", nullable = false, unique = true))
+    private ShipmentId shipmentId;
 
     @Column(name = "return_code")
     private String returnCode;
@@ -28,8 +30,8 @@ public class RouteLogRecordEntity {
     @Column(name = "fault_description")
     private String faultDescription;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "route_log_record_id", referencedColumnName = "id")
+    @OneToMany(mappedBy = "routeLogRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id.value DESC")
     private List<RouteLogRecordDetailEntity> routeLogRecordDetails;
 
     public List<RouteLogRecordDetailEntity> getRouteLogRecordDetails() {
