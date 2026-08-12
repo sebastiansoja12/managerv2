@@ -3,6 +3,7 @@ package com.warehouse.department.domain.port.primary;
 import java.util.List;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.model.Department;
@@ -12,6 +13,8 @@ import com.warehouse.department.domain.vo.*;
 public interface DepartmentPort {
 
     Department findByDepartmentCode(final DepartmentCode departmentCode);
+
+    Department findByDepartmentId(final DepartmentId departmentId);
 
     List<Department> findAll();
 

@@ -5,6 +5,7 @@ import java.time.Instant;
 import org.springframework.stereotype.Service;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.event.*;
@@ -34,6 +35,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public Department findByDepartmentCode(final DepartmentCode departmentCode) {
         return departmentRepository.findByDepartmentCode(departmentCode);
+    }
+
+    @Override
+    public Department findByDepartmentId(final DepartmentId departmentId) {
+        return departmentRepository.findByDepartmentId(departmentId);
     }
 
     @Override

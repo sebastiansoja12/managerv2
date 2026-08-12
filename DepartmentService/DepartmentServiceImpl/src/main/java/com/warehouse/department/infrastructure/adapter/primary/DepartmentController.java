@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import com.warehouse.auth.AccessUserControl;
 import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.department.domain.enumeration.DepartmentType;
 import com.warehouse.department.domain.exception.RestException;
 import com.warehouse.department.domain.helper.Result;
@@ -145,6 +146,14 @@ public class DepartmentController {
     public ResponseEntity<?> viewByDepartmentCode(@PathVariable final String value) {
         final DepartmentCode departmentCode = new DepartmentCode(value);
         final Department department = departmentPort.findByDepartmentCode(departmentCode);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseMapper.map(department));
+    }
+
+    @GetMapping("/id/{value}")
+    public ResponseEntity<?> viewByDepartmentId(@PathVariable final Long value) {
+        final Department department = departmentPort.findByDepartmentId(new DepartmentId(value));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseMapper.map(department));
