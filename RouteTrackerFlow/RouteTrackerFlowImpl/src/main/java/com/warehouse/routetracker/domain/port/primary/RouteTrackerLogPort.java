@@ -1,33 +1,31 @@
 package com.warehouse.routetracker.domain.port.primary;
 
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
+import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
+import com.warehouse.routetracker.domain.model.RouteLogRecord;
+import com.warehouse.routetracker.domain.vo.*;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.warehouse.routetracker.domain.enumeration.ParcelStatus;
-import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
-import com.warehouse.routetracker.domain.model.RouteLogRecord;
-import com.warehouse.routetracker.domain.vo.DepotCodeRequest;
-import com.warehouse.routetracker.domain.vo.DeviceIdInformation;
-import com.warehouse.routetracker.domain.vo.DeviceVersionInformation;
-import com.warehouse.routetracker.domain.vo.DeliveryStatusRequest;
-import com.warehouse.routetracker.domain.vo.SupplierCodeRequest;
-import com.warehouse.routetracker.domain.vo.TerminalRequest;
-import com.warehouse.routetracker.domain.vo.UsernameRequest;
-import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
-
 public interface RouteTrackerLogPort {
 
-    void saveShipmentEvent(final ShipmentId shipmentId,
-                           final String eventType,
-                           final ParcelStatus parcelStatus,
-                           final LocalDateTime occurredAt,
-                           final String payload);
+    void createShipmentEvent(final ShipmentId shipmentId,
+                             final String eventType,
+                             final ShipmentStatus shipmentStatus,
+                             final LocalDateTime occurredAt,
+                             final String payload,
+                             final UserId userId,
+                             final DepartmentId departmentId);
 
     void saveDeliveryStatus(final DeliveryStatusRequest request);
 
-    void saveDepotCode(final DepotCodeRequest request);
+    void saveDepartmentId(final DepartmentIdRequest request);
 
-    void saveSupplierCode(final SupplierCodeRequest request);
+    void saveSupplierId(final SupplierIdRequest request);
 
     void saveTerminalRequest(final TerminalRequest request);
 
@@ -35,7 +33,7 @@ public interface RouteTrackerLogPort {
 
     void saveDeviceVersionInformation(final DeviceVersionInformation information);
 
-    void saveUsername(final UsernameRequest request);
+    void saveUserId(final UserIdRequest request);
 
     void saveDeviceInformation(final DeviceInformationRequest request);
 
