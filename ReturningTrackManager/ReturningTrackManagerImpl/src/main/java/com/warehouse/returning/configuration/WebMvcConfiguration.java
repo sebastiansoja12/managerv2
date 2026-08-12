@@ -1,6 +1,6 @@
 package com.warehouse.returning.configuration;
 
-import com.warehouse.common.DepartmentId;
+import com.warehouse.returning.domain.vo.DepartmentId;
 import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
