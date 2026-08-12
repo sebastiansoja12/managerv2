@@ -8,6 +8,6 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class ZebraInitializeRequestDto {
-    Long parcelId;
+    Long shipmentId;
     ProcessTypeDto processType;
 }
