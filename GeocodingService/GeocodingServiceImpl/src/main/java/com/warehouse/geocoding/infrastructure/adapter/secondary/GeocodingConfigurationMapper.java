@@ -2,6 +2,7 @@ package com.warehouse.geocoding.infrastructure.adapter.secondary;
 
 import com.warehouse.geocoding.domain.model.GeocodingConfiguration;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.entity.GeocodingConfigurationEntity;
+import com.warehouse.commonassets.security.CredentialCipher;
 
 public final class GeocodingConfigurationMapper {
 
@@ -9,12 +10,12 @@ public final class GeocodingConfigurationMapper {
     }
 
     public static GeocodingConfigurationEntity toEntity(final GeocodingConfiguration configuration,
-                                                         final GeocodingPasswordCipher passwordCipher) {
+                                                         final CredentialCipher credentialCipher) {
         final GeocodingConfigurationEntity entity = new GeocodingConfigurationEntity(
                 configuration.getGeocodingConfigurationId(),
                 configuration.getApiUrl(),
                 configuration.getApiUserName(),
-                passwordCipher.encrypt(configuration.getApiPassword()),
+                credentialCipher.encrypt(configuration.getApiPassword()),
                 configuration.getApiKey(),
                 configuration.getAccessToken(),
                 configuration.getRefreshToken(),
@@ -25,12 +26,12 @@ public final class GeocodingConfigurationMapper {
     }
 
     public static GeocodingConfiguration toModel(final GeocodingConfigurationEntity entity,
-                                                 final GeocodingPasswordCipher passwordCipher) {
+                                                 final CredentialCipher credentialCipher) {
         final GeocodingConfiguration configuration = new GeocodingConfiguration(
                 entity.getGeocodingConfigurationId(),
                 entity.getApiUrl(),
                 entity.getApiUserName(),
-                passwordCipher.decrypt(entity.getApiPassword()),
+                credentialCipher.decrypt(entity.getApiPassword()),
                 entity.getApiKey(),
                 entity.getAccessToken(),
                 entity.getRefreshToken(),
