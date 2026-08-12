@@ -13,7 +13,6 @@ import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
 import com.warehouse.routetracker.domain.vo.TerminalId;
-import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
 
@@ -28,19 +27,15 @@ public interface RouteModelMapper {
     Set<RouteLogRecordDetail> mapToLogRecordDetails(List<RouteLogRecordDetailEntity> value);
 
 
-    @Mapping(target = "departmentCode", source = "department.departmentCode")
-    @Mapping(target = "username", source = "user.username")
-    @Mapping(target = "supplierCode", source = "supplier.supplierCode")
     @Mapping(target = "terminalId", source = "deviceId")
+    @Mapping(target = "id", source = "id.value")
     RouteLogRecordDetail map(RouteLogRecordDetailEntity routeLogRecordDetailEntity);
 
     default TerminalId mapTerminalId(final String deviceId) {
         return deviceId != null ? new TerminalId(deviceId) : null;
     }
 
-    @Mapping(target = "processId", source = "id")
-    @Mapping(target = "shipmentId.value", source = "parcelId")
     default RouteProcess map(RouteLogRecordEntity entity) {
-        return new RouteProcess(new ShipmentId(entity.getParcelId()), UUID.fromString(entity.getId()));
+        return new RouteProcess(entity.getShipmentId(), UUID.fromString(entity.getId()));
     }
 }

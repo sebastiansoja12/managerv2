@@ -2,6 +2,9 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.mapper;
 
 import org.mapstruct.Mapper;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.model.DeliveryReturnRequest;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
@@ -25,11 +28,11 @@ public interface RouteRequestMapper {
 
     DeliveryReturnRequest map(DeliveryReturnRequestDto deliveryReturnRequest);
 
-    SupplierCodeRequest map(SupplierCodeRequestDto supplierCodeRequest);
+    SupplierIdRequest map(SupplierIdRequestDto supplierIdRequest);
 
-    DepotCodeRequest map(DepotCodeRequestDto depotCodeRequest);
+    DepartmentIdRequest map(DepartmentIdRequestDto departmentIdRequest);
 
-    UsernameRequest map(UsernameRequestDto usernameRequest);
+    UserIdRequest map(UserIdRequestDto userIdRequest);
 
     DescriptionRequest map(DescriptionRequestDto descriptionRequest);
 
@@ -39,5 +42,17 @@ public interface RouteRequestMapper {
 
     default TerminalId map(final TerminalIdDto terminalId) {
         return terminalId != null ? new TerminalId(terminalId.getValue()) : null;
+    }
+
+    default UserId map(final UserIdDto userId) {
+        return userId != null ? new UserId(userId.value()) : null;
+    }
+
+    default SupplierId map(final SupplierIdDto supplierId) {
+        return supplierId != null ? new SupplierId(supplierId.value()) : null;
+    }
+
+    default DepartmentId map(final DepartmentIdDto departmentId) {
+        return departmentId != null ? new DepartmentId(departmentId.value()) : null;
     }
 }
