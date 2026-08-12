@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.vo.UserContext;
@@ -23,8 +24,9 @@ class CurrentUserServiceAdapterTest {
     }
 
     @Test
-    void shouldReturnCurrentUserAndOperatorIdsFromSecurityContext() {
-        final UserContext userContext = new UserContext(new UserId(42L), OperatorId.of(7L));
+    void shouldReturnCurrentUserOperatorAndDepartmentIdsFromSecurityContext() {
+        final UserContext userContext = new UserContext(
+                new UserId(42L), OperatorId.of(7L), new DepartmentId(10L));
         final UsernamePasswordAuthenticationToken authentication = UsernamePasswordAuthenticationToken.authenticated(
                 userContext,
                 null,
@@ -37,8 +39,10 @@ class CurrentUserServiceAdapterTest {
 
         final UserId currentUserId = currentUserService.getCurrentUserId();
         final OperatorId currentOperatorId = currentUserService.getCurrentOperatorId();
+        final DepartmentId currentDepartmentId = currentUserService.getCurrentDepartmentId();
 
         assertThat(currentUserId).isEqualTo(new UserId(42L));
         assertThat(currentOperatorId).isEqualTo(OperatorId.of(7L));
+        assertThat(currentDepartmentId).isEqualTo(new DepartmentId(10L));
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.port.secondary.CurrentUserServicePort;
@@ -19,6 +20,11 @@ public class CurrentUserServiceAdapter implements CurrentUserServicePort {
     @Override
     public OperatorId getCurrentOperatorId() {
         return getCurrentUserContext().operatorId();
+    }
+
+    @Override
+    public DepartmentId getCurrentDepartmentId() {
+        return getCurrentUserContext().departmentId();
     }
 
     private UserContext getCurrentUserContext() {
