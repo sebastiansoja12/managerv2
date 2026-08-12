@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.auth.UserApiService;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
@@ -86,13 +87,13 @@ public class ShipmentConfiguration {
 									 final PriceService priceService,
 									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
 									 final SignatureService signatureService,
-									 final RouteLogServicePort routeLogServicePort,
+									 final RouteLogService routeLogService,
 									 final ReturningServicePort returningServicePort,
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberService trackingNumberService) {
 		return new ShipmentPortImpl(service, LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				notificationCreatorProvider, shipmentStatusHandlers, countryDetermineService, priceService,
-				countryServiceAvailabilityService, signatureService, routeLogServicePort, returningServicePort,
+				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
 				mailNotificationServicePort, trackingNumberService);
 	}
 
@@ -169,6 +170,23 @@ public class ShipmentConfiguration {
 	public GenericFeignResourceService genericFeignResourceService(final GenericFeignClientFactory genericFeignClientFactory,
 																  final ObjectMapper objectMapper) {
 		return new GenericFeignResourceService(genericFeignClientFactory, objectMapper);
+	}
+
+	@Bean
+	public DepartmentServicePort shipmentDepartmentServicePort(final DepartmentApiService departmentApiService) {
+		return new DepartmentServiceClient(departmentApiService);
+	}
+
+	@Bean
+	public UserServicePort shipmentUserServicePort(final UserApiService userApiService) {
+		return new UserServiceClient(userApiService);
+	}
+
+	@Bean
+	public RouteLogService routeLogService(final RouteLogServicePort routeLogServicePort,
+										 final DepartmentServicePort departmentServicePort,
+										 final UserServicePort userServicePort) {
+		return new RouteLogServiceImpl(routeLogServicePort, departmentServicePort, userServicePort);
 	}
 
 	@Bean
