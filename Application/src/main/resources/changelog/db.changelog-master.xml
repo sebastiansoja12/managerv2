@@ -16,6 +16,7 @@
     <include file="/changelog/db/delivery_missed_details.xml"/>
     <include file="/changelog/db/department.xml"/>
     <include file="/changelog/db/department_aud.xml"/>
+    <include file="/changelog/db/department_id.xml"/>
     <include file="/changelog/db/device_pair.xml"/>
     <include file="/changelog/db/device_settings.xml"/>
     <include file="/changelog/db/device_version.xml"/>
@@ -60,6 +61,7 @@
     <include file="/changelog/db/users.xml"/>
     <include file="/changelog/db/users_role_permissions.xml"/>
     <include file="/changelog/db/foreign-keys.xml"/>
+    <include file="/changelog/db/route_log_detail_ids.xml"/>
     <include file="/changelog/db/initial-login.xml"/>
     <include file="/changelog/db/shipment-dangerous-good-embedded.xml"/>
 
