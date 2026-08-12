@@ -6,11 +6,14 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.commonassets.kafka.domain.model.OperatorAwareEvent;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,11 +23,14 @@ public class KafkaTemplateClient {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
+    private final ObjectProvider<OperatorContextProvider> operatorContextProvider;
 
     public KafkaTemplateClient(final KafkaTemplate<String, String> kafkaTemplate,
-                               final ObjectMapper objectMapper) {
+                               final ObjectMapper objectMapper,
+                               final ObjectProvider<OperatorContextProvider> operatorContextProvider) {
         this.kafkaTemplate = kafkaTemplate;
         this.objectMapper = objectMapper;
+        this.operatorContextProvider = operatorContextProvider;
     }
 
     public <T> CompletableFuture<Void> publish(final String topic, final String key, final T event) {
@@ -35,7 +41,24 @@ public class KafkaTemplateClient {
                                                final String key,
                                                final T event,
                                                final Map<String, String> headers) {
+        this.assignOperatorContext(event);
         return this.publishSerialized(topic, key, this.serialize(event), headers);
+    }
+
+    private <T> void assignOperatorContext(final T event) {
+        if (!(event instanceof final OperatorAwareEvent operatorAwareEvent)) {
+            return;
+        }
+
+        final OperatorContextProvider provider = this.operatorContextProvider.getIfAvailable();
+        if (provider == null) {
+            return;
+        }
+
+        provider.currentOperatorId().ifPresent(operatorId ->
+                provider.currentUserId().ifPresent(userId ->
+                        provider.currentDepartmentId().ifPresent(departmentId ->
+                                operatorAwareEvent.assignOperatorContext(operatorId, userId, departmentId))));
     }
 
     public CompletableFuture<Void> publishSerialized(final String topic,
