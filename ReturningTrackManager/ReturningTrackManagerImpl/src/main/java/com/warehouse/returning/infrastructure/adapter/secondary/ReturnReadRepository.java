@@ -1,7 +1,7 @@
 package com.warehouse.returning.infrastructure.adapter.secondary;
 
-import com.warehouse.common.DepartmentId;
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.DepartmentId;
+import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.OperatorId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnPackageEntity;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ReturnId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId;
