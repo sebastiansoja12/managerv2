@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.warehouse.common.DepartmentId;
+import com.warehouse.returning.domain.vo.DepartmentId;
 import com.warehouse.returning.configuration.JwtContext;
 import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.domain.model.ChangeReturnStatusRequest;
