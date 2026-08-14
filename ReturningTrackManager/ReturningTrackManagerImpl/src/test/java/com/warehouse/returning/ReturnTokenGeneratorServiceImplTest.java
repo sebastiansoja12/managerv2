@@ -1,7 +1,7 @@
 package com.warehouse.returning;
 
 import com.warehouse.returning.domain.service.ReturnTokenGeneratorServiceImpl;
-import com.warehouse.common.DepartmentId;
+import com.warehouse.returning.domain.vo.DepartmentId;
 import com.warehouse.returning.domain.vo.ReturnToken;
 import com.warehouse.returning.domain.vo.ShipmentId;
 import com.warehouse.returning.domain.vo.UserId;
