@@ -16,7 +16,7 @@ public abstract class RequestMapper {
 
     public static SupplierCreateCommand map(final SupplierCreateApiRequest request) {
         return new SupplierCreateCommand(request.supplierCode(), request.firstName(),
-                request.lastName(), request.telephoneNumber());
+                request.lastName(), request.telephoneNumber(), request.departmentCode());
     }
 
     public static DriverLicenseCommand map(final DriverLicenseApiRequest request) {
