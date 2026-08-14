@@ -1,8 +1,8 @@
 package com.warehouse.geocoding.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.security.CredentialCipher;
 import com.warehouse.geocoding.domain.model.GeocodingConfiguration;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.entity.GeocodingConfigurationEntity;
-import com.warehouse.commonassets.security.CredentialCipher;
 
 public final class GeocodingConfigurationMapper {
 
@@ -16,9 +16,10 @@ public final class GeocodingConfigurationMapper {
                 configuration.getApiUrl(),
                 configuration.getApiUserName(),
                 credentialCipher.encrypt(configuration.getApiPassword()),
-                configuration.getApiKey(),
-                configuration.getAccessToken(),
-                configuration.getRefreshToken(),
+                credentialCipher.encrypt(configuration.getApiKey()),
+                configuration.getClientNumber(),
+                credentialCipher.encrypt(configuration.getAccessToken()),
+                credentialCipher.encrypt(configuration.getRefreshToken()),
                 configuration.isEnabled(),
                 configuration.getProvider());
         entity.assignOperator(configuration.operatorId());
@@ -32,9 +33,10 @@ public final class GeocodingConfigurationMapper {
                 entity.getApiUrl(),
                 entity.getApiUserName(),
                 credentialCipher.decrypt(entity.getApiPassword()),
-                entity.getApiKey(),
-                entity.getAccessToken(),
-                entity.getRefreshToken(),
+                credentialCipher.decrypt(entity.getApiKey()),
+                entity.getClientNumber(),
+                credentialCipher.decrypt(entity.getAccessToken()),
+                credentialCipher.decrypt(entity.getRefreshToken()),
                 entity.isEnabled(),
                 entity.getProvider());
         configuration.assignOperator(entity.operatorId());

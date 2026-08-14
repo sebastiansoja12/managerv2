@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public record GeocodingConfigurationApiRequest(String apiUserName,
                                                String apiPassword,
                                                String apiKey,
+                                               String clientNumber,
                                                String accessToken,
                                                String refreshToken,
                                                boolean enabled,

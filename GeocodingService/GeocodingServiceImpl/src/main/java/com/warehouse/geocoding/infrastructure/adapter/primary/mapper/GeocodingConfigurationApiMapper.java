@@ -6,6 +6,7 @@ import com.warehouse.geocoding.domain.vo.GeocodingConfigurationCreateCommand;
 import com.warehouse.geocoding.domain.vo.GeocodingConfigurationUpdateCommand;
 import com.warehouse.geocoding.infrastructure.adapter.primary.api.GeocodingConfigurationApiRequest;
 import com.warehouse.geocoding.infrastructure.adapter.primary.api.GeocodingConfigurationApiResponse;
+import com.warehouse.infrastructure.dto.GeocodingConfigurationCreateDto;
 import com.warehouse.infrastructure.dto.GeocodingConfigurationDto;
 
 public final class GeocodingConfigurationApiMapper {
@@ -19,10 +20,24 @@ public final class GeocodingConfigurationApiMapper {
                 request.apiUserName(),
                 request.apiPassword(),
                 request.apiKey(),
+                request.clientNumber(),
                 request.accessToken(),
                 request.refreshToken(),
                 request.enabled(),
                 request.provider());
+    }
+
+    public static GeocodingConfigurationCreateCommand toCreateCommand(
+            final GeocodingConfigurationCreateDto configuration) {
+        return new GeocodingConfigurationCreateCommand(
+                configuration.apiUserName(),
+                configuration.apiPassword(),
+                configuration.apiKey(),
+                configuration.clientNumber(),
+                configuration.accessToken(),
+                configuration.refreshToken(),
+                configuration.enabled(),
+                configuration.provider());
     }
 
     public static GeocodingConfigurationUpdateCommand toUpdateCommand(
@@ -33,6 +48,7 @@ public final class GeocodingConfigurationApiMapper {
                 request.apiUserName(),
                 request.apiPassword(),
                 request.apiKey(),
+                request.clientNumber(),
                 request.accessToken(),
                 request.refreshToken(),
                 request.enabled(),
@@ -47,6 +63,7 @@ public final class GeocodingConfigurationApiMapper {
                 configuration.getApiUserName(),
                 configuration.getApiPassword(),
                 configuration.getApiKey(),
+                configuration.getClientNumber(),
                 configuration.getAccessToken(),
                 configuration.getRefreshToken(),
                 configuration.isEnabled(),
@@ -60,6 +77,7 @@ public final class GeocodingConfigurationApiMapper {
                 configuration.getApiUserName(),
                 configuration.getApiPassword(),
                 configuration.getApiKey(),
+                configuration.getClientNumber(),
                 configuration.getAccessToken(),
                 configuration.getRefreshToken(),
                 configuration.isEnabled(),
