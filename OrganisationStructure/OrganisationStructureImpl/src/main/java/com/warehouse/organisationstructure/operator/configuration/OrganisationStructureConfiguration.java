@@ -1,20 +1,30 @@
 package com.warehouse.organisationstructure.operator.configuration;
 
-import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.OperatorUserEventPublisher;
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPort;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPortImpl;
+import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorConfigurationEventServicePort;
+import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorContextServicePort;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorDepartmentNotifyPort;
+import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorGeocodingConfigurationEventServicePort;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorRepository;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorUserNotifyPort;
 import com.warehouse.organisationstructure.operator.domain.service.OperatorService;
 import com.warehouse.organisationstructure.operator.domain.service.OperatorServiceImpl;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.primary.OperatorServiceAdapter;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorConfigurationKafkaServiceAdapter;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorContextServiceAdapter;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorDepartmentNotifyAdapter;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorGeocodingConfigurationEventServiceAdapter;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorReadRepository;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorRepositoryImpl;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorUserNotifyAdapter;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.service.OperatorConfigurationService;
 
 @Configuration
@@ -35,6 +45,23 @@ public class OrganisationStructureConfiguration {
     public OperatorDepartmentNotifyPort operatorDepartmentNotifyPort(
             final ApplicationEventPublisher applicationEventPublisher) {
         return new OperatorDepartmentNotifyAdapter(applicationEventPublisher);
+    }
+
+    @Bean
+    public OperatorGeocodingConfigurationEventServicePort operatorGeocodingConfigurationEventServicePort(
+            final ApplicationEventPublisher applicationEventPublisher) {
+        return new OperatorGeocodingConfigurationEventServiceAdapter(applicationEventPublisher);
+    }
+
+    @Bean
+    public OperatorConfigurationEventServicePort operatorConfigurationEventServicePort(
+            final ApplicationEventPublisher applicationEventPublisher) {
+        return new OperatorConfigurationKafkaServiceAdapter(applicationEventPublisher);
+    }
+
+    @Bean
+    public OperatorContextServicePort operatorContextServicePort(final OperatorContext operatorContext) {
+        return new OperatorContextServiceAdapter(operatorContext);
     }
 
     @Bean

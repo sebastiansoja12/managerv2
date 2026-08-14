@@ -1,22 +1,5 @@
 package com.warehouse.organisationstructure.operator.domain.port.primary;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
-
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.OperatorTestFixtures;
 import com.warehouse.organisationstructure.operator.domain.event.OperatorChangedEvent;
@@ -30,6 +13,22 @@ import com.warehouse.organisationstructure.operator.domain.service.OperatorServi
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.secondary.OperatorConfigurationRepository;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.service.OperatorConfigurationService;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.service.OperatorConfigurationServiceImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+
+import java.lang.reflect.Field;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OperatorPortImplTest {
@@ -125,6 +124,7 @@ class OperatorPortImplTest {
                         OperatorTestFixtures.CONTRACT_END,
                         OperatorTestFixtures.FOUNDED_DATE,
                         OperatorTestFixtures.configuration(),
+                        null,
                         null
                 ))
         );

@@ -2,10 +2,13 @@ package com.warehouse.organisationstructure.operator.infrastructure.adapter.prim
 
 import com.warehouse.commonassets.identificator.TaxId;
 import com.warehouse.organisationstructure.api.dto.CreateOperatorApiRequest;
+import com.warehouse.organisationstructure.api.dto.FirstDepartmentDto;
+import com.warehouse.organisationstructure.api.dto.OperatorGeocodingConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.UpdateOperatorApiRequest;
 import com.warehouse.organisationstructure.operator.domain.model.CreateOperatorCommand;
 import com.warehouse.organisationstructure.operator.domain.model.OperatorStatus;
 import com.warehouse.organisationstructure.operator.domain.model.UpdateOperatorCommand;
+import com.warehouse.organisationstructure.operator.domain.vo.OperatorGeocodingConfiguration;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper.OperatorMapper;
 
 public final class OperatorRequestMapper {
@@ -32,6 +35,7 @@ public final class OperatorRequestMapper {
                 request.contractEndDate(),
                 request.foundedDate(),
                 OperatorMapper.toModelConfiguration(request.configuration()),
+                toGeocodingConfiguration(request.geocodingConfiguration()),
                 toFirstDepartment(request.firstDepartment())
         );
     }
@@ -53,8 +57,25 @@ public final class OperatorRequestMapper {
         );
     }
 
+    private static OperatorGeocodingConfiguration toGeocodingConfiguration(
+            final OperatorGeocodingConfigurationDto configuration) {
+        if (configuration == null) {
+            return null;
+        }
+        return new OperatorGeocodingConfiguration(
+                configuration.apiUserName(),
+                configuration.apiPassword(),
+                configuration.apiKey(),
+                configuration.clientNumber(),
+                configuration.accessToken(),
+                configuration.refreshToken(),
+                configuration.enabled(),
+                configuration.provider()
+        );
+    }
+
     private static CreateOperatorCommand.FirstDepartment toFirstDepartment(
-            final CreateOperatorApiRequest.FirstDepartmentDto firstDepartment) {
+            final FirstDepartmentDto firstDepartment) {
         if (firstDepartment == null) {
             return null;
         }
