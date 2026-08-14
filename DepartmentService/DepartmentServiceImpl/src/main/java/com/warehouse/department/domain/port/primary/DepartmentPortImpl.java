@@ -1,11 +1,5 @@
 package com.warehouse.department.domain.port.primary;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -21,8 +15,12 @@ import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.service.DepartmentService;
 import com.warehouse.department.domain.validator.Validator;
 import com.warehouse.department.domain.vo.*;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class DepartmentPortImpl implements DepartmentPort {
@@ -65,6 +63,11 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
+    public List<Department> findAllArchived() {
+        return this.departmentRepository.findAllArchived();
+    }
+
+    @Override
     @Transactional
     public DepartmentCreateResponse createDepartments(final DepartmentCreateCommand command) {
 
@@ -75,7 +78,8 @@ public class DepartmentPortImpl implements DepartmentPort {
         final Map<Department, Boolean> createdDepartments = new HashMap<>();
         for (final DepartmentCreate departmentCreate : command.getDepartments()) {
             final DepartmentCode departmentCode = departmentCreate.getDepartmentCode();
-			final Department department = new Department(departmentCode, departmentCreate.getCity(),
+			final Department department = new Department(DepartmentId.generate(),
+                    departmentCode, departmentCreate.getCity(),
 					departmentCreate.getStreet(), departmentCreate.getPostalCode(),
 					new TaxId(departmentCreate.getTaxId()), departmentCreate.getTelephoneNumber(),
 					departmentCreate.getOpeningHours(), departmentCreate.getEmail(),

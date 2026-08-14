@@ -48,10 +48,26 @@ public class DepartmentReadRepositoryImpl implements DepartmentReadRepository<De
     }
 
     @Override
+    public List<DepartmentReadEntity> listArchived() {
+        return repository.createCriteria(DepartmentReadEntity.class)
+                .eq("status", DepartmentReadEntity.Status.ARCHIVED)
+                .list();
+    }
+
+    @Override
     public DepartmentReadEntity findByDepartmentCode(final DepartmentCode departmentCode) {
         return repository.createCriteria(DepartmentReadEntity.class)
                 .eq("departmentCode.value", departmentCode)
                 .notIn("status", EXCLUDED_STATUSES)
+                .one()
+                .orElse(null);
+    }
+
+    @Override
+    public DepartmentReadEntity findByDepartmentCodeIncludingArchived(final DepartmentCode departmentCode) {
+        return repository.createCriteria(DepartmentReadEntity.class)
+                .eq("departmentCode.value", departmentCode)
+                .notIn("status", List.of(DepartmentReadEntity.Status.DELETED))
                 .one()
                 .orElse(null);
     }

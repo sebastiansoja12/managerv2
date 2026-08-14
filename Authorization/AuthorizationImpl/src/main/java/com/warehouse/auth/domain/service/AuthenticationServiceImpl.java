@@ -11,6 +11,7 @@ import com.warehouse.auth.domain.vo.Token;
 import com.warehouse.auth.domain.vo.UsernamePasswordAuthentication;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,6 +92,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public OperatorId currentOperatorId() {
-        return (OperatorId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final UsernameTenantPasswordAuthenticationToken authentication =
+                (UsernameTenantPasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getOperatorId();
     }
 }

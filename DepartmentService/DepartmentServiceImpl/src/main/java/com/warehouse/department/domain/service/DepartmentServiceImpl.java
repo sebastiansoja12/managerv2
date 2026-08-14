@@ -1,9 +1,5 @@
 package com.warehouse.department.domain.service;
 
-import java.time.Instant;
-
-import org.springframework.stereotype.Service;
-
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -14,6 +10,9 @@ import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.registry.DomainRegistry;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.TaxId;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 
 @Service("department.departmentService")
 public class DepartmentServiceImpl implements DepartmentService {
@@ -88,11 +87,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public void changeStatus(final DepartmentCode departmentCode, final Department.Status status) {
-        final Department department = this.departmentRepository.findByDepartmentCode(departmentCode);
+        final Department department = this.departmentRepository.findByDepartmentCodeIncludingArchived(departmentCode);
         switch (status) {
             case ARCHIVED -> department.markAsArchived();
             case SUSPENDED -> department.markAsSuspended();
             case DELETED -> department.markAsDeleted();
+            case ACTIVE -> department.markAsActive();
             default -> throw new IllegalArgumentException("Unknown status: " + status);
         }
         this.departmentRepository.createOrUpdate(department);

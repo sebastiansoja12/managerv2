@@ -5,10 +5,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.domain.port.primary.DepartmentPortImpl;
+import com.warehouse.department.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.department.domain.port.secondary.DepartmentCoordinatesServicePort;
 import com.warehouse.department.domain.port.secondary.DepartmentReadRepository;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
@@ -53,8 +55,13 @@ public class DepartmentConfiguration {
     }
 
     @Bean(name = "department.authenticationService")
-    public AuthenticationService authenticationService() {
-        return new AuthenticationServiceImpl();
+    public AuthenticationService authenticationService(final CurrentUserServicePort currentUserServicePort) {
+        return new AuthenticationServiceImpl(currentUserServicePort);
+    }
+
+    @Bean(name = "department.currentUserServicePort")
+    public CurrentUserServicePort currentUserServicePort(final CurrentUserApiService currentUserApiService) {
+        return new CurrentUserServiceAdapter(currentUserApiService);
     }
 
     @Bean
