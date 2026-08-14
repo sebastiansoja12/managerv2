@@ -1,6 +1,5 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.outbox;
 
-import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +23,7 @@ public class ReturningOutboxStore {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void markPublished(final ReturningOutboxMessage message) {
-        repository.markPublished(message.eventId(), message.lockToken(), KafkaOutboxStatus.PUBLISHED, Instant.now());
+        repository.markPublished(message.eventId(), message.lockToken(), ReturningOutboxStatus.PUBLISHED, Instant.now());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -32,7 +31,7 @@ public class ReturningOutboxStore {
                            final Instant nextAttemptAt, final int maxAttempts) {
         final boolean exhausted = message.attemptCount() >= maxAttempts;
         repository.markFailed(message.eventId(), message.lockToken(),
-                exhausted ? KafkaOutboxStatus.DEAD : KafkaOutboxStatus.PENDING,
+                exhausted ? ReturningOutboxStatus.DEAD : ReturningOutboxStatus.PENDING,
                 exception.toString(), exhausted ? null : nextAttemptAt);
     }
 }
