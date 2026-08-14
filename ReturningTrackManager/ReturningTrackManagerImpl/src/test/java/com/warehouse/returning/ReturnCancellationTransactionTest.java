@@ -52,7 +52,11 @@ class ReturnCancellationTransactionTest {
         assertEquals(1L, outbox.count());
         final String payload = jdbc.queryForObject("SELECT payload_json FROM returning_event_outbox", String.class);
         assertTrue(payload.contains("\"eventType\":\"return.cancelled\""));
+        assertTrue(payload.contains("\"shipmentId\":{\"value\":456}"));
         assertTrue(payload.contains("\"returnPackageId\":{\"value\":123}"));
+        assertTrue(payload.contains("\"departmentId\":{\"value\":3}"));
+        assertTrue(payload.contains("\"operatorId\":{\"value\":7}"));
+        assertTrue(payload.contains("\"userId\":{\"value\":12}"));
         final String headers = jdbc.queryForObject("SELECT headers_json FROM returning_event_outbox", String.class);
         assertTrue(headers.contains("com.warehouse.returning.api.event.ReturnCancelledIntegrationEvent"));
     }
