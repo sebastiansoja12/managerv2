@@ -1,8 +1,10 @@
 package com.warehouse.shipment.application.listener;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
-import com.warehouse.shipment.application.event.*;
-import com.warehouse.shipment.application.event.snapshot.ShipmentEventData;
+import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
+import com.warehouse.shipment.application.port.secondary.ShipmentEventDataMapperPort;
+import com.warehouse.shipment.application.port.secondary.ShipmentIntegrationEventServicePort;
 import com.warehouse.shipment.domain.event.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
@@ -14,38 +16,42 @@ import org.springframework.stereotype.Component;
         havingValue = "true")
 public class ShipmentIntegrationEventListener {
 
-    private final IntegrationEventPublisher integrationEventPublisher;
+    private final ShipmentIntegrationEventServicePort shipmentIntegrationEventServicePort;
+    private final ShipmentEventDataMapperPort shipmentEventDataMapper;
 
-    public ShipmentIntegrationEventListener(final IntegrationEventPublisher integrationEventPublisher) {
-        this.integrationEventPublisher = integrationEventPublisher;
+    public ShipmentIntegrationEventListener(final ShipmentIntegrationEventServicePort shipmentIntegrationEventServicePort,
+                                            final ShipmentEventDataMapperPort shipmentEventDataMapper) {
+        this.shipmentIntegrationEventServicePort = shipmentIntegrationEventServicePort;
+        this.shipmentEventDataMapper = shipmentEventDataMapper;
     }
 
     @EventListener
     public void handle(final ShipmentCreated event) {
-        this.integrationEventPublisher.publish(
-                new ShipmentCreatedIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
+        shipmentIntegrationEventServicePort.publishEvent(
+                new ShipmentCreatedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
     }
 
     @EventListener
     public void handle(final ShipmentDestinationChanged event) {
-        this.integrationEventPublisher.publish(
-                new ShipmentDestinationChangedIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
+        shipmentIntegrationEventServicePort.publishEvent(
+                new ShipmentDestinationChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
     }
 
     @EventListener
     public void handle(final ShipmentStatusChanged event) {
-        this.integrationEventPublisher.publish(
-                new ShipmentStatusChangedIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
+        shipmentIntegrationEventServicePort.publishEvent(
+                new ShipmentStatusChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
     }
 
     @EventListener
     public void handle(final ShipmentReturned event) {
-        this.integrationEventPublisher.publish(
-                new ShipmentStatusChangedIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
+        shipmentIntegrationEventServicePort.publishEvent(
+                new ShipmentStatusChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
     }
 
     @EventListener
     public void handle(final ShipmentReturnedCompleted event) {
 
     }
+
 }
