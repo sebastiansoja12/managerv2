@@ -1,6 +1,10 @@
 package com.warehouse.returning.infrastructure.adapter.primary.kafka;
 
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.returning.api.event.ReturnPackageStatusChangedIntegrationEvent;
 import com.warehouse.returning.api.event.ReturnProcessingStartedIntegrationEvent;
 import com.warehouse.returning.api.event.ReturnCancelledIntegrationEvent;
@@ -27,15 +31,17 @@ public class ReturnIntegrationListener {
             groupId = "shipment-management")
     public void handle(final ReturnProcessingStartedIntegrationEvent event) {
         returnProcessingPort.applyProcessingStarted(new ApplyReturnProcessingStartedCommand(
-                event.eventId(), event.shipmentId(), event.returnPackageId(), event.departmentId(),
-                event.operatorId(), event.userId()));
+                event.eventId(), new ShipmentId(event.shipmentId().value()), event.returnPackageId(),
+                new DepartmentId(event.departmentId().value()), new OperatorId(event.operatorId().value()),
+                event.userId() == null ? null : new UserId(event.userId().value())));
     }
 
     @KafkaEventListener(topics = "${manager.kafka.topics.return-cancelled:return.cancelled}",
             groupId = "shipment-management")
     public void handle(final ReturnCancelledIntegrationEvent event) {
         returnProcessingPort.applyCancelled(new ApplyReturnCancelledCommand(
-                event.eventId(), event.shipmentId(), event.returnPackageId(), event.departmentId(),
-                event.operatorId(), event.userId()));
+                event.eventId(), new ShipmentId(event.shipmentId().value()), event.returnPackageId(),
+                new DepartmentId(event.departmentId().value()), new OperatorId(event.operatorId().value()),
+                event.userId() == null ? null : new UserId(event.userId().value())));
     }
 }
