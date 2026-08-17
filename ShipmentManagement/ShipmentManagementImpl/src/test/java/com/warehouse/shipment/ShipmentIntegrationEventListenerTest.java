@@ -2,11 +2,13 @@ package com.warehouse.shipment;
 
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentChangedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentCreatedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentDestinationChangedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentStatusChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.shipment.application.listener.ShipmentIntegrationEventListener;
+import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentIntegrationEventServiceAdapter;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
 import com.warehouse.shipment.domain.event.ShipmentCreated;
 import com.warehouse.shipment.domain.event.ShipmentDestinationChanged;
 import com.warehouse.shipment.domain.event.ShipmentSent;
@@ -33,7 +35,9 @@ class ShipmentIntegrationEventListenerTest {
 
     @BeforeEach
     void setUp() {
-        this.listener = new ShipmentIntegrationEventListener(this.integrationEventPublisher);
+        this.listener = new ShipmentIntegrationEventListener(
+                new ShipmentIntegrationEventServiceAdapter(this.integrationEventPublisher),
+                new ShipmentEventDataMapper());
     }
 
     @Test
