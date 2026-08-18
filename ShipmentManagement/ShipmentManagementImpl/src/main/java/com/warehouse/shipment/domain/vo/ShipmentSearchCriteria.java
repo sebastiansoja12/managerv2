@@ -28,11 +28,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
     private final Boolean locked;
     private final LocalDateTime createdFrom;
     private final LocalDateTime createdTo;
-    private final Boolean hasDangerousGoods;
-    private final String unNumber;
-    private final String hazardClass;
-    private final String regulationType;
-    private final String transportMode;
     private final Integer page;
     private final Integer size;
 
@@ -50,11 +45,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
             final Boolean locked,
             final LocalDateTime createdFrom,
             final LocalDateTime createdTo,
-            final Boolean hasDangerousGoods,
-            final String unNumber,
-            final String hazardClass,
-            final String regulationType,
-            final String transportMode,
             final Integer page,
             final Integer size
     ) {
@@ -71,11 +61,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
         this.locked = locked;
         this.createdFrom = createdFrom;
         this.createdTo = createdTo;
-        this.hasDangerousGoods = hasDangerousGoods;
-        this.unNumber = unNumber;
-        this.hazardClass = hazardClass;
-        this.regulationType = regulationType;
-        this.transportMode = transportMode;
         this.page = page;
         this.size = size;
     }
@@ -141,26 +126,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
 
     public LocalDateTime createdTo() {
         return createdTo;
-    }
-
-    public Boolean hasDangerousGoods() {
-        return hasDangerousGoods;
-    }
-
-    public String unNumber() {
-        return unNumber;
-    }
-
-    public String hazardClass() {
-        return hazardClass;
-    }
-
-    public String regulationType() {
-        return regulationType;
-    }
-
-    public String transportMode() {
-        return transportMode;
     }
 
     public Integer page() {
