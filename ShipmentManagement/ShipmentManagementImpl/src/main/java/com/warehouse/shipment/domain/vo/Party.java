@@ -1,7 +1,5 @@
 package com.warehouse.shipment.domain.vo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import lombok.Builder;
 
@@ -17,15 +15,14 @@ public class Party {
     private final String street;
     private final CountryCode countryCode;
 
-    @JsonCreator
-    public Party(@JsonProperty("firstName") final String firstName,
-                 @JsonProperty("lastName") final String lastName,
-                 @JsonProperty("email") final String email,
-                 @JsonProperty("telephoneNumber") final String telephoneNumber,
-                 @JsonProperty("city") final String city,
-                 @JsonProperty("postalCode") final String postalCode,
-                 @JsonProperty("street") final String street,
-                 @JsonProperty("countryCode") final CountryCode countryCode) {
+    public Party(final String firstName,
+                 final String lastName,
+                 final String email,
+                 final String telephoneNumber,
+                 final String city,
+                 final String postalCode,
+                 final String street,
+                 final CountryCode countryCode) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
