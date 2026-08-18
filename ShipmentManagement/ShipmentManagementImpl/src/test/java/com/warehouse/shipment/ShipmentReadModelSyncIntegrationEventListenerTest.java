@@ -2,7 +2,7 @@ package com.warehouse.shipment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
-import com.warehouse.shipment.application.event.ShipmentReadModelChanged;
+import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
 import com.warehouse.shipment.application.listener.ShipmentReadModelSyncIntegrationEventListener;
 import com.warehouse.shipment.domain.event.ShipmentChanged;
 import com.warehouse.shipment.domain.model.Shipment;
