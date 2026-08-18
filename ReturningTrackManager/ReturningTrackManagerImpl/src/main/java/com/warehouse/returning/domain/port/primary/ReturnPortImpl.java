@@ -46,7 +46,7 @@ public class ReturnPortImpl implements ReturnPort {
 			final ReturnPackage returnPackage = new ReturnPackage(returnPackageId, returnPackageRequest.getShipmentId(),
 					returnPackageRequest.getReason(), returnToken, returnPackageRequest.getDepartmentCode(),
 					request.getIssuerDepartmentCode(), returnPackageRequest.getUserId(), request.getIssuerUserId(),
-					returnPackageRequest.getReasonCode());
+					returnPackageRequest.getReasonCode(), request.getOperatorId());
             this.returnService.saveOrUpdate(returnPackage);
 
             processReturns.add(ProcessReturn.from(returnPackage));
@@ -68,6 +68,12 @@ public class ReturnPortImpl implements ReturnPort {
     @Override
     public ReturnPackage getReturn(final ReturnPackageId returnId) {
         return this.returnService.getReturn(returnId);
+    }
+
+    @Override
+    public ReturnPage getReturns(
+            final DepartmentCode departmentCode, final Long operatorId, final int page, final int size) {
+        return this.returnService.getReturns(departmentCode, operatorId, page, size);
     }
 
     @Override

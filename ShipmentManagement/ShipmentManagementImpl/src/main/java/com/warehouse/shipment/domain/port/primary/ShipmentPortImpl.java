@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
@@ -232,10 +233,21 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ShipmentId shipmentId = command.getShipmentId();
         switch (returnStatus) {
             case CREATED -> this.shipmentService.notifyShipmentReturned(shipmentId, command.getReason(),
-                    command.getReasonCode());
+                    command.getReasonCode(), command.getDepartmentCode());
             case COMPLETED -> this.shipmentService.lockShipment(shipmentId);
             case CANCELLED -> this.shipmentService.notifyReturnCanceled(shipmentId);
         }
+    }
+
+    @Override
+    public ShipmentReturnDetails loadShipmentReturn(final ReturnId returnId) {
+        return this.returningServicePort.getReturn(returnId);
+    }
+
+    @Override
+    public ShipmentReturnPage loadShipmentReturns(
+            final DepartmentCode departmentCode, final int page, final int size) {
+        return this.returningServicePort.getReturns(departmentCode, page, size);
     }
 
     @Override

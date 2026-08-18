@@ -30,7 +30,7 @@ public abstract class RequestMapper {
                 .stream()
                 .map(ReturnPackageRequest::from)
                 .toList();
-        return new ReturnRequest(departmentCode, userId, returnPackageRequests);
+        return new ReturnRequest(departmentCode, userId, decodedApiOperator.operatorId(), returnPackageRequests);
     }
 
     public static ChangeReturnStatusRequest map(final ChangeReturnStatusApiRequest request) {

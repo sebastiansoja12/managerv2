@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.returning.configuration.JwtContext;
 import com.warehouse.returning.domain.helper.Result;
 import com.warehouse.returning.domain.model.ChangeReturnStatusRequest;
 import com.warehouse.returning.domain.model.ReturnPackage;
@@ -16,6 +17,7 @@ import com.warehouse.returning.domain.service.ApiKeyService;
 import com.warehouse.returning.domain.vo.*;
 import com.warehouse.returning.infrastructure.adapter.primary.api.*;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ResponseStatus;
+import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnPageApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnRequestApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnResponseApi;
 import com.warehouse.returning.infrastructure.adapter.primary.mapper.RequestMapper;
@@ -25,6 +27,9 @@ import com.warehouse.returning.infrastructure.adapter.secondary.exception.Busine
 
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -128,6 +133,24 @@ public class ReturnController {
         return new ResponseEntity<>(ResponseMapper.toResponseApi(returnModel), HttpStatus.OK);
     }
 
+    @GetMapping
+    public ResponseEntity<ReturnPageApi> getAll(
+            @RequestParam @NotBlank(message = "Department code is required") final String departmentCode,
+            @RequestParam(defaultValue = "0")
+            @Min(value = 0, message = "Page must be non-negative") final int page,
+            @RequestParam(defaultValue = "50")
+            @Min(value = 1, message = "Size must be between 1 and 100")
+            @Max(value = 100, message = "Size must be between 1 and 100") final int size) {
+        final DecodedApiOperator decodedApiOperator = this.apiKeyService.decodeJwt(JwtContext.getToken());
+        if (decodedApiOperator.operatorId() == null) {
+            throw new IllegalArgumentException("Operator ID is required");
+        }
+        final ReturnPage returnPage = this.returnPort.getReturns(
+                new DepartmentCode(departmentCode.trim().toUpperCase()),
+                decodedApiOperator.operatorId(), page, size);
+        return ResponseEntity.ok(ResponseMapper.toResponseApi(returnPage));
+    }
+
     @PostMapping("/token/validate")
     public ResponseEntity<ReturnTokenValidationResponseApi> validateReturnToken(
             @RequestBody final ReturnTokenValidationRequestApi request) {
@@ -150,6 +173,11 @@ public class ReturnController {
         return ResponseEntity
                 .status(ex.getCode())
                 .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(final IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     private RequestValidator getValidator(final String validatorName) {

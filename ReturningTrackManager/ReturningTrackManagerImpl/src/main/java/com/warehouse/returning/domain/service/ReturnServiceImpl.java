@@ -10,6 +10,8 @@ import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.registry.DomainRegistry;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
+import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ShipmentId;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.ReturnPackageNotFoundException;
 
@@ -24,6 +26,12 @@ public class ReturnServiceImpl implements ReturnService {
     @Override
     public ReturnPackage getReturn(final ReturnPackageId returnId) {
         return this.returnRepository.findById(returnId);
+    }
+
+    @Override
+    public ReturnPage getReturns(
+            final DepartmentCode departmentCode, final Long operatorId, final int page, final int size) {
+        return this.returnRepository.findByDepartmentCodeAndOperatorId(departmentCode, operatorId, page, size);
     }
 
     @Override
