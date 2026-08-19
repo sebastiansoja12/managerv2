@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SignatureId;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import jakarta.persistence.*;
 import org.hibernate.envers.Audited;
@@ -11,6 +12,10 @@ import java.time.Instant;
 @Table(name = "signature")
 @Audited
 public class SignatureEntity {
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "signature_id", nullable = false, unique = true))
+    private SignatureId signatureId;
 
     @Column(name = "signer_name", nullable = false)
     private String signerName;
@@ -36,12 +41,14 @@ public class SignatureEntity {
     public SignatureEntity() {
     }
 
-    public SignatureEntity(final String signerName,
+    public SignatureEntity(final SignatureId signatureId,
+                           final String signerName,
                            final Instant signedAt,
                            final SignatureMethod signatureMethod,
                            final String documentReference,
                            final ShipmentId shipmentId,
                            final byte[] signature) {
+        this.signatureId = signatureId;
         this.signerName = signerName;
         this.signedAt = signedAt;
         this.signatureMethod = signatureMethod;
@@ -56,6 +63,10 @@ public class SignatureEntity {
 
     public ShipmentId getShipmentId() {
         return shipmentId;
+    }
+
+    public SignatureId getSignatureId() {
+        return signatureId;
     }
 
     public SignatureMethod getSignatureMethod() {
