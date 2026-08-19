@@ -11,10 +11,10 @@ import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ShipmentSnapshot(ShipmentId shipmentId,
@@ -29,10 +29,8 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                LocalDateTime createdAt,
                                LocalDateTime updatedAt,
                                Boolean locked,
-                               DangerousGood dangerousGood,
                                Boolean signatureRequired,
                                ShipmentPriority shipmentPriority,
-                               Signature signature,
                                TrackingNumber trackingNumber,
                                PickupMethod pickupMethod,
                                DeliveryMethod deliveryMethod,
@@ -46,5 +44,7 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                Weight weight,
                                CustomerReference customerReference,
                                String contentDescription,
-                               Money declaredValue) {
+                               Money declaredValue,
+                               ShipmentServiceLevel serviceLevel,
+                               PackagingType packagingType) {
 }
