@@ -7,7 +7,6 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
@@ -89,7 +88,6 @@ public class DataTestCreator {
                 locked,
                 new DepartmentId(10L),
                 new DepartmentId(9L),
-                null,
                 ShipmentPriority.MEDIUM,
                 trackingNumber(),
                 ShipmentStatus.CREATED
@@ -100,53 +98,15 @@ public class DataTestCreator {
         return new Shipment(
                 shipmentId(), sender(), recipient(), null,
                 money(), false,
-                new DepartmentId(10L), new DepartmentId(9L), null,
+                new DepartmentId(10L), new DepartmentId(9L),
                 ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
-                null, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,
+                PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,
                 new Dimensions(new BigDecimal("40"), new BigDecimal("30"), new BigDecimal("20"), LengthUnit.CM),
                 new Weight(new BigDecimal("5.5"), WeightUnit.KG),
                 new CustomerReference("ORDER-2026-12345"), "Electronics",
-                new Money(new BigDecimal("2500.00"), Currency.PLN)
+                new Money(new BigDecimal("2500.00"), Currency.PLN),
+                null, null
         );
     }
 
-    static DangerousGood dangerousGood() {
-        return dangerousGood("Rechargeable battery");
-    }
-
-    static DangerousGood dangerousGood(final String description) {
-        return new DangerousGood(
-                "UN3480",
-                "Lithium ion batteries",
-                description,
-                "9",
-                null,
-                null,
-                "II",
-                BigDecimal.ONE,
-                "KILOGRAM",
-                1,
-                "BOX",
-                false,
-                false,
-                false,
-                false,
-                "2",
-                null,
-                null,
-                "112",
-                null,
-                "sds",
-                null,
-                "ADR",
-                "ROAD",
-                true,
-                false,
-                false,
-                "flammable",
-                "KEEP_DRY",
-                "Handle with care",
-                CountryCode.PL
-        );
-    }
 }
