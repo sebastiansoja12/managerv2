@@ -8,6 +8,7 @@ public record GeocodingConfigurationSnapshot(GeocodingConfigurationId geocodingC
                                              String apiUserName,
                                              String apiPassword,
                                              String apiKey,
+                                             String clientNumber,
                                              String accessToken,
                                              String refreshToken,
                                              boolean enabled,

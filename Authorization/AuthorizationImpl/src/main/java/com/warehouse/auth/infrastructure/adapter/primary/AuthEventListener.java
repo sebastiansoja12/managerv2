@@ -76,6 +76,7 @@ public class AuthEventListener {
         user.assignOperator(operatorId);
         user.markAsInitial();
 
+        event.getBeforeUserCreated().accept(userId);
         userService.create(user);
         event.getUserCreatedId().accept(userId);
         log.info("Operator admin user created: {} for operator {}", userId.getValue(), operatorId.getValue());

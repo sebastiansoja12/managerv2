@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.listener;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
@@ -52,8 +53,9 @@ public class ShipmentEventListener {
         final ShipmentId shipmentId = snapshot.shipmentId();
         final ReasonCode reasonCode = event.getReasonCode();
         final String reason = event.getReason();
+        final DepartmentCode departmentCode = event.getDepartmentCode();
         this.returningServicePort.shipmentReturnCommand(
-                new ShipmentReturnedCommand(shipmentId, reasonCode, reason)
+                new ShipmentReturnedCommand(shipmentId, reasonCode, reason, departmentCode)
         );
     }
 

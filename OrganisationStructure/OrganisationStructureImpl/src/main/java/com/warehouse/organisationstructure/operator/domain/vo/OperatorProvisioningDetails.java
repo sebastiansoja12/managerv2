@@ -6,6 +6,7 @@ public record OperatorProvisioningDetails(String userFirstName,
                                           String password,
                                           String language,
                                           String email,
+                                          OperatorGeocodingConfiguration geocodingConfiguration,
                                           FirstDepartment firstDepartment) {
 
     public record FirstDepartment(String departmentCode,

@@ -28,16 +28,23 @@ class OperatorNotifyMapperTest {
     @Test
     void shouldMapOperatorSnapshotToUserEventAndCallback() {
         final UserId userId = new UserId(4444L);
+        final CapturedUserId reservedUserId = new CapturedUserId();
         final CapturedUserId capturedUserId = new CapturedUserId();
 
         final com.warehouse.auth.event.OperatorCreatedEvent event =
-                OperatorUserNotifyMapper.toEvent(OperatorTestFixtures.operator().snapshot(), capturedUserId::capture);
+                OperatorUserNotifyMapper.toEvent(
+                        OperatorTestFixtures.operator().snapshot(),
+                        reservedUserId::capture,
+                        capturedUserId::capture
+                );
+        event.getBeforeUserCreated().accept(userId);
         event.getUserCreatedId().accept(userId);
 
         assertEquals("Jan", event.getRegisteringUser().firstName());
         assertEquals("j.kowalski", event.getRegisteringUser().username());
         assertEquals("WRO-1", event.getRegisteringUser().departmentCode().value());
         assertEquals(OperatorTestFixtures.OPERATOR_ID.value(), event.getRegisteringUser().operatorId().value());
+        assertEquals(userId, reservedUserId.value);
         assertEquals(userId, capturedUserId.value);
     }
 

@@ -372,13 +372,16 @@ class ShipmentServiceImplTest {
     @Test
     void shouldNotifyShipmentReturnCreatedAndPublishEvent() {
         final Shipment shipment = shipment();
+        final DepartmentCode departmentCode = new DepartmentCode("KT1");
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
-        shipmentService.notifyShipmentReturned(shipmentId(), "Damaged package", ReasonCode.DAMAGED);
+        shipmentService.notifyShipmentReturned(shipmentId(), "Damaged package", ReasonCode.DAMAGED,
+                departmentCode);
 
         assertEquals(ShipmentStatus.RETURN, shipment.getShipmentStatus());
         verify(shipmentRepository).createOrUpdate(shipment);
-        assertEventPublished(ShipmentReturnCreated.class);
+        verify(eventPublisher).publishEvent(argThat((Object event) -> event instanceof ShipmentReturnCreated created
+                && departmentCode.equals(created.getDepartmentCode())));
     }
 
     @Test

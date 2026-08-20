@@ -18,6 +18,7 @@ public class ReturnPackage {
     private UserId assignedTo;
     private UserId processedBy;
     private ReasonCode reasonCode;
+    private Long operatorId;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -30,6 +31,20 @@ public class ReturnPackage {
                          final UserId assignedTo,
                          final UserId processedBy,
                          final ReasonCode reasonCode) {
+        this(returnPackageId, shipmentId, reason, returnToken, assignedDepartmentCode,
+                returnedDepartmentCode, assignedTo, processedBy, reasonCode, null);
+    }
+
+    public ReturnPackage(final ReturnPackageId returnPackageId,
+                         final ShipmentId shipmentId,
+                         final String reason,
+                         final ReturnToken returnToken,
+                         final DepartmentCode assignedDepartmentCode,
+                         final DepartmentCode returnedDepartmentCode,
+                         final UserId assignedTo,
+                         final UserId processedBy,
+                         final ReasonCode reasonCode,
+                         final Long operatorId) {
         this.returnPackageId = returnPackageId;
         this.shipmentId = shipmentId;
         this.reason = reason;
@@ -40,6 +55,7 @@ public class ReturnPackage {
         this.assignedTo = assignedTo;
         this.processedBy = processedBy;
         this.reasonCode = reasonCode;
+        this.operatorId = operatorId;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
@@ -54,6 +70,7 @@ public class ReturnPackage {
                          final UserId assignedTo,
                          final UserId processedBy,
                          final ReasonCode reasonCode,
+                         final Long operatorId,
                          final Instant createdAt,
                          final Instant updatedAt) {
         this.returnPackageId = returnPackageId;
@@ -66,6 +83,7 @@ public class ReturnPackage {
         this.assignedTo = assignedTo;
         this.processedBy = processedBy;
         this.reasonCode = reasonCode;
+        this.operatorId = operatorId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -92,6 +110,10 @@ public class ReturnPackage {
 
     public ReasonCode getReasonCode() {
         return reasonCode;
+    }
+
+    public Long getOperatorId() {
+        return operatorId;
     }
 
     public DepartmentCode getReturnedDepartmentCode() {
@@ -156,6 +178,7 @@ public class ReturnPackage {
                 assignedTo,
                 processedBy,
                 reasonCode,
+                operatorId,
                 createdAt,
                 updatedAt
         );
@@ -176,6 +199,7 @@ public class ReturnPackage {
         this.assignedTo = builder.assignedTo;
         this.processedBy = builder.processedBy;
         this.reasonCode = builder.reasonCode;
+        this.operatorId = builder.operatorId;
         this.createdAt = builder.createdAt;
         this.updatedAt = builder.updatedAt;
     }
@@ -200,6 +224,7 @@ public class ReturnPackage {
         private UserId assignedTo;
         private UserId processedBy;
         private ReasonCode reasonCode;
+        private Long operatorId;
         private Instant createdAt;
         private Instant updatedAt;
 
@@ -250,6 +275,11 @@ public class ReturnPackage {
 
         public ReturnPackageBuilder reasonCode(ReasonCode reasonCode) {
             this.reasonCode = reasonCode;
+            return this;
+        }
+
+        public ReturnPackageBuilder operatorId(final Long operatorId) {
+            this.operatorId = operatorId;
             return this;
         }
 

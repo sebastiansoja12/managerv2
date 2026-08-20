@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.organisationstructure.OperatorTestFixtures;
@@ -29,7 +32,10 @@ import com.warehouse.organisationstructure.operator.domain.model.Operator;
 import com.warehouse.organisationstructure.operator.domain.model.UpdateOperatorCommand;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPort;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPortImpl;
+import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorConfigurationEventServicePort;
+import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorContextServicePort;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorDepartmentNotifyPort;
+import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorGeocodingConfigurationEventServicePort;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorRepository;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorUserNotifyPort;
 import com.warehouse.organisationstructure.operator.domain.registry.DomainContext;
@@ -37,6 +43,7 @@ import com.warehouse.organisationstructure.operator.domain.service.OperatorServi
 import com.warehouse.organisationstructure.operator.domain.service.OperatorServiceImpl;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorReadRepository;
+import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorContextServiceAdapter;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.OperatorRepositoryImpl;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.entity.OperatorEntity;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.secondary.OperatorConfigurationRepository;
@@ -70,6 +77,9 @@ class OperatorPortIntegrationTest {
     private TestDepartmentNotifyPort departmentNotifyPort;
 
     @Autowired
+    private TestOperatorConfigurationEventServicePort configurationEventServicePort;
+
+    @Autowired
     private TestUserNotifyPort userNotifyPort;
 
     @Autowired
@@ -84,6 +94,7 @@ class OperatorPortIntegrationTest {
     void tearDown() {
         setEventPublisher(null);
         departmentNotifyPort.snapshots.clear();
+        configurationEventServicePort.snapshots.clear();
         userNotifyPort.snapshots.clear();
     }
 
@@ -96,8 +107,9 @@ class OperatorPortIntegrationTest {
         assertEquals(new UserId(7001L), saved.getRegisteringUserId());
         assertEquals("Example Logistics", saved.getCompanyName());
         assertEquals(1, departmentNotifyPort.snapshots.size());
+        assertEquals(1, configurationEventServicePort.snapshots.size());
         assertEquals(1, userNotifyPort.snapshots.size());
-        assertEquals(operatorId, departmentNotifyPort.snapshots.getFirst().operatorId());
+        assertEquals(operatorId, configurationEventServicePort.snapshots.getFirst().operatorId());
     }
 
     @Test
@@ -177,16 +189,41 @@ class OperatorPortIntegrationTest {
         }
 
         @Bean
+        TestOperatorConfigurationEventServicePort testOperatorConfigurationEventServicePort() {
+            return new TestOperatorConfigurationEventServicePort();
+        }
+
+        @Bean
+        TestGeocodingConfigurationEventServicePort testGeocodingConfigurationEventServicePort() {
+            return new TestGeocodingConfigurationEventServicePort();
+        }
+
+        @Bean
         TestUserNotifyPort testUserNotifyPort() {
             return new TestUserNotifyPort();
         }
 
         @Bean
+        OperatorContextServicePort operatorContextServicePort() {
+            return new OperatorContextServiceAdapter(new OperatorContext());
+        }
+
+        @Bean
         OperatorDomainEventListener operatorDomainEventListener(
                 final TestDepartmentNotifyPort departmentNotifyPort,
+                final TestGeocodingConfigurationEventServicePort geocodingConfigurationEventServicePort,
+                final TestOperatorConfigurationEventServicePort configurationEventServicePort,
                 final TestUserNotifyPort userNotifyPort,
-                final OperatorService operatorService) {
-            return new OperatorDomainEventListener(departmentNotifyPort, userNotifyPort, operatorService);
+                final OperatorService operatorService,
+                final OperatorContextServicePort operatorContextServicePort) {
+            return new OperatorDomainEventListener(
+                    departmentNotifyPort,
+                    geocodingConfigurationEventServicePort,
+                    configurationEventServicePort,
+                    userNotifyPort,
+                    operatorService,
+                    operatorContextServicePort
+            );
         }
     }
 
@@ -199,13 +236,35 @@ class OperatorPortIntegrationTest {
         }
     }
 
+    static class TestGeocodingConfigurationEventServicePort
+            implements OperatorGeocodingConfigurationEventServicePort {
+        private final List<OperatorSnapshot> snapshots = new ArrayList<>();
+
+        @Override
+        public void publishOperatorCreated(final OperatorSnapshot snapshot, final Instant timestamp) {
+            snapshots.add(snapshot);
+        }
+    }
+
+    static class TestOperatorConfigurationEventServicePort implements OperatorConfigurationEventServicePort {
+        private final List<OperatorSnapshot> snapshots = new ArrayList<>();
+
+        @Override
+        public void publishOperatorCreated(final OperatorSnapshot snapshot, final Instant timestamp) {
+            snapshots.add(snapshot);
+        }
+    }
+
     static class TestUserNotifyPort implements OperatorUserNotifyPort {
         private final List<OperatorSnapshot> snapshots = new ArrayList<>();
 
         @Override
-        public UserId notifyOperatorCreated(final OperatorSnapshot snapshot) {
+        public UserId notifyOperatorCreated(final OperatorSnapshot snapshot,
+                                            final Consumer<UserId> beforeUserCreated) {
             snapshots.add(snapshot);
-            return new UserId(7001L);
+            final UserId userId = new UserId(7001L);
+            beforeUserCreated.accept(userId);
+            return userId;
         }
     }
 }

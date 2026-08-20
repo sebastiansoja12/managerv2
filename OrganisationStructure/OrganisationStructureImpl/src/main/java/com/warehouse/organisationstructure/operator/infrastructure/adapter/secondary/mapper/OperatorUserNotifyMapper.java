@@ -17,10 +17,19 @@ public final class OperatorUserNotifyMapper {
 
     public static OperatorCreatedEvent toEvent(final OperatorSnapshot snapshot) {
         return toEvent(snapshot, userId -> {
+        }, userId -> {
         });
     }
 
-    public static OperatorCreatedEvent toEvent(final OperatorSnapshot snapshot, final Consumer<UserId> userCreatedId) {
+    public static OperatorCreatedEvent toEvent(final OperatorSnapshot snapshot,
+                                               final Consumer<UserId> userCreatedId) {
+        return toEvent(snapshot, userId -> {
+        }, userCreatedId);
+    }
+
+    public static OperatorCreatedEvent toEvent(final OperatorSnapshot snapshot,
+                                               final Consumer<UserId> beforeUserCreated,
+                                               final Consumer<UserId> userCreatedId) {
         final OperatorProvisioningDetails provisioningDetails = snapshot.provisioningDetails();
         return new OperatorCreatedEvent(new RegisteringUserDto(
                 provisioningDetails.userFirstName(),
@@ -31,6 +40,6 @@ public final class OperatorUserNotifyMapper {
                 provisioningDetails.email(),
                 new DepartmentCodeDto(provisioningDetails.firstDepartment().departmentCode()),
                 new OperatorIdDto(snapshot.operatorId().getValue())
-        ), userCreatedId);
+        ), beforeUserCreated, userCreatedId);
     }
 }

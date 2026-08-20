@@ -1,13 +1,18 @@
 package com.warehouse.department.domain.service;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.department.domain.port.secondary.CurrentUserServicePort;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 
+    private final CurrentUserServicePort currentUserServicePort;
+
+    public AuthenticationServiceImpl(final CurrentUserServicePort currentUserServicePort) {
+        this.currentUserServicePort = currentUserServicePort;
+    }
+
     @Override
     public UserId currentUser() {
-        return (UserId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return currentUserServicePort.getCurrentUserId();
     }
 }

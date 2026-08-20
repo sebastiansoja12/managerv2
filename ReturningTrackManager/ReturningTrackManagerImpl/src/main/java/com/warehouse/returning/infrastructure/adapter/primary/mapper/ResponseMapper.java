@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.vo.ReturnResponse;
+import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.infrastructure.adapter.primary.api.ReturnPackageIdApi;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.*;
 
@@ -34,7 +35,17 @@ public abstract class ResponseMapper {
 		final Instant createdAt = returnPackage.getCreatedAt();
 		final Instant updatedAt = returnPackage.getUpdatedAt();
 		return new ReturnPackageApi(returnPackageId, shipmentId, reason, returnStatus, returnToken,
-				assignedDepartmentCode, returnedDepartmentCode, assignedTo, processedBy, reasonCode, createdAt,
+				assignedDepartmentCode, returnedDepartmentCode, assignedTo, processedBy, reasonCode,
+                returnPackage.getOperatorId(), createdAt,
 				updatedAt);
 	}
+
+    public static ReturnPageApi toResponseApi(final ReturnPage returnPage) {
+        return new ReturnPageApi(
+                returnPage.content().stream().map(ResponseMapper::toResponseApi).toList(),
+                returnPage.page(),
+                returnPage.size(),
+                returnPage.totalElements(),
+                returnPage.totalPages());
+    }
 }

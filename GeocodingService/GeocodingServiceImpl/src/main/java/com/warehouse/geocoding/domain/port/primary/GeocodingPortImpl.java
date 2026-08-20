@@ -25,6 +25,7 @@ public class GeocodingPortImpl implements GeocodingPort {
                 command.apiUserName(),
                 command.apiPassword(),
                 command.apiKey(),
+                command.clientNumber(),
                 command.accessToken(),
                 command.refreshToken(),
                 command.enabled(),

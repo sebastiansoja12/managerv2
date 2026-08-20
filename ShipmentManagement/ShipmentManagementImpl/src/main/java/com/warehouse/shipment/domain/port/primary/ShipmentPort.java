@@ -1,5 +1,7 @@
 package com.warehouse.shipment.domain.port.primary;
 
+import com.warehouse.commonassets.identificator.ReturnId;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
@@ -55,6 +57,10 @@ public interface ShipmentPort {
     void deleteDangerousGood(final ShipmentId shipmentId);
 
     void processShipmentReturn(final ShipmentReturnCommand request);
+
+    ShipmentReturnDetails loadShipmentReturn(final ReturnId returnId);
+
+    ShipmentReturnPage loadShipmentReturns(final DepartmentCode departmentCode, final int page, final int size);
 
     void processShipmentDelivery(final ShipmentDeliveryCommand command);
 }

@@ -1,28 +1,19 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import static com.warehouse.shipment.infrastructure.adapter.primary.validator.SignatureValidator.validateSignatureMethod;
-
-import java.util.List;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
-import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
-import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.exception.DangerousGoodNotFoundException;
+import com.warehouse.shipment.domain.exception.ShipmentModificationException;
+import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.port.primary.ShipmentPort;
@@ -34,9 +25,18 @@ import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequ
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
-
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static com.warehouse.shipment.infrastructure.adapter.primary.validator.SignatureValidator.validateSignatureMethod;
 
 @RestController
 @RequestMapping("/shipments")
@@ -154,6 +154,32 @@ public class ShipmentInternalController {
         final ShipmentReturnCommand request = ShipmentReturnCommand.from(shipmentReturnRequest);
         this.shipmentPort.processShipmentReturn(request);
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
+    }
+
+    @GetMapping("/returns/{returnPackageId}")
+    @Counted(value = "controller.shipment.return.get")
+    @Timed(value = "controller.shipment.return.get")
+    public ResponseEntity<ShipmentReturnDetailsApi> getReturn(@PathVariable final Long returnPackageId) {
+        final ShipmentReturnDetails response = this.shipmentPort.loadShipmentReturn(new ReturnId(returnPackageId));
+        return ResponseEntity.ok(this.responseMapper.map(response));
+    }
+
+    @GetMapping("/returns")
+    @Counted(value = "controller.shipment.returns.get")
+    @Timed(value = "controller.shipment.returns.get")
+    public ResponseEntity<ShipmentReturnPageApi> getReturns(
+            @RequestParam final String departmentCode,
+            @RequestParam(defaultValue = "0") final int page,
+            @RequestParam(defaultValue = "50") final int size) {
+        if (departmentCode.isBlank()) {
+            throw new IllegalArgumentException("Department code is required");
+        }
+        if (page < 0 || size < 1 || size > 100) {
+            throw new IllegalArgumentException("Page must be non-negative and size must be between 1 and 100");
+        }
+        final ShipmentReturnPage response = this.shipmentPort.loadShipmentReturns(
+                new DepartmentCode(departmentCode.trim().toUpperCase()), page, size);
+        return ResponseEntity.ok(this.responseMapper.map(response));
     }
 
     @PutMapping("/deliveries")

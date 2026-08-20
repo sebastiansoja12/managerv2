@@ -8,6 +8,7 @@ public record GeocodingConfigurationApiResponse(GeocodingConfigurationId geocodi
                                                 String apiUserName,
                                                 String apiPassword,
                                                 String apiKey,
+                                                String clientNumber,
                                                 String accessToken,
                                                 String refreshToken,
                                                 boolean enabled,

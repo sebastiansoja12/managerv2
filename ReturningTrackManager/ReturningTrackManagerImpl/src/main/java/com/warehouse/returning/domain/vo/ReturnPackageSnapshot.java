@@ -16,6 +16,7 @@ public record ReturnPackageSnapshot(
         UserId assignedTo,
         UserId processedBy,
         ReasonCode reasonCode,
+        Long operatorId,
         Instant createdAt,
         Instant updatedAt
 ) {}

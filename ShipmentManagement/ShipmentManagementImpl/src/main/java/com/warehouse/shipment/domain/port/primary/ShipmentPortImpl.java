@@ -1,13 +1,8 @@
 package com.warehouse.shipment.domain.port.primary;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
@@ -21,9 +16,17 @@ import com.warehouse.shipment.domain.handler.ShipmentDefaultHandler;
 import com.warehouse.shipment.domain.handler.ShipmentStatusHandler;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.*;
-import com.warehouse.shipment.domain.port.secondary.*;
+import com.warehouse.shipment.domain.port.secondary.Logger;
+import com.warehouse.shipment.domain.port.secondary.MailNotificationServicePort;
+import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
+import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.*;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 public class ShipmentPortImpl implements ShipmentPort {
@@ -111,9 +114,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         final Price shipmentPrice =
                 resolveShipmentPrice(command.getPrice(), command.getShipmentSize());
 
-        final CarrierOperator carrierOperator = command.getCarrierOperator();
-
-        final TrackingNumber trackingNumber = this.trackingNumberService.nextTrackingNumber(carrierOperator);
+        final TrackingNumber trackingNumber = this.trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT);
 
         final ShipmentId shipmentId = this.shipmentService.nextShipmentId();
 
@@ -232,10 +233,21 @@ public class ShipmentPortImpl implements ShipmentPort {
         final ShipmentId shipmentId = command.getShipmentId();
         switch (returnStatus) {
             case CREATED -> this.shipmentService.notifyShipmentReturned(shipmentId, command.getReason(),
-                    command.getReasonCode());
+                    command.getReasonCode(), command.getDepartmentCode());
             case COMPLETED -> this.shipmentService.lockShipment(shipmentId);
             case CANCELLED -> this.shipmentService.notifyReturnCanceled(shipmentId);
         }
+    }
+
+    @Override
+    public ShipmentReturnDetails loadShipmentReturn(final ReturnId returnId) {
+        return this.returningServicePort.getReturn(returnId);
+    }
+
+    @Override
+    public ShipmentReturnPage loadShipmentReturns(
+            final DepartmentCode departmentCode, final int page, final int size) {
+        return this.returningServicePort.getReturns(departmentCode, page, size);
     }
 
     @Override
