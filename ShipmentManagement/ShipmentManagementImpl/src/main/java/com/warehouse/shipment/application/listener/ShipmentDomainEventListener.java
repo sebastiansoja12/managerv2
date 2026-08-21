@@ -1,12 +1,10 @@
 package com.warehouse.shipment.application.listener;
 
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
-import com.warehouse.shipment.application.port.primary.command.ShipmentStatusRequest;
 import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.event.ShipmentLocked;
 import com.warehouse.shipment.domain.event.ShipmentRedirected;
 import com.warehouse.shipment.domain.event.ShipmentReturned;
-import com.warehouse.shipment.domain.event.ShipmentReturnedCompleted;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -28,15 +26,6 @@ public class ShipmentDomainEventListener {
     public void handle(final ShipmentReturned event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
         this.shipmentPort.returnToSender(snapshot.shipmentId());
-    }
-
-    @EventListener
-    public void handle(final ShipmentReturnedCompleted event) {
-        final ShipmentSnapshot snapshot = event.getSnapshot();
-        final ShipmentStatusRequest request = new ShipmentStatusRequest(
-                snapshot.shipmentRelatedId(), snapshot.shipmentStatus()
-        );
-        this.shipmentPort.changeShipmentStatusTo(request);
     }
 
     @TransactionalEventListener(fallbackExecution = true)
