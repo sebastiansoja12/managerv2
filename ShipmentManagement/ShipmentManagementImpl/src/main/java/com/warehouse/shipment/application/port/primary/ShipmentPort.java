@@ -11,17 +11,13 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.vo.Party;
 
-import java.util.Optional;
 
 public interface ShipmentPort {
 
     Result<ShipmentCreateResponse, ErrorCode> ship(final ShipmentCreateCommand request);
-
-    Result<Void, ErrorCode> update(final ShipmentUpdateCommand request);
 
     void changePersonTo(final Party party, final PersonType personType, final ShipmentId shipmentId);
 
@@ -42,12 +38,6 @@ public interface ShipmentPort {
 
     boolean existsShipment(final ShipmentId shipmentId);
 
-    Optional<DangerousGood> loadDangerousGood(final ShipmentId shipmentId);
-
-    void putDangerousGood(final ShipmentId shipmentId, final DangerousGood dangerousGood);
-
-    void deleteDangerousGood(final ShipmentId shipmentId);
-
     void processShipmentDelivery(final ShipmentDeliveryCommand command);
 
     void cancel(final ShipmentId shipmentId);
@@ -55,8 +45,6 @@ public interface ShipmentPort {
     void changeShipmentTypeTo(final ShipmentId shipmentId,
                               final ShipmentType shipmentType,
                               final ShipmentId relatedShipmentId);
-
-    void removeDangerousGood(final ShipmentId shipmentId);
 
     void lockShipment(final ShipmentId shipmentId);
 
