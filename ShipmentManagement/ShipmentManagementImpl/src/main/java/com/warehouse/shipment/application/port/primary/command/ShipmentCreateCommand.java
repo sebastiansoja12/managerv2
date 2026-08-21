@@ -1,16 +1,16 @@
 package com.warehouse.shipment.application.port.primary.command;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
-import com.warehouse.shipment.domain.model.DangerousGood;
+import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.Weight;
 import com.warehouse.shipment.domain.vo.CustomerReference;
+import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 
 public class ShipmentCreateCommand {
 
@@ -20,13 +20,11 @@ public class ShipmentCreateCommand {
 
 	private Money price;
 	
-	private DangerousGood dangerousGood;
-
-	private CountryCode issuerCountryCode;
-
-	private CountryCode receiverCountryCode;
-
 	private ShipmentPriority shipmentPriority;
+
+	private PackagingType packagingType;
+
+	private ShipmentServiceLevel serviceLevel;
 
 	private PickupMethod pickupMethod;
 
@@ -50,61 +48,39 @@ public class ShipmentCreateCommand {
 
 	}
 
-	public ShipmentCreateCommand(final DangerousGood dangerousGood,
-								 final Money price,
+	public ShipmentCreateCommand(final Money price,
 								 final Party recipient,
 								 final Party sender,
-								 final CountryCode issuerCountryCode,
-								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority) {
-		this(dangerousGood, price, recipient, sender, issuerCountryCode,
-				receiverCountryCode, shipmentPriority, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null);
+		this(price, recipient, sender, shipmentPriority, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null);
 	}
 
-	public ShipmentCreateCommand(final DangerousGood dangerousGood,
-								 final Money price,
+	public ShipmentCreateCommand(final Money price,
 								 final Party recipient,
 								 final Party sender,
-								 final CountryCode issuerCountryCode,
-								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority,
 								 final PickupMethod pickupMethod,
 								 final DeliveryMethod deliveryMethod,
 								 final PickupPointId pickupPointId) {
-		this(dangerousGood, price, recipient, sender, issuerCountryCode, receiverCountryCode,
-				shipmentPriority, pickupMethod, deliveryMethod, pickupPointId, null);
+		this(price, recipient, sender, shipmentPriority, pickupMethod, deliveryMethod, pickupPointId, null);
 	}
 
-	public ShipmentCreateCommand(final DangerousGood dangerousGood,
-								 final Money price,
+	public ShipmentCreateCommand(final Money price,
 								 final Party recipient,
 								 final Party sender,
-								 final CountryCode issuerCountryCode,
-								 final CountryCode receiverCountryCode,
 								 final ShipmentPriority shipmentPriority,
 								 final PickupMethod pickupMethod,
 								 final DeliveryMethod deliveryMethod,
 								 final PickupPointId pickupPointId,
 								 final PickupPointId deliveryPickupPointId) {
-		this.dangerousGood = dangerousGood;
 		this.price = price;
 		this.recipient = recipient;
 		this.sender = sender;
-		this.issuerCountryCode = issuerCountryCode;
-		this.receiverCountryCode = receiverCountryCode;
 		this.shipmentPriority = shipmentPriority;
 		this.pickupMethod = pickupMethod;
 		this.deliveryMethod = deliveryMethod;
 		this.pickupPointId = pickupPointId;
 		this.deliveryPickupPointId = deliveryPickupPointId;
-	}
-
-	public DangerousGood getDangerousGood() {
-		return dangerousGood;
-	}
-
-	public void setDangerousGood(final DangerousGood dangerousGood) {
-		this.dangerousGood = dangerousGood;
 	}
 
 	public Money getPrice() {
@@ -131,26 +107,6 @@ public class ShipmentCreateCommand {
 		this.sender = sender;
 	}
 
-	public CountryCode getIssuerCountryCode() {
-		return issuerCountryCode;
-	}
-
-	public void setIssuerCountryCode(final CountryCode issuerCountryCode) {
-		this.issuerCountryCode = issuerCountryCode;
-	}
-
-	public CountryCode getReceiverCountryCode() {
-		return receiverCountryCode;
-	}
-
-	public void setReceiverCountryCode(final CountryCode receiverCountryCode) {
-		this.receiverCountryCode = receiverCountryCode;
-	}
-
-	public boolean isDangerousGood() {
-		return dangerousGood != null;
-	}
-
 	public ShipmentPriority getShipmentPriority() {
 		return shipmentPriority;
 	}
@@ -158,6 +114,14 @@ public class ShipmentCreateCommand {
 	public void setShipmentPriority(final ShipmentPriority shipmentPriority) {
 		this.shipmentPriority = shipmentPriority;
 	}
+
+	public PackagingType getPackagingType() { return packagingType; }
+
+	public void setPackagingType(final PackagingType packagingType) { this.packagingType = packagingType; }
+
+	public ShipmentServiceLevel getServiceLevel() { return serviceLevel; }
+
+	public void setServiceLevel(final ShipmentServiceLevel serviceLevel) { this.serviceLevel = serviceLevel; }
 
 	public PickupMethod getPickupMethod() {
 		return pickupMethod == null ? PickupMethod.DEPARTMENT : pickupMethod;
