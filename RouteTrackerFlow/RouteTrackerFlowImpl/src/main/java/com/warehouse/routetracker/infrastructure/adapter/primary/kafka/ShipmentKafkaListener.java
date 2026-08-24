@@ -38,12 +38,12 @@ public class ShipmentKafkaListener {
 
     @KafkaHandler
     public void handle(final ShipmentCreated event) {
-        this.saveShipmentEvent(event, event.getClass().getName(), ShipmentStatus.CREATED);
+        this.saveShipmentEvent(event, event.getClass().getSimpleName(), ShipmentStatus.CREATED);
     }
 
     @KafkaHandler
     public void handle(final ShipmentReturned event) {
-        this.saveShipmentEvent(event, event.getClass().getName(), ShipmentStatus.RETURN);
+        this.saveShipmentEvent(event, event.getClass().getSimpleName(), ShipmentStatus.RETURN);
     }
 
     @KafkaHandler
