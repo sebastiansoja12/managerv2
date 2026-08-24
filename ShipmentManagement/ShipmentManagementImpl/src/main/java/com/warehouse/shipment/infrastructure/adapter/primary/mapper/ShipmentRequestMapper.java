@@ -13,11 +13,9 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
-import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
+import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
-import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
-import com.warehouse.shipment.application.port.primary.command.ShipmentUpdateCommand;
 import com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.Dimensions;
@@ -25,7 +23,7 @@ import com.warehouse.shipment.domain.vo.LengthUnit;
 import com.warehouse.shipment.domain.vo.Weight;
 import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.domain.vo.CustomerReference;
-import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
+import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.application.port.primary.command.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
@@ -39,27 +37,6 @@ public interface ShipmentRequestMapper {
         final ShipmentCreateCommand command = map(shipmentRequest);
         command.setDeliveryPickupPointId(shipmentRequest.deliveryPickupPointId());
         return command;
-    }
-
-    default DangerousGood map(final DangerousGoodApi dangerousGood) {
-        if (dangerousGood == null) {
-            return null;
-        }
-        return new DangerousGood(
-                dangerousGood.unNumber(), dangerousGood.properShippingName(), dangerousGood.description(),
-                dangerousGood.hazardClass(), dangerousGood.hazardDivision(), dangerousGood.subsidiaryRisk(),
-                dangerousGood.packingGroup(), dangerousGood.quantity(), dangerousGood.quantityUnit(),
-                dangerousGood.packageCount(), dangerousGood.packagingType(), dangerousGood.limitedQuantity(),
-                dangerousGood.exceptedQuantity(), dangerousGood.environmentallyHazardous(),
-                dangerousGood.marinePollutant(), dangerousGood.transportCategory(),
-                dangerousGood.tunnelRestrictionCode(), dangerousGood.flashPoint(),
-                dangerousGood.emergencyContact(), dangerousGood.emergencyContact24h(),
-                dangerousGood.safetyDataSheetReference(), dangerousGood.declarationDocumentReference(),
-                dangerousGood.regulationType(), dangerousGood.transportMode(), dangerousGood.flammable(),
-                dangerousGood.corrosive(), dangerousGood.toxic(), dangerousGood.hazardSymbols(),
-                dangerousGood.storageRequirements(), dangerousGood.handlingInstructions(),
-                dangerousGood.countryOfOrigin()
-        );
     }
 
     default Money map(final MoneyApi money) {
@@ -88,16 +65,18 @@ public interface ShipmentRequestMapper {
         return customerReference == null ? null : new CustomerReference(customerReference);
     }
 
-    ShipmentUpdateCommand map(final ShipmentUpdateRequestApi request);
+    default ShipmentServiceLevel map(final ShipmentServiceLevelDto serviceLevel) {
+        return serviceLevel == null ? null : ShipmentServiceLevel.valueOf(serviceLevel.name());
+    }
 
-    ShipmentConfiguration map(final ShipmentConfigurationApi configuration);
+    default PackagingType map(final PackagingTypeDto packagingType) {
+        return packagingType == null ? null : PackagingType.valueOf(packagingType.name());
+    }
 
     default ShipmentId map(final ShipmentIdDto shipmentId) {
         return new ShipmentId(shipmentId.getValue());
     }
 
-    ShipmentUpdateType map(final ShipmentUpdateTypeApi shipmentUpdateType);
-    
     Party mapToParty(final PersonApi person);
 
     default ShipmentStatusRequest map(final ShipmentStatusRequestApi shipmentStatusRequest) {
@@ -122,7 +101,7 @@ public interface ShipmentRequestMapper {
         if (request == null) {
             return new ShipmentSearchCriteria(
                     null, null, List.of(), List.of(), null, null, null,
-                    null, null, null, null, null, null, null, null, null, null, null, null, null
+                    null, null, null, null, null, null, null, null
             );
         }
 
@@ -140,11 +119,6 @@ public interface ShipmentRequestMapper {
                 request.locked(),
                 request.createdFrom(),
                 request.createdTo(),
-                request.hasDangerousGoods(),
-                request.unNumber(),
-                request.hazardClass(),
-                request.regulationType(),
-                request.transportMode(),
                 request.page(),
                 request.size()
         );
