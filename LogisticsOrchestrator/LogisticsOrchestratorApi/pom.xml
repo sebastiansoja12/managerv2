@@ -20,6 +20,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>DepartmentServiceApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>ShipmentManagementApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>DeliveryOperationApi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
