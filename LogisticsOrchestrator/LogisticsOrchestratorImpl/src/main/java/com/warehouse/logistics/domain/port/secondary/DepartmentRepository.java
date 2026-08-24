@@ -1,8 +1,10 @@
 package com.warehouse.logistics.domain.port.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.logistics.domain.vo.Department;
+import com.warehouse.commonassets.identificator.DepartmentId;
 
 public interface DepartmentRepository {
-    Department findByCode(final DepartmentCode departmentCode);
+    boolean existsByCode(final DepartmentCode departmentCode);
+
+    DepartmentId findIdByCode(final DepartmentCode departmentCode);
 }
