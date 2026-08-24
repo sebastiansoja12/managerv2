@@ -25,5 +25,7 @@ public interface ReturnService {
 
     void completeReturn(final ShipmentId shipmentId);
 
+    void cancelReturn(final ShipmentId shipmentId);
+
     ReturnPackage findByShipmentId(final ShipmentId shipmentId);
 }

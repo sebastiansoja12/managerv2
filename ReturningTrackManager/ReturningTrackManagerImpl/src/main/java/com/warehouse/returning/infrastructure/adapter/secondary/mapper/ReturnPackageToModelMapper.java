@@ -17,7 +17,10 @@ public class ReturnPackageToModelMapper {
                 .returnStatus(ReturnStatusMapper.toModelStatus(entity.getReturnStatus()))
                 .returnToken(entity.getReturnToken() != null ? new ReturnToken(entity.getReturnToken().getValue()) : null)
                 .assignedDepartmentCode(new com.warehouse.returning.domain.vo.DepartmentCode(entity.getAssignedDepartmentCode().getValue()))
-                .returnedDepartmentCode(new com.warehouse.returning.domain.vo.DepartmentCode(entity.getReturnedDepartmentCode().getValue()))
+                .returnedDepartmentCode(
+                        entity.getReturnedDepartmentCode() != null ?
+                                new com.warehouse.returning.domain.vo.DepartmentCode(entity.getReturnedDepartmentCode().getValue())
+                        : null)
                 .assignedTo(new com.warehouse.returning.domain.vo.UserId(entity.getAssignedTo().getValue()))
                 .processedBy(new com.warehouse.returning.domain.vo.UserId(entity.getProcessedBy().getValue()))
                 .reasonCode(entity.getReasonCode())
