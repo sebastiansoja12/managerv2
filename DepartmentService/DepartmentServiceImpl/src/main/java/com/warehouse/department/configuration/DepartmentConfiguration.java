@@ -1,11 +1,12 @@
 package com.warehouse.department.configuration;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
@@ -86,8 +87,10 @@ public class DepartmentConfiguration {
     }
 
     @Bean
-    public UserClientServicePort userClientServicePort(final ApplicationEventPublisher eventPublisher) {
-        return new UserClientServiceAdapter(eventPublisher);
+    public UserClientServicePort userClientServicePort(final KafkaTemplateClient kafkaTemplateClient,
+                                                       @Value("${manager.kafka.topics.department-user-events:department.user.events}")
+                                                       final String departmentUserEventsTopic) {
+        return new UserClientServiceAdapter(kafkaTemplateClient, departmentUserEventsTopic);
     }
 
     @Bean
