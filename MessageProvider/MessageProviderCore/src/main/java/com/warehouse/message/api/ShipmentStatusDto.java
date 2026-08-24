@@ -6,6 +6,10 @@ import com.warehouse.message.domain.model.Message;
 public enum ShipmentStatusDto {
     CREATED,
 
+    PREPARED,
+
+    ACCEPTED,
+
     REROUTE,
 
     SENT,
@@ -20,6 +24,8 @@ public enum ShipmentStatusDto {
         final ShipmentStatus shipmentStatus = message.getShipmentStatus();
         return switch (shipmentStatus) {
             case CREATED -> CREATED;
+            case PREPARED -> PREPARED;
+            case ACCEPTED -> ACCEPTED;
             case REROUTE -> REROUTE;
             case SENT -> SENT;
             case DELIVERY -> DELIVERY;

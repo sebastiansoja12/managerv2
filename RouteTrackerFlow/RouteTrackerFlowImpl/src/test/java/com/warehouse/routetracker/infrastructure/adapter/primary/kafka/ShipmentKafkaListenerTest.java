@@ -103,6 +103,26 @@ class ShipmentKafkaListenerTest {
         );
     }
 
+    @Test
+    void shouldHandleShipmentReturnCanceledEvent() throws Exception {
+        final ShipmentChanged event = new ShipmentChanged(
+                this.snapshot("DELIVERY"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
+
+        this.listener.handle(
+                event,
+                "ShipmentReturnCanceled".getBytes(StandardCharsets.UTF_8));
+
+        verify(this.routeTrackerLogPort).createShipmentEvent(
+                new ShipmentId(SHIPMENT_ID),
+                "ShipmentReturnCanceled",
+                ShipmentStatus.DELIVERY,
+                OCCURRED_AT,
+                this.objectMapper.writeValueAsString(event),
+                USER_ID,
+                DEPARTMENT_ID
+        );
+    }
+
     private ShipmentSnapshot snapshot(final String shipmentStatus) {
         return new ShipmentSnapshot(new ShipmentId(SHIPMENT_ID), shipmentStatus);
     }
