@@ -3,6 +3,7 @@ package com.warehouse.organisationstructure.operatorconfiguration.domain.port.pr
 import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.service.OperatorConfigurationService;
 
 import java.util.Optional;
@@ -22,6 +23,18 @@ public class OperatorConfigurationPortImpl implements OperatorConfigurationPort 
     public Optional<OperatorConfiguration> getCurrent() {
         final OperatorId operatorId = currentOperatorService.getCurrentOperatorId();
         return operatorConfigurationService.getByOperatorId(operatorId);
+    }
+
+    @Override
+    public OperatorConfiguration updateCurrentShipmentConfiguration(final ShipmentConfiguration shipmentConfiguration) {
+        final OperatorId operatorId = currentOperatorService.getCurrentOperatorId();
+        final OperatorConfiguration currentConfiguration = operatorConfigurationService.getByOperatorId(operatorId)
+                .orElseGet(() -> OperatorConfiguration.defaultFor(false, false, false));
+        return operatorConfigurationService.create(operatorId, new OperatorConfiguration(
+                currentConfiguration.getShippingCapabilities(),
+                shipmentConfiguration,
+                currentConfiguration.getDeliveryTimeConfiguration()
+        ));
     }
 
     @Override

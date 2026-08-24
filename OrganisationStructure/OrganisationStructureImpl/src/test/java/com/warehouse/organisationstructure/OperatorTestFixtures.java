@@ -8,13 +8,25 @@ import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.TaxId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.organisationstructure.api.dto.CreateOperatorApiRequest;
+import com.warehouse.organisationstructure.api.dto.DefaultShipmentStatusDto;
 import com.warehouse.organisationstructure.api.dto.DeliveryTimeConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.FirstDepartmentDto;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorGeocodingConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorStatusDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentLabelConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentLabelFormatDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentNotificationChannelDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentNotificationConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentServiceLevelDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentValidationConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentWorkflowConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShippingCapabilitiesDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberDateFormatDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberRuleDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberSourceDto;
 import com.warehouse.organisationstructure.api.dto.UpdateOperatorApiRequest;
 import com.warehouse.organisationstructure.operator.domain.model.CreateOperatorCommand;
 import com.warehouse.organisationstructure.operator.domain.model.Operator;
@@ -22,7 +34,22 @@ import com.warehouse.organisationstructure.operator.domain.model.OperatorStatus;
 import com.warehouse.organisationstructure.operator.domain.model.UpdateOperatorCommand;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorProvisioningDetails;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorGeocodingConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DefaultShipmentStatus;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DeliveryTimeConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.LabelFormat;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.NotificationChannel;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ServiceLevel;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLabelConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLimits;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentNotificationConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentValidationConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentWorkflowConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShippingCapabilities;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberDateFormat;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberRule;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberSource;
 
 public final class OperatorTestFixtures {
 
@@ -66,7 +93,7 @@ public final class OperatorTestFixtures {
 
     public static OperatorConfiguration configuration() {
         return new OperatorConfiguration(
-                new OperatorConfiguration.ShippingCapabilities(
+                new ShippingCapabilities(
                         true,
                         true,
                         true,
@@ -81,15 +108,8 @@ public final class OperatorTestFixtures {
                         true,
                         true
                 ),
-                new OperatorConfiguration.ShipmentLimits(
-                        31.5,
-                        0.2,
-                        120.0,
-                        80.0,
-                        60.0,
-                        5000.0
-                ),
-                new OperatorConfiguration.DeliveryTimeConfiguration(
+                shipmentConfiguration(),
+                new DeliveryTimeConfiguration(
                         1,
                         4,
                         1,
@@ -101,7 +121,7 @@ public final class OperatorTestFixtures {
 
     public static OperatorConfiguration updatedConfiguration() {
         return new OperatorConfiguration(
-                new OperatorConfiguration.ShippingCapabilities(
+                new ShippingCapabilities(
                         true,
                         false,
                         false,
@@ -116,20 +136,119 @@ public final class OperatorTestFixtures {
                         true,
                         false
                 ),
-                new OperatorConfiguration.ShipmentLimits(
-                        20.0,
-                        1.0,
-                        90.0,
-                        60.0,
-                        40.0,
-                        2500.0
-                ),
-                new OperatorConfiguration.DeliveryTimeConfiguration(
+                updatedShipmentConfiguration(),
+                new DeliveryTimeConfiguration(
                         2,
                         5,
                         2,
                         0,
                         10
+                )
+        );
+    }
+
+    public static ShipmentConfiguration shipmentConfiguration() {
+        return new ShipmentConfiguration(
+                new ShipmentValidationConfiguration(
+                        true,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                ),
+                new ShipmentLabelConfiguration(
+                        false,
+                        false,
+                        false,
+                        LabelFormat.PDF_A6
+                ),
+                new ShipmentLimits(
+                        31.5,
+                        0.2,
+                        120.0,
+                        80.0,
+                        60.0,
+                        5000.0,
+                        false
+                ),
+                new ShipmentWorkflowConfiguration(
+                        DefaultShipmentStatus.CREATED,
+                        ServiceLevel.STANDARD,
+                        false,
+                        true,
+                        false,
+                        30,
+                        "16:00"
+                ),
+                new TrackingNumberRule(
+                        "MGR",
+                        "-",
+                        TrackingNumberSource.SEQUENCE,
+                        8,
+                        true,
+                        TrackingNumberDateFormat.YYYYMMDD,
+                        true
+                ),
+                new ShipmentNotificationConfiguration(
+                        true,
+                        true,
+                        true,
+                        true,
+                        NotificationChannel.SMS
+                )
+        );
+    }
+
+    public static ShipmentConfiguration updatedShipmentConfiguration() {
+        return new ShipmentConfiguration(
+                new ShipmentValidationConfiguration(
+                        false,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false
+                ),
+                new ShipmentLabelConfiguration(
+                        true,
+                        true,
+                        true,
+                        LabelFormat.ZPL
+                ),
+                new ShipmentLimits(
+                        20.0,
+                        1.0,
+                        90.0,
+                        60.0,
+                        40.0,
+                        2500.0,
+                        true
+                ),
+                new ShipmentWorkflowConfiguration(
+                        DefaultShipmentStatus.ACCEPTED,
+                        ServiceLevel.EXPRESS,
+                        true,
+                        false,
+                        true,
+                        45,
+                        "15:00"
+                ),
+                new TrackingNumberRule(
+                        "CLIENT",
+                        "/",
+                        TrackingNumberSource.SHIPMENT_ID,
+                        10,
+                        false,
+                        TrackingNumberDateFormat.YYMMDD,
+                        false
+                ),
+                new ShipmentNotificationConfiguration(
+                        true,
+                        false,
+                        true,
+                        false,
+                        NotificationChannel.BOTH
                 )
         );
     }
@@ -236,20 +355,66 @@ public final class OperatorTestFixtures {
                         true,
                         true
                 ),
-                new ShipmentLimitsDto(
-                        31.5,
-                        0.2,
-                        120.0,
-                        80.0,
-                        60.0,
-                        5000.0
-                ),
+                shipmentConfigurationDto(),
                 new DeliveryTimeConfigurationDto(
                         1,
                         4,
                         1,
                         8,
                         7
+                )
+        );
+    }
+
+    public static ShipmentConfigurationDto shipmentConfigurationDto() {
+        return new ShipmentConfigurationDto(
+                new ShipmentValidationConfigurationDto(
+                        true,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                ),
+                new ShipmentLabelConfigurationDto(
+                        false,
+                        false,
+                        false,
+                        ShipmentLabelFormatDto.PDF_A6
+                ),
+                new ShipmentLimitsDto(
+                        31.5,
+                        0.2,
+                        120.0,
+                        80.0,
+                        60.0,
+                        5000.0,
+                        false
+                ),
+                new ShipmentWorkflowConfigurationDto(
+                        DefaultShipmentStatusDto.CREATED,
+                        ShipmentServiceLevelDto.STANDARD,
+                        false,
+                        true,
+                        false,
+                        30,
+                        "16:00"
+                ),
+                new TrackingNumberRuleDto(
+                        "MGR",
+                        "-",
+                        TrackingNumberSourceDto.SEQUENCE,
+                        8,
+                        true,
+                        TrackingNumberDateFormatDto.YYYYMMDD,
+                        true
+                ),
+                new ShipmentNotificationConfigurationDto(
+                        true,
+                        true,
+                        true,
+                        true,
+                        ShipmentNotificationChannelDto.SMS
                 )
         );
     }
