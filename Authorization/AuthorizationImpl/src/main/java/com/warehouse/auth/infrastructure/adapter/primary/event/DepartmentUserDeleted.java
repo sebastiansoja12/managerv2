@@ -1,15 +1,11 @@
 package com.warehouse.auth.infrastructure.adapter.primary.event;
 
+import java.time.Instant;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 
-public class DepartmentUserDeleted {
-    private final DepartmentCode departmentCode;
-
-    public DepartmentUserDeleted(final DepartmentCode departmentCode) {
-        this.departmentCode = departmentCode;
-    }
-
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
-    }
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record DepartmentUserDeleted(DepartmentCode departmentCode,
+                                    Instant timestamp) {
 }

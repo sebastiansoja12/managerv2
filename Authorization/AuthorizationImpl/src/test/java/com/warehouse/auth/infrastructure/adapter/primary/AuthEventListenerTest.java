@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.warehouse.auth.domain.model.RolePermission;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
-import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.service.JwtService;
@@ -38,7 +37,6 @@ import com.warehouse.commonassets.identificator.UserId;
 class AuthEventListenerTest {
 
     private final AuthenticationPort authenticationPort = mock(AuthenticationPort.class);
-    private final UserPort userPort = mock(UserPort.class);
     private final UserService userService = mock(UserService.class);
     private final JwtService jwtService = mock(JwtService.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
@@ -73,7 +71,7 @@ class AuthEventListenerTest {
                 return new com.warehouse.auth.domain.vo.ApiKey(apiKey.userId(), "encoded-api-key");
             }
         };
-        listener = new AuthEventListener(authenticationPort, userPort, userService, jwtService, passwordEncoder,
+        listener = new AuthEventListener(authenticationPort, userService, jwtService, passwordEncoder,
                 apiKeyEncoder);
     }
 
