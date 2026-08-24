@@ -1,8 +1,5 @@
 package com.warehouse.shipment.domain.listener;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
@@ -11,6 +8,7 @@ import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.domain.service.ShipmentService;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -48,21 +46,15 @@ public class ShipmentEventListener {
     }
 
     @TransactionalEventListener(fallbackExecution = true)
-    public void handle(final ShipmentReturnCreated event) {
-        final ShipmentSnapshot snapshot = event.getSnapshot();
-        final ShipmentId shipmentId = snapshot.shipmentId();
-        final ReasonCode reasonCode = event.getReasonCode();
-        final String reason = event.getReason();
-        final DepartmentCode departmentCode = event.getDepartmentCode();
-        this.returningServicePort.shipmentReturnCommand(
-                new ShipmentReturnedCommand(shipmentId, reasonCode, reason, departmentCode)
-        );
-    }
-
-    @TransactionalEventListener(fallbackExecution = true)
     public void handle(final ShipmentLocked event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
         this.returningServicePort.notifyShipmentReturnCompleted(snapshot);
+    }
+
+    @EventListener
+    public void handle(final ShipmentRedirected event) {
+        final ShipmentSnapshot snapshot = event.getSnapshot();
+        this.shipmentService.redirectShipmentToSender(snapshot.shipmentId());
     }
 
 }

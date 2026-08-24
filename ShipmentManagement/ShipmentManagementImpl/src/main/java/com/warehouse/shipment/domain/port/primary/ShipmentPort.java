@@ -32,19 +32,13 @@ public interface ShipmentPort {
 
     void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod);
 
-    void changeIssuerCountryTo(final ShipmentCountryRequest request);
-
-    void changeReceiverCountryTo(final ShipmentCountryRequest request);
-
-    void changeShipmentCountries(final ShipmentCountryRequest request);
-
     Shipment loadShipment(final ShipmentId shipmentId);
 
     Shipment loadShipment(final TrackingNumber trackingNumber);
 
-    ShipmentControlCenter loadShipmentControlCenter(final ShipmentId shipmentId);
+    ShipmentRouteLog getShipmentByShipmentId(final ShipmentId shipmentId);
 
-    ShipmentControlCenter loadShipmentControlCenter(final TrackingNumber trackingNumber);
+    ShipmentRouteLog getShipmenyByTrackingNumber(final TrackingNumber trackingNumber);
 
     List<Shipment> searchShipments(final ShipmentSearchCriteria criteria);
 
@@ -57,6 +51,8 @@ public interface ShipmentPort {
     void deleteDangerousGood(final ShipmentId shipmentId);
 
     void processShipmentReturn(final ShipmentReturnCommand request);
+
+    void cancelShipmentReturn(final ReturnId returnId);
 
     ShipmentReturnDetails loadShipmentReturn(final ReturnId returnId);
 

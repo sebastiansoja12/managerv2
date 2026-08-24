@@ -2,6 +2,7 @@ package com.warehouse.shipment;
 
 import static com.warehouse.shipment.DataTestCreator.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,7 +21,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
-import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.ShipmentNotFoundException;
@@ -464,7 +464,7 @@ class ShipmentServiceImplTest {
         when(shipmentRepository.findById(shipmentId())).thenReturn(shipment);
         ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
         when(applicationContext.getBean(TrackingNumberService.class)).thenReturn(trackingNumberService);
-        when(trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT)).thenReturn(trackingNumber());
+        when(trackingNumberService.nextTrackingNumber(any(), any())).thenReturn(trackingNumber());
 
         shipmentService.redirectShipmentToSender(shipmentId());
 

@@ -13,7 +13,8 @@ public enum ErrorCode {
     ORIGIN_DEPARTMENT_NOT_AVAILABLE(400, "Origin department is not available"),
     DESTINATION_DEPARTMENT_NOT_AVAILABLE(400, "Destination department is not available"),
     ROUTE_TRACKER_SERVICE_NOT_AVAILABLE(500, "Route tracker service is not available"),
-    ROUTE_TRACKER_SERVICE_ERROR(401, "Error occurred in route tracker");
+    ROUTE_TRACKER_SERVICE_ERROR(401, "Error occurred in route tracker"),
+    SHIPMENT_EXTENDED_LIMITATIONS(400, "Shipment invalid limitations");
 
     private final int code;
 

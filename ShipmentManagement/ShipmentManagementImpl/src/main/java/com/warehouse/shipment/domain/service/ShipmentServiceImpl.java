@@ -256,7 +256,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public void update(final Shipment shipment) {
         this.shipmentRepository.createOrUpdate(shipment);
-        DomainContext.publish(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
+        DomainContext.eventPublisher().publishEvent(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -264,7 +264,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         final Shipment shipmentAfterRedirection = shipment.redirectToSender(shipment.getShipmentRelatedId());
         this.shipmentRepository.createOrUpdate(shipmentAfterRedirection);
-        DomainContext.publish(new ShipmentRedirected(shipmentAfterRedirection.snapshot(), Instant.now()));
+        DomainContext.eventPublisher().publishEvent(new ShipmentUpdated(shipmentAfterRedirection.snapshot(), Instant.now()));
     }
 
     @Override
@@ -273,7 +273,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeDestinationDepartment(destination);
         this.shipmentRepository.createOrUpdate(shipment);
-        DomainContext.publish(new ShipmentDestinationChanged(shipment.snapshot(), Instant.now()));
+        DomainContext.eventPublisher().publishEvent(new ShipmentDestinationChanged(shipment.snapshot(), Instant.now()));
     }
 
 	@Override

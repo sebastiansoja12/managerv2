@@ -1,9 +1,11 @@
 package com.warehouse.shipment.domain.model;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.*;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
@@ -116,12 +118,13 @@ public class Shipment {
                     final DepartmentCode destination,
                     final Signature signature,
                     final ShipmentPriority shipmentPriority,
-                    final TrackingNumber trackingNumber) {
+                    final TrackingNumber trackingNumber,
+                    final ShipmentStatus status) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
         this.shipmentSize = shipmentSize;
-        this.shipmentStatus = ShipmentStatus.CREATED;
+        this.shipmentStatus = status;
         this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentType = shipmentRelatedId != null ? ShipmentType.CHILD : ShipmentType.PARENT;
         this.price = price;
@@ -136,6 +139,23 @@ public class Shipment {
         this.shipmentPriority = shipmentPriority;
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = ExternalId.randomUUID();
+    }
+
+    public static Shipment parentShipment(final ShipmentId shipmentId,
+                                          final Sender sender,
+                                          final Recipient recipient,
+                                          final ShipmentSize shipmentSize,
+                                          final ShipmentId shipmentRelatedId,
+                                          final CountryCode originCountry,
+                                          final CountryCode destinationCountry,
+                                          final Money price,
+                                          final DepartmentCode destination,
+                                          final Signature signature,
+                                          final ShipmentPriority shipmentPriority,
+                                          final TrackingNumber trackingNumber,
+                                          final ShipmentStatus status) {
+        return new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
+                price, false, destination, signature, shipmentPriority, trackingNumber, status);
     }
 
 	public ShipmentSnapshot snapshot() {
@@ -627,7 +647,7 @@ public class Shipment {
     }
 
     public boolean recipientCityMatches(final String city) {
-        return this.recipient != null && this.recipient.getCity().equals(city);
+        return this.recipient.getCity().equals(city);
     }
 
     public Shipment redirectToSender(final ShipmentId shipmentId) {
@@ -659,7 +679,7 @@ public class Shipment {
 
         this.shipmentStatus = ShipmentStatus.CREATED;
         this.externalShipmentId = ExternalId.randomUUID();
-        this.trackingNumber = DomainContext.trackingNumberService().nextTrackingNumber(CarrierOperator.DEFAULT);
+        this.trackingNumber = DomainContext.trackingNumberService().nextTrackingNumber(shipmentId);
 
         markAsModified();
 

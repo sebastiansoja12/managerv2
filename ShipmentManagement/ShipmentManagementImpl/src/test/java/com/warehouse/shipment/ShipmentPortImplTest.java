@@ -19,9 +19,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.ReturnId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.exceptionhandler.exception.RestException;
+import com.warehouse.shipment.domain.enumeration.ReasonCode;
+import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.helper.Result;
@@ -33,6 +38,7 @@ import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.ChangeShipmentTypeRequest;
 import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
+import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
 import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 
@@ -97,11 +103,12 @@ class ShipmentPortImplTest {
         final DomainContext domainContext = new DomainContext();
         domainContext.setApplicationEventPublisher(eventPublisher);
         domainContext.setApplicationContext(applicationContext);
-        final TrackingNumberService trackingNumberService = new TrackingNumberServiceImpl(Set.of());
+        final TrackingNumberService trackingNumberService = mock(TrackingNumberService.class);
+        final ShipmentConfigurationServicePort shipmentConfigurationServicePort = mock(ShipmentConfigurationServicePort.class);
 		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
 				shipmentStatusHandlers, countryDetermineService, priceService, countryServiceAvailabilityService,
 				signatureService, routeLogService, returningServicePort, mailNotificationServicePort,
-                trackingNumberService);
+                trackingNumberService, shipmentConfigurationServicePort);
 	}
 
     @Test
@@ -163,6 +170,37 @@ class ShipmentPortImplTest {
                 .findById(shipmentId);
         shipmentPort.changeShipmentStatusTo(request);
         assertEquals(ShipmentStatus.RETURN, shipment.getShipmentStatus());
+        verify(shipmentRepository).createOrUpdate(shipment);
+    }
+
+    @Test
+    void shouldCancelShipmentReturnByReturnId() {
+        final ReturnId returnId = new ReturnId(123L);
+        final ShipmentId shipmentId = shipmentId();
+        final Shipment shipment = shipment(null, true);
+        shipment.changeShipmentStatus(ShipmentStatus.RETURN);
+        final ShipmentReturnDetails returnDetails = new ShipmentReturnDetails(
+                returnId,
+                shipmentId,
+                "Damaged package",
+                ReturnStatus.CREATED,
+                "TOKEN",
+                new DepartmentCode("KT1"),
+                new DepartmentCode("KT1"),
+                new UserId(1L),
+                new UserId(2L),
+                ReasonCode.DAMAGED,
+                77L,
+                null,
+                null);
+        when(returningServicePort.getReturn(returnId)).thenReturn(returnDetails);
+        when(shipmentRepository.findById(shipmentId)).thenReturn(shipment);
+
+        shipmentPort.cancelShipmentReturn(returnId);
+
+        assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus());
+        assertFalse(shipment.getLocked());
+        verify(returningServicePort).getReturn(returnId);
         verify(shipmentRepository).createOrUpdate(shipment);
     }
 

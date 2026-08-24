@@ -86,7 +86,8 @@ public class DataTestCreator {
                 new DepartmentCode("KT1"),
                 null,
                 ShipmentPriority.MEDIUM,
-                trackingNumber()
+                trackingNumber(),
+                ShipmentStatus.CREATED
         );
     }
 

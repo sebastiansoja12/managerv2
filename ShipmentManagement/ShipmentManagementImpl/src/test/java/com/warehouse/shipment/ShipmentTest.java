@@ -2,6 +2,7 @@ package com.warehouse.shipment;
 
 import static com.warehouse.shipment.DataTestCreator.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,7 +19,6 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
-import com.warehouse.shipment.domain.enumeration.CarrierOperator;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.registry.DomainContext;
@@ -170,7 +170,7 @@ class ShipmentTest {
         final TrackingNumberService trackingNumberService = mock(TrackingNumberService.class);
         ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
         when(applicationContext.getBean(TrackingNumberService.class)).thenReturn(trackingNumberService);
-        when(trackingNumberService.nextTrackingNumber(CarrierOperator.DEFAULT))
+        when(trackingNumberService.nextTrackingNumber(any(), any()))
                 .thenReturn(new TrackingNumber("REDIRECTED-TRACKING-NUMBER"));
 
         final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId);
@@ -199,7 +199,8 @@ class ShipmentTest {
                 new DepartmentCode("KT1"),
                 null,
                 ShipmentPriority.MEDIUM,
-                new TrackingNumber("TEST-TRACKING-NUMBER")
+                new TrackingNumber("TEST-TRACKING-NUMBER"),
+                ShipmentStatus.CREATED
         );
     }
 }
