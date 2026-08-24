@@ -35,4 +35,39 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="codex" id="20260821-01-add-shipment-operator-configuration">
+        <addColumn tableName="operator_configurations">
+            <column name="shipment_validate_address_data" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_require_recipient_phone" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_require_recipient_email" type="BIT(1)" defaultValueBoolean="false"/>
+            <column name="shipment_prevent_duplicate_tracking" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_require_sender_reference" type="BIT(1)" defaultValueBoolean="false"/>
+            <column name="shipment_validate_postal_code" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_auto_generate_labels" type="BIT(1)" defaultValueBoolean="false"/>
+            <column name="shipment_include_return_label" type="BIT(1)" defaultValueBoolean="false"/>
+            <column name="shipment_attach_packing_slip" type="BIT(1)" defaultValueBoolean="false"/>
+            <column name="shipment_label_format" type="VARCHAR(32)" defaultValue="PDF_A6"/>
+            <column name="shipment_allow_oversized" type="BIT(1)" defaultValueBoolean="false"/>
+            <column name="shipment_default_status" type="VARCHAR(32)" defaultValue="CREATED"/>
+            <column name="shipment_default_service_level" type="VARCHAR(32)" defaultValue="STANDARD"/>
+            <column name="shipment_auto_assign_courier" type="BIT(1)" defaultValueBoolean="false"/>
+            <column name="shipment_auto_close_delivered" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_generate_tracking_number" type="BIT(1)" defaultValueBoolean="false"/>
+            <column name="shipment_cancellation_window_minutes" type="INT" defaultValueNumeric="30"/>
+            <column name="shipment_pickup_cutoff_time" type="VARCHAR(16)" defaultValue="16:00"/>
+            <column name="shipment_tracking_number_key" type="VARCHAR(20)" defaultValue="MGR"/>
+            <column name="shipment_tracking_number_separator" type="VARCHAR(3)" defaultValue="-"/>
+            <column name="shipment_tracking_number_source" type="VARCHAR(32)" defaultValue="SEQUENCE"/>
+            <column name="shipment_tracking_number_random_length" type="INT" defaultValueNumeric="8"/>
+            <column name="shipment_tracking_number_include_date" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_tracking_number_date_format" type="VARCHAR(32)" defaultValue="YYYYMMDD"/>
+            <column name="shipment_tracking_number_uppercase" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_notify_recipient_on_created" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_notify_recipient_on_dispatched" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_notify_recipient_on_delivered" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_notify_sender_on_exception" type="BIT(1)" defaultValueBoolean="true"/>
+            <column name="shipment_notification_channel" type="VARCHAR(32)" defaultValue="SMS"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

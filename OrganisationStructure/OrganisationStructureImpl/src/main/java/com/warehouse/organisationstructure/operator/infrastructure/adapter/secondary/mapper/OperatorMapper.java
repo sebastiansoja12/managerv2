@@ -1,17 +1,44 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.organisationstructure.api.dto.DefaultShipmentStatusDto;
 import com.warehouse.organisationstructure.api.dto.DeliveryTimeConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorDto;
 import com.warehouse.organisationstructure.api.dto.OperatorIdDto;
 import com.warehouse.organisationstructure.api.dto.OperatorStatusDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentLabelConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentLabelFormatDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentNotificationChannelDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentNotificationConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentServiceLevelDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentValidationConfigurationDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentWorkflowConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShippingCapabilitiesDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberDateFormatDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberRuleDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberSourceDto;
 import com.warehouse.organisationstructure.operator.domain.model.Operator;
 import com.warehouse.organisationstructure.operator.domain.model.OperatorStatus;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.entity.OperatorEntity;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DefaultShipmentStatus;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DeliveryTimeConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.LabelFormat;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.NotificationChannel;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ServiceLevel;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLabelConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLimits;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentNotificationConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentValidationConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentWorkflowConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShippingCapabilities;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberDateFormat;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberRule;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberSource;
 
 public final class OperatorMapper {
 
@@ -96,7 +123,7 @@ public final class OperatorMapper {
         }
         return new OperatorConfiguration(
                 toModelShippingCapabilities(dto.shippingCapabilities()),
-                toModelShipmentLimits(dto.shipmentLimits()),
+                toModelShipmentConfiguration(dto.shipmentConfiguration()),
                 toModelDeliveryTimeConfiguration(dto.deliveryTimeConfiguration())
         );
     }
@@ -107,17 +134,17 @@ public final class OperatorMapper {
         }
         return new OperatorConfigurationDto(
                 toDtoShippingCapabilities(configuration.getShippingCapabilities()),
-                toDtoShipmentLimits(configuration.getShipmentLimits()),
+                toDtoShipmentConfiguration(configuration.getShipmentConfiguration()),
                 toDtoDeliveryTimeConfiguration(configuration.getDeliveryTimeConfiguration())
         );
     }
 
-    private static OperatorConfiguration.ShippingCapabilities toModelShippingCapabilities(
+    private static ShippingCapabilities toModelShippingCapabilities(
             final ShippingCapabilitiesDto shippingCapabilities) {
         if (shippingCapabilities == null) {
             return null;
         }
-        return new OperatorConfiguration.ShippingCapabilities(
+        return new ShippingCapabilities(
                 shippingCapabilities.supportsDomesticShipping(),
                 shippingCapabilities.supportsInternationalShipping(),
                 shippingCapabilities.supportsExpressShipping(),
@@ -134,27 +161,129 @@ public final class OperatorMapper {
         );
     }
 
-    private static OperatorConfiguration.ShipmentLimits toModelShipmentLimits(
+    private static ShipmentLimits toModelShipmentLimits(
             final ShipmentLimitsDto shipmentLimits) {
         if (shipmentLimits == null) {
             return null;
         }
-        return new OperatorConfiguration.ShipmentLimits(
+        return new ShipmentLimits(
                 shipmentLimits.maxWeight(),
                 shipmentLimits.minWeight(),
                 shipmentLimits.maxLength(),
                 shipmentLimits.maxWidth(),
                 shipmentLimits.maxHeight(),
-                shipmentLimits.maxShipmentValue()
+                shipmentLimits.maxShipmentValue(),
+                shipmentLimits.allowOversized()
         );
     }
 
-    private static OperatorConfiguration.DeliveryTimeConfiguration toModelDeliveryTimeConfiguration(
+    public static ShipmentConfiguration toModelShipmentConfiguration(
+            final ShipmentConfigurationDto shipmentConfiguration) {
+        if (shipmentConfiguration == null) {
+            return null;
+        }
+        return new ShipmentConfiguration(
+                toModelShipmentValidationConfiguration(shipmentConfiguration.validationConfiguration()),
+                toModelShipmentLabelConfiguration(shipmentConfiguration.labelConfiguration()),
+                toModelShipmentLimits(shipmentConfiguration.shipmentLimits()),
+                toModelShipmentWorkflowConfiguration(shipmentConfiguration.workflowConfiguration()),
+                toModelTrackingNumberRule(shipmentConfiguration.trackingNumberRule()),
+                toModelShipmentNotificationConfiguration(shipmentConfiguration.notificationConfiguration())
+        );
+    }
+
+    private static ShipmentValidationConfiguration toModelShipmentValidationConfiguration(
+            final ShipmentValidationConfigurationDto validationConfiguration) {
+        if (validationConfiguration == null) {
+            return null;
+        }
+        return new ShipmentValidationConfiguration(
+                validationConfiguration.validateAddressData(),
+                validationConfiguration.requireRecipientPhone(),
+                validationConfiguration.requireRecipientEmail(),
+                validationConfiguration.preventDuplicateTracking(),
+                validationConfiguration.requireSenderReference(),
+                validationConfiguration.validatePostalCode()
+        );
+    }
+
+    private static ShipmentLabelConfiguration toModelShipmentLabelConfiguration(
+            final ShipmentLabelConfigurationDto labelConfiguration) {
+        if (labelConfiguration == null) {
+            return null;
+        }
+        return new ShipmentLabelConfiguration(
+                labelConfiguration.autoGenerateLabels(),
+                labelConfiguration.includeReturnLabel(),
+                labelConfiguration.attachPackingSlip(),
+                labelConfiguration.labelFormat() != null
+                        ? LabelFormat.valueOf(labelConfiguration.labelFormat().name())
+                        : null
+        );
+    }
+
+    private static ShipmentWorkflowConfiguration toModelShipmentWorkflowConfiguration(
+            final ShipmentWorkflowConfigurationDto workflowConfiguration) {
+        if (workflowConfiguration == null) {
+            return null;
+        }
+        return new ShipmentWorkflowConfiguration(
+                workflowConfiguration.defaultStatus() != null
+                        ? DefaultShipmentStatus.valueOf(workflowConfiguration.defaultStatus().name())
+                        : null,
+                workflowConfiguration.defaultServiceLevel() != null
+                        ? ServiceLevel.valueOf(workflowConfiguration.defaultServiceLevel().name())
+                        : null,
+                workflowConfiguration.autoAssignCourier(),
+                workflowConfiguration.autoCloseDelivered(),
+                workflowConfiguration.generateTrackingNumber(),
+                workflowConfiguration.cancellationWindowMinutes(),
+                workflowConfiguration.pickupCutoffTime()
+        );
+    }
+
+    private static TrackingNumberRule toModelTrackingNumberRule(
+            final TrackingNumberRuleDto trackingNumberRule) {
+        if (trackingNumberRule == null) {
+            return null;
+        }
+        return new TrackingNumberRule(
+                trackingNumberRule.key(),
+                trackingNumberRule.separator(),
+                trackingNumberRule.source() != null
+                        ? TrackingNumberSource.valueOf(trackingNumberRule.source().name())
+                        : null,
+                trackingNumberRule.randomLength(),
+                trackingNumberRule.includeDate(),
+                trackingNumberRule.dateFormat() != null
+                        ? TrackingNumberDateFormat.valueOf(trackingNumberRule.dateFormat().name())
+                        : null,
+                trackingNumberRule.uppercase()
+        );
+    }
+
+    private static ShipmentNotificationConfiguration toModelShipmentNotificationConfiguration(
+            final ShipmentNotificationConfigurationDto notificationConfiguration) {
+        if (notificationConfiguration == null) {
+            return null;
+        }
+        return new ShipmentNotificationConfiguration(
+                notificationConfiguration.notifyRecipientOnCreated(),
+                notificationConfiguration.notifyRecipientOnDispatched(),
+                notificationConfiguration.notifyRecipientOnDelivered(),
+                notificationConfiguration.notifySenderOnException(),
+                notificationConfiguration.notificationChannel() != null
+                        ? NotificationChannel.valueOf(notificationConfiguration.notificationChannel().name())
+                        : null
+        );
+    }
+
+    private static DeliveryTimeConfiguration toModelDeliveryTimeConfiguration(
             final DeliveryTimeConfigurationDto deliveryTimeConfiguration) {
         if (deliveryTimeConfiguration == null) {
             return null;
         }
-        return new OperatorConfiguration.DeliveryTimeConfiguration(
+        return new DeliveryTimeConfiguration(
                 deliveryTimeConfiguration.minDeliveryDays(),
                 deliveryTimeConfiguration.maxDeliveryDays(),
                 deliveryTimeConfiguration.expressDeliveryDays(),
@@ -164,7 +293,7 @@ public final class OperatorMapper {
     }
 
     private static ShippingCapabilitiesDto toDtoShippingCapabilities(
-            final OperatorConfiguration.ShippingCapabilities capabilities) {
+            final ShippingCapabilities capabilities) {
         if (capabilities == null) {
             return null;
         }
@@ -186,7 +315,7 @@ public final class OperatorMapper {
     }
 
     private static ShipmentLimitsDto toDtoShipmentLimits(
-            final OperatorConfiguration.ShipmentLimits limits) {
+            final ShipmentLimits limits) {
         if (limits == null) {
             return null;
         }
@@ -196,12 +325,117 @@ public final class OperatorMapper {
                 limits.getMaxLength(),
                 limits.getMaxWidth(),
                 limits.getMaxHeight(),
-                limits.getMaxShipmentValue()
+                limits.getMaxShipmentValue(),
+                limits.isAllowOversized()
+        );
+    }
+
+    public static ShipmentConfigurationDto toDtoShipmentConfiguration(
+            final ShipmentConfiguration configuration) {
+        if (configuration == null) {
+            return null;
+        }
+        return new ShipmentConfigurationDto(
+                toDtoShipmentValidationConfiguration(configuration.getValidationConfiguration()),
+                toDtoShipmentLabelConfiguration(configuration.getLabelConfiguration()),
+                toDtoShipmentLimits(configuration.getShipmentLimits()),
+                toDtoShipmentWorkflowConfiguration(configuration.getWorkflowConfiguration()),
+                toDtoTrackingNumberRule(configuration.getTrackingNumberRule()),
+                toDtoShipmentNotificationConfiguration(configuration.getNotificationConfiguration())
+        );
+    }
+
+    public static ShipmentLimitsDto toDtoCurrentShipmentLimits(final OperatorConfiguration configuration) {
+        if (configuration == null) {
+            return null;
+        }
+        return toDtoShipmentLimits(configuration.getShipmentLimits());
+    }
+
+    private static ShipmentValidationConfigurationDto toDtoShipmentValidationConfiguration(
+            final ShipmentValidationConfiguration configuration) {
+        if (configuration == null) {
+            return null;
+        }
+        return new ShipmentValidationConfigurationDto(
+                configuration.isValidateAddressData(),
+                configuration.isRequireRecipientPhone(),
+                configuration.isRequireRecipientEmail(),
+                configuration.isPreventDuplicateTracking(),
+                configuration.isRequireSenderReference(),
+                configuration.isValidatePostalCode()
+        );
+    }
+
+    private static ShipmentLabelConfigurationDto toDtoShipmentLabelConfiguration(
+            final ShipmentLabelConfiguration configuration) {
+        if (configuration == null) {
+            return null;
+        }
+        return new ShipmentLabelConfigurationDto(
+                configuration.isAutoGenerateLabels(),
+                configuration.isIncludeReturnLabel(),
+                configuration.isAttachPackingSlip(),
+                configuration.getLabelFormat() != null
+                        ? ShipmentLabelFormatDto.valueOf(configuration.getLabelFormat().name())
+                        : null
+        );
+    }
+
+    private static ShipmentWorkflowConfigurationDto toDtoShipmentWorkflowConfiguration(
+            final ShipmentWorkflowConfiguration configuration) {
+        if (configuration == null) {
+            return null;
+        }
+        return new ShipmentWorkflowConfigurationDto(
+                configuration.getDefaultStatus() != null
+                        ? DefaultShipmentStatusDto.valueOf(configuration.getDefaultStatus().name())
+                        : null,
+                configuration.getDefaultServiceLevel() != null
+                        ? ShipmentServiceLevelDto.valueOf(configuration.getDefaultServiceLevel().name())
+                        : null,
+                configuration.isAutoAssignCourier(),
+                configuration.isAutoCloseDelivered(),
+                configuration.isGenerateTrackingNumber(),
+                configuration.getCancellationWindowMinutes(),
+                configuration.getPickupCutoffTime()
+        );
+    }
+
+    private static TrackingNumberRuleDto toDtoTrackingNumberRule(
+            final TrackingNumberRule rule) {
+        if (rule == null) {
+            return null;
+        }
+        return new TrackingNumberRuleDto(
+                rule.getKey(),
+                rule.getSeparator(),
+                rule.getSource() != null ? TrackingNumberSourceDto.valueOf(rule.getSource().name()) : null,
+                rule.getRandomLength(),
+                rule.isIncludeDate(),
+                rule.getDateFormat() != null ? TrackingNumberDateFormatDto.valueOf(rule.getDateFormat().name()) : null,
+                rule.isUppercase()
+        );
+    }
+
+    private static ShipmentNotificationConfigurationDto toDtoShipmentNotificationConfiguration(
+            final ShipmentNotificationConfiguration configuration) {
+        if (configuration == null) {
+            return null;
+        }
+        return new ShipmentNotificationConfigurationDto(
+                configuration.isNotifyRecipientOnCreated(),
+                configuration.isNotifyRecipientOnDispatched(),
+                configuration.isNotifyRecipientOnDelivered(),
+                configuration.isNotifySenderOnException(),
+                configuration.getNotificationChannel() != null
+                        ? ShipmentNotificationChannelDto.valueOf(configuration.getNotificationChannel().name())
+                        : null
         );
     }
 
     private static DeliveryTimeConfigurationDto toDtoDeliveryTimeConfiguration(
-            final OperatorConfiguration.DeliveryTimeConfiguration configuration) {
+            final DeliveryTimeConfiguration configuration) {
         if (configuration == null) {
             return null;
         }
