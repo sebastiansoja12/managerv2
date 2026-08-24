@@ -6,6 +6,7 @@ public record ShipmentLimitsDto(
         double maxLength,
         double maxWidth,
         double maxHeight,
-        double maxShipmentValue
+        double maxShipmentValue,
+        boolean allowOversized
 ) {
 }
