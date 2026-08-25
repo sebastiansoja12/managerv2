@@ -4,6 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.UserApiService;
+import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.logistics.domain.port.primary.*;
 import com.warehouse.logistics.domain.port.secondary.*;
 import com.warehouse.logistics.domain.service.LogisticsService;
@@ -14,13 +17,17 @@ import com.warehouse.logistics.infrastructure.adapter.primary.LoggingSoapEndpoin
 import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import com.warehouse.logistics.infrastructure.adapter.secondary.*;
+import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DeliveryEntity;
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.DeviceEventPublisher;
 import com.warehouse.xmlconverter.XmlToStringService;
 import com.warehouse.xmlconverter.XmlToStringServiceImpl;
+import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Configuration
 public class LogisticsConfiguration {
@@ -86,14 +93,24 @@ public class LogisticsConfiguration {
 
 	@Bean
 	public LogisticsService deliveryService(LogisticsRepository logisticsRepository,
-                                            DeliveryTokenServicePort servicePort) {
-		return new LogisticsServiceImpl(logisticsRepository, servicePort);
+                                            DeliveryTokenServicePort servicePort,
+                                            DepartmentRepository departmentRepository,
+                                            OperatorContextProvider operatorContextProvider) {
+		return new LogisticsServiceImpl(logisticsRepository, servicePort, departmentRepository, operatorContextProvider);
 	}
 
     @Bean
-    public LogisticsRepository deliveryRepository(final LogisticsReadRepository repository,
-                                                  final DepartmentReadRepository departmentReadRepository) {
-        return new LogisticsRepositoryImpl(repository, departmentReadRepository);
+    public BaseRepository<DeliveryEntity> logisticsDeliveryEntityRepository(
+            final EntityManager entityManager,
+            final OperatorContextProvider operatorContextProvider) {
+        return new BaseRepository<>(entityManager, operatorContextProvider);
+    }
+
+    @Bean
+    public LogisticsRepository deliveryRepository(
+            @Qualifier("logisticsDeliveryEntityRepository")
+            final BaseRepository<DeliveryEntity> repository) {
+        return new LogisticsRepositoryImpl(repository);
     }
 
     @Bean(name = "logistics.supplierTokenServicePort")
@@ -117,8 +134,8 @@ public class LogisticsConfiguration {
     }
 
     @Bean("logistics.departmentRepository")
-    public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
-        return new DepartmentRepositoryImpl(repository);
+    public DepartmentRepository departmentRepository(final DepartmentApiService departmentApiService) {
+        return new DepartmentRepositoryImpl(departmentApiService);
     }
 
     @Bean(name = "logistics.requestMapper")
@@ -129,5 +146,10 @@ public class LogisticsConfiguration {
     @Bean(name = "logistics.responseMapper")
     public LogisticsResponseMapper responseMapper() {
         return new LogisticsResponseMapper();
+    }
+
+    @Bean
+    public DeliveryResponseMapper deliveryResponseMapper() {
+        return new DeliveryResponseMapper();
     }
 }
