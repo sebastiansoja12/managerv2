@@ -1,35 +1,75 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
-import org.mapstruct.factory.Mappers;
-
-import com.warehouse.logistics.domain.model.LogisticsRequest;
-import com.warehouse.logistics.domain.model.LogisticsResponse;
+import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
+import com.warehouse.logistics.domain.enumeration.DeliveryType;
+import com.warehouse.logistics.domain.model.Delivery;
+import com.warehouse.logistics.domain.model.DeliveryTarget;
 import com.warehouse.logistics.domain.port.secondary.LogisticsRepository;
 import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DeliveryEntity;
-import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.logistics.infrastructure.adapter.secondary.mapper.DeliveryEntityMapper;
+import org.mapstruct.factory.Mappers;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 public class LogisticsRepositoryImpl implements LogisticsRepository {
 
-    private final LogisticsReadRepository repository;
-
-    private final DepartmentReadRepository departmentReadRepository;
-
+    private final OperatorFilteredRepository<DeliveryEntity> repository;
     private final DeliveryEntityMapper mapper = Mappers.getMapper(DeliveryEntityMapper.class);
 
-    public LogisticsRepositoryImpl(final LogisticsReadRepository repository,
-                                   final DepartmentReadRepository departmentReadRepository) {
+    public LogisticsRepositoryImpl(final OperatorFilteredRepository<DeliveryEntity> repository) {
         this.repository = repository;
-        this.departmentReadRepository = departmentReadRepository;
     }
 
     @Override
-    public LogisticsResponse create(final LogisticsRequest logistics) {
-        final DepartmentEntity department = departmentReadRepository
-                .findByDepartmentCode(logistics.getDepartmentCode().getValue())
-                .orElseThrow();
-        final DeliveryEntity entity = mapper.map(logistics, department.getDepartmentId());
-        repository.save(entity);
-        return mapper.map(entity);
+    @Transactional(readOnly = true)
+    public Optional<Delivery> findById(final DeliveryId deliveryId) {
+        return repository.createCriteria(DeliveryEntity.class)
+                .eq("id.id", deliveryId.getId())
+                .one()
+                .map(mapper::toDomain);
     }
+
+    @Override
+    public Optional<Delivery> findByTargetAndType(final DeliveryTarget target, final DeliveryType type) {
+        return repository.createCriteria(DeliveryEntity.class)
+                .eq("targetType", target.type())
+                .eq("targetId", target.id())
+                .eq("type", type)
+                .maxResults(1)
+                .one()
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Delivery> findRecent(final int offset, final int limit) {
+        return repository.createCriteria(DeliveryEntity.class)
+                .desc("created")
+                .firstResult(offset)
+                .maxResults(limit)
+                .list().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public void createOrUpdate(final Delivery delivery) {
+        final DeliveryEntity entity = mapper.toEntity(delivery);
+        if (deliveryExists(delivery.getDeliveryId())) {
+            repository.update(entity);
+        } else {
+            repository.create(entity);
+        }
+    }
+
+    private boolean deliveryExists(final DeliveryId deliveryId) {
+        return deliveryId != null && repository.createCriteria(DeliveryEntity.class)
+                .eq("id.id", deliveryId.getId())
+                .one()
+                .isPresent();
+    }
+
 }
