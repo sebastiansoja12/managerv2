@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-09-29-shipment-dangerous-good-table" author="s-soja">
+        <sql>
+            ALTER TABLE shipment ADD COLUMN dangerous_good_id BIGINT;
+            ALTER TABLE shipment_rd ADD COLUMN dangerous_good_id BIGINT;
+            ALTER TABLE shipment_aud ADD COLUMN dangerous_good_id BIGINT;
+            ALTER TABLE shipment ADD COLUMN signature_id BIGINT;
+            ALTER TABLE shipment_rd ADD COLUMN signature_id BIGINT;
+            ALTER TABLE shipment_aud ADD COLUMN signature_id BIGINT;
+            ALTER TABLE shipment ADD COLUMN signature_required BOOLEAN NOT NULL DEFAULT FALSE;
+            ALTER TABLE shipment_rd ADD COLUMN signature_required BOOLEAN NOT NULL DEFAULT FALSE;
+            ALTER TABLE shipment_aud ADD COLUMN signature_required BOOLEAN NOT NULL DEFAULT FALSE;
+
+            UPDATE shipment s SET signature_id = s.shipment_id
+                WHERE EXISTS (SELECT 1 FROM signature sig WHERE sig.shipment_id = s.shipment_id);
+            UPDATE shipment_rd s SET signature_id = s.shipment_id
+                WHERE EXISTS (SELECT 1 FROM signature sig WHERE sig.shipment_id = s.shipment_id);
+            UPDATE shipment SET signature_required = TRUE WHERE signature_id IS NOT NULL;
+            UPDATE shipment_rd SET signature_required = TRUE WHERE signature_id IS NOT NULL;
+
+            CREATE TABLE shipment_dangerous_good AS
+            SELECT shipment_id,
+                   dangerous_good_un_number,
+                   dangerous_good_proper_shipping_name,
+                   dangerous_good_description,
+                   dangerous_good_hazard_class,
+                   dangerous_good_hazard_division,
+                   dangerous_good_subsidiary_risk,
+                   dangerous_good_packing_group,
+                   dangerous_good_quantity,
+                   dangerous_good_quantity_unit,
+                   dangerous_good_package_count,
+                   dangerous_good_packaging_type,
+                   dangerous_good_limited_quantity,
+                   dangerous_good_excepted_quantity,
+                   dangerous_good_environmentally_hazardous,
+                   dangerous_good_marine_pollutant,
+                   dangerous_good_transport_category,
+                   dangerous_good_tunnel_restriction_code,
+                   dangerous_good_flash_point,
+                   dangerous_good_emergency_contact,
+                   dangerous_good_emergency_contact_24h,
+                   dangerous_good_safety_data_sheet_reference,
+                   dangerous_good_declaration_document_reference,
+                   dangerous_good_regulation_type,
+                   dangerous_good_transport_mode,
+                   dangerous_good_flammable,
+                   dangerous_good_corrosive,
+                   dangerous_good_toxic,
+                   dangerous_good_hazard_symbols,
+                   dangerous_good_storage_requirements,
+                   dangerous_good_handling_instructions,
+                   dangerous_good_country_origin
+            FROM shipment
+            WHERE 1 = 0;
+
+            ALTER TABLE shipment_dangerous_good
+                ADD COLUMN dangerous_good_id BIGINT;
+            ALTER TABLE shipment_dangerous_good
+                ADD CONSTRAINT pk_shipment_dangerous_good PRIMARY KEY (dangerous_good_id);
+            ALTER TABLE shipment_dangerous_good
+                ADD CONSTRAINT fk_shipment_dangerous_good_shipment
+                    FOREIGN KEY (shipment_id) REFERENCES shipment (shipment_id) ON DELETE CASCADE;
+            ALTER TABLE shipment_dangerous_good
+                ADD CONSTRAINT uk_shipment_dangerous_good_shipment UNIQUE (shipment_id);
+
+            CREATE TABLE shipment_dangerous_good_aud AS
+            SELECT shipment_id,
+                   rev,
+                   revtype,
+                   dangerous_good_un_number,
+                   dangerous_good_proper_shipping_name,
+                   dangerous_good_description,
+                   dangerous_good_hazard_class,
+                   dangerous_good_hazard_division,
+                   dangerous_good_subsidiary_risk,
+                   dangerous_good_packing_group,
+                   dangerous_good_quantity,
+                   dangerous_good_quantity_unit,
+                   dangerous_good_package_count,
+                   dangerous_good_packaging_type,
+                   dangerous_good_limited_quantity,
+                   dangerous_good_excepted_quantity,
+                   dangerous_good_environmentally_hazardous,
+                   dangerous_good_marine_pollutant,
+                   dangerous_good_transport_category,
+                   dangerous_good_tunnel_restriction_code,
+                   dangerous_good_flash_point,
+                   dangerous_good_emergency_contact,
+                   dangerous_good_emergency_contact_24h,
+                   dangerous_good_safety_data_sheet_reference,
+                   dangerous_good_declaration_document_reference,
+                   dangerous_good_regulation_type,
+                   dangerous_good_transport_mode,
+                   dangerous_good_flammable,
+                   dangerous_good_corrosive,
+                   dangerous_good_toxic,
+                   dangerous_good_hazard_symbols,
+                   dangerous_good_storage_requirements,
+                   dangerous_good_handling_instructions,
+                   dangerous_good_country_origin
+            FROM shipment_aud
+            WHERE 1 = 0;
+
+            ALTER TABLE shipment_dangerous_good_aud
+                ADD COLUMN dangerous_good_id BIGINT;
+            ALTER TABLE shipment_dangerous_good_aud
+                ADD CONSTRAINT pk_shipment_dangerous_good_aud PRIMARY KEY (dangerous_good_id, rev);
+            ALTER TABLE shipment_dangerous_good_aud
+                ADD CONSTRAINT fk_shipment_dangerous_good_aud_revinfo
+                    FOREIGN KEY (rev) REFERENCES revinfo (rev);
+
+            INSERT INTO shipment_dangerous_good (
+                shipment_id, dangerous_good_id, dangerous_good_un_number, dangerous_good_proper_shipping_name,
+                dangerous_good_description, dangerous_good_hazard_class, dangerous_good_hazard_division,
+                dangerous_good_subsidiary_risk, dangerous_good_packing_group, dangerous_good_quantity,
+                dangerous_good_quantity_unit, dangerous_good_package_count, dangerous_good_packaging_type,
+                dangerous_good_limited_quantity, dangerous_good_excepted_quantity,
+                dangerous_good_environmentally_hazardous, dangerous_good_marine_pollutant,
+                dangerous_good_transport_category, dangerous_good_tunnel_restriction_code,
+                dangerous_good_flash_point, dangerous_good_emergency_contact,
+                dangerous_good_emergency_contact_24h, dangerous_good_safety_data_sheet_reference,
+                dangerous_good_declaration_document_reference, dangerous_good_regulation_type,
+                dangerous_good_transport_mode, dangerous_good_flammable, dangerous_good_corrosive,
+                dangerous_good_toxic, dangerous_good_hazard_symbols, dangerous_good_storage_requirements,
+                dangerous_good_handling_instructions, dangerous_good_country_origin
+            )
+            SELECT shipment_id, shipment_id, dangerous_good_un_number, dangerous_good_proper_shipping_name,
+                   dangerous_good_description, dangerous_good_hazard_class, dangerous_good_hazard_division,
+                   dangerous_good_subsidiary_risk, dangerous_good_packing_group, dangerous_good_quantity,
+                   dangerous_good_quantity_unit, dangerous_good_package_count, dangerous_good_packaging_type,
+                   dangerous_good_limited_quantity, dangerous_good_excepted_quantity,
+                   dangerous_good_environmentally_hazardous, dangerous_good_marine_pollutant,
+                   dangerous_good_transport_category, dangerous_good_tunnel_restriction_code,
+                   dangerous_good_flash_point, dangerous_good_emergency_contact,
+                   dangerous_good_emergency_contact_24h, dangerous_good_safety_data_sheet_reference,
+                   dangerous_good_declaration_document_reference, dangerous_good_regulation_type,
+                   dangerous_good_transport_mode, dangerous_good_flammable, dangerous_good_corrosive,
+                   dangerous_good_toxic, dangerous_good_hazard_symbols, dangerous_good_storage_requirements,
+                   dangerous_good_handling_instructions, dangerous_good_country_origin
+            FROM shipment
+            WHERE dangerous_good_un_number IS NOT NULL;
+
+            INSERT INTO shipment_dangerous_good_aud (
+                shipment_id, rev, revtype, dangerous_good_id, dangerous_good_un_number, dangerous_good_proper_shipping_name,
+                dangerous_good_description, dangerous_good_hazard_class, dangerous_good_hazard_division,
+                dangerous_good_subsidiary_risk, dangerous_good_packing_group, dangerous_good_quantity,
+                dangerous_good_quantity_unit, dangerous_good_package_count, dangerous_good_packaging_type,
+                dangerous_good_limited_quantity, dangerous_good_excepted_quantity,
+                dangerous_good_environmentally_hazardous, dangerous_good_marine_pollutant,
+                dangerous_good_transport_category, dangerous_good_tunnel_restriction_code,
+                dangerous_good_flash_point, dangerous_good_emergency_contact,
+                dangerous_good_emergency_contact_24h, dangerous_good_safety_data_sheet_reference,
+                dangerous_good_declaration_document_reference, dangerous_good_regulation_type,
+                dangerous_good_transport_mode, dangerous_good_flammable, dangerous_good_corrosive,
+                dangerous_good_toxic, dangerous_good_hazard_symbols, dangerous_good_storage_requirements,
+                dangerous_good_handling_instructions, dangerous_good_country_origin
+            )
+            SELECT shipment_id, rev, revtype, shipment_id, dangerous_good_un_number, dangerous_good_proper_shipping_name,
+                   dangerous_good_description, dangerous_good_hazard_class, dangerous_good_hazard_division,
+                   dangerous_good_subsidiary_risk, dangerous_good_packing_group, dangerous_good_quantity,
+                   dangerous_good_quantity_unit, dangerous_good_package_count, dangerous_good_packaging_type,
+                   dangerous_good_limited_quantity, dangerous_good_excepted_quantity,
+                   dangerous_good_environmentally_hazardous, dangerous_good_marine_pollutant,
+                   dangerous_good_transport_category, dangerous_good_tunnel_restriction_code,
+                   dangerous_good_flash_point, dangerous_good_emergency_contact,
+                   dangerous_good_emergency_contact_24h, dangerous_good_safety_data_sheet_reference,
+                   dangerous_good_declaration_document_reference, dangerous_good_regulation_type,
+                   dangerous_good_transport_mode, dangerous_good_flammable, dangerous_good_corrosive,
+                   dangerous_good_toxic, dangerous_good_hazard_symbols, dangerous_good_storage_requirements,
+                   dangerous_good_handling_instructions, dangerous_good_country_origin
+            FROM shipment_aud
+            WHERE dangerous_good_un_number IS NOT NULL;
+
+            UPDATE shipment SET dangerous_good_id = shipment_id WHERE dangerous_good_un_number IS NOT NULL;
+            UPDATE shipment_rd SET dangerous_good_id = shipment_id WHERE dangerous_good_un_number IS NOT NULL;
+            UPDATE shipment_aud SET dangerous_good_id = shipment_id WHERE dangerous_good_un_number IS NOT NULL;
+
+            DROP INDEX idx_shipment_dangerous_good_un_number;
+            DROP INDEX idx_shipment_dangerous_good_hazard_class;
+            DROP INDEX idx_shipment_rd_dangerous_good_un_number;
+            DROP INDEX idx_shipment_rd_dangerous_good_hazard_class;
+
+            ALTER TABLE shipment DROP COLUMN dangerous_good_un_number, DROP COLUMN dangerous_good_proper_shipping_name,
+                DROP COLUMN dangerous_good_description, DROP COLUMN dangerous_good_hazard_class,
+                DROP COLUMN dangerous_good_hazard_division, DROP COLUMN dangerous_good_subsidiary_risk,
+                DROP COLUMN dangerous_good_packing_group, DROP COLUMN dangerous_good_quantity,
+                DROP COLUMN dangerous_good_quantity_unit, DROP COLUMN dangerous_good_package_count,
+                DROP COLUMN dangerous_good_packaging_type, DROP COLUMN dangerous_good_limited_quantity,
+                DROP COLUMN dangerous_good_excepted_quantity, DROP COLUMN dangerous_good_environmentally_hazardous,
+                DROP COLUMN dangerous_good_marine_pollutant, DROP COLUMN dangerous_good_transport_category,
+                DROP COLUMN dangerous_good_tunnel_restriction_code, DROP COLUMN dangerous_good_flash_point,
+                DROP COLUMN dangerous_good_emergency_contact, DROP COLUMN dangerous_good_emergency_contact_24h,
+                DROP COLUMN dangerous_good_safety_data_sheet_reference,
+                DROP COLUMN dangerous_good_declaration_document_reference, DROP COLUMN dangerous_good_regulation_type,
+                DROP COLUMN dangerous_good_transport_mode, DROP COLUMN dangerous_good_flammable,
+                DROP COLUMN dangerous_good_corrosive, DROP COLUMN dangerous_good_toxic,
+                DROP COLUMN dangerous_good_hazard_symbols, DROP COLUMN dangerous_good_storage_requirements,
+                DROP COLUMN dangerous_good_handling_instructions, DROP COLUMN dangerous_good_country_origin;
+
+            ALTER TABLE shipment_rd DROP COLUMN dangerous_good_un_number, DROP COLUMN dangerous_good_proper_shipping_name,
+                DROP COLUMN dangerous_good_description, DROP COLUMN dangerous_good_hazard_class,
+                DROP COLUMN dangerous_good_hazard_division, DROP COLUMN dangerous_good_subsidiary_risk,
+                DROP COLUMN dangerous_good_packing_group, DROP COLUMN dangerous_good_quantity,
+                DROP COLUMN dangerous_good_quantity_unit, DROP COLUMN dangerous_good_package_count,
+                DROP COLUMN dangerous_good_packaging_type, DROP COLUMN dangerous_good_limited_quantity,
+                DROP COLUMN dangerous_good_excepted_quantity, DROP COLUMN dangerous_good_environmentally_hazardous,
+                DROP COLUMN dangerous_good_marine_pollutant, DROP COLUMN dangerous_good_transport_category,
+                DROP COLUMN dangerous_good_tunnel_restriction_code, DROP COLUMN dangerous_good_flash_point,
+                DROP COLUMN dangerous_good_emergency_contact, DROP COLUMN dangerous_good_emergency_contact_24h,
+                DROP COLUMN dangerous_good_safety_data_sheet_reference,
+                DROP COLUMN dangerous_good_declaration_document_reference, DROP COLUMN dangerous_good_regulation_type,
+                DROP COLUMN dangerous_good_transport_mode, DROP COLUMN dangerous_good_flammable,
+                DROP COLUMN dangerous_good_corrosive, DROP COLUMN dangerous_good_toxic,
+                DROP COLUMN dangerous_good_hazard_symbols, DROP COLUMN dangerous_good_storage_requirements,
+                DROP COLUMN dangerous_good_handling_instructions, DROP COLUMN dangerous_good_country_origin;
+
+            ALTER TABLE shipment_aud DROP COLUMN dangerous_good_un_number, DROP COLUMN dangerous_good_proper_shipping_name,
+                DROP COLUMN dangerous_good_description, DROP COLUMN dangerous_good_hazard_class,
+                DROP COLUMN dangerous_good_hazard_division, DROP COLUMN dangerous_good_subsidiary_risk,
+                DROP COLUMN dangerous_good_packing_group, DROP COLUMN dangerous_good_quantity,
+                DROP COLUMN dangerous_good_quantity_unit, DROP COLUMN dangerous_good_package_count,
+                DROP COLUMN dangerous_good_packaging_type, DROP COLUMN dangerous_good_limited_quantity,
+                DROP COLUMN dangerous_good_excepted_quantity, DROP COLUMN dangerous_good_environmentally_hazardous,
+                DROP COLUMN dangerous_good_marine_pollutant, DROP COLUMN dangerous_good_transport_category,
+                DROP COLUMN dangerous_good_tunnel_restriction_code, DROP COLUMN dangerous_good_flash_point,
+                DROP COLUMN dangerous_good_emergency_contact, DROP COLUMN dangerous_good_emergency_contact_24h,
+                DROP COLUMN dangerous_good_safety_data_sheet_reference,
+                DROP COLUMN dangerous_good_declaration_document_reference, DROP COLUMN dangerous_good_regulation_type,
+                DROP COLUMN dangerous_good_transport_mode, DROP COLUMN dangerous_good_flammable,
+                DROP COLUMN dangerous_good_corrosive, DROP COLUMN dangerous_good_toxic,
+                DROP COLUMN dangerous_good_hazard_symbols, DROP COLUMN dangerous_good_storage_requirements,
+                DROP COLUMN dangerous_good_handling_instructions, DROP COLUMN dangerous_good_country_origin;
+
+            CREATE INDEX idx_shipment_dangerous_good_un_number ON shipment_dangerous_good (dangerous_good_un_number);
+            CREATE INDEX idx_shipment_dangerous_good_hazard_class ON shipment_dangerous_good (dangerous_good_hazard_class);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
