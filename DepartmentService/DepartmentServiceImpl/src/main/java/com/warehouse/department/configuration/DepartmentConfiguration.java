@@ -1,7 +1,6 @@
 package com.warehouse.department.configuration;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -87,10 +86,8 @@ public class DepartmentConfiguration {
     }
 
     @Bean
-    public UserClientServicePort userClientServicePort(final KafkaTemplateClient kafkaTemplateClient,
-                                                       @Value("${manager.kafka.topics.department-user-events:department.user.events}")
-                                                       final String departmentUserEventsTopic) {
-        return new UserClientServiceAdapter(kafkaTemplateClient, departmentUserEventsTopic);
+    public UserClientServicePort userClientServicePort(final KafkaTemplateClient kafkaTemplateClient) {
+        return new UserClientServiceAdapter(kafkaTemplateClient);
     }
 
     @Bean

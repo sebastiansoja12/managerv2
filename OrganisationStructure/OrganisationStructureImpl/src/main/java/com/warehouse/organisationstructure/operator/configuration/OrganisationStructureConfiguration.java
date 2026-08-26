@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.OperatorUserEventPublisher;
 import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPort;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPortImpl;
@@ -55,8 +56,8 @@ public class OrganisationStructureConfiguration {
 
     @Bean
     public OperatorConfigurationEventServicePort operatorConfigurationEventServicePort(
-            final ApplicationEventPublisher applicationEventPublisher) {
-        return new OperatorConfigurationKafkaServiceAdapter(applicationEventPublisher);
+            final KafkaTemplateClient kafkaTemplateClient) {
+        return new OperatorConfigurationKafkaServiceAdapter(kafkaTemplateClient);
     }
 
     @Bean
