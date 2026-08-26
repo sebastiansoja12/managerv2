@@ -21,8 +21,11 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
+import com.warehouse.shipment.domain.port.secondary.ShipmentConfigurationServicePort;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.service.TrackingNumberService;
+import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
+import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 
@@ -138,6 +141,49 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldRejectAnyChangeAfterShipmentIsDelivered() {
+        final Shipment shipment = shipment(null);
+
+        shipment.notifyShipmentDelivered();
+
+        assertAll(
+                () -> assertThrows(ShipmentModificationException.class, () -> shipment.changeSender(sender())),
+                () -> assertThrows(ShipmentModificationException.class, () -> shipment.changeRecipient(recipient())),
+                () -> assertThrows(ShipmentModificationException.class,
+                        () -> shipment.changeShipmentStatus(ShipmentStatus.SENT)),
+                () -> assertThrows(ShipmentModificationException.class,
+                        () -> shipment.redirectToSender(new ShipmentId(10L))),
+                () -> assertThrows(ShipmentModificationException.class,
+                        () -> shipment.changeShipmentType(ShipmentType.PARENT))
+        );
+    }
+
+    @Test
+    void shouldCancelShipmentWithinConfiguredCancellationWindow() {
+        configureCancellationWindow(30);
+        final Shipment shipment = shipment(null);
+        shipment.setCreatedAt(LocalDateTime.now().minusMinutes(10));
+
+        shipment.cancel();
+
+        assertTrue(shipment.getLocked());
+    }
+
+    @Test
+    void shouldRejectShipmentCancellationAfterConfiguredCancellationWindow() {
+        configureCancellationWindow(30);
+        final Shipment shipment = shipment(null);
+        shipment.setCreatedAt(LocalDateTime.now().minusMinutes(31));
+
+        final ShipmentModificationException exception = assertThrows(
+                ShipmentModificationException.class,
+                shipment::cancel
+        );
+
+        assertEquals("Shipment cancellation window expired", exception.getMessage());
+    }
+
+    @Test
     void shouldNotBypassDangerousGoodStatusRuleThroughGeneralUpdate() {
         final Shipment shipment = shipment(null);
         shipment.changeShipmentStatus(ShipmentStatus.SENT);
@@ -202,5 +248,30 @@ class ShipmentTest {
                 new TrackingNumber("TEST-TRACKING-NUMBER"),
                 ShipmentStatus.CREATED
         );
+    }
+
+    private void configureCancellationWindow(final int cancellationWindowMinutes) {
+        final ApplicationContext applicationContext = mock(ApplicationContext.class);
+        final ShipmentConfigurationServicePort configurationServicePort = mock(ShipmentConfigurationServicePort.class);
+        final OperatorShipmentConfiguration configuration = new OperatorShipmentConfiguration(
+                null,
+                null,
+                null,
+                new ShipmentWorkflowSettings(
+                        ShipmentStatus.CREATED,
+                        null,
+                        false,
+                        true,
+                        false,
+                        cancellationWindowMinutes,
+                        "16:00"
+                ),
+                null,
+                null
+        );
+
+        ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
+        when(applicationContext.getBean(ShipmentConfigurationServicePort.class)).thenReturn(configurationServicePort);
+        when(configurationServicePort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
     }
 }

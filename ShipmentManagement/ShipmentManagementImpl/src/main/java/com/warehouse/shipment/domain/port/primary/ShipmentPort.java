@@ -59,4 +59,6 @@ public interface ShipmentPort {
     ShipmentReturnPage loadShipmentReturns(final DepartmentCode departmentCode, final int page, final int size);
 
     void processShipmentDelivery(final ShipmentDeliveryCommand command);
+
+    void cancel(final ShipmentId shipmentId);
 }

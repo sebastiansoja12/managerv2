@@ -48,7 +48,7 @@ public class ShipmentEventListener {
     @TransactionalEventListener(fallbackExecution = true)
     public void handle(final ShipmentLocked event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
-        this.returningServicePort.notifyShipmentReturnCompleted(snapshot);
+        this.shipmentService.lockShipment(snapshot.shipmentId());
     }
 
     @EventListener

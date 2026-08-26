@@ -1,11 +1,9 @@
 package com.warehouse.shipment.domain.port.primary;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ReturnId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
@@ -19,7 +17,6 @@ import com.warehouse.shipment.domain.port.secondary.*;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
-import com.warehouse.shipment.domain.vo.conf.ShipmentLabelSettings;
 import com.warehouse.shipment.domain.vo.conf.ShipmentMetrics;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +56,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ShipmentConfigurationServicePort shipmentConfigurationServicePort;
 
+    private final OperatorContextProvider operatorContextProvider;
+
     private final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT,
             ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
 
@@ -75,7 +74,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final ReturningServicePort returningServicePort,
                             final MailNotificationServicePort mailNotificationServicePort,
                             final TrackingNumberService trackingNumberService,
-                            final ShipmentConfigurationServicePort shipmentConfigurationServicePort) {
+                            final ShipmentConfigurationServicePort shipmentConfigurationServicePort,
+                            final OperatorContextProvider operatorContextProvider) {
 		this.shipmentService = shipmentService;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -90,6 +90,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.mailNotificationServicePort = mailNotificationServicePort;
         this.trackingNumberService = trackingNumberService;
         this.shipmentConfigurationServicePort = shipmentConfigurationServicePort;
+        this.operatorContextProvider = operatorContextProvider;
     }
 
     @Override
@@ -147,6 +148,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 shipmentPrice.getMoney(),
                 false,
                 voronoiResponse.getSuccess().getDepartmentCodeResult(),
+                operatorContextProvider.currentDepartmentId().orElse(null),
                 null,
                 command.getShipmentPriority(),
                 trackingNumber,
@@ -156,8 +158,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         this.shipmentService.createShipment(shipment);
         logCreatedShipment(shipment);
-
-        final ShipmentLabelSettings shipmentLabelSettings = shipmentConfiguration.labelSettings();
 
         return Result.success(new ShipmentCreateResponse(shipment.getExternalShipmentId(),
                 shipment.getTrackingNumber().value()));
@@ -208,7 +208,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         );
 
         this.shipmentService.update(shipment);
-        publishIfNeeded(shipment.snapshot(), configuration);
 
         return Result.success();
     }
@@ -313,6 +312,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    public void cancel(final ShipmentId shipmentId) {
+        this.shipmentService.cancel(shipmentId);
+    }
+
+    @Override
     public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
         this.shipmentService.changeSenderTo(shipmentId, sender);
     }
@@ -365,7 +369,7 @@ public class ShipmentPortImpl implements ShipmentPort {
 			final Shipment newShipment = Shipment.parentShipment(shipmentId, shipment.getSender(),
 					shipment.getRecipient(), shipment.getShipmentSize(), shipment.getShipmentId(),
 					shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
-					shipment.getDestination(), shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber,
+					shipment.getDestination(), shipment.getOriginDepartmentId(), shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber,
 					shipmentConfiguration.workflowSettings().defaultStatus());
 			this.shipmentService.changeShipmentTypeTo(request.shipmentId(), ShipmentType.CHILD, shipmentId);
 			this.shipmentService.createShipment(newShipment);
@@ -471,9 +475,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 : shipment.getDestination();
     }
 
-    private void publishIfNeeded(final ShipmentSnapshot snapshot, final ShipmentConfiguration configuration) {
-		if (configuration.publishInReturnManager()) {
-			this.returningServicePort.notifyShipmentUpdated(snapshot);
-		}
+    private Optional<DepartmentId> currentDepartmentId() {
+        return operatorContextProvider.currentDepartmentId();
     }
 }

@@ -3,6 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 import java.time.LocalDateTime;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
@@ -92,6 +93,10 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @AttributeOverride(name = "value", column = @Column(name = "destination"))
     private DepartmentCode destination;
 
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
+    private DepartmentId originDepartmentId;
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private ShipmentStatus shipmentStatus;
@@ -167,6 +172,7 @@ public class ShipmentReadEntity extends BelongsToOperator {
                 .recipientTelephone(snapshot.recipient().getTelephoneNumber())
                 .shipmentSize(snapshot.shipmentSize())
                 .destination(snapshot.destination())
+                .originDepartmentId(snapshot.originDepartmentId())
                 .shipmentStatus(snapshot.shipmentStatus())
                 .shipmentType(snapshot.shipmentType())
                 .shipmentRelatedId(snapshot.shipmentRelatedId())

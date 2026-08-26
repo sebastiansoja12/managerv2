@@ -1,19 +1,18 @@
 package com.warehouse.shipment.domain.model;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,6 +28,8 @@ public class Shipment {
     private ShipmentSize shipmentSize;
 
     private DepartmentCode destination;
+
+    private DepartmentId originDepartmentId;
 
     private ShipmentStatus shipmentStatus;
 
@@ -78,6 +79,7 @@ public class Shipment {
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
                     final DepartmentCode destination,
+                    final DepartmentId originDepartmentId,
                     final Signature signature,
                     final boolean signatureRequired,
                     final ShipmentPriority shipmentPriority,
@@ -98,6 +100,7 @@ public class Shipment {
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
         this.destination = destination;
+        this.originDepartmentId = originDepartmentId;
         this.signature = signature;
         this.signatureRequired = signatureRequired;
         this.shipmentPriority = shipmentPriority;
@@ -120,6 +123,25 @@ public class Shipment {
                     final ShipmentPriority shipmentPriority,
                     final TrackingNumber trackingNumber,
                     final ShipmentStatus status) {
+        this(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
+                price, locked, destination, null, signature, shipmentPriority, trackingNumber, status);
+    }
+
+    public Shipment(final ShipmentId shipmentId,
+                    final Sender sender,
+                    final Recipient recipient,
+                    final ShipmentSize shipmentSize,
+                    final ShipmentId shipmentRelatedId,
+                    final CountryCode originCountry,
+                    final CountryCode destinationCountry,
+                    final Money price,
+                    final Boolean locked,
+                    final DepartmentCode destination,
+                    final DepartmentId originDepartmentId,
+                    final Signature signature,
+                    final ShipmentPriority shipmentPriority,
+                    final TrackingNumber trackingNumber,
+                    final ShipmentStatus status) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
@@ -135,6 +157,7 @@ public class Shipment {
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
         this.destination = destination;
+        this.originDepartmentId = originDepartmentId;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
         this.trackingNumber = trackingNumber;
@@ -150,16 +173,17 @@ public class Shipment {
                                           final CountryCode destinationCountry,
                                           final Money price,
                                           final DepartmentCode destination,
+                                          final DepartmentId originDepartmentId,
                                           final Signature signature,
                                           final ShipmentPriority shipmentPriority,
                                           final TrackingNumber trackingNumber,
                                           final ShipmentStatus status) {
         return new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
-                price, false, destination, signature, shipmentPriority, trackingNumber, status);
-    }
+                price, false, destination, originDepartmentId, signature, shipmentPriority, trackingNumber, status);
+	}
 
 	public ShipmentSnapshot snapshot() {
-		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destination, shipmentStatus,
+		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destination, originDepartmentId, shipmentStatus,
 				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
 				shipmentPriority, originCountry, destinationCountry, signature,
                 trackingNumber, externalShipmentId);
@@ -180,6 +204,7 @@ public class Shipment {
         final CountryCode originCountry = shipmentEntity.getOriginCountry();
         final CountryCode destinationCountry = shipmentEntity.getDestinationCountry();
         final DepartmentCode destination = shipmentEntity.getDestination();
+        final DepartmentId originDepartmentId = shipmentEntity.getOriginDepartmentId();
         final Signature signature = shipmentEntity.getSignature() != null ? Signature.from(shipmentEntity.getSignature()) : null;
         final boolean signatureRequired = signature != null;
         final ShipmentPriority shipmentPriority = shipmentEntity.getShipmentPriority();
@@ -201,6 +226,7 @@ public class Shipment {
                 originCountry,
                 destinationCountry,
                 destination,
+                originDepartmentId,
                 signature,
                 signatureRequired,
                 shipmentPriority,
@@ -238,6 +264,7 @@ public class Shipment {
                 shipmentEntity.getOriginCountry(),
                 shipmentEntity.getDestinationCountry(),
                 shipmentEntity.getDestination(),
+                shipmentEntity.getOriginDepartmentId(),
                 signature,
                 signatureRequired,
                 shipmentEntity.getShipmentPriority(),
@@ -261,6 +288,10 @@ public class Shipment {
 
     public DepartmentCode getDestination() {
         return destination;
+    }
+
+    public DepartmentId getOriginDepartmentId() {
+        return originDepartmentId;
     }
 
     public ShipmentStatus getShipmentStatus() {
@@ -380,21 +411,25 @@ public class Shipment {
     }
 
     public void changeSignature(final Signature signature) {
+        ensureShipmentIsNotDelivered();
         this.signature = signature;
         markAsModified();
     }
 
     public void prepareShipmentToCreate() {
+        ensureShipmentIsNotDelivered();
         this.shipmentStatus = ShipmentStatus.CREATED;
         this.createdAt = LocalDateTime.now();
     }
 
     public void prepareShipmentToReroute() {
+        ensureShipmentIsNotDelivered();
         this.shipmentStatus = ShipmentStatus.REROUTE;
         markAsModified();
     }
 
     public void prepareShipmentToRedirect(final ShipmentId newRelatedShipmentId) {
+        ensureShipmentIsNotDelivered();
         this.shipmentStatus = ShipmentStatus.REDIRECT;
         this.shipmentType = ShipmentType.CHILD;
         this.shipmentRelatedId = newRelatedShipmentId;
@@ -408,6 +443,7 @@ public class Shipment {
     }
 
     public void prepareShipmentToSend() {
+        ensureShipmentIsNotDelivered();
         this.shipmentStatus = ShipmentStatus.SENT;
         markAsModified();
     }
@@ -418,21 +454,25 @@ public class Shipment {
     }
 
     public void changeSender(final Sender sender) {
+        ensureCanBeModified();
         this.sender = sender;
         markAsModified();
     }
 
     public void changeRecipient(final Recipient recipient) {
+        ensureCanBeModified();
         this.recipient = recipient;
         markAsModified();
     }
 
     public void changeShipmentSize(final ShipmentSize shipmentSize) {
+        ensureCanBeModified();
         this.shipmentSize = shipmentSize;
         markAsModified();
     }
 
     public void changePrice(final Money price) {
+        ensureCanBeModified();
         this.price = price;
         markAsModified();
     }
@@ -442,6 +482,7 @@ public class Shipment {
     }
 
     public void updateDestination(final VoronoiResponse voronoiResponse) {
+        ensureCanBeModified();
         if (ObjectUtils.isNotEmpty(voronoiResponse) && voronoiResponse.getDepartmentCodeResult() != null) {
             this.destination = voronoiResponse.getDepartmentCodeResult();
             markAsModified();
@@ -449,6 +490,7 @@ public class Shipment {
     }
 
     public void update(final ShipmentUpdate shipmentUpdate) {
+        ensureCanBeModified();
         this.recipient = shipmentUpdate.getRecipient();
         this.sender = shipmentUpdate.getSender();
         markAsModified();
@@ -472,6 +514,7 @@ public class Shipment {
     }
 
     public void changeShipmentType(final ShipmentType shipmentType) {
+        ensureShipmentIsNotDelivered();
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = null;
         this.locked = false;
@@ -483,6 +526,7 @@ public class Shipment {
     }
 
     public void notifyRelatedShipmentRedirected(final ShipmentId relatedShipmentId) {
+        ensureShipmentIsNotDelivered();
         this.shipmentRelatedId = relatedShipmentId;
         this.shipmentType = ShipmentType.CHILD;
         this.shipmentStatus = ShipmentStatus.REDIRECT;
@@ -491,11 +535,13 @@ public class Shipment {
     }
 
     public void changeCurrency(final Currency currency) {
+        ensureCanBeModified();
         this.price.changeCurrency(currency);
         markAsModified();
     }
 
     public void changeSignatureRequired(final boolean signatureRequired) {
+        ensureCanBeModified();
         this.signatureRequired = signatureRequired;
         markAsModified();
     }
@@ -516,9 +562,10 @@ public class Shipment {
     }
 
     private void ensureCanBeModified() {
+        ensureShipmentIsNotDelivered();
         if (Boolean.TRUE.equals(locked)) {
             throw new ShipmentModificationException(
-                    "Shipment cannot be changed because the it is locked");
+                    "Shipment cannot be changed because it is locked");
         }
         if (ShipmentStatus.SENT.equals(shipmentStatus)
                 || ShipmentStatus.DELIVERY.equals(shipmentStatus)
@@ -529,16 +576,19 @@ public class Shipment {
     }
 
     public void changeShipmentPriority(final ShipmentPriority shipmentPriority) {
+        ensureCanBeModified();
         this.shipmentPriority = shipmentPriority;
         markAsModified();
     }
 
     public void changeShipmentRelatedId(final ShipmentId relatedShipmentId) {
+        ensureShipmentIsNotDelivered();
         this.shipmentRelatedId = relatedShipmentId;
         markAsModified();
     }
 
     public void notifyRelatedShipmentLocked() {
+        ensureShipmentIsNotDelivered();
         this.shipmentType = ShipmentType.PARENT;
         this.shipmentRelatedId = null;
         unlockShipment();
@@ -546,33 +596,41 @@ public class Shipment {
     }
 
     public void notifyShipmentRerouted() {
+        ensureShipmentIsNotDelivered();
         changeShipmentStatus(ShipmentStatus.REROUTE);
         markAsModified();
     }
 
     public void notifyShipmentSent() {
+        ensureShipmentIsNotDelivered();
         changeShipmentStatus(ShipmentStatus.SENT);
         markAsModified();
     }
 
     public void notifyShipmentReturned() {
+        if (!this.shipmentStatus.equals(ShipmentStatus.DELIVERY)) {
+            throw new ShipmentModificationException("Cannot return for not delivered shipment");
+        }
         changeShipmentStatus(ShipmentStatus.RETURN);
         markAsModified();
     }
 
     public void notifyShipmentDelivered() {
-        changeShipmentStatus(ShipmentStatus.DELIVERY);
-        lockShipment();
+        this.shipmentStatus = ShipmentStatus.DELIVERY;
+        this.locked = true;
         markAsModified();
     }
 
     public void notifyShipmentReturnCanceled() {
+        if (!this.shipmentStatus.equals(ShipmentStatus.RETURN)) {
+            throw new ShipmentModificationException("Cannot undone return for not returned shipment");
+        }
         changeShipmentStatus(ShipmentStatus.DELIVERY);
-        this.locked = false;
         markAsModified();
     }
 
     public void changeDestinationDepartment(final DepartmentCode destination) {
+        ensureCanBeModified();
         this.destination = destination;
         markAsModified();
     }
@@ -614,22 +672,26 @@ public class Shipment {
     }
 
     public void updateCountries(final ShipmentCountryRequest request) {
+        ensureCanBeModified();
         this.originCountry = request.issuerCountry();
         this.destinationCountry = request.receiverCountry();
         markAsModified();
     }
 
     public void changeIssuerCountry(final CountryCode originCountry) {
+        ensureCanBeModified();
         this.originCountry = originCountry;
         markAsModified();
     }
 
     public void changeReceiverCountry(final CountryCode destinationCountry) {
+        ensureCanBeModified();
         this.destinationCountry = destinationCountry;
         markAsModified();
     }
 
     public void changeShipmentTypeWithRelatedId(final ShipmentType shipmentType, final ShipmentId relatedShipmentId) {
+        ensureShipmentIsNotDelivered();
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = relatedShipmentId;
         this.locked = true;
@@ -638,6 +700,7 @@ public class Shipment {
     }
 
     public void lockShipmentWithShipmentType(final ShipmentType shipmentType) {
+        ensureShipmentIsNotDelivered();
         this.shipmentType = shipmentType;
         lockShipment();
     }
@@ -651,6 +714,7 @@ public class Shipment {
     }
 
     public Shipment redirectToSender(final ShipmentId shipmentId) {
+        ensureShipmentIsNotDelivered();
         this.shipmentId = shipmentId;
         this.shipmentType = ShipmentType.PARENT;
 
@@ -686,4 +750,35 @@ public class Shipment {
         return this;
     }
 
+    private void ensureShipmentIsNotDelivered() {
+        if (ShipmentStatus.DELIVERY.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Delivered shipment cannot be changed");
+        }
+    }
+
+    public void cancel() {
+        final ShipmentWorkflowSettings config = DomainContext
+                .shipmentConfigurationServicePort().getCurrentOperatorShipmentConfiguration().workflowSettings();
+        if (!draftStatuses().contains(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Cannot cancel shipment");
+        }
+        if (isCancellationWindowExpired(config.cancellationWindowMinutes())) {
+            throw new ShipmentModificationException("Shipment cancellation window expired");
+        }
+        this.locked = true;
+        changeShipmentStatus(ShipmentStatus.CANCELED);
+        markAsModified();
+    }
+
+    private boolean isCancellationWindowExpired(final int cancellationWindowMinutes) {
+        if (cancellationWindowMinutes <= 0) {
+            return true;
+        }
+
+        return LocalDateTime.now().isAfter(this.createdAt.plusMinutes(cancellationWindowMinutes));
+    }
+
+    private List<ShipmentStatus> draftStatuses() {
+        return List.of(ShipmentStatus.CREATED, ShipmentStatus.ACCEPTED, ShipmentStatus.PREPARED);
+    }
 }
