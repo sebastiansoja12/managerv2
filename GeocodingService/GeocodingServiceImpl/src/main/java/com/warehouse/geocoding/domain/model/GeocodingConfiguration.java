@@ -19,6 +19,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
     private String accessToken;
     private String refreshToken;
     private boolean enabled;
+    private boolean defaultProvider;
     private GeocodingProvider provider;
 
     public GeocodingConfiguration(final GeocodingConfigurationId geocodingConfigurationId,
@@ -30,6 +31,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
                                   final String accessToken,
                                   final String refreshToken,
                                   final boolean enabled,
+                                  final boolean defaultProvider,
                                   final GeocodingProvider provider) {
         this.geocodingConfigurationId = geocodingConfigurationId;
         this.apiUrl = apiUrl;
@@ -40,6 +42,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.enabled = enabled;
+        this.defaultProvider = defaultProvider;
         this.provider = Objects.requireNonNull(provider, "Geocoding provider is required");
     }
 
@@ -52,7 +55,12 @@ public class GeocodingConfiguration extends BelongsToOperator {
         this.accessToken = command.accessToken();
         this.refreshToken = command.refreshToken();
         this.enabled = command.enabled();
+        this.defaultProvider = command.defaultProvider();
         this.provider = Objects.requireNonNull(command.provider(), "Geocoding provider is required");
+    }
+
+    public void unsetDefaultProvider() {
+        this.defaultProvider = false;
     }
 
     public GeocodingConfigurationSnapshot toSnapshot() {
@@ -66,6 +74,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
                 accessToken,
                 refreshToken,
                 enabled,
+                defaultProvider,
                 provider);
     }
 
@@ -103,6 +112,10 @@ public class GeocodingConfiguration extends BelongsToOperator {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isDefaultProvider() {
+        return defaultProvider;
     }
 
     public GeocodingProvider getProvider() {

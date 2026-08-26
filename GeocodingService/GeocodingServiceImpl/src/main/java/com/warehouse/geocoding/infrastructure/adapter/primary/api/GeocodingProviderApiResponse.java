@@ -4,12 +4,15 @@ import java.util.List;
 
 import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.commonassets.enumeration.GeocodingProvider.ConfigurationField;
+import com.warehouse.commonassets.enumeration.GeocodingProvider.ProviderApi;
 
 public record GeocodingProviderApiResponse(GeocodingProvider provider,
                                            String url,
-                                           List<ConfigurationField> activeFields) {
+                                           List<ConfigurationField> activeFields,
+                                           List<ProviderApi> providerApis) {
 
     public static GeocodingProviderApiResponse from(final GeocodingProvider provider) {
-        return new GeocodingProviderApiResponse(provider, provider.getUrl(), provider.getActiveFields());
+        return new GeocodingProviderApiResponse(provider, provider.getUrl(),
+                provider.getActiveFields(), provider.getProviderApis());
     }
 }

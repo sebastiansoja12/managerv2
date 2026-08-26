@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="s-soja" id="add-geocoding-default-provider-2026-08-26">
+        <addColumn tableName="geocoding_configurations">
+            <column name="default_provider" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <update tableName="geocoding_configurations">
+            <column name="default_provider" valueBoolean="true"/>
+            <where>enabled = TRUE</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

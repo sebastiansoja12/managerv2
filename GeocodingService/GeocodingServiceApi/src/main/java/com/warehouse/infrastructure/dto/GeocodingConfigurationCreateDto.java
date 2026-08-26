@@ -9,5 +9,6 @@ public record GeocodingConfigurationCreateDto(String apiUserName,
                                               String accessToken,
                                               String refreshToken,
                                               boolean enabled,
+                                              boolean defaultProvider,
                                               GeocodingProvider provider) {
 }

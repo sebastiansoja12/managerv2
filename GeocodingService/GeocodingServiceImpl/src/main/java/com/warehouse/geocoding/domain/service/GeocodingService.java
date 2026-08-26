@@ -19,5 +19,7 @@ public interface GeocodingService {
 
     GeocodingConfiguration getByProvider(final GeocodingProvider provider);
 
+    GeocodingConfiguration getDefault();
+
     List<GeocodingConfiguration> getAll();
 }

@@ -10,17 +10,18 @@ public final class GeocodingConfigurationMapper {
     }
 
     public static GeocodingConfigurationEntity toEntity(final GeocodingConfiguration configuration,
-                                                         final CredentialCipher credentialCipher) {
+                                                        final CredentialCipher credentialCipher) {
         final GeocodingConfigurationEntity entity = new GeocodingConfigurationEntity(
                 configuration.getGeocodingConfigurationId(),
                 configuration.getApiUrl(),
                 configuration.getApiUserName(),
-                credentialCipher.encrypt(configuration.getApiPassword()),
-                credentialCipher.encrypt(configuration.getApiKey()),
+                encryptCredential(configuration.getApiPassword(), credentialCipher),
+                encryptCredential(configuration.getApiKey(), credentialCipher),
                 configuration.getClientNumber(),
-                credentialCipher.encrypt(configuration.getAccessToken()),
-                credentialCipher.encrypt(configuration.getRefreshToken()),
+                encryptCredential(configuration.getAccessToken(), credentialCipher),
+                encryptCredential(configuration.getRefreshToken(), credentialCipher),
                 configuration.isEnabled(),
+                configuration.isDefaultProvider(),
                 configuration.getProvider());
         entity.assignOperator(configuration.operatorId());
         return entity;
@@ -32,14 +33,35 @@ public final class GeocodingConfigurationMapper {
                 entity.getGeocodingConfigurationId(),
                 entity.getApiUrl(),
                 entity.getApiUserName(),
-                credentialCipher.decrypt(entity.getApiPassword()),
-                credentialCipher.decrypt(entity.getApiKey()),
+                decryptCredential(entity.getApiPassword(), credentialCipher),
+                decryptCredential(entity.getApiKey(), credentialCipher),
                 entity.getClientNumber(),
-                credentialCipher.decrypt(entity.getAccessToken()),
-                credentialCipher.decrypt(entity.getRefreshToken()),
+                decryptCredential(entity.getAccessToken(), credentialCipher),
+                decryptCredential(entity.getRefreshToken(), credentialCipher),
                 entity.isEnabled(),
+                entity.isDefaultProvider(),
                 entity.getProvider());
         configuration.assignOperator(entity.operatorId());
         return configuration;
+    }
+
+    private static String encryptCredential(final String credential,
+                                            final CredentialCipher credentialCipher) {
+        if (credential == null) {
+            return null;
+        }
+        return credentialCipher.encrypt(credential);
+    }
+
+    private static String decryptCredential(final String credential,
+                                            final CredentialCipher credentialCipher) {
+        if (credential == null) {
+            return null;
+        }
+        try {
+            return credentialCipher.decrypt(credential);
+        } catch (final IllegalStateException exception) {
+            return credential;
+        }
     }
 }

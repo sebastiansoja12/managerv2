@@ -7,6 +7,7 @@ import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.VoronoiRequest;
 import com.warehouse.voronoi.domain.port.primary.VoronoiPort;
+import com.warehouse.voronoi.domain.vo.GeocodingAddress;
 import com.warehouse.voronoi.domain.vo.VoronoiResponse;
 import com.warehouse.voronoi.dto.CoordinatesDto;
 import com.warehouse.voronoi.dto.DepartmentCodeDto;
@@ -31,8 +32,8 @@ public class VoronoiServiceAdapter implements VoronoiService, VoronoiCoordinates
     @Override
     public CoordinatesDto findCoordinates(final VoronoiRequestDto voronoiRequest) {
         final VoronoiRequest request = VoronoiRequest.from(voronoiRequest);
-        final Coordinates coordinates = voronoiPort.obtainCoordinates(request.getCity());
+        final Coordinates coordinates = voronoiPort.obtainCoordinates(
+                new GeocodingAddress(request.getCity(), request.getStreet(), request.getZipCode()));
         return new CoordinatesDto(coordinates.lat(), coordinates.lon());
     }
 }
-

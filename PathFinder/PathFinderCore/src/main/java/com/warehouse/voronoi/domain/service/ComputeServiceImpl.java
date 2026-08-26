@@ -2,13 +2,13 @@ package com.warehouse.voronoi.domain.service;
 
 import java.util.*;
 
-import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.voronoi.domain.model.Coordinates;
 import com.warehouse.voronoi.domain.model.Department;
 import com.warehouse.voronoi.domain.model.VoronoiRequest;
 import com.warehouse.voronoi.domain.port.secondary.GeocodingConfigServicePort;
 import com.warehouse.voronoi.domain.port.secondary.GeolocationServiceProvider;
+import com.warehouse.voronoi.domain.vo.GeocodingAddress;
 import com.warehouse.voronoi.domain.vo.GeocodingConfig;
 
 import lombok.AllArgsConstructor;
@@ -22,20 +22,21 @@ public class ComputeServiceImpl implements ComputeService {
 
 	private final GeocodingConfigServicePort geocodingConfigServicePort;
 
-	private Coordinates calculateCoordinatesForRequestCity(final String requestCity) {
-		final GeocodingConfig geocodingConfig = geocodingConfigServicePort.findGeocodingConfig(GeocodingProvider.POSITION_STACK);
+	private Coordinates calculateCoordinatesForRequestCity(final VoronoiRequest request) {
+		final GeocodingConfig geocodingConfig = geocodingConfigServicePort.findDefaultGeocodingConfig();
+        final GeocodingAddress address = new GeocodingAddress(request.getCity(), request.getStreet(), request.getZipCode());
 		return geolocationServiceProvider
 				.stream()
 				.filter(provider -> provider.canHandle(geocodingConfig.provider()))
 				.findAny()
 				.orElseThrow()
-				.obtainCoordinates(requestCity, geocodingConfig);
+				.obtainCoordinates(address, geocodingConfig);
 	}
 
 	@Override
 	public DepartmentCode calculateDepartmentCode(final VoronoiRequest request, final List<Department> departments) {
 		final Map<String, Double> cities = new HashMap<>();
-		final Coordinates coordinates = calculateCoordinatesForRequestCity(request.getCity());
+		final Coordinates coordinates = calculateCoordinatesForRequestCity(request);
 
 		if (Objects.isNull(coordinates)) {
 			return new DepartmentCode("");
@@ -54,5 +55,3 @@ public class ComputeServiceImpl implements ComputeService {
 		return new DepartmentCode(value);
 	}
 }
-
-

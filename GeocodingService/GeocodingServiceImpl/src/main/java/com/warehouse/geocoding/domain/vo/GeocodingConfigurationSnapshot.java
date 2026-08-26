@@ -12,5 +12,6 @@ public record GeocodingConfigurationSnapshot(GeocodingConfigurationId geocodingC
                                              String accessToken,
                                              String refreshToken,
                                              boolean enabled,
+                                             boolean defaultProvider,
                                              GeocodingProvider provider) {
 }

@@ -3,7 +3,6 @@ package com.warehouse.voronoi.domain.port.primary;
 import java.util.List;
 import java.util.Set;
 
-import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.voronoi.domain.exception.MissingDepotsException;
 import com.warehouse.voronoi.domain.exception.MissingRequestCityException;
@@ -13,6 +12,7 @@ import com.warehouse.voronoi.domain.model.VoronoiRequest;
 import com.warehouse.voronoi.domain.port.secondary.GeocodingConfigServicePort;
 import com.warehouse.voronoi.domain.port.secondary.GeolocationServiceProvider;
 import com.warehouse.voronoi.domain.service.ComputeService;
+import com.warehouse.voronoi.domain.vo.GeocodingAddress;
 import com.warehouse.voronoi.domain.vo.GeocodingConfig;
 import com.warehouse.voronoi.domain.vo.VoronoiResponse;
 
@@ -46,14 +46,14 @@ public class VoronoiPortImpl implements VoronoiPort {
     }
 
     @Override
-    public Coordinates obtainCoordinates(final String requestCity) {
-        final GeocodingConfig geocodingConfig = geocodingConfigServicePort.findGeocodingConfig(GeocodingProvider.POSITION_STACK);
+    public Coordinates obtainCoordinates(final GeocodingAddress address) {
+        final GeocodingConfig geocodingConfig = geocodingConfigServicePort.findDefaultGeocodingConfig();
         return geolocationServiceProvider.stream()
                 .filter(e -> geocodingConfig != null)
                 .filter(provider -> provider.canHandle(geocodingConfig.provider()))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("External system for finding geolocations not configured for this operator!!!"))
-                .obtainCoordinates(requestCity, geocodingConfig);
+                .obtainCoordinates(address, geocodingConfig);
     }
 
     private void validateRequest(final List<Department> departments, final String requestCity) {
