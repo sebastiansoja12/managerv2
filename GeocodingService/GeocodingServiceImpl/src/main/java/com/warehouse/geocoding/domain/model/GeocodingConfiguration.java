@@ -1,12 +1,12 @@
 package com.warehouse.geocoding.domain.model;
 
-import java.util.Objects;
-
 import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.commonassets.identificator.GeocodingConfigurationId;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.geocoding.domain.vo.GeocodingConfigurationSnapshot;
 import com.warehouse.geocoding.domain.vo.GeocodingConfigurationUpdateCommand;
+
+import java.util.Objects;
 
 public class GeocodingConfiguration extends BelongsToOperator {
 
@@ -47,6 +47,7 @@ public class GeocodingConfiguration extends BelongsToOperator {
     }
 
     public void update(final GeocodingConfigurationUpdateCommand command) {
+        this.provider = Objects.requireNonNull(command.provider(), "Geocoding provider is required");
         this.apiUrl = command.provider().getUrl();
         this.apiUserName = command.apiUserName();
         this.apiPassword = command.apiPassword();
@@ -56,7 +57,6 @@ public class GeocodingConfiguration extends BelongsToOperator {
         this.refreshToken = command.refreshToken();
         this.enabled = command.enabled();
         this.defaultProvider = command.defaultProvider();
-        this.provider = Objects.requireNonNull(command.provider(), "Geocoding provider is required");
     }
 
     public void unsetDefaultProvider() {
