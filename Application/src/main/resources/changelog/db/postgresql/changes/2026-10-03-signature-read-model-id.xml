@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-03-signature-read-model-id" author="s-soja">
+        <addColumn tableName="signature">
+            <column name="signature_id" type="BIGINT"/>
+        </addColumn>
+        <sql>UPDATE signature SET signature_id = shipment_id</sql>
+        <addNotNullConstraint tableName="signature" columnName="signature_id" columnDataType="BIGINT"/>
+        <addUniqueConstraint tableName="signature" columnNames="signature_id" constraintName="uk_signature_signature_id"/>
+        <sql>
+            UPDATE shipment_rd rd
+            SET signature_id = signature.signature_id
+            FROM signature
+            WHERE rd.shipment_id = signature.shipment_id
+        </sql>
+        <dropColumn tableName="shipment" columnName="signature_id"/>
+        <dropColumn tableName="shipment_aud" columnName="signature_id"/>
+    </changeSet>
+    <changeSet id="2026-10-03-signature-audit-id" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="signature_aud"/>
+        </preConditions>
+        <addColumn tableName="signature_aud">
+            <column name="signature_id" type="BIGINT"/>
+        </addColumn>
+        <sql>UPDATE signature_aud SET signature_id = shipment_id</sql>
+    </changeSet>
+</databaseChangeLog>
