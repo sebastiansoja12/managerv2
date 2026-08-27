@@ -22,7 +22,8 @@ public class ShipmentKafkaListener {
     }
 
     @KafkaListener(
-            topics = "${manager.kafka.topics.shipment-events:shipment.events}",
+            topics = {"${manager.kafka.topics.shipment-events:shipment.events}",
+                    "${manager.kafka.topics.shipment-created:shipment.created}"},
             groupId = "${spring.kafka.consumer.group-id:route-tracker-flow}"
     )
     public void handle(final ShipmentChangedIntegrationEvent message) {
