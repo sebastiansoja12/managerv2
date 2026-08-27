@@ -74,4 +74,13 @@
     <include file="changes/2026-09-29-shipment-parcel-size-optional.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-29-shipment-parcel-size-removed.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-29-shipment-party-country.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-29-shipment-dangerous-good-table.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-30-delivery-general-target.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-30-shipment-service-and-packaging.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-30-delivery-step.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-01-shipment-dangerous-good-operator.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-02-remove-shipment-dangerous-good.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-03-signature-read-model-id.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-07-delivery-step-owner.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-07-delivery-step-user.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
