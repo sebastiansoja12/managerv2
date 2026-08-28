@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="codex" id="20260826-01-create-async-job">
+        <createTable tableName="async_job">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="read_model_type" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_from" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_to" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="started_at" type="TIMESTAMP"/>
+            <column name="finished_at" type="TIMESTAMP"/>
+            <column name="error" type="CLOB"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="codex" id="20260826-02-index-async-job">
+        <createIndex indexName="idx_async_job_status" tableName="async_job">
+            <column name="status"/>
+        </createIndex>
+        <createIndex indexName="idx_async_job_read_model_type" tableName="async_job">
+            <column name="read_model_type"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
