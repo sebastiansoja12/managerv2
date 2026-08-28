@@ -2,27 +2,20 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
+import com.warehouse.routetracker.domain.model.CreateShipmentEventCommand;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentEvent;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentEventMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
-@KafkaListener(
-        topics = "${manager.kafka.topics.shipment-events:shipment.events}",
-        groupId = "${spring.kafka.consumer.group-id:route-tracker-flow}"
-)
 public class ShipmentKafkaListener {
 
     private final ObjectMapper objectMapper;
@@ -33,37 +26,27 @@ public class ShipmentKafkaListener {
         this.routeTrackerLogPort = routeTrackerLogPort;
     }
 
-    @KafkaHandler
-    public void handle(final ShipmentEvent event,
-                       @Header(KafkaEventHeaders.EVENT_TYPE) final byte[] eventType) {
-        this.saveShipmentEvent(
-                event,
-                this.headerValue(eventType),
-                ShipmentStatus.valueOf(event.shipmentStatus()));
+    @KafkaListener(
+            topics = "${manager.kafka.topics.shipment-events:shipment.events}",
+            groupId = "${spring.kafka.consumer.group-id:route-tracker-flow}"
+    )
+    public void handle(final ShipmentEventMessage message) {
+        final CreateShipmentEventCommand command = new CreateShipmentEventCommand(
+                message.eventId(),
+                new ShipmentId(message.payload().shipmentId().getValue()),
+                message.eventType(),
+                ShipmentStatus.valueOf(message.payload().shipmentStatus().name()),
+                LocalDateTime.ofInstant(message.occurredAt(), ZoneOffset.UTC),
+                this.serialize(message),
+                message.userId(),
+                message.departmentId()
+        );
+        this.routeTrackerLogPort.createShipmentEvent(command);
+        log.info("Processed shipment event {} for {}", message.eventType(),
+                message.payload().shipmentId().getValue());
     }
 
-    private void saveShipmentEvent(final ShipmentEvent event,
-                                   final String eventType,
-                                   final ShipmentStatus shipmentStatus) {
-        final LocalDateTime occurredAt = LocalDateTime.ofInstant(event.timestamp(), ZoneOffset.UTC);
-        final String payload = this.serialize(event);
-
-        this.routeTrackerLogPort.createShipmentEvent(
-                new ShipmentId(event.shipmentId()),
-                eventType,
-                shipmentStatus,
-                occurredAt,
-                payload,
-                event.userId(),
-                event.departmentId());
-        log.info("Processed shipment event {} for {}", eventType, event.shipmentId());
-    }
-
-    private String headerValue(final byte[] value) {
-        return new String(value, StandardCharsets.UTF_8);
-    }
-
-    private String serialize(final ShipmentEvent event) {
+    private String serialize(final ShipmentEventMessage event) {
         try {
             return this.objectMapper.writeValueAsString(event);
         } catch (final JsonProcessingException exception) {

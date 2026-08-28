@@ -13,6 +13,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.Objects;
 
 @Builder
 @EqualsAndHashCode
@@ -41,21 +42,23 @@ public class RouteLogRecord {
         this.faultDescription = faultDescription;
     }
 
-    public void createShipmentEvent(final String eventType,
-                                    final ShipmentStatus shipmentStatus,
-                                    final LocalDateTime occurredAt,
-                                    final String payload,
-                                    final UserId userId,
-                                    final DepartmentId departmentId) {
+    public void createShipmentEvent(final CreateShipmentEventCommand command) {
+        final boolean alreadyProcessed = getRouteLogRecordDetails().getRouteLogRecordDetailSet().stream()
+                .map(RouteLogRecordDetail::getEventId)
+                .anyMatch(eventId -> Objects.equals(eventId, command.eventId()));
+        if (alreadyProcessed) {
+            return;
+        }
         getRouteLogRecordDetails()
                 .getRouteLogRecordDetailSet().add(RouteLogRecordDetail.builder()
-                .shipmentStatus(shipmentStatus)
-                .processType(determineProcessType(shipmentStatus))
-                .description(eventType)
-                .timestamp(occurredAt)
-                .request(payload)
-                .userId(userId)
-                .departmentId(departmentId)
+                .eventId(command.eventId())
+                .shipmentStatus(command.shipmentStatus())
+                .processType(determineProcessType(command.shipmentStatus()))
+                .description(command.eventType())
+                .timestamp(command.occurredAt())
+                .request(command.payload())
+                .userId(command.userId())
+                .departmentId(command.departmentId())
                 .build());
     }
 

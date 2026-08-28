@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.shipment.domain.port.secondary.DepartmentRepository;
+import com.warehouse.shipment.application.port.secondary.DepartmentRepository;
 
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 

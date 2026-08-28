@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.validator;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.shipment.domain.service.PriceService;
+import com.warehouse.shipment.application.service.PriceService;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;

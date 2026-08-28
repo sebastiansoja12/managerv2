@@ -6,9 +6,11 @@ import com.warehouse.shipment.domain.vo.conf.TrackingNumberRule;
 
 public interface TrackingNumberService {
 
-    TrackingNumber nextTrackingNumber(final ShipmentId shipmentId);
-
     TrackingNumber nextTrackingNumber(final TrackingNumberRule rule);
 
     TrackingNumber nextTrackingNumber(final TrackingNumberRule rule, final ShipmentId shipmentId);
+
+    TrackingNumber nextTrackingNumber(final TrackingNumberRule rule,
+                                      final ShipmentId shipmentId,
+                                      final Long sequenceValue);
 }

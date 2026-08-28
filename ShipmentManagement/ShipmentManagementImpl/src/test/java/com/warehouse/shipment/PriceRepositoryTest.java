@@ -20,7 +20,7 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.shipment.domain.port.secondary.PriceRepository;
+import com.warehouse.shipment.application.port.secondary.PriceRepository;
 import com.warehouse.shipment.domain.vo.Price;
 
 @ExtendWith(SpringExtension.class)

@@ -24,6 +24,9 @@ public class RouteLogRecordDetailEntity {
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false))
     private RouteLogRecordDetailId id;
 
+    @Column(name = "event_id", unique = true)
+    private String eventId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "route_log_record_id", nullable = false)
     @EqualsAndHashCode.Exclude

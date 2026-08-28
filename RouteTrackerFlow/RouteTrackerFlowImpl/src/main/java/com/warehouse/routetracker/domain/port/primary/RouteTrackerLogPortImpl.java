@@ -3,14 +3,11 @@ package com.warehouse.routetracker.domain.port.primary;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.DeviceInformationRequest;
+import com.warehouse.routetracker.domain.model.CreateShipmentEventCommand;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.domain.vo.*;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.UserId;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -23,17 +20,8 @@ public class RouteTrackerLogPortImpl implements RouteTrackerLogPort {
     }
 
     @Override
-    public void createShipmentEvent(final ShipmentId shipmentId,
-                                    final String eventType,
-                                    final ShipmentStatus shipmentStatus,
-                                    final LocalDateTime occurredAt,
-                                    final String payload,
-                                    final UserId userId,
-                                    final DepartmentId departmentId) {
-        this.update(shipmentId, routeLogRecord -> {
-            routeLogRecord.createShipmentEvent(
-                    eventType, shipmentStatus, occurredAt, payload, userId, departmentId);
-        });
+    public void createShipmentEvent(final CreateShipmentEventCommand command) {
+        this.update(command.shipmentId(), routeLogRecord -> routeLogRecord.createShipmentEvent(command));
     }
 
     @Override

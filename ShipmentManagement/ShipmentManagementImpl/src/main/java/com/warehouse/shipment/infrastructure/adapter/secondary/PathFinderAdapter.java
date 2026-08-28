@@ -5,7 +5,7 @@ import java.util.List;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
+import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OutputResponseMapper;

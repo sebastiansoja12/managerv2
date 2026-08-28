@@ -18,10 +18,9 @@ import com.warehouse.commonassets.enumeration.Country;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
-import com.warehouse.shipment.domain.port.secondary.CountryDetermineServicePort;
-import com.warehouse.shipment.domain.port.secondary.CountryRepository;
-import com.warehouse.shipment.domain.service.CountryDetermineServiceImpl;
+import com.warehouse.shipment.application.port.secondary.CountryDetermineServicePort;
+import com.warehouse.shipment.application.port.secondary.CountryRepository;
+import com.warehouse.shipment.application.service.CountryDetermineServiceImpl;
 import com.warehouse.shipment.domain.vo.CountryDetermine;
 import com.warehouse.shipment.domain.vo.LocationInfo;
 import com.warehouse.shipment.domain.vo.ShipmentCountry;
@@ -51,13 +50,10 @@ class CountryDetermineServiceImplTest {
     void shouldReturnSuccessWhenCountryIsDeterminedForShipmentCreateCommand() {
         final CountryDetermineServiceImpl service =
                 new CountryDetermineServiceImpl(countryDetermineServicePort, countryRepository);
-        final ShipmentCreateCommand command = new ShipmentCreateCommand();
-        command.setSender(sender());
-        command.setRecipient(recipient());
         when(countryDetermineServicePort.determineCountry(any(LocationInfo.class)))
                 .thenReturn(new ShipmentCountry(Country.POLAND, Country.GERMANY, shipmentId()));
 
-        final Result<CountryDetermine, ErrorCode> result = service.determineCountry(command);
+        final Result<CountryDetermine, ErrorCode> result = service.determineCountry(sender(), recipient());
 
         assertTrue(result.isSuccess());
         verify(countryDetermineServicePort).determineCountry(any(LocationInfo.class));

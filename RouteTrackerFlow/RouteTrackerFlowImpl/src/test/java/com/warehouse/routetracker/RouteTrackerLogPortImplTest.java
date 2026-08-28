@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
+import com.warehouse.routetracker.domain.model.CreateShipmentEventCommand;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPortImpl;
 import com.warehouse.routetracker.domain.port.secondary.RouteLogRepository;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
@@ -31,6 +33,7 @@ class RouteTrackerLogPortImplTest {
     private static final LocalDateTime OCCURRED_AT = LocalDateTime.of(2026, 8, 9, 12, 0);
     private static final UserId USER_ID = new UserId(42L);
     private static final DepartmentId DEPARTMENT_ID = new DepartmentId(10L);
+    private static final UUID EVENT_ID = UUID.fromString("f783d37e-06e9-4efc-8f18-099343b150e8");
 
     @Mock
     private RouteLogRepository repository;
@@ -46,10 +49,7 @@ class RouteTrackerLogPortImplTest {
     void shouldCreateRouteLogWhenFirstShipmentEventIsReceived() {
         when(this.repository.findById(SHIPMENT_ID)).thenReturn(Optional.empty());
 
-        this.routeTrackerLogPort.createShipmentEvent(
-                SHIPMENT_ID, "ShipmentCreatedEvent", ShipmentStatus.CREATED, OCCURRED_AT, "{}",
-                USER_ID, DEPARTMENT_ID
-        );
+        this.routeTrackerLogPort.createShipmentEvent(command("shipment.created", ShipmentStatus.CREATED));
 
         final ArgumentCaptor<RouteLogRecord> recordCaptor = ArgumentCaptor.forClass(RouteLogRecord.class);
         verify(this.repository).save(recordCaptor.capture());
@@ -57,7 +57,8 @@ class RouteTrackerLogPortImplTest {
         assertThat(recordCaptor.getValue().getRouteLogRecordDetails().getRouteLogRecordDetailSet()).hasSize(1);
         final RouteLogRecordDetail detail = recordCaptor.getValue().getRouteLogRecordDetails()
                 .getRouteLogRecordDetailSet().iterator().next();
-        assertThat(detail.getDescription()).isEqualTo("ShipmentCreatedEvent");
+        assertThat(detail.getEventId()).isEqualTo(EVENT_ID);
+        assertThat(detail.getDescription()).isEqualTo("shipment.created");
         assertThat(detail.getUserId()).isEqualTo(USER_ID);
         assertThat(detail.getDepartmentId()).isEqualTo(DEPARTMENT_ID);
     }
@@ -69,10 +70,7 @@ class RouteTrackerLogPortImplTest {
                 .build();
         when(this.repository.findById(SHIPMENT_ID)).thenReturn(Optional.of(routeLogRecord));
 
-        this.routeTrackerLogPort.createShipmentEvent(
-                SHIPMENT_ID, "ShipmentSent", ShipmentStatus.SENT, OCCURRED_AT, "{}",
-                USER_ID, DEPARTMENT_ID
-        );
+        this.routeTrackerLogPort.createShipmentEvent(command("shipment.sent", ShipmentStatus.SENT));
 
         verify(this.repository).update(routeLogRecord);
         assertThat(routeLogRecord.getRouteLogRecordDetails().getRouteLogRecordDetailSet()).hasSize(1);
@@ -98,5 +96,23 @@ class RouteTrackerLogPortImplTest {
         final List<RouteLogRecord> result = this.routeTrackerLogPort.findAll();
 
         assertThat(result).isSameAs(routeLogRecords);
+    }
+
+    @Test
+    void shouldIgnoreRepeatedEventId() {
+        final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
+                .shipmentId(SHIPMENT_ID)
+                .build();
+        when(this.repository.findById(SHIPMENT_ID)).thenReturn(Optional.of(routeLogRecord));
+
+        this.routeTrackerLogPort.createShipmentEvent(command("shipment.created", ShipmentStatus.CREATED));
+        this.routeTrackerLogPort.createShipmentEvent(command("shipment.created", ShipmentStatus.CREATED));
+
+        assertThat(routeLogRecord.getRouteLogRecordDetails().getRouteLogRecordDetailSet()).hasSize(1);
+    }
+
+    private CreateShipmentEventCommand command(final String eventType, final ShipmentStatus status) {
+        return new CreateShipmentEventCommand(EVENT_ID, SHIPMENT_ID, eventType, status, OCCURRED_AT, "{}",
+                USER_ID, DEPARTMENT_ID);
     }
 }

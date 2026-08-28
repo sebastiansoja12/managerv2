@@ -11,8 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.shipment.domain.port.secondary.DepartmentRepository;
-import com.warehouse.shipment.domain.service.CountryServiceAvailabilityServiceImpl;
+import com.warehouse.shipment.application.port.secondary.DepartmentRepository;
+import com.warehouse.shipment.application.service.CountryServiceAvailabilityServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class CountryServiceAvailabilityServiceImplTest {

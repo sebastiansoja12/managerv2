@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.shipment.domain.port.secondary.CountryDetermineServicePort;
+import com.warehouse.shipment.application.port.secondary.CountryDetermineServicePort;
 import com.warehouse.shipment.domain.vo.LocationInfo;
 import com.warehouse.shipment.domain.vo.ShipmentCountry;
 

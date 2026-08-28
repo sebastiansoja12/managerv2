@@ -8,7 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.reroute.domain.port.secondary.MailServicePort;
-import com.warehouse.shipment.domain.port.primary.ShipmentPort;
+import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.voronoi.VoronoiService;
 
 @ComponentScan(basePackages = { "com.warehouse.reroute", "com.warehouse.mail" })

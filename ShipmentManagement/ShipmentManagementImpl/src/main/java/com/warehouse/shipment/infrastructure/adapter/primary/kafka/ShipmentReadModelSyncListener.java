@@ -3,7 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary.kafka;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
-import com.warehouse.shipment.domain.service.ShipmentReadModelSyncService;
+import com.warehouse.shipment.application.service.ShipmentReadModelSyncService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.kafka.event.ShipmentReadModelChanged;
 
 import lombok.extern.slf4j.Slf4j;

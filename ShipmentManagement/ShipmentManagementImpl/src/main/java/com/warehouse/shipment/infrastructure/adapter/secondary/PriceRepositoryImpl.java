@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.shipment.domain.port.secondary.PriceRepository;
+import com.warehouse.shipment.application.port.secondary.PriceRepository;
 import com.warehouse.shipment.domain.vo.Price;
 
 public class PriceRepositoryImpl implements PriceRepository {
@@ -16,7 +16,7 @@ public class PriceRepositoryImpl implements PriceRepository {
     @Override
     public Price priceByShipmentSize(final ShipmentSize shipmentSize, final Currency currency) {
         return repository.findByShipmentSize(shipmentSize, currency)
-                .map(Price::from)
+                .map(priceEntity -> new Price(priceEntity.getPrice()))
                 .orElseGet(Price::empty);
     }
 }

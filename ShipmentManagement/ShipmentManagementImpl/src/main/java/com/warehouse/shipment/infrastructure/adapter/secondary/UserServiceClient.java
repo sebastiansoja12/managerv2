@@ -3,7 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.shipment.domain.port.secondary.UserServicePort;
+import com.warehouse.shipment.application.port.secondary.UserServicePort;
 
 public class UserServiceClient implements UserServicePort {
 

@@ -13,8 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.ShipmentSize;
-import com.warehouse.shipment.domain.port.secondary.PriceRepository;
-import com.warehouse.shipment.domain.service.PriceServiceImpl;
+import com.warehouse.shipment.application.port.secondary.PriceRepository;
+import com.warehouse.shipment.application.service.PriceServiceImpl;
 import com.warehouse.shipment.domain.vo.Price;
 
 @ExtendWith(MockitoExtension.class)

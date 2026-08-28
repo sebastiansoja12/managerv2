@@ -4,7 +4,6 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.Shipment;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -196,32 +195,4 @@ public class ShipmentEntity extends BelongsToOperator {
         this.trackingNumber = trackingNumber;
     }
 
-    public static ShipmentEntity from(final Shipment shipment) {
-        final String senderFirstName = shipment.getSender().getFirstName();
-        final String senderLastName = shipment.getSender().getLastName();
-        final String senderEmail = shipment.getSender().getEmail();
-        final String senderCity = shipment.getSender().getCity();
-        final String senderStreet = shipment.getSender().getStreet();
-        final String senderPostalCode = shipment.getSender().getPostalCode();
-        final String senderTelephoneNumber = shipment.getSender().getTelephoneNumber();
-        final String recipientFirstName = shipment.getRecipient().getFirstName();
-        final String recipientLastName = shipment.getRecipient().getLastName();
-        final String recipientEmail = shipment.getRecipient().getEmail();
-        final String recipientCity = shipment.getRecipient().getCity();
-        final String recipientStreet = shipment.getRecipient().getStreet();
-        final String recipientPostalCode = shipment.getRecipient().getPostalCode();
-        final String recipientTelephoneNumber = shipment.getRecipient().getTelephoneNumber();
-        final DangerousGoodEmbeddable dangerousGoodEmbeddable =
-                DangerousGoodEmbeddable.from(shipment.getDangerousGood());
-        return new ShipmentEntity(shipment.getShipmentId(), senderFirstName, senderLastName,
-                senderEmail, senderCity, senderStreet, senderPostalCode, senderTelephoneNumber,
-                recipientFirstName, recipientLastName, recipientEmail, recipientCity, recipientStreet,
-                recipientPostalCode, recipientTelephoneNumber, shipment.getShipmentSize(), shipment.getDestination(),
-                shipment.getOriginDepartmentId(), shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
-                shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
-				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
-				shipment.getShipmentPriority(), dangerousGoodEmbeddable,
-                new ExternalId<>(shipment.getExternalShipmentId().value().toString()),
-                shipment.getTrackingNumber());
-    }
 }

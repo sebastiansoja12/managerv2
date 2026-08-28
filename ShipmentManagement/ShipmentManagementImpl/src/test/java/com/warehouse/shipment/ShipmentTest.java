@@ -2,18 +2,12 @@ package com.warehouse.shipment;
 
 import static com.warehouse.shipment.DataTestCreator.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -21,20 +15,11 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
-import com.warehouse.shipment.domain.port.secondary.ShipmentConfigurationServicePort;
-import com.warehouse.shipment.domain.registry.DomainContext;
-import com.warehouse.shipment.domain.service.TrackingNumberService;
-import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 
 class ShipmentTest {
-
-    @AfterEach
-    void tearDown() {
-        ReflectionTestUtils.setField(DomainContext.class, "context", null);
-    }
 
     @Test
     void shouldCreateParentShipmentWhenRelatedShipmentIsMissing() {
@@ -152,7 +137,8 @@ class ShipmentTest {
                 () -> assertThrows(ShipmentModificationException.class,
                         () -> shipment.changeShipmentStatus(ShipmentStatus.SENT)),
                 () -> assertThrows(ShipmentModificationException.class,
-                        () -> shipment.redirectToSender(new ShipmentId(10L))),
+                        () -> shipment.redirectToSender(new ShipmentId(10L),
+                                new TrackingNumber("REDIRECTED-TRACKING-NUMBER"))),
                 () -> assertThrows(ShipmentModificationException.class,
                         () -> shipment.changeShipmentType(ShipmentType.PARENT))
         );
@@ -160,24 +146,20 @@ class ShipmentTest {
 
     @Test
     void shouldCancelShipmentWithinConfiguredCancellationWindow() {
-        configureCancellationWindow(30);
         final Shipment shipment = shipment(null);
-        shipment.setCreatedAt(LocalDateTime.now().minusMinutes(10));
 
-        shipment.cancel();
+        shipment.cancel(workflowSettings(30), shipment.getCreatedAt().plusMinutes(10));
 
         assertTrue(shipment.getLocked());
     }
 
     @Test
     void shouldRejectShipmentCancellationAfterConfiguredCancellationWindow() {
-        configureCancellationWindow(30);
         final Shipment shipment = shipment(null);
-        shipment.setCreatedAt(LocalDateTime.now().minusMinutes(31));
 
         final ShipmentModificationException exception = assertThrows(
                 ShipmentModificationException.class,
-                shipment::cancel
+                () -> shipment.cancel(workflowSettings(30), shipment.getCreatedAt().plusMinutes(31))
         );
 
         assertEquals("Shipment cancellation window expired", exception.getMessage());
@@ -212,14 +194,10 @@ class ShipmentTest {
         final Sender originalSender = shipment.getSender();
         final Recipient originalRecipient = shipment.getRecipient();
         final ShipmentId redirectedShipmentId = new ShipmentId(10L);
-        final ApplicationContext applicationContext = mock(ApplicationContext.class);
-        final TrackingNumberService trackingNumberService = mock(TrackingNumberService.class);
-        ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
-        when(applicationContext.getBean(TrackingNumberService.class)).thenReturn(trackingNumberService);
-        when(trackingNumberService.nextTrackingNumber(any(), any()))
-                .thenReturn(new TrackingNumber("REDIRECTED-TRACKING-NUMBER"));
+        final TrackingNumber redirectedTrackingNumber = new TrackingNumber("REDIRECTED-TRACKING-NUMBER");
 
-        final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId);
+        final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId,
+                redirectedTrackingNumber);
 
         assertAll(
                 () -> assertEquals(shipment, redirectedShipment),
@@ -250,28 +228,15 @@ class ShipmentTest {
         );
     }
 
-    private void configureCancellationWindow(final int cancellationWindowMinutes) {
-        final ApplicationContext applicationContext = mock(ApplicationContext.class);
-        final ShipmentConfigurationServicePort configurationServicePort = mock(ShipmentConfigurationServicePort.class);
-        final OperatorShipmentConfiguration configuration = new OperatorShipmentConfiguration(
+    private ShipmentWorkflowSettings workflowSettings(final int cancellationWindowMinutes) {
+        return new ShipmentWorkflowSettings(
+                ShipmentStatus.CREATED,
                 null,
-                null,
-                null,
-                new ShipmentWorkflowSettings(
-                        ShipmentStatus.CREATED,
-                        null,
-                        false,
-                        true,
-                        false,
-                        cancellationWindowMinutes,
-                        "16:00"
-                ),
-                null,
-                null
+                false,
+                true,
+                false,
+                cancellationWindowMinutes,
+                "16:00"
         );
-
-        ReflectionTestUtils.setField(DomainContext.class, "context", applicationContext);
-        when(applicationContext.getBean(ShipmentConfigurationServicePort.class)).thenReturn(configurationServicePort);
-        when(configurationServicePort.getCurrentOperatorShipmentConfiguration()).thenReturn(configuration);
     }
 }

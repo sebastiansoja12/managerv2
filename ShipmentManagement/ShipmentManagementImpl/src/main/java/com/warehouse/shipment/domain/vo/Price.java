@@ -4,13 +4,8 @@ import java.math.BigDecimal;
 
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.PriceEntity;
 
 public record Price(BigDecimal price, Currency currency) {
-    public static Price from(PriceEntity priceEntity) {
-        return new Price(priceEntity.getPrice().getAmount(), priceEntity.getPrice().getCurrency());
-    }
-
     public Price(final Money money) {
         this(money.getAmount(), money.getCurrency());
     }

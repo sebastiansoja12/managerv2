@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.shipment.domain.service.ShipmentReadModelSyncService;
+import com.warehouse.shipment.application.service.ShipmentReadModelSyncService;
 
 @RestController
 @RequestMapping("/internal/shipments/read-sync")

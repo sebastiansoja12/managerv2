@@ -1,6 +1,5 @@
 package com.warehouse.shipment;
 
-import com.google.common.collect.Sets;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -13,18 +12,27 @@ import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
-import com.warehouse.shipment.domain.handler.*;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
-import com.warehouse.shipment.domain.port.primary.ShipmentPortImpl;
-import com.warehouse.shipment.domain.port.secondary.*;
-import com.warehouse.shipment.domain.registry.DomainContext;
+import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
+import com.warehouse.shipment.application.port.primary.command.ChangeShipmentTypeRequest;
+import com.warehouse.shipment.application.port.primary.command.ShipmentStatusRequest;
+import com.warehouse.shipment.application.port.secondary.ShipmentConfigurationPort;
+import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
+import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
+import com.warehouse.shipment.application.service.SignatureServiceImpl;
+import com.warehouse.shipment.application.port.secondary.*;
 import com.warehouse.shipment.domain.service.*;
-import com.warehouse.shipment.domain.vo.ChangeShipmentTypeRequest;
-import com.warehouse.shipment.domain.vo.ShipmentCreateResponse;
+import com.warehouse.shipment.application.service.CountryServiceAvailabilityService;
+import com.warehouse.shipment.application.service.CountryServiceAvailabilityServiceImpl;
+import com.warehouse.shipment.application.service.PriceService;
+import com.warehouse.shipment.application.service.PriceServiceImpl;
+import com.warehouse.shipment.application.service.RouteLogService;
+import com.warehouse.shipment.application.service.SignatureService;
+import com.warehouse.shipment.application.service.TrackingNumberGenerationService;
+import com.warehouse.shipment.domain.context.ShipmentEventContext;
+import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
 import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
-import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,10 +40,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
-
-import java.util.Set;
 
 import static com.warehouse.shipment.DataTestCreator.recipient;
 import static com.warehouse.shipment.DataTestCreator.sender;
@@ -57,16 +62,10 @@ class ShipmentPortImplTest {
     private ShipmentRepository shipmentRepository;
 
     @Mock
-    private CountryDetermineServicePort countryDetermineServicePort;
-
-    @Mock
     private PriceRepository priceRepository;
 
     @Mock
     private DepartmentRepository departmentRepository;
-
-    @Mock
-    private CountryRepository countryRepository;
 
     @Mock
     private SignatureRepository signatureRepository;
@@ -83,7 +82,8 @@ class ShipmentPortImplTest {
     @Mock
     private OperatorContextProvider operatorContextProvider;
 
-    private Set<ShipmentStatusHandler> shipmentStatusHandlers;
+    @Mock
+    private ShipmentIdGenerator shipmentIdGenerator;
 
     private ShipmentPortImpl shipmentPort;
 
@@ -91,29 +91,22 @@ class ShipmentPortImplTest {
 
     @BeforeEach
     void setUp() {
-        final ShipmentService shipmentService = new ShipmentServiceImpl(shipmentRepository, specificationShipmentRepository);
-        final CountryDetermineService countryDetermineService = new CountryDetermineServiceImpl(countryDetermineServicePort, countryRepository);
+        final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        new ShipmentEventContext().setApplicationEventPublisher(eventPublisher);
+        final TrackingNumberGenerationService trackingNumberGenerationService =
+                mock(TrackingNumberGenerationService.class);
+        final ShipmentConfigurationPort shipmentConfigurationServicePort = mock(ShipmentConfigurationPort.class);
         final PriceService priceService = new PriceServiceImpl(priceRepository);
-        final NotificationCreatorProvider notificationCreatorProvider = new NotificationCreatorProviderImpl();
         final CountryServiceAvailabilityService countryServiceAvailabilityService =
                 new CountryServiceAvailabilityServiceImpl(departmentRepository);
         final SignatureService signatureService = new SignatureServiceImpl(signatureRepository, shipmentRepository);
         final Logger logger = mock(Logger.class);
-        shipmentStatusHandlers = Sets.newHashSet(Sets.newHashSet(
-                new ShipmentCreatedHandler(), new ShipmentRerouteHandler(shipmentService),
-                new ShipmentSentHandler(shipmentService), new ShipmentDeliveryHandler(shipmentService),
-                new ShipmentRedirectHandler(shipmentService), new ShipmentReturnHandler(shipmentService)));
-        final ApplicationContext applicationContext = mock(ApplicationContext.class);
-        final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
-        final DomainContext domainContext = new DomainContext();
-        domainContext.setApplicationEventPublisher(eventPublisher);
-        domainContext.setApplicationContext(applicationContext);
-        final TrackingNumberService trackingNumberService = mock(TrackingNumberService.class);
-        final ShipmentConfigurationServicePort shipmentConfigurationServicePort = mock(ShipmentConfigurationServicePort.class);
-		shipmentPort = new ShipmentPortImpl(shipmentService, logger, pathFinderServicePort, notificationCreatorProvider,
-				shipmentStatusHandlers, countryDetermineService, priceService, countryServiceAvailabilityService,
-				signatureService, routeLogService, returningServicePort, mailNotificationServicePort,
-                trackingNumberService, shipmentConfigurationServicePort, operatorContextProvider);
+		shipmentPort = new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
+                shipmentIdGenerator,
+				logger, pathFinderServicePort, priceService, countryServiceAvailabilityService,
+                signatureService, routeLogService, returningServicePort, mailNotificationServicePort,
+                trackingNumberGenerationService, shipmentConfigurationServicePort,
+                operatorContextProvider);
 	}
 
     @Test
@@ -126,6 +119,7 @@ class ShipmentPortImplTest {
     @Test
     void shouldChangeShipmentStatusToRedirected() {
         final ShipmentId shipmentId = shipmentId();
+        when(shipmentIdGenerator.nextId()).thenReturn(new ShipmentId(987654321L));
         final Shipment shipment = shipment();
         final ShipmentStatusRequest request = new ShipmentStatusRequest(shipmentId, ShipmentStatus.REDIRECT);
         doReturn(shipment)
@@ -169,6 +163,7 @@ class ShipmentPortImplTest {
     void shouldChangeShipmentStatusToReturned() {
         final ShipmentId shipmentId = shipmentId();
         final Shipment shipment = shipment();
+        shipment.notifyShipmentDelivered();
         final ShipmentStatusRequest request = new ShipmentStatusRequest(shipmentId, ShipmentStatus.RETURN);
         doReturn(shipment)
                 .when(shipmentRepository)
@@ -182,8 +177,9 @@ class ShipmentPortImplTest {
     void shouldCancelShipmentReturnByReturnId() {
         final ReturnId returnId = new ReturnId(123L);
         final ShipmentId shipmentId = shipmentId();
-        final Shipment shipment = shipment(null, true);
-        shipment.changeShipmentStatus(ShipmentStatus.RETURN);
+        final Shipment shipment = shipment();
+        shipment.notifyShipmentDelivered();
+        shipment.notifyShipmentReturned();
         final ShipmentReturnDetails returnDetails = new ShipmentReturnDetails(
                 returnId,
                 shipmentId,

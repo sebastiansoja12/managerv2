@@ -1,8 +1,9 @@
 package com.warehouse.commonassets.identificator;
 
-import java.util.Objects;
-
 import jakarta.persistence.Embeddable;
+
+import java.util.Objects;
+import java.util.UUID;
 
 @Embeddable
 public class ShipmentId {
@@ -19,6 +20,11 @@ public class ShipmentId {
 
 	public Long getValue() {
 		return value;
+	}
+
+	public static ShipmentId nextId() {
+		final long randomUUIDBits = UUID.randomUUID().getLeastSignificantBits();
+		return new ShipmentId(Math.abs(randomUUIDBits));
 	}
 
 	@Override

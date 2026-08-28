@@ -2,13 +2,13 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
-import com.warehouse.shipment.domain.port.secondary.ShipmentConfigurationServicePort;
+import com.warehouse.shipment.application.port.secondary.ShipmentConfigurationPort;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OperatorShipmentConfigurationMapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ShipmentConfigurationServiceAdapter implements ShipmentConfigurationServicePort {
+public class ShipmentConfigurationServiceAdapter implements ShipmentConfigurationPort {
 
     private final OperatorConfigurationApiService operatorConfigurationApiService;
     private final OperatorShipmentConfigurationMapper mapper;

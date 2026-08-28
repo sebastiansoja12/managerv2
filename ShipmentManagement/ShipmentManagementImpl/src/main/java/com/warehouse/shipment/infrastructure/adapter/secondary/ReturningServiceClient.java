@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ReturnId;
-import com.warehouse.shipment.domain.port.secondary.ReturningServicePort;
+import com.warehouse.shipment.application.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
 import com.warehouse.shipment.domain.vo.ShipmentReturnPage;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.ReturnPackageApi;

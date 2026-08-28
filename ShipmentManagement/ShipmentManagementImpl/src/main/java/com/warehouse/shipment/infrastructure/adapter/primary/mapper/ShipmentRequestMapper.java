@@ -15,16 +15,17 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
-import com.warehouse.shipment.domain.model.ShipmentCreateCommand;
+import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
 import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.model.ShipmentDeliveryCommand;
-import com.warehouse.shipment.domain.model.ShipmentUpdateCommand;
-import com.warehouse.shipment.domain.model.SignatureChangeRequest;
+import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
+import com.warehouse.shipment.application.port.primary.command.ShipmentUpdateCommand;
+import com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Person;
 import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
-import com.warehouse.shipment.domain.vo.ShipmentStatusRequest;
+import com.warehouse.shipment.application.port.primary.command.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
@@ -73,6 +74,13 @@ public interface ShipmentRequestMapper {
     Sender mapToSender(final PersonApi person);
 
     Recipient mapToRecipient(final PersonApi person);
+
+    default Person map(final PersonApi person, final PersonType personType) {
+        return switch (personType) {
+            case SENDER -> mapToSender(person);
+            case RECIPIENT -> mapToRecipient(person);
+        };
+    }
 
     default ShipmentStatusRequest map(final ShipmentStatusRequestApi shipmentStatusRequest) {
         return new ShipmentStatusRequest(new ShipmentId(shipmentStatusRequest.shipmentId().getValue()), ShipmentStatus.valueOf(shipmentStatusRequest.shipmentStatus().name()));

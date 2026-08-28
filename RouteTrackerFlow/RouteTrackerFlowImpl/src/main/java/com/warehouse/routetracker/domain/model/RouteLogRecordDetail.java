@@ -1,6 +1,7 @@
 package com.warehouse.routetracker.domain.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.SupplierId;
@@ -18,6 +19,7 @@ import lombok.*;
 @AllArgsConstructor
 public class RouteLogRecordDetail {
     private Long id;
+    private UUID eventId;
     private TerminalId terminalId;
     private String version;
     private UserId userId;

@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.shipment.domain.model.TrackingSequence;
-import com.warehouse.shipment.domain.port.secondary.TrackingSequenceRepository;
+import com.warehouse.shipment.application.port.secondary.TrackingSequenceRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.TrackingSequenceEntity;
 
 import java.util.Optional;

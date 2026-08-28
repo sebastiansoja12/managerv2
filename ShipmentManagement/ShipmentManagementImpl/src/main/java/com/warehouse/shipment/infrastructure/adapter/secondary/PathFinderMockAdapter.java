@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
+import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
 

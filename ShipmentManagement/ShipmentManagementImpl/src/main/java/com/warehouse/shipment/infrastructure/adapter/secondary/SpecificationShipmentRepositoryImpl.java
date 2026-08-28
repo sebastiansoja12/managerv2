@@ -9,6 +9,7 @@ import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -18,9 +19,12 @@ public class SpecificationShipmentRepositoryImpl
         implements SpecificationRepository<ShipmentSearchCriteria, Shipment> {
 
     private final OperatorFilteredRepository<ShipmentReadEntity> repository;
+    private final ShipmentPersistenceMapper persistenceMapper;
 
-    public SpecificationShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentReadEntity> repository) {
+    public SpecificationShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentReadEntity> repository,
+                                                final ShipmentPersistenceMapper persistenceMapper) {
         this.repository = repository;
+        this.persistenceMapper = persistenceMapper;
     }
 
     @Override
@@ -118,7 +122,7 @@ public class SpecificationShipmentRepositoryImpl
                 .maxResults(criteria.pageSize())
                 .list()
                 .stream()
-                .map(Shipment::from)
+                .map(this.persistenceMapper::toDomain)
                 .toList();
     }
 
