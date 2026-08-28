@@ -7,7 +7,6 @@ import com.warehouse.commonassets.event.application.port.secondary.DomainEventPu
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.deliverynetwork.application.exception.DepartmentDirectoryImportMismatchException;
 import com.warehouse.deliverynetwork.application.exception.IncompleteDepartmentDirectoryImportException;
-import com.warehouse.deliverynetwork.application.exception.MissingOperatorContextException;
 import com.warehouse.deliverynetwork.application.exception.UnknownDepartmentCodeException;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCodeCommand;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCommand;
@@ -154,8 +153,7 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
     }
 
     private OperatorId currentOperatorId() {
-        return this.operatorContextProvider.currentOperatorId()
-                .orElseThrow(MissingOperatorContextException::new);
+        return this.operatorContextProvider.currentOperatorId();
     }
 
     private DepartmentConnection connection(final DepartmentConnectionCommand connection) {
