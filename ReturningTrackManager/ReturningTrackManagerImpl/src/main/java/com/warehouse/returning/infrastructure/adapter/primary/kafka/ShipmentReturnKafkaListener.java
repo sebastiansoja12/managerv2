@@ -1,7 +1,5 @@
 package com.warehouse.returning.infrastructure.adapter.primary.kafka;
 
-import java.util.List;
-
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
@@ -9,20 +7,16 @@ import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.vo.DepartmentCode;
 import com.warehouse.returning.domain.vo.ShipmentId;
 import com.warehouse.returning.domain.vo.UserId;
-import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.IgnoredShipmentEvent;
 import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentReturnCanceled;
 import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentReturnCreated;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
-@KafkaListener(
-        topics = "${manager.kafka.topics.shipment-events:shipment.events}",
-        groupId = "${spring.kafka.consumer.group-id:returning-track-manager}"
-)
 public class ShipmentReturnKafkaListener {
 
     private final ReturnPort returnPort;
@@ -31,22 +25,23 @@ public class ShipmentReturnKafkaListener {
         this.returnPort = returnPort;
     }
 
-    @KafkaHandler
+    @KafkaListener(
+            topics = "${manager.kafka.topics.shipment-return-created:shipment.return.created}",
+            groupId = "${spring.kafka.consumer.group-id:returning-track-manager}"
+    )
     public void handle(final ShipmentReturnCreated event) {
         final ReturnRequest request = this.toReturnRequest(event);
         this.returnPort.process(request);
         log.info("Processed shipment return created event for shipment {}", event.shipmentId().value());
     }
 
-    @KafkaHandler
+    @KafkaListener(
+            topics = "${manager.kafka.topics.shipment-return-canceled:shipment.return.canceled}",
+            groupId = "${spring.kafka.consumer.group-id:returning-track-manager}"
+    )
     public void handle(final ShipmentReturnCanceled event) {
-        this.returnPort.cancel(event.shipmentId());
-        log.info("Processed shipment return canceled event for shipment {}", event.shipmentId().value());
-    }
-
-    @KafkaHandler
-    public void handle(final IgnoredShipmentEvent event) {
-        log.debug("Ignoring shipment event for returning track manager");
+        this.returnPort.cancel(event.getShipmentId());
+        log.info("Processed shipment return canceled event for shipment {}", event.getShipmentId().value());
     }
 
     private ReturnRequest toReturnRequest(final ShipmentReturnCreated event) {

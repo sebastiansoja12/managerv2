@@ -74,20 +74,6 @@ public interface ShipmentPort {
                               final ShipmentType shipmentType,
                               final ShipmentId relatedShipmentId);
 
-    void changeShipmentStatusTo(final ShipmentId shipmentId, final ShipmentStatus shipmentStatus);
-
-    void changeShipmentRelatedIdTo(final ShipmentId shipmentId, final ShipmentId relatedShipmentId);
-
-    void changeShipmentPriorityTo(final ShipmentId shipmentId, final ShipmentPriority shipmentPriority);
-
-    void changeCurrencyTo(final ShipmentId shipmentId, final Currency currency);
-
-    void changeShipmentIssuerCountryTo(final ShipmentId shipmentId, final CountryCode originCountry);
-
-    void changeShipmentReceiverCountryTo(final ShipmentId shipmentId, final CountryCode destinationCountry);
-
-    void changeSignatureRequiredTo(final ShipmentId shipmentId, final boolean signatureRequired);
-
     void changeDangerousGoodTo(final ShipmentId shipmentId, final DangerousGood dangerousGood);
 
     Optional<DangerousGood> findDangerousGood(final ShipmentId shipmentId);
@@ -97,8 +83,6 @@ public interface ShipmentPort {
     void notifyRelatedShipmentRedirected(final ShipmentId shipmentId, final ShipmentId relatedShipmentId);
 
     void notifyShipmentRerouted(final ShipmentId shipmentId);
-
-    void notifyRelatedShipmentLocked(final ShipmentId shipmentId);
 
     void notifyShipmentSent(final ShipmentId shipmentId);
 
@@ -113,13 +97,9 @@ public interface ShipmentPort {
 
     void notifyReturnCanceled(final ShipmentId shipmentId);
 
-    void changeShipmentCountries(final ShipmentCountryRequest request);
-
     void lockShipment(final ShipmentId shipmentId);
 
     void redirectShipmentToSender(final ShipmentId shipmentId);
 
     void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination);
-
-    Shipment findByExternalId(final ExternalId<String> externalId);
 }

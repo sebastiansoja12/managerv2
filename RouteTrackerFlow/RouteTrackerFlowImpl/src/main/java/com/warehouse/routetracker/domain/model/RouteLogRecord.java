@@ -1,9 +1,9 @@
 package com.warehouse.routetracker.domain.model;
 
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.SupplierId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
@@ -11,7 +11,6 @@ import com.warehouse.routetracker.domain.vo.TerminalId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.Objects;
 
@@ -42,23 +41,23 @@ public class RouteLogRecord {
         this.faultDescription = faultDescription;
     }
 
-    public void createShipmentEvent(final CreateShipmentEventCommand command) {
+    public void createShipmentEvent(final ShipmentStatusStateChangeCommand command) {
         final boolean alreadyProcessed = getRouteLogRecordDetails().getRouteLogRecordDetailSet().stream()
-                .map(RouteLogRecordDetail::getEventId)
-                .anyMatch(eventId -> Objects.equals(eventId, command.eventId()));
+                .anyMatch(detail -> Objects.equals(detail.getDescription(), command.eventType())
+                        && detail.getShipmentStatus() == command.shipmentStatus()
+                        && Objects.equals(detail.getTimestamp(), command.changedAt()));
         if (alreadyProcessed) {
             return;
         }
         getRouteLogRecordDetails()
                 .getRouteLogRecordDetailSet().add(RouteLogRecordDetail.builder()
-                .eventId(command.eventId())
                 .shipmentStatus(command.shipmentStatus())
                 .processType(determineProcessType(command.shipmentStatus()))
                 .description(command.eventType())
-                .timestamp(command.occurredAt())
-                .request(command.payload())
-                .userId(command.userId())
+                .timestamp(command.changedAt())
+                .operatorId(command.operatorId())
                 .departmentId(command.departmentId())
+                .userId(command.userId())
                 .build());
     }
 

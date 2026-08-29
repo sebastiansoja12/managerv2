@@ -1,68 +1,16 @@
 package com.warehouse.shipment.application.event;
 
-import java.time.Instant;
-import java.util.UUID;
-
-import com.warehouse.commonassets.kafka.domain.model.OperatorAwareContext;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.warehouse.commonassets.event.domain.annotation.IntegrationEventType;
+import com.warehouse.commonassets.event.domain.model.IntegrationEvent;
 import com.warehouse.shipment.application.event.snapshot.ShipmentSnapshot;
 
-public final class ShipmentCreatedIntegrationEvent extends OperatorAwareContext {
+@IntegrationEventType(value = "shipment.created", version = 1)
+public class ShipmentCreatedIntegrationEvent extends ShipmentChangedIntegrationEvent implements IntegrationEvent {
 
-    private final UUID eventId;
-    private final String eventType;
-    private final int version;
-    private final Instant occurredAt;
-    private final ShipmentSnapshot payload;
-
-    public ShipmentCreatedIntegrationEvent(final UUID eventId,
-                                           final String eventType,
-                                           final int version,
-                                           final Instant occurredAt,
-                                           final ShipmentSnapshot payload) {
-        this.eventId = eventId;
-        this.eventType = eventType;
-        this.version = version;
-        this.occurredAt = occurredAt;
-        this.payload = payload;
-    }
-
-    public UUID eventId() {
-        return eventId;
-    }
-
-    public String eventType() {
-        return eventType;
-    }
-
-    public int version() {
-        return version;
-    }
-
-    public Instant occurredAt() {
-        return occurredAt;
-    }
-
-    public ShipmentSnapshot payload() {
-        return payload;
-    }
-
-    public UUID getEventId() {
-        return eventId;
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public Instant getOccurredAt() {
-        return occurredAt;
-    }
-
-    public ShipmentSnapshot getPayload() {
-        return payload;
+    @JsonCreator
+    public ShipmentCreatedIntegrationEvent(@JsonProperty("payload") final ShipmentSnapshot payload) {
+        super(payload);
     }
 }

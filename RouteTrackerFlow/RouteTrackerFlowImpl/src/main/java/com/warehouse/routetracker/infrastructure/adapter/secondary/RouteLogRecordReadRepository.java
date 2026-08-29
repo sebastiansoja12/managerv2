@@ -10,9 +10,10 @@ import org.springframework.stereotype.Repository;
 
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordId;
 
 @Repository
-public interface RouteLogRecordReadRepository extends JpaRepository<RouteLogRecordEntity, String> {
+public interface RouteLogRecordReadRepository extends JpaRepository<RouteLogRecordEntity, RouteLogRecordId> {
 
     @EntityGraph(attributePaths = "routeLogRecordDetails")
     @Query("SELECT r FROM RouteLogRecordEntity r WHERE r.shipmentId = :shipmentId")

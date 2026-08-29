@@ -21,6 +21,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.commonassets.event.domain.model.DomainEvent;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.kafka.domain.annotation.KafkaDomainEvent;
 import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
@@ -33,8 +34,6 @@ import com.warehouse.commonassets.repository.OperatorContextProvider;
 @Component
 @ConditionalOnProperty(name = "manager.kafka.domain-events.enabled", havingValue = "true")
 public class KafkaDomainEventExternalizer {
-
-    private static final String KAFKA_TYPE_ID = "__TypeId__";
 
     private final Environment environment;
     private final ObjectMapper objectMapper;
@@ -56,6 +55,10 @@ public class KafkaDomainEventExternalizer {
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT, fallbackExecution = true)
     public void publishIfRouted(final Object event) {
+        if (event instanceof DomainEvent) {
+            return;
+        }
+
         final Set<KafkaDomainEvent> routedEvents = routedEvents(event);
         if (routedEvents.isEmpty()) {
             return;
@@ -109,7 +112,7 @@ public class KafkaDomainEventExternalizer {
                                         final Instant occurredAt,
                                         final OperatorId operatorId) {
         final Map<String, String> headers = new LinkedHashMap<>();
-        headers.put(KAFKA_TYPE_ID, eventName);
+        headers.put(KafkaEventHeaders.TYPE_ID, eventName);
         headers.put(KafkaEventHeaders.EVENT_ID, eventId.toString());
         headers.put(KafkaEventHeaders.EVENT_TYPE, eventName);
         headers.put(KafkaEventHeaders.EVENT_CLASS, eventType);

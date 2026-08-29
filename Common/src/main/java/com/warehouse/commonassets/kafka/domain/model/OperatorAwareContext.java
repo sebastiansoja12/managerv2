@@ -1,5 +1,6 @@
 package com.warehouse.commonassets.kafka.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -11,14 +12,6 @@ public abstract class OperatorAwareContext implements OperatorAwareEvent {
     private OperatorId operatorId;
 
     protected OperatorAwareContext() {
-    }
-
-    protected OperatorAwareContext(final UserId userId,
-                                   final DepartmentId departmentId,
-                                   final OperatorId operatorId) {
-        this.userId = userId;
-        this.departmentId = departmentId;
-        this.operatorId = operatorId;
     }
 
     @Override
@@ -35,24 +28,13 @@ public abstract class OperatorAwareContext implements OperatorAwareEvent {
         this.operatorId = operatorId;
     }
 
-    public UserId getUserId() {
-        return userId;
-    }
-
-    public DepartmentId getDepartmentId() {
-        return departmentId;
-    }
-
-    public OperatorId getOperatorId() {
-        return operatorId;
-    }
-
     @Override
     public UserId userId() {
         return userId;
     }
 
     @Override
+    @JsonIgnore
     public DepartmentId departmentId() {
         return departmentId;
     }

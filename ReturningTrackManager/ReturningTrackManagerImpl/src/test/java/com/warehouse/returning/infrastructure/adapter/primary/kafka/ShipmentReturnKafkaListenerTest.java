@@ -1,27 +1,19 @@
 package com.warehouse.returning.infrastructure.adapter.primary.kafka;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.Instant;
-
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
-import com.warehouse.returning.domain.vo.ChangeReasonCodeRequest;
-import com.warehouse.returning.domain.vo.DepartmentCode;
-import com.warehouse.returning.domain.vo.ReturnPage;
-import com.warehouse.returning.domain.vo.ReturnPackageId;
-import com.warehouse.returning.domain.vo.ReturnResponse;
-import com.warehouse.returning.domain.vo.ReturnToken;
-import com.warehouse.returning.domain.vo.ReturnTokenValidation;
-import com.warehouse.returning.domain.vo.ShipmentId;
-import com.warehouse.returning.domain.vo.UserId;
+import com.warehouse.returning.domain.vo.*;
 import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.OperatorId;
 import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentReturnCanceled;
 import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentReturnCreated;
 import com.warehouse.returning.infrastructure.adapter.primary.kafka.event.ShipmentSnapshot;
 import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ShipmentReturnKafkaListenerTest {
 
@@ -59,7 +51,8 @@ class ShipmentReturnKafkaListenerTest {
                 new ShipmentSnapshot(new ShipmentId(123L), "DELIVERY"),
                 Instant.parse("2026-08-23T08:00:00Z"),
                 new UserId(0L),
-                new OperatorId(77L)));
+                new OperatorId(77L),
+                new ShipmentId(123L)));
 
         assertThat(this.returnPort.canceledShipmentId.value()).isEqualTo(123L);
     }

@@ -89,24 +89,21 @@ class ShipmentArchitectureTest {
                 .doesNotContain("private void notifyRelatedShipmentRedirected")
                 .doesNotContain("ApplicationEventPublisher")
                 .doesNotContain("nextShipmentId()")
-                .doesNotContain("ShipmentId.nextId()")
+                .contains("ShipmentId.nextId()")
                 .contains("public void notifyRelatedShipmentRedirected")
-                .contains("shipmentIdGenerator.nextId()")
+                .doesNotContain("shipmentIdGenerator")
                 .contains("ShipmentEventContext.eventPublisher().publishEvent(new ShipmentRedirected");
 
         final Path shipmentIdGeneratorPort = Path.of(
                 "src/main/java/com/warehouse/shipment/application/port/secondary/ShipmentIdGenerator.java");
         final Path shipmentIdGeneratorAdapter = Path.of(
                 "src/main/java/com/warehouse/shipment/infrastructure/adapter/secondary/ShipmentIdGeneratorAdapter.java");
-        assertThat(shipmentIdGeneratorPort).exists();
-        assertThat(shipmentIdGeneratorAdapter).exists();
-        assertThat(Files.readString(shipmentIdGeneratorAdapter))
-                .contains("implements ShipmentIdGenerator")
-                .contains("return ShipmentId.nextId()");
+        assertThat(shipmentIdGeneratorPort).doesNotExist();
+        assertThat(shipmentIdGeneratorAdapter).doesNotExist();
     }
 
     @Test
-    void shipmentCreatedHandlerShouldBuildConcreteIntegrationEventWithoutGenericPublisher() throws IOException {
+    void shipmentCreatedHandlerShouldPublishConcreteIntegrationEvent() throws IOException {
         final String listenerSource = Files.readString(Path.of(
                 "src/main/java/com/warehouse/shipment/application/listener/ShipmentEventListener.java"));
 
@@ -114,10 +111,19 @@ class ShipmentArchitectureTest {
                 .contains("handle(final ShipmentCreatedEvent event)")
                 .contains("new ShipmentCreatedIntegrationEvent(")
                 .contains("application.event.snapshot.ShipmentSnapshot.from(snapshot)")
-                .doesNotContain("IntegrationEventPublisher")
+                .contains("IntegrationEventPublisher")
                 .doesNotContain("Optional<")
                 .doesNotContain("TODO")
                 .doesNotContain("handle(final ShipmentEvent event)");
+
+        final String integrationEvent = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/application/event/ShipmentChangedIntegrationEvent.java"));
+        assertThat(integrationEvent)
+                .contains("@IntegrationEventType(value = \"shipment.changed\", version = 1)")
+                .doesNotContain("UUID eventId")
+                .doesNotContain("Instant occurredAt")
+                .doesNotContain("String eventType")
+                .doesNotContain("int version");
 
         final String integrationSnapshot = Files.readString(Path.of(
                 "src/main/java/com/warehouse/shipment/application/event/snapshot/ShipmentSnapshot.java"));

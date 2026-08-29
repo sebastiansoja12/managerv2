@@ -8,17 +8,17 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
-@Setter
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "route_log")
 public class RouteLogRecordEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false))
+    private RouteLogRecordId id;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "shipment_id", nullable = false, unique = true))
@@ -39,5 +39,12 @@ public class RouteLogRecordEntity {
             routeLogRecordDetails = new ArrayList<>();
         }
         return routeLogRecordDetails;
+    }
+
+    @PrePersist
+    private void assignId() {
+        if (id == null) {
+            id = RouteLogRecordId.generate();
+        }
     }
 }

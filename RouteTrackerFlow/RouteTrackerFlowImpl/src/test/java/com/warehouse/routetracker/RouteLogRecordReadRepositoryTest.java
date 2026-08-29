@@ -3,18 +3,19 @@ package com.warehouse.routetracker;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.configuration.RouteTrackerTestConfiguration;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
-import com.warehouse.routetracker.domain.model.CreateShipmentEventCommand;
+import com.warehouse.routetracker.domain.model.ShipmentStatusStateChangeCommand;
+import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.RouteLogRecordReadRepository;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.mapper.RouteLogToEntityMapper;
 import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
@@ -56,21 +57,22 @@ public class RouteLogRecordReadRepositoryTest {
         final RouteLogRecord routeLogRecord = RouteLogRecord.builder()
                 .shipmentId(new ShipmentId(345678L))
                 .build();
-        routeLogRecord.createShipmentEvent(new CreateShipmentEventCommand(
-                UUID.randomUUID(),
+        routeLogRecord.createShipmentEvent(new ShipmentStatusStateChangeCommand(
                 routeLogRecord.getShipmentId(),
-                "shipment.created",
+                "shipment.changed",
                 ShipmentStatus.CREATED,
                 LocalDateTime.now(),
-                "{\"event\":\"created\"}",
-                new UserId(3L),
-                new DepartmentId(30L)));
+                new OperatorId(3L),
+                new DepartmentId(30L),
+                new UserId(4L)));
 
         final RouteLogRecordEntity saved = repository.saveAndFlush(entityMapper.map(routeLogRecord));
         final RouteLogRecordDetailEntity detail = saved.getRouteLogRecordDetails().getFirst();
 
         assertNotNull(saved.getId());
         assertEquals(saved.getId(), detail.getRouteLogRecord().getId());
+        assertEquals(new com.warehouse.routetracker.infrastructure.adapter.secondary.entity.OperatorId(3L),
+                detail.getOperatorId());
     }
 
     @Test
@@ -78,7 +80,8 @@ public class RouteLogRecordReadRepositoryTest {
         // given
         final UUID id = UUID.fromString("7ecaa82b-eda9-4b5d-ae9f-933f9adaee27");
         // when
-        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findById(String.valueOf(id));
+        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findById(
+                new RouteLogRecordId(String.valueOf(id)));
         // then
         assertTrue(routeLogRecord.isPresent());
     }
@@ -105,9 +108,12 @@ public class RouteLogRecordReadRepositoryTest {
 
         assertEquals(new RouteLogRecordDetailId(1L), detail.getId());
         assertEquals(routeLogRecord.getId(), detail.getRouteLogRecord().getId());
-        assertEquals(new UserId(1L), detail.getUserId());
-        assertEquals(new DepartmentId(10L), detail.getDepartmentId());
-        assertEquals(new SupplierId(100L), detail.getSupplierId());
+        assertEquals(new com.warehouse.routetracker.infrastructure.adapter.secondary.entity.UserId(1L),
+                detail.getUserId());
+        assertEquals(new com.warehouse.routetracker.infrastructure.adapter.secondary.entity.DepartmentId(10L),
+                detail.getDepartmentId());
+        assertEquals(new com.warehouse.routetracker.infrastructure.adapter.secondary.entity.SupplierId(100L),
+                detail.getSupplierId());
     }
 
     @Test
@@ -115,7 +121,8 @@ public class RouteLogRecordReadRepositoryTest {
         // given
         final UUID id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
         // when
-        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findById(String.valueOf(id));
+        final Optional<RouteLogRecordEntity> routeLogRecord = repository.findById(
+                new RouteLogRecordId(String.valueOf(id)));
         // then
         assertTrue(routeLogRecord.isEmpty());
     }

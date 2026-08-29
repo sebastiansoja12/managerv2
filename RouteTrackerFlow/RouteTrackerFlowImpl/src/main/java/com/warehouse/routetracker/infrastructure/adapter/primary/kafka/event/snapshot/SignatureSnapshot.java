@@ -3,7 +3,6 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.sn
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.warehouse.commonassets.identificator.ShipmentId;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record SignatureSnapshot(
