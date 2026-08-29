@@ -30,7 +30,7 @@
 		<module>Authorization</module>
 		<module>Utility</module>
         <module>DestinationDetermination</module>
-        <module>DocumentManager</module>
+        <module>DocumentStorage</module>
 		<module>ExceptionHandler</module>
         <module>Device</module>
         <module>ArchitectureTest</module>

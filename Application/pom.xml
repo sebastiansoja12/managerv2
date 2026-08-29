@@ -52,17 +52,17 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>DocumentStorageImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>DeliveryNetworkImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>PickupPointManagementImpl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>BarcodeGenerator</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -88,11 +88,6 @@
         <dependency>
             <groupId>com.warehouse</groupId>
             <artifactId>PathFinderCore</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>CsvFileGenerator</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
