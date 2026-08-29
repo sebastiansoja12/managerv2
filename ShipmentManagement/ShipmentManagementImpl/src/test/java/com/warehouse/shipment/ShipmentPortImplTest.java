@@ -27,6 +27,7 @@ import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.service.AddressValidationService;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
@@ -104,6 +105,8 @@ class ShipmentPortImplTest {
     @Mock
     private PickupPointServicePort pickupPointServicePort;
 
+    private final AddressValidationService addressValidationService = new AddressValidationService();
+
     private ShipmentPortImpl shipmentPort;
 
     private static final String SHIPMENT_WAS_NOT_FOUND = "Shipment not found";
@@ -132,7 +135,7 @@ class ShipmentPortImplTest {
 				this.signatureService, shipmentResultFactory, mailNotificationServicePort,
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                this.domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService);
+                this.domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService);
 	}
 
     @Test
