@@ -15,7 +15,7 @@ public record DeliveryTarget(DeliveryTargetType type, String id) {
     }
 
     public static DeliveryTarget shipment(final ShipmentId shipmentId) {
-        Objects.requireNonNull(shipmentId, "Shipment id is required");
+        Objects.requireNonNull(shipmentId, "DeliverableShipment id is required");
         return new DeliveryTarget(DeliveryTargetType.SHIPMENT, shipmentId.getValue().toString());
     }
 

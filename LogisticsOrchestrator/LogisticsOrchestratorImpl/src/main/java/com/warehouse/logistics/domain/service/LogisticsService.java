@@ -1,5 +1,6 @@
 package com.warehouse.logistics.domain.service;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.logistics.domain.model.Delivery;
@@ -21,4 +22,6 @@ public interface LogisticsService {
     List<Delivery> findRecent(final int offset, final int limit);
 
     void createOrUpdate(final Delivery delivery);
+
+    Optional<Delivery> findByShipmentId(final ShipmentId shipmentId);
 }

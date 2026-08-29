@@ -8,16 +8,7 @@ import com.warehouse.logistics.infrastructure.adapter.primary.dto.DeliveryRespon
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -56,12 +47,13 @@ public class DeliveryReadController {
     }
 
     @PutMapping("/{deliveryId}/method")
-    public DeliveryResponseDto changeMethod(@PathVariable final String deliveryId,
-                                            @RequestBody final DeliveryMethodUpdateRequestDto request) {
+    public ResponseEntity<Void> changeMethod(@PathVariable final String deliveryId,
+                                               @RequestBody final DeliveryMethodUpdateRequestDto request) {
         if (request == null || request.method() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Delivery method is required");
         }
-        return responseMapper.map(logisticsPort.changeDeliveryMethod(new DeliveryId(deliveryId), request.method()));
+        this.logisticsPort.changeDeliveryMethod(new DeliveryId(deliveryId), request.method());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{deliveryId}/cancel")

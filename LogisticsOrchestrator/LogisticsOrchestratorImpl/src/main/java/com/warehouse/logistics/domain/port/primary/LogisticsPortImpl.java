@@ -4,12 +4,9 @@ import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
-import com.warehouse.logistics.domain.model.CreateDeliveryCommand;
-import com.warehouse.logistics.domain.model.Delivery;
-import com.warehouse.logistics.domain.model.DeliveryTarget;
-import com.warehouse.logistics.domain.model.LogisticsRequest;
-import com.warehouse.logistics.domain.model.LogisticsResponse;
+import com.warehouse.logistics.domain.model.*;
 import com.warehouse.logistics.domain.service.LogisticsService;
+import com.warehouse.logistics.domain.vo.CompleteDeliveryCommand;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -41,7 +38,22 @@ public class LogisticsPortImpl implements LogisticsPort {
 				command.pickupPointId(), command.deliveryPickupPointId(), command.signatureId(),
 				command.signatureRequired(), command.userId());
 
-		logisticsService.createOrUpdate(delivery);
+		this.logisticsService.createOrUpdate(delivery);
+    }
+
+    @Override
+    public void completeDelivery(final CompleteDeliveryCommand command) {
+        final DeliveryTarget target = DeliveryTarget.shipment(command.getShipmentId());
+        final Optional<Delivery> delivery = this.logisticsService.findByTargetAndType(target, DeliveryType.OUTBOUND);
+        delivery.ifPresent(
+                d -> {
+                    final DeliveryStep finalStep = DeliveryStep.complete(d.getDeliveryId(), command.getSupplierId(), command.getUserId(),
+                            command.getDepartmentId(), d.getDeliverySteps().size());
+                    d.addStep(finalStep);
+                    d.markAsCompleted();
+                    this.logisticsService.createOrUpdate(d);
+                }
+        );
     }
 
     @Override
@@ -62,11 +74,10 @@ public class LogisticsPortImpl implements LogisticsPort {
     }
 
     @Override
-    public Delivery changeDeliveryMethod(final DeliveryId deliveryId, final DeliveryMethod method) {
+    public void changeDeliveryMethod(final DeliveryId deliveryId, final DeliveryMethod method) {
         final Delivery delivery = findDelivery(deliveryId);
         delivery.changeMethod(method);
-        logisticsService.createOrUpdate(delivery);
-        return delivery;
+        this.logisticsService.createOrUpdate(delivery);
     }
 
     @Override

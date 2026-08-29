@@ -39,8 +39,8 @@ public class DeliveryReturnServiceImpl implements DeliveryReturnService {
 
         return deliveryReturnRequests.stream()
                 .peek(deliveryReturn -> {
-                    final Shipment shipment = shipmentRepositoryServicePort.downloadShipment(deliveryReturn.getShipmentId());
-                    mailServicePort.sendNotification(shipment);
+                    final DeliverableShipment deliverableShipment = shipmentRepositoryServicePort.downloadShipment(deliveryReturn.getShipmentId());
+                    mailServicePort.sendNotification(deliverableShipment);
                 })
                 .map(deliveryReturnDetails -> DeliveryReturn
                         .builder()
