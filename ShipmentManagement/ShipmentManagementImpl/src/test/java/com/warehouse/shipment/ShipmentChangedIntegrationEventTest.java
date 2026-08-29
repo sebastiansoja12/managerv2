@@ -1,17 +1,16 @@
 package com.warehouse.shipment;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ShipmentChangedIntegrationEventTest {
 
@@ -52,8 +51,8 @@ class ShipmentChangedIntegrationEventTest {
         assertThat(json.has("eventType")).isFalse();
         assertThat(json.has("eventVersion")).isFalse();
         assertThat(json.has("occurredAt")).isFalse();
-        assertThat(json.has("userId")).isFalse();
-        assertThat(json.has("departmentId")).isFalse();
-        assertThat(json.has("operatorId")).isFalse();
+        assertThat(json.has("userId")).isTrue();
+        assertThat(json.has("departmentId")).isTrue();
+        assertThat(json.has("operatorId")).isTrue();
     }
 }
