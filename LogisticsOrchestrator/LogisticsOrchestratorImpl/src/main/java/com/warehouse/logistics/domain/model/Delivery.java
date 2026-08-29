@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.logistics.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
@@ -38,27 +39,26 @@ public class Delivery {
     public Delivery(final DeliveryTarget target,
                     final ShipmentId shipmentId,
                     final DeliveryType type,
-                    final CreateDeliveryCommand createDeliveryCommand) {
+                    final DeliveryMethod method,
+                    final PickupPointId pickupPointId,
+                    final PickupPointId deliveryPickupPointId,
+                    final ShipmentId signatureId,
+                    final Boolean signatureRequired,
+                    final UserId userId) {
         this.deliveryId = DeliveryId.generate();
         this.target = target;
         this.shipmentId = shipmentId;
         this.type = type;
         this.deliverySteps = new ArrayList<>();
         this.createdAt = LocalDateTime.now();
-        this.deliveryStatus = DeliveryStatus.UNKNOWN;
+        this.deliveryStatus = DeliveryStatus.DEPOT;
         this.status = DeliveryLifecycleStatus.CREATED;
-        this.signatureRequired = false;
-        if (createDeliveryCommand != null) {
-            final DeliveryStep creationStep = DeliveryStep.created(deliveryId, createdAt,
-                    createDeliveryCommand.signatureId(), createDeliveryCommand.method(), "Shipment created",
-                    createDeliveryCommand.userId());
-            this.deliverySteps.add(creationStep);
-            this.deliveryStatus = creationStep.deliveryStatus();
-            this.method = createDeliveryCommand.method();
-            this.pickupPointId = createDeliveryCommand.pickupPointId();
-            this.deliveryPickupPointId = createDeliveryCommand.deliveryPickupPointId();
-            this.signatureRequired = createDeliveryCommand.signatureRequired();
-        }
+        this.method = method;
+        this.pickupPointId = pickupPointId;
+        this.deliveryPickupPointId = deliveryPickupPointId;
+        this.signatureRequired = Boolean.TRUE.equals(signatureRequired);
+        this.deliverySteps.add(DeliveryStep.created(deliveryId, createdAt, signatureId, method,
+                "Shipment created", userId));
     }
 
     public Delivery(final DeliveryId deliveryId,

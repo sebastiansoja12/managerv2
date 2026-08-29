@@ -1,14 +1,17 @@
 package com.warehouse.commonassets.event.integration.context;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 
 public abstract class OperatorAwareContext implements OperatorAwareEvent {
 
+    @JsonProperty("userId")
     private UserId userId;
+    @JsonProperty("departmentId")
     private DepartmentId departmentId;
+    @JsonProperty("operatorId")
     private OperatorId operatorId;
 
     protected OperatorAwareContext() {
@@ -34,7 +37,6 @@ public abstract class OperatorAwareContext implements OperatorAwareEvent {
     }
 
     @Override
-    @JsonIgnore
     public DepartmentId departmentId() {
         return departmentId;
     }

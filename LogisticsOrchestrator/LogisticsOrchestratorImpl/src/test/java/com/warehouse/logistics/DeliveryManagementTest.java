@@ -7,7 +7,6 @@ import com.warehouse.logistics.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.enumeration.DeliveryStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
-import com.warehouse.logistics.domain.model.CreateDeliveryCommand;
 import com.warehouse.logistics.domain.model.Delivery;
 import com.warehouse.logistics.domain.model.DeliveryStep;
 import com.warehouse.logistics.domain.model.DeliveryTarget;
@@ -24,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,16 +36,16 @@ class DeliveryManagementTest {
         assertNotNull(delivery.getDeliveryId());
         assertNotNull(delivery.getCreatedAt());
         assertEquals(DeliveryLifecycleStatus.CREATED, delivery.getStatus());
-        assertEquals(DeliveryStatus.UNKNOWN, delivery.getDeliveryStatus());
-        assertTrue(delivery.getDeliverySteps().isEmpty());
+        assertEquals(DeliveryStatus.DEPOT, delivery.getDeliveryStatus());
+        assertEquals(1, delivery.getDeliverySteps().size());
+        assertEquals(DeliveryStatus.DEPOT, delivery.getDeliverySteps().get(0).deliveryStatus());
     }
 
     @Test
     void shouldUseCreationTimestampForShipmentStep() {
         final ShipmentId shipmentId = new ShipmentId(1L);
         final Delivery delivery = new Delivery(DeliveryTarget.shipment(shipmentId), shipmentId,
-                DeliveryType.OUTBOUND, new CreateDeliveryCommand(
-                        shipmentId, DeliveryMethod.COURIER, null, null, null, false, new UserId(42L)));
+                DeliveryType.OUTBOUND, DeliveryMethod.COURIER, null, null, null, false, new UserId(42L));
 
         assertEquals(DeliveryLifecycleStatus.CREATED, delivery.getStatus());
         assertEquals(DeliveryStatus.DEPOT, delivery.getDeliveryStatus());
@@ -99,7 +97,7 @@ class DeliveryManagementTest {
         final LogisticsService logisticsService = mock(LogisticsService.class);
         final LogisticsPortImpl logisticsPort = new LogisticsPortImpl(logisticsService);
         final Delivery delivery = delivery();
-        delivery.addStep(com.warehouse.logistics.domain.model.DeliveryStep.attempt(delivery.getDeliveryId(), 1,
+        delivery.addStep(com.warehouse.logistics.domain.model.DeliveryStep.attempt(delivery.getDeliveryId(), 2,
                 java.time.LocalDateTime.now(), com.warehouse.logistics.domain.enumeration.DeliveryStatus.DELIVERED,
                 null, null, null, null, null, null, null));
         when(logisticsService.findById(delivery.getDeliveryId())).thenReturn(Optional.of(delivery));
@@ -119,6 +117,7 @@ class DeliveryManagementTest {
 
     private Delivery delivery() {
         final ShipmentId shipmentId = new ShipmentId(1L);
-        return new Delivery(DeliveryTarget.shipment(shipmentId), shipmentId, DeliveryType.OUTBOUND, null);
+        return new Delivery(DeliveryTarget.shipment(shipmentId), shipmentId, DeliveryType.OUTBOUND,
+                null, null, null, null, false, null);
     }
 }
