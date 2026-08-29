@@ -10,6 +10,7 @@ import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToEntityMa
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToModelMapper;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.repository.NoOperatorContextRepository;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +21,15 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final OperatorFilteredRepository<UserEntity> repository;
 
+    private final NoOperatorContextRepository<UserEntity> noOperatorContextRepository;
+
     private final ApiKeyEncoder apiKeyEncoder;
 
     public UserRepositoryImpl(final OperatorFilteredRepository<UserEntity> repository,
+                              final NoOperatorContextRepository<UserEntity> noOperatorContextRepository,
                               final ApiKeyEncoder apiKeyEncoder) {
         this.repository = repository;
+        this.noOperatorContextRepository = noOperatorContextRepository;
         this.apiKeyEncoder = apiKeyEncoder;
     }
 
@@ -42,7 +47,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findByUsername(final String username) {
-        return repository.createCriteria(UserEntity.class)
+        return noOperatorContextRepository.createCriteria(UserEntity.class)
                 .eq("username", username)
                 .one()
                 .map(UserToModelMapper::map)
@@ -65,7 +70,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private User findByStoredApiKey(final String apiKey) {
-        return repository.createCriteria(UserEntity.class)
+        return noOperatorContextRepository.createCriteria(UserEntity.class)
                 .eq("apiKey", apiKey)
                 .one()
                 .map(UserToModelMapper::map)
@@ -115,7 +120,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public UserId findInitialUser() {
-        return repository.createCriteria(UserEntity.class)
+        return noOperatorContextRepository.createCriteria(UserEntity.class)
                 .isTrue("initial")
                 .one()
                 .map(UserEntity::getUserId)
