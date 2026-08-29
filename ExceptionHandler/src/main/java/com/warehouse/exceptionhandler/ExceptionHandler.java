@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 @ControllerAdvice
@@ -20,6 +21,18 @@ public class ExceptionHandler {
         final ProblemDetails body = ProblemDetails.fromException(ex, request != null ? request.getRequestURI() : null);
         return ResponseEntity
                 .status(ex.getStatus())
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(body);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ProblemDetails> handleAccessDenied(final AccessDeniedException ex,
+                                                            final HttpServletRequest request) {
+        final ProblemDetailsException forbidden = new ProblemDetailsException(
+                "about:blank", "Forbidden", 403, "Access denied");
+        final ProblemDetails body = ProblemDetails.fromException(forbidden, request != null ? request.getRequestURI() : null);
+        return ResponseEntity
+                .status(403)
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(body);
     }

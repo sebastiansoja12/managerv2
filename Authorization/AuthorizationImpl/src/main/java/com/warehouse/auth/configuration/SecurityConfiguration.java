@@ -68,6 +68,7 @@ public class SecurityConfiguration {
                                 "/webjars/**"
                         )
                         .permitAll()
+                        .requestMatchers("/returns/packages", "/returns/packages/**").authenticated()
                         .requestMatchers("/v2/api/returns").authenticated()
                         .requestMatchers(apiExposureProperties.pairKeySecurityMatchers(contextPath)).permitAll()
                         .anyRequest().permitAll()
