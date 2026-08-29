@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
 
 @Service("user.departmentService")
 public class DepartmentService {
@@ -19,8 +20,8 @@ public class DepartmentService {
         return departmentServicePort.departmentExists(departmentCode);
     }
 
-    public boolean existsByDepartmentId(final DepartmentId departmentId) {
-        return departmentServicePort.departmentExists(departmentId);
+    public boolean existsByDepartmentId(final DepartmentId departmentId, final OperatorId operatorId) {
+        return departmentServicePort.departmentExists(departmentId, operatorId);
     }
 
     public DepartmentId getDepartmentId(final DepartmentCode departmentCode) {
