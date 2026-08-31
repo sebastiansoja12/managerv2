@@ -1,10 +1,10 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
 public abstract class UserToEntityMapper {
-    public static UserEntity map(final User user) {
+    public static UserEntity map(final OrganizationUser user) {
         final UserEntity entity = UserEntity.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())

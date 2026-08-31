@@ -168,6 +168,19 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
                 )
         ),
 
+        SUPERADMIN(
+                Set.of(
+                        Permission.ROLE_ADMIN_READ,
+                        Permission.ROLE_ADMIN_UPDATE,
+                        Permission.ROLE_ADMIN_DELETE,
+                        Permission.ROLE_ADMIN_CREATE,
+                        Permission.ROLE_MANAGER_READ,
+                        Permission.ROLE_MANAGER_UPDATE,
+                        Permission.ROLE_MANAGER_DELETE,
+                        Permission.ROLE_MANAGER_CREATE
+                )
+        ),
+
         MANAGER(
                 Set.of(
                         Permission.ROLE_MANAGER_READ,
