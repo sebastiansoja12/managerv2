@@ -15,12 +15,11 @@ import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
 import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
 import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChangedEventPayload;
 import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentCreatedIntegrationEvent;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentId;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentStatus;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentSnapshot;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.TrackingNumber;
 import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.mapper.ShipmentKafkaEventMapper;
+import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentKafkaListenerTest {
@@ -40,38 +39,21 @@ class ShipmentKafkaListenerTest {
     @Test
     void shouldMapLocalMessageToPrimaryCommand() {
         final ShipmentCreatedIntegrationEvent message = new ShipmentCreatedIntegrationEvent(
-                new ShipmentSnapshot(
+                new ShipmentChangedEventPayload(
                         new ShipmentId(123L),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
+                        "shipment.created",
                         ShipmentStatus.CREATED,
-                        null,
-                        null,
-                        null,
                         CHANGED_AT,
-                        CHANGED_AT,
-                        false,
-                        null,
-                        false,
-                        null,
-                        null,
-                        null,
-                        null,
-                        new TrackingNumber("TRACKING-123"),
-                        null),
-                new UserId(42L),
-                new DepartmentId(10L),
-                new OperatorId(7L)
+                        new OperatorId(7L),
+                        new DepartmentId(10L),
+                        new UserId(42L))
         );
 
         this.listener.handle(message);
 
         verify(this.routeTrackerLogPort).createOrChangeShipmentState(new ShipmentStatusStateChangeCommand(
-                new com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId(123L),
-                "shipment.changed",
+                new ShipmentId(123L),
+                "shipment.created",
                 com.warehouse.routetracker.domain.enumeration.ShipmentStatus.CREATED,
                 CHANGED_AT,
                 new OperatorId(7L),

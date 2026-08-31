@@ -1,6 +1,9 @@
 package com.warehouse.shipment;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.warehouse.shipment.application.port.primary.ShipmentPort;
+import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
+import com.warehouse.shipment.domain.model.Shipment;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -9,11 +12,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import com.warehouse.shipment.application.port.primary.ShipmentPort;
-import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
-import com.warehouse.shipment.domain.model.Shipment;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ShipmentArchitectureTest {
 
@@ -87,12 +86,30 @@ class ShipmentArchitectureTest {
                 .doesNotExist();
         assertThat(shipmentPortSource)
                 .doesNotContain("private void notifyRelatedShipmentRedirected")
+                .doesNotContain("public void notifyRelatedShipmentRedirected")
+                .doesNotContain("public void notifyShipmentRerouted")
+                .doesNotContain("public void notifyShipmentSent")
+                .doesNotContain("public void notifyShipmentReturned")
+                .doesNotContain("public void notifyShipmentDelivered")
+                .doesNotContain("public void notifyReturnCanceled")
                 .doesNotContain("ApplicationEventPublisher")
                 .doesNotContain("nextShipmentId()")
                 .contains("ShipmentId.nextId()")
-                .contains("public void notifyRelatedShipmentRedirected")
                 .doesNotContain("shipmentIdGenerator")
-                .contains("ShipmentEventContext.eventPublisher().publishEvent(new ShipmentRedirected");
+                .contains("shipmentStatusChangeStrategyResolver.resolve(request.shipmentStatus())")
+                .contains("shipmentReturnStrategyResolver.resolve(command.getReturnStatus())")
+                .doesNotContain("switch (returnStatus)")
+                .doesNotContain("case REDIRECT");
+
+        final String redirectedStatusStrategy = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/application/service/status/ShipmentRedirectedStatusChangeStrategy.java"));
+        assertThat(redirectedStatusStrategy)
+                .contains("ShipmentStatus.REDIRECT")
+                .contains("new ShipmentRedirected(");
+
+        final String shipmentPortContract = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/application/port/primary/ShipmentPort.java"));
+        assertThat(shipmentPortContract).doesNotContain("void notify");
 
         final Path shipmentIdGeneratorPort = Path.of(
                 "src/main/java/com/warehouse/shipment/application/port/secondary/ShipmentIdGenerator.java");
@@ -108,9 +125,9 @@ class ShipmentArchitectureTest {
                 "src/main/java/com/warehouse/shipment/application/listener/ShipmentEventListener.java"));
 
         assertThat(listenerSource)
-                .contains("handle(final ShipmentCreatedEvent event)")
+                .contains("handle(final ShipmentCreated event)")
                 .contains("new ShipmentCreatedIntegrationEvent(")
-                .contains("application.event.snapshot.ShipmentSnapshot.from(snapshot)")
+                .contains("ShipmentEventData.from(snapshot)")
                 .contains("IntegrationEventPublisher")
                 .doesNotContain("Optional<")
                 .doesNotContain("TODO")
@@ -120,13 +137,25 @@ class ShipmentArchitectureTest {
                 "src/main/java/com/warehouse/shipment/application/event/ShipmentChangedIntegrationEvent.java"));
         assertThat(integrationEvent)
                 .contains("@IntegrationEventType(value = \"shipment.changed\", version = 1)")
+                .contains("ShipmentChangedEventPayload payload")
                 .doesNotContain("UUID eventId")
                 .doesNotContain("Instant occurredAt")
-                .doesNotContain("String eventType")
+                .doesNotContain("private String eventType")
                 .doesNotContain("int version");
 
+        final String changedEventPayload = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/application/event/ShipmentChangedEventPayload.java"));
+        assertThat(changedEventPayload)
+                .contains("ShipmentId shipmentId")
+                .contains("String eventType")
+                .contains("ShipmentStatus shipmentStatus")
+                .contains("LocalDateTime changedAt")
+                .contains("OperatorId operatorId")
+                .contains("DepartmentId departmentId")
+                .contains("UserId userId");
+
         final String integrationSnapshot = Files.readString(Path.of(
-                "src/main/java/com/warehouse/shipment/application/event/snapshot/ShipmentSnapshot.java"));
+                "src/main/java/com/warehouse/shipment/application/event/snapshot/ShipmentEventData.java"));
         assertThat(integrationSnapshot)
                 .contains("ShipmentId shipmentId")
                 .contains("DepartmentId originDepartmentId")
