@@ -20,7 +20,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DepartmentServiceImpl</artifactId>
+            <artifactId>OrganisationStructureImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -1,0 +1,25 @@
+package com.warehouse.organisationstructure.department.infrastructure.adapter.primary.api.dto;
+
+import lombok.Value;
+
+@Value
+public class DepartmentDto {
+
+    DepartmentCodeApi departmentCode;
+
+    String city;
+
+    String street;
+
+    String postalCode;
+
+    String nip;
+
+    String telephoneNumber;
+
+    String openingHours;
+
+    Boolean active;
+
+    String countryCode;
+}

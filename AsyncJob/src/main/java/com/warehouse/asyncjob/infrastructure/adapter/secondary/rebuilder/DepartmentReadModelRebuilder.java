@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.warehouse.asyncjob.domain.model.ReadModelType;
 import com.warehouse.asyncjob.domain.service.ReadModelRebuilder;
-import com.warehouse.department.api.DepartmentReadModelRebuildApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentReadModelRebuildApiService;
 
 @Component
 public class DepartmentReadModelRebuilder implements ReadModelRebuilder {

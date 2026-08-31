@@ -1,0 +1,68 @@
+package com.warehouse.organisationstructure.department.infrastructure.adapter.primary.mapper;
+
+import com.warehouse.organisationstructure.department.api.dto.CoordinatesDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentCodeDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentIdDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentTypeDto;
+import com.warehouse.organisationstructure.department.domain.model.Department;
+import com.warehouse.organisationstructure.department.domain.vo.Address;
+import com.warehouse.organisationstructure.department.domain.vo.DepartmentCreateResponse;
+import com.warehouse.organisationstructure.department.domain.vo.IdentificationNumberChangeResponse;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.api.dto.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class ResponseMapper {
+
+    public static DepartmentCreateApiResponse mapToCreateApiResponse(final DepartmentCreateResponse response) {
+        final Map<DepartmentApi, Boolean> departments = new HashMap<>();
+        for (final Map.Entry<Department, Boolean> entry : response.departmentMap().entrySet()) {
+            departments.put(map(entry.getKey()), entry.getValue());
+        }
+        return new DepartmentCreateApiResponse(departments);
+    }
+
+    public static DepartmentApi map(final Department department) {
+        final DepartmentCodeApi departmentCode = new DepartmentCodeApi(department.getDepartmentCode().getValue());
+		final CoordinatesApi coordinates = department.getCoordinates() == null
+				? null
+				: new CoordinatesApi(department.getCoordinates().lat(), department.getCoordinates().lon());
+		return new DepartmentApi(department.getDepartmentId().getValue(), departmentCode,
+				map(department.getAddress()), coordinates, department.getTaxId().value(),
+				department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
+                department.getDepartmentType().name(), department.getStatus().name(), department.getCreatedAt(), department.getUpdatedAt());
+    }
+
+    public static DepartmentDto mapToDto(final Department department) {
+        final String departmentCode = department.getDepartmentCode().getValue();
+        final CoordinatesDto coordinates = new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
+        return new DepartmentDto(department.getDepartmentId().getValue(), departmentCode,
+                department.getCity(), department.getStreet(),
+                department.getPostalCode(), department.getCountryCode().name(), coordinates);
+    }
+
+    public static DepartmentDirectoryEntryDto mapToDirectoryEntryDto(final Department department) {
+        final CoordinatesDto coordinates = department.getCoordinates() == null
+                ? null
+                : new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
+        return new DepartmentDirectoryEntryDto(
+                new DepartmentIdDto(department.getDepartmentId().getValue()),
+                new DepartmentCodeDto(department.getDepartmentCode().getValue()),
+                DepartmentTypeDto.valueOf(department.getDepartmentType().name()),
+                DepartmentStatusDto.valueOf(department.getStatus().name()),
+                coordinates);
+    }
+
+    public static IdentificationNumberChangeApiResponse map(final IdentificationNumberChangeResponse response) {
+        return new IdentificationNumberChangeApiResponse(new DepartmentCodeApi(response.departmentCode().getValue()),
+                response.oldIdentificationNumber().value(), response.newIdentificationNumber().value());
+    }
+
+    private static AddressApi map(final Address address) {
+        return new AddressApi(address.city(), address.street(), address.postalCode(), address.countryCode().name());
+    }
+}

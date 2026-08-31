@@ -22,7 +22,6 @@
 		<module>DeliveryNetwork</module>
 		<module>PickupPointManagement</module>
 		<module>MailService</module>
-		<module>DepartmentService</module>
         <module>AsyncJob</module>
         <module>OrganisationStructure</module>
 		<module>DeliveryOperation</module>

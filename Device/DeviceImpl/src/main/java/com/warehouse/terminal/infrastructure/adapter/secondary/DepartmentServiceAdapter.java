@@ -1,8 +1,8 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.department.api.DepartmentApiService;
-import com.warehouse.department.api.dto.DepartmentDto;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 import com.warehouse.terminal.domain.model.Department;
 import com.warehouse.terminal.domain.port.secondary.DepartmentServicePort;
 

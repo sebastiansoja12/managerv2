@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.UserApiService;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.port.primary.DevicePairPortImpl;

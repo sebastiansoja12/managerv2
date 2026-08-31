@@ -1,0 +1,19 @@
+package com.warehouse.organisationstructure.department.api;
+
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
+
+import java.util.List;
+
+public interface DepartmentApiService {
+    List<DepartmentDto> getAllDepartments();
+    List<DepartmentDirectoryEntryDto> getDepartmentDirectory();
+    DepartmentDto getDepartmentByCode(final DepartmentCode departmentCode);
+    DepartmentDto getDepartmentById(final DepartmentId departmentId);
+    Boolean checkIfDepartmentExists(final DepartmentCode departmentCode);
+    Boolean checkIfDepartmentExists(final DepartmentId departmentId);
+    boolean checkIfAnyExistsWithCountryCode(final CountryCode countryCode);
+}

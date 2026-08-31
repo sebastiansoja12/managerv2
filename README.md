@@ -25,8 +25,7 @@ under `/v2/api`.
 | --- | --- |
 | `Application` | Main Spring Boot application on port `8080`, API context `/v2/api`. |
 | `Authorization` | Login, JWT/cookie authentication, refresh tokens, current user/operator context and permissions. |
-| `OrganisationStructure` | Operator management, operator configuration and provisioning of initial operator data. |
-| `DepartmentService` | Departments, department identifiers, coordinates and read-model synchronization. |
+| `OrganisationStructure` | Operator management, operator configuration, provisioning of initial operator data and departments (identifiers, coordinates and read-model synchronization). |
 | `ShipmentManagement` | Shipments, dangerous goods, pickup and delivery methods, pickup-point assignment, return summaries, shipment status, notes, document links and tracking integrations. |
 | `PickupPointManagement` | Pickup-point aggregate, lifecycle, address geocoding, operator-scoped persistence, Kafka-projected search model and REST API. |
 | `OrganizationChat` | Persistent direct conversations, organization-user discovery, WebSocket presence and message notifications. |

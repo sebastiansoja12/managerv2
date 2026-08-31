@@ -1,0 +1,91 @@
+package com.warehouse.organisationstructure.department.configuration;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPortImpl;
+import com.warehouse.organisationstructure.department.domain.port.secondary.CurrentUserServicePort;
+import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentCoordinatesServicePort;
+import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentReadRepository;
+import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentRepository;
+import com.warehouse.organisationstructure.department.domain.port.secondary.TenantAdminProvisioningPort;
+import com.warehouse.organisationstructure.department.domain.service.AuthenticationService;
+import com.warehouse.organisationstructure.department.domain.service.AuthenticationServiceImpl;
+import com.warehouse.organisationstructure.department.domain.service.DepartmentService;
+import com.warehouse.organisationstructure.department.domain.service.DepartmentServiceImpl;
+import com.warehouse.organisationstructure.department.domain.validator.Validator;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.DepartmentServiceAdapter;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.validator.DepartmentCreateApiDepartmentRequestValidator;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.*;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
+import com.warehouse.voronoi.VoronoiCoordinatesService;
+
+@Configuration
+public class DepartmentConfiguration {
+    
+	@Bean
+	public DepartmentCreateApiDepartmentRequestValidator departmentRequestValidator() {
+		return new DepartmentCreateApiDepartmentRequestValidator() {
+		};
+    }
+
+    @Bean(name = "department.departmentRepository")
+    public DepartmentRepository departmentRepository(
+            final OperatorFilteredRepository<DepartmentEntity> repository,
+            final DepartmentReadRepository<DepartmentReadEntity> readRepository) {
+        return new DepartmentRepositoryImpl(repository, readRepository);
+    }
+
+    @Bean
+    public DepartmentPort departmentPort(final DepartmentRepository departmentRepository,
+                                         final DepartmentService departmentService,
+                                         final TenantAdminProvisioningPort tenantAdminProvisioningPort,
+                                         final Validator validator,
+                                         final DepartmentCoordinatesServicePort departmentCoordinatesServicePort) {
+        return new DepartmentPortImpl(departmentRepository, departmentService, tenantAdminProvisioningPort, validator,
+                departmentCoordinatesServicePort);
+    }
+
+    @Bean(name = "department.authenticationService")
+    public AuthenticationService authenticationService(final CurrentUserServicePort currentUserServicePort) {
+        return new AuthenticationServiceImpl(currentUserServicePort);
+    }
+
+    @Bean(name = "department.currentUserServicePort")
+    public CurrentUserServicePort currentUserServicePort(final CurrentUserApiService currentUserApiService) {
+        return new CurrentUserServiceAdapter(currentUserApiService);
+    }
+
+    @Bean
+    public Validator validator() {
+        return new Validator() {
+        };
+    }
+
+    @Bean
+    public DepartmentApiService departmentApiService(final DepartmentPort departmentPort) {
+        return new DepartmentServiceAdapter(departmentPort);
+    }
+
+    @Bean
+    public DepartmentService departmentService(final DepartmentRepository departmentRepository) {
+        return new DepartmentServiceImpl(departmentRepository);
+    }
+
+    @Bean
+    public TenantAdminProvisioningPort tenantAdminProvisioningPort() {
+        return new TenantAdminProvisioningAdapter();
+    }
+
+    @Bean
+    public DepartmentCoordinatesServicePort departmentCoordinatesServicePort(
+            @Qualifier("voronoiCoordinatesService") final VoronoiCoordinatesService coordinatesService) {
+        return new DepartmentCoordinatesServiceAdapter(coordinatesService);
+    }
+}

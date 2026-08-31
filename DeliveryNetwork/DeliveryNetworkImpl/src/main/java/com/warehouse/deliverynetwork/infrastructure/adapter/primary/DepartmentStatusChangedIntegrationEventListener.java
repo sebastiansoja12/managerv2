@@ -3,8 +3,8 @@ package com.warehouse.deliverynetwork.infrastructure.adapter.primary;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
 import com.warehouse.deliverynetwork.application.port.primary.DeliveryNetworkPort;
-import com.warehouse.department.api.dto.DepartmentStatusDto;
-import com.warehouse.department.api.event.DepartmentStatusChangedIntegrationEvent;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDto;
+import com.warehouse.organisationstructure.department.api.event.DepartmentStatusChangedIntegrationEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

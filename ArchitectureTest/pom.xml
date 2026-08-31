@@ -34,11 +34,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DepartmentServiceImpl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>DestinationDetermination</artifactId>
             <version>${project.version}</version>
         </dependency>

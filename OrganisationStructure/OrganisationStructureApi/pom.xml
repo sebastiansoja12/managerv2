@@ -21,11 +21,6 @@
             <artifactId>Common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>AuthorizationApi</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
     <properties>

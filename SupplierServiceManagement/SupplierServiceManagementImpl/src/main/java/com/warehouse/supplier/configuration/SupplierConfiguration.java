@@ -1,6 +1,6 @@
 package com.warehouse.supplier.configuration;
 
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.supplier.domain.port.primary.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;

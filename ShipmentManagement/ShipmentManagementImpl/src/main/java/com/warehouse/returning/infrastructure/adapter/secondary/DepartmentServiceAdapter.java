@@ -1,7 +1,7 @@
 package com.warehouse.returning.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.returning.application.port.secondary.DepartmentServicePort;
 import org.springframework.stereotype.Component;
 

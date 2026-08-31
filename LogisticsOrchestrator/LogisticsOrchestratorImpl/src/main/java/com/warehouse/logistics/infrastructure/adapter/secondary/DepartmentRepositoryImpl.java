@@ -2,8 +2,8 @@ package com.warehouse.logistics.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.department.api.DepartmentApiService;
-import com.warehouse.department.api.dto.DepartmentDto;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 import com.warehouse.logistics.domain.port.secondary.DepartmentRepository;
 
 public class DepartmentRepositoryImpl implements DepartmentRepository {

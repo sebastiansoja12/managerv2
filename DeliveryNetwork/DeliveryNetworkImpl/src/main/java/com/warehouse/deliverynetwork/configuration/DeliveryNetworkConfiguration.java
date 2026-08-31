@@ -18,7 +18,7 @@ import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.Department
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.entity.DeliveryNetworkEntity;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.mapper.DeliveryNetworkPersistenceMapper;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.mapper.DepartmentDirectoryMapper;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
