@@ -12,6 +12,7 @@
     <artifactId>SupplierServiceManagement</artifactId>
     <packaging>pom</packaging>
     <modules>
+        <module>SupplierServiceManagementApi</module>
         <module>SupplierServiceManagementImpl</module>
     </modules>
 

@@ -161,6 +161,19 @@ public class Supplier {
         this.status = SupplierStatus.DELETED;
     }
 
+    public void anonymize() {
+        this.firstName = "Deleted";
+        this.lastName = "Courier";
+        this.telephoneNumber = "erased";
+        this.driverLicense = null;
+        this.dangerousGoodCertification = null;
+        this.apiKey = null;
+        this.deviceId = null;
+        this.vehicleId = null;
+        this.status = SupplierStatus.DELETED;
+        markAsModified();
+    }
+
     public void markAsSuspended() {
         this.status = SupplierStatus.SUSPENDED;
     }

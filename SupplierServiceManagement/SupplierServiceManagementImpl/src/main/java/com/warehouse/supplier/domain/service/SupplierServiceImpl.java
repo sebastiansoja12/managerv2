@@ -210,4 +210,14 @@ public class SupplierServiceImpl implements SupplierService {
         DomainContext.eventPublisher()
                 .publishEvent(new SupplierDepartmentChanged(supplier.snapshot(), Instant.now()));
     }
+
+    @Override
+    public int anonymizeAll() {
+        final List<Supplier> suppliers = supplierRepository.findAllByCurrentDepartment();
+        suppliers.forEach(supplier -> {
+            supplier.anonymize();
+            supplierRepository.update(supplier);
+        });
+        return suppliers.size();
+    }
 }
