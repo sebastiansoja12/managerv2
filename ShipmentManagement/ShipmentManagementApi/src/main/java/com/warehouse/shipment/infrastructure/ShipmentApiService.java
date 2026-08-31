@@ -16,4 +16,6 @@ public interface ShipmentApiService {
 
     void completeReturn(final ShipmentId shipmentId);
     void cancelReturnShipment(final ShipmentId shipmentId);
+
+    boolean hasAnyShipment();
 }

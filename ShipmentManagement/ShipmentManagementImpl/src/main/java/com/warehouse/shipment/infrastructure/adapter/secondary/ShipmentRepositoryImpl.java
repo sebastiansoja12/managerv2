@@ -104,4 +104,12 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
                 .one()
                 .isPresent();
     }
+
+    @Override
+    public boolean existsAny() {
+        return !writeRepository.createCriteria(ShipmentEntity.class)
+                .maxResults(1)
+                .list()
+                .isEmpty();
+    }
 }

@@ -74,4 +74,9 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     public void cancelReturnShipment(final ShipmentId shipmentId) {
         shipmentPort.notifyShipmentReturnCanceled(shipmentId);
     }
+
+    @Override
+    public boolean hasAnyShipment() {
+        return shipmentPort.hasAnyShipment();
+    }
 }

@@ -458,4 +458,9 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentRepository.createOrUpdate(returnedShipment);
         this.domainEventPublisher.publish(new ShipmentCreated(returnedShipment.snapshot(), Instant.now()));
     }
+
+    @Override
+    public boolean hasAnyShipment() {
+        return shipmentRepository.existsAny();
+    }
 }
