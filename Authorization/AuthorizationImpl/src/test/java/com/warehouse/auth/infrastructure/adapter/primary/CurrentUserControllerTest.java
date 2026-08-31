@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.primary.CurrentUserAuthenticationPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
@@ -50,8 +51,9 @@ class CurrentUserControllerTest {
     void shouldReturnCurrentApiKeyWithoutCachingTheProfile() throws Exception {
         final UserId userId = new UserId(17L);
         final DepartmentId departmentId = new DepartmentId(11L);
-        final User user = new User(userId, "profile-user", "password", "Profile", "User",
-                "profile@example.com", User.Role.USER, departmentId, "mgr_existing-key", "pl", Set.of());
+        final OrganizationUser user = OrganizationUser.of(userId, "profile-user", "password", "Profile", "User",
+                "profile@example.com", OrganizationUser.Role.USER, departmentId, "mgr_existing-key");
+        user.setLanguage("pl");
         user.assignOperator(new OperatorId(1L));
         when(currentUserAuthenticationPort.getCurrentUser()).thenReturn(user);
         when(userPort.getDepartmentCode(departmentId)).thenReturn(new DepartmentCode("KT1"));
@@ -65,7 +67,7 @@ class CurrentUserControllerTest {
     @Test
     void shouldRegenerateApiKeyForCurrentUserWithoutCachingTheSecret() throws Exception {
         final UserId userId = new UserId(17L);
-        final User user = new User();
+        final OrganizationUser user = new User();
         user.setUserId(userId);
         when(currentUserAuthenticationPort.getCurrentUser()).thenReturn(user);
         when(userPort.regenerateApiKey(userId)).thenReturn("mgr_generated-key");
@@ -81,7 +83,7 @@ class CurrentUserControllerTest {
     @Test
     void shouldDeleteApiKeyForCurrentUser() throws Exception {
         final UserId userId = new UserId(17L);
-        final User user = new User();
+        final OrganizationUser user = new User();
         user.setUserId(userId);
         when(currentUserAuthenticationPort.getCurrentUser()).thenReturn(user);
 

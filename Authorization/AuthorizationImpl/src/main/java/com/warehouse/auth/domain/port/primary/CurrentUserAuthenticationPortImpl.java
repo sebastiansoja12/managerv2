@@ -1,6 +1,6 @@
 package com.warehouse.auth.domain.port.primary;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.service.CurrentUserAuthenticationService;
 import com.warehouse.auth.domain.vo.CurrentUserAuthentication;
 import com.warehouse.commonassets.identificator.UserId;
@@ -19,7 +19,7 @@ public class CurrentUserAuthenticationPortImpl implements CurrentUserAuthenticat
     }
 
     @Override
-    public User getCurrentUser() {
+    public OrganizationUser getCurrentUser() {
         return currentUserAuthenticationService.getCurrentUser();
     }
 

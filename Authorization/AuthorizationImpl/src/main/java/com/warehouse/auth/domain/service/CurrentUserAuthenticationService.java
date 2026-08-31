@@ -1,6 +1,6 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.domain.vo.CurrentUserAuthentication;
 import com.warehouse.commonassets.identificator.UserId;
@@ -22,7 +22,7 @@ public class CurrentUserAuthenticationService {
     }
 
     public CurrentUserAuthentication getCurrentUserAuthentication() {
-        final User user = getCurrentUser();
+        final OrganizationUser user = getCurrentUser();
         final String jwtToken = jwtService.generateToken(user);
         return new CurrentUserAuthentication(jwtToken, user);
     }
@@ -31,7 +31,7 @@ public class CurrentUserAuthenticationService {
         return authenticationService.currentUserId();
     }
 
-    public User getCurrentUser() {
+    public OrganizationUser getCurrentUser() {
         final UserId userId = getCurrentUserId();
         return userPort.findUser(userId);
     }
