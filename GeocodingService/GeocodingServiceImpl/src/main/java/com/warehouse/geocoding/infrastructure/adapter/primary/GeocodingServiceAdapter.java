@@ -26,4 +26,11 @@ public class GeocodingServiceAdapter implements GeocodingApiService {
         final GeocodingConfiguration configuration = geocodingPort.getDefault();
         return GeocodingConfigurationApiMapper.toDto(configuration);
     }
+
+    @Override
+    public boolean hasEnabledConfiguration() {
+        return geocodingPort.getAll()
+                .stream()
+                .anyMatch(GeocodingConfiguration::isEnabled);
+    }
 }
