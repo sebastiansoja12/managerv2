@@ -3,6 +3,9 @@ package com.warehouse.organisationstructure.department.api;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.organisationstructure.department.api.dto.CreateDepartmentApiRequest;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentCodeDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDetailsDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 
@@ -16,4 +19,6 @@ public interface DepartmentApiService {
     Boolean checkIfDepartmentExists(final DepartmentCode departmentCode);
     Boolean checkIfDepartmentExists(final DepartmentId departmentId);
     boolean checkIfAnyExistsWithCountryCode(final CountryCode countryCode);
+    List<DepartmentDetailsDto> getDepartmentDetails();
+    DepartmentCodeDto createDepartment(final CreateDepartmentApiRequest request);
 }

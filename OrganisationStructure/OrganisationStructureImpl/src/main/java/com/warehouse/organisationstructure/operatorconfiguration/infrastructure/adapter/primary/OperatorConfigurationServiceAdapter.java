@@ -35,6 +35,13 @@ public class OperatorConfigurationServiceAdapter implements OperatorConfiguratio
     }
 
     @Override
+    public ShipmentConfigurationDto updateCurrentShipmentConfiguration(final ShipmentConfigurationDto configuration) {
+        return OperatorMapper.toDtoShipmentConfiguration(operatorConfigurationPort
+                .updateCurrentShipmentConfiguration(OperatorMapper.toModelShipmentConfiguration(configuration))
+                .getShipmentConfiguration());
+    }
+
+    @Override
     public Optional<ShipmentLimitsDto> getCurrentShipmentLimits() {
         return operatorConfigurationPort.getCurrent()
                 .map(OperatorMapper::toDtoCurrentShipmentLimits);

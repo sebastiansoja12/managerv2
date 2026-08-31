@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.organisationstructure.department.api.dto.CreateDepartmentApiRequest;
 import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreate;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreateCommand;
@@ -17,6 +18,21 @@ public abstract class RequestMapper {
     public static DepartmentCreateCommand map(final DepartmentCreateApiRequest request) {
         final List<DepartmentCreate> deps = map(request.departments());
         return new DepartmentCreateCommand(deps);
+    }
+
+    public static DepartmentCreateCommand map(final CreateDepartmentApiRequest request) {
+        final DepartmentCreate departmentCreate = new DepartmentCreate(
+                new DepartmentCode(request.departmentCode().value()),
+                request.city(),
+                request.street(),
+                request.postalCode(),
+                request.taxId(),
+                request.telephoneNumber(),
+                request.openingHours(),
+                request.email(),
+                CountryCode.valueOf(request.countryCode()),
+                DepartmentType.valueOf(request.departmentType().name()));
+        return new DepartmentCreateCommand(List.of(departmentCreate));
     }
 
 	private static List<DepartmentCreate> map(final List<DepartmentCreateApi> deps) {
