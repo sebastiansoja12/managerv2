@@ -4,7 +4,7 @@ import com.warehouse.auth.domain.event.*;
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.FullNameChangeCommand;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.registry.DomainRegistry;
@@ -21,6 +21,9 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final String ERASED_PASSWORD = "{erased}";
+
+
     private final UserRepository userRepository;
 
     private final DepartmentServicePort departmentServicePort;
@@ -31,7 +34,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RegisterResponse create(final User user) {
+    public RegisterResponse create(final OrganizationUser user) {
         userRepository.createOrUpdate(user);
         final DepartmentCode departmentCode = departmentServicePort.getDepartmentCode(user.getDepartmentId());
         final UserResponse userResponse = UserResponse.from(user, departmentCode);
@@ -40,18 +43,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUser(final String username) {
+    public OrganizationUser findUser(final String username) {
         return userRepository.findByUsername(username);
     }
 
     @Override
-    public List<User> findAll() {
+    public List<OrganizationUser> findAll() {
         return userRepository.findAll();
     }
 
     @Override
-    public User update(final UpdateUserCommand command) {
-        final User user = userRepository.findById(command.userId());
+    public OrganizationUser update(final UpdateUserCommand command) {
+        final OrganizationUser user = userRepository.findById(command.userId());
         if (user == null) {
             throw new AuthenticationErrorException("User does not exist");
         }
@@ -69,7 +72,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeFullName(final FullNameChangeCommand request) {
-        final User user = this.userRepository.findById(request.getUserId());
+        final OrganizationUser user = this.userRepository.findById(request.getUserId());
         user.changeFullName(request);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserFullNameChangedEvent(user.snapshot()));
@@ -77,7 +80,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changePassword(final UserId userId, final String encodedPassword) {
-        final User user = this.userRepository.findById(userId);
+        final OrganizationUser user = this.userRepository.findById(userId);
         user.changePassword(encodedPassword);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
@@ -85,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeLanguage(final UserId userId, final String language) {
-        final User user = this.userRepository.findById(userId);
+        final OrganizationUser user = this.userRepository.findById(userId);
         user.changeLanguage(language);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
@@ -93,23 +96,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeApiKey(final UserId userId, final String apiKey) {
-        final User user = this.userRepository.findById(userId);
+        final OrganizationUser user = this.userRepository.findById(userId);
         user.changeApiKey(apiKey);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
     }
 
     @Override
-    public void changeRole(final UserId userId, final User.Role role) {
-        final User user = this.userRepository.findById(userId);
-        user.changeRole(role);
+    public void changeRole(final UserId userId, final OrganizationUser.Role role) {
+        final OrganizationUser user = this.userRepository.findById(userId).changeRole(role);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserRoleChangedEvent(user.snapshot()));
     }
 
     @Override
     public void addPermission(final UserId userId, final String permission) {
-        final User user = this.userRepository.findById(userId);
+        final OrganizationUser user = this.userRepository.findById(userId);
         user.addPermission(permission);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserRoleAddedEvent(user.snapshot()));
@@ -117,19 +119,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removePermission(final UserId userId, final String permission) {
-        final User user = this.userRepository.findById(userId);
+        final OrganizationUser user = this.userRepository.findById(userId);
         user.removePermission(permission);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserRoleRemovedEvent(user.snapshot()));
     }
 
     @Override
-    public User findUserById(final UserId userId) {
+    public OrganizationUser findUserById(final UserId userId) {
         return this.userRepository.findById(userId);
     }
 
     @Override
-    public User findByEmail(final String email) {
+    public OrganizationUser findByEmail(final String email) {
         return this.userRepository.findByEmail(email);
     }
 
@@ -141,14 +143,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteDataForUser(final UserId userId) {
-        final User user = this.userRepository.findById(userId);
+        final OrganizationUser user = this.userRepository.findById(userId);
         user.markAsDeleted();
         this.userRepository.createOrUpdate(user);
     }
 
     @Override
     public void updateDefaultDepartmentUser(final UserDepartmentUpdateRequest request) {
-        final User user = this.userRepository.findById(request.userId());
+        final OrganizationUser user = this.userRepository.findById(request.userId());
         user.updateUserInfo(request);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
@@ -162,5 +164,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public DepartmentCode getDepartmentCode(final DepartmentId departmentId) {
         return departmentServicePort.getDepartmentCode(departmentId);
+    }
+
+    @Override
+    public DepartmentId getDepartmentId(final DepartmentCode departmentCode) {
+        return departmentServicePort.getDepartmentId(departmentCode);
+    }
+
+    @Override
+    public void anonymize(final UserId userId) {
+        final OrganizationUser user = this.userRepository.findById(userId);
+        if (user == null) {
+            return;
+        }
+        user.anonymize(ERASED_PASSWORD);
+        this.userRepository.createOrUpdate(user);
     }
 }

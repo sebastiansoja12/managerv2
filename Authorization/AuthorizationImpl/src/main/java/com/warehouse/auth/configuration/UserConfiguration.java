@@ -92,8 +92,10 @@ public class UserConfiguration {
     }
 
     @Bean
-    public UserApiService userApiService(final UserService userService, final ResponseMapper responseMapper) {
-        return new UserApiServiceAdapter(userService, responseMapper);
+    public UserApiService userApiService(final UserService userService,
+                                         final ResponseMapper responseMapper,
+                                         final AuthenticationPort authenticationPort) {
+        return new UserApiServiceAdapter(userService, responseMapper, authenticationPort);
     }
 
     @Bean

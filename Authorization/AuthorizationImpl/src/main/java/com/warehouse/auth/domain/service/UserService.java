@@ -2,7 +2,7 @@ package com.warehouse.auth.domain.service;
 
 import com.warehouse.auth.domain.model.FullNameChangeCommand;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -13,13 +13,13 @@ import java.util.List;
 
 public interface UserService {
 
-    RegisterResponse create(final User user);
+    RegisterResponse create(final OrganizationUser user);
 
-    User findUser(final String username);
+    OrganizationUser findUser(final String username);
 
-    List<User> findAll();
+    List<OrganizationUser> findAll();
 
-    User update(final UpdateUserCommand command);
+    OrganizationUser update(final UpdateUserCommand command);
 
     UserId nextUserId();
 
@@ -31,15 +31,15 @@ public interface UserService {
 
     void changeApiKey(final UserId userId, final String apiKey);
 
-    void changeRole(final UserId userId, final User.Role role);
+    void changeRole(final UserId userId, final OrganizationUser.Role role);
 
     void addPermission(final UserId userId, final String permission);
 
     void removePermission(final UserId userId, final String permission);
 
-    User findUserById(final UserId userId);
+    OrganizationUser findUserById(final UserId userId);
 
-    User findByEmail(final String email);
+    OrganizationUser findByEmail(final String email);
 
     List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode);
 
@@ -50,4 +50,8 @@ public interface UserService {
     UserId findInitialUser();
 
     DepartmentCode getDepartmentCode(final DepartmentId departmentId);
+
+    DepartmentId getDepartmentId(final DepartmentCode departmentCode);
+
+    void anonymize(final UserId userId);
 }

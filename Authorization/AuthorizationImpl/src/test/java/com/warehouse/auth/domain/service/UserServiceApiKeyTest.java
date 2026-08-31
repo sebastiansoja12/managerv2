@@ -1,6 +1,6 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.registry.DomainRegistry;
@@ -34,8 +34,8 @@ class UserServiceApiKeyTest {
     @Test
     void shouldChangeApiKeyOnUser() {
         final UserId userId = new UserId(10L);
-        final User user = new User(userId, "s-soja", "password", "Sebastian", "Soja",
-                "sebastian5152@wp.pl", User.Role.USER, new DepartmentId(10L), "old-api-key");
+        final OrganizationUser user = OrganizationUser.of(userId, "s-soja", "password", "Sebastian", "Soja",
+                "sebastian5152@wp.pl", OrganizationUser.Role.USER, new DepartmentId(10L), "old-api-key");
         when(userRepository.findById(userId)).thenReturn(user);
 
         userService.changeApiKey(userId, "new-api-key");

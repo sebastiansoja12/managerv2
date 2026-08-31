@@ -2,10 +2,11 @@ package com.warehouse.auth.infrastructure.adapter.primary;
 
 
 import com.warehouse.auth.AccessUserControl;
+import com.warehouse.auth.domain.exception.UserAccessDeniedException;
 import com.warehouse.auth.domain.helper.Result;
 import com.warehouse.auth.domain.model.CreateUserCommand;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.CurrentOperatorPort;
 import com.warehouse.auth.domain.port.primary.UserPort;
@@ -73,7 +74,7 @@ public class UserResourceController {
 
     @GetMapping("/{username}")
     public ResponseEntity<?> findUserByUsername(@PathVariable final String username) {
-        final User user = userPort.findUser(username);
+        final OrganizationUser user = userPort.findUser(username);
         return new ResponseEntity<>(map(user), HttpStatus.OK);
     }
 
@@ -97,7 +98,7 @@ public class UserResourceController {
         }
 
 
-        final User.Role role = User.Role.valueOf(userRole);
+        final OrganizationUser.Role role = OrganizationUser.Role.valueOf(userRole);
         this.userPort.changeRole(userId, role);
         return ResponseEntity.ok().build();
     }
@@ -144,11 +145,13 @@ public class UserResourceController {
         return ResponseEntity.ok().build();
     }
 
-    private UserDto map(final User user) {
-        if (user == null) {
-            return null;
-        }
+    private UserDto map(final OrganizationUser user) {
         return responseMapper.map(user, userPort.getDepartmentCode(user.getDepartmentId()));
+    }
+
+    @ExceptionHandler(UserAccessDeniedException.class)
+    public ResponseEntity<String> handleUserAccessDeniedException(final UserAccessDeniedException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
     }
 
     @ExceptionHandler(exception = {BusinessException.class, TechnicalException.class})

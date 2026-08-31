@@ -1,6 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.vo.ApiKey;
@@ -9,6 +9,7 @@ import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoun
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToEntityMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToModelMapper;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.repository.NoOperatorContextRepository;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserRepositoryImpl implements UserRepository {
 
@@ -34,7 +36,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void createOrUpdate(final User user) {
+    public void createOrUpdate(final OrganizationUser user) {
         final UserEntity userEntity = UserToEntityMapper.map(user);
 
         if (findById(user.getUserId()) == null) {
@@ -46,7 +48,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findByUsername(final String username) {
+    public OrganizationUser findByUsername(final String username) {
         return noOperatorContextRepository.createCriteria(UserEntity.class)
                 .eq("username", username)
                 .one()
@@ -55,12 +57,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findByApiKey(final String apiKey) {
+    public OrganizationUser findByApiKey(final String apiKey) {
         if (apiKey == null || apiKey.isBlank()) {
             return null;
         }
 
-        final User userWithDisplayedApiKey = findByStoredApiKey(apiKey);
+        final OrganizationUser userWithDisplayedApiKey = findByStoredApiKey(apiKey);
         if (userWithDisplayedApiKey != null) {
             return userWithDisplayedApiKey;
         }
@@ -69,7 +71,7 @@ public class UserRepositoryImpl implements UserRepository {
         return findByStoredApiKey(encodedApiKey);
     }
 
-    private User findByStoredApiKey(final String apiKey) {
+    private OrganizationUser findByStoredApiKey(final String apiKey) {
         return noOperatorContextRepository.createCriteria(UserEntity.class)
                 .eq("apiKey", apiKey)
                 .one()
@@ -78,7 +80,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findById(final UserId userId) {
+    public OrganizationUser findById(final UserId userId) {
         return repository.createCriteria(UserEntity.class)
                 .eq("userId.value", userId.value())
                 .one()
@@ -87,7 +89,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<OrganizationUser> findAll() {
         return repository.createCriteria(UserEntity.class)
                 .isFalse("deleted")
                 .list()
@@ -104,12 +106,12 @@ public class UserRepositoryImpl implements UserRepository {
                 .list()
                 .stream()
                 .map(UserToModelMapper::map)
-                .map(User::getUserId)
+                .map(OrganizationUser::getUserId)
                 .toList();
     }
 
     @Override
-    public User findByEmail(final String email) {
+    public OrganizationUser findByEmail(final String email) {
         return repository.createCriteria(UserEntity.class)
                 .eq("email", email)
                 .one()
@@ -125,5 +127,19 @@ public class UserRepositoryImpl implements UserRepository {
                 .one()
                 .map(UserEntity::getUserId)
                 .orElse(null);
+    }
+
+    @Override
+    public Optional<OrganizationUser> findActiveSuperadmin(final OperatorId operatorId) {
+        return noOperatorContextRepository.createCriteria(UserEntity.class)
+                .eq("operatorId.value", operatorId.value())
+                .eq("role", UserEntity.Role.SUPERADMIN)
+                .isFalse("deleted")
+                .desc("initial")
+                .asc("createdAt")
+                .list()
+                .stream()
+                .findFirst()
+                .map(UserToModelMapper::map);
     }
 }
