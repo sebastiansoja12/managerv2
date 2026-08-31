@@ -14,9 +14,10 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResp
 import com.warehouse.shipment.application.port.secondary.*;
 import com.warehouse.shipment.application.service.*;
 import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrategyResolver;
+import com.warehouse.shipment.application.service.returning.ShipmentReturnStrategyResolver;
+import com.warehouse.shipment.application.service.status.ShipmentStatusChangeStrategyResolver;
 import com.warehouse.shipment.domain.context.ShipmentEventContext;
 import com.warehouse.shipment.domain.enumeration.PersonType;
-import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.event.*;
@@ -69,8 +70,9 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver;
 
-    private final List<ShipmentStatus> shipmentStatuses = List.of(ShipmentStatus.REDIRECT,
-            ShipmentStatus.DELIVERY, ShipmentStatus.RETURN, ShipmentStatus.SENT);
+    private final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver;
+
+    private final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver;
 
 	public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
                             final SpecificationRepository specificationShipmentRepository,
@@ -85,7 +87,9 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final TrackingNumberGenerationService trackingNumberGenerationService,
                             final ShipmentConfigurationPort shipmentConfigurationServicePort,
                             final OperatorContextProvider operatorContextProvider,
-                            final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver) {
+                            final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
+                            final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
+                            final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver) {
 		this.shipmentRepository = shipmentRepository;
         this.specificationShipmentRepository = specificationShipmentRepository;
 		this.logger = logger;
@@ -100,6 +104,8 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentConfigurationServicePort = shipmentConfigurationServicePort;
         this.operatorContextProvider = operatorContextProvider;
         this.shipmentDeliveryStrategyResolver = shipmentDeliveryStrategyResolver;
+        this.shipmentStatusChangeStrategyResolver = shipmentStatusChangeStrategyResolver;
+        this.shipmentReturnStrategyResolver = shipmentReturnStrategyResolver;
     }
 
     @Override
@@ -168,7 +174,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentRepository.createOrUpdate(shipment);
         logCreatedShipment(shipment);
 
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentCreatedEvent(shipment.snapshot(), Instant.now()));
+        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentCreated(shipment.snapshot(), Instant.now()));
 
         return Result.success(new ShipmentCreateResponse(shipment.getExternalShipmentId(),
                 shipment.getTrackingNumber().value()));
@@ -184,13 +190,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
 
         final ShipmentConfiguration configuration = command.getShipmentConfiguration();
-        if (shouldValidateState(configuration)) {
-            final Result<Void, String> validation =
-                    new ShipmentStateValidatorServiceImpl().validateShipmentState(shipment);
-            if (validation.isFailure()) {
-                return Result.failure(ErrorCode.SHIPMENT_203);
-            }
-        }
 
         final CountryCode issuerCountryCode = command.getIssuerCountryCode();
         final CountryCode receiverCountryCode = command.getReceiverCountryCode();
@@ -246,12 +245,15 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public Optional<DangerousGood> loadDangerousGood(final ShipmentId shipmentId) {
-        return this.findDangerousGood(shipmentId);
+        return Optional.ofNullable(this.shipmentRepository.findById(shipmentId).getDangerousGood());
     }
 
     @Override
     public void putDangerousGood(final ShipmentId shipmentId, final DangerousGood dangerousGood) {
-        this.changeDangerousGoodTo(shipmentId, dangerousGood);
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        shipment.changeDangerousGood(dangerousGood);
+        this.shipmentRepository.createOrUpdate(shipment);
+        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentDangerousGoodUpdated(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -261,14 +263,13 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public void processShipmentReturn(final ShipmentReturnCommand command) {
-        final ReturnStatus returnStatus = command.getReturnStatus();
-        final ShipmentId shipmentId = command.getShipmentId();
-        switch (returnStatus) {
-            case CREATED -> this.notifyShipmentReturned(shipmentId, command.getReason(),
-                    command.getReasonCode(), command.getDepartmentCode());
-            case COMPLETED -> this.lockShipment(shipmentId);
-            case CANCELLED -> this.notifyReturnCanceled(shipmentId);
-        }
+        final Shipment shipment = this.shipmentRepository.findById(command.getShipmentId());
+        this.shipmentReturnStrategyResolver.resolve(command.getReturnStatus())
+                .process(shipment, command)
+                .ifPresent(event -> {
+                    this.shipmentRepository.createOrUpdate(shipment);
+                    ShipmentEventContext.eventPublisher().publishEvent(event);
+                });
     }
 
     @Override
@@ -311,14 +312,14 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public void cancel(final ShipmentId shipmentId) {
+        final ShipmentWorkflowSettings settings = this.shipmentConfigurationServicePort
+                .getCurrentOperatorShipmentConfiguration().workflowSettings();
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.cancel(this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration().workflowSettings(),
-                LocalDateTime.now());
+        shipment.cancel(settings, LocalDateTime.now());
         this.shipmentRepository.createOrUpdate(shipment);
         ShipmentEventContext.eventPublisher().publishEvent(new ShipmentCanceled(shipment.snapshot(), Instant.now()));
     }
 
-    @Override
     public void changeSenderTo(final ShipmentId shipmentId, final Sender sender) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.changeSender(sender);
@@ -326,7 +327,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         ShipmentEventContext.eventPublisher().publishEvent(new ShipmentSenderChanged(shipment.snapshot(), Instant.now()));
     }
 
-    @Override
     public void changeRecipientTo(final ShipmentId shipmentId, final Recipient recipient) {
         final Shipment shipment = this.find(shipmentId);
         if (!shipment.recipientCityMatches(recipient.getCity())) {
@@ -345,7 +345,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     public void changePersonTo(final Person person, final ShipmentId shipmentId) {
-        validateShipmentNotInStatus(shipmentId);
         if (person.getType() == PersonType.SENDER) {
             changeSenderTo(shipmentId, (Sender) person);
         } else if (person.getType() == PersonType.RECIPIENT) {
@@ -379,7 +378,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 					shipment.getDestination(), shipment.getOriginDepartmentId(), shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber,
 					shipmentConfiguration.workflowSettings().defaultStatus());
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.CHILD, shipmentId);
-			this.createShipment(newShipment);
+			this.shipmentRepository.createOrUpdate(newShipment);
+            ShipmentEventContext.eventPublisher().publishEvent(new ShipmentCreated(shipment.snapshot(), Instant.now()));
         } else {
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, null);
 			this.lockShipment(shipment.getShipmentRelatedId());
@@ -388,18 +388,13 @@ public class ShipmentPortImpl implements ShipmentPort {
 
 	@Override
 	public void changeShipmentStatusTo(final ShipmentStatusRequest request) {
-		final ShipmentStatus status = request.shipmentStatus();
-		final ShipmentId shipmentId = request.shipmentId();
-        switch (status) {
-            case CREATED -> throw new IllegalStateException("Shipment already created, status cannot be changed");
-            case REDIRECT -> notifyRelatedShipmentRedirected(shipmentId, ShipmentId.nextId());
-            case REROUTE -> notifyShipmentRerouted(shipmentId);
-            case SENT -> notifyShipmentSent(shipmentId);
-            case DELIVERY -> notifyShipmentDelivered(shipmentId);
-            case RETURN -> notifyShipmentReturned(shipmentId);
-            default -> {
-            }
-        }
+		final Shipment shipment = this.shipmentRepository.findById(request.shipmentId());
+        this.shipmentStatusChangeStrategyResolver.resolve(request.shipmentStatus())
+                .process(shipment)
+                .ifPresent(event -> {
+                    this.shipmentRepository.createOrUpdate(shipment);
+                    ShipmentEventContext.eventPublisher().publishEvent(event);
+                });
 	}
 
     @Override
@@ -453,26 +448,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                 shipment.getShipmentPriority());
     }
 
-    private void validateShipmentNotInStatus(final ShipmentId shipmentId) {
-        final Shipment shipment = loadShipment(shipmentId);
-        if (shipment == null) {
-            throw new RestException(404, "Shipment not found");
-        }
-        if (shipmentStatuses.contains(shipment.getShipmentStatus())) {
-            throw new RestException(400, "Cannot modify shipment in current status");
-        }
-        if (shipment.getShipmentRelatedId() != null) {
-            final Shipment relatedShipment = loadShipment(shipment.getShipmentRelatedId());
-            if (shipmentStatuses.contains(relatedShipment.getShipmentStatus())) {
-                throw new RestException(400, "Cannot modify child shipment");
-            }
-        }
-    }
-
-    private boolean shouldValidateState(final ShipmentConfiguration configuration) {
-        return !configuration.forceUpdate();
-    }
-
     private DepartmentCode resolveDestination(final ShipmentUpdateCommand command,
                                       final Shipment shipment,
                                       final ShipmentConfiguration configuration) {
@@ -490,12 +465,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         return voronoiResult.isSuccess()
                 ? voronoiResult.getSuccess().getDepartmentCodeResult()
                 : shipment.getDestination();
-    }
-
-    @Override
-    public void createShipment(final Shipment shipment) {
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentCreatedEvent(shipment.snapshot(), Instant.now()));
     }
 
     @Override
@@ -528,84 +497,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeDangerousGoodTo(final ShipmentId shipmentId, final DangerousGood dangerousGood) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.changeDangerousGood(dangerousGood);
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentDangerousGoodUpdated(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public Optional<DangerousGood> findDangerousGood(final ShipmentId shipmentId) {
-        return Optional.ofNullable(this.shipmentRepository.findById(shipmentId).getDangerousGood());
-    }
-
-    @Override
     public void removeDangerousGood(final ShipmentId shipmentId) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         shipment.removeDangerousGood();
         this.shipmentRepository.createOrUpdate(shipment);
         ShipmentEventContext.eventPublisher().publishEvent(new ShipmentDangerousGoodRemoved(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public void notifyRelatedShipmentRedirected(final ShipmentId shipmentId, final ShipmentId relatedShipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.notifyRelatedShipmentRedirected(relatedShipmentId);
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentRedirected(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public void notifyShipmentRerouted(final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.notifyShipmentRerouted();
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentRerouted(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public void notifyShipmentSent(final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.notifyShipmentSent();
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentSent(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public void notifyShipmentReturned(final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.notifyShipmentReturned();
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentReturned(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public void notifyShipmentReturned(final ShipmentId shipmentId,
-                                       final String reason,
-                                       final ReasonCode reasonCode,
-                                       final DepartmentCode departmentCode) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.notifyShipmentReturned();
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentReturnCreated(
-                shipment.snapshot(), reasonCode, reason, departmentCode, Instant.now()));
-    }
-
-    @Override
-    public void notifyShipmentDelivered(final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.notifyShipmentDelivered();
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentDelivered(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public void notifyReturnCanceled(final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.notifyShipmentReturnCanceled();
-        this.shipmentRepository.createOrUpdate(shipment);
-        ShipmentEventContext.eventPublisher().publishEvent(new ShipmentReturnCanceled(shipment.snapshot(), Instant.now()));
     }
 
     @Override

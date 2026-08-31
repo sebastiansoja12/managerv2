@@ -1,14 +1,14 @@
 package com.warehouse.shipment.domain.event;
 
-import java.time.Instant;
-
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
-public class ShipmentCreatedEvent extends ShipmentChangedEvent implements ShipmentEvent {
+import java.time.Instant;
+
+public class ShipmentCreated extends ShipmentChanged implements ShipmentEvent {
 
     private final ShipmentSnapshot snapshot;
 
-    public ShipmentCreatedEvent(final ShipmentSnapshot snapshot, final Instant timestamp) {
+    public ShipmentCreated(final ShipmentSnapshot snapshot, final Instant timestamp) {
         super(snapshot, timestamp);
         this.snapshot = snapshot;
     }

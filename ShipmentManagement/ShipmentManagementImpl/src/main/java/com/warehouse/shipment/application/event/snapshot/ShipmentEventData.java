@@ -2,11 +2,12 @@ package com.warehouse.shipment.application.event.snapshot;
 
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record ShipmentSnapshot(
+public record ShipmentEventData(
         ShipmentId shipmentId,
         SenderSnapshot sender,
         RecipientSnapshot recipient,
@@ -30,8 +31,8 @@ public record ShipmentSnapshot(
         ExternalId<UUID> externalShipmentId
 ) {
 
-    public static ShipmentSnapshot from(final com.warehouse.shipment.domain.vo.ShipmentSnapshot snapshot) {
-        return new ShipmentSnapshot(
+    public static ShipmentEventData from(final ShipmentSnapshot snapshot) {
+        return new ShipmentEventData(
                 snapshot.shipmentId(),
                 SenderSnapshot.from(snapshot.sender()),
                 RecipientSnapshot.from(snapshot.recipient()),

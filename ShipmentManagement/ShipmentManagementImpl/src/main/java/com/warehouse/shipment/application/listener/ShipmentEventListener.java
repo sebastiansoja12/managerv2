@@ -1,10 +1,8 @@
 package com.warehouse.shipment.application.listener;
 
 import com.warehouse.commonassets.event.domain.port.IntegrationEventPublisher;
-import com.warehouse.shipment.application.event.ShipmentCreatedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentDestinationChangedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentReturnCanceledIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentReturnCreatedIntegrationEvent;
+import com.warehouse.shipment.application.event.*;
+import com.warehouse.shipment.application.event.snapshot.ShipmentEventData;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.event.*;
@@ -35,17 +33,10 @@ public class ShipmentEventListener {
     }
 
     @EventListener
-    public void handle(final ShipmentCreatedEvent event) {
+    public void handle(final ShipmentCreated event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
-        final ShipmentCreatedIntegrationEvent integrationEvent = new ShipmentCreatedIntegrationEvent(
-                com.warehouse.shipment.application.event.snapshot.ShipmentSnapshot.from(snapshot)
-        );
-        this.integrationEventPublisher.publish(integrationEvent);
-    }
-
-    @EventListener
-    public void handle(final ShipmentCanceled event) {
-
+        this.integrationEventPublisher.publish(
+                new ShipmentCreatedIntegrationEvent(ShipmentEventData.from(snapshot)));
     }
 
     @EventListener
@@ -70,19 +61,22 @@ public class ShipmentEventListener {
 
     @EventListener
     public void handle(final ShipmentDelivered event) {
+        final ShipmentSnapshot snapshot = event.getSnapshot();
+
     }
 
     @EventListener
     public void handle(final ShipmentDestinationChanged event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
         final ShipmentDestinationChangedIntegrationEvent integrationEvent = new ShipmentDestinationChangedIntegrationEvent(
-                com.warehouse.shipment.application.event.snapshot.ShipmentSnapshot.from(snapshot)
+                ShipmentEventData.from(snapshot)
         );
         this.integrationEventPublisher.publish(integrationEvent);
     }
 
     @EventListener
     public void handle(final ShipmentRecipientChanged event) {
+
     }
 
     @EventListener
@@ -95,13 +89,13 @@ public class ShipmentEventListener {
 
     @EventListener
     public void handle(final ShipmentReturnCanceled event) {
-        this.integrationEventPublisher.publish(new ShipmentReturnCanceledIntegrationEvent(event.getSnapshot().shipmentId()));
+        this.integrationEventPublisher.publish(new ShipmentReturnCanceledIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
     }
 
     @EventListener
     public void handle(final ShipmentReturnCreated event) {
         final ShipmentReturnCreatedIntegrationEvent integrationEvent = new ShipmentReturnCreatedIntegrationEvent(
-                com.warehouse.shipment.application.event.snapshot.ShipmentSnapshot.from(event.getSnapshot()),
+                ShipmentEventData.from(event.getSnapshot()),
                 event.getTimestamp(),
                 event.getReasonCode().name(),
                 event.getReason(),
@@ -119,7 +113,7 @@ public class ShipmentEventListener {
     }
 
     @EventListener
-    public void handle(final ShipmentStatusChangedEvent event) {
+    public void handle(final ShipmentStatusChanged event) {
     }
 
     @EventListener

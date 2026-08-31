@@ -8,12 +8,12 @@ import com.warehouse.commonassets.event.domain.annotation.IntegrationEventType;
 import com.warehouse.commonassets.event.domain.model.IntegrationEvent;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.kafka.domain.model.OperatorAwareContext;
-import com.warehouse.shipment.application.event.snapshot.ShipmentSnapshot;
+import com.warehouse.shipment.application.event.snapshot.ShipmentEventData;
 
 @IntegrationEventType(value = "shipment.return.created", version = 1)
 public class ShipmentReturnCreatedIntegrationEvent extends OperatorAwareContext implements IntegrationEvent {
 
-    private final ShipmentSnapshot snapshot;
+    private final ShipmentEventData snapshot;
     private final Instant timestamp;
     private final String reasonCode;
     private final String reason;
@@ -21,7 +21,7 @@ public class ShipmentReturnCreatedIntegrationEvent extends OperatorAwareContext 
 
     @JsonCreator
     public ShipmentReturnCreatedIntegrationEvent(
-            @JsonProperty("snapshot") final ShipmentSnapshot snapshot,
+            @JsonProperty("snapshot") final ShipmentEventData snapshot,
             @JsonProperty("timestamp") final Instant timestamp,
             @JsonProperty("reasonCode") final String reasonCode,
             @JsonProperty("reason") final String reason,
@@ -33,7 +33,7 @@ public class ShipmentReturnCreatedIntegrationEvent extends OperatorAwareContext 
         this.departmentCode = departmentCode;
     }
 
-    public ShipmentSnapshot getSnapshot() {
+    public ShipmentEventData getSnapshot() {
         return snapshot;
     }
 
