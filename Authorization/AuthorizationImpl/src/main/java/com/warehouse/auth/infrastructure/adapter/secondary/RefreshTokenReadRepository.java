@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,4 +27,14 @@ public interface RefreshTokenReadRepository extends JpaRepository<RefreshTokenEn
     @Query("delete from RefreshTokenEntity t where t.expiryDate <= ?1")
     @Transactional
     void deleteAllExpiredSince(LocalDateTime now);
+
+    @Query("select count(t) from RefreshTokenEntity t where t.expiryDate > :now and t.username in "
+            + "(select u.username from UserEntity u where u.operatorId.value = :operatorId)")
+    long countActiveForOperator(@Param("operatorId") Long operatorId, @Param("now") LocalDateTime now);
+
+    @Modifying
+    @Transactional
+    @Query("delete from RefreshTokenEntity t where t.username in "
+            + "(select u.username from UserEntity u where u.operatorId.value = :operatorId)")
+    int deleteAllForOperator(@Param("operatorId") Long operatorId);
 }
