@@ -3,7 +3,6 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.kafka;
 import com.warehouse.routetracker.domain.model.ShipmentStatusStateChangeCommand;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChangedIntegrationEvent;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.mapper.ShipmentKafkaEventMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -30,13 +29,6 @@ public class ShipmentKafkaListener {
         final ShipmentStatusStateChangeCommand command = this.shipmentKafkaEventMapper.map(message);
         this.routeTrackerLogPort.createOrChangeShipmentState(command);
         log.info("Processed shipment event {} for {}", command.eventType(), command.shipmentId().value());
-    }
-
-    @KafkaListener(
-            topics = "${manager.kafka.topics.shipment-events:shipment.events}",
-            groupId = "${spring.kafka.consumer.group-id:route-tracker-flow}"
-    )
-    public void handle(final ShipmentStatusChangedIntegrationEvent message) {
     }
 
 }

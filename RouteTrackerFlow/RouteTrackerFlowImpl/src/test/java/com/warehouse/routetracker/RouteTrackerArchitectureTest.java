@@ -31,46 +31,37 @@ class RouteTrackerArchitectureTest {
         }
 
         assertThat(Path.of(
-                "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentCreatedIntegrationEvent.java"))
+                "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentChangedIntegrationEvent.java"))
                 .exists();
         final Path snapshotPackage = Path.of(
                 "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/snapshot");
-        assertThat(snapshotPackage.resolve("ShipmentSnapshot.java")).exists();
+        assertThat(snapshotPackage.resolve("ShipmentEventData.java")).exists();
+        assertThat(snapshotPackage.resolve("ShipmentSnapshot.java")).doesNotExist();
         assertThat(snapshotPackage.resolve("SenderSnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("RecipientSnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("MoneySnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("DangerousGoodSnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("SignatureSnapshot.java")).exists();
 
-        final String message = Files.readString(Path.of(
-                "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentCreatedIntegrationEvent.java"));
-        assertThat(message)
-                .contains("ShipmentChangedEventPayload payload")
-                .contains("extends ShipmentChangedIntegrationEvent")
-                .doesNotContain("UUID eventId")
-                .doesNotContain("Instant occurredAt")
-                .doesNotContain("String eventType")
-                .doesNotContain("int version")
-                .doesNotContain("com.warehouse.commonassets");
         final String changedMessage = Files.readString(Path.of(
                 "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentChangedIntegrationEvent.java"));
         assertThat(changedMessage)
+                .contains("final class ShipmentChangedIntegrationEvent")
                 .contains("extends OperatorAwareContext")
-                .contains("ShipmentChangedEventPayload payload")
+                .contains("ShipmentEventData payload")
+                .contains("private final String eventType")
                 .doesNotContain("UUID eventId")
                 .doesNotContain("Instant occurredAt")
-                .doesNotContain("private final String eventType")
                 .doesNotContain("int version");
-        final String payload = Files.readString(Path.of(
-                "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentChangedEventPayload.java"));
-        assertThat(payload)
-                .contains("ShipmentId shipmentId")
-                .contains("String eventType")
-                .contains("ShipmentStatus shipmentStatus")
-                .contains("LocalDateTime changedAt")
-                .contains("OperatorId operatorId")
-                .contains("DepartmentId departmentId")
-                .contains("UserId userId");
+        assertThat(Path.of(
+                "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentCreatedIntegrationEvent.java"))
+                .doesNotExist();
+        assertThat(Path.of(
+                "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentStatusChangedIntegrationEvent.java"))
+                .doesNotExist();
+        assertThat(Path.of(
+                "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/ShipmentChangedEventPayload.java"))
+                .doesNotExist();
         assertThat(Path.of(
                 "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/OperatorAwareContext.java"))
                 .exists();
@@ -80,6 +71,7 @@ class RouteTrackerArchitectureTest {
         assertThat(listener)
                 .contains("handle(final ShipmentChangedIntegrationEvent message)")
                 .contains("shipmentKafkaEventMapper.map(message)")
+                .doesNotContain("handle(final ShipmentStatusChangedIntegrationEvent message)")
                 .doesNotContain("@Header")
                 .doesNotContain("ConsumerRecord")
                 .doesNotContain("ObjectMapper")

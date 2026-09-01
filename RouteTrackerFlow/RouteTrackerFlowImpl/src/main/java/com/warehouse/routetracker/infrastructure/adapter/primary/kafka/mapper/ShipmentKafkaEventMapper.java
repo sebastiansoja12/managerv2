@@ -1,23 +1,25 @@
 package com.warehouse.routetracker.infrastructure.adapter.primary.kafka.mapper;
 
 import com.warehouse.routetracker.domain.model.ShipmentStatusStateChangeCommand;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChangedEventPayload;
+import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChangedIntegrationEvent;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentEventData;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ShipmentKafkaEventMapper {
 
     public ShipmentStatusStateChangeCommand map(final ShipmentChangedIntegrationEvent event) {
-        final ShipmentChangedEventPayload payload = event.payload();
+        final ShipmentEventData payload = event.payload();
         return new ShipmentStatusStateChangeCommand(
-                payload.shipmentId(),
-                payload.eventType(),
-                payload.shipmentStatus(),
-                payload.changedAt(),
-                payload.operatorId(),
-                payload.departmentId(),
-                payload.userId()
+                new ShipmentId(payload.shipmentId().value()),
+                event.eventType(),
+                com.warehouse.routetracker.domain.enumeration.ShipmentStatus.valueOf(
+                        payload.shipmentStatus().name()),
+                payload.updatedAt(),
+                event.operatorId(),
+                event.departmentId(),
+                event.userId()
         );
     }
 }
