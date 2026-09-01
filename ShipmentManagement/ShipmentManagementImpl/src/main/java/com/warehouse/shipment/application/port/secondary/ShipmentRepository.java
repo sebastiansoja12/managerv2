@@ -1,5 +1,6 @@
 package com.warehouse.shipment.application.port.secondary;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,7 @@ public interface ShipmentRepository {
     Shipment findByTrackingNumber(final TrackingNumber trackingNumber);
 
     List<Shipment> findAll();
+
+    List<Shipment> findAllCreatedBetween(final LocalDateTime createdFromInclusive,
+                                         final LocalDateTime createdToExclusive);
 }

@@ -10,6 +10,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEn
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,6 +80,18 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     @Override
     public List<Shipment> findAll() {
         return this.writeRepository.createCriteria(ShipmentEntity.class)
+                .list()
+                .stream()
+                .map(this.persistenceMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Shipment> findAllCreatedBetween(final LocalDateTime createdFromInclusive,
+                                                final LocalDateTime createdToExclusive) {
+        return this.writeRepository.createCriteria(ShipmentEntity.class)
+                .ge("createdAt", createdFromInclusive)
+                .lt("createdAt", createdToExclusive)
                 .list()
                 .stream()
                 .map(this.persistenceMapper::toDomain)

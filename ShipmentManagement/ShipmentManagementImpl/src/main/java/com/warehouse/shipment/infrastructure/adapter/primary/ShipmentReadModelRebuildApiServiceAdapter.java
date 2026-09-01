@@ -25,6 +25,6 @@ public class ShipmentReadModelRebuildApiServiceAdapter implements ShipmentReadMo
     public int rebuildReadModels(final OperatorId operatorId,
                                  final LocalDate dateFrom,
                                  final LocalDate dateTo) {
-        return this.operatorContext.runAs(operatorId, this.syncPort::syncReadModels);
+        return this.operatorContext.runAs(operatorId, () -> this.syncPort.syncReadModels(dateFrom, dateTo));
     }
 }
