@@ -41,7 +41,7 @@ public class KafkaConfiguration {
 
     private DefaultJackson2JavaTypeMapper kafkaTypeMapper(final String typeMappings) {
         final DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
-        typeMapper.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.TYPE_ID);
+        typeMapper.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.INFERRED);
         final Map<String, Class<?>> mappings = new LinkedHashMap<>();
         for (final String mapping : typeMappings.split(",")) {
             if (mapping.isBlank()) {
