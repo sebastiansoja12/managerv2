@@ -1,4 +1,4 @@
-package com.warehouse.commonassets.kafka.domain.annotation;
+package com.warehouse.commonassets.event.integration.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -9,7 +9,9 @@ import java.lang.annotation.Target;
 @Inherited
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface KafkaDomainEvents {
+public @interface IntegrationEventType {
 
-    KafkaDomainEvent[] value();
+    String value();
+
+    int version() default 1;
 }

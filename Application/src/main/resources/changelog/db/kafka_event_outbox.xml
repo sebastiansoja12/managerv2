@@ -45,4 +45,30 @@
             <column name="topic"/>
         </createIndex>
     </changeSet>
+
+    <changeSet author="s-soja" id="20260831-01-add-kafka-outbox-processing-state">
+        <addColumn tableName="kafka_event_outbox">
+            <column defaultValue="PENDING" name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="attempt_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="next_attempt_at" type="TIMESTAMP"/>
+            <column name="locked_by" type="VARCHAR(64)"/>
+            <column name="locked_until" type="TIMESTAMP"/>
+        </addColumn>
+
+        <update tableName="kafka_event_outbox">
+            <column name="status" value="PUBLISHED"/>
+            <where>published_at IS NOT NULL</where>
+        </update>
+
+        <createIndex indexName="idx_kafka_event_outbox_claim" tableName="kafka_event_outbox">
+            <column name="status"/>
+            <column name="next_attempt_at"/>
+            <column name="locked_until"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
 </databaseChangeLog>

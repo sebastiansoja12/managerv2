@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
+
 @Embeddable
-public record UserId(Long value) {
+public record UserId(Long value) implements Serializable {
 
     public Long getValue() {
         return value;

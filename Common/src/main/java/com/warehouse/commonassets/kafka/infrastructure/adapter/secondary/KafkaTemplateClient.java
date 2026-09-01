@@ -6,7 +6,7 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
-import com.warehouse.commonassets.kafka.domain.model.OperatorAwareEvent;
+import com.warehouse.commonassets.event.integration.context.OperatorAwareEvent;
 import com.warehouse.commonassets.kafka.infrastructure.annotation.KafkaTopic;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorDetails;

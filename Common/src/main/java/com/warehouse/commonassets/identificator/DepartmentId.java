@@ -2,11 +2,12 @@ package com.warehouse.commonassets.identificator;
 
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 @Embeddable
-public class DepartmentId {
+public class DepartmentId implements Serializable {
     private Long value;
 
     protected DepartmentId() {

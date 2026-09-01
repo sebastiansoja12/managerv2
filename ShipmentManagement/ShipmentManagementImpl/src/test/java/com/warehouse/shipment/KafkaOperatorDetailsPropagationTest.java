@@ -6,13 +6,13 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
-import com.warehouse.commonassets.kafka.domain.model.OperatorAwareEvent;
+import com.warehouse.commonassets.event.integration.context.OperatorAwareEvent;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaOperatorContextRecordInterceptor;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorDetails;
-import com.warehouse.shipment.infrastructure.adapter.secondary.kafka.event.ShipmentReadModelChanged;
+import com.warehouse.shipment.application.event.ShipmentReadModelChanged;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterEach;
@@ -63,7 +63,7 @@ class KafkaOperatorDetailsPropagationTest {
                 kafkaTemplate, objectMapper, contextProviderHolder, environment);
         final ShipmentReadModelChanged event = new ShipmentReadModelChanged(null, Instant.EPOCH);
 
-        client.publish("shipment-1", event);
+        client.publish("shipment.read-model.sync", "shipment-1", event);
 
         final ArgumentCaptor<ProducerRecord<String, String>> recordCaptor = ArgumentCaptor.forClass(ProducerRecord.class);
         verify(kafkaTemplate).send(recordCaptor.capture());

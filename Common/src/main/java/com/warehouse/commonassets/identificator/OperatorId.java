@@ -2,10 +2,11 @@ package com.warehouse.commonassets.identificator;
 
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class OperatorId {
+public class OperatorId implements Serializable {
 
     private Long value;
 
