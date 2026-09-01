@@ -1,4 +1,6 @@
 package com.warehouse.shipment.domain.event;
 
-public interface SignatureEvent {
+import com.warehouse.commonassets.event.domain.model.DomainEvent;
+
+public interface SignatureEvent extends DomainEvent {
 }

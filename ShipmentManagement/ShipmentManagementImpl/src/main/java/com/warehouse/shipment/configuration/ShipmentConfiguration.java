@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
@@ -21,6 +22,7 @@ import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEvent
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
+import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 import com.warehouse.shipment.application.port.secondary.*;
 import com.warehouse.shipment.application.service.*;
 import com.warehouse.shipment.application.service.delivery.*;
@@ -102,14 +104,15 @@ public class ShipmentConfiguration {
                                      final OperatorContextProvider operatorContextProvider,
                                      final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
                                      final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
-                                     final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver) {
+                                     final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver,
+                                     final DomainEventPublisher domainEventPublisher) {
         return new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort, priceService,
 				countryServiceAvailabilityService, signatureService, routeLogService, returningServicePort,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 operatorContextProvider, shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                shipmentReturnStrategyResolver);
+                shipmentReturnStrategyResolver, domainEventPublisher);
 	}
 
     @Bean
@@ -263,8 +266,9 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public SignatureService signatureService(final SignatureRepository signatureRepository,
-											 final ShipmentRepository shipmentRepository) {
-		return new SignatureServiceImpl(signatureRepository, shipmentRepository);
+											 final ShipmentRepository shipmentRepository,
+                                             final DomainEventPublisher domainEventPublisher) {
+		return new SignatureServiceImpl(signatureRepository, shipmentRepository, domainEventPublisher);
 	}
 
 	@Bean
@@ -347,7 +351,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentReadModelSyncService shipmentReadModelSyncService(
+	public ShipmentReadModelSyncPort shipmentReadModelSyncPort(
 			final ShipmentReadModelRepository shipmentReadModelRepository,
 			final ShipmentRepository shipmentRepository) {
 		return new ShipmentReadModelSyncServiceImpl(shipmentReadModelRepository, shipmentRepository);

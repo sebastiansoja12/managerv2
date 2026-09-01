@@ -1,6 +1,7 @@
 package com.warehouse.shipment;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
@@ -15,7 +16,6 @@ import com.warehouse.shipment.application.service.*;
 import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrategyResolver;
 import com.warehouse.shipment.application.service.returning.*;
 import com.warehouse.shipment.application.service.status.*;
-import com.warehouse.shipment.domain.context.ShipmentEventContext;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
@@ -34,7 +34,6 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -90,7 +89,7 @@ class ShipmentPortImplTest {
     private Logger logger;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private DomainEventPublisher domainEventPublisher;
 
     private ShipmentPortImpl shipmentPort;
 
@@ -98,7 +97,6 @@ class ShipmentPortImplTest {
 
     @BeforeEach
     void setUp() {
-        new ShipmentEventContext().setApplicationEventPublisher(this.eventPublisher);
 		final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver =
 				new ShipmentStatusChangeStrategyResolver(List.of(
 						new ShipmentCreatedStatusChangeStrategy(),
@@ -119,7 +117,7 @@ class ShipmentPortImplTest {
                 this.signatureService, routeLogService, returningServicePort, mailNotificationServicePort,
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 operatorContextProvider, shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                shipmentReturnStrategyResolver);
+                shipmentReturnStrategyResolver, this.domainEventPublisher);
 	}
 
     @Test
@@ -144,7 +142,7 @@ class ShipmentPortImplTest {
         assertEquals(new DepartmentCode("KT2"), shipmentCaptor.getValue().getDestination());
         assertEquals(CountryCode.PL, shipmentCaptor.getValue().getOriginCountry());
         assertEquals(CountryCode.DE, shipmentCaptor.getValue().getDestinationCountry());
-        verify(this.eventPublisher).publishEvent(any(ShipmentCreated.class));
+        verify(this.domainEventPublisher).publish(any(ShipmentCreated.class));
     }
 
     @Test
@@ -456,7 +454,7 @@ class ShipmentPortImplTest {
 
         assertNotNull(shipment.getDangerousGood());
         verify(this.shipmentRepository).createOrUpdate(shipment);
-        verify(this.eventPublisher).publishEvent(
+        verify(this.domainEventPublisher).publish(
                 any(com.warehouse.shipment.domain.event.ShipmentDangerousGoodUpdated.class));
     }
 
@@ -470,7 +468,7 @@ class ShipmentPortImplTest {
 
         assertNull(shipment.getDangerousGood());
         verify(this.shipmentRepository).createOrUpdate(shipment);
-        verify(this.eventPublisher).publishEvent(
+        verify(this.domainEventPublisher).publish(
                 any(com.warehouse.shipment.domain.event.ShipmentDangerousGoodRemoved.class));
     }
 
@@ -504,7 +502,7 @@ class ShipmentPortImplTest {
         assertEquals(ShipmentStatus.CANCELED, shipment.getShipmentStatus());
         assertTrue(shipment.getLocked());
         verify(this.shipmentRepository).createOrUpdate(shipment);
-        verify(this.eventPublisher).publishEvent(any(ShipmentCanceled.class));
+        verify(this.domainEventPublisher).publish(any(ShipmentCanceled.class));
     }
 
     @Test
@@ -518,7 +516,7 @@ class ShipmentPortImplTest {
 
         assertSame(newSender, shipment.getSender());
         verify(this.shipmentRepository).createOrUpdate(shipment);
-        verify(this.eventPublisher).publishEvent(
+        verify(this.domainEventPublisher).publish(
                 any(ShipmentSenderChanged.class));
     }
 
@@ -642,7 +640,7 @@ class ShipmentPortImplTest {
 
         assertTrue(shipment.getLocked());
         verify(this.shipmentRepository).createOrUpdate(shipment);
-        verify(this.eventPublisher).publishEvent(any(ShipmentLocked.class));
+        verify(this.domainEventPublisher).publish(any(ShipmentLocked.class));
     }
 
     @Test
@@ -655,7 +653,7 @@ class ShipmentPortImplTest {
 
         assertEquals(destination, shipment.getDestination());
         verify(this.shipmentRepository).createOrUpdate(shipment);
-        verify(this.eventPublisher).publishEvent(
+        verify(this.domainEventPublisher).publish(
                 any(ShipmentDestinationChanged.class));
     }
 

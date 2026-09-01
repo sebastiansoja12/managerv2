@@ -1,5 +1,6 @@
 package com.warehouse.shipment.application.event.snapshot;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
@@ -18,8 +19,8 @@ public record ShipmentEventData(
         ShipmentType shipmentType,
         ShipmentId shipmentRelatedId,
         MoneySnapshot price,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
+        @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDateTime createdAt,
+        @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDateTime updatedAt,
         Boolean locked,
         DangerousGoodSnapshot dangerousGood,
         Boolean signatureRequired,

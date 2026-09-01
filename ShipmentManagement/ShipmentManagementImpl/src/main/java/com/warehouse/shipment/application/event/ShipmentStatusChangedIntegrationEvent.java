@@ -4,10 +4,10 @@ import com.warehouse.commonassets.event.integration.annotation.IntegrationEventT
 import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
 import com.warehouse.shipment.application.event.snapshot.ShipmentEventData;
 
-@IntegrationEventType(value = "shipment.canceled", version = 1)
-public class ShipmentCanceledMessage extends ShipmentChangedIntegrationEvent implements IntegrationEvent {
+@IntegrationEventType(value = "shipment.status.changed", version = 1)
+public class ShipmentStatusChangedIntegrationEvent extends ShipmentChangedIntegrationEvent implements IntegrationEvent {
 
-    public ShipmentCanceledMessage(final ShipmentEventData shipmentEventData) {
+    public ShipmentStatusChangedIntegrationEvent(final ShipmentEventData shipmentEventData) {
         super(shipmentEventData);
     }
 }

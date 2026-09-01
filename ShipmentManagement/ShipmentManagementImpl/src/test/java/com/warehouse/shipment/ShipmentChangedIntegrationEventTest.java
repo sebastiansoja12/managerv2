@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
+
 class ShipmentChangedIntegrationEventTest {
 
     @Test
@@ -22,14 +24,14 @@ class ShipmentChangedIntegrationEventTest {
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(event));
 
         final JsonNode payload = json.path("payload");
-        assertThat(payload.size()).isEqualTo(7);
+        assertThat(payload.size()).isEqualTo(21);
         assertThat(payload.path("shipmentId").path("value").asLong()).isEqualTo(1L);
-        assertThat(payload.path("eventType").asText()).isEqualTo("shipment.changed");
         assertThat(payload.path("shipmentStatus").asText()).isEqualTo("CREATED");
-        assertThat(payload.path("changedAt").asText()).isEqualTo(snapshot.updatedAt().toString());
-        assertThat(payload.path("operatorId").isNull()).isTrue();
-        assertThat(payload.path("departmentId").isNull()).isTrue();
-        assertThat(payload.path("userId").isNull()).isTrue();
+        assertThat(LocalDateTime.parse(payload.path("updatedAt").asText())).isEqualTo(snapshot.updatedAt());
+        assertThat(payload.has("eventType")).isFalse();
+        assertThat(payload.has("operatorId")).isFalse();
+        assertThat(payload.has("departmentId")).isFalse();
+        assertThat(payload.has("userId")).isFalse();
         assertThat(json.has("eventId")).isFalse();
         assertThat(json.has("eventType")).isFalse();
         assertThat(json.has("eventVersion")).isFalse();

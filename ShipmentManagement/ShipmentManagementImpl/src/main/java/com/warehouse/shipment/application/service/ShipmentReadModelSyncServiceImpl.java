@@ -1,16 +1,15 @@
 package com.warehouse.shipment.application.service;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 import com.warehouse.shipment.application.port.secondary.ShipmentReadModelRepository;
 import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncService {
+public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncPort {
 
     private final ShipmentReadModelRepository readModelRepository;
 
@@ -20,12 +19,6 @@ public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncSe
                                             final ShipmentRepository shipmentRepository) {
         this.readModelRepository = readModelRepository;
         this.shipmentRepository = shipmentRepository;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Override
-    public void sync(final ShipmentSnapshot snapshot) {
-        this.readModelRepository.sync(snapshot);
     }
 
     @Transactional
