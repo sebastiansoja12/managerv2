@@ -112,4 +112,45 @@
         </sql>
     </changeSet>
 
+    <changeSet author="s-soja" id="2026-10-17-postgresql-initial-platform-owner">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM platform_owners WHERE username = 'a@a.pl'</sqlCheck>
+        </preConditions>
+        <insert tableName="platform_owners">
+            <column name="platform_owner_id" valueNumeric="1"/>
+            <column name="username" value="a@a.pl"/>
+            <column name="password" value="$2a$10$GIi6ypLfEcfc.9Q9R99IAeeZn9cCL0YpG8fUEIKijN.hs4koSdE5y"/>
+            <column name="first_name" value="Platform"/>
+            <column name="last_name" value="Owner"/>
+            <column name="email" value="a@a.pl"/>
+            <column name="deleted" valueBoolean="false"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="s-soja" id="2026-10-17-postgresql-initial-login-superadmin">
+        <update tableName="users">
+            <column name="role" value="SUPERADMIN"/>
+            <where>user_id = 1 AND role = 'ADMIN'</where>
+        </update>
+    </changeSet>
+
+    <changeSet author="s-soja" id="2026-10-17-postgresql-platform-owner-s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM platform_owners WHERE username = 's-soja'</sqlCheck>
+        </preConditions>
+        <insert tableName="platform_owners">
+            <column name="platform_owner_id" valueNumeric="2"/>
+            <column name="username" value="s-soja"/>
+            <column name="password" value="$2a$10$qgPPGCaNug/RtXuBEuCOg.oyDwdhn8nncnVctpSyUrrVgwxpf/VkS"/>
+            <column name="first_name" value="Sebastian"/>
+            <column name="last_name" value="Soja"/>
+            <column name="email" value="s-soja@manager.local"/>
+            <column name="deleted" valueBoolean="false"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
