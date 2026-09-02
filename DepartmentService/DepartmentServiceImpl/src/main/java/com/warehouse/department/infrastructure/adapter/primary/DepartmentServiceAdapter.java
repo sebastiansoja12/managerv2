@@ -5,6 +5,7 @@ import java.util.List;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.department.api.dto.DepartmentDirectoryEntryDto;
 import com.warehouse.department.api.dto.DepartmentDto;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
@@ -23,6 +24,14 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
         return this.departmentPort.findAll()
                 .stream()
                 .map(ResponseMapper::mapToDto)
+                .toList();
+    }
+
+    @Override
+    public List<DepartmentDirectoryEntryDto> getDepartmentDirectory() {
+        return this.departmentPort.findAll()
+                .stream()
+                .map(ResponseMapper::mapToDirectoryEntryDto)
                 .toList();
     }
 

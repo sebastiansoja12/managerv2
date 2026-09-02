@@ -148,6 +148,7 @@ public class DepartmentPortImpl implements DepartmentPort {
     }
 
     @Override
+    @Transactional
     public void changeStatus(final ChangeDepartmentStatusCommand command) {
         final DepartmentCode departmentCode = command.departmentCode();
         final Department.Status status = Department.Status.valueOf(command.status());

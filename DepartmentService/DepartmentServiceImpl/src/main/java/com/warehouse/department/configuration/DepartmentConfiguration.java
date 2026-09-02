@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.CurrentUserApiService;
-import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTemplateClient;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
@@ -15,7 +14,6 @@ import com.warehouse.department.domain.port.secondary.DepartmentCoordinatesServi
 import com.warehouse.department.domain.port.secondary.DepartmentReadRepository;
 import com.warehouse.department.domain.port.secondary.DepartmentRepository;
 import com.warehouse.department.domain.port.secondary.TenantAdminProvisioningPort;
-import com.warehouse.department.domain.port.secondary.UserClientServicePort;
 import com.warehouse.department.domain.service.AuthenticationService;
 import com.warehouse.department.domain.service.AuthenticationServiceImpl;
 import com.warehouse.department.domain.service.DepartmentService;
@@ -83,11 +81,6 @@ public class DepartmentConfiguration {
     @Bean
     public TenantAdminProvisioningPort tenantAdminProvisioningPort() {
         return new TenantAdminProvisioningAdapter();
-    }
-
-    @Bean
-    public UserClientServicePort userClientServicePort(final KafkaTemplateClient kafkaTemplateClient) {
-        return new UserClientServiceAdapter(kafkaTemplateClient);
     }
 
     @Bean
