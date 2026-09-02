@@ -70,6 +70,7 @@ class KafkaOperatorDetailsPropagationTest {
         final ProducerRecord<String, String> record = recordCaptor.getValue();
 
         assertThat(event).isInstanceOf(OperatorAwareEvent.class);
+        assertThat(header(record, KafkaEventHeaders.TYPE_ID)).isEqualTo(event.getClass().getName());
         assertThat(header(record, KafkaEventHeaders.OPERATOR_ID)).isEqualTo("11");
         assertThat(header(record, KafkaEventHeaders.USER_ID)).isEqualTo("22");
         assertThat(header(record, KafkaEventHeaders.DEPARTMENT_ID)).isEqualTo("33");

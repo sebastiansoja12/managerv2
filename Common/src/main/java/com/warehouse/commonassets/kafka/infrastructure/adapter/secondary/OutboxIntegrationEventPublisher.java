@@ -80,7 +80,7 @@ public class OutboxIntegrationEventPublisher implements IntegrationEventPublishe
                 operatorId,
                 serializeMessage(event, eventId, eventType, eventVersion, occurredAt,
                         operatorId, userId, departmentId),
-                headers(event.getClass().getSimpleName(), eventId, eventType, eventVersion, occurredAt,
+                headers(event.getClass().getName(), eventId, eventType, eventVersion, occurredAt,
                         operatorId, userId, departmentId)
         );
         this.outboxWriter.append(record);

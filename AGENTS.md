@@ -19,6 +19,7 @@
 - Secondary adapters are implementation of secondary ports
 - Maven config is manager_settings.xml
 - Liquibase changesets author as 's-soja'
+- Add finals in interface method args
 
 ---
 
@@ -37,6 +38,9 @@ Rules:
 
 - The `Api` module is used only for internal communication between modules/domains.
 - The `Api` module calls ports/adapters exposed by the corresponding `Impl` module.
+- An `Impl` module may depend directly on its own `Api` module, but it must not declare a direct Maven dependency on
+  another bounded context's `Api` or implementation module. Declare cross-context API dependencies in the owning
+  module's `Api` module.
 - Controllers belong to the `Impl` module.
 - Controllers are outside the `Api` module and are used for communication from outside the system.
 - `Application` is the main monolithic application module.
@@ -78,10 +82,10 @@ Use these subpackages when the corresponding responsibility exists:
 | `*.application.port.primary.result` | Results returned by primary ports. |
 | `*.application.port.secondary` | Outbound contracts required by application use cases, including persistence and integrations. |
 | `*.application.service` | Use-case orchestration shared by primary-port implementations. |
-| `*.application.listener` | Domain-event and integration-event listeners that coordinate application behavior. |
-| `*.application.event` | Integration events exposed outside the bounded context. Do not place domain events here. |
+| `*.application.listener` | Domain-event listeners and listeners that translate events owned by the same bounded context into outgoing integration events. |
+| `*.application.event` | Integration-event contracts when the bounded context has no separate `Api` module. Do not place domain events here. |
 | `*.application.event.snapshot` | Stable serializable payloads used by integration events. |
-| `*.infrastructure.adapter.primary` | Controllers, inbound messaging adapters, request validation, and inbound mapping. |
+| `*.infrastructure.adapter.primary` | Controllers, inbound messaging adapters, listeners for integration events received from other bounded contexts, request validation, and inbound mapping. |
 | `*.infrastructure.adapter.secondary` | Persistence adapters, external service adapters, JPA entities, technical repositories, and outbound mapping. |
 
 Rules:
@@ -95,8 +99,15 @@ Rules:
 - A primary adapter must call a primary port. It must not call repositories or mutate domain objects directly.
 - A secondary adapter must implement a secondary port owned by the application layer.
 - Mapping between transport/persistence models and domain or application models belongs in primary or secondary adapters only.
-- Domain events belong in `*.domain.event`; integration events and their serializable payloads belong in `*.application.event`.
-- Domain-event listeners and integration-event listeners belong in `*.application.listener`, because listeners coordinate use cases and integrations.
+- Domain events belong in `*.domain.event`. A cross-context integration-event contract belongs to the owning bounded
+  context's `Api` module under `*.api.event`; use `*.application.event` only when that context has no separate `Api`
+  module. Serializable event payloads follow the same ownership rule.
+- Domain-event listeners belong in `*.application.listener`.
+- A listener that translates a bounded context's own domain event into an outgoing integration event belongs in
+  `*.application.listener` and publishes through `IntegrationEventPublisher` so the event is stored in the Kafka outbox.
+- A listener for an integration event received from another bounded context is an inbound adapter and belongs in
+  `*.infrastructure.adapter.primary`. It must consume the event through `@KafkaEventListener` and invoke a primary port;
+  it must not use Spring's in-process `@EventListener` as a cross-context transport.
 - The separate `Api` Maven module contains cross-module contracts only. Implementations, controllers, entities, and application orchestration remain in the corresponding implementation module.
 - Apply this structure to all new bounded contexts and new features. Do not refactor a legacy context only to move packages unless the task explicitly includes that migration.
 - Do not break hexagonal boundaries by calling infrastructure directly from another domain.
@@ -168,7 +179,16 @@ public ShipmentId create(final ShipmentCreateCommand command) {
 
 Listeners:
 
-- Put domain-event and integration-event listeners in `*.application.listener`.
+- Put domain-event listeners and producers of outgoing integration events in `*.application.listener`.
+- Put consumers of integration events owned by another bounded context in `*.infrastructure.adapter.primary`.
+- Outgoing integration events must implement `IntegrationEvent`, declare `@IntegrationEventType` with a stable type and
+  version, and be published through `IntegrationEventPublisher`. Configure their
+  `manager.kafka.integration-events.routes.<event-type>` route to a Kafka topic.
+- Kafka producers must put the integration event's fully qualified class name in the `__TypeId__` header. Producers
+  and consumers must use the same event class from the owning bounded context's `Api` module so Spring Kafka can
+  serialize and deserialize it automatically. Do not add per-event `manager.kafka.type-mappings` entries.
+- Incoming cross-context listeners must use `@KafkaEventListener`, configure an explicit topic and consumer group, and
+  call a primary port. They must not call repositories or infrastructure adapters directly.
 - Listener dependencies must be primary ports, secondary ports, application services, or event publishers, injected through a constructor.
 - Listeners must not call infrastructure adapters directly.
 
