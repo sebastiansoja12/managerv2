@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="s-soja" id="20260901-1-create-delivery-network">
+        <createTable tableName="delivery_network">
+            <column name="delivery_network_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_delivery_network"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="0" name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="delivery_network"
+                             columnNames="operator_id"
+                             constraintName="uk_delivery_network_operator"/>
+
+        <addForeignKeyConstraint baseTableName="delivery_network"
+                                 baseColumnNames="operator_id"
+                                 constraintName="fk_delivery_network_operator"
+                                 referencedTableName="operators"
+                                 referencedColumnNames="operator_id"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+
+        <createTable tableName="delivery_network_connection">
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_delivery_network_connection"/>
+            </column>
+            <column name="delivery_network_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_department_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_department_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="delivery_network_connection"
+                             columnNames="delivery_network_id, first_department_id, second_department_id"
+                             constraintName="uk_delivery_network_connection_pair"/>
+
+        <addForeignKeyConstraint baseTableName="delivery_network_connection"
+                                 baseColumnNames="delivery_network_id"
+                                 constraintName="fk_delivery_network_connection_network"
+                                 referencedTableName="delivery_network"
+                                 referencedColumnNames="delivery_network_id"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint baseTableName="delivery_network_connection"
+                                 baseColumnNames="first_department_id"
+                                 constraintName="fk_delivery_network_connection_first_department"
+                                 referencedTableName="department"
+                                 referencedColumnNames="department_id"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+
+        <addForeignKeyConstraint baseTableName="delivery_network_connection"
+                                 baseColumnNames="second_department_id"
+                                 constraintName="fk_delivery_network_connection_second_department"
+                                 referencedTableName="department"
+                                 referencedColumnNames="department_id"
+                                 onDelete="RESTRICT"
+                                 onUpdate="RESTRICT"/>
+
+        <createIndex tableName="delivery_network_connection"
+                     indexName="idx_delivery_network_connection_first">
+            <column name="delivery_network_id"/>
+            <column name="first_department_id"/>
+        </createIndex>
+
+        <createIndex tableName="delivery_network_connection"
+                     indexName="idx_delivery_network_connection_second">
+            <column name="delivery_network_id"/>
+            <column name="second_department_id"/>
+        </createIndex>
+
+        <sql>
+            ALTER TABLE delivery_network_connection
+            ADD CONSTRAINT chk_delivery_network_connection_order
+            CHECK (first_department_id &lt; second_department_id)
+        </sql>
+    </changeSet>
+</databaseChangeLog>

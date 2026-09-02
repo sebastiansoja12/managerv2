@@ -33,6 +33,7 @@
     <include file="/changelog/db/operator_configurations_aud.xml"/>
     <include file="/changelog/db/operators.xml"/>
     <include file="/changelog/db/operators_aud.xml"/>
+    <include file="/changelog/db/delivery_network.xml"/>
     <include file="/changelog/db/parcel.xml"/>
     <include file="/changelog/db/price.xml"/>
     <include file="/changelog/db/process_logs.xml"/>
