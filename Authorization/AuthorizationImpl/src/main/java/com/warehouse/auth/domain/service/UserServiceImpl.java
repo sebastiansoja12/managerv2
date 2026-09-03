@@ -174,9 +174,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void anonymize(final UserId userId) {
         final OrganizationUser user = this.userRepository.findById(userId);
-        if (user == null) {
-            return;
-        }
         user.anonymize(ERASED_PASSWORD);
         this.userRepository.createOrUpdate(user);
     }
