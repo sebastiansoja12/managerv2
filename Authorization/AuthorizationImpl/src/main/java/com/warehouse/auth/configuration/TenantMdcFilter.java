@@ -3,12 +3,15 @@ package com.warehouse.auth.configuration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.warehouse.auth.domain.model.PlatformOwner;
+import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
 import com.warehouse.auth.domain.service.JwtDecodeService;
 import com.warehouse.auth.domain.vo.DecodedApiTenant;
 import com.warehouse.exceptionhandler.exception.RestException;
@@ -27,6 +30,8 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
     private final AuthCookieService authCookieService;
 
+    private final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort;
+
     private final Logger log = org.slf4j.LoggerFactory.getLogger("");
 
     private static final List<String> WHITELIST = List.of(
@@ -38,6 +43,10 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/v2/api/auth/refresh",
             "/v2/api/auth/logout",
             "/v2/api/auth/csrf",
+            "/v2/api/maintenance",
+            "/v2/api/platform/auth/login",
+            "/v2/api/platform/auth/refresh",
+            "/v2/api/platform/auth/logout",
             "/v2/api/departments/read-sync",
             "/v2/api/internal/shipments/read-sync",
             "/internal/shipments/read-sync",
@@ -48,10 +57,12 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
     public TenantMdcFilter(final JwtDecodeService jwtDecodeService,
                            final ApiExposureProperties apiExposureProperties,
-                           final AuthCookieService authCookieService) {
+                           final AuthCookieService authCookieService,
+                           final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort) {
         this.jwtDecodeService = jwtDecodeService;
         this.apiExposureProperties = apiExposureProperties;
         this.authCookieService = authCookieService;
+        this.platformOwnerAuthenticationPort = platformOwnerAuthenticationPort;
     }
 
     @Override
@@ -65,6 +76,16 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             if (isWhitelisted(request)) {
                 filterChain.doFilter(request, response);
                 return;
+            }
+
+            if (authCookieService.readAccessToken(request).isEmpty()) {
+                final Optional<PlatformOwner> platformOwner = authenticatePlatformOwner(request);
+                if (platformOwner.isPresent()) {
+                    initPlatformOwnerMdc(platformOwner.get(), request);
+                    log.info("Incoming {} platform owner request", request.getMethod());
+                    filterChain.doFilter(request, response);
+                    return;
+                }
             }
 
             final DecodedApiTenant tenantInfo = authenticateWithJwt(request, response);
@@ -93,6 +114,25 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         MDC.put("operator", tenant.operatorId() != null ? tenant.operatorId().toString() : "N/A");
         MDC.put("user", tenant.userId().value().toString());
         MDC.put("username", tenant.username());
+        MDC.put("uri", request.getRequestURL().toString());
+        MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        MDC.put("method", request.getMethod());
+    }
+
+    private Optional<PlatformOwner> authenticatePlatformOwner(final HttpServletRequest request) {
+        try {
+            return authCookieService.readPlatformOwnerAccessToken(request)
+                    .flatMap(platformOwnerAuthenticationPort::authenticate);
+        } catch (final RuntimeException exception) {
+            log.warn("Invalid or expired platform owner access token");
+            return Optional.empty();
+        }
+    }
+
+    private void initPlatformOwnerMdc(final PlatformOwner platformOwner, final HttpServletRequest request) {
+        MDC.put("operator", "PLATFORM");
+        MDC.put("user", "platform-owner-" + platformOwner.getPlatformOwnerId().value());
+        MDC.put("username", platformOwner.getUsername());
         MDC.put("uri", request.getRequestURL().toString());
         MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         MDC.put("method", request.getMethod());

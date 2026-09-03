@@ -3,7 +3,7 @@ package com.warehouse.deliveryreturn.infrastructure.adapter.secondary;
 import static org.mapstruct.factory.Mappers.getMapper;
 
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
-import com.warehouse.deliveryreturn.domain.vo.Shipment;
+import com.warehouse.deliveryreturn.domain.vo.DeliverableShipment;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.mapper.MailMapper;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationDto;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEvent;
@@ -19,13 +19,13 @@ public class MailAdapter implements MailServicePort {
     private final NotificationEventPublisher notificationEventPublisher;
 
     @Override
-    public void sendNotification(final Shipment shipment) {
-        sendEvent(buildEvent(shipment));
+    public void sendNotification(final DeliverableShipment deliverableShipment) {
+        sendEvent(buildEvent(deliverableShipment));
     }
 
-    private NotificationEvent buildEvent(final Shipment shipment) {
+    private NotificationEvent buildEvent(final DeliverableShipment deliverableShipment) {
         return NotificationEvent.builder()
-                .notification(new NotificationDto(shipment.getRecipientEmail(), "", shipment.getSenderEmail()))
+                .notification(new NotificationDto(deliverableShipment.getRecipientEmail(), "", deliverableShipment.getSenderEmail()))
                 .build();
     }
 

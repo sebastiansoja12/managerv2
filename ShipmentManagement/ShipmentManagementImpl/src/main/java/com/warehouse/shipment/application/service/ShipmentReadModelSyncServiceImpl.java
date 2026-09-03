@@ -31,13 +31,6 @@ public class ShipmentReadModelSyncServiceImpl implements ShipmentReadModelSyncPo
 
     @Transactional
     @Override
-    public int syncReadModels() {
-        final List<Shipment> shipments = this.shipmentRepository.findAll();
-        return syncReadModels(shipments);
-    }
-
-    @Transactional
-    @Override
     public int syncReadModels(final LocalDate dateFrom, final LocalDate dateTo) {
         final List<Shipment> shipments = this.shipmentRepository.findAllCreatedBetween(
                 dateFrom.atStartOfDay(),

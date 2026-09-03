@@ -18,7 +18,6 @@ public class ShipmentReturnedStrategy implements ShipmentDeliveryStrategy {
 
     @Override
     public Optional<ShipmentEvent> process(final Shipment shipment) {
-        shipment.notifyShipmentReturned();
-        return Optional.of(new ShipmentReturned(shipment.snapshot(), Instant.now()));
+        throw new IllegalStateException("Return requires an RTM pickupId and a new return shipment");
     }
 }

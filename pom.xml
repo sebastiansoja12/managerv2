@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.warehouse</groupId>
 	<artifactId>warehouse</artifactId>
-	<version>2026.3-SNAPSHOT</version>
+	<version>2026.4-SNAPSHOT</version>
 	<name>warehouse</name>
 	<description>Pom file for all modules</description>
 	<packaging>pom</packaging>
@@ -18,10 +18,10 @@
 	<modules>
 		<module>Application</module>
 		<module>ShipmentManagement</module>
+        <module>ReturningTrackManager</module>
 		<module>DeliveryNetwork</module>
 		<module>PickupPointManagement</module>
 		<module>MailService</module>
-		<module>DepartmentService</module>
         <module>AsyncJob</module>
         <module>OrganisationStructure</module>
 		<module>DeliveryOperation</module>
@@ -29,7 +29,7 @@
 		<module>Authorization</module>
 		<module>Utility</module>
         <module>DestinationDetermination</module>
-        <module>DocumentManager</module>
+        <module>DocumentStorage</module>
 		<module>ExceptionHandler</module>
         <module>Device</module>
         <module>ArchitectureTest</module>
@@ -48,6 +48,7 @@
         <module>DriverHub</module>
         <module>ProcessHub</module>
         <module>GeocodingService</module>
+        <module>PlatformAdministration</module>
     </modules>
 
 	<properties>
@@ -324,7 +325,7 @@
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.5.1</version>
+				<version>3.9.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -363,6 +364,11 @@
 			<dependency>
 				<groupId>io.github.resilience4j</groupId>
 				<artifactId>resilience4j-core</artifactId>
+				<version>1.7.1</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-circuitbreaker</artifactId>
 				<version>1.7.1</version>
 			</dependency>
 			<dependency>

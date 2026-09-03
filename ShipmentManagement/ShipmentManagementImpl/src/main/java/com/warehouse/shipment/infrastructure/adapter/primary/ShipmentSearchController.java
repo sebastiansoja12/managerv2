@@ -1,6 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
-import com.warehouse.shipment.application.port.primary.ShipmentPort;
+import com.warehouse.shipment.application.port.primary.ShipmentQueryPort;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentDto;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentSearchRequestApi;
@@ -20,16 +20,16 @@ import java.util.List;
 @RequestMapping("/shipments/read-model")
 public class ShipmentSearchController {
 
-    private final ShipmentPort shipmentPort;
+    private final ShipmentQueryPort shipmentQueryPort;
 
     private final ShipmentRequestMapper requestMapper;
 
     private final ShipmentResponseMapper responseMapper;
 
-    public ShipmentSearchController(final ShipmentPort shipmentPort,
+    public ShipmentSearchController(final ShipmentQueryPort shipmentQueryPort,
                                     final ShipmentRequestMapper requestMapper,
                                     final ShipmentResponseMapper responseMapper) {
-        this.shipmentPort = shipmentPort;
+        this.shipmentQueryPort = shipmentQueryPort;
         this.requestMapper = requestMapper;
         this.responseMapper = responseMapper;
     }
@@ -40,7 +40,7 @@ public class ShipmentSearchController {
     public ResponseEntity<List<ShipmentDto>> search(
             @RequestBody(required = false) final ShipmentSearchRequestApi request) {
         final ShipmentSearchCriteria criteria = requestMapper.map(request);
-        final List<ShipmentDto> shipmentResponse = shipmentPort.searchShipments(criteria).stream()
+        final List<ShipmentDto> shipmentResponse = shipmentQueryPort.searchShipments(criteria).stream()
                 .map(responseMapper::map)
                 .toList();
         return ResponseEntity.ok(shipmentResponse);

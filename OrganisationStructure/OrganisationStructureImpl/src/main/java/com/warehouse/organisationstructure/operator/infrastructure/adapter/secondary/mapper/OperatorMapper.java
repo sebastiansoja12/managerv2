@@ -18,6 +18,7 @@ import com.warehouse.organisationstructure.api.dto.ShipmentValidationConfigurati
 import com.warehouse.organisationstructure.api.dto.ShipmentWorkflowConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShippingCapabilitiesDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberDateFormatDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberPrefixModeDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberRuleDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberSourceDto;
 import com.warehouse.organisationstructure.operator.domain.model.Operator;
@@ -37,6 +38,7 @@ import com.warehouse.organisationstructure.operatorconfiguration.domain.model.Sh
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentWorkflowConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShippingCapabilities;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberDateFormat;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberPrefixMode;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberRule;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberSource;
 
@@ -248,6 +250,9 @@ public final class OperatorMapper {
             return null;
         }
         return new TrackingNumberRule(
+                trackingNumberRule.prefixMode() != null
+                        ? TrackingNumberPrefixMode.valueOf(trackingNumberRule.prefixMode().name())
+                        : null,
                 trackingNumberRule.key(),
                 trackingNumberRule.separator(),
                 trackingNumberRule.source() != null
@@ -408,6 +413,9 @@ public final class OperatorMapper {
             return null;
         }
         return new TrackingNumberRuleDto(
+                rule.getPrefixMode() != null
+                        ? TrackingNumberPrefixModeDto.valueOf(rule.getPrefixMode().name())
+                        : null,
                 rule.getKey(),
                 rule.getSeparator(),
                 rule.getSource() != null ? TrackingNumberSourceDto.valueOf(rule.getSource().name()) : null,

@@ -20,13 +20,15 @@ import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.RefreshTokenMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
+import com.warehouse.commonassets.repository.NoOperatorContextRepository;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 
 @Configuration
 public class UserConfiguration {
 
     @Bean
-    public UserPort userPort(final UserService userService, final AuthenticationService authenticationService) {
+    public UserPort userPort(final UserService userService,
+                             final AuthenticationService authenticationService) {
         return new UserPortImpl(userService, authenticationService);
     }
 
@@ -42,8 +44,9 @@ public class UserConfiguration {
 
     @Bean
     public UserRepository userRepository(final OperatorFilteredRepository<UserEntity> repository,
+                                         final NoOperatorContextRepository<UserEntity> noOperatorContextRepository,
                                          final ApiKeyEncoder apiKeyEncoder) {
-        return new UserRepositoryImpl(repository, apiKeyEncoder);
+        return new UserRepositoryImpl(repository, noOperatorContextRepository, apiKeyEncoder);
     }
 
     @Bean
@@ -89,8 +92,10 @@ public class UserConfiguration {
     }
 
     @Bean
-    public UserApiService userApiService(final UserService userService, final ResponseMapper responseMapper) {
-        return new UserApiServiceAdapter(userService, responseMapper);
+    public UserApiService userApiService(final UserService userService,
+                                         final ResponseMapper responseMapper,
+                                         final AuthenticationPort authenticationPort) {
+        return new UserApiServiceAdapter(userService, responseMapper, authenticationPort);
     }
 
     @Bean

@@ -1,6 +1,6 @@
 package com.warehouse.auth;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.provider.JwtProvider;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.service.JwtService;
@@ -46,7 +46,7 @@ public class JwtServiceTest {
 
     @Test
     void shouldGenerateToken() {
-        final User user = user(new UserId(1L), "s-soja", User.Role.USER);
+        final OrganizationUser user = user(new UserId(1L), "s-soja", OrganizationUser.Role.USER);
 
         doReturn(EXPIRATION)
                 .when(jwtProvider)
@@ -64,7 +64,7 @@ public class JwtServiceTest {
 
     @Test
     void shouldCheckIfTokenIsValid() {
-        final User user = user(new UserId(2L), "test", User.Role.ADMIN);
+        final OrganizationUser user = user(new UserId(2L), "test", OrganizationUser.Role.ADMIN);
         user.setDeleted(false);
 
         doReturn(SECRET_KEY)
@@ -84,7 +84,7 @@ public class JwtServiceTest {
 
     @Test
     void shouldTokenBeInvalid() {
-        final User user = user(new UserId(3L), "test", User.Role.USER);
+        final OrganizationUser user = user(new UserId(3L), "test", OrganizationUser.Role.USER);
 
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
@@ -103,7 +103,7 @@ public class JwtServiceTest {
 
     @Test
     void shouldExtractUsernameFromJwt() {
-        final User user = user(new UserId(4L), "test", User.Role.ADMIN);
+        final OrganizationUser user = user(new UserId(4L), "test", OrganizationUser.Role.ADMIN);
         doReturn(SECRET_KEY)
                 .when(jwtProvider)
                 .getSecretKey();
@@ -116,8 +116,8 @@ public class JwtServiceTest {
         assertEquals("test", username);
     }
 
-    private User user(final UserId userId, final String username, final User.Role role) {
-        final User user = new User(userId, username, "test", "Test", "Test", "test@test.pl", role,
+    private OrganizationUser user(final UserId userId, final String username, final OrganizationUser.Role role) {
+        final OrganizationUser user = OrganizationUser.of(userId, username, "test", "Test", "Test", "test@test.pl", role,
                 new DepartmentId(10L), "");
         user.assignOperator(OperatorId.of(10001L));
         return user;

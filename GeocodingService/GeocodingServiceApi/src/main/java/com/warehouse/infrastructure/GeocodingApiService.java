@@ -7,4 +7,6 @@ public interface GeocodingApiService {
     GeocodingConfigurationDto getGeocodingConfig(final GeocodingProvider geocodingProvider);
 
     GeocodingConfigurationDto getDefaultGeocodingConfig();
+
+    boolean hasEnabledConfiguration();
 }

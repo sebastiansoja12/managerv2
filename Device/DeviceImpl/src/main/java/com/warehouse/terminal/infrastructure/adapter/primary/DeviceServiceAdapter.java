@@ -1,5 +1,7 @@
 package com.warehouse.terminal.infrastructure.adapter.primary;
 
+import java.util.List;
+import com.warehouse.terminal.dto.DeviceAccessDto;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -107,5 +109,64 @@ public class DeviceServiceAdapter implements DeviceApiService {
 
     private UsernameDto mapUsername(final Username username) {
         return username != null ? new UsernameDto(username.value()) : null;
+    }
+
+    @Override
+    public List<DeviceAccessDto> findAllAccess() {
+        return deviceGenericService.findAll()
+                .stream()
+                .map(this::toAccess)
+                .toList();
+    }
+
+    @Override
+    public boolean revokeAccess(final DeviceIdDto deviceId) {
+        return devicePairService.revokePairing(new DeviceId(deviceId.value()));
+    }
+
+    @Override
+    public void changeStatus(final DeviceIdDto deviceId, final String status) {
+        deviceGenericService.updateStatus(new DeviceId(deviceId.value()), DeviceStatus.valueOf(status));
+    }
+
+    @Override
+    public int retireAll() {
+        final List<Device> devices = deviceGenericService.findAll();
+        devices.forEach(device -> {
+            devicePairService.revokePairing(device.getDeviceId());
+            deviceGenericService.updateStatus(device.getDeviceId(), DeviceStatus.RETIRED);
+        });
+        return devices.size();
+    }
+
+    private DeviceAccessDto toAccess(final Device device) {
+        final Optional<DevicePair> devicePair = devicePairService.findExistingByDeviceId(device.getDeviceId());
+        return new DeviceAccessDto(
+                device.getDeviceId() != null ? device.getDeviceId().value() : null,
+                device.getDeviceType() != null ? device.getDeviceType().name() : null,
+                device.getStatus() != null ? device.getStatus().name() : null,
+                device.getUserId() != null ? device.getUserId().value() : null,
+                device.getDepartmentCode() != null ? device.getDepartmentCode().getValue() : null,
+                versionOf(device),
+                lastUpdateOf(device),
+                devicePair.map(DevicePair::isPaired).orElse(false),
+                devicePair.map(DevicePair::getPairKeyExpiresAt).orElse(null),
+                devicePair.map(DevicePair::getLoginTime).orElse(null));
+    }
+
+    private String versionOf(final Device device) {
+        try {
+            return device.getVersion();
+        } catch (UnsupportedOperationException exception) {
+            return null;
+        }
+    }
+
+    private java.time.Instant lastUpdateOf(final Device device) {
+        try {
+            return device.getLastUpdate();
+        } catch (UnsupportedOperationException exception) {
+            return null;
+        }
     }
 }

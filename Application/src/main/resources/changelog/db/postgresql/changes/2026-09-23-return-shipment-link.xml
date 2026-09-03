@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-23-return-shipment-link" author="s-soja">
+        <createTable tableName="return_shipment_link">
+            <column name="return_id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="pk_return_shipment_link" nullable="false"/>
+            </column>
+            <column name="original_shipment_id" type="BIGINT">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_return_original_shipment"/>
+            </column>
+            <column name="pickup_id" type="UUID">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_return_pickup"/>
+            </column>
+            <column name="return_shipment_id" type="BIGINT">
+                <constraints unique="true" uniqueConstraintName="uq_return_new_shipment"/>
+            </column>
+            <column name="return_version" type="BIGINT"/>
+            <column name="last_event_id" type="UUID"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_return_link_new_shipment" tableName="return_shipment_link">
+            <column name="return_shipment_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-09-23-manager-return-consumed-event" author="s-soja">
+        <createTable tableName="return_consumed_event">
+            <column name="event_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_manager_return_consumed_event" nullable="false"/>
+            </column>
+            <column name="consumed_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

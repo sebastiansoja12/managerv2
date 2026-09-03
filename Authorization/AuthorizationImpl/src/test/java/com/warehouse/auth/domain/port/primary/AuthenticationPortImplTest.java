@@ -23,7 +23,7 @@ import com.warehouse.auth.domain.model.CreateOperatorUserCommand;
 import com.warehouse.auth.domain.model.CreateUserCommand;
 import com.warehouse.auth.domain.model.RefreshToken;
 import com.warehouse.auth.domain.model.RolePermission;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
@@ -97,7 +97,7 @@ class AuthenticationPortImplTest {
         };
         apiKeyEncoder = new ApiEncoderImpl(apiKeyProvider);
         port = new AuthenticationPortImpl(authenticationService, userService, jwtService, passwordEncoder,
-                departmentService, mailServicePort, apiKeyEncoder);
+                departmentService, mailServicePort, apiKeyEncoder, (operatorId, issuedAt, impersonation) -> true);
 
         final StaticApplicationContext applicationContext = new StaticApplicationContext();
         applicationContext.getBeanFactory()
@@ -110,7 +110,7 @@ class AuthenticationPortImplTest {
 
     @Test
     void shouldLoginWithRealServices() {
-        givenUser("s-soja", "raw-password", User.Role.ADMIN, OperatorId.of(100L));
+        givenUser("s-soja", "raw-password", OrganizationUser.Role.ADMIN, OperatorId.of(100L));
 
         final AuthenticationResponse response = port.login(new LoginRequest("s-soja", "raw-password"));
 
@@ -122,7 +122,7 @@ class AuthenticationPortImplTest {
 
     @Test
     void shouldRejectLoginWithInvalidPassword() {
-        givenUser("s-soja", "raw-password", User.Role.USER, OperatorId.of(100L));
+        givenUser("s-soja", "raw-password", OrganizationUser.Role.USER, OperatorId.of(100L));
 
         assertThrows(AuthenticationErrorException.class,
                 () -> port.login(new LoginRequest("s-soja", "bad-password")));
@@ -130,7 +130,7 @@ class AuthenticationPortImplTest {
 
     @Test
     void shouldRefreshAndRotateRefreshTokenWithRealServices() {
-        givenUser("s-soja", "raw-password", User.Role.MANAGER, OperatorId.of(100L));
+        givenUser("s-soja", "raw-password", OrganizationUser.Role.MANAGER, OperatorId.of(100L));
         final AuthenticationResponse loginResponse = port.login(new LoginRequest("s-soja", "raw-password"));
 
         final AuthenticationResponse refreshResponse = port.refresh(loginResponse.refreshToken());
@@ -158,10 +158,10 @@ class AuthenticationPortImplTest {
 
         final UserId userId = port.createOperatorUser(command);
 
-        final User createdUser = userRepository.findByUsername("operator-user");
+        final OrganizationUser createdUser = userRepository.findByUsername("operator-user");
         assertThat(userId).isEqualTo(createdUser.getUserId());
         assertThat(createdUser.operatorId()).isEqualTo(OperatorId.of(123L));
-        assertThat(createdUser.getRole()).isEqualTo(User.Role.SUPPLIER);
+        assertThat(createdUser.getRole()).isEqualTo(OrganizationUser.Role.SUPPLIER);
         assertThat(passwordEncoder.matches("raw-password", createdUser.getPassword())).isTrue();
         assertThat(createdUser.getDepartmentId()).isEqualTo(new DepartmentId(10L));
         assertThat(createdUser.getApiKey()).isNotNull();
@@ -191,9 +191,9 @@ class AuthenticationPortImplTest {
 
     private void givenUser(final String username,
                            final String rawPassword,
-                           final User.Role role,
+                           final OrganizationUser.Role role,
                            final OperatorId operatorId) {
-        final User user = User.createWithRole(
+        final OrganizationUser user = OrganizationUser.createWithRole(
                 new UserId((long) userRepository.users.size() + 1),
                 username,
                 passwordEncoder.encode(rawPassword),
@@ -210,20 +210,20 @@ class AuthenticationPortImplTest {
     }
 
     private static final class InMemoryUserRepository implements UserRepository {
-        private final Map<String, User> users = new HashMap<>();
+        private final Map<String, OrganizationUser> users = new HashMap<>();
 
         @Override
-        public void createOrUpdate(final User user) {
+        public void createOrUpdate(final OrganizationUser user) {
             users.put(user.getUsername(), user);
         }
 
         @Override
-        public User findByUsername(final String username) {
+        public OrganizationUser findByUsername(final String username) {
             return users.get(username);
         }
 
         @Override
-        public User findByApiKey(final String apiKey) {
+        public OrganizationUser findByApiKey(final String apiKey) {
             return users.values().stream()
                     .filter(user -> apiKey.equals(user.getApiKey()))
                     .findFirst()
@@ -231,7 +231,7 @@ class AuthenticationPortImplTest {
         }
 
         @Override
-        public User findById(final UserId userId) {
+        public OrganizationUser findById(final UserId userId) {
             return users.values().stream()
                     .filter(user -> userId.equals(user.getUserId()))
                     .findFirst()
@@ -239,7 +239,7 @@ class AuthenticationPortImplTest {
         }
 
         @Override
-        public List<User> findAll() {
+        public List<OrganizationUser> findAll() {
             return new ArrayList<>(users.values());
         }
 
@@ -248,12 +248,12 @@ class AuthenticationPortImplTest {
             return users.values().stream()
                     .filter(user -> departmentId.equals(user.getDepartmentId()))
                     .filter(user -> !Boolean.TRUE.equals(user.isDeleted()))
-                    .map(User::getUserId)
+                    .map(OrganizationUser::getUserId)
                     .toList();
         }
 
         @Override
-        public User findByEmail(final String email) {
+        public OrganizationUser findByEmail(final String email) {
             return users.values().stream()
                     .filter(user -> email.equals(user.getEmail()))
                     .findFirst()
@@ -263,10 +263,18 @@ class AuthenticationPortImplTest {
         @Override
         public UserId findInitialUser() {
             return users.values().stream()
-                    .filter(User::isInitial)
-                    .map(User::getUserId)
+                    .filter(OrganizationUser::isInitial)
+                    .map(OrganizationUser::getUserId)
                     .findFirst()
                     .orElse(null);
+        }
+
+        @Override
+        public Optional<OrganizationUser> findActiveSuperadmin(final OperatorId operatorId) {
+            return users.values().stream()
+                    .filter(user -> OrganizationUser.Role.SUPERADMIN.equals(user.getRole()))
+                    .filter(user -> operatorId.equals(user.operatorId()))
+                    .findFirst();
         }
     }
 
@@ -306,7 +314,7 @@ class AuthenticationPortImplTest {
         }
 
         @Override
-        public Boolean departmentExists(final DepartmentId departmentId) {
+        public Boolean departmentExists(final DepartmentId departmentId, final OperatorId operatorId) {
             return departmentExists;
         }
 

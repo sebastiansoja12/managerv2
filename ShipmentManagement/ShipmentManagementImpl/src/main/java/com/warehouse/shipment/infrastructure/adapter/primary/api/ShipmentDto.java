@@ -1,6 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.PickupPointId;
 
@@ -14,8 +13,6 @@ public class ShipmentDto {
 
     private final PersonApi recipient;
 
-    private final ShipmentSizeDto shipmentSize;
-
     private final DepartmentCodeDto destination;
 
     private final DepartmentId originDepartmentId;
@@ -28,15 +25,15 @@ public class ShipmentDto {
 
     private final DeliveryMethodDto deliveryMethod;
 
-    private final CountryCode originCountry;
-
-    private final CountryCode destinationCountry;
-
     private final ShipmentStatusDto shipmentStatus;
     
     private final ShipmentIdDto shipmentRelatedId;
 
     private final ShipmentPriorityDto shipmentPriority;
+
+    private final PackagingTypeDto packagingType;
+
+    private final ShipmentServiceLevelDto serviceLevel;
 
     private final TrackingNumberDto trackingNumber;
 
@@ -46,44 +43,58 @@ public class ShipmentDto {
 
     private final SignatureDto signature;
 
-    private final DangerousGoodApi dangerousGood;
-
     private final LocalDateTime createdAt;
 
     private final LocalDateTime updatedAt;
 
+    private final DimensionsApi dimensions;
+
+    private final WeightApi weight;
+
+    private final String customerReference;
+
+    private final String contentDescription;
+
+    private final MoneyApi declaredValue;
+
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
-                       final ShipmentSizeDto shipmentSize, final DepartmentCodeDto destination,
+                       final DepartmentCodeDto destination,
                        final DepartmentId originDepartmentId, final PickupPointId pickupPointId,
                        final PickupMethodDto pickupMethod, final DeliveryMethodDto deliveryMethod,
-                       final CountryCode originCountry,
-                       final CountryCode destinationCountry, final ShipmentStatusDto shipmentStatus,
+                       final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
                        final TrackingNumberDto trackingNumber,
                        final MoneyApi price, final Boolean locked,
-                       final SignatureDto signature, final DangerousGoodApi dangerousGood,
-                       final LocalDateTime createdAt, final LocalDateTime updatedAt) {
+                       final SignatureDto signature,
+                       final LocalDateTime createdAt, final LocalDateTime updatedAt,
+                       final DimensionsApi dimensions, final WeightApi weight,
+                       final String customerReference, final String contentDescription,
+                       final MoneyApi declaredValue, final PackagingTypeDto packagingType,
+                       final ShipmentServiceLevelDto serviceLevel) {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
-		this.shipmentSize = shipmentSize;
         this.destination = destination;
         this.originDepartmentId = originDepartmentId;
         this.pickupPointId = pickupPointId;
         this.pickupMethod = pickupMethod;
         this.deliveryMethod = deliveryMethod;
-        this.originCountry = originCountry;
-        this.destinationCountry = destinationCountry;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentPriority = shipmentPriority;
+        this.packagingType = packagingType;
+        this.serviceLevel = serviceLevel;
         this.trackingNumber = trackingNumber;
         this.price = price;
         this.locked = locked;
         this.signature = signature;
-        this.dangerousGood = dangerousGood;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.dimensions = dimensions;
+        this.weight = weight;
+        this.customerReference = customerReference;
+        this.contentDescription = contentDescription;
+        this.declaredValue = declaredValue;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -96,10 +107,6 @@ public class ShipmentDto {
 
     public PersonApi getRecipient() {
         return recipient;
-    }
-
-    public ShipmentSizeDto getShipmentSize() {
-        return shipmentSize;
     }
 
     public DepartmentCodeDto getDestination() {
@@ -130,14 +137,6 @@ public class ShipmentDto {
         return deliveryMethod;
     }
 
-    public CountryCode getOriginCountry() {
-        return originCountry;
-    }
-
-    public CountryCode getDestinationCountry() {
-        return destinationCountry;
-    }
-
     public ShipmentStatusDto getShipmentStatus() {
         return shipmentStatus;
     }
@@ -162,12 +161,12 @@ public class ShipmentDto {
         return shipmentPriority;
     }
 
+    public PackagingTypeDto getPackagingType() { return packagingType; }
+
+    public ShipmentServiceLevelDto getServiceLevel() { return serviceLevel; }
+
     public SignatureDto getSignature() {
         return signature;
-    }
-
-    public DangerousGoodApi getDangerousGood() {
-        return dangerousGood;
     }
 
     public TrackingNumberDto getTrackingNumber() {
@@ -180,5 +179,25 @@ public class ShipmentDto {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public DimensionsApi getDimensions() {
+        return dimensions;
+    }
+
+    public WeightApi getWeight() {
+        return weight;
+    }
+
+    public String getCustomerReference() {
+        return customerReference;
+    }
+
+    public String getContentDescription() {
+        return contentDescription;
+    }
+
+    public MoneyApi getDeclaredValue() {
+        return declaredValue;
     }
 }

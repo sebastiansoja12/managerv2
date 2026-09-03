@@ -1,0 +1,60 @@
+package com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.mapper;
+
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
+import com.warehouse.organisationstructure.department.domain.model.Department;
+import com.warehouse.organisationstructure.department.domain.vo.Address;
+import com.warehouse.organisationstructure.department.domain.vo.Coordinates;
+import com.warehouse.organisationstructure.department.domain.vo.TaxId;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.DepartmentAddress;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.DepartmentCoordinates;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
+import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
+
+public abstract class DepartmentToModelMapper {
+
+    public static Department map(final DepartmentEntity department) {
+        if (department == null) {
+            return null;
+        } else {
+            final Department model = new Department(department.getDepartmentId(),
+					new DepartmentCode(department.getDepartmentCode().getValue()),
+					map(department.getDepartmentAddress()), new TaxId(department.getTaxId().value()),
+					department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
+					DepartmentType.valueOf(department.getDepartmentType().name()),
+					Department.Status.valueOf(department.getStatus().name()),
+                    map(department.getDepartmentCoordinates()), department.getCreatedAt(),
+					department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
+					department.getLastModifiedBy());
+            model.assignOperator(department.operatorId());
+            return model;
+        }
+    }
+
+    public static Department map(final DepartmentReadEntity department) {
+        if (department == null) {
+            return null;
+        } else {
+            final Department model = new Department(new DepartmentId(department.getDepartmentId()),
+                    new DepartmentCode(department.getDepartmentCode().getValue()),
+                    map(department.getDepartmentAddress()), new TaxId(department.getTaxId().value()),
+                    department.getTelephoneNumber(), department.getOpeningHours(), department.getEmail(),
+                    DepartmentType.valueOf(department.getDepartmentType().name()),
+                    Department.Status.valueOf(department.getStatus().name()),
+                    map(department.getDepartmentCoordinates()), department.getCreatedAt(),
+                    department.getUpdatedAt(), department.getAdminUserId(), department.getCreatedBy(),
+                    department.getLastModifiedBy());
+            model.assignOperator(department.operatorId());
+            return model;
+        }
+    }
+
+    public static Address map(final DepartmentAddress address) {
+        return new Address(address.city(), address.street(), address.postalCode(), address.countryCode());
+    }
+
+    public static Coordinates map(final DepartmentCoordinates coordinates) {
+        return new Coordinates(coordinates.latitude(), coordinates.longitude());
+    }
+}

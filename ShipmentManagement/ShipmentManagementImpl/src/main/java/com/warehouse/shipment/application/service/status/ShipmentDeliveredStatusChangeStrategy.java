@@ -17,7 +17,7 @@ public class ShipmentDeliveredStatusChangeStrategy implements ShipmentStatusChan
 
     @Override
     public ShipmentEvent process(final Shipment shipment) {
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
         return new ShipmentDelivered(shipment.snapshot(), Instant.now());
     }
 }

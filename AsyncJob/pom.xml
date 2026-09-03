@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>warehouse</artifactId>
-        <version>2026.3-SNAPSHOT</version>
+        <version>2026.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>AsyncJob</artifactId>
@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DepartmentServiceApi</artifactId>
+            <artifactId>OrganisationStructureApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -43,6 +43,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

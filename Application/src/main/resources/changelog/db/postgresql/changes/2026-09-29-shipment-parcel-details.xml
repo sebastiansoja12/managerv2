@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-29-shipment-parcel-details" author="s-soja">
+        <addColumn tableName="shipment">
+            <column name="length" type="DECIMAL(19,3)"/>
+            <column name="width" type="DECIMAL(19,3)"/>
+            <column name="height" type="DECIMAL(19,3)"/>
+            <column name="length_unit" type="VARCHAR(8)"/>
+            <column name="weight_value" type="DECIMAL(19,3)"/>
+            <column name="weight_unit" type="VARCHAR(8)"/>
+            <column name="customer_reference" type="VARCHAR(255)"/>
+            <column name="content_description" type="VARCHAR(1000)"/>
+            <column name="declared_value_amount" type="DECIMAL(19,2)"/>
+            <column name="declared_value_currency" type="VARCHAR(10)"/>
+        </addColumn>
+        <addColumn tableName="shipment_rd">
+            <column name="length" type="DECIMAL(19,3)"/>
+            <column name="width" type="DECIMAL(19,3)"/>
+            <column name="height" type="DECIMAL(19,3)"/>
+            <column name="length_unit" type="VARCHAR(8)"/>
+            <column name="weight_value" type="DECIMAL(19,3)"/>
+            <column name="weight_unit" type="VARCHAR(8)"/>
+            <column name="customer_reference" type="VARCHAR(255)"/>
+            <column name="content_description" type="VARCHAR(1000)"/>
+            <column name="declared_value_amount" type="DECIMAL(19,2)"/>
+            <column name="declared_value_currency" type="VARCHAR(10)"/>
+        </addColumn>
+        <addColumn tableName="shipment_aud">
+            <column name="length" type="DECIMAL(19,3)"/>
+            <column name="width" type="DECIMAL(19,3)"/>
+            <column name="height" type="DECIMAL(19,3)"/>
+            <column name="length_unit" type="VARCHAR(8)"/>
+            <column name="weight_value" type="DECIMAL(19,3)"/>
+            <column name="weight_unit" type="VARCHAR(8)"/>
+            <column name="customer_reference" type="VARCHAR(255)"/>
+            <column name="content_description" type="VARCHAR(1000)"/>
+            <column name="declared_value_amount" type="DECIMAL(19,2)"/>
+            <column name="declared_value_currency" type="VARCHAR(10)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

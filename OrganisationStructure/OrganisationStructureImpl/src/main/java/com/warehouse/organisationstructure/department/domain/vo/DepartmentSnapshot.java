@@ -1,0 +1,30 @@
+package com.warehouse.organisationstructure.department.domain.vo;
+
+import java.time.Instant;
+
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
+import com.warehouse.organisationstructure.department.domain.model.Department;
+
+public record DepartmentSnapshot(
+        DepartmentId departmentId,
+        DepartmentCode departmentCode,
+        Address address,
+        TaxId taxId,
+        String telephoneNumber,
+        String openingHours,
+        String email,
+        DepartmentType departmentType,
+        Department.Status status,
+        Coordinates coordinates,
+        OperatorId operatorId,
+        Instant createdAt,
+        Instant updatedAt,
+        UserId adminUserId,
+        UserId createdBy,
+        UserId lastModifiedBy
+) {
+}

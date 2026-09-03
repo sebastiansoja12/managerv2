@@ -2,7 +2,6 @@ package com.warehouse.shipment.domain.vo;
 
 import java.time.LocalDateTime;
 
-import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -14,11 +13,9 @@ import lombok.Builder;
 @Builder
 public class Parcel {
     
-    private final Sender sender;
+    private final Party sender;
 
-    private final Recipient recipient;
-
-    private final ShipmentSize shipmentSize;
+    private final Party recipient;
 
     private final DepartmentId targetDepartmentId;
 
@@ -36,9 +33,8 @@ public class Parcel {
 
     private final Boolean locked;
 
-	public Parcel(final Sender sender,
-                  final Recipient recipient,
-                  final ShipmentSize shipmentSize,
+	public Parcel(final Party sender,
+                  final Party recipient,
                   final DepartmentId targetDepartmentId,
                   final ShipmentStatus shipmentStatus,
                   final ShipmentType shipmentType,
@@ -49,7 +45,6 @@ public class Parcel {
                   final Boolean locked) {
 		this.sender = sender;
 		this.recipient = recipient;
-		this.shipmentSize = shipmentSize;
 		this.targetDepartmentId = targetDepartmentId;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentType = shipmentType;
@@ -60,16 +55,12 @@ public class Parcel {
 		this.locked = locked;
 	}
     
-    public Sender getSender() {
+    public Party getSender() {
         return sender;
     }
 
-    public Recipient getRecipient() {
+    public Party getRecipient() {
         return recipient;
-    }
-
-    public ShipmentSize getShipmentSize() {
-        return shipmentSize;
     }
 
     public DepartmentId getTargetDepartmentId() {

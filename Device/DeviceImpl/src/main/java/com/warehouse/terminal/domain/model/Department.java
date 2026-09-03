@@ -1,7 +1,7 @@
 package com.warehouse.terminal.domain.model;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.department.api.dto.DepartmentDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 
 public class Department {
     private DepartmentCode departmentCode;

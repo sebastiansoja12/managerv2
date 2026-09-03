@@ -5,12 +5,12 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentStatus;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentType;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentNode;
-import com.warehouse.department.api.dto.CoordinatesDto;
-import com.warehouse.department.api.dto.DepartmentCodeDto;
-import com.warehouse.department.api.dto.DepartmentDirectoryEntryDto;
-import com.warehouse.department.api.dto.DepartmentIdDto;
-import com.warehouse.department.api.dto.DepartmentStatusDto;
-import com.warehouse.department.api.dto.DepartmentTypeDto;
+import com.warehouse.organisationstructure.department.api.dto.CoordinatesDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentCodeDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentIdDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentTypeDto;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

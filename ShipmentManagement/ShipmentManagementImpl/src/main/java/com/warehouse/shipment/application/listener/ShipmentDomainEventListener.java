@@ -5,12 +5,7 @@ import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.event.ShipmentLocked;
 import com.warehouse.shipment.domain.event.ShipmentRedirected;
 import com.warehouse.shipment.domain.event.ShipmentReturned;
-import com.warehouse.shipment.domain.exception.DestinationDepartmentDeterminationException;
-import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
-import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
-import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -27,18 +22,10 @@ public class ShipmentDomainEventListener {
         this.pathFinderServicePort = pathFinderServicePort;
     }
 
-    @TransactionalEventListener(fallbackExecution = true)
+    @EventListener
     public void handle(final ShipmentReturned event) {
         final ShipmentSnapshot snapshot = event.getSnapshot();
-        final Result<VoronoiResponse, ErrorCode> destinationResult = this.pathFinderServicePort
-                .determineDeliveryDepartment(Address.from(snapshot.sender()));
-
-        if (destinationResult.isFailure()) {
-            throw new DestinationDepartmentDeterminationException(destinationResult.getFailure());
-        }
-
-        final VoronoiResponse voronoiResponse = destinationResult.getSuccess();
-        this.shipmentPort.changeDestination(snapshot.shipmentId(), voronoiResponse.getDepartmentCodeResult());
+        this.shipmentPort.returnToSender(snapshot.shipmentId());
     }
 
     @TransactionalEventListener(fallbackExecution = true)

@@ -10,9 +10,8 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ShipmentEventData(
         ShipmentId shipmentId,
-        SenderSnapshot sender,
-        RecipientSnapshot recipient,
-        ShipmentSize shipmentSize,
+        PartySnapshot sender,
+        PartySnapshot recipient,
         DepartmentId targetDepartmentId,
         DepartmentId originDepartmentId,
         ShipmentStatus shipmentStatus,
@@ -22,16 +21,15 @@ public record ShipmentEventData(
         @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDateTime createdAt,
         @JsonFormat(shape = JsonFormat.Shape.STRING) LocalDateTime updatedAt,
         Boolean locked,
-        DangerousGoodSnapshot dangerousGood,
         Boolean signatureRequired,
         ShipmentPriority shipmentPriority,
-        CountryCode originCountry,
-        CountryCode destinationCountry,
-        SignatureSnapshot signature,
+        ShipmentId signatureId,
         TrackingNumber trackingNumber,
         PickupMethod pickupMethod,
         DeliveryMethod deliveryMethod,
         PickupPointId pickupPointId,
-        ExternalId<UUID> externalShipmentId
+        ExternalId<UUID> externalShipmentId,
+        String serviceLevel,
+        String packagingType
 ) {
 }

@@ -34,7 +34,7 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
 import com.warehouse.deliveryreturn.domain.vo.ReturnTokenValidationResult;
-import com.warehouse.deliveryreturn.domain.vo.Shipment;
+import com.warehouse.deliveryreturn.domain.vo.DeliverableShipment;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatusShipmentRequest;
 import com.warehouse.terminal.DeviceInformation;
@@ -161,7 +161,7 @@ public class DeliveryReturnPortImplTest {
 		when(returnTokenServicePort.validate(any()))
 				.thenReturn(ReturnTokenValidationResult.valid(new ShipmentId(1L)));
 		when(shipmentRepositoryServicePort.downloadShipment(any()))
-				.thenReturn(Shipment.builder().build());
+				.thenReturn(DeliverableShipment.builder().build());
 		when(shipmentStatusControlServicePort.updateStatus(any()))
 				.thenReturn(UpdateStatus.OK);
 

@@ -8,22 +8,22 @@ import org.mapstruct.ReportingPolicy;
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
-import com.warehouse.shipment.domain.enumeration.ShipmentUpdateType;
+import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
-import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
-import com.warehouse.shipment.application.port.primary.command.ShipmentUpdateCommand;
 import com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.vo.Person;
-import com.warehouse.shipment.domain.vo.ShipmentConfiguration;
+import com.warehouse.shipment.domain.vo.Party;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.LengthUnit;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
+import com.warehouse.shipment.domain.vo.CustomerReference;
+import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.application.port.primary.command.ShipmentStatusRequest;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
@@ -39,27 +39,6 @@ public interface ShipmentRequestMapper {
         return command;
     }
 
-    default DangerousGood map(final DangerousGoodApi dangerousGood) {
-        if (dangerousGood == null) {
-            return null;
-        }
-        return new DangerousGood(
-                dangerousGood.unNumber(), dangerousGood.properShippingName(), dangerousGood.description(),
-                dangerousGood.hazardClass(), dangerousGood.hazardDivision(), dangerousGood.subsidiaryRisk(),
-                dangerousGood.packingGroup(), dangerousGood.quantity(), dangerousGood.quantityUnit(),
-                dangerousGood.packageCount(), dangerousGood.packagingType(), dangerousGood.limitedQuantity(),
-                dangerousGood.exceptedQuantity(), dangerousGood.environmentallyHazardous(),
-                dangerousGood.marinePollutant(), dangerousGood.transportCategory(),
-                dangerousGood.tunnelRestrictionCode(), dangerousGood.flashPoint(),
-                dangerousGood.emergencyContact(), dangerousGood.emergencyContact24h(),
-                dangerousGood.safetyDataSheetReference(), dangerousGood.declarationDocumentReference(),
-                dangerousGood.regulationType(), dangerousGood.transportMode(), dangerousGood.flammable(),
-                dangerousGood.corrosive(), dangerousGood.toxic(), dangerousGood.hazardSymbols(),
-                dangerousGood.storageRequirements(), dangerousGood.handlingInstructions(),
-                dangerousGood.countryOfOrigin()
-        );
-    }
-
     default Money map(final MoneyApi money) {
         if (money == null) {
             return null;
@@ -67,26 +46,38 @@ public interface ShipmentRequestMapper {
         return new Money(money.getAmount(), Currency.valueOf(money.getCurrency()));
     }
 
-    ShipmentUpdateCommand map(final ShipmentUpdateRequestApi request);
+    default Dimensions map(final DimensionsApi dimensions) {
+        if (dimensions == null) {
+            return null;
+        }
+        return new Dimensions(dimensions.length(), dimensions.width(), dimensions.height(),
+                dimensions.unit() == null ? null : LengthUnit.valueOf(dimensions.unit().name()));
+    }
 
-    ShipmentConfiguration map(final ShipmentConfigurationApi configuration);
+    default Weight map(final WeightApi weight) {
+        if (weight == null) {
+            return null;
+        }
+        return new Weight(weight.value(), weight.unit() == null ? null : WeightUnit.valueOf(weight.unit().name()));
+    }
+
+    default CustomerReference mapCustomerReference(final String customerReference) {
+        return customerReference == null ? null : new CustomerReference(customerReference);
+    }
+
+    default ShipmentServiceLevel map(final ShipmentServiceLevelDto serviceLevel) {
+        return serviceLevel == null ? null : ShipmentServiceLevel.valueOf(serviceLevel.name());
+    }
+
+    default PackagingType map(final PackagingTypeDto packagingType) {
+        return packagingType == null ? null : PackagingType.valueOf(packagingType.name());
+    }
 
     default ShipmentId map(final ShipmentIdDto shipmentId) {
         return new ShipmentId(shipmentId.getValue());
     }
 
-    ShipmentUpdateType map(final ShipmentUpdateTypeApi shipmentUpdateType);
-    
-    Sender mapToSender(final PersonApi person);
-
-    Recipient mapToRecipient(final PersonApi person);
-
-    default Person map(final PersonApi person, final PersonType personType) {
-        return switch (personType) {
-            case SENDER -> mapToSender(person);
-            case RECIPIENT -> mapToRecipient(person);
-        };
-    }
+    Party mapToParty(final PersonApi person);
 
     default ShipmentStatusRequest map(final ShipmentStatusRequestApi shipmentStatusRequest) {
         return new ShipmentStatusRequest(
@@ -109,8 +100,8 @@ public interface ShipmentRequestMapper {
     default ShipmentSearchCriteria map(final ShipmentSearchRequestApi request) {
         if (request == null) {
             return new ShipmentSearchCriteria(
-                    null, null, List.of(), List.of(), List.of(), null, null, null,
-                    null, null, null, null, null, null, null, null, null, null, null, null, null
+                    null, null, List.of(), List.of(), null, null, null,
+                    null, null, null, null, null, null, null, null
             );
         }
 
@@ -118,7 +109,6 @@ public interface ShipmentRequestMapper {
                 request.shipmentId(),
                 request.trackingNumber(),
                 mapStatuses(request.shipmentStatuses()),
-                mapSizes(request.shipmentSizes()),
                 mapPriorities(request.shipmentPriorities()),
                 request.senderName(),
                 request.recipientName(),
@@ -129,11 +119,6 @@ public interface ShipmentRequestMapper {
                 request.locked(),
                 request.createdFrom(),
                 request.createdTo(),
-                request.hasDangerousGoods(),
-                request.unNumber(),
-                request.hazardClass(),
-                request.regulationType(),
-                request.transportMode(),
                 request.page(),
                 request.size()
         );
@@ -142,12 +127,6 @@ public interface ShipmentRequestMapper {
     private List<ShipmentStatus> mapStatuses(final List<ShipmentStatusDto> statuses) {
         return statuses == null ? List.of() : statuses.stream()
                 .map(status -> ShipmentStatus.valueOf(status.name()))
-                .toList();
-    }
-
-    private List<ShipmentSize> mapSizes(final List<ShipmentSizeDto> sizes) {
-        return sizes == null ? List.of() : sizes.stream()
-                .map(size -> ShipmentSize.valueOf(size.name()))
                 .toList();
     }
 

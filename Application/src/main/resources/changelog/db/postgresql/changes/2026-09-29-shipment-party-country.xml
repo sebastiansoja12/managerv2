@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-29-shipment-party-country" author="s-soja">
+        <addColumn tableName="shipment">
+            <column name="sender_country_code" type="VARCHAR(10)"/>
+            <column name="recipient_country_code" type="VARCHAR(10)"/>
+        </addColumn>
+        <addColumn tableName="shipment_rd">
+            <column name="sender_country_code" type="VARCHAR(10)"/>
+            <column name="recipient_country_code" type="VARCHAR(10)"/>
+        </addColumn>
+        <addColumn tableName="shipment_aud">
+            <column name="sender_country_code" type="VARCHAR(10)"/>
+            <column name="recipient_country_code" type="VARCHAR(10)"/>
+        </addColumn>
+
+        <sql>UPDATE shipment SET sender_country_code = origin_country, recipient_country_code = destination_country</sql>
+        <sql>UPDATE shipment_rd SET sender_country_code = origin_country, recipient_country_code = destination_country</sql>
+        <sql>UPDATE shipment_aud SET sender_country_code = origin_country, recipient_country_code = destination_country</sql>
+
+        <addNotNullConstraint tableName="shipment" columnName="sender_country_code" columnDataType="VARCHAR(10)"/>
+        <addNotNullConstraint tableName="shipment" columnName="recipient_country_code" columnDataType="VARCHAR(10)"/>
+        <addNotNullConstraint tableName="shipment_rd" columnName="sender_country_code" columnDataType="VARCHAR(10)"/>
+        <addNotNullConstraint tableName="shipment_rd" columnName="recipient_country_code" columnDataType="VARCHAR(10)"/>
+
+        <dropColumn tableName="shipment" columnName="origin_country"/>
+        <dropColumn tableName="shipment" columnName="destination_country"/>
+        <dropColumn tableName="shipment_rd" columnName="origin_country"/>
+        <dropColumn tableName="shipment_rd" columnName="destination_country"/>
+        <dropColumn tableName="shipment_aud" columnName="origin_country"/>
+        <dropColumn tableName="shipment_aud" columnName="destination_country"/>
+    </changeSet>
+</databaseChangeLog>

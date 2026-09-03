@@ -1,34 +1,57 @@
 package com.warehouse.shipment;
 
-import static com.warehouse.shipment.DataTestCreator.*;
-import static org.junit.jupiter.api.Assertions.*;
+import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.identificator.*;
+import com.warehouse.commonassets.model.Money;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.domain.exception.ShipmentModificationException;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.model.ShipmentUpdate;
+import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.WeightUnit;
+import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
+import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-
-import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
-import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.exception.ShipmentModificationException;
-import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.ShipmentUpdate;
-import com.warehouse.shipment.domain.model.Signature;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
-import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
-import com.warehouse.shipment.domain.vo.VoronoiResponse;
-import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
+import static com.warehouse.shipment.DataTestCreator.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ShipmentTest {
+
+    @Test
+    void shouldCreateShipmentWithParcelDetailsInConstructor() {
+        final Dimensions dimensions = new Dimensions(
+                BigDecimal.valueOf(40), BigDecimal.valueOf(30), BigDecimal.valueOf(20), LengthUnit.CM);
+        final Weight weight = new Weight(BigDecimal.valueOf(5.5), WeightUnit.KG);
+        final CustomerReference customerReference = new CustomerReference("ORDER-123");
+        final Money declaredValue = new Money(BigDecimal.valueOf(2500), Currency.PLN);
+
+        final Shipment shipment = new Shipment(
+                shipmentId(), sender(), recipient(), null,
+                money(), false,
+                new DepartmentId(10L), new DepartmentId(9L),
+                ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
+                PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,
+                dimensions, weight, customerReference, "Electronics", declaredValue,
+                ShipmentServiceLevel.EXPRESS, PackagingType.BOX
+        );
+
+        assertAll(
+                () -> assertEquals(dimensions, shipment.getDimensions()),
+                () -> assertEquals(weight, shipment.getWeight()),
+                () -> assertEquals(customerReference, shipment.getCustomerReference()),
+                () -> assertEquals("Electronics", shipment.getContentDescription()),
+                () -> assertEquals(declaredValue, shipment.getDeclaredValue()),
+                () -> assertEquals(ShipmentServiceLevel.EXPRESS, shipment.getServiceLevel()),
+                () -> assertEquals(PackagingType.BOX, shipment.getPackagingType())
+        );
+    }
 
     @Test
     void shouldCreateParentShipmentWhenRelatedShipmentIsMissing() {
@@ -91,7 +114,7 @@ class ShipmentTest {
     void shouldMarkDeliveredShipmentAsFullyDelivered() {
         final Shipment shipment = shipment(null);
 
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
 
         assertAll(
                 () -> assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus()),
@@ -101,53 +124,16 @@ class ShipmentTest {
     }
 
     @Test
-    void shouldAddAndRemoveDangerousGoodBeforeShipmentIsSent() {
-        final Shipment shipment = shipment(null);
-
-        shipment.changeDangerousGood(dangerousGood());
-        assertNotNull(shipment.getDangerousGood());
-
-        shipment.removeDangerousGood();
-        assertNull(shipment.getDangerousGood());
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = ShipmentStatus.class, names = {"SENT", "DELIVERY", "RETURN"})
-    void shouldRejectDangerousGoodChangeForFinalShipmentStatus(final ShipmentStatus status) {
-        final Shipment shipment = shipment(null);
-        shipment.changeShipmentStatus(status);
-
-        assertThrows(
-                ShipmentModificationException.class,
-                () -> shipment.changeDangerousGood(dangerousGood())
-        );
-    }
-
-    @Test
-    void shouldRejectDangerousGoodChangeForLockedShipment() {
-        final Shipment shipment = shipment(null);
-        shipment.lockShipment();
-
-        assertThrows(
-                ShipmentModificationException.class,
-                () -> shipment.changeDangerousGood(dangerousGood())
-        );
-    }
-
-    @Test
     void shouldRejectAnyChangeAfterShipmentIsDelivered() {
         final Shipment shipment = shipment(null);
 
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
 
         assertAll(
                 () -> assertThrows(ShipmentModificationException.class, () -> shipment.changeSender(sender())),
                 () -> assertThrows(ShipmentModificationException.class, () -> shipment.changeRecipient(recipient())),
                 () -> assertThrows(ShipmentModificationException.class,
                         () -> shipment.changeShipmentStatus(ShipmentStatus.SENT)),
-                () -> assertThrows(ShipmentModificationException.class,
-                        () -> shipment.redirectToSender(new ShipmentId(10L),
-                                new TrackingNumber("REDIRECTED-TRACKING-NUMBER"))),
                 () -> assertThrows(ShipmentModificationException.class,
                         () -> shipment.changeShipmentType(ShipmentType.PARENT))
         );
@@ -161,7 +147,22 @@ class ShipmentTest {
 
         assertAll(
                 () -> assertEquals(ShipmentStatus.CANCELED, shipment.getShipmentStatus()),
+                () -> assertEquals(shipment.getCreatedAt().plusMinutes(10), shipment.getCancelledAt()),
+                () -> assertNull(shipment.getCancellationReason()),
                 () -> assertTrue(shipment.getLocked())
+        );
+    }
+
+    @Test
+    void shouldRecordCancellationReasonAndTime() {
+        final Shipment shipment = shipment(null);
+        final LocalDateTime cancelledAt = shipment.getCreatedAt().plusMinutes(5);
+
+        shipment.cancel(workflowSettings(30), cancelledAt, CancellationReason.CUSTOMER_REQUEST);
+
+        assertAll(
+                () -> assertEquals(cancelledAt, shipment.getCancelledAt()),
+                () -> assertEquals(CancellationReason.CUSTOMER_REQUEST, shipment.getCancellationReason())
         );
     }
 
@@ -172,6 +173,20 @@ class ShipmentTest {
 
         assertThrows(ShipmentModificationException.class,
                 () -> shipment.cancel(workflowSettings(30), shipment.getCreatedAt().plusMinutes(10)));
+    }
+
+    @Test
+    void shouldRecordWhenShipmentWasAccepted() {
+        final Shipment shipment = shipment(null);
+
+        shipment.prepareShipmentToSend();
+        shipment.notifyShipmentAccepted();
+
+        assertAll(
+                () -> assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus()),
+                () -> assertNotNull(shipment.getAcceptedAt()),
+                () -> assertEquals(shipment.getAcceptedAt(), shipment.snapshot().acceptedAt())
+        );
     }
 
     @Test
@@ -187,38 +202,18 @@ class ShipmentTest {
     }
 
     @Test
-    void shouldNotBypassDangerousGoodStatusRuleThroughGeneralUpdate() {
-        final Shipment shipment = shipment(null);
-        shipment.changeShipmentStatus(ShipmentStatus.SENT);
-
-        assertThrows(
-                ShipmentModificationException.class,
-                () -> shipment.update(
-                        shipment.getSender(),
-                        shipment.getRecipient(),
-                        ShipmentStatus.CREATED,
-                        shipment.getShipmentPriority(),
-                        shipment.getShipmentSize(),
-                        shipment.getPrice(),
-                        dangerousGood(),
-                        shipment.getTargetDepartmentId(),
-                        shipment.getSignatureRequired()
-                )
-        );
-        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
-        assertNull(shipment.getDangerousGood());
-    }
-
-    @Test
     void shouldRedirectShipmentToSenderAsNewParentShipment() {
         final Shipment shipment = shipment(null);
-        final Sender originalSender = shipment.getSender();
-        final Recipient originalRecipient = shipment.getRecipient();
+        final Party originalSender = shipment.getSender();
+        final Party originalRecipient = shipment.getRecipient();
         final ShipmentId redirectedShipmentId = new ShipmentId(10L);
         final TrackingNumber redirectedTrackingNumber = new TrackingNumber("REDIRECTED-TRACKING-NUMBER");
+        final ExternalId<UUID> externalId = new ExternalId<>(
+                UUID.fromString("00000000-0000-4000-8000-000000000001"));
+        final ShipmentWorkflowSettings shipmentWorkflowSettings = ShipmentWorkflowSettings.defaults();
 
-        final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId,
-                redirectedTrackingNumber);
+        final Shipment redirectedShipment = shipment.redirectToSender(redirectedShipmentId, redirectedTrackingNumber,
+                externalId, shipmentWorkflowSettings);
 
         assertAll(
                 () -> assertSame(shipment, redirectedShipment),
@@ -296,19 +291,9 @@ class ShipmentTest {
     }
 
     @Test
-    void shouldChangeSignature() {
-        final Shipment shipment = shipment(null);
-        final Signature signature = new Signature();
-
-        shipment.changeSignature(signature);
-
-        assertSame(signature, shipment.getSignature());
-    }
-
-    @Test
     void shouldChangeSender() {
         final Shipment shipment = shipment(null);
-        final Sender newSender = Sender.builder().firstName("new sender").build();
+        final Party newSender = Party.builder().firstName("new sender").build();
 
         shipment.changeSender(newSender);
 
@@ -318,20 +303,11 @@ class ShipmentTest {
     @Test
     void shouldChangeRecipient() {
         final Shipment shipment = shipment(null);
-        final Recipient newRecipient = Recipient.builder().firstName("new recipient").build();
+        final Party newRecipient = Party.builder().firstName("new recipient").build();
 
         shipment.changeRecipient(newRecipient);
 
         assertSame(newRecipient, shipment.getRecipient());
-    }
-
-    @Test
-    void shouldChangeShipmentSize() {
-        final Shipment shipment = shipment(null);
-
-        shipment.changeShipmentSize(ShipmentSize.BIG);
-
-        assertEquals(ShipmentSize.BIG, shipment.getShipmentSize());
     }
 
     @Test
@@ -371,8 +347,8 @@ class ShipmentTest {
     @Test
     void shouldUpdateSenderAndRecipientFromShipmentUpdate() {
         final Shipment shipment = shipment(null);
-        final Sender newSender = Sender.builder().firstName("updated sender").build();
-        final Recipient newRecipient = Recipient.builder().firstName("updated recipient").build();
+        final Party newSender = Party.builder().firstName("updated sender").build();
+        final Party newRecipient = Party.builder().firstName("updated recipient").build();
 
         shipment.update(new ShipmentUpdate(newSender, newRecipient, "token"));
 
@@ -385,21 +361,31 @@ class ShipmentTest {
     @Test
     void shouldUpdateAllEditableShipmentData() {
         final Shipment shipment = shipment(null);
-        final Sender newSender = Sender.builder().firstName("updated sender").build();
-        final Recipient newRecipient = Recipient.builder().firstName("updated recipient").build();
+        final Party newSender = Party.builder().firstName("updated sender").build();
+        final Party newRecipient = Party.builder().firstName("updated recipient").build();
         final Money newPrice = new Money(BigDecimal.valueOf(99), Currency.GBP);
         final DepartmentId newDestination = new DepartmentId(11L);
+        final Dimensions newDimensions = new Dimensions(
+                BigDecimal.valueOf(40), BigDecimal.valueOf(30), BigDecimal.valueOf(20), LengthUnit.CM);
+        final Weight newWeight = new Weight(BigDecimal.valueOf(5.5), WeightUnit.KG);
+        final CustomerReference newCustomerReference = new CustomerReference("ORDER-123");
+        final Money newDeclaredValue = new Money(BigDecimal.valueOf(2500), Currency.PLN);
 
         shipment.update(
                 newSender,
                 newRecipient,
                 ShipmentStatus.ACCEPTED,
                 ShipmentPriority.EXPRESS,
-                ShipmentSize.CUSTOM,
                 newPrice,
-                dangerousGood(),
                 newDestination,
-                true
+                true,
+                newDimensions,
+                newWeight,
+                newCustomerReference,
+                "Electronics",
+                newDeclaredValue,
+                ShipmentServiceLevel.EXPRESS,
+                PackagingType.BOX
         );
 
         assertAll(
@@ -407,11 +393,16 @@ class ShipmentTest {
                 () -> assertSame(newRecipient, shipment.getRecipient()),
                 () -> assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus()),
                 () -> assertEquals(ShipmentPriority.EXPRESS, shipment.getShipmentPriority()),
-                () -> assertEquals(ShipmentSize.CUSTOM, shipment.getShipmentSize()),
                 () -> assertSame(newPrice, shipment.getPrice()),
-                () -> assertNotNull(shipment.getDangerousGood()),
                 () -> assertEquals(newDestination, shipment.getTargetDepartmentId()),
-                () -> assertTrue(shipment.getSignatureRequired())
+                () -> assertTrue(shipment.getSignatureRequired()),
+                () -> assertEquals(newDimensions, shipment.getDimensions()),
+                () -> assertEquals(newWeight, shipment.getWeight()),
+                () -> assertEquals(newCustomerReference, shipment.getCustomerReference()),
+                () -> assertEquals("Electronics", shipment.getContentDescription()),
+                () -> assertEquals(newDeclaredValue, shipment.getDeclaredValue()),
+                () -> assertEquals(ShipmentServiceLevel.EXPRESS, shipment.getServiceLevel()),
+                () -> assertEquals(PackagingType.BOX, shipment.getPackagingType())
         );
     }
 
@@ -474,7 +465,7 @@ class ShipmentTest {
     @Test
     void shouldReturnDeliveredShipment() {
         final Shipment shipment = shipment(null);
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
 
         shipment.notifyShipmentReturned();
 
@@ -493,13 +484,13 @@ class ShipmentTest {
                 shipment::notifyShipmentReturned
         );
 
-        assertEquals("Cannot return for not delivered shipment", exception.getMessage());
+        assertEquals("Cannot return shipment in current status", exception.getMessage());
     }
 
     @Test
     void shouldCancelShipmentReturn() {
         final Shipment shipment = shipment(null);
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
         shipment.notifyShipmentReturned();
 
         shipment.notifyShipmentReturnCanceled();
@@ -563,8 +554,8 @@ class ShipmentTest {
         shipment.updateCountries(new ShipmentCountryRequest(shipment.getShipmentId(), CountryCode.FR, CountryCode.CZ));
 
         assertAll(
-                () -> assertEquals(CountryCode.FR, shipment.getOriginCountry()),
-                () -> assertEquals(CountryCode.CZ, shipment.getDestinationCountry())
+                () -> assertEquals(CountryCode.FR, shipment.getSender().getAddress().getCountryCode()),
+                () -> assertEquals(CountryCode.CZ, shipment.getRecipient().getAddress().getCountryCode())
         );
     }
 
@@ -591,11 +582,15 @@ class ShipmentTest {
         final Shipment shipment = shipment(null);
         final ExternalId<UUID> previousExternalShipmentId = shipment.getExternalShipmentId();
         final TrackingNumber newTrackingNumber = new TrackingNumber("RETURN-TRACKING-NUMBER");
+        final ExternalId<UUID> externalId = new ExternalId<>(
+                UUID.fromString("00000000-0000-4000-8000-000000000001"));
+        final ShipmentWorkflowSettings workflowSettings = ShipmentWorkflowSettings.defaults();
 
-        shipment.redirectToSender(new ShipmentId(31L), newTrackingNumber);
+        shipment.redirectToSender(new ShipmentId(31L), newTrackingNumber, externalId, workflowSettings);
 
         assertAll(
                 () -> assertNotEquals(previousExternalShipmentId, shipment.getExternalShipmentId()),
+                () -> assertEquals(externalId, shipment.getExternalShipmentId()),
                 () -> assertEquals(newTrackingNumber, shipment.getTrackingNumber())
         );
     }
@@ -605,15 +600,11 @@ class ShipmentTest {
                 shipmentId(),
                 sender(),
                 recipient(),
-                ShipmentSize.SMALL,
                 relatedShipmentId,
-                CountryCode.PL,
-                CountryCode.DE,
                 money(),
                 false,
                 new DepartmentId(10L),
                 new DepartmentId(9L),
-                null,
                 ShipmentPriority.MEDIUM,
                 new TrackingNumber("TEST-TRACKING-NUMBER"),
                 ShipmentStatus.CREATED

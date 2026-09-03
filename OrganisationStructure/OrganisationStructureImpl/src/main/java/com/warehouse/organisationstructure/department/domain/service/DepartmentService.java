@@ -1,0 +1,35 @@
+package com.warehouse.organisationstructure.department.domain.service;
+
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
+import com.warehouse.organisationstructure.department.domain.model.Department;
+import com.warehouse.organisationstructure.department.domain.vo.Address;
+import com.warehouse.organisationstructure.department.domain.vo.TaxId;
+
+public interface DepartmentService {
+    void createDepartment(final Department department);
+
+    Department findByDepartmentCode(final DepartmentCode departmentCode);
+
+    Department findByDepartmentId(final DepartmentId departmentId);
+
+    void changeAddress(final DepartmentCode departmentCode, final Address address);
+
+    void changeTaxId(final DepartmentCode departmentCode, final TaxId newTaxId);
+
+    void activateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy);
+
+    void deactivateDepartment(final DepartmentCode departmentCode, final UserId modifiedBy);
+
+    void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType);
+
+    void changeAdminUser(final DepartmentCode departmentCode, final UserId userId);
+
+    void changeStatus(final DepartmentCode departmentCode, final Department.Status status);
+
+    void changeEmail(final DepartmentCode departmentCode, final String email);
+
+    Boolean checkExists(final DepartmentCode departmentCode);
+}

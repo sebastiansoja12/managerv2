@@ -27,4 +27,6 @@ public interface SupplyPort {
     DriverLicenseResponse updateDriverLicense(final DriverLicenseCommand request);
     CertificationUpdateResponse updateCertification(CertificationUpdateCommand request);
     DepartmentCode getDepartmentCode(final DepartmentId departmentId);
+
+    int anonymizeAll();
 }

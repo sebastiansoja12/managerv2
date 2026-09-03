@@ -12,4 +12,8 @@ public interface DevicePairService {
     DevicePair findByDeviceId(final DeviceId deviceId);
     Optional<DevicePair> findByPairKey(final String pairKey);
     Optional<DevicePair> findValidByPairKey(final String pairKey);
+
+    Optional<DevicePair> findExistingByDeviceId(final DeviceId deviceId);
+
+    boolean revokePairing(final DeviceId deviceId);
 }

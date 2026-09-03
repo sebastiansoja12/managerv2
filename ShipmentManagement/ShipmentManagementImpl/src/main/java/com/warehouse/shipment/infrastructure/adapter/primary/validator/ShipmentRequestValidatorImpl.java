@@ -1,6 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.validator;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.application.service.PriceService;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
@@ -33,14 +32,36 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.addAll(validatePerson(request.recipient()));
 		}
 
-        if (Objects.isNull(request.shipmentSize())) {
-            errors.add("Shipment size cannot be empty");
+        if (request.dimensions() == null) {
+            errors.add("Dimensions are required");
         } else {
-            validateShipmentStatus(request.shipmentSize(), errors);
+            validatePositive(request.dimensions().length(), "Length", errors);
+            validatePositive(request.dimensions().width(), "Width", errors);
+            validatePositive(request.dimensions().height(), "Height", errors);
+            if (request.dimensions().unit() == null) {
+                errors.add("Dimensions unit is required");
+            }
+        }
+
+        if (request.weight() == null) {
+            errors.add("Weight is required");
+        } else {
+            validatePositive(request.weight().value(), "Weight", errors);
+            if (request.weight().unit() == null) {
+                errors.add("Weight unit is required");
+            }
+        }
+
+        if (request.customerReference() != null && StringUtils.isBlank(request.customerReference())) {
+            errors.add("Customer reference cannot be blank");
         }
 
         if (validateShipmentPrice(request.price())) {
             errors.add("Invalid price");
+        }
+
+        if (request.declaredValue() != null && validateShipmentPrice(request.declaredValue())) {
+            errors.add("Invalid declared value");
         }
 
         if (request.deliveryMethod() != null
@@ -49,38 +70,38 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.add("Delivery pickup point is required for the selected delivery method");
         }
 
-        try {
-            CountryCode.valueOf(request.issuerCountryCode());
-            CountryCode.valueOf(request.receiverCountryCode());
-        } catch (final IllegalArgumentException e) {
-            errors.add("Invalid country code");
-        }
-
         if (!errors.isEmpty()) {
             throw new ShipmentValidationException(errors, HttpStatus.BAD_REQUEST);
         }
     }
 
     private boolean validateShipmentPrice(final MoneyApi price) {
-        return price != null && price.getAmount() == null && price.getCurrency() == null;
+        return price == null || price.getAmount() == null || StringUtils.isBlank(price.getCurrency());
+    }
+
+    private void validatePositive(final java.math.BigDecimal value, final String fieldName,
+                                  final List<String> errors) {
+        if (value == null || value.signum() <= 0) {
+            errors.add(fieldName + " must be greater than 0");
+        }
     }
 
     private List<String> validatePerson(final PersonApi person) {
         final Set<String> errors = new HashSet<>();
 
-        if (StringUtils.isEmpty(person.getFirstName())) {
+        if (StringUtils.isEmpty(person.firstName())) {
             errors.add("First name is required");
         }
 
-        if (StringUtils.isEmpty(person.getLastName())) {
+        if (StringUtils.isEmpty(person.lastName())) {
             errors.add("Last name is required");
         }
 
-        if (StringUtils.isEmpty(person.getEmail())) {
+        if (StringUtils.isEmpty(person.email())) {
             errors.add("Email is required");
         }
 
-        String telephone = person.getTelephoneNumber();
+        String telephone = person.telephoneNumber();
         if (StringUtils.isEmpty(telephone)) {
             errors.add("Telephone number for sender/recipient is required");
         } else {
@@ -92,16 +113,20 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             }
         }
 
-        if (StringUtils.isEmpty(person.getCity())) {
+        if (StringUtils.isEmpty(person.city())) {
             errors.add("City is required");
         }
 
-        if (StringUtils.isEmpty(person.getStreet())) {
+        if (StringUtils.isEmpty(person.street())) {
             errors.add("Street is required");
         }
 
-        if (StringUtils.isEmpty(person.getPostalCode())) {
+        if (StringUtils.isEmpty(person.postalCode())) {
             errors.add("Postal code is required");
+        }
+
+        if (person.countryCode() == null) {
+            errors.add("Country code is required");
         }
 
         return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
@@ -111,11 +136,6 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     @Override
     public void validateRequest(final ShipmentCreateRequestApi shipmentRequest, final ShipmentValidationRules validationRules) {
         validateRequest(shipmentRequest);
-    }
-
-    @Override
-    public void validateBody(final ShipmentUpdateRequestApi shipmentRequest) {
-        validateRequestObj(shipmentRequest);
     }
 
     @Override
@@ -172,14 +192,6 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.add("Document reference is required");
         }
         return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
-    }
-
-    private void validateShipmentStatus(final ShipmentSizeDto shipmentSize, final List<String> errors) {
-        if (Objects.isNull(shipmentSize)) {
-            errors.add("Shipment size cannot be empty");
-        } else if (ShipmentSizeDto.TEST.equals(shipmentSize)) {
-            errors.add("Shipment size not allowed");
-        }
     }
 
     private void validateRequestObj(final Object obj) {

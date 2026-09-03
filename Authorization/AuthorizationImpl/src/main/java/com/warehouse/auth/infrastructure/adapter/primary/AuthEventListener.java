@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.warehouse.auth.event.OperatorCreatedEvent;
 import com.warehouse.auth.domain.model.AdminCreateRequest;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.service.JwtService;
@@ -71,7 +71,7 @@ public class AuthEventListener {
         event.getBeforeUserCreated().accept(userId);
         final DepartmentId departmentId = departmentService.getDepartmentId(departmentCode);
 
-        final User user = User.createAdmin(userId, registeringUser.username(), password, registeringUser.firstName(),
+        final OrganizationUser user = OrganizationUser.createSuperadmin(userId, registeringUser.username(), password, registeringUser.firstName(),
                 registeringUser.lastName(), registeringUser.email(), departmentId,
                 registeringUser.language(), apiKey);
         user.assignOperator(operatorId);

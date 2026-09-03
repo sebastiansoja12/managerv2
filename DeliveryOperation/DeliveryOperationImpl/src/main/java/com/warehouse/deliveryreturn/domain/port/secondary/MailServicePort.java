@@ -1,7 +1,7 @@
 package com.warehouse.deliveryreturn.domain.port.secondary;
 
-import com.warehouse.deliveryreturn.domain.vo.Shipment;
+import com.warehouse.deliveryreturn.domain.vo.DeliverableShipment;
 
 public interface MailServicePort {
-    void sendNotification(final Shipment shipment);
+    void sendNotification(final DeliverableShipment deliverableShipment);
 }
