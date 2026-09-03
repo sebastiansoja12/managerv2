@@ -364,7 +364,7 @@ public class Mobile implements Device, DeviceHandler, ExecutionSourceResolver {
 
     private OwnershipProfile ensureOwnership() {
         if (this.ownership == null) {
-            this.ownership = OwnershipProfile.initializeOwnership("", null, null, null);
+            this.ownership = OwnershipProfile.initializeOwnership("", null, null, null, null);
         }
         return this.ownership;
     }

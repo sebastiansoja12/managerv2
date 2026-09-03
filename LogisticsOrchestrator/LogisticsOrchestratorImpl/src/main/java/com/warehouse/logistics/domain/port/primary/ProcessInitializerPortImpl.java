@@ -24,4 +24,9 @@ public class ProcessInitializerPortImpl implements ProcessInitializerPort {
         final DeviceInformation deviceInformation = JaxbDeviceInformationMapper.map(request.getDevice());
         return this.processHubServicePort.initialize(deviceInformation, xmlToStringService.convertToString(request));
     }
+
+    @Override
+    public ProcessId initializeProcess(final DeviceInformation deviceInformation, final String request) {
+        return this.processHubServicePort.initialize(deviceInformation, request);
+    }
 }

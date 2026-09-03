@@ -4,52 +4,69 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.stereotype.Repository;
+
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.repository.NoOperatorContextRepository;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.port.secondary.DeviceRepository;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.ScannerEntity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.mapper.EntityToModelMapper;
 import com.warehouse.terminal.infrastructure.adapter.secondary.mapper.ModelToEntityMapper;
 
-
-import org.springframework.stereotype.Repository;
-
-
 @Repository
 public class ScannerRepositoryImpl implements DeviceRepository<Scanner> {
     private static final String SCANNER_ID_PREFIX = "SC:";
 
-    private final ScannerReadRepository repository;
+    private final OperatorFilteredRepository<ScannerEntity> repository;
+
+    private final NoOperatorContextRepository<ScannerEntity> noOperatorContextRepository;
 
     private final ModelToEntityMapper toEntityMapper;
 
     private final EntityToModelMapper toModelMapper;
 
-    public ScannerRepositoryImpl(final ScannerReadRepository repository,
+    public ScannerRepositoryImpl(final OperatorFilteredRepository<ScannerEntity> repository,
+                                 final NoOperatorContextRepository<ScannerEntity> noOperatorContextRepository,
                                  final ModelToEntityMapper toEntityMapper,
                                  final EntityToModelMapper toModelMapper) {
         this.repository = repository;
+        this.noOperatorContextRepository = noOperatorContextRepository;
         this.toEntityMapper = toEntityMapper;
         this.toModelMapper = toModelMapper;
     }
 
     @Override
     public Scanner findById(final DeviceId deviceId) {
-        final ScannerEntity entity = repository.findById(deviceId).orElseThrow();
-        return toModelMapper.map(entity);
+        return findEntity(deviceId)
+                .map(toModelMapper::map)
+                .orElseThrow();
+    }
+
+    @Override
+    public Optional<Scanner> findByIdForAuthentication(final DeviceId deviceId) {
+        return noOperatorContextRepository.createCriteria(ScannerEntity.class)
+                .eq("deviceId.value", deviceId.value())
+                .one()
+                .map(toModelMapper::map);
     }
 
     @Override
     public Optional<Scanner> findByExternalSystemId(final String externalSystemId) {
-        return repository.findByIdentityExternalSystemId(externalSystemId)
+        return repository.createCriteria(ScannerEntity.class)
+                .eq("identity.externalSystemId", externalSystemId)
+                .one()
                 .map(toModelMapper::map);
     }
 
     @Override
     public List<Scanner> findByUserId(final UserId userId) {
-        return repository.findByUserId(userId)
+        return repository.createCriteria(ScannerEntity.class)
+                .eq("userId.value", userId.value())
+                .list()
                 .stream()
                 .map(toModelMapper::map)
                 .toList();
@@ -58,12 +75,17 @@ public class ScannerRepositoryImpl implements DeviceRepository<Scanner> {
     @Override
     public void saveOrUpdate(final Scanner scanner) {
         final ScannerEntity entity = toEntityMapper.map(scanner);
-        repository.save(entity);
+        if (findEntity(scanner.getDeviceId()).isPresent()) {
+            repository.update(entity);
+        } else {
+            repository.create(entity);
+        }
     }
 
     @Override
     public List<Scanner> findAll() {
-        return repository.findAll()
+        return repository.createCriteria(ScannerEntity.class)
+                .list()
                 .stream()
                 .map(toModelMapper::map)
                 .toList();
@@ -77,5 +99,11 @@ public class ScannerRepositoryImpl implements DeviceRepository<Scanner> {
     @Override
     public DeviceId nextDeviceId() {
         return new DeviceId(SCANNER_ID_PREFIX + UUID.randomUUID());
+    }
+
+    private Optional<ScannerEntity> findEntity(final DeviceId deviceId) {
+        return repository.createCriteria(ScannerEntity.class)
+                .eq("deviceId.value", deviceId.value())
+                .one();
     }
 }

@@ -707,6 +707,14 @@ public class Shipment {
         markAsModified();
     }
 
+    public void notifyShipmentCollected() {
+        if (!ShipmentStatus.CREATED.equals(this.shipmentStatus) && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be collected from status " + shipmentStatus);
+        }
+        this.shipmentStatus = ShipmentStatus.SENT;
+        markAsModified();
+    }
+
     private void unlockShipment() {
         this.locked = false;
     }

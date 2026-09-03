@@ -346,6 +346,16 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    @Transactional
+    public ShipmentResult collectShipment(final TrackingNumber trackingNumber) {
+        final Shipment shipment = this.find(trackingNumber);
+        shipment.notifyShipmentCollected();
+        this.shipmentRepository.createOrUpdate(shipment);
+        this.domainEventPublisher.publish(new ShipmentSent(shipment.snapshot(), Instant.now()));
+        return this.shipmentResultFactory.create(shipment);
+    }
+
+    @Override
     public boolean existsShipment(final ShipmentId shipmentId) {
         return this.shipmentRepository.exists(shipmentId);
     }

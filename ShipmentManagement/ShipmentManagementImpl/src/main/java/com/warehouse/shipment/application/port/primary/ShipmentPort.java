@@ -35,6 +35,7 @@ public interface ShipmentPort {
 
     ShipmentRouteLog loadShipmentWithRouteLog(final TrackingNumber trackingNumber);
 
+    ShipmentResult collectShipment(final TrackingNumber trackingNumber);
 
     boolean existsShipment(final ShipmentId shipmentId);
 

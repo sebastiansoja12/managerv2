@@ -227,7 +227,8 @@ public interface TerminalRequestMapper {
                 request.teamId() != null ? new TeamId(request.teamId()) : null,
                 request.unassignedAt(),
                 request.userId() != null ? new UserId(request.userId().value()) : null,
-                request.vehicleId() != null ? new VehicleId(request.vehicleId()) : null
+                request.vehicleId() != null ? new VehicleId(request.vehicleId()) : null,
+                null
         );
     }
 
