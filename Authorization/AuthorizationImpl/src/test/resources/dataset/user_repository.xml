@@ -10,7 +10,7 @@
             language="PL"
             email = "sebastian5152@wp.pl"
             role = "ADMIN"
-            department_code = "TST"
+            department_id = "1"
             api_key="abc"
             deleted="0"
             initial="0"
