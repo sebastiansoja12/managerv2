@@ -308,12 +308,11 @@ public class Shipment {
     }
 
 	public ShipmentSnapshot snapshot() {
-		return new ShipmentSnapshot(shipmentId, sender, recipient, destinationDepartmentId, originDepartmentId, shipmentStatus,
-                shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
-                shipmentPriority,
-                trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
-                externalShipmentId, acceptedAt, cancelledAt, cancellationReason, dimensions, weight,
-                customerReference, contentDescription, declaredValue, serviceLevel, packagingType);
+		return new ShipmentSnapshot(shipmentId, sender, recipient, destinationDepartmentId, originDepartmentId,
+				shipmentStatus, shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
+				shipmentPriority, trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
+				externalShipmentId, acceptedAt, cancelledAt, cancellationReason, dimensions, weight, customerReference,
+				contentDescription, declaredValue, serviceLevel, packagingType);
 	}
 
     public Party getSender() {
@@ -707,6 +706,20 @@ public class Shipment {
         markAsModified();
     }
 
+    public boolean canBeRerouted() {
+        return !Boolean.TRUE.equals(this.locked) && reroutableStatuses().contains(this.shipmentStatus);
+    }
+
+    public void reroute(final Party sender, final Party recipient) {
+        if (!canBeRerouted()) {
+            throw new ShipmentModificationException("Shipment cannot be rerouted from status " + shipmentStatus);
+        }
+        this.sender = sender;
+        this.recipient = recipient;
+        this.shipmentStatus = ShipmentStatus.REROUTE;
+        markAsModified();
+    }
+
     public void notifyShipmentCollected() {
         if (!ShipmentStatus.CREATED.equals(this.shipmentStatus) && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be collected from status " + shipmentStatus);
@@ -912,5 +925,9 @@ public class Shipment {
 
     private List<ShipmentStatus> draftStatuses() {
         return List.of(ShipmentStatus.PLANNED, ShipmentStatus.CREATED, ShipmentStatus.PREPARED);
+    }
+
+    private List<ShipmentStatus> reroutableStatuses() {
+        return List.of(ShipmentStatus.PLANNED, ShipmentStatus.CREATED, ShipmentStatus.PREPARED, ShipmentStatus.REROUTE);
     }
 }

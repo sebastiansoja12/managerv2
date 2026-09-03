@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
@@ -40,7 +43,7 @@ class ShipmentApiServiceAdapterTest {
 
     @BeforeEach
     void setUp() {
-        this.adapter = new ShipmentApiServiceAdapter(this.shipmentPort, new ShipmentApiServiceMapper());
+        this.adapter = new ShipmentApiServiceAdapter(this.shipmentPort, new ShipmentApiServiceMapper(), new OperatorContext());
     }
 
     @Test
@@ -111,5 +114,13 @@ class ShipmentApiServiceAdapterTest {
                 new ShipmentId(1L), null, null, relatedShipmentId, null,
                 false, null, null, null, null, null);
         return new ShipmentResult(shipment.snapshot(), null);
+    }
+
+    @Test
+    void shouldReturnEmptyRerouteDetailsWhenShipmentDoesNotExist() {
+        final TrackingNumber trackingNumber = new TrackingNumber("UNKNOWN");
+        when(shipmentPort.findOperator(trackingNumber)).thenReturn(Optional.empty());
+
+        assertTrue(adapter.getShipmentForReroute(trackingNumber).isEmpty());
     }
 }

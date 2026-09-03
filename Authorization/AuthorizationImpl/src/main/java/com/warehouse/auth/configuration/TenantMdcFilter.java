@@ -44,6 +44,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/v2/api/auth/logout",
             "/v2/api/auth/csrf",
             "/v2/api/maintenance",
+            "/v2/api/reroutes",
             "/v2/api/platform/auth/login",
             "/v2/api/platform/auth/refresh",
             "/v2/api/platform/auth/logout",

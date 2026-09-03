@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
@@ -12,15 +13,20 @@ import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentApiS
 import com.warehouse.shipment.infrastructure.dto.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ShipmentApiServiceAdapter implements ShipmentApiService {
 
     private final ShipmentPort shipmentPort;
     private final ShipmentApiServiceMapper mapper;
+    private final OperatorContext operatorContext;
 
-    public ShipmentApiServiceAdapter(final ShipmentPort shipmentPort, final ShipmentApiServiceMapper mapper) {
+    public ShipmentApiServiceAdapter(final ShipmentPort shipmentPort,
+                                     final ShipmentApiServiceMapper mapper,
+                                     final OperatorContext operatorContext) {
         this.shipmentPort = shipmentPort;
         this.mapper = mapper;
+        this.operatorContext = operatorContext;
     }
 
     @Override
@@ -31,6 +37,13 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     @Override
     public ShipmentDetailsDto collectShipment(final TrackingNumber trackingNumber) {
         return mapper.map(shipmentPort.collectShipment(trackingNumber));
+    }
+
+    @Override
+    public Optional<ShipmentRerouteDetailsDto> getShipmentForReroute(final TrackingNumber trackingNumber) {
+        return shipmentPort.findOperator(trackingNumber)
+                .map(operatorId -> operatorContext.runAs(operatorId,
+                        () -> mapper.map(shipmentPort.loadShipmentForReroute(trackingNumber))));
     }
 
     @Override

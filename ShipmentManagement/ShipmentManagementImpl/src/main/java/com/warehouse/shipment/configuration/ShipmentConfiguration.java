@@ -6,13 +6,16 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.commonassets.repository.NoOperatorContextRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
@@ -257,8 +260,9 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentApiService shipmentApiService(final ShipmentPort shipmentPort,
-                                                final ShipmentApiServiceMapper shipmentApiServiceMapper) {
-		return new ShipmentApiServiceAdapter(shipmentPort, shipmentApiServiceMapper);
+                                                final ShipmentApiServiceMapper shipmentApiServiceMapper,
+                                                final OperatorContext operatorContext) {
+		return new ShipmentApiServiceAdapter(shipmentPort, shipmentApiServiceMapper, operatorContext);
 	}
 
     @Bean
@@ -291,8 +295,9 @@ public class ShipmentConfiguration {
 	
 	@Bean
 	public MailNotificationServicePort mailNotificationServicePort(
-			final NotificationEventPublisher notificationEventPublisher) {
-		return new MailNotificationServiceAdapter(notificationEventPublisher);
+			final NotificationEventPublisher notificationEventPublisher,
+			@Value("${reroute.shipment-edit-url:http://localhost:3000/shipment-edit}") final String shipmentEditUrl) {
+		return new MailNotificationServiceAdapter(notificationEventPublisher, shipmentEditUrl);
 	}
 	
 	@Bean
@@ -374,9 +379,10 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentRepository shipmentRepository(final OperatorFilteredRepository<ShipmentEntity> repository,
+                                                 final NoOperatorContextRepository<ShipmentEntity> noOperatorContextRepository,
                                                  final ShipmentPersistenceMapper persistenceMapper) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment repository");
-		return new ShipmentRepositoryImpl(repository, persistenceMapper);
+		return new ShipmentRepositoryImpl(repository, noOperatorContextRepository, persistenceMapper);
 	}
 
 	@Bean
