@@ -419,6 +419,17 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    @Transactional
+    public ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId) {
+        final Shipment shipment = this.find(shipmentId);
+        if (shipment.notifyShipmentLoadedOnPallet()) {
+            this.shipmentRepository.createOrUpdate(shipment);
+            this.domainEventPublisher.publish(new ShipmentSent(shipment.snapshot(), Instant.now()));
+        }
+        return this.shipmentResultFactory.create(shipment);
+    }
+
+    @Override
     public boolean existsShipment(final ShipmentId shipmentId) {
         return this.shipmentRepository.exists(shipmentId);
     }

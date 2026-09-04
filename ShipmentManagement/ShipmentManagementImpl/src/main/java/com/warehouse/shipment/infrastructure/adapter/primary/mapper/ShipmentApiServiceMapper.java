@@ -4,10 +4,14 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentRerouteRes
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentPartyDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRerouteDetailsDto;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 @Component
 public class ShipmentApiServiceMapper {
@@ -16,8 +20,19 @@ public class ShipmentApiServiceMapper {
         return new ShipmentDetailsDto(
                 shipment.snapshot().shipmentId(),
                 shipment.snapshot().shipmentStatus(),
-                shipment.snapshot().shipmentRelatedId()
+                shipment.snapshot().shipmentRelatedId(),
+                weightInKilograms(shipment.snapshot().weight()),
+                shipment.snapshot().trackingNumber() == null ? null : shipment.snapshot().trackingNumber().value(),
+                shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getCity(),
+                shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getPostalCode()
         );
+    }
+
+    private BigDecimal weightInKilograms(final Weight weight) {
+        if (weight == null) {
+            return null;
+        }
+        return WeightUnit.G.equals(weight.unit()) ? weight.value().movePointLeft(3) : weight.value();
     }
 
     public ShipmentRerouteDetailsDto map(final ShipmentRerouteResult shipmentRerouteResult) {

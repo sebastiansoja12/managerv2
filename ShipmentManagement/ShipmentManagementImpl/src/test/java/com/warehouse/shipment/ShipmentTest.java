@@ -226,6 +226,57 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldMarkCreatedShipmentAsSentWhenLoadedOnPallet() {
+        final Shipment shipment = shipment(null);
+
+        final boolean changed = shipment.notifyShipmentLoadedOnPallet();
+
+        assertAll(
+                () -> assertTrue(changed),
+                () -> assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus())
+        );
+    }
+
+    @Test
+    void shouldMarkAcceptedShipmentAsSentWhenLoadedOnPallet() {
+        final Shipment shipment = shipment(null);
+        shipment.changeShipmentStatus(ShipmentStatus.ACCEPTED);
+
+        assertTrue(shipment.notifyShipmentLoadedOnPallet());
+        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldIgnoreRepeatedPalletLoadingOfSentShipment() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentLoadedOnPallet();
+
+        assertFalse(shipment.notifyShipmentLoadedOnPallet());
+        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectPalletLoadingOfDeliveredShipment() {
+        final Shipment shipment = shipment(null);
+        shipment.markAsDelivered();
+
+        assertThrows(ShipmentModificationException.class, shipment::notifyShipmentLoadedOnPallet);
+    }
+
+    @Test
+    void shouldRejectPalletLoadingOfCanceledShipment() {
+        final Shipment shipment = shipment(null);
+        shipment.changeShipmentStatus(ShipmentStatus.CANCELED);
+
+        final ShipmentModificationException exception = assertThrows(
+                ShipmentModificationException.class,
+                shipment::notifyShipmentLoadedOnPallet
+        );
+
+        assertEquals("Shipment cannot be loaded on pallet from status CANCELED", exception.getMessage());
+    }
+
+    @Test
     void shouldMarkCreatedShipmentAsSentWhenCollectedFromClient() {
         final Shipment shipment = shipment(null);
 
