@@ -103,3 +103,5 @@ build/
 /TransportAssets/TransportAssetsCore/pom.xml.versionsBackup
 /TransportAssets/pom.xml.versionsBackup
 ${project.build.directory}/
+application-local.properties
+.env

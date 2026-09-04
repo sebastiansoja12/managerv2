@@ -38,7 +38,7 @@ under `/v2/api`.
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
 | `PathFinder` and `DestinationDetermination` | Routing, delivery-department determination, address coordinates and area calculation support. |
 | `DocumentStorage` | Barcode and CSV generation utilities, plus shared operator-scoped document storage (`DocumentStorageApi` and `DocumentStorageImpl`). |
-| `MessageProvider` and `MailService` | Message and mail infrastructure. |
+| `MessageProvider` and `MailService` | Message infrastructure; Kafka-driven e-mail notifications rendered from multilingual database templates. |
 | `Common` | Shared value objects, enums, exceptions, repository helpers, operator context and security utilities. |
 | `Gateway` | Gateway service on port `8088`; routes requests to manager and related services. |
 | `EurekaServer` | Eureka server on port `8761`. |
@@ -81,6 +81,30 @@ Common environment variables:
 - `JWT_SECRET_KEY`
 - `AUTH_CORS_ALLOWED_ORIGINS`
 - `CREDENTIALS_ENCRYPTION_KEY`
+
+### E-mail notifications
+
+`MailService` consumes shipment integration events from Kafka in `MailKafkaListener`
+(`shipment.created`, `shipment.events` status changes, `shipment.out-for-delivery`, `shipment.delivered`,
+`shipment.reroute.requested`), maps each event to generic `MailRequest`s (template key, recipient, locale,
+variables) and sends them over SMTP. Mail texts are not in code: they are stored in the `mail_templates`
+table (`template_key`, `locale`, `subject`, `body`) seeded by Liquibase in `pl`, `en` and `de`.
+Templates use `{{variable}}` placeholders and optional `{{#variable}}...{{/variable}}` sections.
+A request without a template is skipped, so adding a template row enables a new notification
+(for example `shipment.status.prepared.recipient`). The recipient language is resolved from the
+party country code (`MAIL_COUNTRY_LOCALES`) with fallback to the language and then to `MAIL_DEFAULT_LOCALE`.
+
+Local development: `docker compose -f docker.compose.yml up -d mailhog` starts MailHog (SMTP `localhost:1025`,
+web UI http://localhost:8025) and the `dev` profile sends every e-mail there, so nothing leaves your machine.
+To use a real SMTP server instead, copy `application-local.properties.example` to `application-local.properties`
+(ignored by git, imported by the `dev` profile from the working directory or its parent) and fill in the mailbox
+credentials. Environment variables override both files.
+
+- `MAIL_ENABLED` (`false` by default, `true` in the `dev` profile; when `false` e-mails are only logged)
+- `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SMTP_AUTH`, `MAIL_SMTP_STARTTLS`, `MAIL_SMTP_SSL`
+- `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`
+- `MAIL_DEFAULT_LOCALE`, `MAIL_UNMAPPED_COUNTRY_LOCALE`, `MAIL_COUNTRY_LOCALES`
+- `MAIL_TRACKING_URL`, `MAIL_SHIPMENT_EDIT_URL`
 
 ## Build and Run
 
@@ -141,7 +165,7 @@ database volumes are retained unless `--volumes` is explicitly supplied.
 The stack is defined in `docker.compose.yml`. The project name remains
 `managerv2`, matching the existing containers and Docker Desktop configuration.
 
-The stack contains PostgreSQL, MongoDB, ZooKeeper, Kafka, Kafka UI, Eureka,
+The stack contains PostgreSQL, MongoDB, ZooKeeper, Kafka, Kafka UI, MailHog (http://localhost:8025), Eureka,
 Gateway, Software Configuration, Returning Manager and Route Tracker. Run the
 main `Application` separately using the instructions above.
 
