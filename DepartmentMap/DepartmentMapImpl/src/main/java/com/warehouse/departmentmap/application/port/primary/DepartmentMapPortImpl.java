@@ -15,6 +15,7 @@ import com.warehouse.departmentmap.domain.exception.DepartmentMapException;
 import com.warehouse.departmentmap.domain.model.DepartmentMap;
 import com.warehouse.departmentmap.domain.model.StorageLocation;
 import com.warehouse.departmentmap.domain.service.StorageLocationSynchronizer;
+import com.warehouse.departmentmap.domain.vo.Plan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,16 +63,15 @@ public class DepartmentMapPortImpl implements DepartmentMapPort {
     @Override
     @Transactional
     public DepartmentMapView createMap(final CreateDepartmentMapCommand command) {
-        if (command == null) {
-            throw DepartmentMapException.invalid("Request body is required");
-        }
-        if (command.departmentId() == null || !this.departmentServicePort.departmentExists(command.departmentId())) {
+        if (!this.departmentServicePort.departmentExists(command.departmentId())) {
             throw DepartmentMapException.notFound("DEPARTMENT_NOT_FOUND", "Department "
-                    + (command.departmentId() == null ? "" : command.departmentId().getValue()) + " does not exist");
+                    + command.departmentId().getValue() + " does not exist");
         }
-        final DepartmentMap departmentMap = this.departmentMapRepository.save(DepartmentMap.create(
+
+        final DepartmentMap map = DepartmentMap.create(
                 this.currentUserServicePort.currentOperatorId(), command.departmentId(), command.name(),
-                command.width(), command.height(), command.gridSize(), Instant.now()));
+                command.width(), command.height(), command.gridSize(), Instant.now());
+        final DepartmentMap departmentMap = this.departmentMapRepository.save(map);
         log.info("Department map {} created for department {}", departmentMap.getDepartmentMapId().value(),
                 departmentMap.getDepartmentId().getValue());
         return new DepartmentMapView(departmentMap, List.of());
@@ -81,14 +81,11 @@ public class DepartmentMapPortImpl implements DepartmentMapPort {
     @Transactional
     public DepartmentMapView saveLayout(final DepartmentMapId departmentMapId,
                                         final SaveDepartmentMapLayoutCommand command) {
-        if (command == null) {
-            throw DepartmentMapException.invalid("Request body is required");
-        }
         final DepartmentMap departmentMap = loadMap(departmentMapId);
         departmentMap.verifyVersion(command.version());
         departmentMap.changeLayout(command.name(), command.width(), command.height(), command.gridSize(),
                 command.elements(), Instant.now());
-        final StorageLocationSynchronizer.Plan plan = this.storageLocationSynchronizer.plan(departmentMap,
+        final Plan plan = this.storageLocationSynchronizer.plan(departmentMap,
                 this.storageLocationRepository.findByMap(departmentMapId));
         final DepartmentMap savedMap = this.departmentMapRepository.save(departmentMap);
         plan.removed().forEach(this.storageLocationRepository::delete);

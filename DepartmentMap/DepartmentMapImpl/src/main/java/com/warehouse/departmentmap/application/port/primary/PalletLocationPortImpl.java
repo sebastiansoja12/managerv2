@@ -53,7 +53,6 @@ public class PalletLocationPortImpl implements PalletLocationPort {
     @Transactional
     public PalletLocationResult placePallet(final MapElementId locationId,
                                             final PalletTrackingNumber palletTrackingNumber) {
-        requirePallet(palletTrackingNumber);
         this.storageLocationRepository.findByPallet(palletTrackingNumber).ifPresent(current -> {
             throw DepartmentMapException.conflict("PALLET_ALREADY_PLACED", "Pallet " + palletTrackingNumber.value()
                     + " is already placed on location " + current.getCode() + ". Move it instead");
@@ -72,7 +71,6 @@ public class PalletLocationPortImpl implements PalletLocationPort {
     @Transactional
     public PalletLocationResult movePallet(final PalletTrackingNumber palletTrackingNumber,
                                            final MapElementId targetLocationId) {
-        requirePallet(palletTrackingNumber);
         final StorageLocation source = this.storageLocationRepository.findByPallet(palletTrackingNumber)
                 .orElseThrow(() -> palletNotPlaced(palletTrackingNumber));
         final StorageLocation target = loadLocation(targetLocationId);
@@ -96,7 +94,6 @@ public class PalletLocationPortImpl implements PalletLocationPort {
     @Override
     @Transactional
     public void removePallet(final PalletTrackingNumber palletTrackingNumber) {
-        requirePallet(palletTrackingNumber);
         final StorageLocation location = this.storageLocationRepository.findByPallet(palletTrackingNumber)
                 .orElseThrow(() -> palletNotPlaced(palletTrackingNumber));
         location.remove(palletTrackingNumber);
@@ -109,9 +106,6 @@ public class PalletLocationPortImpl implements PalletLocationPort {
     @Override
     @Transactional
     public StorageLocation reserveLocation(final MapElementId locationId, final ReserveLocationCommand command) {
-        if (command == null) {
-            throw DepartmentMapException.invalid("Request body is required");
-        }
         final StorageLocation location = loadLocation(locationId);
         final UserId userId = this.currentUserServicePort.currentUserId();
         final Instant now = Instant.now();
@@ -141,7 +135,6 @@ public class PalletLocationPortImpl implements PalletLocationPort {
     @Override
     @Transactional(readOnly = true)
     public Optional<PalletLocationResult> findPalletLocation(final PalletTrackingNumber palletTrackingNumber) {
-        requirePallet(palletTrackingNumber);
         return this.storageLocationRepository.findByPallet(palletTrackingNumber)
                 .flatMap(location -> location.findPallet(palletTrackingNumber)
                         .map(placement -> new PalletLocationResult(placement, location, loadMap(location))));
@@ -171,7 +164,6 @@ public class PalletLocationPortImpl implements PalletLocationPort {
     @Override
     @Transactional(readOnly = true)
     public List<PalletMovement> palletHistory(final PalletTrackingNumber palletTrackingNumber) {
-        requirePallet(palletTrackingNumber);
         return this.palletMovementRepository.findHistory(palletTrackingNumber);
     }
 
@@ -188,12 +180,6 @@ public class PalletLocationPortImpl implements PalletLocationPort {
         return this.departmentMapRepository.findById(location.getDepartmentMapId())
                 .orElseThrow(() -> DepartmentMapException.notFound("MAP_NOT_FOUND",
                         "Department map " + location.getDepartmentMapId().value() + " not found"));
-    }
-
-    private static void requirePallet(final PalletTrackingNumber palletTrackingNumber) {
-        if (palletTrackingNumber == null) {
-            throw DepartmentMapException.invalid("Pallet number is required");
-        }
     }
 
     private static DepartmentMapException palletNotPlaced(final PalletTrackingNumber palletTrackingNumber) {
