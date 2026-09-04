@@ -1,6 +1,6 @@
 package com.warehouse.pallet.infrastructure.adapter.secondary.document;
 
-import com.warehouse.pallet.configuration.identificator.DepartmentCode;
+import com.warehouse.pallet.configuration.identificator.DepartmentId;
 import com.warehouse.pallet.configuration.identificator.PalletId;
 import com.warehouse.pallet.configuration.identificator.ShipmentId;
 import com.warehouse.pallet.domain.enumeration.PalletHandlingPriority;
@@ -10,7 +10,9 @@ import com.warehouse.pallet.domain.model.Pallet;
 import com.warehouse.pallet.domain.model.Weight;
 import com.warehouse.pallet.domain.vo.Dimension;
 import com.warehouse.pallet.domain.vo.MaxPalletWeight;
+import com.warehouse.pallet.configuration.identificator.OperatorId;
 import com.warehouse.pallet.domain.vo.SealNumber;
+import com.warehouse.pallet.domain.vo.TrackingNumber;
 import com.warehouse.pallet.infrastructure.adapter.secondary.enumeration.PalletType;
 import jakarta.persistence.*;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,11 +26,13 @@ public class PalletDocument {
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "pallet_id"))
     private final PalletId palletId;
+    private final TrackingNumber trackingNumber;
+    private final OperatorId operatorId;
     private final Set<ShipmentId> shipmentIds;
     @AttributeOverride(name = "value", column = @Column(name = "origin_department"))
-    private final DepartmentCode originDepartment;
+    private final DepartmentId originDepartmentId;
     @AttributeOverride(name = "value", column = @Column(name = "destination_department"))
-    private final DepartmentCode destinationDepartment;
+    private final DepartmentId destinationDepartmentId;
     private final Instant created;
     private final Instant modified;
     @Enumerated(EnumType.STRING)
@@ -47,18 +51,23 @@ public class PalletDocument {
     private final MaxPalletWeight maxPalletWeight;
 
 	public static PalletDocument from(final Pallet pallet) {
-		return new PalletDocument(pallet.getPalletId(), pallet.getShipmentIds(), pallet.getOriginDepartment(),
-				pallet.getDestinationDepartment(), pallet.getCreated(), pallet.getModified(), pallet.getPalletStatus(),
+		return new PalletDocument(pallet.getPalletId(), pallet.getTrackingNumber(), pallet.getOperatorId(),
+                pallet.getShipmentIds(), pallet.getOriginDepartmentId(),
+				pallet.getDestinationDepartmentId(), pallet.getCreated(), pallet.getModified(), pallet.getPalletStatus(),
 				pallet.getStorageStatus(), DriverDocument.from(pallet.getDriver()), pallet.getPalletWeight(),
 				pallet.getDimension(), pallet.getPalletHandlingPriority(),
 				PalletType.valueOf(pallet.getPalletType().name()), pallet.getSealNumber(), pallet.isRefrigerated(),
 				pallet.getMaxPalletWeight());
 	}
 
+
+
     public PalletDocument(final PalletId palletId,
+                          final TrackingNumber trackingNumber,
+                          final OperatorId operatorId,
                           final Set<ShipmentId> shipmentIds,
-                          final DepartmentCode originDepartment,
-                          final DepartmentCode destinationDepartment,
+                          final DepartmentId originDepartmentId,
+                          final DepartmentId destinationDepartmentId,
                           final Instant created,
                           final Instant modified,
                           final PalletStatus palletStatus,
@@ -72,9 +81,11 @@ public class PalletDocument {
                           final Boolean refrigerated,
                           final MaxPalletWeight maxPalletWeight) {
         this.palletId = palletId;
+        this.trackingNumber = trackingNumber;
+        this.operatorId = operatorId;
         this.shipmentIds = shipmentIds;
-        this.originDepartment = originDepartment;
-        this.destinationDepartment = destinationDepartment;
+        this.originDepartmentId = originDepartmentId;
+        this.destinationDepartmentId = destinationDepartmentId;
         this.created = created;
         this.modified = modified;
         this.palletStatus = palletStatus;
@@ -93,8 +104,8 @@ public class PalletDocument {
         return created;
     }
 
-    public DepartmentCode getDestinationDepartment() {
-        return destinationDepartment;
+    public DepartmentId getDestinationDepartmentId() {
+        return destinationDepartmentId;
     }
 
     public Dimension getDimension() {
@@ -113,8 +124,8 @@ public class PalletDocument {
         return modified;
     }
 
-    public DepartmentCode getOriginDepartment() {
-        return originDepartment;
+    public DepartmentId getOriginDepartmentId() {
+        return originDepartmentId;
     }
 
     public PalletHandlingPriority getPalletHandlingPriority() {
@@ -123,6 +134,14 @@ public class PalletDocument {
 
     public PalletId getPalletId() {
         return palletId;
+    }
+
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public OperatorId getOperatorId() {
+        return operatorId;
     }
 
     public PalletStatus getPalletStatus() {

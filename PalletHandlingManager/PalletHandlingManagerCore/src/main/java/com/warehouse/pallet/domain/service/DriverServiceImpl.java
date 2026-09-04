@@ -1,7 +1,7 @@
 package com.warehouse.pallet.domain.service;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.pallet.domain.model.Driver;
+import com.warehouse.pallet.domain.vo.DepartmentId;
 
 public class DriverServiceImpl implements DriverService {
 
@@ -23,7 +23,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void assignDepartment(final Driver driver, final DepartmentCode departmentCode) {
+    public void assignDepartment(final Driver driver, final DepartmentId departmentId) {
 
     }
 }
