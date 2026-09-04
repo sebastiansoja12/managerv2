@@ -35,7 +35,7 @@ class StorageLocationTest {
                 () -> storageLocation.place(pallet("PAL000000000002"), USER_ID, NOW));
 
         assertEquals("LOCATION_OCCUPIED", exception.getCode());
-        assertEquals(409, exception.getStatus());
+        assertEquals(DepartmentMapException.Reason.CONFLICT, exception.reason());
         assertEquals(1, storageLocation.getPallets().size());
     }
 
@@ -159,7 +159,7 @@ class StorageLocationTest {
         final DepartmentMapException exception = assertThrows(DepartmentMapException.class,
                 () -> storageLocation.remove(pallet("PAL1")));
 
-        assertEquals(404, exception.getStatus());
+        assertEquals(DepartmentMapException.Reason.NOT_FOUND, exception.reason());
     }
 
     @Test

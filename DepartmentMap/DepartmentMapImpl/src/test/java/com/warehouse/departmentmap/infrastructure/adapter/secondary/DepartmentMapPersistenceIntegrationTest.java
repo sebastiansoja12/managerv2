@@ -210,7 +210,7 @@ class DepartmentMapPersistenceIntegrationTest {
         assertEquals(1, location.getPallets().size());
         assertEquals(attempts - 1, failures.size());
         assertTrue(failures.stream().allMatch(failure -> failure instanceof DepartmentMapException conflict
-                && conflict.getStatus() == 409), () -> "Unexpected failures: " + failures);
+                && conflict.reason() == DepartmentMapException.Reason.CONFLICT), () -> "Unexpected failures: " + failures);
     }
 
     @Test

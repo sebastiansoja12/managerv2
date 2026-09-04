@@ -67,7 +67,7 @@ class DepartmentMapTest {
                 () -> departmentMap.changeLayout("Hall A", 50, 30, 1,
                         List.of(storageLocation("A-01", 1), storageLocation("a-01", 1)), NOW));
 
-        assertEquals(400, exception.getStatus());
+        assertEquals(DepartmentMapException.Reason.INVALID_REQUEST, exception.reason());
     }
 
     @Test
@@ -97,7 +97,7 @@ class DepartmentMapTest {
                 () -> departmentMap.verifyVersion(3L));
 
         assertEquals("MAP_VERSION_CONFLICT", exception.getCode());
-        assertEquals(409, exception.getStatus());
+        assertEquals(DepartmentMapException.Reason.CONFLICT, exception.reason());
     }
 
     @Test
