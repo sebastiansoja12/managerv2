@@ -22,7 +22,6 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.shipment.application.listener.ShipmentDomainEventListener;
 import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
@@ -53,11 +52,6 @@ public class ShipmentReadRepositoryTest {
         @Bean
         PriceRepository priceRepository(final PriceReadRepository repository) {
             return new PriceRepositoryImpl(repository);
-        }
-
-        @Bean
-        MailService mailService() {
-            return Mockito.mock(MailService.class);
         }
 
         @Bean

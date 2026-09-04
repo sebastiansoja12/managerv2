@@ -1,18 +1,20 @@
 package com.warehouse.reroute.infrastructure.adapter.secondary;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.Instant;
-
-import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationDto;
-import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEvent;
+import com.warehouse.mail.infrastructure.adapter.primary.event.MailTemplateNotificationEvent;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.reroute.application.port.secondary.RerouteNotificationServicePort;
 import com.warehouse.reroute.domain.model.RerouteToken;
 import com.warehouse.reroute.domain.vo.ReroutableShipment;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Map;
+
 public class RerouteNotificationServiceAdapter implements RerouteNotificationServicePort {
+
+    private static final String REROUTE_TOKEN_TEMPLATE = "shipment.reroute.token";
 
     private final NotificationEventPublisher notificationEventPublisher;
 
@@ -29,20 +31,14 @@ public class RerouteNotificationServiceAdapter implements RerouteNotificationSer
         final String trackingNumber = shipment.trackingNumber().value();
         final long validMinutes = Math.max(1,
                 Duration.between(Instant.now(), rerouteToken.getExpiresAt()).toMinutes());
-        final String body = """
-                Dzień dobry,
-
-                otrzymaliśmy prośbę o zmianę danych przesyłki %s.
-
-                Kod weryfikacyjny: %s
-
-                Kod jest ważny przez %d min i można go użyć tylko raz. Wpisz go na stronie edycji przesyłki:
-                %s
-
-                Jeśli to nie Ty prosiłeś o zmianę danych, zignoruj tę wiadomość.
-                """.formatted(trackingNumber, rerouteToken.getValue().formatted(), validMinutes,
-                shipmentEditUrl + "/" + URLEncoder.encode(trackingNumber, StandardCharsets.UTF_8));
-        notificationEventPublisher.send(new NotificationEvent(new NotificationDto(
-                "Kod do zmiany danych przesyłki " + trackingNumber, body, rerouteToken.getEmail())));
+        final Map<String, String> variables = Map.of(
+                "trackingNumber", trackingNumber,
+                "code", rerouteToken.getValue().formatted(),
+                "validMinutes", String.valueOf(validMinutes),
+                "shipmentEditUrl", shipmentEditUrl + "/" + URLEncoder.encode(trackingNumber, StandardCharsets.UTF_8),
+                "firstName", shipment.sender().firstName());
+        notificationEventPublisher.send(new MailTemplateNotificationEvent(REROUTE_TOKEN_TEMPLATE,
+                rerouteToken.getEmail(),  shipment.sender().countryCode(),
+                variables));
     }
 }

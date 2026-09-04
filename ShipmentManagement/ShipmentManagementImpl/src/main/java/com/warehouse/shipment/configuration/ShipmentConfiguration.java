@@ -20,8 +20,6 @@ import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
-import com.warehouse.mail.domain.port.primary.MailPort;
-import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.pickuppoint.api.PickupPointApiService;
@@ -59,11 +57,6 @@ import java.util.List;
 public class ShipmentConfiguration {
 
 	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
-
-	@Bean(name = "shipment.mailPort")
-	public MailPort mailPort(final com.warehouse.mail.domain.service.MailService mailService) {
-		return new MailPortImpl(mailService);
-	}
 
 	@Bean
 	public NotificationCreatorProvider notificationCreatorService() {
@@ -295,9 +288,8 @@ public class ShipmentConfiguration {
 	
 	@Bean
 	public MailNotificationServicePort mailNotificationServicePort(
-			final NotificationEventPublisher notificationEventPublisher,
-			@Value("${reroute.shipment-edit-url:http://localhost:3000/shipment-edit}") final String shipmentEditUrl) {
-		return new MailNotificationServiceAdapter(notificationEventPublisher, shipmentEditUrl);
+			final NotificationEventPublisher notificationEventPublisher) {
+		return new MailNotificationServiceAdapter(notificationEventPublisher);
 	}
 	
 	@Bean
