@@ -1,9 +1,9 @@
 package com.warehouse.logistics.domain.model;
 
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.logistics.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
-import com.warehouse.logistics.domain.enumeration.DeliveryStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
 
 import java.time.LocalDateTime;
@@ -205,6 +205,28 @@ public class Delivery {
     private void markAsModified() {
         ensureCanBeModified();
         this.status = DeliveryLifecycleStatus.MODIFIED;
+    }
+
+    public static Delivery forPallet(final DeliveryTarget target, final UserId userId) {
+        if (target.type() != DeliveryTargetType.PALLET) {
+            throw new IllegalArgumentException("Pallet delivery requires pallet target");
+        }
+        return new Delivery(target, null, DeliveryType.OUTBOUND, DeliveryMethod.COURIER, null, null, null,
+                false, userId);
+    }
+
+    public boolean isActive() {
+        return status != DeliveryLifecycleStatus.CANCELED && status != DeliveryLifecycleStatus.COMPLETED;
+    }
+
+    public boolean replaceByPalletDelivery(final DeliveryId palletDeliveryId, final UserId userId) {
+        if (!isActive()) {
+            return false;
+        }
+        addStep(DeliveryStep.attempt(deliveryId, deliveryStatus, userId, supplierId, null, vehicleId, method,
+                "Replaced by pallet delivery " + palletDeliveryId.getId(), null, deliverySteps.size()));
+        markAsCanceled();
+        return true;
     }
 
     public void markAsCanceled() {

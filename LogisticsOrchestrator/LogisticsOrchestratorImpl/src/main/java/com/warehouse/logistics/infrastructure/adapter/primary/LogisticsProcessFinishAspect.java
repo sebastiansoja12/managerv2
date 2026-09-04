@@ -13,6 +13,7 @@ import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.dto.ProcessStatusDto;
 import com.warehouse.process.infrastructure.event.ProcessFinishEvent;
 import com.warehouse.terminal.jaxb.CollectResponse;
+import com.warehouse.terminal.jaxb.PalletScanResponse;
 import com.warehouse.terminal.response.TerminalResponse;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,10 @@ public class LogisticsProcessFinishAspect {
             }
             if (response instanceof CollectResponse collectResponse) {
                 publishProcessFinishEvent(collectResponse.getProcessId(), null);
+            }
+            if (response instanceof PalletScanResponse palletScanResponse) {
+                publishProcessFinishEvent(palletScanResponse.getProcessId(),
+                        palletScanResponse.isSuccess() ? null : palletScanResponse.getErrorMessage());
             }
         } finally {
             LogisticsProcessContext.clear();

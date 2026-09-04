@@ -8,12 +8,18 @@ import com.warehouse.logistics.domain.model.*;
 import com.warehouse.logistics.domain.service.LogisticsService;
 import com.warehouse.logistics.domain.vo.CompleteDeliveryCommand;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
 public class LogisticsPortImpl implements LogisticsPort {
+
+    private static final Logger log = LoggerFactory.getLogger(LogisticsPortImpl.class);
 
     private final LogisticsService logisticsService;
 
@@ -42,9 +48,30 @@ public class LogisticsPortImpl implements LogisticsPort {
     }
 
     @Override
+    @Transactional
+    public void createPalletDelivery(final CreatePalletDeliveryCommand command) {
+        final DeliveryTarget target = DeliveryTarget.pallet(command.palletId());
+        final Delivery palletDelivery = this.logisticsService.findByTargetAndType(target, DeliveryType.OUTBOUND)
+                .orElseGet(() -> {
+                    final Delivery delivery = Delivery.forPallet(target, command.userId());
+                    this.logisticsService.createOrUpdate(delivery);
+                    log.info("Pallet delivery {} created for pallet {}", delivery.getDeliveryId().getId(),
+                            command.palletId());
+                    return delivery;
+                });
+        for (final ShipmentId shipmentId : command.shipmentIds()) {
+            this.logisticsService.findByTargetAndType(DeliveryTarget.shipment(shipmentId), DeliveryType.OUTBOUND)
+                    .filter(delivery -> delivery.replaceByPalletDelivery(palletDelivery.getDeliveryId(),
+                            command.userId()))
+                    .ifPresent(this.logisticsService::createOrUpdate);
+        }
+    }
+
+    @Override
     public void completeDelivery(final CompleteDeliveryCommand command) {
         final DeliveryTarget target = DeliveryTarget.shipment(command.getShipmentId());
-        final Optional<Delivery> delivery = this.logisticsService.findByTargetAndType(target, DeliveryType.OUTBOUND);
+        final Optional<Delivery> delivery = this.logisticsService.findByTargetAndType(target, DeliveryType.OUTBOUND)
+                .filter(Delivery::isActive);
         delivery.ifPresent(
                 d -> {
                     final DeliveryStep finalStep = DeliveryStep.complete(d.getDeliveryId(), command.getSupplierId(), command.getUserId(),
@@ -71,6 +98,12 @@ public class LogisticsPortImpl implements LogisticsPort {
     public Delivery findDeliveryByShipmentId(final ShipmentId shipmentId) {
         return logisticsService.findByTargetAndType(DeliveryTarget.shipment(shipmentId), DeliveryType.OUTBOUND)
                 .orElseThrow(() -> new NoSuchElementException("Delivery not found for shipment"));
+    }
+
+    @Override
+    public Delivery findDeliveryByPalletId(final String palletId) {
+        return logisticsService.findByTargetAndType(DeliveryTarget.pallet(palletId), DeliveryType.OUTBOUND)
+                .orElseThrow(() -> new NoSuchElementException("Delivery not found for pallet"));
     }
 
     @Override

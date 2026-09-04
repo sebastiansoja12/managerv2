@@ -46,6 +46,11 @@ public class DeliveryReadController {
         return responseMapper.map(logisticsPort.findDeliveryByShipmentId(new ShipmentId(shipmentId)));
     }
 
+    @GetMapping("/by-pallet/{palletId}")
+    public DeliveryResponseDto findByPalletId(@PathVariable final String palletId) {
+        return responseMapper.map(logisticsPort.findDeliveryByPalletId(palletId));
+    }
+
     @PutMapping("/{deliveryId}/method")
     public ResponseEntity<Void> changeMethod(@PathVariable final String deliveryId,
                                                @RequestBody final DeliveryMethodUpdateRequestDto request) {

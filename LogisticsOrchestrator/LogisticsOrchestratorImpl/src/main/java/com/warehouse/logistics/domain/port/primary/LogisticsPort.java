@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.model.CreateDeliveryCommand;
+import com.warehouse.logistics.domain.model.CreatePalletDeliveryCommand;
 import com.warehouse.logistics.domain.model.Delivery;
 import com.warehouse.logistics.domain.model.LogisticsRequest;
 import com.warehouse.logistics.domain.model.LogisticsResponse;
@@ -18,6 +19,8 @@ public interface LogisticsPort {
 
     void createDelivery(final CreateDeliveryCommand command);
 
+    void createPalletDelivery(final CreatePalletDeliveryCommand command);
+
     void completeDelivery(final CompleteDeliveryCommand command);
 
     List<Delivery> findRecentDeliveries(final int offset, final int limit);
@@ -25,6 +28,8 @@ public interface LogisticsPort {
     Delivery findDelivery(final DeliveryId deliveryId);
 
     Delivery findDeliveryByShipmentId(final ShipmentId shipmentId);
+
+    Delivery findDeliveryByPalletId(final String palletId);
 
     void changeDeliveryMethod(final DeliveryId deliveryId, final DeliveryMethod method);
 
