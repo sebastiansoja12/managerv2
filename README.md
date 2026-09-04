@@ -32,6 +32,7 @@ under `/v2/api`.
 | `DeliveryOperation` | Delivery, return and rejection process handling. |
 | `LogisticsOrchestrator` | Coordination layer for logistics flows. |
 | `ProcessHub` | Process logs and process details used by the GUI. |
+| `DepartmentMap` | Department floor plans (`department_maps`, elements), storage-location occupancy with optimistic locking, pallet placement, reservations and location history (`/department-maps`). |
 | `Device` | Device pairing, device verification and terminal/device access validation. |
 | `SupplierServiceManagement` | Suppliers, package types, delivery areas, vehicle data and supplier updates. |
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
