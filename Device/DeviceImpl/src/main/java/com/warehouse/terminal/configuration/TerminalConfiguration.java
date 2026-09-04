@@ -1,9 +1,7 @@
 package com.warehouse.terminal.configuration;
 
-import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,9 +21,7 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.*;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.MobileEntity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.ScannerEntity;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.TerminalEntity;
-import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 
-import io.github.resilience4j.retry.RetryConfig;
 
 @Configuration
 public class TerminalConfiguration {
@@ -52,24 +48,6 @@ public class TerminalConfiguration {
                                                            final UserServicePort userServicePort) {
         return new DeviceValidatorServiceImpl(deviceVersionRepository, deviceRepository, departmentServicePort,
                 userServicePort);
-    }
-
-    @Bean("device.softwareConfigurationServicePort")
-    @ConditionalOnProperty(name = "services.mock", havingValue = "false")
-    public SoftwareConfigurationServicePort softwareConfigurationServicePort(final SoftwareConfigurationProperties softwareConfigurationProperties) {
-        final RetryConfig retryConfig = RetryConfig.custom()
-                .maxAttempts(4)
-                .waitDuration(Duration.ofSeconds(2))
-                .retryExceptions(RuntimeException.class)
-                .writableStackTraceEnabled(true)
-                .build();
-        return new SoftwareConfigurationServiceAdapter(retryConfig, softwareConfigurationProperties);
-    }
-
-    @Bean("device.softwareConfigurationServicePort")
-    @ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
-    public SoftwareConfigurationServicePort softwareConfigurationServiceMockPort() {
-        return new SoftwareConfigurationServiceMockAdapter();
     }
 
     @Bean("terminal.supplierRepository")

@@ -142,4 +142,16 @@ public class UserRepositoryImpl implements UserRepository {
                 .findFirst()
                 .map(UserToModelMapper::map);
     }
+
+    @Override
+    public List<UserId> findActiveSuperadminIds(final OperatorId operatorId) {
+        return noOperatorContextRepository.createCriteria(UserEntity.class)
+                .eq("operatorId.value", operatorId.value())
+                .eq("role", UserEntity.Role.SUPERADMIN)
+                .isFalse("deleted")
+                .list()
+                .stream()
+                .map(UserEntity::getUserId)
+                .toList();
+    }
 }
