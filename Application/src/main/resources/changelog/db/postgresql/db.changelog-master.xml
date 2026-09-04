@@ -91,4 +91,6 @@
     <include file="changes/2026-10-17-impersonation-consents.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-17-device-operator.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-17-reroute-token-verification.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-18-carriers-and-pallet-transports.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-18-pallet-transports-uuid-id.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
