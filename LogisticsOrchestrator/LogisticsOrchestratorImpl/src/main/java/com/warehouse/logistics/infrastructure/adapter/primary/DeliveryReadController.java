@@ -1,6 +1,7 @@
 package com.warehouse.logistics.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.port.primary.LogisticsPort;
 import com.warehouse.logistics.infrastructure.adapter.primary.dto.DeliveryMethodUpdateRequestDto;
@@ -29,9 +30,14 @@ public class DeliveryReadController {
 
     @GetMapping
     public List<DeliveryResponseDto> findRecent(@RequestParam(defaultValue = "0") final int offset,
-                                                @RequestParam(defaultValue = "25") final int limit) {
+                                                @RequestParam(defaultValue = "25") final int limit,
+                                                @RequestParam(required = false) final Long departmentId) {
         if (offset < 0 || limit < 1 || limit > 100) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid delivery page");
+        }
+        if (departmentId != null) {
+            return responseMapper.map(logisticsPort.findDeliveriesByDepartment(new DepartmentId(departmentId),
+                    offset, limit));
         }
         return responseMapper.map(logisticsPort.findRecentDeliveries(offset, limit));
     }

@@ -18,7 +18,16 @@ public class DeliveryResponseMapper {
                 delivery.getTarget().id(), delivery.getShipmentId() == null ? null
                 : String.valueOf(delivery.getShipmentId().getValue()), delivery.getType().name(),
                 delivery.getDeliveryStatus() == null ? null : delivery.getDeliveryStatus().name(),
-                delivery.getStatus().name(), delivery.getMethod() == null ? null : delivery.getMethod().name(),
+                delivery.getStatus().name(),
+                delivery.getOriginDepartmentId() == null ? null
+                        : String.valueOf(delivery.getOriginDepartmentId().getValue()),
+                delivery.getDestinationDepartmentId() == null ? null
+                        : String.valueOf(delivery.getDestinationDepartmentId().getValue()),
+                delivery.getPickupMethod() == null ? null : delivery.getPickupMethod().name(),
+                delivery.getMethod() == null ? null : delivery.getMethod().name(),
+                delivery.getPickupPointId() == null ? null : String.valueOf(delivery.getPickupPointId().value()),
+                delivery.getDeliveryPickupPointId() == null ? null
+                        : String.valueOf(delivery.getDeliveryPickupPointId().value()),
                 delivery.getCreatedAt(), delivery.getPlannedAt(), delivery.getDeliveredAt(),
                 delivery.getDeliverySteps().stream().map(this::map).toList());
     }
@@ -30,7 +39,6 @@ public class DeliveryResponseMapper {
                 step.departmentId() == null ? null : String.valueOf(step.departmentId().getValue()),
                 step.supplierId() == null ? null : String.valueOf(step.supplierId().value()),
                 step.vehicleId() == null ? null : String.valueOf(step.vehicleId().value()),
-                step.method() == null ? null : step.method().name(),
                 step.comment(), step.failureReason());
     }
 }

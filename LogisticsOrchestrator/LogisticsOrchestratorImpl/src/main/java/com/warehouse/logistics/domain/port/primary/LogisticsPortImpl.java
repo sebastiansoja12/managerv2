@@ -1,6 +1,7 @@
 package com.warehouse.logistics.domain.port.primary;
 
 import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
@@ -35,16 +36,35 @@ public class LogisticsPortImpl implements LogisticsPort {
     @Override
     public void createDelivery(final CreateDeliveryCommand command) {
         final DeliveryTarget target = DeliveryTarget.shipment(command.shipmentId());
-        final Optional<Delivery> possibleExistingDelivery = this.logisticsService.findByTargetAndType(target, DeliveryType.OUTBOUND);
-        if (possibleExistingDelivery.isPresent()) {
-            throw new RuntimeException("Delivery for shipment: " + command.shipmentId().toString() + " already exists");
-        }
+        ensureDeliveryDoesNotExist(target);
 
-		final Delivery delivery = new Delivery(target, command.shipmentId(), DeliveryType.OUTBOUND, command.method(),
-				command.pickupPointId(), command.deliveryPickupPointId(), command.signatureId(),
+		final Delivery delivery = new Delivery(target, command.shipmentId(), DeliveryType.OUTBOUND,
+				command.originDepartmentId(), command.destinationDepartmentId(), command.pickupMethod(),
+				command.method(), command.pickupPointId(), command.deliveryPickupPointId(), command.signatureId(),
 				command.signatureRequired(), command.userId());
 
 		this.logisticsService.createOrUpdate(delivery);
+    }
+
+    @Override
+    public void createDerivedDelivery(final CreateDerivedDeliveryCommand command) {
+        final DeliveryTarget target = DeliveryTarget.shipment(command.shipmentId());
+        ensureDeliveryDoesNotExist(target);
+
+        final Delivery source = this.logisticsService.findByTargetAndType(
+                        DeliveryTarget.shipment(command.sourceShipmentId()), DeliveryType.OUTBOUND)
+                .orElseThrow(() -> new NoSuchElementException("Delivery for source shipment: "
+                        + command.sourceShipmentId().getValue() + " not found"));
+        final Delivery delivery = Delivery.derivedFrom(source, command.shipmentId(), command.derivationType(),
+                command.signatureRequired(), command.userId());
+
+        this.logisticsService.createOrUpdate(delivery);
+    }
+
+    private void ensureDeliveryDoesNotExist(final DeliveryTarget target) {
+        if (this.logisticsService.findByTargetAndType(target, DeliveryType.OUTBOUND).isPresent()) {
+            throw new RuntimeException("Delivery for shipment: " + target.id() + " already exists");
+        }
     }
 
     @Override
@@ -111,6 +131,20 @@ public class LogisticsPortImpl implements LogisticsPort {
         final Delivery delivery = findDelivery(deliveryId);
         delivery.changeMethod(method);
         this.logisticsService.createOrUpdate(delivery);
+    }
+
+    @Override
+    public void changeDestinationDepartment(final ShipmentId shipmentId, final DepartmentId destinationDepartmentId) {
+        this.logisticsService.findActiveByTargetAndType(DeliveryTarget.shipment(shipmentId), DeliveryType.OUTBOUND)
+                .ifPresent(delivery -> {
+                    delivery.changeDestinationDepartment(destinationDepartmentId);
+                    this.logisticsService.createOrUpdate(delivery);
+                });
+    }
+
+    @Override
+    public List<Delivery> findDeliveriesByDepartment(final DepartmentId departmentId, final int offset, final int limit) {
+        return logisticsService.findByDepartment(departmentId, offset, limit);
     }
 
     @Override

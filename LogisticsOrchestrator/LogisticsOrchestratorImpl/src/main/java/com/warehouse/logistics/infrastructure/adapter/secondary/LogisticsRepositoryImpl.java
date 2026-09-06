@@ -1,8 +1,11 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
+import com.warehouse.logistics.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
 import com.warehouse.logistics.domain.model.Delivery;
 import com.warehouse.logistics.domain.model.DeliveryTarget;
@@ -11,6 +14,9 @@ import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DeliveryE
 import com.warehouse.logistics.infrastructure.adapter.secondary.mapper.DeliveryEntityMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Root;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,9 +51,39 @@ public class LogisticsRepositoryImpl implements LogisticsRepository {
     }
 
     @Override
+    public Optional<Delivery> findActiveByTargetAndType(final DeliveryTarget target, final DeliveryType type) {
+        return repository.createCriteria(DeliveryEntity.class)
+                .eq("targetType", target.type())
+                .eq("targetId", target.id())
+                .eq("type", type)
+                .notIn("status", List.of(DeliveryLifecycleStatus.CANCELED, DeliveryLifecycleStatus.COMPLETED))
+                .maxResults(1)
+                .one()
+                .map(mapper::toDomain);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<Delivery> findRecent(final int offset, final int limit) {
         return repository.createCriteria(DeliveryEntity.class)
+                .desc("created")
+                .firstResult(offset)
+                .maxResults(limit)
+                .list().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Delivery> findByDepartment(final DepartmentId departmentId, final int offset, final int limit) {
+        final Criteria<DeliveryEntity> criteria = repository.createCriteria(DeliveryEntity.class);
+        final CriteriaBuilder criteriaBuilder = criteria.getCriteriaBuilder();
+        final Root<DeliveryEntity> root = criteria.getRoot();
+        return criteria
+                .and(criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("originDepartmentId").get("value"), departmentId.getValue()),
+                        criteriaBuilder.equal(root.get("destinationDepartmentId").get("value"), departmentId.getValue())))
                 .desc("created")
                 .firstResult(offset)
                 .maxResults(limit)

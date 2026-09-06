@@ -10,7 +10,6 @@ public record DeliveryStepResponseDto(int stepNumber,
                                       String departmentId,
                                       String supplierId,
                                       String vehicleId,
-                                      String method,
                                       String comment,
                                       String failureReason) {
 }
