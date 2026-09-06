@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-04-postgresql-table-tracking-integration-configurations" author="s-soja">
+        <createTable tableName="tracking_integration_configurations">
+            <column name="tracking_integration_configuration_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="provider" type="VARCHAR(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="environment" type="VARCHAR(32)">
+                <constraints nullable="true" />
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="client_id" type="VARCHAR(512)">
+                <constraints nullable="true" />
+            </column>
+            <column name="client_secret" type="VARCHAR(2048)">
+                <constraints nullable="true" />
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="encrypted_configuration" type="VARCHAR(8192)" />
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

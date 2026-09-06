@@ -1,6 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import jakarta.persistence.*;
@@ -35,10 +35,10 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @Column(nullable = false)
@@ -48,9 +48,9 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "department_code", nullable = false)
-    @AttributeOverride(name = "value", column = @Column(name = "department_code"))
-    private DepartmentCode departmentCode;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "department_id", nullable = false))
+    private DepartmentId departmentId;
 
     @Column(name = "language", nullable = false)
     private String language;

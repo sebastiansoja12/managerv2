@@ -16,6 +16,7 @@ import com.warehouse.auth.domain.port.primary.UserPort;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.dto.ChangeLanguageRequestDto;
 import com.warehouse.auth.infrastructure.dto.ChangePasswordRequestDto;
+import com.warehouse.auth.infrastructure.dto.UserDto;
 
 @RestController
 @RequestMapping("/auth/me")
@@ -28,18 +29,22 @@ public class CurrentUserController {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final ResponseMapper responseMapper;
+
     public CurrentUserController(final CurrentUserAuthenticationPort currentUserAuthenticationPort,
                                  final UserPort userPort,
-                                 final PasswordEncoder passwordEncoder) {
+                                 final PasswordEncoder passwordEncoder,
+                                 final ResponseMapper responseMapper) {
         this.currentUserAuthenticationPort = currentUserAuthenticationPort;
         this.userPort = userPort;
         this.passwordEncoder = passwordEncoder;
+        this.responseMapper = responseMapper;
     }
 
     @GetMapping
     public ResponseEntity<?> getCurrentUser() {
         final User user = currentUserAuthenticationPort.getCurrentUser();
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(ResponseMapper.map(user));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(map(user));
     }
 
     @PutMapping("/password")
@@ -66,7 +71,11 @@ public class CurrentUserController {
         final User user = currentUserAuthenticationPort.getCurrentUser();
         userPort.changeLanguage(user.getUserId(), request.language());
         final User changedUser = userPort.findUser(user.getUserId());
-        return ResponseEntity.ok(ResponseMapper.map(changedUser));
+        return ResponseEntity.ok(map(changedUser));
+    }
+
+    private UserDto map(final User user) {
+        return responseMapper.map(user, userPort.getDepartmentCode(user.getDepartmentId()));
     }
 
     private boolean isBlank(final String value) {

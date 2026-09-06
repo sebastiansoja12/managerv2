@@ -13,4 +13,5 @@ public interface DepartmentApiService {
     DepartmentDto getDepartmentByCode(final DepartmentCode departmentCode);
     DepartmentDto getDepartmentById(final DepartmentId departmentId);
     Boolean checkIfDepartmentExists(final DepartmentCode departmentCode);
+    Boolean checkIfDepartmentExists(final DepartmentId departmentId);
 }

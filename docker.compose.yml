@@ -1,20 +1,20 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: manager-mysql
+  postgresql:
+    image: postgres:16-alpine
+    container_name: manager-postgresql
     restart: unless-stopped
-    command: --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-dev}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-dev}
     ports:
-      - "${MYSQL_PORT:-3306}:3306"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+      - postgresql_data:/var/lib/postgresql/data
+      - ./docker/postgresql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
-      start_period: 40s
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      start_period: 10s
       interval: 10s
       timeout: 5s
       retries: 20
@@ -151,15 +151,15 @@ services:
       - "${RETURNING_MANAGER_PORT:-8070}:8070"
     environment:
       SPRING_PROFILES_ACTIVE: ${RETURNING_MANAGER_SPRING_PROFILES_ACTIVE:-dev,docker}
-      SPRING_DATASOURCE_URL: ${RETURNING_MANAGER_DATASOURCE_URL:-jdbc:mysql://mysql:3306/rm}
-      SPRING_DATASOURCE_USERNAME: ${RETURNING_MANAGER_DATASOURCE_USERNAME:-root}
-      SPRING_DATASOURCE_PASSWORD: ${RETURNING_MANAGER_DATASOURCE_PASSWORD:-rootpassword}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${RETURNING_MANAGER_JPA_HIBERNATE_DDL_AUTO:-update}
+      SPRING_DATASOURCE_URL: ${RETURNING_MANAGER_DATASOURCE_URL:-jdbc:postgresql://postgresql:5432/rm}
+      SPRING_DATASOURCE_USERNAME: ${RETURNING_MANAGER_DATASOURCE_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${RETURNING_MANAGER_DATASOURCE_PASSWORD:-postgres}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${RETURNING_MANAGER_JPA_HIBERNATE_DDL_AUTO:-validate}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
     depends_on:
-      mysql:
+      postgresql:
         condition: service_healthy
       mongodb:
         condition: service_started
@@ -180,14 +180,14 @@ services:
     ports:
       - "${ROUTE_TRACKER_PORT:-8082}:8082"
     environment:
-      SPRING_DATASOURCE_URL: ${ROUTE_TRACKER_DATASOURCE_URL:-jdbc:mysql://mysql:3306/rt}
-      SPRING_DATASOURCE_USERNAME: ${ROUTE_TRACKER_DATASOURCE_USERNAME:-root}
-      SPRING_DATASOURCE_PASSWORD: ${ROUTE_TRACKER_DATASOURCE_PASSWORD:-rootpassword}
+      SPRING_DATASOURCE_URL: ${ROUTE_TRACKER_DATASOURCE_URL:-jdbc:postgresql://postgresql:5432/rt}
+      SPRING_DATASOURCE_USERNAME: ${ROUTE_TRACKER_DATASOURCE_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${ROUTE_TRACKER_DATASOURCE_PASSWORD:-postgres}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
     depends_on:
-      mysql:
+      postgresql:
         condition: service_healthy
       mongodb:
         condition: service_started
@@ -203,5 +203,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  postgresql_data:
   mongo_data:

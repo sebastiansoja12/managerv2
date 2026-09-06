@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-04-postgresql-table-geocoding-configurations" author="s-soja">
+        <createTable tableName="geocoding_configurations">
+            <column name="geocoding_configuration_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="api_url" type="VARCHAR(50)" />
+            <column name="api_user_name" type="VARCHAR(50)" />
+            <column name="api_password" type="TEXT" />
+            <column name="api_key" type="TEXT" />
+            <column name="access_token" type="TEXT" />
+            <column name="refresh_token" type="TEXT" />
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="provider" type="VARCHAR(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="client_number" type="VARCHAR(255)" />
+            <column name="default_provider" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

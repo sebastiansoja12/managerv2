@@ -2,7 +2,6 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import java.time.LocalDateTime;
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -87,9 +86,13 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Enumerated(EnumType.STRING)
     private ShipmentSize shipmentSize;
 
-    @Column(name = "destination", nullable = false)
-    @AttributeOverride(name = "value", column = @Column(name = "destination"))
-    private DepartmentCode destination;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
+    private DepartmentId targetDepartmentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_department_id", referencedColumnName = "department_id", insertable = false, updatable = false)
+    private DepartmentEntity targetDepartment;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))

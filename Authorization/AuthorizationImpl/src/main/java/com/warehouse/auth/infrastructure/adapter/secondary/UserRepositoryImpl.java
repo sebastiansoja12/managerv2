@@ -4,12 +4,11 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.vo.ApiKey;
-import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToEntityMapper;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToModelMapper;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,7 +29,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public UserResponse createOrUpdate(final User user) {
+    public void createOrUpdate(final User user) {
         final UserEntity userEntity = UserToEntityMapper.map(user);
 
         if (findById(user.getUserId()) == null) {
@@ -39,7 +38,6 @@ public class UserRepositoryImpl implements UserRepository {
             repository.update(userEntity);
         }
 
-        return UserResponse.from(userEntity);
     }
 
     @Override
@@ -81,9 +79,9 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
+    public List<UserId> findAllActiveUsersByDepartmentId(final DepartmentId departmentId) {
         return repository.createCriteria(UserEntity.class)
-                .eq("departmentCode.value", departmentCode)
+                .eq("departmentId.value", departmentId.value())
                 .isFalse("deleted")
                 .list()
                 .stream()

@@ -23,7 +23,7 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
                 user.getLastName() +
                 user.getEmail() +
                 user.getRole().toString() +
-                user.getDepartmentCode() +
+                user.getDepartmentId() +
                 refreshTokenProvider.getKey();
 
         String token = generateSHA256Hash(input);

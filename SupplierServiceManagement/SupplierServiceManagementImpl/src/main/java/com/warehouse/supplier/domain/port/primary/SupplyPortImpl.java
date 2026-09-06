@@ -2,12 +2,14 @@ package com.warehouse.supplier.domain.port.primary;
 
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
+import com.warehouse.supplier.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.supplier.domain.service.DriverLicenseService;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
@@ -30,16 +32,20 @@ public class SupplyPortImpl implements SupplyPort {
 
     private final DeviceServicePort deviceServicePort;
 
+    private final DepartmentServicePort departmentServicePort;
+
     public SupplyPortImpl(final SupplierService supplierService,
                           final SupplierCodeGeneratorService generatorService,
                           final SupplierValidatorService validatorService,
                           final DriverLicenseService driverLicenseService,
-                          final DeviceServicePort deviceServicePort) {
+                          final DeviceServicePort deviceServicePort,
+                          final DepartmentServicePort departmentServicePort) {
         this.supplierService = supplierService;
         this.generatorService = generatorService;
         this.validatorService = validatorService;
         this.driverLicenseService = driverLicenseService;
         this.deviceServicePort = deviceServicePort;
+        this.departmentServicePort = departmentServicePort;
     }
 
     @Override
@@ -55,7 +61,8 @@ public class SupplyPortImpl implements SupplyPort {
         }
         final SupplierId supplierId = this.supplierService.nextSupplierId();
 		final Supplier supplier = new Supplier(supplierId, supplierCode, firstName, lastName, telephoneNumber);
-        supplier.changeDepartmentCode(departmentCode);
+        final DepartmentId departmentId = departmentServicePort.getDepartmentId(departmentCode);
+        supplier.changeDepartment(departmentId);
 
         this.supplierService.create(supplier);
 
@@ -140,7 +147,8 @@ public class SupplyPortImpl implements SupplyPort {
             throw new RestClientException("Supplier or department not found");
         }
 
-        this.supplierService.changeDepartment(supplierCode, departmentCode);
+        final DepartmentId departmentId = departmentServicePort.getDepartmentId(departmentCode);
+        this.supplierService.changeDepartment(supplierCode, departmentId);
     }
 
     @Override
@@ -150,8 +158,14 @@ public class SupplyPortImpl implements SupplyPort {
         if (validationResult.isFailure()) {
             return Result.failure(validationResult.getFailure());
         }
-        this.supplierService.update(supplierCode, SupplierDto.from(command));
+        final DepartmentId departmentId = departmentServicePort.getDepartmentId(command.departmentCode());
+        this.supplierService.update(supplierCode, SupplierDto.from(command, departmentId));
         return Result.success();
+    }
+
+    @Override
+    public DepartmentCode getDepartmentCode(final DepartmentId departmentId) {
+        return departmentServicePort.getDepartmentCode(departmentId);
     }
 
     @Override

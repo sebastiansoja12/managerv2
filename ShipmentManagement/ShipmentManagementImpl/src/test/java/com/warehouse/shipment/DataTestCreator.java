@@ -3,7 +3,7 @@ package com.warehouse.shipment;
 import java.math.BigDecimal;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
@@ -83,7 +83,7 @@ public class DataTestCreator {
                 CountryCode.DE,
                 money(),
                 locked,
-                new DepartmentCode("KT1"),
+                new DepartmentId(10L),
                 null,
                 ShipmentPriority.MEDIUM,
                 trackingNumber(),

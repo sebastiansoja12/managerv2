@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -87,9 +88,14 @@ public class ShipmentEntity extends BelongsToOperator {
     @Enumerated(EnumType.STRING)
     private ShipmentSize shipmentSize;
 
-    @Column(name = "destination", nullable = false)
-    @AttributeOverride(name = "value", column = @Column(name = "destination"))
-    private DepartmentCode destination;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
+    private DepartmentId targetDepartmentId;
+
+    @NotAudited
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_department_id", referencedColumnName = "department_id", insertable = false, updatable = false)
+    private DepartmentEntity targetDepartment;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
@@ -156,7 +162,7 @@ public class ShipmentEntity extends BelongsToOperator {
 			final String senderTelephone, final String recipientFirstName, final String recipientLastName,
 			final String recipientEmail, final String recipientCity, final String recipientStreet,
 			final String recipientPostalCode, final String recipientTelephone, final ShipmentSize shipmentSize,
-			final DepartmentCode destination, final DepartmentId originDepartmentId, final ShipmentStatus shipmentStatus,
+			final DepartmentId targetDepartmentId, final DepartmentId originDepartmentId, final ShipmentStatus shipmentStatus,
             final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
             final LocalDateTime updatedAt, final Boolean locked, final CountryCode originCountry,
             final CountryCode destinationCountry, final Money price, final ShipmentPriority shipmentPriority,
@@ -178,7 +184,7 @@ public class ShipmentEntity extends BelongsToOperator {
         this.recipientPostalCode = recipientPostalCode;
         this.recipientTelephone = recipientTelephone;
         this.shipmentSize = shipmentSize;
-        this.destination = destination;
+        this.targetDepartmentId = targetDepartmentId;
         this.originDepartmentId = originDepartmentId;
         this.shipmentStatus = shipmentStatus;
         this.shipmentType = shipmentType;

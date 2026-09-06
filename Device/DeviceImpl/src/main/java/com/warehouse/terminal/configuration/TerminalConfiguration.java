@@ -73,8 +73,8 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public DepartmentRepository departmentRepository(final DepartmentReadRepository repository) {
-        return new DepartmentRepositoryImpl(repository);
+    public DepartmentRepository departmentRepository(final DepartmentServicePort departmentServicePort) {
+        return new DepartmentRepositoryImpl(departmentServicePort);
     }
 
     @Bean
@@ -103,8 +103,8 @@ public class TerminalConfiguration {
     }
 
     @Bean("device.userRepository")
-    public UserRepository userRepository(final UserReadRepository repository) {
-        return new UserRepositoryImpl(repository);
+    public UserRepository userRepository(final UserServicePort userServicePort) {
+        return new UserRepositoryImpl(userServicePort);
     }
 
     @Bean

@@ -6,7 +6,6 @@ import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
-import org.apache.commons.lang3.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +23,7 @@ public class Shipment {
 
     private ShipmentSize shipmentSize;
 
-    private DepartmentCode destination;
+    private DepartmentId targetDepartmentId;
 
     private DepartmentId originDepartmentId;
 
@@ -71,7 +70,7 @@ public class Shipment {
                     final Boolean locked,
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
-                    final DepartmentCode destination,
+                    final DepartmentId targetDepartmentId,
                     final DepartmentId originDepartmentId,
                     final Signature signature,
                     final boolean signatureRequired,
@@ -92,7 +91,7 @@ public class Shipment {
 		this.locked = locked;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
-        this.destination = destination;
+        this.targetDepartmentId = targetDepartmentId;
         this.originDepartmentId = originDepartmentId;
         this.signature = signature;
         this.signatureRequired = signatureRequired;
@@ -111,13 +110,14 @@ public class Shipment {
                     final CountryCode destinationCountry,
                     final Money price,
                     final Boolean locked,
-                    final DepartmentCode destination,
+                    final DepartmentId targetDepartmentId,
                     final Signature signature,
                     final ShipmentPriority shipmentPriority,
                     final TrackingNumber trackingNumber,
                     final ShipmentStatus status) {
         this(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
-                price, locked, destination, null, signature, shipmentPriority, trackingNumber, status);
+                price, locked, targetDepartmentId, null, signature, shipmentPriority,
+                trackingNumber, status);
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -129,7 +129,7 @@ public class Shipment {
                     final CountryCode destinationCountry,
                     final Money price,
                     final Boolean locked,
-                    final DepartmentCode destination,
+                    final DepartmentId targetDepartmentId,
                     final DepartmentId originDepartmentId,
                     final Signature signature,
                     final ShipmentPriority shipmentPriority,
@@ -149,7 +149,7 @@ public class Shipment {
         this.signature = signature;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
-        this.destination = destination;
+        this.targetDepartmentId = targetDepartmentId;
         this.originDepartmentId = originDepartmentId;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
@@ -166,7 +166,7 @@ public class Shipment {
                     final CountryCode destinationCountry,
                     final Money price,
                     final Boolean locked,
-                    final DepartmentCode destination,
+                    final DepartmentId targetDepartmentId,
                     final DepartmentId originDepartmentId,
                     final Signature signature,
                     final ShipmentPriority shipmentPriority,
@@ -187,7 +187,7 @@ public class Shipment {
         this.signature = signature;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
-        this.destination = destination;
+        this.targetDepartmentId = targetDepartmentId;
         this.originDepartmentId = originDepartmentId;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
@@ -204,14 +204,15 @@ public class Shipment {
                                           final CountryCode originCountry,
                                           final CountryCode destinationCountry,
                                           final Money price,
-                                          final DepartmentCode destination,
+                                          final DepartmentId targetDepartmentId,
                                           final DepartmentId originDepartmentId,
                                           final Signature signature,
                                           final ShipmentPriority shipmentPriority,
                                           final TrackingNumber trackingNumber,
                                           final ShipmentStatus status) {
         return new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
-                price, false, destination, originDepartmentId, signature, shipmentPriority, trackingNumber, status);
+                price, false, targetDepartmentId, originDepartmentId, signature,
+                shipmentPriority, trackingNumber, status);
 	}
 
     public static Shipment rehydrate(final ShipmentId shipmentId,
@@ -227,7 +228,7 @@ public class Shipment {
                                      final Boolean locked,
                                      final CountryCode originCountry,
                                      final CountryCode destinationCountry,
-                                     final DepartmentCode destination,
+                                     final DepartmentId targetDepartmentId,
                                      final DepartmentId originDepartmentId,
                                      final Signature signature,
                                      final boolean signatureRequired,
@@ -237,12 +238,13 @@ public class Shipment {
                                      final ExternalId<UUID> externalShipmentId) {
         return new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentStatus, shipmentType,
                 shipmentRelatedId, price, createdAt, updatedAt, locked, originCountry, destinationCountry,
-                destination, originDepartmentId, signature, signatureRequired, shipmentPriority, dangerousGood,
+                targetDepartmentId, originDepartmentId, signature, signatureRequired,
+                shipmentPriority, dangerousGood,
                 trackingNumber, externalShipmentId);
     }
 
 	public ShipmentSnapshot snapshot() {
-		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destination, originDepartmentId, shipmentStatus,
+		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, targetDepartmentId, originDepartmentId, shipmentStatus,
 				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
 				shipmentPriority, originCountry, destinationCountry, signature,
                 trackingNumber, externalShipmentId);
@@ -260,8 +262,8 @@ public class Shipment {
         return shipmentSize;
     }
 
-    public DepartmentCode getDestination() {
-        return destination;
+    public DepartmentId getTargetDepartmentId() {
+        return targetDepartmentId;
     }
 
     public DepartmentId getOriginDepartmentId() {
@@ -408,12 +410,10 @@ public class Shipment {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateDestination(final VoronoiResponse voronoiResponse) {
+    public void updateDestination(final DepartmentId targetDepartmentId) {
         ensureCanBeModified();
-        if (ObjectUtils.isNotEmpty(voronoiResponse) && voronoiResponse.getDepartmentCodeResult() != null) {
-            this.destination = voronoiResponse.getDepartmentCodeResult();
-            markAsModified();
-        }
+        this.targetDepartmentId = targetDepartmentId;
+        markAsModified();
     }
 
     public void update(final ShipmentUpdate shipmentUpdate) {
@@ -426,7 +426,7 @@ public class Shipment {
     public void update(final Sender sender, final Recipient recipient, final ShipmentStatus shipmentStatus,
                        final ShipmentPriority shipmentPriority, final ShipmentSize shipmentSize,
                        final Money price, final DangerousGood dangerousGood,
-                       final DepartmentCode destination, final Boolean signatureRequired) {
+                       final DepartmentId targetDepartmentId, final Boolean signatureRequired) {
         ensureCanBeModified();
         this.recipient = recipient;
         this.sender = sender;
@@ -435,7 +435,7 @@ public class Shipment {
         this.shipmentSize = shipmentSize;
         this.price = price;
         this.dangerousGood = dangerousGood;
-        this.destination = destination;
+        this.targetDepartmentId = targetDepartmentId;
         this.signatureRequired = signatureRequired;
         markAsModified();
     }
@@ -558,9 +558,9 @@ public class Shipment {
         markAsModified();
     }
 
-    public void changeDestinationDepartment(final DepartmentCode destination) {
+    public void changeTargetDepartment(final DepartmentId targetDepartmentId) {
         ensureCanBeModified();
-        this.destination = destination;
+        this.targetDepartmentId = targetDepartmentId;
         markAsModified();
     }
 

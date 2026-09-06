@@ -61,10 +61,8 @@ public class AuthConfiguration  {
     }
 
     @Bean
-    public JwtService jwtService(final JwtProvider jwtProvider,
-                                 @Qualifier("authentication.departmentServicePort")
-                                 final DepartmentServicePort departmentServicePort) {
-        return new JwtServiceImpl(jwtProvider, departmentServicePort);
+    public JwtService jwtService(final JwtProvider jwtProvider) {
+        return new JwtServiceImpl(jwtProvider);
     }
     
     @Bean

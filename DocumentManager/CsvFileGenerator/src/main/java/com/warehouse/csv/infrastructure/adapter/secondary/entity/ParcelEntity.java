@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 @Getter
 @Builder
@@ -77,7 +78,10 @@ public class ParcelEntity {
     @Column(name = "recipient_postal_code", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "destination", nullable = false)
+    @Column(name = "target_department_id", nullable = false)
+    private Long targetDepartmentId;
+
+    @Formula("(select department.department_code from department where department.department_id = target_department_id)")
     private String destination;
 
     @Column(name = "shipment_related_id")

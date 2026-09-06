@@ -19,4 +19,9 @@ public class DepartmentServiceClient implements DepartmentServicePort {
 		final DepartmentDto department = this.departmentApiService.getDepartmentById(departmentId);
 		return new DepartmentCode(department.departmentCode());
 	}
+
+	@Override
+	public DepartmentId getDepartmentId(final DepartmentCode departmentCode) {
+		return new DepartmentId(this.departmentApiService.getDepartmentByCode(departmentCode).departmentId());
+	}
 }

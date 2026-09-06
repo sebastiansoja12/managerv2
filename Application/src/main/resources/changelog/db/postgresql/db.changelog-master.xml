@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <include file="sequences.xml" relativeToChangelogFile="true"/>
+    <include file="tables/communication_log_details.xml" relativeToChangelogFile="true"/>
+    <include file="tables/communication_log_details_rd.xml" relativeToChangelogFile="true"/>
+    <include file="tables/geocoding_configurations.xml" relativeToChangelogFile="true"/>
+    <include file="tables/tracking_integration_configurations.xml" relativeToChangelogFile="true"/>
+    <include file="tables/kafka_event_outbox.xml" relativeToChangelogFile="true"/>
+    <include file="tables/async_job.xml" relativeToChangelogFile="true"/>
+    <include file="tables/country.xml" relativeToChangelogFile="true"/>
+    <include file="tables/delivery.xml" relativeToChangelogFile="true"/>
+    <include file="tables/delivery_area_postal_codes.xml" relativeToChangelogFile="true"/>
+    <include file="tables/delivery_area_postal_codes_aud.xml" relativeToChangelogFile="true"/>
+    <include file="tables/delivery_missed_details.xml" relativeToChangelogFile="true"/>
+    <include file="tables/department.xml" relativeToChangelogFile="true"/>
+    <include file="tables/department_rd.xml" relativeToChangelogFile="true"/>
+    <include file="tables/department_aud.xml" relativeToChangelogFile="true"/>
+    <include file="tables/department_rd_aud.xml" relativeToChangelogFile="true"/>
+    <include file="tables/announcements.xml" relativeToChangelogFile="true"/>
+    <include file="tables/device_pair.xml" relativeToChangelogFile="true"/>
+    <include file="tables/device_settings.xml" relativeToChangelogFile="true"/>
+    <include file="tables/device_version.xml" relativeToChangelogFile="true"/>
+    <include file="tables/messages.xml" relativeToChangelogFile="true"/>
+    <include file="tables/mobile_installed_apps.xml" relativeToChangelogFile="true"/>
+    <include file="tables/mobiles.xml" relativeToChangelogFile="true"/>
+    <include file="tables/operator_configurations.xml" relativeToChangelogFile="true"/>
+    <include file="tables/operator_configurations_aud.xml" relativeToChangelogFile="true"/>
+    <include file="tables/operators.xml" relativeToChangelogFile="true"/>
+    <include file="tables/operators_aud.xml" relativeToChangelogFile="true"/>
+    <include file="tables/delivery_network.xml" relativeToChangelogFile="true"/>
+    <include file="tables/delivery_network_connection.xml" relativeToChangelogFile="true"/>
+    <include file="tables/parcel.xml" relativeToChangelogFile="true"/>
+    <include file="tables/price.xml" relativeToChangelogFile="true"/>
+    <include file="tables/process_logs.xml" relativeToChangelogFile="true"/>
+    <include file="tables/process_logs_rd.xml" relativeToChangelogFile="true"/>
+    <include file="tables/refresh_token.xml" relativeToChangelogFile="true"/>
+    <include file="tables/reject_reason.xml" relativeToChangelogFile="true"/>
+    <include file="tables/reroute_token.xml" relativeToChangelogFile="true"/>
+    <include file="tables/return_tokens.xml" relativeToChangelogFile="true"/>
+    <include file="tables/revinfo.xml" relativeToChangelogFile="true"/>
+    <include file="tables/role_permissions.xml" relativeToChangelogFile="true"/>
+    <include file="tables/scanners.xml" relativeToChangelogFile="true"/>
+    <include file="tables/shipment.xml" relativeToChangelogFile="true"/>
+    <include file="tables/shipment_rd.xml" relativeToChangelogFile="true"/>
+    <include file="tables/shipment_aud.xml" relativeToChangelogFile="true"/>
+    <include file="tables/signature.xml" relativeToChangelogFile="true"/>
+    <include file="tables/supplier.xml" relativeToChangelogFile="true"/>
+    <include file="tables/suppliers.xml" relativeToChangelogFile="true"/>
+    <include file="tables/suppliers_aud.xml" relativeToChangelogFile="true"/>
+    <include file="tables/suppliers_supported_package_types.xml" relativeToChangelogFile="true"/>
+    <include file="tables/suppliers_supported_package_types_aud.xml" relativeToChangelogFile="true"/>
+    <include file="tables/terminals.xml" relativeToChangelogFile="true"/>
+    <include file="tables/tracking_sequence.xml" relativeToChangelogFile="true"/>
+    <include file="tables/users.xml" relativeToChangelogFile="true"/>
+    <include file="tables/users_role_permissions.xml" relativeToChangelogFile="true"/>
+    <include file="schema-objects.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>

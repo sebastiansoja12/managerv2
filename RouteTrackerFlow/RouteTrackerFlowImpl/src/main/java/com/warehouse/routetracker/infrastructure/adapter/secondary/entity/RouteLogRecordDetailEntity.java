@@ -43,8 +43,7 @@ public class RouteLogRecordDetailEntity {
     @Column(name = "process_type")
     private ProcessType processType;
 
-    @Column(name = "request")
-    @Lob
+    @Column(name = "request", columnDefinition = "TEXT")
     @Size(min = 5, max = 65555)
     private String request;
 

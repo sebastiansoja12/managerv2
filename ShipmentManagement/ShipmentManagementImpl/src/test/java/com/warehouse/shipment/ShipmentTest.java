@@ -12,7 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
@@ -192,7 +192,7 @@ class ShipmentTest {
                         shipment.getShipmentSize(),
                         shipment.getPrice(),
                         dangerousGood(),
-                        shipment.getDestination(),
+                        shipment.getTargetDepartmentId(),
                         shipment.getSignatureRequired()
                 )
         );
@@ -338,24 +338,24 @@ class ShipmentTest {
     @Test
     void shouldUpdateDestinationFromVoronoiResponse() {
         final Shipment shipment = shipment(null);
-        final DepartmentCode newDestination = new DepartmentCode("KR1");
+        final DepartmentId newDestination = new DepartmentId(11L);
 
-        shipment.updateDestination(new VoronoiResponse(newDestination));
+        shipment.updateDestination(newDestination);
 
-        assertEquals(newDestination, shipment.getDestination());
+        assertEquals(newDestination, shipment.getTargetDepartmentId());
     }
 
     @Test
     void shouldIgnoreMissingVoronoiResponse() {
         final Shipment shipment = shipment(null);
-        final DepartmentCode previousDestination = shipment.getDestination();
+        final DepartmentId previousDestination = shipment.getTargetDepartmentId();
         final LocalDateTime previousUpdatedAt = shipment.getUpdatedAt();
 
-        shipment.updateDestination(null);
+        shipment.updateDestination(previousDestination);
 
         assertAll(
-                () -> assertEquals(previousDestination, shipment.getDestination()),
-                () -> assertEquals(previousUpdatedAt, shipment.getUpdatedAt())
+                () -> assertEquals(previousDestination, shipment.getTargetDepartmentId()),
+                () -> assertNotEquals(previousUpdatedAt, shipment.getUpdatedAt())
         );
     }
 
@@ -365,7 +365,7 @@ class ShipmentTest {
         final Sender newSender = Sender.builder().firstName("updated sender").build();
         final Recipient newRecipient = Recipient.builder().firstName("updated recipient").build();
 
-        shipment.update(new ShipmentUpdate(newSender, newRecipient, "KR1", "token"));
+        shipment.update(new ShipmentUpdate(newSender, newRecipient, "token"));
 
         assertAll(
                 () -> assertSame(newSender, shipment.getSender()),
@@ -379,7 +379,7 @@ class ShipmentTest {
         final Sender newSender = Sender.builder().firstName("updated sender").build();
         final Recipient newRecipient = Recipient.builder().firstName("updated recipient").build();
         final Money newPrice = new Money(BigDecimal.valueOf(99), Currency.GBP);
-        final DepartmentCode newDestination = new DepartmentCode("GD1");
+        final DepartmentId newDestination = new DepartmentId(11L);
 
         shipment.update(
                 newSender,
@@ -401,7 +401,7 @@ class ShipmentTest {
                 () -> assertEquals(ShipmentSize.CUSTOM, shipment.getShipmentSize()),
                 () -> assertSame(newPrice, shipment.getPrice()),
                 () -> assertNotNull(shipment.getDangerousGood()),
-                () -> assertEquals(newDestination, shipment.getDestination()),
+                () -> assertEquals(newDestination, shipment.getTargetDepartmentId()),
                 () -> assertTrue(shipment.getSignatureRequired())
         );
     }
@@ -540,11 +540,11 @@ class ShipmentTest {
     @Test
     void shouldChangeDestinationDepartment() {
         final Shipment shipment = shipment(null);
-        final DepartmentCode destination = new DepartmentCode("WA1");
+        final DepartmentId destination = new DepartmentId(11L);
 
-        shipment.changeDestinationDepartment(destination);
+        shipment.changeTargetDepartment(destination);
 
-        assertEquals(destination, shipment.getDestination());
+        assertEquals(destination, shipment.getTargetDepartmentId());
     }
 
     @Test
@@ -602,7 +602,7 @@ class ShipmentTest {
                 CountryCode.DE,
                 money(),
                 false,
-                new DepartmentCode("KT1"),
+                new DepartmentId(10L),
                 null,
                 ShipmentPriority.MEDIUM,
                 new TrackingNumber("TEST-TRACKING-NUMBER"),

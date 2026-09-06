@@ -31,7 +31,7 @@ public class ShipmentPersistenceMapper {
                 entity.getLocked(),
                 entity.getOriginCountry(),
                 entity.getDestinationCountry(),
-                entity.getDestination(),
+                entity.getTargetDepartmentId(),
                 entity.getOriginDepartmentId(),
                 signature(entity.getSignature()),
                 entity.getSignature() != null,
@@ -61,7 +61,7 @@ public class ShipmentPersistenceMapper {
                 entity.getLocked(),
                 entity.getOriginCountry(),
                 entity.getDestinationCountry(),
-                entity.getDestination(),
+                entity.getTargetDepartmentId(),
                 entity.getOriginDepartmentId(),
                 signature(entity.getSignature()),
                 entity.getSignature() != null,
@@ -90,7 +90,7 @@ public class ShipmentPersistenceMapper {
                 .recipientStreet(shipment.getRecipient().getStreet())
                 .recipientPostalCode(shipment.getRecipient().getPostalCode())
                 .shipmentSize(shipment.getShipmentSize())
-                .destination(shipment.getDestination())
+                .targetDepartmentId(shipment.getTargetDepartmentId())
                 .originDepartmentId(shipment.getOriginDepartmentId())
                 .shipmentStatus(shipment.getShipmentStatus())
                 .shipmentType(shipment.getShipmentType())
@@ -127,7 +127,7 @@ public class ShipmentPersistenceMapper {
                 .recipientStreet(snapshot.recipient().getStreet())
                 .recipientPostalCode(snapshot.recipient().getPostalCode())
                 .shipmentSize(snapshot.shipmentSize())
-                .destination(snapshot.destination())
+                .targetDepartmentId(snapshot.targetDepartmentId())
                 .originDepartmentId(snapshot.originDepartmentId())
                 .shipmentStatus(snapshot.shipmentStatus())
                 .shipmentType(snapshot.shipmentType())

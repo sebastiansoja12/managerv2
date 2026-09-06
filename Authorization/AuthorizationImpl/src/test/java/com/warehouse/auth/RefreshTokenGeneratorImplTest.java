@@ -3,7 +3,7 @@ package com.warehouse.auth;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.RefreshTokenGeneratorImpl;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ public class RefreshTokenGeneratorImplTest {
     void shouldGenerateRandomToken() {
         // given
         final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
-                new DepartmentCode("TST"), "");
+                new DepartmentId(10L), "");
         // when
         final String token = refreshTokenGenerator.generateToken(user);
         // then
