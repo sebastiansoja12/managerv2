@@ -104,9 +104,8 @@ public class AuthConfiguration  {
     }
 
     @Bean
-    public PlatformActorService platformActorService(
-            final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort) {
-        return new PlatformActorServiceAdapter(platformOwnerAuthenticationPort);
+    public PlatformActorService platformActorService() {
+        return new PlatformActorServiceAdapter();
     }
 
     @Bean
