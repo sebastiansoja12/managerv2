@@ -125,20 +125,11 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     }
 
     @Override
-    public DepartmentId findOriginDepartmentByTrackingNumber(final TrackingNumber trackingNumber) {
-        return noOperatorContextRepository.createCriteria(ShipmentEntity.class)
-                .eq("trackingNumber.value", trackingNumber.value())
-                .one()
-                .map(ShipmentEntity::getOriginDepartmentId)
-                .orElseThrow(() -> new ShipmentNotFoundException("Shipment: " + trackingNumber.value() + " was not found"));
-    }
-
-    @Override
     public ShipmentOwnerContext findContext(final TrackingNumber trackingNumber) {
         return noOperatorContextRepository.createCriteria(ShipmentEntity.class)
                 .eq("trackingNumber.value", trackingNumber.value())
                 .one()
-                .map(shipment -> new ShipmentOwnerContext(shipment.operatorId(), shipment.getOriginDepartmentId(), shipment.getTargetDepartmentId()))
+                .map(shipment -> new ShipmentOwnerContext(shipment.operatorId()))
                 .orElseThrow(() -> new ShipmentNotFoundException("Shipment: " + trackingNumber.value() + " was not found"));
     }
 }

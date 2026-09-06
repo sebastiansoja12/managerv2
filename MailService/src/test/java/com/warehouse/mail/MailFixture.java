@@ -53,9 +53,9 @@ public final class MailFixture {
                                              final PartySnapshot sender,
                                              final PartySnapshot recipient,
                                              final ShipmentId relatedShipmentId) {
-        return new ShipmentEventData(new ShipmentId(100L), sender, recipient, null, null, status, null,
-                relatedShipmentId, null, null, null, false, false, null, new TrackingNumber("PL 123/45"), null, null,
-                null, null, null, null, null);
+        return new ShipmentEventData(new ShipmentId(100L), sender, recipient, status, null,
+                relatedShipmentId, null, null, null, false, false, null, new TrackingNumber("PL 123/45"), null,
+                null, null);
     }
 
     public static final class InMemoryMailTemplateRepository implements MailTemplateRepository {

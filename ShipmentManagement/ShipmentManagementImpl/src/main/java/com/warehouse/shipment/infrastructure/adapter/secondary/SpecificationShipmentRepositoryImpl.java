@@ -61,10 +61,6 @@ public class SpecificationShipmentRepositoryImpl
             ));
         }
 
-        if (hasText(criteria.destination())) {
-            shipmentCriteria.ilike("targetDepartment.departmentCode.value", like(criteria.destination()));
-        }
-
         if (criteria.minPrice() != null) {
             shipmentCriteria.ge("price.amount", criteria.minPrice());
         }

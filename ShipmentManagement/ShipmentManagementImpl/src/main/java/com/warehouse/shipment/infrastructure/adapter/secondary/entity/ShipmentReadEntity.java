@@ -7,8 +7,6 @@ import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
-import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import jakarta.persistence.*;
@@ -60,30 +58,6 @@ public class ShipmentReadEntity extends BelongsToOperator {
             @AttributeOverride(name = "countryCode", column = @Column(name = "recipient_country_code"))
     })
     private PartyEntity recipient;
-
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
-    private DepartmentId targetDepartmentId;
-
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
-    private DepartmentId originDepartmentId;
-
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "pickup_point_id", columnDefinition = "UUID"))
-    private PickupPointId pickupPointId;
-
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "delivery_pickup_point_id", columnDefinition = "UUID"))
-    private PickupPointId deliveryPickupPointId;
-
-    @Column(name = "pickup_method")
-    @Enumerated(EnumType.STRING)
-    private PickupMethod pickupMethod;
-
-    @Column(name = "delivery_method")
-    @Enumerated(EnumType.STRING)
-    private DeliveryMethod deliveryMethod;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

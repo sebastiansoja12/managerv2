@@ -3,13 +3,10 @@ package com.warehouse.shipment;
 import java.math.BigDecimal;
 
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
-import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.vo.CustomerReference;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;
@@ -86,8 +83,6 @@ public class DataTestCreator {
                 relatedShipmentId,
                 money(),
                 locked,
-                new DepartmentId(10L),
-                new DepartmentId(9L),
                 ShipmentPriority.MEDIUM,
                 trackingNumber(),
                 ShipmentStatus.CREATED
@@ -98,9 +93,7 @@ public class DataTestCreator {
         return new Shipment(
                 shipmentId(), sender(), recipient(), null,
                 money(), false,
-                new DepartmentId(10L), new DepartmentId(9L),
                 ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
-                PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,
                 new Dimensions(new BigDecimal("40"), new BigDecimal("30"), new BigDecimal("20"), LengthUnit.CM),
                 new Weight(new BigDecimal("5.5"), WeightUnit.KG),
                 new CustomerReference("ORDER-2026-12345"), "Electronics",

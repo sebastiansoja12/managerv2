@@ -40,7 +40,7 @@ public class ShipmentRerouteIntegrationListener {
             return;
         }
 
-        operatorContext.runAs(context.operatorId(), null, context.originDepartmentId(), () -> shipmentPort.reroute(mapper.map(event)));
+        operatorContext.runAs(context.operatorId(), null, null, () -> shipmentPort.reroute(mapper.map(event)));
         log.info("Shipment {} rerouted (reroute token {})", event.trackingNumber(), event.rerouteTokenId());
     }
 }

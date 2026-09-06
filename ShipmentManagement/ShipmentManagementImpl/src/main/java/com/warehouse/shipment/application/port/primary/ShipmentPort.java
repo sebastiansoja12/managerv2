@@ -75,7 +75,5 @@ public interface ShipmentPort {
 
     boolean hasAnyShipment();
 
-    DepartmentId findOriginDepartmentForShipment(final TrackingNumber trackingNumber);
-
     ShipmentOwnerContext findContext(final TrackingNumber trackingNumber);
 }

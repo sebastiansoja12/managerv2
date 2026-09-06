@@ -31,7 +31,5 @@ public interface ShipmentRepository {
 
     boolean existsAny();
 
-    DepartmentId findOriginDepartmentByTrackingNumber(final TrackingNumber trackingNumber);
-
     ShipmentOwnerContext findContext(final TrackingNumber trackingNumber);
 }

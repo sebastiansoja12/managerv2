@@ -29,12 +29,11 @@ public interface ShipmentResponseMapper {
                 response.trackingNumber());
     }
 
-    default ShipmentDto map(final ShipmentSnapshot shipment, final DepartmentCode departmentCode) {
-        return map(shipment, departmentCode, null);
+    default ShipmentDto map(final ShipmentSnapshot shipment) {
+        return map(shipment, null);
     }
 
     default ShipmentDto map(final ShipmentSnapshot shipment,
-                            final DepartmentCode departmentCode,
                             final com.warehouse.shipment.domain.model.Signature signature) {
         if (shipment == null) {
             return null;
@@ -43,11 +42,6 @@ public interface ShipmentResponseMapper {
                 map(shipment.shipmentId()),
                 map(shipment.sender()),
                 map(shipment.recipient()),
-                map(departmentCode),
-                shipment.originDepartmentId(),
-                shipment.pickupPointId(),
-                shipment.pickupMethod() == null ? null : PickupMethodDto.valueOf(shipment.pickupMethod().name()),
-                shipment.deliveryMethod() == null ? null : DeliveryMethodDto.valueOf(shipment.deliveryMethod().name()),
                 shipment.shipmentStatus() == null ? null : ShipmentStatusDto.from(shipment.shipmentStatus()),
                 map(shipment.shipmentRelatedId()),
                 shipment.shipmentPriority() == null
@@ -68,12 +62,11 @@ public interface ShipmentResponseMapper {
                         : PackagingTypeDto.valueOf(shipment.packagingType().name()),
                 shipment.serviceLevel() == null ? null
                         : ShipmentServiceLevelDto.valueOf(shipment.serviceLevel().name()));
-        response.setDeliveryPickupPointId(shipment.deliveryPickupPointId());
         return response;
     }
 
     default ShipmentDto map(final ShipmentResult shipmentResult) {
-        return map(shipmentResult.snapshot(), shipmentResult.destination(), shipmentResult.signature());
+        return map(shipmentResult.snapshot(), shipmentResult.signature());
     }
 
     default PersonApi map(final Party person) {

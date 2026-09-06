@@ -29,7 +29,7 @@ class MailKafkaListenerTest {
 
     @Test
     void shouldSendShipmentCreatedMails() {
-        listener.handle(new ShipmentCreatedIntegrationEvent(shipment));
+        listener.handle(new ShipmentCreatedIntegrationEvent(shipment, null));
 
         assertEquals(List.of("shipment.created.sender", "shipment.created.recipient"), mailPort.templateKeys());
     }
@@ -43,7 +43,7 @@ class MailKafkaListenerTest {
 
     @Test
     void shouldIgnoreOtherEventsFromSharedShipmentTopic() {
-        listener.handle(new ShipmentDestinationChangedIntegrationEvent(shipment));
+        listener.handle(new ShipmentDestinationChangedIntegrationEvent(shipment, null));
 
         assertEquals(List.of(), mailPort.templateKeys());
     }

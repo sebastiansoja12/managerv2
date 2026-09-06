@@ -2,7 +2,6 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.sn
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,8 +11,6 @@ public record ShipmentEventData(
         ShipmentId shipmentId,
         PartySnapshot sender,
         PartySnapshot recipient,
-        DepartmentId targetDepartmentId,
-        DepartmentId originDepartmentId,
         ShipmentStatus shipmentStatus,
         ShipmentType shipmentType,
         ShipmentId shipmentRelatedId,
@@ -25,9 +22,6 @@ public record ShipmentEventData(
         ShipmentPriority shipmentPriority,
         ShipmentId signatureId,
         TrackingNumber trackingNumber,
-        PickupMethod pickupMethod,
-        DeliveryMethod deliveryMethod,
-        PickupPointId pickupPointId,
         ExternalId<UUID> externalShipmentId,
         String serviceLevel,
         String packagingType
