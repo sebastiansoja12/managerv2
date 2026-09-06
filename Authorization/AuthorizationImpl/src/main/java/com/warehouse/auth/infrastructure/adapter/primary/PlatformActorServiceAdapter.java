@@ -43,6 +43,13 @@ public class PlatformActorServiceAdapter implements PlatformActorService {
                                 && token.getOperatorId() != null ? token.getOperatorId().value() : null));
     }
 
+    @Override
+    public boolean isPlatformActorRequest() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null
+                && (authentication.getPrincipal() instanceof PlatformOwnerId || currentImpersonation().isPresent());
+    }
+
     private Optional<Impersonation> currentImpersonation() {
         return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
                 .map(attributes -> attributes.getAttribute(JwtAuthenticationFilter.IMPERSONATION_ATTRIBUTE,
