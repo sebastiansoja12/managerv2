@@ -52,6 +52,13 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     }
 
     @Override
+    public Optional<SourceShipmentDto> findSourceShipment(final ShipmentId shipmentId) {
+        return shipmentPort.findSourceShipment(shipmentId)
+                .map(sourceShipment -> new SourceShipmentDto(sourceShipment.snapshot().shipmentId(),
+                        sourceShipment.snapshot().shipmentStatus()));
+    }
+
+    @Override
     public ShipmentRejectResponseDto rejectShipment(final ShipmentRejectRequestDto shipmentRejectRequest) {
         final List<ShipmentRejectResponseItemDto> responses = shipmentRejectRequest.shipments()
                 .stream()
@@ -82,6 +89,11 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     @Override
     public void markReturned(final ShipmentId shipmentId) {
         shipmentPort.markReturned(shipmentId);
+    }
+
+    @Override
+    public void markDelivered(final ShipmentId shipmentId) {
+        shipmentPort.markDelivered(shipmentId);
     }
 
     @Override

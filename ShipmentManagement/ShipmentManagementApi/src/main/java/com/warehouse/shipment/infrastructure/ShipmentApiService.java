@@ -8,6 +8,7 @@ import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRerouteDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseDto;
+import com.warehouse.shipment.infrastructure.dto.SourceShipmentDto;
 
 public interface ShipmentApiService {
     ShipmentDetailsDto getShipment(final ShipmentId shipmentId);
@@ -18,9 +19,13 @@ public interface ShipmentApiService {
 
     Optional<ShipmentRerouteDetailsDto> getShipmentForReroute(final TrackingNumber trackingNumber);
 
+    Optional<SourceShipmentDto> findSourceShipment(final ShipmentId shipmentId);
+
     ShipmentRejectResponseDto rejectShipment(final ShipmentRejectRequestDto shipmentRejectRequest);
 
     void markReturned(final ShipmentId shipmentId);
+
+    void markDelivered(final ShipmentId shipmentId);
 
     void restoreAfterReturnCancellation(final ShipmentId shipmentId);
 

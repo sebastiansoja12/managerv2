@@ -22,7 +22,6 @@ import com.warehouse.shipment.application.service.status.*;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
-import com.warehouse.shipment.domain.enumeration.ShipmentDerivationType;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
@@ -313,6 +312,32 @@ class ShipmentPortImplTest {
         shipmentPort.changeShipmentStatusTo(request);
         assertEquals(ShipmentStatus.REROUTE, shipment.getShipmentStatus());
         verify(shipmentRepository).createOrUpdate(shipment);
+    }
+
+    @Test
+    void shouldMarkShipmentDeliveredAfterDeliveryCompletion() {
+        final ShipmentId shipmentId = shipmentId();
+        final Shipment shipment = shipment();
+        doReturn(shipment)
+                .when(shipmentRepository)
+                .findById(shipmentId);
+        shipmentPort.markDelivered(shipmentId);
+        assertEquals(ShipmentStatus.DELIVERY, shipment.getShipmentStatus());
+        verify(shipmentRepository).createOrUpdate(shipment);
+        verify(domainEventPublisher).publish(any());
+    }
+
+    @Test
+    void shouldNotMarkAlreadyDeliveredShipmentAgain() {
+        final ShipmentId shipmentId = shipmentId();
+        final Shipment shipment = shipment();
+        shipment.markAsDelivered();
+        doReturn(shipment)
+                .when(shipmentRepository)
+                .findById(shipmentId);
+        shipmentPort.markDelivered(shipmentId);
+        verify(shipmentRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(domainEventPublisher);
     }
 
     @Test
@@ -769,7 +794,7 @@ class ShipmentPortImplTest {
     }
 
     @Test
-    void shouldPublishDerivedEventWhenReturningShipmentToSender() {
+    void shouldPublishCreatedEventWithoutRouteWhenReturningShipmentToSender() {
         final ShipmentId returnedShipmentId = new ShipmentId(2L);
         final Shipment shipment = DataTestCreator.shipment(returnedShipmentId, false);
         final OperatorShipmentConfiguration configuration = permissiveConfiguration();
@@ -781,11 +806,21 @@ class ShipmentPortImplTest {
 
         this.shipmentPort.returnToSender(shipmentId());
 
-        final ShipmentDerived derived = publishedEvent(ShipmentDerived.class);
-        assertEquals(shipmentId(), derived.getSourceShipmentId());
-        assertEquals(ShipmentDerivationType.RETURN, derived.getDerivationType());
-        assertEquals(returnedShipmentId, derived.getSnapshot().shipmentId());
-        assertTrue(publishedEvent(ShipmentCreated.class).getDeliveryPlan().isEmpty());
+        final ShipmentCreated created = publishedEvent(ShipmentCreated.class);
+        assertEquals(returnedShipmentId, created.getSnapshot().shipmentId());
+        assertTrue(created.getDeliveryPlan().isEmpty());
+    }
+
+    @Test
+    void shouldFindSourceShipmentByRelatedShipmentId() {
+        final ShipmentId returnedShipmentId = new ShipmentId(2L);
+        final Shipment sourceShipment = DataTestCreator.shipment(returnedShipmentId, false);
+        when(this.shipmentRepository.findByShipmentRelatedId(returnedShipmentId)).thenReturn(Optional.of(sourceShipment));
+
+        final Optional<ShipmentResult> result = this.shipmentPort.findSourceShipment(returnedShipmentId);
+
+        assertTrue(result.isPresent());
+        assertEquals(sourceShipment.getShipmentId(), result.get().snapshot().shipmentId());
     }
 
     private ShipmentDeliveryPlan publishedDeliveryPlan() {

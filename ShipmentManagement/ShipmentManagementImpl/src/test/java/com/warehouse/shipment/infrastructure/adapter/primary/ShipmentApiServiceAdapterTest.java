@@ -32,6 +32,7 @@ import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestItemDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseItemDto;
+import com.warehouse.shipment.infrastructure.dto.SourceShipmentDto;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentApiServiceAdapterTest {
@@ -44,6 +45,24 @@ class ShipmentApiServiceAdapterTest {
     @BeforeEach
     void setUp() {
         this.adapter = new ShipmentApiServiceAdapter(this.shipmentPort, new ShipmentApiServiceMapper(), new OperatorContext());
+    }
+
+    @Test
+    void shouldReturnSourceShipmentOfRelatedShipment() {
+        when(this.shipmentPort.findSourceShipment(new ShipmentId(2L)))
+                .thenReturn(Optional.of(shipmentResult(new ShipmentId(2L))));
+
+        final Optional<SourceShipmentDto> sourceShipment = this.adapter.findSourceShipment(new ShipmentId(2L));
+
+        assertTrue(sourceShipment.isPresent());
+        assertEquals(new ShipmentId(1L), sourceShipment.get().shipmentId());
+    }
+
+    @Test
+    void shouldReturnEmptyWhenShipmentHasNoSourceShipment() {
+        when(this.shipmentPort.findSourceShipment(new ShipmentId(2L))).thenReturn(Optional.empty());
+
+        assertTrue(this.adapter.findSourceShipment(new ShipmentId(2L)).isEmpty());
     }
 
     @Test

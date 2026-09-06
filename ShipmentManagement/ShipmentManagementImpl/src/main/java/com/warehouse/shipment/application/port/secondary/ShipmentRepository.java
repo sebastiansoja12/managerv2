@@ -20,6 +20,8 @@ public interface ShipmentRepository {
 
     Optional<ShipmentId> findIdByExternalId(final ExternalId<String> externalId);
 
+    Optional<Shipment> findByShipmentRelatedId(final ShipmentId shipmentRelatedId);
+
     Shipment findByTrackingNumber(final TrackingNumber trackingNumber);
 
     Optional<OperatorId> findOperatorIdByTrackingNumber(final TrackingNumber trackingNumber);

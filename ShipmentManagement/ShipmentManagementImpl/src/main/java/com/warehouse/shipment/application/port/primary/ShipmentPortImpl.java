@@ -22,7 +22,6 @@ import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrat
 import com.warehouse.shipment.application.service.status.ShipmentStatusChangeStrategyResolver;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
-import com.warehouse.shipment.domain.enumeration.ShipmentDerivationType;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
@@ -303,8 +302,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.CHILD, shipmentId);
 			this.shipmentRepository.createOrUpdate(newShipment);
             this.domainEventPublisher.publish(new ShipmentCreated(newShipment.snapshot(), Instant.now()));
-            this.domainEventPublisher.publish(new ShipmentDerived(newShipment.snapshot(), shipment.getShipmentId(),
-                    ShipmentDerivationType.SPLIT, Instant.now()));
         } else {
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, null);
 			this.lockShipment(shipment.getShipmentRelatedId());
@@ -321,6 +318,16 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.shipmentRepository.createOrUpdate(shipment);
 		this.domainEventPublisher.publish(event);
 	}
+
+    @Override
+    @Transactional
+    public void markDelivered(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        if (shipment.isFullyDelivered()) {
+            return;
+        }
+        changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.DELIVERY));
+    }
 
     @Override
     public void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod) {
@@ -356,6 +363,13 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public Optional<OperatorId> findOperator(final TrackingNumber trackingNumber) {
         return this.shipmentRepository.findOperatorIdByTrackingNumber(trackingNumber);
+    }
+
+    @Override
+    public Optional<ShipmentResult> findSourceShipment(final ShipmentId shipmentId) {
+        return this.shipmentRepository.findByShipmentRelatedId(shipmentId)
+                .map(Shipment::snapshot)
+                .map(ShipmentResult::new);
     }
 
     @Override
@@ -483,8 +497,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                 ExternalId.randomUUID(), cfg.workflowSettings());
         this.shipmentRepository.createOrUpdate(redirectedShipment);
         this.domainEventPublisher.publish(new ShipmentCreated(redirectedShipment.snapshot(), Instant.now()));
-        this.domainEventPublisher.publish(new ShipmentDerived(redirectedShipment.snapshot(), shipmentId,
-                ShipmentDerivationType.REDIRECT, Instant.now()));
     }
 
     @Override
@@ -544,8 +556,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                 cfg.workflowSettings(), ExternalId.randomUUID());
         this.shipmentRepository.createOrUpdate(returnedShipment);
         this.domainEventPublisher.publish(new ShipmentCreated(returnedShipment.snapshot(), Instant.now()));
-        this.domainEventPublisher.publish(new ShipmentDerived(returnedShipment.snapshot(), shipmentId,
-                ShipmentDerivationType.RETURN, Instant.now()));
     }
 
     @Override

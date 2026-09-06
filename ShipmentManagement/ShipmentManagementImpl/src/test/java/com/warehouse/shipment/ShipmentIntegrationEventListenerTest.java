@@ -7,7 +7,6 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDeliveredIntegrationEvent;
-import com.warehouse.shipment.api.event.ShipmentDerivedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryData;
@@ -16,12 +15,10 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentIntegrati
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
 import com.warehouse.shipment.domain.event.ShipmentCreated;
 import com.warehouse.shipment.domain.event.ShipmentDelivered;
-import com.warehouse.shipment.domain.event.ShipmentDerived;
 import com.warehouse.shipment.domain.event.ShipmentDestinationChanged;
 import com.warehouse.shipment.domain.event.ShipmentSent;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
-import com.warehouse.shipment.domain.enumeration.ShipmentDerivationType;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,19 +75,6 @@ class ShipmentIntegrationEventListenerTest {
         final ShipmentCreatedIntegrationEvent event = (ShipmentCreatedIntegrationEvent)
                 assertPublishedEvent(ShipmentCreatedIntegrationEvent.class, shipment);
         assertNull(event.delivery());
-    }
-
-    @Test
-    void shouldPublishDerivedIntegrationEvent() {
-        final Shipment shipment = DataTestCreator.shipment();
-
-        this.listener.handle(new ShipmentDerived(shipment.snapshot(), new ShipmentId(99L),
-                ShipmentDerivationType.RETURN, Instant.now()));
-
-        final ShipmentDerivedIntegrationEvent event = (ShipmentDerivedIntegrationEvent)
-                assertPublishedEvent(ShipmentDerivedIntegrationEvent.class, shipment);
-        assertEquals(new ShipmentId(99L), event.sourceShipmentId());
-        assertEquals(ShipmentDerivedIntegrationEvent.DerivationType.RETURN, event.derivationType());
     }
 
     @Test

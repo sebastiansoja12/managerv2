@@ -72,6 +72,15 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     }
 
     @Override
+    public Optional<Shipment> findByShipmentRelatedId(final ShipmentId shipmentRelatedId) {
+        return writeRepository.createCriteria(ShipmentEntity.class)
+                .eq("shipmentRelatedId.value", shipmentRelatedId.getValue())
+                .maxResults(1)
+                .one()
+                .map(this.persistenceMapper::toDomain);
+    }
+
+    @Override
     public Shipment findByTrackingNumber(final TrackingNumber trackingNumber) {
         return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("trackingNumber.value", trackingNumber.value())
