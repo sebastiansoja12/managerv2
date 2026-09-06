@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-19-delivery-shipment-routing" author="s-soja">
+        <addColumn tableName="delivery">
+            <column name="origin_department_id" type="BIGINT"/>
+            <column name="destination_department_id" type="BIGINT"/>
+            <column name="pickup_method" type="VARCHAR(32)"/>
+        </addColumn>
+        <sql>
+            UPDATE delivery d
+            SET origin_department_id = s.origin_department_id,
+                destination_department_id = s.target_department_id,
+                pickup_method = s.pickup_method,
+                delivery_method = COALESCE(d.delivery_method, s.delivery_method),
+                pickup_point_id = COALESCE(d.pickup_point_id, s.pickup_point_id),
+                delivery_pickup_point_id = COALESCE(d.delivery_pickup_point_id, s.delivery_pickup_point_id)
+            FROM shipment s
+            WHERE d.shipment_id = s.shipment_id
+              AND d.target_type = 'SHIPMENT'
+        </sql>
+        <sql>
+            INSERT INTO delivery (
+                id, shipment_id, target_type, target_id, delivery_type, created, delivery_status, status,
+                origin_department_id, destination_department_id, pickup_method, delivery_method,
+                pickup_point_id, delivery_pickup_point_id, signature_required, operator_id
+            )
+            SELECT CAST(gen_random_uuid() AS VARCHAR(255)), s.shipment_id, 'SHIPMENT',
+                   CAST(s.shipment_id AS VARCHAR(255)), 'OUTBOUND', s.created_at,
+                   CASE WHEN s.status = 'DELIVERY' THEN 6 ELSE 0 END,
+                   CASE WHEN s.status = 'DELIVERY' THEN 'COMPLETED'
+                        WHEN s.status = 'CANCELED' THEN 'CANCELED'
+                        ELSE 'CREATED' END,
+                   s.origin_department_id, s.target_department_id, s.pickup_method, s.delivery_method,
+                   s.pickup_point_id, s.delivery_pickup_point_id, COALESCE(s.signature_required, FALSE),
+                   s.operator_id
+            FROM shipment s
+            WHERE NOT EXISTS (
+                SELECT 1 FROM delivery d
+                WHERE d.target_type = 'SHIPMENT'
+                  AND d.delivery_type = 'OUTBOUND'
+                  AND d.shipment_id = s.shipment_id
+            )
+        </sql>
+        <sql>
+            INSERT INTO delivery_step (
+                id, delivery_id, step_number, attempted_at, outcome, delivery_status, comment
+            )
+            SELECT gen_random_uuid(), d.id, 1, d.created, 'IN_PROGRESS', 'DEPOT', 'Shipment created'
+            FROM delivery d
+            WHERE NOT EXISTS (SELECT 1 FROM delivery_step ds WHERE ds.delivery_id = d.id)
+        </sql>
+        <dropColumn tableName="delivery_step" columnName="delivery_method"/>
+        <createIndex tableName="delivery" indexName="idx_delivery_origin_department_id">
+            <column name="origin_department_id"/>
+        </createIndex>
+        <createIndex tableName="delivery" indexName="idx_delivery_destination_department_id">
+            <column name="destination_department_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-10-19-shipment-drop-delivery-routing" author="s-soja">
+        <dropColumn tableName="shipment">
+            <column name="target_department_id"/>
+            <column name="origin_department_id"/>
+            <column name="pickup_point_id"/>
+            <column name="delivery_pickup_point_id"/>
+            <column name="pickup_method"/>
+            <column name="delivery_method"/>
+        </dropColumn>
+        <dropColumn tableName="shipment_rd">
+            <column name="target_department_id"/>
+            <column name="origin_department_id"/>
+            <column name="pickup_point_id"/>
+            <column name="delivery_pickup_point_id"/>
+            <column name="pickup_method"/>
+            <column name="delivery_method"/>
+        </dropColumn>
+    </changeSet>
+</databaseChangeLog>
