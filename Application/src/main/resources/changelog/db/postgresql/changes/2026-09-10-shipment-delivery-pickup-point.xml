@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-09-10-shipment-delivery-pickup-point" author="s-soja">
+        <addColumn tableName="shipment">
+            <column name="delivery_pickup_point_id" type="UUID"/>
+        </addColumn>
+        <addColumn tableName="shipment_rd">
+            <column name="delivery_pickup_point_id" type="UUID"/>
+        </addColumn>
+        <addColumn tableName="shipment_aud">
+            <column name="delivery_pickup_point_id" type="UUID"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
