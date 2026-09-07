@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-07-postgresql-organization-chat" author="codex">
+        <createTable tableName="chat_conversations">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="first_user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="second_user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_message_at" type="TIMESTAMP WITH TIME ZONE" />
+        </createTable>
+
+        <addUniqueConstraint
+                columnNames="operator_id, first_user_id, second_user_id"
+                constraintName="uk_chat_direct_conversation"
+                tableName="chat_conversations" />
+        <sql>ALTER TABLE chat_conversations ADD CONSTRAINT chk_chat_direct_user_order CHECK (first_user_id &lt; second_user_id)</sql>
+        <createIndex indexName="idx_chat_conversation_operator_activity" tableName="chat_conversations">
+            <column name="operator_id" />
+            <column descending="true" name="last_message_at" />
+        </createIndex>
+
+        <createTable tableName="chat_participants">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="conversation_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="joined_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_read_message_id" type="BIGINT" />
+            <column defaultValueBoolean="false" name="archived" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                columnNames="conversation_id, user_id"
+                constraintName="uk_chat_participant"
+                tableName="chat_participants" />
+        <createIndex indexName="idx_chat_participant_user" tableName="chat_participants">
+            <column name="user_id" />
+            <column name="conversation_id" />
+        </createIndex>
+
+        <createTable tableName="chat_messages">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="conversation_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="sender_user_id" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="client_message_id" type="UUID">
+                <constraints nullable="false" />
+            </column>
+            <column name="body" type="VARCHAR(2000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                columnNames="sender_user_id, client_message_id"
+                constraintName="uk_chat_message_client_id"
+                tableName="chat_messages" />
+        <createIndex indexName="idx_chat_message_history" tableName="chat_messages">
+            <column name="conversation_id" />
+            <column descending="true" name="id" />
+        </createIndex>
+
+        <addForeignKeyConstraint
+                baseColumnNames="operator_id"
+                baseTableName="chat_conversations"
+                constraintName="fk_chat_conversation_operator"
+                onDelete="CASCADE"
+                referencedColumnNames="operator_id"
+                referencedTableName="operators" />
+        <addForeignKeyConstraint
+                baseColumnNames="first_user_id"
+                baseTableName="chat_conversations"
+                constraintName="fk_chat_conversation_first_user"
+                onDelete="CASCADE"
+                referencedColumnNames="user_id"
+                referencedTableName="users" />
+        <addForeignKeyConstraint
+                baseColumnNames="second_user_id"
+                baseTableName="chat_conversations"
+                constraintName="fk_chat_conversation_second_user"
+                onDelete="CASCADE"
+                referencedColumnNames="user_id"
+                referencedTableName="users" />
+        <addForeignKeyConstraint
+                baseColumnNames="conversation_id"
+                baseTableName="chat_participants"
+                constraintName="fk_chat_participant_conversation"
+                onDelete="CASCADE"
+                referencedColumnNames="id"
+                referencedTableName="chat_conversations" />
+        <addForeignKeyConstraint
+                baseColumnNames="user_id"
+                baseTableName="chat_participants"
+                constraintName="fk_chat_participant_user"
+                onDelete="CASCADE"
+                referencedColumnNames="user_id"
+                referencedTableName="users" />
+        <addForeignKeyConstraint
+                baseColumnNames="conversation_id"
+                baseTableName="chat_messages"
+                constraintName="fk_chat_message_conversation"
+                onDelete="CASCADE"
+                referencedColumnNames="id"
+                referencedTableName="chat_conversations" />
+        <addForeignKeyConstraint
+                baseColumnNames="sender_user_id"
+                baseTableName="chat_messages"
+                constraintName="fk_chat_message_sender"
+                onDelete="CASCADE"
+                referencedColumnNames="user_id"
+                referencedTableName="users" />
+    </changeSet>
+</databaseChangeLog>
