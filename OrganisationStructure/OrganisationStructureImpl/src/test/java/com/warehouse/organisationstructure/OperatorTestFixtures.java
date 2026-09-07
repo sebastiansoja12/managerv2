@@ -226,7 +226,7 @@ public final class OperatorTestFixtures {
                         true
                 ),
                 new ShipmentWorkflowConfiguration(
-                        DefaultShipmentStatus.ACCEPTED,
+                        DefaultShipmentStatus.PREPARED,
                         ServiceLevel.EXPRESS,
                         true,
                         false,
