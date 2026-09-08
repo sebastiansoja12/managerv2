@@ -1,5 +1,7 @@
 package com.warehouse.logistics.configuration;
 
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Request;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Response;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;

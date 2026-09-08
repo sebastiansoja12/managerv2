@@ -1,11 +1,11 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
+import com.warehouse.logistics.application.port.primary.command.PalletScanCommand;
+import com.warehouse.logistics.application.port.primary.result.PalletScanDetail;
+import com.warehouse.logistics.application.port.primary.result.PalletScanOutcome;
+import com.warehouse.logistics.application.port.secondary.PalletScanServicePort;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
-import com.warehouse.logistics.domain.port.secondary.PalletScanServicePort;
-import com.warehouse.logistics.domain.vo.PalletScanCommand;
-import com.warehouse.logistics.domain.vo.PalletScanDetail;
-import com.warehouse.logistics.domain.vo.PalletScanOutcome;
 import com.warehouse.palletmanagement.api.PalletApiService;
 import com.warehouse.palletmanagement.api.dto.PalletScanRequestDto;
 import com.warehouse.palletmanagement.api.dto.PalletScanResponseDto;

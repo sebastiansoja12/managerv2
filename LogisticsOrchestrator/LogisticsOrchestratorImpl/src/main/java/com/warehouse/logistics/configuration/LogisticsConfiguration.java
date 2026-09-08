@@ -1,42 +1,62 @@
 package com.warehouse.logistics.configuration;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import com.warehouse.auth.UserApiService;
-import com.warehouse.deliverycollect.api.DeliveryCollectApiService;
-import com.warehouse.logistics.domain.port.primary.PalletScanPort;
-import com.warehouse.logistics.domain.port.primary.PalletScanPortImpl;
-import com.warehouse.logistics.domain.port.secondary.PalletScanServicePort;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.PalletScanMapper;
-import com.warehouse.logistics.infrastructure.adapter.secondary.PalletScanServiceAdapter;
-import com.warehouse.palletmanagement.api.PalletApiService;
-import com.warehouse.organisationstructure.department.api.DepartmentApiService;
-import com.warehouse.commonassets.repository.OperatorContextProvider;
-import com.warehouse.commonassets.repository.BaseRepository;
-import com.warehouse.logistics.domain.port.primary.*;
-import com.warehouse.logistics.domain.port.secondary.*;
-import com.warehouse.logistics.domain.service.LogisticsService;
-import com.warehouse.logistics.domain.service.LogisticsServiceImpl;
+import com.warehouse.logistics.application.port.primary.DepartmentValidatorPort;
+import com.warehouse.logistics.application.port.primary.DepartmentValidatorPortImpl;
+import com.warehouse.logistics.application.port.primary.DeviceAgentPort;
+import com.warehouse.logistics.application.port.primary.DeviceAgentPortImpl;
+import com.warehouse.logistics.application.port.primary.DeviceValidatorPort;
+import com.warehouse.logistics.application.port.primary.DeviceValidatorPortImpl;
+import com.warehouse.logistics.application.port.primary.LogisticsPort;
+import com.warehouse.logistics.application.port.primary.LogisticsPortImpl;
+import com.warehouse.logistics.application.port.primary.PalletScanPort;
+import com.warehouse.logistics.application.port.primary.PalletScanPortImpl;
+import com.warehouse.logistics.application.port.primary.ProcessInitializerPort;
+import com.warehouse.logistics.application.port.primary.ProcessInitializerPortImpl;
+import com.warehouse.logistics.application.port.primary.ShipmentCollectPort;
+import com.warehouse.logistics.application.port.primary.ShipmentCollectPortImpl;
+import com.warehouse.logistics.application.port.primary.SupplierValidatorPort;
+import com.warehouse.logistics.application.port.primary.SupplierValidatorPortImpl;
+import com.warehouse.logistics.application.port.secondary.DeliveryCollectServicePort;
+import com.warehouse.logistics.application.port.secondary.DeliveryServicePort;
+import com.warehouse.logistics.application.port.secondary.DepartmentServicePort;
+import com.warehouse.logistics.application.port.secondary.DeviceAgentServicePort;
+import com.warehouse.logistics.application.port.secondary.PalletScanServicePort;
+import com.warehouse.logistics.application.port.secondary.ProcessHubServicePort;
+import com.warehouse.logistics.application.port.secondary.SupplierRepository;
+import com.warehouse.logistics.application.service.LogisticsService;
+import com.warehouse.logistics.application.service.LogisticsServiceImpl;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValidatorAspect;
-import com.warehouse.logistics.infrastructure.adapter.primary.DeviceTypeResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator;
+import com.warehouse.logistics.infrastructure.adapter.primary.DeviceTypeResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.LoggingSoapEndpointExceptionResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.CollectMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
-import com.warehouse.logistics.infrastructure.adapter.secondary.*;
-import com.warehouse.logistics.infrastructure.adapter.secondary.entity.DeliveryEntity;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.PalletScanMapper;
+import com.warehouse.logistics.infrastructure.adapter.secondary.DeliveryCollectServiceAdapter;
+import com.warehouse.logistics.infrastructure.adapter.secondary.DeliveryServiceAdapter;
+import com.warehouse.logistics.infrastructure.adapter.secondary.DepartmentServiceAdapter;
+import com.warehouse.logistics.infrastructure.adapter.secondary.DeviceAgentServiceAdapter;
+import com.warehouse.logistics.infrastructure.adapter.secondary.PalletScanServiceAdapter;
+import com.warehouse.logistics.infrastructure.adapter.secondary.ProcessHubServiceAdapter;
+import com.warehouse.logistics.infrastructure.adapter.secondary.SupplierReadRepository;
+import com.warehouse.logistics.infrastructure.adapter.secondary.SupplierRepositoryImpl;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.warehouse.auth.UserApiService;
+import com.warehouse.deliverycollect.api.DeliveryCollectApiService;
+import com.warehouse.logisticsdelivery.api.DeliveryApiService;
+import com.warehouse.palletmanagement.api.PalletApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.DeviceEventPublisher;
 import com.warehouse.xmlconverter.XmlToStringService;
 import com.warehouse.xmlconverter.XmlToStringServiceImpl;
-import jakarta.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 @Configuration
 public class LogisticsConfiguration {
@@ -91,8 +111,8 @@ public class LogisticsConfiguration {
     }
 
     @Bean
-    public ProcessInitializerPort processInitializerPort(final ProcessHubServicePort processHubServicePort, final XmlToStringService xmlToStringService) {
-        return new ProcessInitializerPortImpl(processHubServicePort, xmlToStringService);
+    public ProcessInitializerPort processInitializerPort(final ProcessHubServicePort processHubServicePort) {
+        return new ProcessInitializerPortImpl(processHubServicePort);
     }
 
     @Bean
@@ -107,30 +127,15 @@ public class LogisticsConfiguration {
     }
 
 	@Bean
-	public LogisticsService deliveryService(LogisticsRepository logisticsRepository,
-                                            DeliveryTokenServicePort servicePort,
-                                            DepartmentRepository departmentRepository,
-                                            OperatorContextProvider operatorContextProvider) {
-		return new LogisticsServiceImpl(logisticsRepository, servicePort, departmentRepository, operatorContextProvider);
+	public LogisticsService logisticsService(final DeliveryServicePort deliveryServicePort,
+                                             final DepartmentServicePort departmentServicePort,
+                                             final OperatorContextProvider operatorContextProvider) {
+		return new LogisticsServiceImpl(deliveryServicePort, departmentServicePort, operatorContextProvider);
 	}
 
-    @Bean
-    public BaseRepository<DeliveryEntity> logisticsDeliveryEntityRepository(
-            final EntityManager entityManager,
-            final OperatorContextProvider operatorContextProvider) {
-        return new BaseRepository<>(entityManager, operatorContextProvider);
-    }
-
-    @Bean
-    public LogisticsRepository deliveryRepository(
-            @Qualifier("logisticsDeliveryEntityRepository")
-            final BaseRepository<DeliveryEntity> repository) {
-        return new LogisticsRepositoryImpl(repository);
-    }
-
-    @Bean(name = "logistics.supplierTokenServicePort")
-    public DeliveryTokenServicePort supplierTokenServicePort() {
-        return new DeliveryTokenAdapter();
+    @Bean("logistics.deliveryServicePort")
+    public DeliveryServicePort deliveryServicePort(final DeliveryApiService deliveryApiService) {
+        return new DeliveryServiceAdapter(deliveryApiService);
     }
 
     @Bean
@@ -144,13 +149,13 @@ public class LogisticsConfiguration {
     }
 
     @Bean
-    public DepartmentValidatorPort departmentValidatorPort(final DepartmentRepository repository) {
-        return new DepartmentValidatorPortImpl(repository);
+    public DepartmentValidatorPort departmentValidatorPort(final DepartmentServicePort departmentServicePort) {
+        return new DepartmentValidatorPortImpl(departmentServicePort);
     }
 
-    @Bean("logistics.departmentRepository")
-    public DepartmentRepository departmentRepository(final DepartmentApiService departmentApiService) {
-        return new DepartmentRepositoryImpl(departmentApiService);
+    @Bean("logistics.departmentServicePort")
+    public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService) {
+        return new DepartmentServiceAdapter(departmentApiService);
     }
 
     @Bean(name = "logistics.requestMapper")
@@ -161,11 +166,6 @@ public class LogisticsConfiguration {
     @Bean(name = "logistics.responseMapper")
     public LogisticsResponseMapper responseMapper() {
         return new LogisticsResponseMapper();
-    }
-
-    @Bean
-    public DeliveryResponseMapper deliveryResponseMapper() {
-        return new DeliveryResponseMapper();
     }
 
     @Bean

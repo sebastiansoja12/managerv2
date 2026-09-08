@@ -1,12 +1,12 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
+import com.warehouse.logistics.application.port.secondary.ProcessHubServicePort;
 import java.util.Locale;
 
 import com.warehouse.auth.UserApiService;
 import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.logistics.domain.port.secondary.ProcessHubServicePort;
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.process.infrastructure.dto.*;
 import com.warehouse.terminal.DeviceInformation;

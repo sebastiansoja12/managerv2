@@ -1,5 +1,6 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Response;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +23,6 @@ import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnResponseDetailsDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnResponseDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.ReturnTokenDto;
-import com.warehouse.logistics.domain.model.Response;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.information.Device;
 import com.warehouse.terminal.model.DeliveryRejectResponse;

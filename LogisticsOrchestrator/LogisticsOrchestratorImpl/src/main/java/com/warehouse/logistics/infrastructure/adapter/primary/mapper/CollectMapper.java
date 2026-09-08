@@ -1,12 +1,12 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.logistics.application.port.primary.command.ShipmentCollectCommand;
+import com.warehouse.logistics.application.port.primary.result.ShipmentCollectDetail;
+import com.warehouse.logistics.application.port.primary.result.ShipmentCollectResult;
 import java.util.List;
 
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
-import com.warehouse.logistics.domain.vo.ShipmentCollectCommand;
-import com.warehouse.logistics.domain.vo.ShipmentCollectDetail;
-import com.warehouse.logistics.domain.vo.ShipmentCollectResult;
 import com.warehouse.terminal.jaxb.CollectDetailType;
 import com.warehouse.terminal.jaxb.CollectRequest;
 import com.warehouse.terminal.jaxb.CollectResponse;

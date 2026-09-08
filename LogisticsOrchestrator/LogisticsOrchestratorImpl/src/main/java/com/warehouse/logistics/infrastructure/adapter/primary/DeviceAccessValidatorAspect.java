@@ -1,11 +1,9 @@
 package com.warehouse.logistics.infrastructure.adapter.primary;
 
+import com.warehouse.terminal.jaxb.DeviceType;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-
-import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator.AuthenticatedDeviceContext;
-import com.warehouse.terminal.jaxb.DeviceType;
 
 @Aspect
 public class DeviceAccessValidatorAspect {
@@ -24,7 +22,7 @@ public class DeviceAccessValidatorAspect {
     public Object validateDeviceAccess(final ProceedingJoinPoint joinPoint) throws Throwable {
         final DeviceType device = deviceTypeResolver.resolve(joinPoint.getArgs());
 
-        final AuthenticatedDeviceContext authenticatedDevice =
+        final DeviceContextAuthenticator.AuthenticatedDeviceContext authenticatedDevice =
                 deviceContextAuthenticator.authenticateByPairKey(device.getPairKey());
         applyAuthenticatedDeviceContext(device, authenticatedDevice);
 
@@ -36,7 +34,7 @@ public class DeviceAccessValidatorAspect {
     }
 
     private void applyAuthenticatedDeviceContext(final DeviceType device,
-                                                 final AuthenticatedDeviceContext authenticatedDevice) {
+                                                 final DeviceContextAuthenticator.AuthenticatedDeviceContext authenticatedDevice) {
         if (authenticatedDevice.deviceId() != null && !authenticatedDevice.deviceId().isBlank()) {
             device.setDeviceID(authenticatedDevice.deviceId());
         }

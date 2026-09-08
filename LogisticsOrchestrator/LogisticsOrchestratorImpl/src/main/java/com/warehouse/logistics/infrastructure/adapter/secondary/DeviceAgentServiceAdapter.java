@@ -1,9 +1,9 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
+import com.warehouse.logistics.application.port.secondary.DeviceAgentServicePort;
+import com.warehouse.logistics.application.port.secondary.DeviceValidateCommand;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
-import com.warehouse.logistics.domain.model.DeviceValidateCommand;
-import com.warehouse.logistics.domain.port.secondary.DeviceAgentServicePort;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.event.ProcessDeviceValidatedEvent;
 import com.warehouse.terminal.DeviceInformation;
