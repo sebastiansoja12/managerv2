@@ -87,7 +87,7 @@ public class DepartmentReadSyncBasicAuthenticationFilter extends OncePerRequestF
         if (uri.startsWith(contextPath + ENDPOINT_PREFIX)) {
             return false;
         }
-        return !uri.startsWith("/v2/api" + ENDPOINT_PREFIX);
+        return !uri.startsWith("/v1/api" + ENDPOINT_PREFIX);
     }
 
     private boolean hasRefreshPermission(final UserEntity user) {

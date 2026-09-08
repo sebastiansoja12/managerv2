@@ -41,7 +41,7 @@ public class CsvControllerIntegrationTest {
         // given
         final Long parcelId = 1L;
         // when
-        mockMvc.perform(get("/v2/api/csv/{id}", parcelId).contextPath("/v2/api"))
+        mockMvc.perform(get("/v1/api/csv/{id}", parcelId).contextPath("/v1/api"))
         // then
                 .andExpect(status().isOk());
     }

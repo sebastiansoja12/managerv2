@@ -36,7 +36,7 @@ public class ShipmentRepositoryServiceAdapter implements ShipmentRepositoryServi
     public DeliverableShipment downloadShipment(final ShipmentId shipmentId) {
         final ResponseEntity<ShipmentDto> parcelResponse = restClient
                 .get()
-                .uri("/v2/api/shipments/{value}", shipmentId.getValue())
+                .uri("/v1/api/shipments/{value}", shipmentId.getValue())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         (req, res) -> {

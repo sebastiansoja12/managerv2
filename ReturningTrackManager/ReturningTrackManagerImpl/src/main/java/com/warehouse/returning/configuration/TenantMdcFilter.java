@@ -50,11 +50,11 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         try {
             final String uri = request.getRequestURI();
 
-            if (uri.startsWith("/v2/api/swagger-ui")
-                    || uri.startsWith("/v2/api/v3/api-docs")
-                    || uri.startsWith("/v2/api/swagger-resources")
-                    || uri.startsWith("/v2/api/webjars")
-                    || uri.startsWith("/v2/api/auth/login")) {
+            if (uri.startsWith("/v1/api/swagger-ui")
+                    || uri.startsWith("/v1/api/v3/api-docs")
+                    || uri.startsWith("/v1/api/swagger-resources")
+                    || uri.startsWith("/v1/api/webjars")
+                    || uri.startsWith("/v1/api/auth/login")) {
                 filterChain.doFilter(request, response);
                 return;
             }

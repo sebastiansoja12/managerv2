@@ -49,7 +49,7 @@ public class QrCodeGeneratorControllerIntegrationTest {
         final Long parcelId = 1L;
         // when
         final ResponseEntity<Void> qrCode = restClient.get()
-                .uri("/v2/api/qrcodes/{id}", parcelId)
+                .uri("/v1/api/qrcodes/{id}", parcelId)
                 .retrieve()
                 .toBodilessEntity();
         // then

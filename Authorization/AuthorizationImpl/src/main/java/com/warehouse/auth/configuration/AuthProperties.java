@@ -19,9 +19,9 @@ public class AuthProperties {
         private String refreshName = "REFRESH-TOKEN";
         private String platformOwnerAccessName = "PLATFORM-AUTH-TOKEN";
         private String platformOwnerRefreshName = "PLATFORM-REFRESH-TOKEN";
-        private String platformOwnerRefreshPath = "/v2/api/platform/auth";
+        private String platformOwnerRefreshPath = "/v1/api/platform/auth";
         private String accessPath = "/";
-        private String refreshPath = "/v2/api/auth";
+        private String refreshPath = "/v1/api/auth";
         private String domain;
         private boolean secure;
         private String sameSite = "Lax";
