@@ -88,6 +88,11 @@ public class PalletController {
         return ResponseEntity.ok(this.palletResponseMapper.map(pallet));
     }
 
+    @GetMapping("/{palletId}")
+    public ResponseEntity<PalletResponseApi> getPalletById(@PathVariable final String palletId) {
+        return ResponseEntity.ok(this.palletResponseMapper.map(this.palletPort.getPallet(new PalletId(palletId))));
+    }
+
     @PutMapping("/{palletId}/cancel")
     public ResponseEntity<PalletResponseApi> cancelPallet(@PathVariable final String palletId) {
         final PalletDetails pallet = this.palletPort.cancelPallet(new PalletId(palletId));

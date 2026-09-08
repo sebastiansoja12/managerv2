@@ -82,6 +82,11 @@ public class PalletPortImpl implements PalletPort {
     }
 
     @Override
+    public PalletDetails getPallet(final PalletId palletId) {
+        return this.palletTransportService.withTransport(this.palletHandlingManagerServicePort.getPallet(palletId));
+    }
+
+    @Override
     public PalletPage findPallets(final PalletSearchCriteria criteria) {
         return this.palletTransportService.withTransport(this.palletHandlingManagerServicePort.findPallets(criteria));
     }
