@@ -7,9 +7,8 @@ import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.warehouse.asyncjob.domain.model.AsyncJob;
-import com.warehouse.asyncjob.domain.model.AsyncJobStatus;
-import com.warehouse.asyncjob.domain.model.ReadModelType;
+import com.warehouse.asyncjob.domain.enumeration.AsyncJobStatus;
+import com.warehouse.asyncjob.domain.enumeration.ReadModelType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,7 +58,7 @@ public class AsyncJobEntity {
     protected AsyncJobEntity() {
     }
 
-    private AsyncJobEntity(final UUID id,
+    public AsyncJobEntity(final UUID id,
                            final AsyncJobStatus status,
                            final ReadModelType readModelType,
                            final LocalDate dateFrom,
@@ -81,14 +80,43 @@ public class AsyncJobEntity {
         this.error = error;
     }
 
-    public static AsyncJobEntity from(final AsyncJob job) {
-        return new AsyncJobEntity(job.getId(), job.getStatus(), job.getReadModelType(), job.getDateFrom(),
-                job.getDateTo(), job.getOperatorId(), job.getCreatedAt(), job.getStartedAt(), job.getFinishedAt(),
-                job.getError());
+    public UUID getId() {
+        return id;
     }
 
-    public AsyncJob toDomain() {
-        return new AsyncJob(id, status, readModelType, dateFrom, dateTo, operatorId, createdAt, startedAt,
-                finishedAt, error);
+    public AsyncJobStatus getStatus() {
+        return status;
+    }
+
+    public ReadModelType getReadModelType() {
+        return readModelType;
+    }
+
+    public LocalDate getDateFrom() {
+        return dateFrom;
+    }
+
+    public LocalDate getDateTo() {
+        return dateTo;
+    }
+
+    public Long getOperatorId() {
+        return operatorId;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public Instant getFinishedAt() {
+        return finishedAt;
+    }
+
+    public String getError() {
+        return error;
     }
 }

@@ -1,28 +1,33 @@
 package com.warehouse.asyncjob.domain.model;
 
+import com.warehouse.asyncjob.domain.enumeration.AsyncJobStatus;
+import com.warehouse.asyncjob.domain.enumeration.ReadModelType;
+import com.warehouse.asyncjob.domain.vo.AsyncJobId;
+import com.warehouse.asyncjob.domain.vo.AsyncJobSnapshot;
+import com.warehouse.commonassets.identificator.OperatorId;
+
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class AsyncJob {
 
-    private final UUID id;
+    private final AsyncJobId id;
     private AsyncJobStatus status;
     private final ReadModelType readModelType;
     private final LocalDate dateFrom;
     private final LocalDate dateTo;
-    private final Long operatorId;
+    private final OperatorId operatorId;
     private final Instant createdAt;
     private Instant startedAt;
     private Instant finishedAt;
     private String error;
 
-    public AsyncJob(final UUID id,
+    public AsyncJob(final AsyncJobId id,
                     final AsyncJobStatus status,
                     final ReadModelType readModelType,
                     final LocalDate dateFrom,
                     final LocalDate dateTo,
-                    final Long operatorId,
+                    final OperatorId operatorId,
                     final Instant createdAt,
                     final Instant startedAt,
                     final Instant finishedAt,
@@ -40,10 +45,10 @@ public class AsyncJob {
     }
 
     public static AsyncJob pending(final ReadModelType readModelType,
-                                   final Long operatorId,
+                                   final OperatorId operatorId,
                                    final LocalDate dateFrom,
                                    final LocalDate dateTo) {
-        return new AsyncJob(UUID.randomUUID(), AsyncJobStatus.PENDING, readModelType, dateFrom, dateTo, operatorId,
+        return new AsyncJob(AsyncJobId.generate(), AsyncJobStatus.PENDING, readModelType, dateFrom, dateTo, operatorId,
                 Instant.now(), null, null, null);
     }
 
@@ -58,18 +63,19 @@ public class AsyncJob {
         this.finishedAt = Instant.now();
     }
 
-    public void markFailed(final Throwable exception) {
+    public void markFailed(final String failureReason) {
         this.status = AsyncJobStatus.FAILED;
         this.finishedAt = Instant.now();
-        this.error = exception.getMessage();
+        this.error = failureReason;
     }
 
-    public UUID getId() {
+    public AsyncJobSnapshot snapshot() {
+        return new AsyncJobSnapshot(id, status, readModelType, dateFrom, dateTo, operatorId, createdAt, startedAt,
+                finishedAt, error);
+    }
+
+    public AsyncJobId getId() {
         return id;
-    }
-
-    public AsyncJobStatus getStatus() {
-        return status;
     }
 
     public ReadModelType getReadModelType() {
@@ -84,23 +90,7 @@ public class AsyncJob {
         return dateTo;
     }
 
-    public Long getOperatorId() {
+    public OperatorId getOperatorId() {
         return operatorId;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getStartedAt() {
-        return startedAt;
-    }
-
-    public Instant getFinishedAt() {
-        return finishedAt;
-    }
-
-    public String getError() {
-        return error;
     }
 }

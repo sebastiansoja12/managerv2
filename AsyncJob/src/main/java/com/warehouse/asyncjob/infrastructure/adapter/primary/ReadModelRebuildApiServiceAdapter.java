@@ -2,11 +2,13 @@ package com.warehouse.asyncjob.infrastructure.adapter.primary;
 
 import com.warehouse.asyncjob.api.ReadModelRebuildApiService;
 import com.warehouse.asyncjob.api.dto.ReadModelRebuildJobDto;
-import com.warehouse.asyncjob.domain.model.AsyncJob;
-import com.warehouse.asyncjob.domain.model.ReadModelType;
-import com.warehouse.asyncjob.domain.service.AsyncJobNotFoundException;
-import com.warehouse.asyncjob.domain.service.AsyncJobService;
-import org.springframework.stereotype.Component;
+import com.warehouse.asyncjob.application.port.primary.AsyncJobPort;
+import com.warehouse.asyncjob.application.port.primary.command.CreateReadModelRebuildJobCommand;
+import com.warehouse.asyncjob.domain.enumeration.ReadModelType;
+import com.warehouse.asyncjob.domain.exception.AsyncJobNotFoundException;
+import com.warehouse.asyncjob.domain.vo.AsyncJobId;
+import com.warehouse.asyncjob.infrastructure.adapter.primary.mapper.AsyncJobResponseMapper;
+import com.warehouse.commonassets.identificator.OperatorId;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -14,13 +16,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
 public class ReadModelRebuildApiServiceAdapter implements ReadModelRebuildApiService {
 
-    private final AsyncJobService asyncJobService;
+    private final AsyncJobPort asyncJobPort;
+    private final AsyncJobResponseMapper responseMapper;
 
-    public ReadModelRebuildApiServiceAdapter(final AsyncJobService asyncJobService) {
-        this.asyncJobService = asyncJobService;
+    public ReadModelRebuildApiServiceAdapter(final AsyncJobPort asyncJobPort,
+                                             final AsyncJobResponseMapper responseMapper) {
+        this.asyncJobPort = asyncJobPort;
+        this.responseMapper = responseMapper;
     }
 
     @Override
@@ -38,31 +42,24 @@ public class ReadModelRebuildApiServiceAdapter implements ReadModelRebuildApiSer
         if (dateFrom == null || dateTo == null || dateFrom.isAfter(dateTo)) {
             throw new IllegalArgumentException("dateFrom must be less than or equal to dateTo");
         }
-        final AsyncJob job = asyncJobService.createReadModelRebuildJob(ReadModelType.valueOf(readModelType),
-                operatorId, dateFrom, dateTo);
-        return toDto(job);
+        return this.responseMapper.toDto(this.asyncJobPort.createReadModelRebuildJob(
+                new CreateReadModelRebuildJobCommand(ReadModelType.valueOf(readModelType), OperatorId.of(operatorId),
+                        dateFrom, dateTo)));
     }
 
     @Override
     public Optional<ReadModelRebuildJobDto> find(final UUID jobId) {
         try {
-            return Optional.of(toDto(asyncJobService.get(jobId)));
-        } catch (AsyncJobNotFoundException exception) {
+            return Optional.of(this.responseMapper.toDto(this.asyncJobPort.get(new AsyncJobId(jobId))));
+        } catch (final AsyncJobNotFoundException exception) {
             return Optional.empty();
         }
     }
 
     @Override
     public List<ReadModelRebuildJobDto> findLatest(final Long operatorId, final int limit) {
-        return asyncJobService.findLatest(operatorId, limit)
-                .stream()
-                .map(this::toDto)
+        return this.asyncJobPort.findLatest(OperatorId.of(operatorId), limit).stream()
+                .map(this.responseMapper::toDto)
                 .toList();
-    }
-
-    private ReadModelRebuildJobDto toDto(final AsyncJob job) {
-        return new ReadModelRebuildJobDto(job.getId(), job.getStatus().name(), job.getReadModelType().name(),
-                job.getDateFrom(), job.getDateTo(), job.getOperatorId(), job.getCreatedAt(), job.getStartedAt(),
-                job.getFinishedAt(), job.getError());
     }
 }
