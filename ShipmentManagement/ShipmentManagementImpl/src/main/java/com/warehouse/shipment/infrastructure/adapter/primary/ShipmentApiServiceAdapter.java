@@ -35,6 +35,11 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     }
 
     @Override
+    public ShipmentDocumentDto getShipmentDocument(final ShipmentId shipmentId) {
+        return mapper.mapDocument(shipmentPort.loadShipment(shipmentId));
+    }
+
+    @Override
     public ShipmentDetailsDto collectShipment(final TrackingNumber trackingNumber) {
         return mapper.map(shipmentPort.collectShipment(trackingNumber));
     }
