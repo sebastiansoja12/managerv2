@@ -3,6 +3,8 @@ package com.warehouse.shipment.infrastructure.adapter.primary.api;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 
 public enum ShipmentStatusDto {
+    PLANNED,
+
     CREATED,
 
     PREPARED,
