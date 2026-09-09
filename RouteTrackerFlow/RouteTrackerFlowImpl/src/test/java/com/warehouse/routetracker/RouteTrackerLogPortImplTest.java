@@ -49,7 +49,7 @@ class RouteTrackerLogPortImplTest {
     void shouldCreateRouteLogWhenFirstShipmentEventIsReceived() {
         when(this.repository.findById(SHIPMENT_ID)).thenReturn(Optional.empty());
 
-        this.routeTrackerLogPort.createOrChangeShipmentState(command("shipment.changed", ShipmentStatus.CREATED));
+        this.routeTrackerLogPort.createOrChangeShipmentState(command("shipment.changed", ShipmentStatus.PLANNED));
 
         final ArgumentCaptor<RouteLogRecord> recordCaptor = ArgumentCaptor.forClass(RouteLogRecord.class);
         verify(this.repository).save(recordCaptor.capture());
