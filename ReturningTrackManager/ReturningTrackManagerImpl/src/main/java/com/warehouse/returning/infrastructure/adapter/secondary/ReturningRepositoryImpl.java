@@ -27,6 +27,13 @@ public class ReturningRepositoryImpl implements ReturnRepository {
     }
 
     @Override
+    public ReturnPackage findDetailsById(final ReturnPackageId returnPackageId) {
+        return this.repository.findDetailsById(ReturnId.of(returnPackageId))
+                .map(ReturnPackageToModelMapper::map)
+                .orElseThrow(ReturnPackageNotFoundException::new);
+    }
+
+    @Override
     public ReturnPackage findById(final ReturnPackageId returnPackageId) {
 		return this.repository
 				.findById(ReturnId.of(returnPackageId))
@@ -38,6 +45,13 @@ public class ReturningRepositoryImpl implements ReturnRepository {
     public ReturnPackage findByShipmentId(final ShipmentId shipmentId) {
         final Optional<ReturnPackageEntity> returnPackage = this.repository.findByShipmentId(shipmentId);
         return returnPackage.map(ReturnPackageToModelMapper::map).orElse(null);
+    }
+
+    @Override
+    public Optional<ReturnPackage> findLatestByShipmentIdAndOperatorId(
+            final ShipmentId shipmentId, final Long operatorId) {
+        return this.repository.findLatestByShipmentIdAndOperatorId(shipmentId, operatorId, PageRequest.of(0, 1))
+                .stream().findFirst().map(ReturnPackageToModelMapper::map);
     }
 
     @Override
