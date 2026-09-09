@@ -7,7 +7,6 @@ import com.warehouse.shipment.domain.event.ShipmentRedirected;
 import com.warehouse.shipment.domain.model.Shipment;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.Set;
 
 public class ShipmentRedirectedStatusChangeStrategy implements ShipmentStatusChangeStrategy {
@@ -18,8 +17,8 @@ public class ShipmentRedirectedStatusChangeStrategy implements ShipmentStatusCha
     }
 
     @Override
-    public Optional<ShipmentEvent> process(final Shipment shipment) {
+    public ShipmentEvent process(final Shipment shipment) {
         shipment.notifyRelatedShipmentRedirected(ShipmentId.nextId());
-        return Optional.of(new ShipmentRedirected(shipment.snapshot(), Instant.now()));
+        return new ShipmentRedirected(shipment.snapshot(), Instant.now());
     }
 }
