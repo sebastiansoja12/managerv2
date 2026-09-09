@@ -16,6 +16,9 @@ public record ShipmentWorkflowSettings(
 
     public ShipmentWorkflowSettings {
         defaultStatus = Objects.requireNonNullElse(defaultStatus, ShipmentStatus.CREATED);
+        if (defaultStatus != ShipmentStatus.CREATED && defaultStatus != ShipmentStatus.PREPARED) {
+            defaultStatus = ShipmentStatus.CREATED;
+        }
         defaultServiceLevel = Objects.requireNonNullElse(defaultServiceLevel, ShipmentServiceLevel.STANDARD);
         pickupCutoffTime = pickupCutoffTime == null || pickupCutoffTime.isBlank() ? "16:00" : pickupCutoffTime;
     }
