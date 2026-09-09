@@ -2,6 +2,8 @@ package com.warehouse.routetracker.domain.enumeration;
 
 public enum ShipmentStatus {
 
+    PLANNED,
+
     CREATED,
 
     PREPARED,
