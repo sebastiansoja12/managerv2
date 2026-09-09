@@ -3,6 +3,8 @@ package com.warehouse.shipment.application.event.snapshot;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
 import java.time.LocalDateTime;
@@ -29,6 +31,10 @@ public record ShipmentEventData(
         CountryCode destinationCountry,
         SignatureSnapshot signature,
         TrackingNumber trackingNumber,
+        PickupMethod pickupMethod,
+        DeliveryMethod deliveryMethod,
+        PickupPointId pickupPointId,
+        PickupPointId deliveryPickupPointId,
         ExternalId<UUID> externalShipmentId
 ) {
 
@@ -54,6 +60,10 @@ public record ShipmentEventData(
                 snapshot.destinationCountry(),
                 SignatureSnapshot.from(snapshot.signature()),
                 snapshot.trackingNumber(),
+                snapshot.pickupMethod(),
+                snapshot.deliveryMethod(),
+                snapshot.pickupPointId(),
+                snapshot.deliveryPickupPointId(),
                 snapshot.externalShipmentId()
         );
     }
