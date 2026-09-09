@@ -5,7 +5,7 @@ import java.util.List;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
-import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
@@ -40,8 +40,9 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
         try {
             this.shipmentPort.processShipmentDelivery(command);
 
-            final Shipment shipment = this.shipmentPort.loadShipment(shipmentId);
-            final ShipmentId newShipmentId = shipment.getShipmentRelatedId() == null ? shipmentId : shipment.getShipmentRelatedId();
+            final ShipmentResult shipment = this.shipmentPort.loadShipment(shipmentId);
+            final ShipmentId relatedShipmentId = shipment.snapshot().shipmentRelatedId();
+            final ShipmentId newShipmentId = relatedShipmentId == null ? shipmentId : relatedShipmentId;
 
             return new ShipmentRejectResponseItemDto(shipmentId.getValue(), newShipmentId.getValue(), true, true, null);
         } catch (final RuntimeException e) {
