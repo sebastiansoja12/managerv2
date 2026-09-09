@@ -4,6 +4,8 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 
@@ -26,6 +28,14 @@ public class Shipment {
     private DepartmentId targetDepartmentId;
 
     private DepartmentId originDepartmentId;
+
+    private PickupPointId pickupPointId;
+
+    private PickupPointId deliveryPickupPointId;
+
+    private PickupMethod pickupMethod;
+
+    private DeliveryMethod deliveryMethod;
 
     private ShipmentStatus shipmentStatus;
 
@@ -77,6 +87,10 @@ public class Shipment {
                     final ShipmentPriority shipmentPriority,
                     final DangerousGood dangerousGood,
                     final TrackingNumber trackingNumber,
+                    final PickupMethod pickupMethod,
+                    final DeliveryMethod deliveryMethod,
+                    final PickupPointId pickupPointId,
+                    final PickupPointId deliveryPickupPointId,
                     final ExternalId<UUID> externalShipmentId) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
@@ -98,6 +112,10 @@ public class Shipment {
         this.shipmentPriority = shipmentPriority;
         this.dangerousGood = dangerousGood;
         this.trackingNumber = trackingNumber;
+        this.pickupMethod = pickupMethod;
+        this.deliveryMethod = deliveryMethod;
+        this.pickupPointId = pickupPointId;
+        this.deliveryPickupPointId = deliveryPickupPointId;
         this.externalShipmentId = externalShipmentId;
     }
 
@@ -155,6 +173,8 @@ public class Shipment {
         this.shipmentPriority = shipmentPriority;
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = ExternalId.randomUUID();
+        this.pickupMethod = PickupMethod.DEPARTMENT;
+        this.deliveryMethod = DeliveryMethod.COURIER;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -173,6 +193,55 @@ public class Shipment {
                     final TrackingNumber trackingNumber,
                     final ShipmentStatus status,
                     final DangerousGood dangerousGood) {
+        this(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
+                price, locked, targetDepartmentId, originDepartmentId, signature, shipmentPriority,
+                trackingNumber, status, dangerousGood, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null);
+    }
+
+    public Shipment(final ShipmentId shipmentId,
+                    final Sender sender,
+                    final Recipient recipient,
+                    final ShipmentSize shipmentSize,
+                    final ShipmentId shipmentRelatedId,
+                    final CountryCode originCountry,
+                    final CountryCode destinationCountry,
+                    final Money price,
+                    final Boolean locked,
+                    final DepartmentId targetDepartmentId,
+                    final DepartmentId originDepartmentId,
+                    final Signature signature,
+                    final ShipmentPriority shipmentPriority,
+                    final TrackingNumber trackingNumber,
+                    final ShipmentStatus status,
+                    final DangerousGood dangerousGood,
+                    final PickupMethod pickupMethod,
+                    final DeliveryMethod deliveryMethod,
+                    final PickupPointId pickupPointId) {
+        this(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
+                price, locked, targetDepartmentId, originDepartmentId, signature, shipmentPriority,
+                trackingNumber, status, dangerousGood, pickupMethod, deliveryMethod, pickupPointId, null);
+    }
+
+    public Shipment(final ShipmentId shipmentId,
+                    final Sender sender,
+                    final Recipient recipient,
+                    final ShipmentSize shipmentSize,
+                    final ShipmentId shipmentRelatedId,
+                    final CountryCode originCountry,
+                    final CountryCode destinationCountry,
+                    final Money price,
+                    final Boolean locked,
+                    final DepartmentId targetDepartmentId,
+                    final DepartmentId originDepartmentId,
+                    final Signature signature,
+                    final ShipmentPriority shipmentPriority,
+                    final TrackingNumber trackingNumber,
+                    final ShipmentStatus status,
+                    final DangerousGood dangerousGood,
+                    final PickupMethod pickupMethod,
+                    final DeliveryMethod deliveryMethod,
+                    final PickupPointId pickupPointId,
+                    final PickupPointId deliveryPickupPointId) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
@@ -194,6 +263,10 @@ public class Shipment {
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = ExternalId.randomUUID();
         this.dangerousGood = dangerousGood;
+        this.pickupMethod = pickupMethod;
+        this.deliveryMethod = deliveryMethod;
+        this.pickupPointId = pickupPointId;
+        this.deliveryPickupPointId = deliveryPickupPointId;
     }
 
     public static Shipment parentShipment(final ShipmentId shipmentId,
@@ -235,19 +308,25 @@ public class Shipment {
                                      final ShipmentPriority shipmentPriority,
                                      final DangerousGood dangerousGood,
                                      final TrackingNumber trackingNumber,
+                                     final PickupMethod pickupMethod,
+                                     final DeliveryMethod deliveryMethod,
+                                     final PickupPointId pickupPointId,
+                                     final PickupPointId deliveryPickupPointId,
                                      final ExternalId<UUID> externalShipmentId) {
         return new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentStatus, shipmentType,
                 shipmentRelatedId, price, createdAt, updatedAt, locked, originCountry, destinationCountry,
                 targetDepartmentId, originDepartmentId, signature, signatureRequired,
                 shipmentPriority, dangerousGood,
-                trackingNumber, externalShipmentId);
+                trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
+                externalShipmentId);
     }
 
 	public ShipmentSnapshot snapshot() {
 		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, targetDepartmentId, originDepartmentId, shipmentStatus,
 				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
 				shipmentPriority, originCountry, destinationCountry, signature,
-                trackingNumber, externalShipmentId);
+                trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
+                externalShipmentId);
 	}
 
     public Sender getSender() {
@@ -268,6 +347,22 @@ public class Shipment {
 
     public DepartmentId getOriginDepartmentId() {
         return originDepartmentId;
+    }
+
+    public PickupPointId getPickupPointId() {
+        return pickupPointId;
+    }
+
+    public PickupPointId getDeliveryPickupPointId() {
+        return deliveryPickupPointId;
+    }
+
+    public PickupMethod getPickupMethod() {
+        return pickupMethod;
+    }
+
+    public DeliveryMethod getDeliveryMethod() {
+        return deliveryMethod;
     }
 
     public ShipmentStatus getShipmentStatus() {
@@ -496,8 +591,7 @@ public class Shipment {
             throw new ShipmentModificationException(
                     "Shipment cannot be changed because it is locked");
         }
-        if (ShipmentStatus.SENT.equals(shipmentStatus)
-                || ShipmentStatus.DELIVERY.equals(shipmentStatus)
+        if (ShipmentStatus.DELIVERY.equals(shipmentStatus)
                 || ShipmentStatus.RETURN.equals(shipmentStatus)) {
             throw new ShipmentModificationException(
                     "Shipment cannot be changed after it has been sent");
@@ -561,6 +655,15 @@ public class Shipment {
     public void changeTargetDepartment(final DepartmentId targetDepartmentId) {
         ensureCanBeModified();
         this.targetDepartmentId = targetDepartmentId;
+        markAsModified();
+    }
+
+    public void notifyShipmentAccepted() {
+        ensureCanBeModified();
+        if (!ShipmentStatus.SENT.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be accepted from status " + shipmentStatus);
+        }
+        this.shipmentStatus = ShipmentStatus.ACCEPTED;
         markAsModified();
     }
 
@@ -678,6 +781,7 @@ public class Shipment {
     }
 
     private List<ShipmentStatus> draftStatuses() {
-        return List.of(ShipmentStatus.CREATED, ShipmentStatus.ACCEPTED, ShipmentStatus.PREPARED);
+        return List.of(ShipmentStatus.PLANNED, ShipmentStatus.CREATED, ShipmentStatus.PREPARED);
     }
+
 }

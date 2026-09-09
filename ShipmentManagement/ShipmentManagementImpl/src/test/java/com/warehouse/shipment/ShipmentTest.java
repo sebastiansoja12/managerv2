@@ -166,6 +166,15 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldNotTreatAcceptedShipmentAsCancelableDraft() {
+        final Shipment shipment = shipment(null);
+        shipment.changeShipmentStatus(ShipmentStatus.ACCEPTED);
+
+        assertThrows(ShipmentModificationException.class,
+                () -> shipment.cancel(workflowSettings(30), shipment.getCreatedAt().plusMinutes(10)));
+    }
+
+    @Test
     void shouldRejectShipmentCancellationAfterConfiguredCancellationWindow() {
         final Shipment shipment = shipment(null);
 
@@ -603,6 +612,7 @@ class ShipmentTest {
                 money(),
                 false,
                 new DepartmentId(10L),
+                new DepartmentId(9L),
                 null,
                 ShipmentPriority.MEDIUM,
                 new TrackingNumber("TEST-TRACKING-NUMBER"),
