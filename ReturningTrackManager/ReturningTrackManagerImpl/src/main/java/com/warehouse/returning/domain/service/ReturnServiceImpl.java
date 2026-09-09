@@ -1,8 +1,11 @@
 package com.warehouse.returning.domain.service;
 
+import java.util.Optional;
+
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.event.ReturnPackageCanceled;
 import com.warehouse.returning.domain.event.ReturnPackageCompleted;
+import com.warehouse.returning.domain.event.ReturnPackageProcessingStarted;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.registry.DomainRegistry;
@@ -23,8 +26,15 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
+    public Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final Long operatorId) {
+        return this.returnRepository.findLatestByShipmentIdAndOperatorId(
+                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
+                        shipmentId.value()), operatorId);
+    }
+
+    @Override
     public ReturnPackage getReturn(final ReturnPackageId returnId) {
-        return this.returnRepository.findById(returnId);
+        return this.returnRepository.findDetailsById(returnId);
     }
 
     @Override
@@ -63,6 +73,14 @@ public class ReturnServiceImpl implements ReturnService {
     @Override
     public void saveOrUpdate(final ReturnPackage returnPackage) {
         this.returnRepository.createOrUpdate(returnPackage);
+    }
+
+    @Override
+    public void startProcessingReturn(final ShipmentId shipmentId) {
+        final ReturnPackage returnPackage = this.findByShipmentId(shipmentId);
+        returnPackage.markAsProcessing();
+        this.saveOrUpdate(returnPackage);
+        DomainRegistry.publish(new ReturnPackageProcessingStarted(returnPackage.toSnapshot(), Instant.now()));
     }
 
     @Override
