@@ -80,6 +80,9 @@ class ShipmentKafkaListenerTest {
                 null,
                 null,
                 null,
+                null,
+                null,
+                null,
                 null
         );
     }
