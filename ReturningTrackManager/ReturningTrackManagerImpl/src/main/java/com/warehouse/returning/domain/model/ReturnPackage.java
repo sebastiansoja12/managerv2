@@ -148,11 +148,21 @@ public class ReturnPackage {
         markAsModified();
     }
 
+    public void markAsProcessing() {
+        if (this.returnStatus != ReturnStatus.CREATED) {
+            throw new StatusChangeException("Only a created return package can start processing");
+        }
+        changeReturnStatus(ReturnStatus.PROCESSING);
+        markAsModified();
+    }
+
     public void markAsCompleted() {
         if (this.returnStatus == ReturnStatus.CANCELLED) {
             throw new StatusChangeException("Return package is already cancelled, cannot override status");
         } else if (this.returnStatus == ReturnStatus.COMPLETED) {
             throw new StatusChangeException("Return package is already completed, cannot override status");
+        } else if (this.returnStatus != ReturnStatus.PROCESSING) {
+            throw new StatusChangeException("Only a processing return package can be completed");
         }
         changeReturnStatus(ReturnStatus.COMPLETED);
         markAsModified();
