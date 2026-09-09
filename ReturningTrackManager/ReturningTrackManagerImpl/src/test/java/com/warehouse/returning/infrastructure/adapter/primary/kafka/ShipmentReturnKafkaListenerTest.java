@@ -74,6 +74,11 @@ class ShipmentReturnKafkaListenerTest {
         }
 
         @Override
+        public void startProcessing(final ShipmentId shipmentId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public void complete(final ShipmentId shipmentId) {
             throw new UnsupportedOperationException();
         }
@@ -81,6 +86,11 @@ class ShipmentReturnKafkaListenerTest {
         @Override
         public void cancel(final ShipmentId shipmentId) {
             this.canceledShipmentId = shipmentId;
+        }
+
+        @Override
+        public java.util.Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final Long operatorId) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
