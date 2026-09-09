@@ -7,6 +7,8 @@ import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.application.port.primary.command.*;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
+import com.warehouse.shipment.application.port.primary.result.ShipmentControlCenterResult;
+import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.domain.model.*;
 import com.warehouse.shipment.domain.vo.*;
 
@@ -27,15 +29,15 @@ public interface ShipmentPort {
 
     void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod);
 
-    Shipment loadShipment(final ShipmentId shipmentId);
+    ShipmentResult loadShipment(final ShipmentId shipmentId);
 
-    Shipment loadShipment(final TrackingNumber trackingNumber);
+    ShipmentResult loadShipment(final TrackingNumber trackingNumber);
 
-    ShipmentRouteLog getShipmentByShipmentId(final ShipmentId shipmentId);
+    ShipmentControlCenterResult loadShipmentControlCenter(final ShipmentId shipmentId);
 
-    ShipmentRouteLog getShipmenyByTrackingNumber(final TrackingNumber trackingNumber);
+    ShipmentControlCenterResult loadShipmentControlCenter(final TrackingNumber trackingNumber);
 
-    List<Shipment> searchShipments(final ShipmentSearchCriteria criteria);
+    List<ShipmentResult> searchShipments(final ShipmentSearchCriteria criteria);
 
     boolean existsShipment(final ShipmentId shipmentId);
 
@@ -47,6 +49,10 @@ public interface ShipmentPort {
 
     void processShipmentReturn(final ShipmentReturnCommand request);
 
+    void startProcessingShipmentReturn(final ShipmentId shipmentId);
+
+    void completeShipmentReturn(final ShipmentId shipmentId);
+
     void cancelShipmentReturn(final ReturnId returnId);
 
     ShipmentReturnDetails loadShipmentReturn(final ReturnId returnId);
@@ -56,12 +62,6 @@ public interface ShipmentPort {
     void processShipmentDelivery(final ShipmentDeliveryCommand command);
 
     void cancel(final ShipmentId shipmentId);
-
-    Shipment find(final ShipmentId shipmentId);
-
-    Shipment find(final TrackingNumber trackingNumber);
-
-    List<Shipment> search(final ShipmentSearchCriteria criteria);
 
     void changeShipmentTypeTo(final ShipmentId shipmentId,
                               final ShipmentType shipmentType,
@@ -75,5 +75,4 @@ public interface ShipmentPort {
 
     void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination);
 
-    DepartmentCode getDepartmentCode(final DepartmentId departmentId);
 }
