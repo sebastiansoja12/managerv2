@@ -2,11 +2,12 @@ package com.warehouse.commonassets.identificator;
 
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 @Embeddable
-public class DepartmentId {
+public class DepartmentId implements Serializable {
     private Long value;
 
     protected DepartmentId() {
@@ -18,6 +19,10 @@ public class DepartmentId {
 
     public static DepartmentId generate() {
         return new DepartmentId(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
+    }
+
+    public Long value() {
+        return value;
     }
 
     public Long getValue() {

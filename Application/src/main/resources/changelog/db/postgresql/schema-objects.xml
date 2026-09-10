@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-04-postgresql-schema-objects" author="s-soja">
+        <addUniqueConstraint tableName="geocoding_configurations" columnNames="operator_id, provider" constraintName="uk_geocoding_configurations_operator_provider" />
+        <addUniqueConstraint tableName="tracking_integration_configurations" columnNames="operator_id, provider" constraintName="uk_tracking_integration_operator_provider" />
+        <addUniqueConstraint tableName="department" columnNames="department_code" constraintName="uk_department_code" />
+        <addUniqueConstraint tableName="department_rd" columnNames="department_code" constraintName="uk_department_rd_code" />
+        <addUniqueConstraint tableName="delivery_network" columnNames="operator_id" constraintName="uk_delivery_network_operator" />
+        <addUniqueConstraint tableName="delivery_network_connection" columnNames="delivery_network_id, first_department_id, second_department_id" constraintName="uk_delivery_network_connection_pair" />
+        <createIndex indexName="fk_communication_log_details_process_logs" tableName="communication_log_details">
+            <column name="process_id" />
+        </createIndex>
+        <createIndex indexName="fk_communication_log_details_rd_process_logs_rd" tableName="communication_log_details_rd">
+            <column name="process_id" />
+        </createIndex>
+        <createIndex indexName="idx_kafka_event_outbox_unpublished" tableName="kafka_event_outbox">
+            <column name="published_at" />
+            <column name="created_at" />
+        </createIndex>
+        <createIndex indexName="idx_kafka_event_outbox_topic" tableName="kafka_event_outbox">
+            <column name="topic" />
+        </createIndex>
+        <createIndex indexName="idx_kafka_event_outbox_claim" tableName="kafka_event_outbox">
+            <column name="status" />
+            <column name="next_attempt_at" />
+            <column name="locked_until" />
+            <column name="created_at" />
+        </createIndex>
+        <createIndex indexName="idx_async_job_status" tableName="async_job">
+            <column name="status" />
+        </createIndex>
+        <createIndex indexName="idx_async_job_read_model_type" tableName="async_job">
+            <column name="read_model_type" />
+        </createIndex>
+        <createIndex indexName="fk_delivery_department" tableName="delivery">
+            <column name="department_id" />
+        </createIndex>
+        <createIndex indexName="fk_delivery_shipment" tableName="delivery">
+            <column name="shipment_id" />
+        </createIndex>
+        <createIndex indexName="fk_delivery_supplier" tableName="delivery">
+            <column name="supplier_code" />
+        </createIndex>
+        <createIndex indexName="fk_delivery_area_postal_codes_aud_revinfo" tableName="delivery_area_postal_codes_aud">
+            <column name="rev" />
+        </createIndex>
+        <createIndex indexName="idx_department_operator_id" tableName="department">
+            <column name="operator_id" />
+        </createIndex>
+        <createIndex indexName="idx_department_rd_operator_id" tableName="department_rd">
+            <column name="operator_id" />
+        </createIndex>
+        <createIndex indexName="fk_department_aud_revinfo" tableName="department_aud">
+            <column name="rev" />
+        </createIndex>
+        <createIndex indexName="fk_department_rd_aud_revinfo" tableName="department_rd_aud">
+            <column name="rev" />
+        </createIndex>
+        <createIndex indexName="idx_device_pair_pair_key" tableName="device_pair">
+            <column name="pair_key" />
+        </createIndex>
+        <createIndex indexName="fk_operator_configurations_aud_revinfo" tableName="operator_configurations_aud">
+            <column name="rev" />
+        </createIndex>
+        <createIndex indexName="fk_operators_aud_revinfo" tableName="operators_aud">
+            <column name="rev" />
+        </createIndex>
+        <createIndex tableName="delivery_network_connection" indexName="idx_delivery_network_connection_first">
+            <column name="delivery_network_id" />
+            <column name="first_department_id" />
+        </createIndex>
+        <createIndex tableName="delivery_network_connection" indexName="idx_delivery_network_connection_second">
+            <column name="delivery_network_id" />
+            <column name="second_department_id" />
+        </createIndex>
+        <createIndex indexName="fk_reroute_token_shipment" tableName="reroute_token">
+            <column name="parcel_id" />
+        </createIndex>
+        <createIndex indexName="fk_return_tokens_shipment" tableName="return_tokens">
+            <column name="shipment_id" />
+        </createIndex>
+        <createIndex indexName="idx_shipment_operator_id" tableName="shipment">
+            <column name="operator_id" />
+        </createIndex>
+        <createIndex indexName="idx_shipment_target_department_id" tableName="shipment">
+            <column name="target_department_id" />
+        </createIndex>
+        <createIndex indexName="idx_shipment_rd_operator_id" tableName="shipment_rd">
+            <column name="operator_id" />
+        </createIndex>
+        <createIndex indexName="idx_shipment_rd_status" tableName="shipment_rd">
+            <column name="status" />
+        </createIndex>
+        <createIndex indexName="idx_shipment_rd_created_at" tableName="shipment_rd">
+            <column name="created_at" />
+        </createIndex>
+        <createIndex indexName="idx_shipment_rd_target_department_id" tableName="shipment_rd">
+            <column name="target_department_id" />
+        </createIndex>
+        <createIndex indexName="fk_shipment_aud_revinfo" tableName="shipment_aud">
+            <column name="rev" />
+        </createIndex>
+        <createIndex indexName="fk_supplier_department_id" tableName="supplier">
+            <column name="department_id" />
+        </createIndex>
+        <createIndex indexName="fk_suppliers_department_id" tableName="suppliers">
+            <column name="department_id" />
+        </createIndex>
+        <createIndex indexName="idx_suppliers_operator_id" tableName="suppliers">
+            <column name="operator_id" />
+        </createIndex>
+        <createIndex indexName="fk_suppliers_aud_revinfo" tableName="suppliers_aud">
+            <column name="rev" />
+        </createIndex>
+        <createIndex indexName="fk_suppliers_supported_package_types_aud_revinfo" tableName="suppliers_supported_package_types_aud">
+            <column name="rev" />
+        </createIndex>
+        <createIndex indexName="fk_users_department_id" tableName="users">
+            <column name="department_id" />
+        </createIndex>
+        <createIndex indexName="idx_users_operator_id" tableName="users">
+            <column name="operator_id" />
+        </createIndex>
+        <createIndex indexName="fk_users_role_permissions_permission_id" tableName="users_role_permissions">
+            <column name="permission_id" />
+        </createIndex>
+        <createIndex tableName="shipment" indexName="idx_shipment_dangerous_good_un_number">
+            <column name="dangerous_good_un_number" />
+        </createIndex>
+        <createIndex tableName="shipment" indexName="idx_shipment_dangerous_good_hazard_class">
+            <column name="dangerous_good_hazard_class" />
+        </createIndex>
+        <createIndex tableName="shipment_rd" indexName="idx_shipment_rd_dangerous_good_un_number">
+            <column name="dangerous_good_un_number" />
+        </createIndex>
+        <createIndex tableName="shipment_rd" indexName="idx_shipment_rd_dangerous_good_hazard_class">
+            <column name="dangerous_good_hazard_class" />
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="delivery_network" baseColumnNames="operator_id" constraintName="fk_delivery_network_operator" referencedTableName="operators" referencedColumnNames="operator_id" onDelete="RESTRICT" onUpdate="RESTRICT" />
+        <addForeignKeyConstraint baseTableName="delivery_network_connection" baseColumnNames="delivery_network_id" constraintName="fk_delivery_network_connection_network" referencedTableName="delivery_network" referencedColumnNames="delivery_network_id" onDelete="CASCADE" onUpdate="RESTRICT" />
+        <addForeignKeyConstraint baseTableName="delivery_network_connection" baseColumnNames="first_department_id" constraintName="fk_delivery_network_connection_first_department" referencedTableName="department" referencedColumnNames="department_id" onDelete="RESTRICT" onUpdate="RESTRICT" />
+        <addForeignKeyConstraint baseTableName="delivery_network_connection" baseColumnNames="second_department_id" constraintName="fk_delivery_network_connection_second_department" referencedTableName="department" referencedColumnNames="department_id" onDelete="RESTRICT" onUpdate="RESTRICT" />
+        <addForeignKeyConstraint baseColumnNames="process_id" baseTableName="communication_log_details" constraintName="fk_communication_log_details_process_logs" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="process_id" referencedTableName="process_logs" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="process_id" baseTableName="communication_log_details_rd" constraintName="fk_communication_log_details_rd_process_logs_rd" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="process_id" referencedTableName="process_logs_rd" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="delivery_area_postal_codes_aud" constraintName="fk_delivery_area_postal_codes_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="delivery_area_id" baseTableName="delivery_area_postal_codes" constraintName="fk_delivery_area_postal_codes_supplier" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="supplier_id" referencedTableName="suppliers" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="department_id" baseTableName="delivery" constraintName="fk_delivery_department" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_id" referencedTableName="department" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="delivery" constraintName="fk_delivery_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="supplier_code" baseTableName="delivery" constraintName="fk_delivery_supplier" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="supplier_code" referencedTableName="supplier" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="department_aud" constraintName="fk_department_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="department_rd_aud" constraintName="fk_department_rd_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="device_id" baseTableName="mobile_installed_apps" constraintName="fk_mobile_installed_apps_mobile" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="device_id" referencedTableName="mobiles" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="operator_configurations_aud" constraintName="fk_operator_configurations_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="operators_aud" constraintName="fk_operators_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="parcel_id" baseTableName="reroute_token" constraintName="fk_reroute_token_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="return_tokens" constraintName="fk_return_tokens_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="shipment_aud" constraintName="fk_shipment_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="target_department_id" baseTableName="shipment" constraintName="fk_shipment_target_department" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_id" referencedTableName="department" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="target_department_id" baseTableName="shipment_rd" constraintName="fk_shipment_rd_target_department" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_id" referencedTableName="department" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="shipment_id" baseTableName="signature" constraintName="fk_signature_shipment" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="shipment_id" referencedTableName="shipment" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="department_id" baseTableName="supplier" constraintName="fk_supplier_department_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_id" referencedTableName="department" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="suppliers_aud" constraintName="fk_suppliers_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="department_id" baseTableName="suppliers" constraintName="fk_suppliers_department_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_id" referencedTableName="department" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="rev" baseTableName="suppliers_supported_package_types_aud" constraintName="fk_suppliers_supported_package_types_aud_revinfo" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="rev" referencedTableName="revinfo" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="supplier_id" baseTableName="suppliers_supported_package_types" constraintName="fk_suppliers_supported_package_types_supplier" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="supplier_id" referencedTableName="suppliers" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="department_id" baseTableName="users" constraintName="fk_users_department_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="department_id" referencedTableName="department" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="users_role_permissions" constraintName="fk_users_role_permissions_permission_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="role_permissions" validate="true" />
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="users_role_permissions" constraintName="fk_users_role_permissions_user_id" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="users" validate="true" />
+        <sql>ALTER TABLE delivery_network_connection ADD CONSTRAINT chk_delivery_network_connection_order CHECK (first_department_id &lt; second_department_id)</sql>
+    </changeSet>
+</databaseChangeLog>

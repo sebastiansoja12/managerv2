@@ -1,9 +1,9 @@
 package com.warehouse.routetracker.domain.model;
 
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.SupplierId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.vo.Error;
@@ -11,8 +11,8 @@ import com.warehouse.routetracker.domain.vo.TerminalId;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.Objects;
 
 @Builder
 @EqualsAndHashCode
@@ -41,21 +41,23 @@ public class RouteLogRecord {
         this.faultDescription = faultDescription;
     }
 
-    public void createShipmentEvent(final String eventType,
-                                    final ShipmentStatus shipmentStatus,
-                                    final LocalDateTime occurredAt,
-                                    final String payload,
-                                    final UserId userId,
-                                    final DepartmentId departmentId) {
+    public void createShipmentEvent(final ShipmentStatusStateChangeCommand command) {
+        final boolean alreadyProcessed = getRouteLogRecordDetails().getRouteLogRecordDetailSet().stream()
+                .anyMatch(detail -> Objects.equals(detail.getDescription(), command.eventType())
+                        && detail.getShipmentStatus() == command.shipmentStatus()
+                        && Objects.equals(detail.getTimestamp(), command.changedAt()));
+        if (alreadyProcessed) {
+            return;
+        }
         getRouteLogRecordDetails()
                 .getRouteLogRecordDetailSet().add(RouteLogRecordDetail.builder()
-                .shipmentStatus(shipmentStatus)
-                .processType(determineProcessType(shipmentStatus))
-                .description(eventType)
-                .timestamp(occurredAt)
-                .request(payload)
-                .userId(userId)
-                .departmentId(departmentId)
+                .shipmentStatus(command.shipmentStatus())
+                .processType(determineProcessType(command.shipmentStatus()))
+                .description(command.eventType())
+                .timestamp(command.changedAt())
+                .operatorId(command.operatorId())
+                .departmentId(command.departmentId())
+                .userId(command.userId())
                 .build());
     }
 
@@ -133,11 +135,12 @@ public class RouteLogRecord {
 
     private ProcessType determineProcessType(final ShipmentStatus shipmentStatus) {
         return switch (shipmentStatus) {
-            case CREATED -> ProcessType.CREATED;
+            case PLANNED, CREATED, PREPARED, ACCEPTED -> ProcessType.CREATED;
             case REROUTE -> ProcessType.REROUTE;
             case SENT, DELIVERY -> ProcessType.ROUTE;
             case RETURN -> ProcessType.RETURN;
             case REDIRECT -> ProcessType.REDIRECT;
+            case CANCELED -> ProcessType.CANCELED;
         };
     }
 }

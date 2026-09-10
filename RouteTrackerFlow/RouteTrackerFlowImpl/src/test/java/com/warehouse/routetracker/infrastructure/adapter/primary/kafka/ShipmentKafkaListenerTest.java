@@ -2,108 +2,88 @@ package com.warehouse.routetracker.infrastructure.adapter.primary.kafka;
 
 import static org.mockito.Mockito.verify;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.nio.charset.StandardCharsets;
 
-import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.routetracker.domain.model.ShipmentStatusStateChangeCommand;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.port.primary.RouteTrackerLogPort;
 import com.warehouse.routetracker.infrastructure.adapter.primary.api.ShipmentId;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChanged;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentCreated;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentReturned;
-import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentSnapshot;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.ShipmentChangedIntegrationEvent;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentEventData;
+import com.warehouse.routetracker.infrastructure.adapter.primary.kafka.mapper.ShipmentKafkaEventMapper;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentKafkaListenerTest {
 
-    private static final Long SHIPMENT_ID = 123L;
-    private static final Instant EVENT_TIME = Instant.parse("2026-08-11T10:15:30Z");
-    private static final LocalDateTime OCCURRED_AT = LocalDateTime.of(2026, 8, 11, 10, 15, 30);
-    private static final UserId USER_ID = new UserId(42L);
-    private static final DepartmentId DEPARTMENT_ID = new DepartmentId(10L);
-    private static final OperatorId OPERATOR_ID = new OperatorId(7L);
+    private static final LocalDateTime CHANGED_AT = LocalDateTime.of(2026, 8, 11, 10, 15, 30);
 
     @Mock
     private RouteTrackerLogPort routeTrackerLogPort;
 
-    private ObjectMapper objectMapper;
     private ShipmentKafkaListener listener;
 
     @BeforeEach
     void setUp() {
-        this.objectMapper = new ObjectMapper().findAndRegisterModules();
-        this.listener = new ShipmentKafkaListener(this.objectMapper, this.routeTrackerLogPort);
+        this.listener = new ShipmentKafkaListener(this.routeTrackerLogPort, new ShipmentKafkaEventMapper());
     }
 
     @Test
-    void shouldHandleShipmentCreated() throws Exception {
-        final ShipmentCreated event = new ShipmentCreated(
-                this.snapshot("CREATED"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
-
-        this.listener.handle(event);
-
-        verify(this.routeTrackerLogPort).createShipmentEvent(
-                new ShipmentId(SHIPMENT_ID),
-                "ShipmentCreated",
-                ShipmentStatus.CREATED,
-                OCCURRED_AT,
-                this.objectMapper.writeValueAsString(event),
-                USER_ID,
-                DEPARTMENT_ID
+    void shouldMapLocalMessageToPrimaryCommand() {
+        final ShipmentChangedIntegrationEvent message = new ShipmentChangedIntegrationEvent(
+                shipmentEventData(),
+                "shipment.created",
+                new OperatorId(7L),
+                new DepartmentId(10L),
+                new UserId(42L)
         );
+
+        this.listener.handle(message);
+
+        verify(this.routeTrackerLogPort).createOrChangeShipmentState(new ShipmentStatusStateChangeCommand(
+                new ShipmentId(123L),
+                "shipment.created",
+                com.warehouse.routetracker.domain.enumeration.ShipmentStatus.CREATED,
+                CHANGED_AT,
+                new OperatorId(7L),
+                new DepartmentId(10L),
+                new UserId(42L)
+        ));
     }
 
-    @Test
-    void shouldHandleShipmentReturned() throws Exception {
-        final ShipmentReturned event = new ShipmentReturned(
-                this.snapshot("RETURN"), EVENT_TIME, "DAMAGED", "Damaged package",
-                USER_ID, DEPARTMENT_ID, OPERATOR_ID);
-
-        this.listener.handle(event);
-
-        verify(this.routeTrackerLogPort).createShipmentEvent(
-                new ShipmentId(SHIPMENT_ID),
-                "ShipmentReturned",
-                ShipmentStatus.RETURN,
-                OCCURRED_AT,
-                this.objectMapper.writeValueAsString(event),
-                USER_ID,
-                DEPARTMENT_ID
+    private ShipmentEventData shipmentEventData() {
+        return new ShipmentEventData(
+                new com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentId(123L),
+                null,
+                null,
+                null,
+                null,
+                null,
+                com.warehouse.routetracker.infrastructure.adapter.primary.kafka.event.snapshot.ShipmentStatus.CREATED,
+                null,
+                null,
+                null,
+                null,
+                CHANGED_AT,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
         );
-    }
-
-    @Test
-    void shouldHandleOtherShipmentEvent() throws Exception {
-        final ShipmentChanged event = new ShipmentChanged(
-                this.snapshot("SENT"), EVENT_TIME, USER_ID, DEPARTMENT_ID, OPERATOR_ID);
-
-        this.listener.handle(
-                event,
-                "ShipmentSent".getBytes(StandardCharsets.UTF_8));
-
-        verify(this.routeTrackerLogPort).createShipmentEvent(
-                new ShipmentId(SHIPMENT_ID),
-                "ShipmentSent",
-                ShipmentStatus.SENT,
-                OCCURRED_AT,
-                this.objectMapper.writeValueAsString(event),
-                USER_ID,
-                DEPARTMENT_ID
-        );
-    }
-
-    private ShipmentSnapshot snapshot(final String shipmentStatus) {
-        return new ShipmentSnapshot(new ShipmentId(SHIPMENT_ID), shipmentStatus);
     }
 }

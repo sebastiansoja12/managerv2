@@ -13,15 +13,16 @@ public class TrackingSequenceEntity {
     private String id;
 
     @Version
-    private long version;
+    private Long version;
 
     private long nextValue;
 
     protected TrackingSequenceEntity() {}
 
-    public TrackingSequenceEntity(final String id, final long start) {
+    public TrackingSequenceEntity(final String id, final long start, final Long version) {
         this.id = id;
         this.nextValue = start;
+        this.version = version;
     }
 
     public long next() {
@@ -36,8 +37,7 @@ public class TrackingSequenceEntity {
         return nextValue;
     }
 
-    public long getVersion() {
+    public Long getVersion() {
         return version;
     }
 }
-

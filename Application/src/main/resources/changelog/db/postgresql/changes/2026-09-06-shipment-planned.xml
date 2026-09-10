@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-06-shipment-planned" author="s-soja">
+        <dropNotNullConstraint tableName="shipment"
+                               columnName="target_department_id"
+                               columnDataType="BIGINT"/>
+        <dropNotNullConstraint tableName="shipment_rd"
+                               columnName="target_department_id"
+                               columnDataType="BIGINT"/>
+        <addColumn tableName="shipment">
+            <column name="pickup_point_id" type="UUID"/>
+            <column name="pickup_method" type="VARCHAR(32)"/>
+            <column name="delivery_method" type="VARCHAR(32)"/>
+        </addColumn>
+        <addColumn tableName="shipment_rd">
+            <column name="pickup_point_id" type="UUID"/>
+            <column name="pickup_method" type="VARCHAR(32)"/>
+            <column name="delivery_method" type="VARCHAR(32)"/>
+        </addColumn>
+        <addColumn tableName="shipment_aud">
+            <column name="pickup_point_id" type="UUID"/>
+            <column name="pickup_method" type="VARCHAR(32)"/>
+            <column name="delivery_method" type="VARCHAR(32)"/>
+        </addColumn>
+        <update tableName="operator_configurations">
+            <column name="shipment_default_status" value="CREATED"/>
+            <where>shipment_default_status = 'ACCEPTED'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

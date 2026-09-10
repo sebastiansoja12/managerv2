@@ -12,7 +12,7 @@ import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.vo.RolePermissionId;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.commonassets.enumeration.UserPermission;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 
@@ -21,7 +21,7 @@ class UserMapperTest {
     @Test
     void shouldMapUserToEntityWithOperatorAndFlags() {
         final User user = new User(new UserId(7L), "supplier", "password", "Supplier", "User",
-                "supplier@test.pl", User.Role.SUPPLIER, new DepartmentCode("SUP"), "api-key", "PL",
+                "supplier@test.pl", User.Role.SUPPLIER, new DepartmentId(10L), "api-key", "PL",
                 Set.of(new RolePermission(new RolePermissionId(5L), UserPermission.ROLE_SUPPLIER_READ)));
         user.assignOperator(OperatorId.of(200L));
         user.setInitial(true);
@@ -47,7 +47,7 @@ class UserMapperTest {
                 .lastName("User")
                 .email("manager@test.pl")
                 .role(UserEntity.Role.MANAGER)
-                .departmentCode(new DepartmentCode("MAN"))
+                .departmentId(new DepartmentId(10L))
                 .language("PL")
                 .apiKey("api-key")
                 .permissions(Set.of(new com.warehouse.auth.infrastructure.adapter.secondary.entity.RolePermissionEntity(

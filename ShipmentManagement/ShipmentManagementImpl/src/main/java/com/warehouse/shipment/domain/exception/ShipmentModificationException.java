@@ -1,8 +1,10 @@
 package com.warehouse.shipment.domain.exception;
 
-public class ShipmentModificationException extends RuntimeException {
+import com.warehouse.exceptionhandler.exception.RestException;
+
+public class ShipmentModificationException extends RestException {
 
     public ShipmentModificationException(final String message) {
-        super(message);
+        super(400, message);
     }
 }

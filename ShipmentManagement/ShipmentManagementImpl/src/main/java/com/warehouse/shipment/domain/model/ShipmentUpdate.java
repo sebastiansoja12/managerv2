@@ -9,17 +9,13 @@ public class ShipmentUpdate {
     
     private Recipient recipient;
     
-    private String destination;
-
     private String token;
 
 	public ShipmentUpdate(final Sender sender,
                           final Recipient recipient,
-                          final String destination,
                           final String token) {
         this.sender = sender;
         this.recipient = recipient;
-        this.destination = destination;
         this.token = token;
     }
 
@@ -35,11 +31,4 @@ public class ShipmentUpdate {
         return recipient;
     }
 
-    public String getDestination() {
-        return destination;
-    }
-
-    public void updateDestination(final String destination) {
-        this.destination = destination;
-    }
 }

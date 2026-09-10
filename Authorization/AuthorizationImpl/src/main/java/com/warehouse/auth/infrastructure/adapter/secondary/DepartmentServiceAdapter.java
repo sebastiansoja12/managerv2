@@ -20,8 +20,18 @@ public class DepartmentServiceAdapter implements DepartmentServicePort {
     }
 
     @Override
+    public Boolean departmentExists(final DepartmentId departmentId) {
+        return this.departmentApiService.checkIfDepartmentExists(departmentId);
+    }
+
+    @Override
     public DepartmentId getDepartmentId(final DepartmentCode departmentCode) {
         final Long departmentId = this.departmentApiService.getDepartmentByCode(departmentCode).departmentId();
         return new DepartmentId(departmentId);
+    }
+
+    @Override
+    public DepartmentCode getDepartmentCode(final DepartmentId departmentId) {
+        return new DepartmentCode(departmentApiService.getDepartmentById(departmentId).departmentCode());
     }
 }

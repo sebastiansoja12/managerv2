@@ -4,12 +4,16 @@ public class TrackingSequence {
 
     private final String id;
     private long nextValue;
-    private long version;
+    private Long version;
 
     public TrackingSequence(final String id, final long nextValue) {
+        this(id, nextValue, null);
+    }
+
+    public TrackingSequence(final String id, final long nextValue, final Long version) {
         this.id = id;
         this.nextValue = nextValue;
-        this.version = 0L;
+        this.version = version;
     }
 
     public String getId() {
@@ -20,7 +24,7 @@ public class TrackingSequence {
         return nextValue;
     }
 
-    public long getVersion() {
+    public Long getVersion() {
         return version;
     }
 
@@ -28,14 +32,13 @@ public class TrackingSequence {
         this.nextValue = nextValue;
     }
 
-    public void setVersion(final long version) {
+    public void setVersion(final Long version) {
         this.version = version;
     }
 
     public synchronized long next() {
         final long current = nextValue;
         nextValue++;
-        version++;
         return current;
     }
 
@@ -48,4 +51,3 @@ public class TrackingSequence {
                 '}';
     }
 }
-

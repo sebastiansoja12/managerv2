@@ -19,6 +19,9 @@ import lombok.NoArgsConstructor;
 public class DepartmentEntity {
 
     @Id
+    @Column(name = "department_id", nullable = false)
+    private Long departmentId;
+
     @Column(name = "department_code", nullable = false, unique = true)
     private String departmentCode;
 
@@ -35,4 +38,3 @@ public class DepartmentEntity {
         return active;
     }
 }
-

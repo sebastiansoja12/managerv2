@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,10 +19,12 @@ import org.springframework.http.ResponseEntity;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ReturnId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.ReasonCode;
 import com.warehouse.shipment.domain.enumeration.ReturnStatus;
 import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
 import com.warehouse.shipment.domain.vo.ShipmentReturnPage;
+import com.warehouse.shipment.infrastructure.adapter.secondary.api.ChangeReturnStatusApiRequest;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.DepartmentCodeApi;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.ReasonCodeApi;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.ReturnIdDto;
@@ -32,6 +35,8 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.api.ShipmentIdDto
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.UserIdApi;
 import com.warehouse.tools.returning.ReturnProperties;
 
+import feign.FeignException;
+
 @ExtendWith(MockitoExtension.class)
 class ReturningServiceClientTest {
 
@@ -39,6 +44,9 @@ class ReturningServiceClientTest {
 
     @Mock
     private ExternalFeignClient externalFeignClient;
+
+    @Mock
+    private FeignException feignException;
 
     private ReturningServiceClient returningServiceClient;
 
@@ -86,6 +94,33 @@ class ReturningServiceClientTest {
         assertEquals(createdAt, result.createdAt());
         assertEquals(updatedAt, result.updatedAt());
         verify(externalFeignClient).getReturn(RETURN_URI);
+
+        final URI shipmentReturnUri = URI.create("http://returning-track-manager/returns/shipment/456");
+        when(externalFeignClient.getReturn(shipmentReturnUri)).thenReturn(ResponseEntity.ok(response));
+
+        final ShipmentReturnDetails shipmentReturn = returningServiceClient
+                .findReturnByShipmentId(new ShipmentId(456L)).orElseThrow();
+
+        assertEquals(result, shipmentReturn);
+        verify(externalFeignClient).getReturn(shipmentReturnUri);
+    }
+
+    @Test
+    void shouldTreatNoContentAsNoReturnForShipment() {
+        final URI uri = URI.create("http://returning-track-manager/returns/shipment/6805406359141427429");
+        when(externalFeignClient.getReturn(uri)).thenReturn(ResponseEntity.noContent().build());
+
+        assertTrue(returningServiceClient.findReturnByShipmentId(new ShipmentId(6805406359141427429L)).isEmpty());
+        verify(externalFeignClient).getReturn(uri);
+    }
+
+    @Test
+    void shouldLoadShipmentWithoutReturnWhenReturningTrackManagerIsUnavailable() {
+        final URI uri = URI.create("http://returning-track-manager/returns/shipment/456");
+        when(externalFeignClient.getReturn(uri)).thenThrow(feignException);
+
+        assertTrue(returningServiceClient.findReturnByShipmentId(new ShipmentId(456L)).isEmpty());
+        verify(externalFeignClient).getReturn(uri);
     }
 
     @Test
@@ -115,5 +150,27 @@ class ReturningServiceClientTest {
         assertEquals(123L, result.content().get(0).returnPackageId().getId());
         assertEquals(77L, result.content().get(0).operatorId());
         verify(externalFeignClient).getReturns(returnsUri);
+    }
+
+    @Test
+    void shouldStartProcessingReturnThroughReturningTrackManager() {
+        final URI uri = URI.create("http://returning-track-manager/returns/process");
+
+        returningServiceClient.startProcessing(new ShipmentId(456L));
+
+        verify(externalFeignClient).changeReturnStatus(
+                uri,
+                new ChangeReturnStatusApiRequest(new ShipmentIdDto(456L), "PROCESSING"));
+    }
+
+    @Test
+    void shouldCompleteReturnThroughReturningTrackManager() {
+        final URI uri = URI.create("http://returning-track-manager/returns/complete");
+
+        returningServiceClient.complete(new ShipmentId(456L));
+
+        verify(externalFeignClient).changeReturnStatus(
+                uri,
+                new ChangeReturnStatusApiRequest(new ShipmentIdDto(456L), "COMPLETED"));
     }
 }

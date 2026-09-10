@@ -44,21 +44,25 @@ public class UserResourceController {
 
     private final CurrentOperatorPort currentOperatorPort;
 
+    private final ResponseMapper responseMapper;
+
     public UserResourceController(final UserPort userPort,
                                   final AuthenticationPort authenticationPort,
                                   final JwtDecodeService jwtDecodeService,
-                                  final CurrentOperatorPort currentOperatorPort) {
+                                  final CurrentOperatorPort currentOperatorPort,
+                                  final ResponseMapper responseMapper) {
         this.userPort = userPort;
         this.authenticationPort = authenticationPort;
         this.jwtDecodeService = jwtDecodeService;
         this.currentOperatorPort = currentOperatorPort;
+        this.responseMapper = responseMapper;
     }
 
     @GetMapping
     public ResponseEntity<List<UserDto>> findAllUsers() {
         return ResponseEntity.ok(userPort.findAll()
                 .stream()
-                .map(ResponseMapper::map)
+                .map(this::map)
                 .toList());
     }
 
@@ -74,7 +78,7 @@ public class UserResourceController {
     @GetMapping("/{username}")
     public ResponseEntity<?> findUserByUsername(@PathVariable final String username) {
         final User user = userPort.findUser(username);
-        return new ResponseEntity<>(ResponseMapper.map(user), HttpStatus.OK);
+        return new ResponseEntity<>(map(user), HttpStatus.OK);
     }
 
     @PutMapping
@@ -91,7 +95,7 @@ public class UserResourceController {
     public ResponseEntity<UserDto> updateUser(@PathVariable final Long id,
                                               @Valid @RequestBody final UpdateUserApiRequest request) {
         final UpdateUserCommand command = UserRequestMapper.toCommand(new UserId(id), request);
-        return ResponseEntity.ok(ResponseMapper.map(userPort.update(command)));
+        return ResponseEntity.ok(map(userPort.update(command)));
     }
 
     @PutMapping("/roles/{id}")
@@ -151,6 +155,13 @@ public class UserResourceController {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    private UserDto map(final User user) {
+        if (user == null) {
+            return null;
+        }
+        return responseMapper.map(user, userPort.getDepartmentCode(user.getDepartmentId()));
     }
 
     @ExceptionHandler(exception = {BusinessException.class, TechnicalException.class})

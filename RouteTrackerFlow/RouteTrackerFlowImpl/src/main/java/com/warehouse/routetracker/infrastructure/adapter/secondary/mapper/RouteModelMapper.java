@@ -15,6 +15,7 @@ import com.warehouse.routetracker.domain.vo.RouteProcess;
 import com.warehouse.routetracker.domain.vo.TerminalId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordDetailEntity;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordEntity;
+import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.RouteLogRecordId;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RouteModelMapper {
@@ -36,6 +37,10 @@ public interface RouteModelMapper {
     }
 
     default RouteProcess map(RouteLogRecordEntity entity) {
-        return new RouteProcess(entity.getShipmentId(), UUID.fromString(entity.getId()));
+        return new RouteProcess(entity.getShipmentId(), map(entity.getId()));
+    }
+
+    default UUID map(final RouteLogRecordId id) {
+        return id == null ? null : UUID.fromString(id.value());
     }
 }

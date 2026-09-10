@@ -91,8 +91,9 @@ public class LogisticsConfiguration {
 	}
 
     @Bean
-    public LogisticsRepository deliveryRepository(LogisticsReadRepository repository) {
-        return new LogisticsRepositoryImpl(repository);
+    public LogisticsRepository deliveryRepository(final LogisticsReadRepository repository,
+                                                  final DepartmentReadRepository departmentReadRepository) {
+        return new LogisticsRepositoryImpl(repository, departmentReadRepository);
     }
 
     @Bean(name = "logistics.supplierTokenServicePort")

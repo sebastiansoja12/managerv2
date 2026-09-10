@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.mail.domain.service.MailService;
-import com.warehouse.shipment.domain.port.secondary.RouteLogServicePort;
+import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ExternalFeignClient;
 import com.warehouse.tools.returning.ReturnProperties;

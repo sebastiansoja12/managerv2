@@ -52,7 +52,10 @@ class OperatorDomainEventListenerTest {
                 new TestGeocodingConfigurationEventServicePort(provisioningInvocations);
         final TestOperatorConfigurationEventServicePort configurationEventServicePort =
                 new TestOperatorConfigurationEventServicePort();
-        final TestUserNotifyPort userNotifyPort = new TestUserNotifyPort(new UserId(3333L));
+        final TestUserNotifyPort userNotifyPort = new TestUserNotifyPort(
+                new UserId(3333L),
+                provisioningInvocations
+        );
         final Operator operator = OperatorTestFixtures.operator();
         operatorRepository.save(operator);
         final Instant timestamp = Instant.now();
@@ -69,7 +72,8 @@ class OperatorDomainEventListenerTest {
         listener.handle(new OperatorCreatedEvent(operator.snapshot(), timestamp));
 
         assertEquals(1, departmentNotifyPort.snapshots.size());
-        assertEquals(List.of("geocoding", "department"), provisioningInvocations);
+        assertEquals(List.of("geocoding", "department", "user"), provisioningInvocations);
+        assertEquals(new UserId(3333L), departmentNotifyPort.adminUserIds.getFirst());
         assertEquals(1, configurationEventServicePort.snapshots.size());
         assertEquals(operator.getOperatorId(), configurationEventServicePort.operatorIds.getFirst());
         assertEquals(new UserId(3333L), configurationEventServicePort.userIds.getFirst());
@@ -87,6 +91,7 @@ class OperatorDomainEventListenerTest {
 
     private static class TestDepartmentNotifyPort implements OperatorDepartmentNotifyPort {
         private final List<OperatorSnapshot> snapshots = new ArrayList<>();
+        private final List<UserId> adminUserIds = new ArrayList<>();
         private final List<String> invocations;
 
         private TestDepartmentNotifyPort(final List<String> invocations) {
@@ -94,8 +99,9 @@ class OperatorDomainEventListenerTest {
         }
 
         @Override
-        public void notifyOperatorCreated(final OperatorSnapshot snapshot) {
+        public void notifyOperatorCreated(final OperatorSnapshot snapshot, final UserId adminUserId) {
             snapshots.add(snapshot);
+            adminUserIds.add(adminUserId);
             invocations.add("department");
         }
     }
@@ -134,10 +140,12 @@ class OperatorDomainEventListenerTest {
 
     private static class TestUserNotifyPort implements OperatorUserNotifyPort {
         private final UserId userId;
+        private final List<String> invocations;
         private final List<OperatorSnapshot> snapshots = new ArrayList<>();
 
-        private TestUserNotifyPort(final UserId userId) {
+        private TestUserNotifyPort(final UserId userId, final List<String> invocations) {
             this.userId = userId;
+            this.invocations = invocations;
         }
 
         @Override
@@ -145,6 +153,7 @@ class OperatorDomainEventListenerTest {
                                             final Consumer<UserId> beforeUserCreated) {
             snapshots.add(snapshot);
             beforeUserCreated.accept(userId);
+            invocations.add("user");
             return userId;
         }
     }

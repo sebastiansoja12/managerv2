@@ -5,7 +5,7 @@ import java.util.List;
 import com.warehouse.department.api.DepartmentApiService;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.port.secondary.PathFinderServicePort;
+import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OutputResponseMapper;
@@ -37,7 +37,7 @@ public class PathFinderAdapter implements PathFinderServicePort {
                         new CoordinatesDto(dep.coordinates().latitude(), dep.coordinates().longitude())))
                 .toList();
         final VoronoiRequestDto voronoiRequest = new VoronoiRequestDto(
-                address.getCity(), address.getPostalCode(), departments
+                address.getCity(), address.getStreet(), address.getPostalCode(), departments
         );
         final VoronoiResponseDto voronoiResponse = voronoiService.findFastestRoute(voronoiRequest);
         return Result.success(OutputResponseMapper.map(voronoiResponse));

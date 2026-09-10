@@ -5,6 +5,7 @@ import java.util.List;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.department.api.dto.DepartmentDirectoryEntryDto;
 import com.warehouse.department.api.dto.DepartmentDto;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
@@ -27,6 +28,14 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     }
 
     @Override
+    public List<DepartmentDirectoryEntryDto> getDepartmentDirectory() {
+        return this.departmentPort.findAll()
+                .stream()
+                .map(ResponseMapper::mapToDirectoryEntryDto)
+                .toList();
+    }
+
+    @Override
     public DepartmentDto getDepartmentByCode(final DepartmentCode departmentCode) {
         final Department department = this.departmentPort.findByDepartmentCode(departmentCode);
         return ResponseMapper.mapToDto(department);
@@ -41,5 +50,10 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     @Override
     public Boolean checkIfDepartmentExists(final DepartmentCode departmentCode) {
         return this.departmentPort.checkExists(departmentCode);
+    }
+
+    @Override
+    public Boolean checkIfDepartmentExists(final DepartmentId departmentId) {
+        return this.departmentPort.findByDepartmentId(departmentId) != null;
     }
 }

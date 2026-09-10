@@ -24,6 +24,7 @@ public final class GeocodingConfigurationApiMapper {
                 request.accessToken(),
                 request.refreshToken(),
                 request.enabled(),
+                request.defaultProvider(),
                 request.provider());
     }
 
@@ -37,6 +38,7 @@ public final class GeocodingConfigurationApiMapper {
                 configuration.accessToken(),
                 configuration.refreshToken(),
                 configuration.enabled(),
+                configuration.defaultProvider(),
                 configuration.provider());
     }
 
@@ -52,6 +54,7 @@ public final class GeocodingConfigurationApiMapper {
                 request.accessToken(),
                 request.refreshToken(),
                 request.enabled(),
+                request.defaultProvider(),
                 request.provider());
     }
 
@@ -67,6 +70,7 @@ public final class GeocodingConfigurationApiMapper {
                 configuration.getAccessToken(),
                 configuration.getRefreshToken(),
                 configuration.isEnabled(),
+                configuration.isDefaultProvider(),
                 configuration.getProvider());
     }
 
@@ -81,6 +85,7 @@ public final class GeocodingConfigurationApiMapper {
                 configuration.getAccessToken(),
                 configuration.getRefreshToken(),
                 configuration.isEnabled(),
+                configuration.isDefaultProvider(),
                 configuration.getProvider());
     }
 }

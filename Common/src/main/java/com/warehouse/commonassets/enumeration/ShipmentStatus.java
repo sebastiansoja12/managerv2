@@ -1,7 +1,13 @@
 package com.warehouse.commonassets.enumeration;
 
 public enum ShipmentStatus {
+    PLANNED,
+
     CREATED,
+
+    PREPARED,
+
+    ACCEPTED,
 
     REROUTE,
 
@@ -11,5 +17,7 @@ public enum ShipmentStatus {
 
     RETURN,
 
-    REDIRECT
+    REDIRECT,
+
+    CANCELED
 }

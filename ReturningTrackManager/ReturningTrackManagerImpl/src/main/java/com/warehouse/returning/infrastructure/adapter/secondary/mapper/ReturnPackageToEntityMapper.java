@@ -1,7 +1,5 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.mapper;
 
-import java.time.Instant;
-
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnPackageEntity;
@@ -11,6 +9,8 @@ import com.warehouse.returning.infrastructure.adapter.secondary.entity.identific
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ReturnId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.UserId;
+
+import java.time.Instant;
 
 public class ReturnPackageToEntityMapper {
 
@@ -22,7 +22,9 @@ public class ReturnPackageToEntityMapper {
         final ReturnToken returnToken = returnPackage.getReturnToken() != null ?
                 new ReturnToken(returnPackage.getReturnToken().value()) : null;
         final DepartmentCode assignedDepartmentCode = new DepartmentCode(returnPackage.getAssignedDepartmentCode().value());
-        final DepartmentCode returnedDepartmentCode = new DepartmentCode(returnPackage.getReturnedDepartmentCode().value());
+        final DepartmentCode returnedDepartmentCode =
+                returnPackage.getReturnedDepartmentCode() != null ?
+                        new DepartmentCode(returnPackage.getReturnedDepartmentCode().value()) : null;
         final UserId assignedTo = new UserId(returnPackage.getAssignedTo().value());
         final UserId processedBy = new UserId(returnPackage.getProcessedBy().value());
         final ReasonCode reasonCode = returnPackage.getReasonCode();

@@ -1,7 +1,7 @@
 package com.warehouse.commonassets.enumeration;
 
 public enum ProcessType {
-    CREATED, RETURN, ROUTE, REJECT, REROUTE, REDIRECT, MISS;
+    CREATED, RETURN, ROUTE, REJECT, REROUTE, REDIRECT, MISS, CANCELED;
 
     public boolean isUpdateProcessType() {
         return this.equals(REROUTE) || this.equals(REDIRECT);

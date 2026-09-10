@@ -4,10 +4,7 @@ import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
-import com.warehouse.shipment.domain.event.SignatureSigned;
-import com.warehouse.shipment.domain.registry.DomainContext;
 import com.warehouse.shipment.domain.vo.SignatureSnapshot;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.SignatureEntity;
 
 public class Signature {
 
@@ -46,24 +43,6 @@ public class Signature {
         this.documentReference = documentReference;
         this.shipmentId = shipmentId;
         this.signature = signature;
-        DomainContext.publish(new SignatureSigned(this.snapshot(), Instant.now()));
-    }
-
-    public static Signature from(final SignatureEntity entity) {
-        return new Signature(entity.getSignerName(), entity.getSignedAt(), entity.getSignatureMethod(),
-                entity.getDocumentReference(), entity.getShipmentId(), entity.getSignature());
-    }
-    
-    public static Signature from(final SignatureChangeRequest request, final SignatureMethod signatureMethod) {
-        final Signature signature;
-        
-        if (signatureMethod.equals(SignatureMethod.NONE)) {
-            signature = new Signature();
-        } else {
-			signature = new Signature(request.getSignerName(), signatureMethod, request.getDocumentReference(),
-					request.getShipmentId(), request.getSignature().getBytes());
-        }
-        return signature;
     }
 
     public static Signature from(final SignatureSnapshot snapshot) {
@@ -123,4 +102,3 @@ public class Signature {
         this.signature = signature;
     }
 }
-

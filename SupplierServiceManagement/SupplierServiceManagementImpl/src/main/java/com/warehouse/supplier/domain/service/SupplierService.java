@@ -37,6 +37,6 @@ public interface SupplierService {
 
     void updateCertification(final SupplierCode supplierCode, final DangerousGoodCertification certification);
 
-    void changeDepartment(final SupplierId supplierId, final DepartmentCode departmentCode);
-    void changeDepartment(final SupplierCode supplierCode, final DepartmentCode departmentCode);
+    void changeDepartment(final SupplierId supplierId, final DepartmentId departmentId);
+    void changeDepartment(final SupplierCode supplierCode, final DepartmentId departmentId);
 }

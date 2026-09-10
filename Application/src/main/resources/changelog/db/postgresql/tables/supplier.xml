@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-04-postgresql-table-supplier" author="s-soja">
+        <createTable tableName="supplier">
+            <column name="supplier_code" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="telephone" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="department_id" type="BIGINT" />
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

@@ -1,7 +1,9 @@
 package com.warehouse.shipment.domain.event;
 
-import com.warehouse.commonassets.kafka.domain.model.KafkaEventKey;
-import com.warehouse.commonassets.kafka.domain.model.OperatorAwareEvent;
+import com.warehouse.commonassets.event.domain.model.DomainEvent;
+import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
-public interface ShipmentEvent extends KafkaEventKey, OperatorAwareEvent {
+public interface ShipmentEvent extends DomainEvent {
+
+    ShipmentSnapshot getSnapshot();
 }

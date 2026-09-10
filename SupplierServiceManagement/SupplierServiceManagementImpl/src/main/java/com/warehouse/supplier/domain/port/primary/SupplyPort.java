@@ -1,6 +1,8 @@
 package com.warehouse.supplier.domain.port.primary;
 
 import com.warehouse.commonassets.helper.Result;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.supplier.domain.model.Supplier;
@@ -24,4 +26,5 @@ public interface SupplyPort {
     Result<Void, String> update(final SupplierUpdateCommand request);
     DriverLicenseResponse updateDriverLicense(final DriverLicenseCommand request);
     CertificationUpdateResponse updateCertification(CertificationUpdateCommand request);
+    DepartmentCode getDepartmentCode(final DepartmentId departmentId);
 }

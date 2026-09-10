@@ -4,6 +4,7 @@ import com.warehouse.qrcode.domain.vo.ShipmentId;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
+import org.hibernate.annotations.Formula;
 
 @Table(name = "shipment")
 @Entity(name = "qrcode.ShipmentEntity")
@@ -67,7 +68,10 @@ public class ShipmentEntity {
     @Column(name = "recipient_postal_code", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "destination", nullable = false)
+    @Column(name = "target_department_id", nullable = false)
+    private Long targetDepartmentId;
+
+    @Formula("(select department.department_code from department where department.department_id = target_department_id)")
     private String destination;
 
     @Column(name = "shipment_related_id")
@@ -77,13 +81,13 @@ public class ShipmentEntity {
     public ShipmentEntity() {
     }
 
-    public ShipmentEntity(final String destination, final String firstName, final String lastName,
+    public ShipmentEntity(final Long targetDepartmentId, final String firstName, final String lastName,
                           final ShipmentId shipmentRelatedId, final String recipientCity, final String recipientEmail,
                           final String recipientFirstName, final String recipientLastName, final String recipientPostalCode,
                           final String recipientStreet, final String recipientTelephone, final String senderCity,
                           final String senderEmail, final String senderPostalCode, final String senderStreet,
                           final String senderTelephone, final ShipmentId shipmentId) {
-        this.destination = destination;
+        this.targetDepartmentId = targetDepartmentId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.shipmentRelatedId = shipmentRelatedId;
@@ -170,4 +174,3 @@ public class ShipmentEntity {
         return shipmentId;
     }
 }
-

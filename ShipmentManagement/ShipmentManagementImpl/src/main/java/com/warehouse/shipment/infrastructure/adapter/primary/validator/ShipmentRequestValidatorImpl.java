@@ -1,17 +1,17 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.validator;
 
-import java.util.*;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatus;
-
 import com.warehouse.commonassets.enumeration.CountryCode;
-import com.warehouse.shipment.domain.service.PriceService;
+import com.warehouse.shipment.application.service.PriceService;
+import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.ShipmentValidationException;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.SignatureValidationException;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
+
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
@@ -21,9 +21,8 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
         this.priceService = priceService;
     }
 
-    @Override
-    public void validateBody(final ShipmentCreateRequestApi request) {
-        validateRequest(request);
+    private void validateRequest(final ShipmentCreateRequestApi request) {
+        validateRequestObj(request);
 
         final List<String> errors = new ArrayList<>();
 
@@ -42,6 +41,12 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
         if (validateShipmentPrice(request.price())) {
             errors.add("Invalid price");
+        }
+
+        if (request.deliveryMethod() != null
+                && request.deliveryMethod() != DeliveryMethodDto.COURIER
+                && request.deliveryPickupPointId() == null) {
+            errors.add("Delivery pickup point is required for the selected delivery method");
         }
 
         try {
@@ -104,19 +109,32 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
 
     @Override
-    public void validateBody(final ShipmentUpdateRequestApi shipmentRequest) {
+    public void validateRequest(final ShipmentCreateRequestApi shipmentRequest, final ShipmentValidationRules validationRules) {
         validateRequest(shipmentRequest);
     }
 
     @Override
+    public void validateBody(final ShipmentUpdateRequestApi shipmentRequest) {
+        validateRequestObj(shipmentRequest);
+    }
+
+    @Override
     public void validateBody(final ShipmentIdDto shipmentId) {
-        validateRequest(shipmentId);
+        validateRequestObj(shipmentId);
         validateValue(shipmentId);
     }
 
     @Override
     public void validateBody(final ShipmentStatusRequestApi shipmentStatusRequest) {
-
+        validateRequestObj(shipmentStatusRequest);
+        final List<String> errors = new ArrayList<>();
+        errors.addAll(validateShipment(shipmentStatusRequest.shipmentId()));
+        if (shipmentStatusRequest.shipmentStatus() == null) {
+            errors.add("Shipment status is required");
+        }
+        if (!errors.isEmpty()) {
+            throw new ShipmentValidationException(errors, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override
@@ -164,7 +182,7 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
         }
     }
 
-    private void validateRequest(final Object obj) {
+    private void validateRequestObj(final Object obj) {
         if (Objects.isNull(obj)) {
             throw new EmptyRequestException("Request cannot be null");
         }

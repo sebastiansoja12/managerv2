@@ -46,7 +46,7 @@ class OperatorMapperTest {
         assertEquals(OperatorTestFixtures.OPERATOR_ID, dto.operatorId());
         assertEquals(OperatorStatusDto.ACTIVE, dto.status());
         assertNotNull(dto.configuration());
-        assertEquals(31.5, dto.configuration().shipmentLimits().maxWeight());
+        assertEquals(31.5, dto.configuration().shipmentConfiguration().shipmentLimits().maxWeight());
         assertEquals(8, dto.configuration().deliveryTimeConfiguration().sameDayDeliveryHours());
     }
 

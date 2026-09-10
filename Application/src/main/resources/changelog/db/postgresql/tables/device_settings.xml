@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-04-postgresql-table-device-settings" author="s-soja">
+        <createTable tableName="device_settings">
+            <column name="device_settings_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="device_id" type="VARCHAR(64)">
+                <constraints unique="true" />
+            </column>
+            <column name="cross_courier_delivery" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="validate_responsible_user" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="validate_department_code" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

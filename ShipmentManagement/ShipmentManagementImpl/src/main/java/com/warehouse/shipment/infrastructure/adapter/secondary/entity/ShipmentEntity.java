@@ -1,25 +1,22 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import java.time.LocalDateTime;
-
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import org.hibernate.envers.Audited;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.Shipment;
-
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -93,9 +90,34 @@ public class ShipmentEntity extends BelongsToOperator {
     @Enumerated(EnumType.STRING)
     private ShipmentSize shipmentSize;
 
-    @Column(name = "destination", nullable = false)
-    @AttributeOverride(name = "value", column = @Column(name = "destination"))
-    private DepartmentCode destination;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
+    private DepartmentId targetDepartmentId;
+
+    @NotAudited
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_department_id", referencedColumnName = "department_id", insertable = false, updatable = false)
+    private DepartmentEntity targetDepartment;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
+    private DepartmentId originDepartmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "pickup_point_id", columnDefinition = "UUID"))
+    private PickupPointId pickupPointId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "delivery_pickup_point_id", columnDefinition = "UUID"))
+    private PickupPointId deliveryPickupPointId;
+
+    @Column(name = "pickup_method")
+    @Enumerated(EnumType.STRING)
+    private PickupMethod pickupMethod;
+
+    @Column(name = "delivery_method")
+    @Enumerated(EnumType.STRING)
+    private DeliveryMethod deliveryMethod;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -158,11 +180,12 @@ public class ShipmentEntity extends BelongsToOperator {
 			final String senderTelephone, final String recipientFirstName, final String recipientLastName,
 			final String recipientEmail, final String recipientCity, final String recipientStreet,
 			final String recipientPostalCode, final String recipientTelephone, final ShipmentSize shipmentSize,
-			final DepartmentCode destination, final ShipmentStatus shipmentStatus, final ShipmentType shipmentType,
-			final ShipmentId shipmentRelatedId, final LocalDateTime createdAt, final LocalDateTime updatedAt,
-			final Boolean locked, final CountryCode originCountry, final CountryCode destinationCountry,
-			final Money price, final ShipmentPriority shipmentPriority, final DangerousGoodEmbeddable dangerousGood,
-            final ExternalId<String> externalId, final TrackingNumber trackingNumber) {
+			final DepartmentId targetDepartmentId, final DepartmentId originDepartmentId, final ShipmentStatus shipmentStatus,
+            final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
+            final LocalDateTime updatedAt, final Boolean locked, final CountryCode originCountry,
+            final CountryCode destinationCountry, final Money price, final ShipmentPriority shipmentPriority,
+            final DangerousGoodEmbeddable dangerousGood, final ExternalId<String> externalId,
+            final TrackingNumber trackingNumber) {
         this.shipmentId = shipmentId;
         this.firstName = senderFirstName;
         this.lastName = senderLastName;
@@ -179,7 +202,8 @@ public class ShipmentEntity extends BelongsToOperator {
         this.recipientPostalCode = recipientPostalCode;
         this.recipientTelephone = recipientTelephone;
         this.shipmentSize = shipmentSize;
-        this.destination = destination;
+        this.targetDepartmentId = targetDepartmentId;
+        this.originDepartmentId = originDepartmentId;
         this.shipmentStatus = shipmentStatus;
         this.shipmentType = shipmentType;
         this.shipmentRelatedId = shipmentRelatedId;
@@ -195,32 +219,4 @@ public class ShipmentEntity extends BelongsToOperator {
         this.trackingNumber = trackingNumber;
     }
 
-    public static ShipmentEntity from(final Shipment shipment) {
-        final String senderFirstName = shipment.getSender().getFirstName();
-        final String senderLastName = shipment.getSender().getLastName();
-        final String senderEmail = shipment.getSender().getEmail();
-        final String senderCity = shipment.getSender().getCity();
-        final String senderStreet = shipment.getSender().getStreet();
-        final String senderPostalCode = shipment.getSender().getPostalCode();
-        final String senderTelephoneNumber = shipment.getSender().getTelephoneNumber();
-        final String recipientFirstName = shipment.getRecipient().getFirstName();
-        final String recipientLastName = shipment.getRecipient().getLastName();
-        final String recipientEmail = shipment.getRecipient().getEmail();
-        final String recipientCity = shipment.getRecipient().getCity();
-        final String recipientStreet = shipment.getRecipient().getStreet();
-        final String recipientPostalCode = shipment.getRecipient().getPostalCode();
-        final String recipientTelephoneNumber = shipment.getRecipient().getTelephoneNumber();
-        final DangerousGoodEmbeddable dangerousGoodEmbeddable =
-                DangerousGoodEmbeddable.from(shipment.getDangerousGood());
-        return new ShipmentEntity(shipment.getShipmentId(), senderFirstName, senderLastName,
-                senderEmail, senderCity, senderStreet, senderPostalCode, senderTelephoneNumber,
-                recipientFirstName, recipientLastName, recipientEmail, recipientCity, recipientStreet,
-                recipientPostalCode, recipientTelephoneNumber, shipment.getShipmentSize(), shipment.getDestination(),
-                shipment.getShipmentStatus(), shipment.getShipmentType(), shipment.getShipmentRelatedId(),
-                shipment.getCreatedAt(), shipment.getUpdatedAt(), shipment.isLocked(),
-				shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
-				shipment.getShipmentPriority(), dangerousGoodEmbeddable,
-                new ExternalId<>(shipment.getExternalShipmentId().value().toString()),
-                shipment.getTrackingNumber());
-    }
 }

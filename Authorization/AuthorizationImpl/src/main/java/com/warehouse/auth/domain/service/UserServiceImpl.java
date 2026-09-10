@@ -10,11 +10,13 @@ import com.warehouse.auth.domain.model.FullNameRequest;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
+import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.vo.RegisterResponse;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.auth.domain.vo.UserResponse;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
 @Service
@@ -22,13 +24,18 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    public UserServiceImpl(final UserRepository userRepository) {
+    private final DepartmentServicePort departmentServicePort;
+
+    public UserServiceImpl(final UserRepository userRepository, final DepartmentServicePort departmentServicePort) {
         this.userRepository = userRepository;
+        this.departmentServicePort = departmentServicePort;
     }
 
     @Override
     public RegisterResponse create(final User user) {
-        final UserResponse userResponse = userRepository.createOrUpdate(user);
+        userRepository.createOrUpdate(user);
+        final DepartmentCode departmentCode = departmentServicePort.getDepartmentCode(user.getDepartmentId());
+        final UserResponse userResponse = UserResponse.from(user, departmentCode);
         DomainRegistry.eventPublisher().publishEvent(new UserCreatedEvent(user.snapshot()));
         return new RegisterResponse(userResponse);
     }
@@ -49,7 +56,8 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new AuthenticationErrorException("User does not exist");
         }
-        user.update(command);
+        final DepartmentId departmentId = departmentServicePort.getDepartmentId(command.departmentCode());
+        user.update(command, departmentId);
         userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
         return user;
@@ -120,7 +128,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserId> findAllActiveUsersByDepartmentCode(final DepartmentCode departmentCode) {
-        return this.userRepository.findAllActiveUsersByDepartmentCode(departmentCode);
+        final DepartmentId departmentId = departmentServicePort.getDepartmentId(departmentCode);
+        return this.userRepository.findAllActiveUsersByDepartmentId(departmentId);
     }
 
     @Override
@@ -141,5 +150,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserId findInitialUser() {
         return this.userRepository.findInitialUser();
+    }
+
+    @Override
+    public DepartmentCode getDepartmentCode(final DepartmentId departmentId) {
+        return departmentServicePort.getDepartmentCode(departmentId);
     }
 }

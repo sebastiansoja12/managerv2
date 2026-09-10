@@ -2,8 +2,10 @@ package com.warehouse.department.api.event;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.UserId;
 
 public record OperatorInitialDepartmentCreateEvent(OperatorId operatorId,
+                                                   UserId adminUserId,
                                                    DepartmentCode departmentCode,
                                                    String companyName,
                                                    String taxId,

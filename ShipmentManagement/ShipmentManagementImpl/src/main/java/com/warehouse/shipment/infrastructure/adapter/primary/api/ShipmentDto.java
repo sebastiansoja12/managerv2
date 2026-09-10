@@ -1,5 +1,11 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.PickupPointId;
+
+import java.time.LocalDateTime;
+
 public class ShipmentDto {
     
     private final ShipmentIdDto shipmentId;
@@ -11,6 +17,20 @@ public class ShipmentDto {
     private final ShipmentSizeDto shipmentSize;
 
     private final DepartmentCodeDto destination;
+
+    private final DepartmentId originDepartmentId;
+
+    private final PickupPointId pickupPointId;
+
+    private PickupPointId deliveryPickupPointId;
+
+    private final PickupMethodDto pickupMethod;
+
+    private final DeliveryMethodDto deliveryMethod;
+
+    private final CountryCode originCountry;
+
+    private final CountryCode destinationCountry;
 
     private final ShipmentStatusDto shipmentStatus;
     
@@ -28,17 +48,32 @@ public class ShipmentDto {
 
     private final DangerousGoodApi dangerousGood;
 
+    private final LocalDateTime createdAt;
+
+    private final LocalDateTime updatedAt;
+
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
-                       final ShipmentSizeDto shipmentSize, final DepartmentCodeDto destination, final ShipmentStatusDto shipmentStatus,
+                       final ShipmentSizeDto shipmentSize, final DepartmentCodeDto destination,
+                       final DepartmentId originDepartmentId, final PickupPointId pickupPointId,
+                       final PickupMethodDto pickupMethod, final DeliveryMethodDto deliveryMethod,
+                       final CountryCode originCountry,
+                       final CountryCode destinationCountry, final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
                        final TrackingNumberDto trackingNumber,
                        final MoneyApi price, final Boolean locked,
-                       final SignatureDto signature, final DangerousGoodApi dangerousGood) {
+                       final SignatureDto signature, final DangerousGoodApi dangerousGood,
+                       final LocalDateTime createdAt, final LocalDateTime updatedAt) {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
 		this.shipmentSize = shipmentSize;
-		this.destination = destination;
+        this.destination = destination;
+        this.originDepartmentId = originDepartmentId;
+        this.pickupPointId = pickupPointId;
+        this.pickupMethod = pickupMethod;
+        this.deliveryMethod = deliveryMethod;
+        this.originCountry = originCountry;
+        this.destinationCountry = destinationCountry;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentPriority = shipmentPriority;
@@ -47,6 +82,8 @@ public class ShipmentDto {
         this.locked = locked;
         this.signature = signature;
         this.dangerousGood = dangerousGood;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -67,6 +104,38 @@ public class ShipmentDto {
 
     public DepartmentCodeDto getDestination() {
         return destination;
+    }
+
+    public DepartmentId getOriginDepartmentId() {
+        return originDepartmentId;
+    }
+
+    public PickupPointId getPickupPointId() {
+        return pickupPointId;
+    }
+
+    public PickupPointId getDeliveryPickupPointId() {
+        return deliveryPickupPointId;
+    }
+
+    public void setDeliveryPickupPointId(final PickupPointId deliveryPickupPointId) {
+        this.deliveryPickupPointId = deliveryPickupPointId;
+    }
+
+    public PickupMethodDto getPickupMethod() {
+        return pickupMethod;
+    }
+
+    public DeliveryMethodDto getDeliveryMethod() {
+        return deliveryMethod;
+    }
+
+    public CountryCode getOriginCountry() {
+        return originCountry;
+    }
+
+    public CountryCode getDestinationCountry() {
+        return destinationCountry;
     }
 
     public ShipmentStatusDto getShipmentStatus() {
@@ -103,5 +172,13 @@ public class ShipmentDto {
 
     public TrackingNumberDto getTrackingNumber() {
         return trackingNumber;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }

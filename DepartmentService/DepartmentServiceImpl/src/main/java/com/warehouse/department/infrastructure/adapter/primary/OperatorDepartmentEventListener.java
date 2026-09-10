@@ -34,7 +34,8 @@ public class OperatorDepartmentEventListener {
                 event.contactEmail(),
                 CountryCode.valueOf(event.countryCode()),
                 DepartmentType.valueOf(event.departmentType()),
-                event.operatorId()
+                event.operatorId(),
+                event.adminUserId()
         );
         this.departmentPort.createDepartments(new DepartmentCreateCommand(List.of(department)));
     }

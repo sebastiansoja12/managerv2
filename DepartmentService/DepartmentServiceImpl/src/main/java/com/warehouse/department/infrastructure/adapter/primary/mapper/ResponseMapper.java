@@ -1,7 +1,12 @@
 package com.warehouse.department.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.department.api.dto.CoordinatesDto;
+import com.warehouse.department.api.dto.DepartmentCodeDto;
+import com.warehouse.department.api.dto.DepartmentDirectoryEntryDto;
 import com.warehouse.department.api.dto.DepartmentDto;
+import com.warehouse.department.api.dto.DepartmentIdDto;
+import com.warehouse.department.api.dto.DepartmentStatusDto;
+import com.warehouse.department.api.dto.DepartmentTypeDto;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.vo.Address;
 import com.warehouse.department.domain.vo.DepartmentCreateResponse;
@@ -38,6 +43,18 @@ public abstract class ResponseMapper {
         return new DepartmentDto(department.getDepartmentId().getValue(), departmentCode,
                 department.getCity(), department.getStreet(),
                 department.getPostalCode(), department.getCountryCode().name(), coordinates);
+    }
+
+    public static DepartmentDirectoryEntryDto mapToDirectoryEntryDto(final Department department) {
+        final CoordinatesDto coordinates = department.getCoordinates() == null
+                ? null
+                : new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
+        return new DepartmentDirectoryEntryDto(
+                new DepartmentIdDto(department.getDepartmentId().getValue()),
+                new DepartmentCodeDto(department.getDepartmentCode().getValue()),
+                DepartmentTypeDto.valueOf(department.getDepartmentType().name()),
+                DepartmentStatusDto.valueOf(department.getStatus().name()),
+                coordinates);
     }
 
     public static IdentificationNumberChangeApiResponse map(final IdentificationNumberChangeResponse response) {

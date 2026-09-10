@@ -19,5 +19,7 @@ public interface GeocodingRepository {
 
     Optional<GeocodingConfiguration> findByProvider(final GeocodingProvider provider);
 
+    Optional<GeocodingConfiguration> findDefault();
+
     List<GeocodingConfiguration> findAll();
 }

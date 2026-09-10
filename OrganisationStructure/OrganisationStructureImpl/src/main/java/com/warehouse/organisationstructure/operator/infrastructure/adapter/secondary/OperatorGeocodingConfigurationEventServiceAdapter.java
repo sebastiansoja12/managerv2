@@ -32,6 +32,7 @@ public class OperatorGeocodingConfigurationEventServiceAdapter
                         blankToNull(configuration.accessToken()),
                         blankToNull(configuration.refreshToken()),
                         configuration.enabled(),
+                        true,
                         configuration.provider()
                 ),
                 timestamp

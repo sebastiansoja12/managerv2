@@ -1,19 +1,21 @@
 package com.warehouse.returning.domain.service;
 
-import java.time.Instant;
-import java.util.UUID;
+import java.util.Optional;
 
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.event.ReturnPackageCanceled;
 import com.warehouse.returning.domain.event.ReturnPackageCompleted;
+import com.warehouse.returning.domain.event.ReturnPackageProcessingStarted;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.registry.DomainRegistry;
-import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ShipmentId;
-import com.warehouse.returning.infrastructure.adapter.secondary.exception.ReturnPackageNotFoundException;
+
+import java.time.Instant;
+import java.util.UUID;
 
 public class ReturnServiceImpl implements ReturnService {
 
@@ -24,8 +26,15 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
+    public Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final Long operatorId) {
+        return this.returnRepository.findLatestByShipmentIdAndOperatorId(
+                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
+                        shipmentId.value()), operatorId);
+    }
+
+    @Override
     public ReturnPackage getReturn(final ReturnPackageId returnId) {
-        return this.returnRepository.findById(returnId);
+        return this.returnRepository.findDetailsById(returnId);
     }
 
     @Override
@@ -44,7 +53,7 @@ public class ReturnServiceImpl implements ReturnService {
     @Override
     public void deleteReturn(final ReturnPackageId returnPackageId) {
         final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
-        returnPackage.markAsDeleted();
+        returnPackage.markAsCanceled();
         this.saveOrUpdate(returnPackage);
         DomainRegistry.publish(new ReturnPackageCanceled(returnPackage.toSnapshot(), Instant.now()));
     }
@@ -67,14 +76,27 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
+    public void startProcessingReturn(final ShipmentId shipmentId) {
+        final ReturnPackage returnPackage = this.findByShipmentId(shipmentId);
+        returnPackage.markAsProcessing();
+        this.saveOrUpdate(returnPackage);
+        DomainRegistry.publish(new ReturnPackageProcessingStarted(returnPackage.toSnapshot(), Instant.now()));
+    }
+
+    @Override
     public void completeReturn(final ShipmentId shipmentId) {
         final ReturnPackage returnPackage = this.findByShipmentId(shipmentId);
-        if (returnPackage == null) {
-            throw new ReturnPackageNotFoundException();
-        }
         returnPackage.markAsCompleted();
         this.saveOrUpdate(returnPackage);
         DomainRegistry.publish(new ReturnPackageCompleted(returnPackage.toSnapshot(), Instant.now()));
+    }
+
+    @Override
+    public void cancelReturn(final ShipmentId shipmentId) {
+        final ReturnPackage returnPackage = this.findByShipmentId(shipmentId);
+        returnPackage.markAsCanceled();
+        this.saveOrUpdate(returnPackage);
+        DomainRegistry.publish(new ReturnPackageCanceled(returnPackage.toSnapshot(), Instant.now()));
     }
 
     @Override

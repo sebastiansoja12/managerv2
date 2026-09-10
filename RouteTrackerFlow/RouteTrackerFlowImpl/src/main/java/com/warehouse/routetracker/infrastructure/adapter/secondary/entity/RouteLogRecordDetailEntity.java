@@ -1,8 +1,5 @@
 package com.warehouse.routetracker.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.entity.enumeration.ProcessType;
 import com.warehouse.routetracker.infrastructure.adapter.secondary.enumeration.ShipmentStatus;
 import jakarta.persistence.*;
@@ -12,17 +9,19 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "route_log_details")
 public class RouteLogRecordDetailEntity {
 
     @EmbeddedId
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false))
     private RouteLogRecordDetailId id;
+
+    @Column(name = "event_id", unique = true)
+    private String eventId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "route_log_record_id", nullable = false)
@@ -44,13 +43,16 @@ public class RouteLogRecordDetailEntity {
     @Column(name = "process_type")
     private ProcessType processType;
 
-    @Column(name = "request")
-    @Lob
+    @Column(name = "request", columnDefinition = "TEXT")
     @Size(min = 5, max = 65555)
     private String request;
 
     @Column(name = "shipment_status")
     private ShipmentStatus shipmentStatus;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "operator_id"))
+    private OperatorId operatorId;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "user_id"))

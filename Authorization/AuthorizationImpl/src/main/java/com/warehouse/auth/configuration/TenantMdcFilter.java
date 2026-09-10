@@ -41,6 +41,7 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/v2/api/departments/read-sync",
             "/v2/api/internal/shipments/read-sync",
             "/internal/shipments/read-sync",
+            "/v2/api/admin/async-jobs",
             "/v2/api/ws",
             "/ws"
     );

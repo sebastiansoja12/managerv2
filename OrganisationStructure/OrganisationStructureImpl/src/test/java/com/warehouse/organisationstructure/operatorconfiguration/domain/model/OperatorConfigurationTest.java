@@ -15,7 +15,7 @@ class OperatorConfigurationTest {
     void shouldBuildDefaultConfigurationFromOperatorFlags() {
         final OperatorConfiguration configuration = OperatorConfiguration.defaultFor(true, false, true);
 
-        final OperatorConfiguration.ShippingCapabilities capabilities =
+        final ShippingCapabilities capabilities =
                 configuration.getShippingCapabilities();
 
         assertTrue(capabilities.isSupportsDomesticShipping());
@@ -24,6 +24,10 @@ class OperatorConfigurationTest {
         assertTrue(capabilities.isSupportsParcelLockers());
         assertTrue(capabilities.isSupportsHomeDelivery());
         assertTrue(capabilities.isProvidesTracking());
+        assertNotNull(configuration.getShipmentConfiguration());
+        assertTrue(configuration.getShipmentConfiguration().getValidationConfiguration().isValidateAddressData());
+        assertEquals(LabelFormat.PDF_A6,
+                configuration.getShipmentConfiguration().getLabelConfiguration().getLabelFormat());
         assertNotNull(configuration.getShipmentLimits());
         assertNotNull(configuration.getDeliveryTimeConfiguration());
     }
@@ -35,6 +39,10 @@ class OperatorConfigurationTest {
         assertEquals(31.5, configuration.getShipmentLimits().getMaxWeight());
         assertEquals(0.2, configuration.getShipmentLimits().getMinWeight());
         assertEquals(120.0, configuration.getShipmentLimits().getMaxLength());
+        assertEquals(TrackingNumberSource.SEQUENCE,
+                configuration.getShipmentConfiguration().getTrackingNumberRule().getSource());
+        assertEquals(NotificationChannel.SMS,
+                configuration.getShipmentConfiguration().getNotificationConfiguration().getNotificationChannel());
         assertEquals(4, configuration.getDeliveryTimeConfiguration().getMaxDeliveryDays());
         assertEquals(8, configuration.getDeliveryTimeConfiguration().getSameDayDeliveryHours());
     }

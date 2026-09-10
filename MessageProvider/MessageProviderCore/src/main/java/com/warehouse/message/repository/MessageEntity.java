@@ -25,8 +25,7 @@ public class MessageEntity {
     @Column(name = "language", nullable = false)
     private String language;
 
-    @Lob
-    @Column(name = "message_content", nullable = false)
+    @Column(name = "message_content", nullable = false, columnDefinition = "TEXT")
     private String messageContent;
 
     @Column(name = "created_at", nullable = false)
@@ -124,5 +123,4 @@ public class MessageEntity {
         this.updatedAt = updatedAt;
     }
 }
-
 

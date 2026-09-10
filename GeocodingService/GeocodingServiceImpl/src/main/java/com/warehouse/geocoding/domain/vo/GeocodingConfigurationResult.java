@@ -13,6 +13,7 @@ public record GeocodingConfigurationResult(GeocodingConfigurationId geocodingCon
                                           String accessToken,
                                           String refreshToken,
                                           boolean enabled,
+                                          boolean defaultProvider,
                                           GeocodingProvider provider) {
 
     public static GeocodingConfigurationResult from(final GeocodingConfiguration configuration) {
@@ -26,6 +27,7 @@ public record GeocodingConfigurationResult(GeocodingConfigurationId geocodingCon
                 configuration.getAccessToken(),
                 configuration.getRefreshToken(),
                 configuration.isEnabled(),
+                configuration.isDefaultProvider(),
                 configuration.getProvider());
     }
 }

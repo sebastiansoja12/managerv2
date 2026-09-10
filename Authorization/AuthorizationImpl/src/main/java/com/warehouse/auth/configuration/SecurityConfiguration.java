@@ -49,7 +49,10 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfTokenRepository)
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .ignoringRequestMatchers("/departments/read-sync/**", "/internal/shipments/read-sync/**"))
+                        .ignoringRequestMatchers(
+                                "/departments/read-sync/**",
+                                "/internal/shipments/read-sync/**",
+                                "/admin/async-jobs/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth

@@ -2,10 +2,10 @@ package com.warehouse.routetracker.infrastructure.adapter.primary;
 
 import java.security.Key;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.configuration.JwtProperties;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.OperatorId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.vo.UserContext;
 
 import io.jsonwebtoken.Claims;
@@ -36,7 +36,7 @@ public class JwtDecodeService {
         final Long userId = extractRequiredLongClaim(claims, "userId");
         final Long operatorId = extractRequiredLongClaim(claims, "operatorId", "operator_id");
         final Long departmentId = extractRequiredLongClaim(claims, "departmentId", "department_id");
-        return new UserContext(new UserId(userId), OperatorId.of(operatorId), new DepartmentId(departmentId));
+        return new UserContext(new UserId(userId), new OperatorId(operatorId), new DepartmentId(departmentId));
     }
 
     private Long extractRequiredLongClaim(final Claims claims, final String... claimNames) {

@@ -1,19 +1,14 @@
 package com.warehouse.organisationstructure.operator.domain.listener;
 
-import java.time.Instant;
-
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.organisationstructure.operator.domain.event.OperatorCreatedEvent;
+import com.warehouse.organisationstructure.operator.domain.port.secondary.*;
+import com.warehouse.organisationstructure.operator.domain.service.OperatorService;
+import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.organisationstructure.operator.domain.event.OperatorCreatedEvent;
-import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorConfigurationEventServicePort;
-import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorContextServicePort;
-import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorDepartmentNotifyPort;
-import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorGeocodingConfigurationEventServicePort;
-import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorUserNotifyPort;
-import com.warehouse.organisationstructure.operator.domain.service.OperatorService;
-import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
+import java.time.Instant;
 
 @Component
 public class OperatorDomainEventListener {
@@ -55,7 +50,10 @@ public class OperatorDomainEventListener {
                 reservedUserId -> operatorContextServicePort.runInContext(
                         snapshot.operatorId(),
                         reservedUserId,
-                        () -> publishResourcesRequiredByUser(snapshot, timestamp)
+                        () -> {
+                            operatorGeocodingConfigurationEventServicePort.publishOperatorCreated(snapshot, timestamp);
+                            operatorDepartmentNotifyPort.notifyOperatorCreated(snapshot, reservedUserId);
+                        }
                 )
         );
         operatorService.assignRegisteringUser(snapshot.operatorId(), userId);
@@ -64,10 +62,5 @@ public class OperatorDomainEventListener {
                 userId,
                 () -> operatorConfigurationEventServicePort.publishOperatorCreated(snapshot, timestamp)
         );
-    }
-
-    private void publishResourcesRequiredByUser(final OperatorSnapshot snapshot, final Instant timestamp) {
-        operatorGeocodingConfigurationEventServicePort.publishOperatorCreated(snapshot, timestamp);
-        operatorDepartmentNotifyPort.notifyOperatorCreated(snapshot);
     }
 }

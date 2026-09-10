@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.provider.ApiKeyProvider;
 import com.warehouse.auth.domain.vo.ApiKey;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
 class ApiEncoderImplTest {
@@ -66,6 +66,6 @@ class ApiEncoderImplTest {
 
     private User user(final String apiKey) {
         return new User(new UserId(10L), "s-soja", "password", "Sebastian", "Soja", "s-soja@test.pl",
-                User.Role.USER, new DepartmentCode("TST"), apiKey);
+                User.Role.USER, new DepartmentId(10L), apiKey);
     }
 }

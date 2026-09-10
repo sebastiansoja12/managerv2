@@ -11,5 +11,6 @@ public record GeocodingConfigurationUpdateCommand(GeocodingConfigurationId geoco
                                                   String accessToken,
                                                   String refreshToken,
                                                   boolean enabled,
+                                                  boolean defaultProvider,
                                                   GeocodingProvider provider) {
 }

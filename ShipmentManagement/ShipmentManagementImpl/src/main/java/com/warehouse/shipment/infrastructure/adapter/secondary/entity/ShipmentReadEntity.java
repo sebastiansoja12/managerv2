@@ -2,14 +2,15 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
 import java.time.LocalDateTime;
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -88,9 +89,33 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Enumerated(EnumType.STRING)
     private ShipmentSize shipmentSize;
 
-    @Column(name = "destination", nullable = false)
-    @AttributeOverride(name = "value", column = @Column(name = "destination"))
-    private DepartmentCode destination;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
+    private DepartmentId targetDepartmentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_department_id", referencedColumnName = "department_id", insertable = false, updatable = false)
+    private DepartmentEntity targetDepartment;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
+    private DepartmentId originDepartmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "pickup_point_id", columnDefinition = "UUID"))
+    private PickupPointId pickupPointId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "delivery_pickup_point_id", columnDefinition = "UUID"))
+    private PickupPointId deliveryPickupPointId;
+
+    @Column(name = "pickup_method")
+    @Enumerated(EnumType.STRING)
+    private PickupMethod pickupMethod;
+
+    @Column(name = "delivery_method")
+    @Enumerated(EnumType.STRING)
+    private DeliveryMethod deliveryMethod;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -148,42 +173,4 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @AttributeOverride(name = "value", column = @Column(name = "tracking_number"))
     private TrackingNumber trackingNumber;
 
-    public static ShipmentReadEntity from(final ShipmentSnapshot snapshot) {
-        return ShipmentReadEntity.builder()
-                .shipmentId(snapshot.shipmentId())
-                .firstName(snapshot.sender().getFirstName())
-                .lastName(snapshot.sender().getLastName())
-                .senderEmail(snapshot.sender().getEmail())
-                .senderCity(snapshot.sender().getCity())
-                .senderStreet(snapshot.sender().getStreet())
-                .senderPostalCode(snapshot.sender().getPostalCode())
-                .senderTelephone(snapshot.sender().getTelephoneNumber())
-                .recipientFirstName(snapshot.recipient().getFirstName())
-                .recipientLastName(snapshot.recipient().getLastName())
-                .recipientEmail(snapshot.recipient().getEmail())
-                .recipientCity(snapshot.recipient().getCity())
-                .recipientStreet(snapshot.recipient().getStreet())
-                .recipientPostalCode(snapshot.recipient().getPostalCode())
-                .recipientTelephone(snapshot.recipient().getTelephoneNumber())
-                .shipmentSize(snapshot.shipmentSize())
-                .destination(snapshot.destination())
-                .shipmentStatus(snapshot.shipmentStatus())
-                .shipmentType(snapshot.shipmentType())
-                .shipmentRelatedId(snapshot.shipmentRelatedId())
-                .createdAt(snapshot.createdAt())
-                .updatedAt(snapshot.updatedAt())
-                .locked(snapshot.locked())
-                .originCountry(snapshot.originCountry())
-                .destinationCountry(snapshot.destinationCountry())
-                .shipmentPriority(snapshot.shipmentPriority())
-                .price(snapshot.price())
-                .dangerousGood(DangerousGoodEmbeddable.from(snapshot.dangerousGood()))
-                .externalId(new ExternalId<>(snapshot.externalShipmentId().value().toString()))
-                .trackingNumber(snapshot.trackingNumber())
-                .build();
-    }
-
-    public DangerousGood dangerousGood() {
-        return dangerousGood == null ? null : dangerousGood.toDomain();
-    }
 }

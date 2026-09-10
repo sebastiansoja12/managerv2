@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-04-postgresql-table-suppliers-aud" author="s-soja">
+        <createTable tableName="suppliers_aud">
+            <column name="rev" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_suppliers_aud" />
+            </column>
+            <column name="revtype" type="SMALLINT" />
+            <column name="supplier_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_suppliers_aud" />
+            </column>
+            <column name="supplier_code" type="VARCHAR(50)" />
+            <column name="department_id" type="BIGINT" />
+            <column name="first_name" type="VARCHAR(100)" />
+            <column name="last_name" type="VARCHAR(100)" />
+            <column name="telephone_number" type="VARCHAR(20)" />
+            <column name="status" type="VARCHAR(50)" />
+            <column name="user_status" type="VARCHAR(50)" />
+            <column name="vehicle_id" type="BIGINT" />
+            <column name="device_id" type="VARCHAR(64)" />
+            <column name="certificate_number" type="VARCHAR(100)" />
+            <column name="issue_date" type="TIMESTAMP WITH TIME ZONE" />
+            <column name="expiry_date" type="TIMESTAMP WITH TIME ZONE" />
+            <column name="authority" type="VARCHAR(100)" />
+            <column name="valid" type="BOOLEAN" />
+            <column name="driver_license_number" type="VARCHAR(50)" />
+            <column name="acquired_date" type="TIMESTAMP WITH TIME ZONE" />
+            <column name="driving_license_expiry_date" type="TIMESTAMP WITH TIME ZONE" />
+            <column name="area_name" type="VARCHAR(100)" />
+            <column name="city" type="VARCHAR(100)" />
+            <column name="district" type="VARCHAR(100)" />
+            <column name="municipality" type="VARCHAR(100)" />
+            <column name="region" type="VARCHAR(100)" />
+            <column name="country" type="VARCHAR(100)" />
+            <column name="api_key" type="VARCHAR(255)" />
+            <column name="terms_accepted" type="BOOLEAN" />
+            <column name="created_user_id" type="BIGINT" />
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE" />
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE" />
+            <column name="operator_id" type="BIGINT" />
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

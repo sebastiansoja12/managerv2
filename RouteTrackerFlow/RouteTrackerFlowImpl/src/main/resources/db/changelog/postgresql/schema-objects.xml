@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-09-04-route-tracker-postgresql-schema-objects" author="s-soja">
+        <addUniqueConstraint tableName="route_log"
+                             columnNames="shipment_id"
+                             constraintName="uk_route_log_shipment_id"/>
+        <addUniqueConstraint tableName="route_log_details"
+                             columnNames="event_id"
+                             constraintName="uk_route_log_details_event_id"/>
+        <addForeignKeyConstraint baseTableName="route_log_details"
+                                 baseColumnNames="route_log_record_id"
+                                 referencedTableName="route_log"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_route_log_details_route_log"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

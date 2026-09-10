@@ -5,4 +5,6 @@ import com.warehouse.voronoi.domain.vo.GeocodingConfig;
 
 public interface GeocodingConfigServicePort {
     GeocodingConfig findGeocodingConfig(final GeocodingProvider provider);
+
+    GeocodingConfig findDefaultGeocodingConfig();
 }

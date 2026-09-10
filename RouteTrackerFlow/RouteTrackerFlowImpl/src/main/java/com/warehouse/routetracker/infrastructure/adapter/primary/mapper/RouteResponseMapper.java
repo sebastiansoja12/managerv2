@@ -5,13 +5,13 @@ import java.util.List;
 import com.warehouse.routetracker.domain.enumeration.ShipmentStatus;
 import org.mapstruct.Mapper;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.routetracker.domain.enumeration.ProcessType;
 import com.warehouse.routetracker.domain.model.RouteLogRecord;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetail;
 import com.warehouse.routetracker.domain.model.RouteLogRecordDetails;
+import com.warehouse.routetracker.domain.vo.identifier.DepartmentId;
+import com.warehouse.routetracker.domain.vo.identifier.SupplierId;
+import com.warehouse.routetracker.domain.vo.identifier.UserId;
 import com.warehouse.routetracker.domain.vo.RouteProcess;
 import com.warehouse.routetracker.infrastructure.adapter.primary.dto.*;
 
@@ -60,7 +60,7 @@ public interface RouteResponseMapper {
     }
 
     default DepartmentIdDto map(final DepartmentId departmentId) {
-        return departmentId != null ? new DepartmentIdDto(departmentId.getValue()) : null;
+        return departmentId != null ? new DepartmentIdDto(departmentId.value()) : null;
     }
 
     ProcessTypeDto map(final ProcessType processType);

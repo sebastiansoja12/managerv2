@@ -3,7 +3,13 @@ package com.warehouse.shipment.infrastructure.adapter.primary.api;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 
 public enum ShipmentStatusDto {
+    PLANNED,
+
     CREATED,
+
+    PREPARED,
+
+    ACCEPTED,
 
     REROUTE,
 
@@ -13,7 +19,9 @@ public enum ShipmentStatusDto {
 
     RETURN,
 
-    REDIRECT;
+    REDIRECT,
+
+    CANCELED;
 
     public static ShipmentStatusDto from(final ShipmentStatus shipmentStatus) {
         return ShipmentStatusDto.valueOf(shipmentStatus.name());
