@@ -43,6 +43,12 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.add("Invalid price");
         }
 
+        if (request.deliveryMethod() != null
+                && request.deliveryMethod() != DeliveryMethodDto.COURIER
+                && request.deliveryPickupPointId() == null) {
+            errors.add("Delivery pickup point is required for the selected delivery method");
+        }
+
         try {
             CountryCode.valueOf(request.issuerCountryCode());
             CountryCode.valueOf(request.receiverCountryCode());
@@ -120,7 +126,15 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
 
     @Override
     public void validateBody(final ShipmentStatusRequestApi shipmentStatusRequest) {
-
+        validateRequestObj(shipmentStatusRequest);
+        final List<String> errors = new ArrayList<>();
+        errors.addAll(validateShipment(shipmentStatusRequest.shipmentId()));
+        if (shipmentStatusRequest.shipmentStatus() == null) {
+            errors.add("Shipment status is required");
+        }
+        if (!errors.isEmpty()) {
+            throw new ShipmentValidationException(errors, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override
