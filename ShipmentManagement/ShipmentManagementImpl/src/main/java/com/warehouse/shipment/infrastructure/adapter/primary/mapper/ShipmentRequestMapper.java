@@ -33,6 +33,12 @@ public interface ShipmentRequestMapper {
 
     ShipmentCreateCommand map(final ShipmentCreateRequestApi requestDto);
 
+    default ShipmentCreateCommand mapCreateRequest(final ShipmentCreateRequestApi shipmentRequest) {
+        final ShipmentCreateCommand command = map(shipmentRequest);
+        command.setDeliveryPickupPointId(shipmentRequest.deliveryPickupPointId());
+        return command;
+    }
+
     default DangerousGood map(final DangerousGoodApi dangerousGood) {
         if (dangerousGood == null) {
             return null;
@@ -83,7 +89,9 @@ public interface ShipmentRequestMapper {
     }
 
     default ShipmentStatusRequest map(final ShipmentStatusRequestApi shipmentStatusRequest) {
-        return new ShipmentStatusRequest(new ShipmentId(shipmentStatusRequest.shipmentId().getValue()), ShipmentStatus.valueOf(shipmentStatusRequest.shipmentStatus().name()));
+        return new ShipmentStatusRequest(
+                new ShipmentId(shipmentStatusRequest.shipmentId().getValue()),
+                ShipmentStatus.valueOf(shipmentStatusRequest.shipmentStatus().name()));
     }
 
     default SignatureChangeRequest map(final SignatureChangeRequestApi signatureChangeRequest) {
