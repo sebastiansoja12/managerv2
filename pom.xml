@@ -19,6 +19,7 @@
 		<module>Application</module>
 		<module>ShipmentManagement</module>
 		<module>DeliveryNetwork</module>
+		<module>PickupPointManagement</module>
 		<module>MailService</module>
 		<module>DepartmentService</module>
         <module>AsyncJob</module>
@@ -37,6 +38,7 @@
         <module>Common</module>
         <module>AssetConverter</module>
 		<module>MessageProvider</module>
+		<module>OrganizationChat</module>
         <module>LogisticsOrchestrator</module>
         <module>CrossLogistics</module>
         <module>Gateway</module>
