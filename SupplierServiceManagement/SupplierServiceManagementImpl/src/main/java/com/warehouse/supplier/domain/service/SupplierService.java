@@ -30,6 +30,7 @@ public interface SupplierService {
 
     Supplier findById(final SupplierId supplierId);
     Supplier findByCode(final SupplierCode supplierCode);
+    Supplier findByUserId(final UserId userId);
     List<Supplier> findAllByCurrentDepartment();
     SupplierId nextSupplierId();
 
