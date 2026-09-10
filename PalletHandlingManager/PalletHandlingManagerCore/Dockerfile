@@ -8,7 +8,7 @@ RUN cd PalletHandlingManager && mvn -pl PalletHandlingManagerCore -am package sp
 
 FROM eclipse-temurin:21-jre
 
-COPY --from=build /workspace/PalletHandlingManager/PalletHandlingManagerCore/target/PalletHandlingManagerCore-2026.3-SNAPSHOT.jar /app.jar
+COPY --from=build /workspace/PalletHandlingManager/PalletHandlingManagerCore/target/PalletHandlingManagerCore-2026.4-SNAPSHOT.jar /app.jar
 
 EXPOSE 8071
 

@@ -7,7 +7,7 @@ RUN mvn -pl Application -am package -DskipTests
 
 FROM eclipse-temurin:21-jre
 
-COPY --from=build /workspace/Application/target/Application-2026.3-SNAPSHOT.jar /app.jar
+COPY --from=build /workspace/Application/target/Application-2026.4-SNAPSHOT.jar /app.jar
 
 EXPOSE 8080
 
