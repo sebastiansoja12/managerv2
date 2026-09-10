@@ -1,6 +1,17 @@
-## [2026.3] - 2026-08-12
+## [2026.3] - 2026-09-10
 
 ### Added
+- PickupPointManagement API and implementation modules with pickup-point types, capabilities, shipment-size policies, opening schedules, lifecycle rules and operator-scoped persistence.
+- Pickup-point REST endpoints for creation, editing, status changes, detail lookup, eligibility checks and paginated search by text, street, city, country, network and map bounds.
+- Automatic pickup-point coordinate resolution and shipment delivery-department determination through the existing coordinates and routing modules.
+- Dedicated `pickup_point_read_model` table synchronized through domain events, application-level integration-event translation, Kafka and a primary-adapter listener.
+- Pickup-point identifiers and sender/recipient pickup-point assignments in shipment commands, snapshots, events, entities, read models and API responses.
+- Shipment pickup and delivery methods, including pickup-point and locker flows.
+- Required target delivery department assignment when a shipment is created.
+- `PLANNED` shipment status across shared, delivery, message, organisation and shipment contracts.
+- OrganizationChat API and implementation modules with persistent direct conversations, message notifications and WebSocket presence tracking.
+- Shipment application results and a result factory for assembling department, route and optional return information before REST mapping.
+- Return search, processing and completion operations exposed through the Manager shipment API.
 - Operator-aware domain model across organisation, authorization, departments, shipments, suppliers, returns, processes and devices.
 - OrganisationStructure module with operator aggregate, configuration, management endpoints and provisioning events.
 - Initial operator provisioning for departments and users after operator creation.
@@ -16,6 +27,15 @@
 - InPost tracking integration API.
 
 ### Changed
+- Kept pickup-point state transitions in the domain model while making persistence entities immutable representations mapped from snapshots.
+- Moved pickup-point search to its separate read-model entity and table, with operator filtering provided by `BelongsToOperator` and `OperatorFilteredRepository`.
+- Reworked pickup-point projection flow to publish a domain event after persistence, translate it in the application layer and synchronize the read model through Kafka.
+- Replaced client-provided pickup-point coordinates with automatic address-based resolution.
+- Changed shipment loading ports to return application results instead of exposing `Shipment` to primary adapters.
+- Centralized shipment result construction and delivery-department-code resolution in `ShipmentResultFactory`.
+- Routed return list and status requests through Manager and the generic `ExternalFeignClient` integration.
+- Limited return-detail lookup to shipments in `RETURN` status and made optional return enrichment tolerant of ReturningTrackManager outages.
+- Added the `CREATED -> PROCESSING -> COMPLETED` return lifecycle while preserving cancellation rules.
 - Renamed module implementations from `Core` to `Impl`.
 - Scoped common repositories, process logs, suppliers, shipments, returns and departments by operator context.
 - Reworked authentication responses, refresh-token handling and auth cookie configuration.
@@ -27,6 +47,12 @@
 - Updated Docker, Eureka, Gateway, CORS and local development configuration.
 
 ### Fixed
+- Pickup-point read-model synchronization after restart and map searches by street, city and bounding box.
+- Persistence of the recipient delivery pickup-point identifier on newly created shipments.
+- Pickup-point lookup support used by clients to present point codes instead of raw UUIDs.
+- Shipment response mapping failures caused by stale generated MapStruct implementations and constructor signature changes.
+- Shipment detail loading when ReturningTrackManager is unavailable for shipments without returns.
+- Manager return-processing endpoints required by clients that must not call ReturningTrackManager through the gateway directly.
 - Shipment department country mapping.
 - Route detail ownership persistence in RouteTracker.
 - Kafka and Docker configuration problems.
