@@ -84,6 +84,7 @@ public class DataTestCreator {
                 money(),
                 locked,
                 new DepartmentId(10L),
+                new DepartmentId(9L),
                 null,
                 ShipmentPriority.MEDIUM,
                 trackingNumber(),
