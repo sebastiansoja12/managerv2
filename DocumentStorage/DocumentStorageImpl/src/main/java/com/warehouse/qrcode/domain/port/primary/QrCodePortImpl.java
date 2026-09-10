@@ -3,8 +3,6 @@ package com.warehouse.qrcode.domain.port.primary;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import com.lowagie.text.Image;
-import com.warehouse.qrcode.domain.service.BarcodeGeneratorService;
 import com.warehouse.qrcode.domain.service.ShipmentExportService;
 import com.warehouse.qrcode.domain.vo.ShipmentId;
 
@@ -17,8 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 public class QrCodePortImpl implements QrCodePort {
 
     private final ShipmentExportService shipmentExportService;
-
-    private final BarcodeGeneratorService generatorService;
 
     private final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
 
@@ -34,8 +30,7 @@ public class QrCodePortImpl implements QrCodePort {
         final String currentDateTime = dateFormatter.format(new java.util.Date());
         final String fileName = shipmentId.getValue() + "_" + currentDateTime + ".pdf";
         response.setHeader(headerKey, String.format(headerValue, fileName));
-        final Image image = generatorService.generateQRCodeImage(shipmentId.getValue());
-        shipmentExportService.exportToPdf(response, shipmentId, image);
+        shipmentExportService.exportToPdf(response, shipmentId);
         log.info("Label has been successfully generated with name: {}", fileName);
     }
 }

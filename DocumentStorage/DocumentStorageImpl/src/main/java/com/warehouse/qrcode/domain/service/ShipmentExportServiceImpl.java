@@ -11,7 +11,8 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.warehouse.qrcode.domain.model.Shipment;
-import com.warehouse.qrcode.domain.port.secondary.ShipmentRepository;
+import com.warehouse.qrcode.domain.port.secondary.DeliveryServicePort;
+import com.warehouse.qrcode.domain.port.secondary.ShipmentServicePort;
 import com.warehouse.qrcode.domain.vo.ShipmentId;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,7 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ShipmentExportServiceImpl implements ShipmentExportService {
 
-    private final ShipmentRepository shipmentRepository;
+    private final ShipmentServicePort shipmentServicePort;
+
+    private final DeliveryServicePort deliveryServicePort;
+
+    private final BarcodeGeneratorService barcodeGeneratorService;
 
     private void writeTableHeader(final PdfPTable table, final String... headers) {
         final PdfPCell cell = new PdfPCell();
@@ -48,7 +53,7 @@ public class ShipmentExportServiceImpl implements ShipmentExportService {
     }
 
     @Override
-    public void exportToPdf(final HttpServletResponse response, final ShipmentId shipmentId, final Image qrImage) throws Exception {
+    public void exportToPdf(final HttpServletResponse response, final ShipmentId shipmentId) throws Exception {
         final Document document = new Document(PageSize.LETTER);
         PdfWriter writer = null;
         try {
@@ -62,7 +67,9 @@ public class ShipmentExportServiceImpl implements ShipmentExportService {
             header.setSpacingAfter(15);
             document.add(header);
 
-            final Shipment shipment = shipmentRepository.find(shipmentId);
+            final Shipment shipment = shipmentServicePort.find(shipmentId);
+            shipment.setDestination(deliveryServicePort.findDestinationDepartmentCode(shipmentId));
+            final Image qrImage = barcodeGeneratorService.generateQRCodeImage(shipment.getTrackingNumber());
 
             final PdfPTable senderTable = new PdfPTable(2);
             senderTable.setWidthPercentage(100);
