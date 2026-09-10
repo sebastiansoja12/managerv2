@@ -25,7 +25,7 @@ public class DeliveryRejectResponseDetail {
     @XmlElement(name = "ShipmentID")
     private Long shipmentId;
 
-    @XmlElement(name = "ShipmentID")
+    @XmlElement(name = "NewShipmentID")
     private Long newShipmentId;
 
     @XmlElement(name = "DeliveryStatus")

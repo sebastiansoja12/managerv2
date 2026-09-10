@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    <soapenv:Body>
+        <CollectRequest xmlns="http://warehouse.com/logistics/terminal">
+            <DeviceInformation>
+                <Version>${version}</Version>
+                <DeviceID>${deviceId}</DeviceID>
+                <ResponsibleUser>${username}</ResponsibleUser>
+                <DepartmentCode>${departmentCode}</DepartmentCode>
+                <PairKey>${pairKey}</PairKey>
+                <DeviceUserType>SUPPLIER</DeviceUserType>
+                <DeviceType>TERMINAL</DeviceType>
+            </DeviceInformation>
+            <CollectDetails>${collectDetails}</CollectDetails>
+        </CollectRequest>
+    </soapenv:Body>
+</soapenv:Envelope>
