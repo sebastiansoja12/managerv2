@@ -33,7 +33,7 @@ class OperatorShipmentConfigurationTest {
         assertThat(configuration.validationRules()).isEqualTo(ShipmentValidationRules.defaults());
         assertThat(configuration.limits()).isEqualTo(ShipmentLimits.defaults());
         assertThat(configuration.labelSettings().labelFormat()).isEqualTo(ShipmentLabelFormat.PDF_A6);
-        assertThat(configuration.workflowSettings().defaultStatus()).isEqualTo(ShipmentStatus.ACCEPTED);
+        assertThat(configuration.workflowSettings().defaultStatus()).isEqualTo(ShipmentStatus.CREATED);
         assertThat(configuration.workflowSettings().defaultServiceLevel()).isEqualTo(ShipmentServiceLevel.STANDARD);
         assertThat(configuration.workflowSettings().pickupCutoffTime()).isEqualTo("16:00");
         assertThat(configuration.trackingNumberRule().key()).isEqualTo("MGR");
