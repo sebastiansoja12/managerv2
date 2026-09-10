@@ -1,13 +1,13 @@
 package com.warehouse.csv.configuration;
 
-import com.warehouse.csv.infrastructure.adapter.secondary.ParcelReadRepository;
-import com.warehouse.csv.infrastructure.adapter.secondary.ParcelRepositoryImpl;
+import com.warehouse.csv.infrastructure.adapter.secondary.ShipmentServiceAdapter;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.csv.domain.port.primary.CsvPort;
 import com.warehouse.csv.domain.port.primary.CsvPortImpl;
-import com.warehouse.csv.domain.port.secondary.ParcelRepository;
+import com.warehouse.csv.domain.port.secondary.ShipmentServicePort;
 import com.warehouse.csv.domain.service.CsvExporterService;
 import com.warehouse.csv.domain.service.CsvExporterServiceImpl;
 
@@ -20,12 +20,12 @@ public class CsvConfiguration {
     }
 
     @Bean
-    public CsvExporterService exporterService(ParcelRepository parcelRepository) {
-        return new CsvExporterServiceImpl(parcelRepository);
+    public CsvExporterService exporterService(ShipmentServicePort shipmentServicePort) {
+        return new CsvExporterServiceImpl(shipmentServicePort);
     }
 
-    @Bean("csv.parcelRepository")
-    public ParcelRepository parcelRepository(ParcelReadRepository parcelReadRepository) {
-        return new ParcelRepositoryImpl(parcelReadRepository);
+    @Bean("csv.shipmentServicePort")
+    public ShipmentServicePort csvShipmentServicePort(ShipmentApiService shipmentApiService) {
+        return new ShipmentServiceAdapter(shipmentApiService);
     }
 }

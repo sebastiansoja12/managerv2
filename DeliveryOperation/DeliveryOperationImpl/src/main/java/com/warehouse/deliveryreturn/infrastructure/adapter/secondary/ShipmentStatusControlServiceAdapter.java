@@ -49,7 +49,7 @@ public class ShipmentStatusControlServiceAdapter extends RestGatewaySupport
         try {
             final UpdateStatus updateStatus = restClient
                     .put()
-                    .uri("/v2/api/shipments/status")
+                    .uri("/v1/api/shipments/status")
                     .body(request)
                     .contentType(MediaType.APPLICATION_JSON)
                     .exchange((req, res) -> {

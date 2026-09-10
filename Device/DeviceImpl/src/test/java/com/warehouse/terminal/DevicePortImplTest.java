@@ -152,7 +152,7 @@ class DevicePortImplTest {
     void shouldValidateReferencesBeforeUpdateDevice() {
         final UserId userId = new UserId(101L);
         final DepartmentCode departmentCode = new DepartmentCode("KT1");
-        final OwnershipProfile ownership = OwnershipProfile.initializeOwnership("OPERATOR", new UserId(202L), new DepartmentCode("KT2"), null);
+        final OwnershipProfile ownership = OwnershipProfile.initializeOwnership("OPERATOR", new UserId(202L), new DepartmentCode("KT2"), null, new OperatorId(1L));
         final DeviceUpdateCommand request = new DeviceUpdateCommand(
                 new DeviceId("TL:update-1"),
                 null,
@@ -218,7 +218,7 @@ class DevicePortImplTest {
 
     @Test
     void shouldThrowWhenUpdateOwnershipUserDoesNotExist() {
-        final OwnershipProfile ownership = OwnershipProfile.initializeOwnership("OPERATOR", new UserId(777L), new DepartmentCode("KT1"), null);
+        final OwnershipProfile ownership = OwnershipProfile.initializeOwnership("OPERATOR", new UserId(777L), new DepartmentCode("KT1"), null, new OperatorId(1L));
         final DeviceOwnershipUpdateCommand request = new DeviceOwnershipUpdateCommand(new DeviceId("TL:ownership-missing"), ownership);
         when(userService.findByUserId(ownership.getUserId())).thenReturn(null);
 
@@ -228,7 +228,7 @@ class DevicePortImplTest {
 
     @Test
     void shouldValidateOwnershipAndUpdateOwnershipField() {
-        final OwnershipProfile ownership = OwnershipProfile.initializeOwnership("OPERATOR", new UserId(888L), new DepartmentCode("KT3"), null);
+        final OwnershipProfile ownership = OwnershipProfile.initializeOwnership("OPERATOR", new UserId(888L), new DepartmentCode("KT3"), null, new OperatorId(1L));
         final DeviceOwnershipUpdateCommand request = new DeviceOwnershipUpdateCommand(new DeviceId("TL:ownership-ok"), ownership);
         when(userService.findByUserId(ownership.getUserId())).thenReturn(user(ownership.getUserId(), ownership.getDepartmentCode()));
         when(departmentServicePort.getDepartment(any())).thenReturn(department(ownership.getDepartmentCode()));
@@ -269,7 +269,7 @@ class DevicePortImplTest {
                         null,
                         null,
                         null,
-                        OwnershipProfile.initializeOwnership("OPERATOR", new UserId(1L), new DepartmentCode("KT1"), null)
+                        OwnershipProfile.initializeOwnership("OPERATOR", new UserId(1L), new DepartmentCode("KT1"), null, new OperatorId(1L))
                 ),
                 new Mobile(
                         new DeviceId("MB:all-2"),
@@ -278,7 +278,7 @@ class DevicePortImplTest {
                         null,
                         null,
                         null,
-                        OwnershipProfile.initializeOwnership("OPERATOR", new UserId(2L), new DepartmentCode("KT2"), null)
+                        OwnershipProfile.initializeOwnership("OPERATOR", new UserId(2L), new DepartmentCode("KT2"), null, new OperatorId(1L))
                 )
         );
         when(deviceGenericService.findAll()).thenReturn(devices);
@@ -296,7 +296,7 @@ class DevicePortImplTest {
                 new DeviceIdentity(),
                 new DeviceHardware(),
                 new DeviceNetwork(),
-                OwnershipProfile.initializeOwnership("OPERATOR", new UserId(3L), new DepartmentCode("KT3"), null),
+                OwnershipProfile.initializeOwnership("OPERATOR", new UserId(3L), new DepartmentCode("KT3"), null, new OperatorId(1L)),
                 Scanner.ScanType.QRCODE,
                 Scanner.ScannerType.RING
         );
@@ -387,7 +387,7 @@ class DevicePortImplTest {
     }
 
     private User user(final UserId userId, final DepartmentCode departmentCode) {
-        return new User(userId, departmentCode, new Username("john.doe"));
+        return new User(userId, departmentCode, new Username("john.doe"), new OperatorId(1L));
     }
 
     private Department department(final DepartmentCode departmentCode) {

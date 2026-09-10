@@ -11,7 +11,7 @@ import org.springframework.ws.transport.context.TransportContext;
 import org.springframework.ws.transport.context.TransportContextHolder;
 import org.springframework.ws.transport.http.HttpServletConnection;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.terminal.DeviceApiService;
@@ -48,12 +48,17 @@ public class DeviceContextAuthenticator {
             throw new IllegalArgumentException("Missing department for authenticated device");
         }
 
+        final OperatorId operatorId = authentication.operatorId();
+        if (operatorId == null) {
+            throw new IllegalArgumentException("Missing operator for authenticated device");
+        }
+
         final Long userId = authentication.userId() != null ? authentication.userId().value() : null;
         final String username = authentication.username() != null ? authentication.username().value() : null;
         final String deviceId = authentication.deviceId() != null ? authentication.deviceId().value() : null;
 
-        setSecurityContext(pairKey, departmentCode, userId, deviceId);
-        setMdc(departmentCode, userId, username, deviceId);
+        setSecurityContext(pairKey, operatorId, userId, deviceId);
+        setMdc(operatorId, userId, username, deviceId);
         log.info("Device context initialized for device {}, user {}, department {}",
                 deviceId, username != null ? username : userId, departmentCode);
         return new AuthenticatedDeviceContext(pairKey, deviceId, departmentCode, userId, username);
@@ -65,24 +70,24 @@ public class DeviceContextAuthenticator {
     }
 
     private void setSecurityContext(final String pairKey,
-                                    final String departmentCode,
+                                    final OperatorId operatorId,
                                     final Long userId,
                                     final String deviceId) {
         final Object principal = userId != null ? new UserId(userId) : "device:" + fallback(deviceId);
         final SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(new UsernameTenantPasswordAuthenticationToken(
                 principal,
-                new DepartmentCode(departmentCode),
+                operatorId,
                 pairKey,
                 Collections.emptyList()));
         SecurityContextHolder.setContext(context);
     }
 
-    private void setMdc(final String departmentCode,
+    private void setMdc(final OperatorId operatorId,
                         final Long userId,
                         final String username,
                         final String deviceId) {
-        MDC.put("operator", "N/A");
+        MDC.put("operator", operatorId.toString());
         MDC.put("user", userId != null ? userId.toString() : fallback(deviceId));
         MDC.put("username", username != null ? username : "device:" + fallback(deviceId));
     }

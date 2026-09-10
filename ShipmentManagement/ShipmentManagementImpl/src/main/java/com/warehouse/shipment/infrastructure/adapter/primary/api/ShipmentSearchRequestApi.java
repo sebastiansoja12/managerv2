@@ -11,7 +11,6 @@ public record ShipmentSearchRequestApi(
         List<ShipmentPriorityDto> shipmentPriorities,
         String senderName,
         String recipientName,
-        String destination,
         BigDecimal minPrice,
         BigDecimal maxPrice,
         String currency,

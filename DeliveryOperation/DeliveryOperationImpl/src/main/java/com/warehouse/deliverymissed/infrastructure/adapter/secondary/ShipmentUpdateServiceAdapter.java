@@ -35,7 +35,7 @@ public class ShipmentUpdateServiceAdapter implements ShipmentUpdateServicePort {
         final UpdateStatusShipmentRequestDto request = updateStatusParcelRequestMapper.map(updateStatusShipmentRequest);
         restClient
                 .post()
-                .uri("/v2/api/{url}", shipmentStatusProperties.getEndpoint())
+                .uri("/v1/api/{url}", shipmentStatusProperties.getEndpoint())
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()

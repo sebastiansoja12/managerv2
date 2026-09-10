@@ -1,6 +1,6 @@
 server:
   servlet:
-    contextPath: /v2/api
+    contextPath: /v1/api
 local:
   server:
     port: 8080

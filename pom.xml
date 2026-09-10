@@ -49,6 +49,8 @@
         <module>ProcessHub</module>
         <module>GeocodingService</module>
         <module>PlatformAdministration</module>
+        <module>PalletManagement</module>
+        <module>DepartmentMap</module>
     </modules>
 
 	<properties>

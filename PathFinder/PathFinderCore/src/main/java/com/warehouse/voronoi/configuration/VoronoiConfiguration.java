@@ -22,6 +22,7 @@ import com.warehouse.voronoi.domain.service.UrlReaderServiceImpl;
 import com.warehouse.voronoi.infrastructure.adapter.primary.VoronoiServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.GeocodingConfigServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.GeolocationGeoapifyServiceAdapter;
+import com.warehouse.voronoi.infrastructure.adapter.secondary.GeolocationOpenCageServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.GeolocationPositionStackServiceAdapter;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.PositionStackReadRepository;
 import com.warehouse.voronoi.infrastructure.adapter.secondary.PositionStackRepositoryImpl;
@@ -57,6 +58,11 @@ public class VoronoiConfiguration {
     @Bean
     public GeolocationServiceProvider geoapifyServicePort() {
         return new GeolocationGeoapifyServiceAdapter();
+    }
+
+    @Bean
+    public GeolocationServiceProvider openCageServicePort() {
+        return new GeolocationOpenCageServiceAdapter();
     }
 
     @Bean

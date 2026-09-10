@@ -19,6 +19,26 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
+            <artifactId>DepartmentMapImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>PalletManagementImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>PickupPointManagementImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.transport</groupId>
+            <artifactId>DriverHubCore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
             <artifactId>Application</artifactId>
             <version>${project.version}</version>
         </dependency>

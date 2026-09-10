@@ -30,6 +30,8 @@ public interface DeviceGenericService {
     void updateOwnership(final DeviceId deviceId, final OwnershipProfile ownership);
     void updateVersionField(final DeviceId deviceId, final String version);
     Device findByDeviceId(final DeviceId deviceId);
+
+    Optional<Device> findByDeviceIdForAuthentication(final DeviceId deviceId);
     List<Device> findAll();
 
     void updateSettings(final DeviceId deviceId, final DeviceSettings deviceSettings);

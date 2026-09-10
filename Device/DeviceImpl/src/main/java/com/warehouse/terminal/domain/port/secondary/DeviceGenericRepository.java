@@ -25,6 +25,11 @@ public class DeviceGenericRepository {
         return Optional.ofNullable(repository.findById(deviceId));
     }
 
+    public Optional<Device> findByIdForAuthentication(final DeviceId deviceId) {
+        final DeviceRepository repository = determineDeviceRepository(deviceId.type());
+        return repository.findByIdForAuthentication(deviceId);
+    }
+
     public Optional<Device> findByExternalSystemId(final String externalSystemId) {
         for (final DeviceRepository repository : repositories) {
             final Optional<Device> device = repository.findByExternalSystemId(externalSystemId);

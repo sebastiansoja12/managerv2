@@ -11,7 +11,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.warehouse.qrcode.domain.model.Shipment;
 import com.warehouse.qrcode.domain.port.primary.QrCodePortImpl;
-import com.warehouse.qrcode.domain.port.secondary.ShipmentRepository;
+import com.warehouse.qrcode.domain.port.secondary.DeliveryServicePort;
+import com.warehouse.qrcode.domain.port.secondary.ShipmentServicePort;
 import com.warehouse.qrcode.domain.service.BarcodeGeneratorService;
 import com.warehouse.qrcode.domain.service.BarcodeGeneratorServiceImpl;
 import com.warehouse.qrcode.domain.service.ShipmentExportServiceImpl;
@@ -21,15 +22,19 @@ import com.warehouse.qrcode.domain.vo.ShipmentId;
 public class QrCodePortImplTest {
 
     @Mock
-    private ShipmentRepository shipmentRepository;
+    private ShipmentServicePort shipmentServicePort;
+
+    @Mock
+    private DeliveryServicePort deliveryServicePort;
 
     private QrCodePortImpl qrCodePort;
 
     @BeforeEach
     void setup() {
-        final ShipmentExportServiceImpl parcelExportService = new ShipmentExportServiceImpl(shipmentRepository);
         final BarcodeGeneratorService barcodeGeneratorService = new BarcodeGeneratorServiceImpl();
-        qrCodePort = new QrCodePortImpl(parcelExportService, barcodeGeneratorService);
+        final ShipmentExportServiceImpl parcelExportService = new ShipmentExportServiceImpl(shipmentServicePort,
+                deliveryServicePort, barcodeGeneratorService);
+        qrCodePort = new QrCodePortImpl(parcelExportService);
     }
 
     @Test
@@ -39,16 +44,21 @@ public class QrCodePortImplTest {
         final MockHttpServletResponse response = new MockHttpServletResponse();
 
         doReturn(shipment)
-                .when(shipmentRepository)
+                .when(shipmentServicePort)
                 .find(shipmentId);
+        doReturn("KT1")
+                .when(deliveryServicePort)
+                .findDestinationDepartmentCode(shipmentId);
 
         qrCodePort.exportShipment(response, shipmentId);
-        verify(shipmentRepository, atLeast(1)).find(shipmentId);
+        verify(shipmentServicePort, atLeast(1)).find(shipmentId);
+        verify(deliveryServicePort).findDestinationDepartmentCode(shipmentId);
     }
 
     private Shipment buildShipment() {
         return Shipment.builder()
                 .id(1L)
+                .trackingNumber("INP000000001")
                 .build();
     }
 }

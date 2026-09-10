@@ -10,6 +10,10 @@ public enum GeocodingProvider {
     GEOAPIFY(
             "https://api.geoapify.com/v1/geocode/search",
             List.of(ConfigurationField.API_KEY),
+            List.of(ProviderApi.GEOCODING_API)),
+    OPEN_CAGE(
+            "https://api.opencagedata.com/geocode/v1/json",
+            List.of(ConfigurationField.API_KEY),
             List.of(ProviderApi.GEOCODING_API));
 
     private final String url;

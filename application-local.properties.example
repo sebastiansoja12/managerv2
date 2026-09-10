@@ -1,0 +1,10 @@
+# Optional: copy to application-local.properties (ignored by git) to send e-mails through a real SMTP server
+# instead of MailHog. Example for a WP.pl mailbox; MAIL_FROM_ADDRESS must match MAIL_USERNAME.
+MAIL_HOST=smtp.wp.pl
+MAIL_PORT=465
+MAIL_SMTP_AUTH=true
+MAIL_SMTP_SSL=true
+MAIL_SMTP_STARTTLS=false
+MAIL_USERNAME=your-login@wp.pl
+MAIL_PASSWORD=your-mailbox-password
+MAIL_FROM_ADDRESS=your-login@wp.pl

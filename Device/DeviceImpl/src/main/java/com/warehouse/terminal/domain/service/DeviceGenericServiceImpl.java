@@ -169,6 +169,11 @@ public class DeviceGenericServiceImpl implements DeviceGenericService {
     }
 
     @Override
+    public Optional<Device> findByDeviceIdForAuthentication(final DeviceId deviceId) {
+        return this.deviceRepository.findByIdForAuthentication(deviceId);
+    }
+
+    @Override
     public List<Device> findAll() {
         return this.deviceRepository.findAll();
     }

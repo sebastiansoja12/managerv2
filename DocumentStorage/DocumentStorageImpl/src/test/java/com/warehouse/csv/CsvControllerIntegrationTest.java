@@ -1,34 +1,32 @@
 package com.warehouse.csv;
 
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
+import com.warehouse.shipment.infrastructure.dto.ShipmentDocumentDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentPartyDto;
 
 @SpringBootTest(classes = CsvControllerIntegrationTest.CsvControllerTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionDbUnitTestExecutionListener.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-@DatabaseSetup("/dataset/shipment.xml")
 public class CsvControllerIntegrationTest {
 
     @ComponentScan(basePackages = { "com.warehouse.csv" })
-    @EntityScan(basePackages = { "com.warehouse.csv" })
-    @EnableJpaRepositories(basePackages = { "com.warehouse.csv" })
     @EnableAutoConfiguration
     public static class CsvControllerTestConfiguration {
     }
@@ -36,12 +34,19 @@ public class CsvControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private ShipmentApiService shipmentApiService;
+
     @Test
     void shouldGenerateCsv() throws Exception {
         // given
         final Long parcelId = 1L;
+        final ShipmentPartyDto party = new ShipmentPartyDto("Jan", "Kowalski", "jan@test.pl", "123456789",
+                "Katowice", "40-000", "Mariacka 1", "PL");
+        when(shipmentApiService.getShipmentDocument(any())).thenReturn(new ShipmentDocumentDto(
+                new ShipmentId(parcelId), null, null, null, null, party, party));
         // when
-        mockMvc.perform(get("/v2/api/csv/{id}", parcelId).contextPath("/v2/api"))
+        mockMvc.perform(get("/v1/api/csv/{id}", parcelId).contextPath("/v1/api"))
         // then
                 .andExpect(status().isOk());
     }

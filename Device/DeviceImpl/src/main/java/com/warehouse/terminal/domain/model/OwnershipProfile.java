@@ -3,6 +3,7 @@ package com.warehouse.terminal.domain.model;
 import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.TeamId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.VehicleId;
@@ -16,10 +17,11 @@ public class OwnershipProfile {
     private String assignedRole;
     private Instant assignedAt;
     private Instant unassignedAt;
+    private final OperatorId operatorId;
 
 	public OwnershipProfile(final Instant assignedAt, final String assignedRole, final DepartmentCode departmentCode,
 			final UserId previousUserId, final TeamId teamId, final Instant unassignedAt, final UserId userId,
-			final VehicleId vehicleId) {
+			final VehicleId vehicleId, final OperatorId operatorId) {
         this.assignedAt = assignedAt;
         this.assignedRole = assignedRole;
         this.departmentCode = departmentCode;
@@ -28,11 +30,20 @@ public class OwnershipProfile {
         this.unassignedAt = unassignedAt;
         this.userId = userId;
         this.vehicleId = vehicleId;
+        this.operatorId = operatorId;
     }
 
-    public static OwnershipProfile initializeOwnership(
-            final String assignedRole, final UserId userId, final DepartmentCode departmentCode, final VehicleId vehicleId) {
-        return new OwnershipProfile(Instant.now(), assignedRole, departmentCode, null, null, null, userId, null);
+    public static OwnershipProfile initializeOwnership(final String assignedRole,
+                                                       final UserId userId,
+                                                       final DepartmentCode departmentCode,
+                                                       final VehicleId vehicleId,
+                                                       final OperatorId operatorId) {
+        return new OwnershipProfile(Instant.now(), assignedRole, departmentCode, null, null, null, userId, null,
+                operatorId);
+    }
+
+    public OperatorId getOperatorId() {
+        return operatorId;
     }
 
     public Instant getAssignedAt() {

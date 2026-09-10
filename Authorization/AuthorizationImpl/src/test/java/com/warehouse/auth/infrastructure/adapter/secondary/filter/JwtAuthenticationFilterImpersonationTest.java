@@ -136,8 +136,8 @@ class JwtAuthenticationFilterImpersonationTest {
     }
 
     private MockHttpServletRequest request(final String accessToken) {
-        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v2/api/users");
-        request.setContextPath("/v2/api");
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/api/users");
+        request.setContextPath("/v1/api");
         request.setCookies(new Cookie("AUTH-TOKEN", accessToken));
         return request;
     }

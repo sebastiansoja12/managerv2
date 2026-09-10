@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
 import com.warehouse.terminal.domain.model.device.Mobile;
@@ -46,6 +47,7 @@ public class ModelToEntityMapper {
         entity.setSecurity(mapSecurity(terminal.getSecurity()));
         entity.setLocation(mapLocation(terminal.getLocation()));
         entity.setOwnership(mapOwnership(terminal.getOwnership()));
+        entity.assignOperator(resolveOperatorId(terminal.getOwnership()));
         return entity;
     }
 
@@ -65,6 +67,7 @@ public class ModelToEntityMapper {
         entity.setSecurity(mapSecurity(mobile.getSecurity()));
         entity.setLocation(mapLocation(mobile.getLocation()));
         entity.setOwnership(mapOwnership(mobile.getOwnership()));
+        entity.assignOperator(resolveOperatorId(mobile.getOwnership()));
         return entity;
     }
 
@@ -79,6 +82,7 @@ public class ModelToEntityMapper {
         entity.setOwnership(mapOwnership(scanner.getOwnership()));
         entity.setScanType(scanner.getScanType());
         entity.setScannerType(scanner.getScannerType());
+        entity.assignOperator(resolveOperatorId(scanner.getOwnership()));
         return entity;
     }
 
@@ -219,6 +223,10 @@ public class ModelToEntityMapper {
                 location.getGeoZone(),
                 location.getGpsEnabled(),
                 location.getLastLocationUpdateAt());
+    }
+
+    private OperatorId resolveOperatorId(final OwnershipProfile ownership) {
+        return ownership != null ? ownership.getOperatorId() : null;
     }
 
     private Ownership mapOwnership(final OwnershipProfile ownership) {

@@ -4,7 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryData;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +22,10 @@ class ShipmentChangedIntegrationEventTest {
     @Test
     void shouldDeserializeCreatedEventThroughSharedContract() throws Exception {
         final ShipmentEventData snapshot = new ShipmentEventDataMapper().map(DataTestCreator.shipment().snapshot());
-        final ShipmentCreatedIntegrationEvent original = new ShipmentCreatedIntegrationEvent(snapshot);
+        final ShipmentDeliveryData deliveryData = new ShipmentEventDataMapper().map(new ShipmentDeliveryPlan(
+                new DepartmentId(9L), new DepartmentId(10L), PickupMethod.DEPARTMENT, DeliveryMethod.COURIER,
+                null, null));
+        final ShipmentCreatedIntegrationEvent original = new ShipmentCreatedIntegrationEvent(snapshot, deliveryData);
         final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
         final ShipmentCreatedIntegrationEvent restored = objectMapper.readValue(
@@ -25,7 +33,7 @@ class ShipmentChangedIntegrationEventTest {
 
         assertThat(restored).isInstanceOf(ShipmentChangedIntegrationEvent.class);
         assertThat(restored.payload().shipmentId()).isEqualTo(snapshot.shipmentId());
-        assertThat(restored.payload().deliveryMethod()).isEqualTo(snapshot.deliveryMethod());
+        assertThat(restored.delivery()).isEqualTo(deliveryData);
     }
 
     @Test
@@ -39,7 +47,7 @@ class ShipmentChangedIntegrationEventTest {
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(event));
 
         final JsonNode payload = json.path("payload");
-        assertThat(payload.size()).isEqualTo(22);
+        assertThat(payload.size()).isEqualTo(16);
         assertThat(payload.path("shipmentId").path("value").asLong()).isEqualTo(1L);
         assertThat(payload.path("shipmentStatus").asText()).isEqualTo("CREATED");
         assertThat(LocalDateTime.parse(payload.path("updatedAt").asText())).isEqualTo(snapshot.updatedAt());

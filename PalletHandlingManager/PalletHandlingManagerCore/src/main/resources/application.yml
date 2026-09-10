@@ -21,6 +21,27 @@ spring:
       # connection-pool-size: 100
       # auto-index-creation: true  # U?ywaj ostro?nie w produkcji
 
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID:pallet-handling-manager}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  issuer: ${JWT_ISSUER:manager-v2}
+  audience: ${JWT_AUDIENCE:manager-v2-gui}
+
+manager:
+  kafka:
+    topics:
+      pallet-loaded: ${PALLET_LOADED_TOPIC:pallet.loaded}
+
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: TRACE

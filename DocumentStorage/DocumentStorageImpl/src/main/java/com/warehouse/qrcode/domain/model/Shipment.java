@@ -13,6 +13,8 @@ public class Shipment {
 
     private Long id;
 
+    private String trackingNumber;
+
     private String firstName;
 
     private String lastName;

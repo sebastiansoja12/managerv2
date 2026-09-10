@@ -1,8 +1,8 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
-import com.warehouse.logistics.domain.port.secondary.SupplierRepository;
-import com.warehouse.logistics.infrastructure.adapter.secondary.entity.SupplierEntity;
 
+import com.warehouse.logistics.application.port.secondary.SupplierRepository;
+import com.warehouse.logistics.infrastructure.adapter.secondary.entity.SupplierEntity;
 import lombok.AllArgsConstructor;
 
 

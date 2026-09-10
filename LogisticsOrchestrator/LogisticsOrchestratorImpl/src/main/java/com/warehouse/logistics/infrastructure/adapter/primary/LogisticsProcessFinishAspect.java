@@ -12,6 +12,8 @@ import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.dto.ProcessStatusDto;
 import com.warehouse.process.infrastructure.event.ProcessFinishEvent;
+import com.warehouse.terminal.jaxb.CollectResponse;
+import com.warehouse.terminal.jaxb.PalletScanResponse;
 import com.warehouse.terminal.response.TerminalResponse;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,22 +30,34 @@ public class LogisticsProcessFinishAspect {
 
     @AfterReturning(
             pointcut = "@annotation(com.warehouse.commonassets.validator.DeviceAccessValidator)",
-            returning = "terminalResponse")
-    public void publishProcessFinishEvent(final TerminalResponse terminalResponse) {
+            returning = "response")
+    public void publishProcessFinishEvent(final Object response) {
         try {
-            if (terminalResponse == null || terminalResponse.getProcessId() == null || terminalResponse.getProcessId().isBlank()) {
-                return;
+            if (response instanceof TerminalResponse terminalResponse) {
+                publishProcessFinishEvent(terminalResponse.getProcessId(), resolveFaultDescription(terminalResponse));
             }
-            final String faultDescription = resolveFaultDescription(terminalResponse);
-            processHubEventPublisher.publish(new ProcessFinishEvent(
-                    new ProcessId(UUID.fromString(terminalResponse.getProcessId())),
-                    ServiceType.LOGISTICS_ORCHESTRATOR,
-                    faultDescription == null ? ProcessStatusDto.SUCCESS : ProcessStatusDto.FAILURE,
-                    LocalDateTime.now(),
-                    faultDescription));
+            if (response instanceof CollectResponse collectResponse) {
+                publishProcessFinishEvent(collectResponse.getProcessId(), null);
+            }
+            if (response instanceof PalletScanResponse palletScanResponse) {
+                publishProcessFinishEvent(palletScanResponse.getProcessId(),
+                        palletScanResponse.isSuccess() ? null : palletScanResponse.getErrorMessage());
+            }
         } finally {
             LogisticsProcessContext.clear();
         }
+    }
+
+    private void publishProcessFinishEvent(final String processId, final String faultDescription) {
+        if (processId == null || processId.isBlank()) {
+            return;
+        }
+        processHubEventPublisher.publish(new ProcessFinishEvent(
+                new ProcessId(UUID.fromString(processId)),
+                ServiceType.LOGISTICS_ORCHESTRATOR,
+                faultDescription == null ? ProcessStatusDto.SUCCESS : ProcessStatusDto.FAILURE,
+                LocalDateTime.now(),
+                faultDescription));
     }
 
     private String resolveFaultDescription(final TerminalResponse terminalResponse) {

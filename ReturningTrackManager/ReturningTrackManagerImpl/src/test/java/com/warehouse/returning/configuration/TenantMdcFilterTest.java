@@ -26,7 +26,7 @@ class TenantMdcFilterTest {
     void shouldAuthenticateRequestWithManagerAccessTokenCookie() throws Exception {
         final ApiKeyService apiKeyService = mock(ApiKeyService.class);
         final TenantMdcFilter filter = new TenantMdcFilter(apiKeyService, "AUTH-TOKEN");
-        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v2/api/returns/123");
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/api/returns/123");
         request.setCookies(new Cookie("AUTH-TOKEN", "access-token"));
         final MockHttpServletResponse response = new MockHttpServletResponse();
         final AtomicBoolean filterChainInvoked = new AtomicBoolean(false);
@@ -43,7 +43,7 @@ class TenantMdcFilterTest {
     void shouldReturnUnauthorizedWhenAccessTokenCookieIsExpired() throws Exception {
         final ApiKeyService apiKeyService = mock(ApiKeyService.class);
         final TenantMdcFilter filter = new TenantMdcFilter(apiKeyService, "AUTH-TOKEN");
-        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v2/api/returns/123");
+        final MockHttpServletRequest request = new MockHttpServletRequest("GET", "/v1/api/returns/123");
         request.setCookies(new Cookie("AUTH-TOKEN", "expired-token"));
         final MockHttpServletResponse response = new MockHttpServletResponse();
         final AtomicBoolean filterChainInvoked = new AtomicBoolean(false);

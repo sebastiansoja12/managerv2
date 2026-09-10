@@ -10,6 +10,7 @@ import com.warehouse.terminal.domain.model.Device;
 
 public interface DeviceRepository<T extends Device> {
     T findById(final DeviceId deviceId);
+    Optional<T> findByIdForAuthentication(final DeviceId deviceId);
     Optional<T> findByExternalSystemId(final String externalSystemId);
     List<T> findByUserId(final UserId userId);
     void saveOrUpdate(final T t);

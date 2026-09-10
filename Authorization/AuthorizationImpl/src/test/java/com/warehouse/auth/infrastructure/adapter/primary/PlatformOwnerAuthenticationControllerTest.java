@@ -72,7 +72,7 @@ class PlatformOwnerAuthenticationControllerTest {
         assertThat(result.getResponse().getHeaders("Set-Cookie"))
                 .anyMatch(cookie -> cookie.startsWith("PLATFORM-AUTH-TOKEN=access-token"))
                 .anyMatch(cookie -> cookie.startsWith("PLATFORM-REFRESH-TOKEN=refresh-token")
-                        && cookie.contains("Path=/v2/api/platform/auth"));
+                        && cookie.contains("Path=/v1/api/platform/auth"));
     }
 
     @Test

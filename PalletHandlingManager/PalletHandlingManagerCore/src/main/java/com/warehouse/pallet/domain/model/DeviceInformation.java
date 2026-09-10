@@ -1,6 +1,6 @@
 package com.warehouse.pallet.domain.model;
 
-import com.warehouse.pallet.configuration.identificator.DepartmentCode;
+import com.warehouse.pallet.configuration.identificator.DepartmentId;
 import com.warehouse.pallet.domain.enumeration.DeviceType;
 import com.warehouse.pallet.domain.enumeration.DeviceUserType;
 import com.warehouse.pallet.domain.vo.DeviceId;
@@ -8,20 +8,20 @@ import com.warehouse.pallet.domain.vo.UserId;
 
 public class DeviceInformation {
     private DeviceId deviceId;
-    private DepartmentCode departmentCode;
+    private DepartmentId departmentId;
     private UserId userId;
     private DeviceType deviceType;
     private DeviceUserType deviceUserType;
     private String version;
 
     public DeviceInformation(final DeviceId deviceId,
-                             final DepartmentCode departmentCode,
+                             final DepartmentId departmentId,
                              final UserId userId,
                              final DeviceType deviceType,
                              final DeviceUserType deviceUserType,
                              final String version) {
         this.deviceId = deviceId;
-        this.departmentCode = departmentCode;
+        this.departmentId = departmentId;
         this.userId = userId;
         this.deviceType = deviceType;
         this.deviceUserType = deviceUserType;
@@ -36,12 +36,12 @@ public class DeviceInformation {
         this.deviceId = deviceId;
     }
 
-    public DepartmentCode getDepartmentCode() {
-        return departmentCode;
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartmentCode(final DepartmentCode departmentCode) {
-        this.departmentCode = departmentCode;
+    public void setDepartmentId(final DepartmentId departmentId) {
+        this.departmentId = departmentId;
     }
 
     public UserId getUserId() {

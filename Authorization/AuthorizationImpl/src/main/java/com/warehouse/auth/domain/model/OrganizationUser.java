@@ -86,6 +86,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         user.departmentId = departmentId;
         user.apiKey = apiKey;
         user.permissions = new HashSet<>();
+        user.deleted = false;
         return user;
     }
 

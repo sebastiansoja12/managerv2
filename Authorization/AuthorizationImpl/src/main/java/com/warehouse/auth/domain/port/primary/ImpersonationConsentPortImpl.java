@@ -3,6 +3,7 @@ package com.warehouse.auth.domain.port.primary;
 import com.warehouse.auth.domain.exception.ImpersonationConsentNotFoundException;
 import com.warehouse.auth.domain.exception.ImpersonationConsentRequiredException;
 import com.warehouse.auth.domain.model.ImpersonationConsent;
+import com.warehouse.auth.domain.port.secondary.ImpersonationConsentNotificationServicePort;
 import com.warehouse.auth.domain.port.secondary.ImpersonationConsentRepository;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.PlatformOwnerId;
@@ -19,10 +20,15 @@ public class ImpersonationConsentPortImpl implements ImpersonationConsentPort {
 
     private final ImpersonationConsentRepository repository;
 
+    private final ImpersonationConsentNotificationServicePort notificationServicePort;
+
     private final Clock clock;
 
-    public ImpersonationConsentPortImpl(final ImpersonationConsentRepository repository, final Clock clock) {
+    public ImpersonationConsentPortImpl(final ImpersonationConsentRepository repository,
+                                        final ImpersonationConsentNotificationServicePort notificationServicePort,
+                                        final Clock clock) {
         this.repository = repository;
+        this.notificationServicePort = notificationServicePort;
         this.clock = clock;
     }
 
@@ -41,6 +47,7 @@ public class ImpersonationConsentPortImpl implements ImpersonationConsentPort {
                 platformOwnerUsername, reason, now));
         log.info("Platform owner {} requested impersonation consent from operator {}", platformOwnerId.value(),
                 operatorId.value());
+        notificationServicePort.notifyConsentsChanged(operatorId);
         return consent;
     }
 
@@ -76,6 +83,7 @@ public class ImpersonationConsentPortImpl implements ImpersonationConsentPort {
         final ImpersonationConsent consent = repository.save(load(consentId, operatorId)
                 .approve(userId, username, durationMinutes, now()));
         log.info("User {} approved impersonation consent {} for {} minutes", userId.value(), consentId, durationMinutes);
+        notificationServicePort.notifyConsentsChanged(operatorId);
         return consent;
     }
 
@@ -86,6 +94,7 @@ public class ImpersonationConsentPortImpl implements ImpersonationConsentPort {
                                        final String username) {
         final ImpersonationConsent consent = repository.save(load(consentId, operatorId).reject(userId, username, now()));
         log.info("User {} rejected impersonation consent {}", userId.value(), consentId);
+        notificationServicePort.notifyConsentsChanged(operatorId);
         return consent;
     }
 
@@ -96,6 +105,7 @@ public class ImpersonationConsentPortImpl implements ImpersonationConsentPort {
                                        final String username) {
         final ImpersonationConsent consent = repository.save(load(consentId, operatorId).revoke(userId, username, now()));
         log.info("User {} revoked impersonation consent {}", userId.value(), consentId);
+        notificationServicePort.notifyConsentsChanged(operatorId);
         return consent;
     }
 

@@ -276,6 +276,15 @@ class AuthenticationPortImplTest {
                     .filter(user -> operatorId.equals(user.operatorId()))
                     .findFirst();
         }
+
+        @Override
+        public List<UserId> findActiveSuperadminIds(final OperatorId operatorId) {
+            return users.values().stream()
+                    .filter(user -> OrganizationUser.Role.SUPERADMIN.equals(user.getRole()))
+                    .filter(user -> operatorId.equals(user.operatorId()))
+                    .map(OrganizationUser::getUserId)
+                    .toList();
+        }
     }
 
     private static final class InMemoryRefreshTokenRepository implements RefreshTokenRepository {

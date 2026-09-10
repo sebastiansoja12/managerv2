@@ -19,9 +19,9 @@ public class AuthProperties {
         private String refreshName = "REFRESH-TOKEN";
         private String platformOwnerAccessName = "PLATFORM-AUTH-TOKEN";
         private String platformOwnerRefreshName = "PLATFORM-REFRESH-TOKEN";
-        private String platformOwnerRefreshPath = "/v2/api/platform/auth";
+        private String platformOwnerRefreshPath = "/v1/api/platform/auth";
         private String accessPath = "/";
-        private String refreshPath = "/v2/api/auth";
+        private String refreshPath = "/v1/api/auth";
         private String domain;
         private boolean secure;
         private String sameSite = "Lax";
@@ -32,7 +32,8 @@ public class AuthProperties {
         private List<String> allowedOrigins = List.of("http://localhost:3000", "https://managerv2gui.onrender.com",
                 "https://neighbors-billing-ownership-houston.trycloudflare.com");
         private List<String> allowedMethods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
-        private List<String> allowedHeaders = List.of("Content-Type", "X-XSRF-TOKEN", "X-Correlation-ID", "X-Requested-With");
+        private List<String> allowedHeaders = List.of("Content-Type", "X-XSRF-TOKEN", "X-Correlation-ID", "X-Requested-With",
+                "SOAPAction");
         private List<String> exposedHeaders = List.of("X-Correlation-ID");
         private long maxAgeSeconds = 3600;
     }

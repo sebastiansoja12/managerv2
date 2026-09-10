@@ -67,7 +67,7 @@ public class DevicePortImpl implements DevicePort {
         final DeviceNetwork deviceNetwork = command.getNetwork();
         final DeviceLocation deviceLocation = command.getLocation();
 		final OwnershipProfile ownershipProfile = OwnershipProfile.initializeOwnership("", userId, departmentCode,
-                null);
+                null, user.operatorId());
         
 		final Device device = 
                 getDevice(command, deviceType, deviceId, deviceDeviceIdentity, deviceHardware, deviceSoftware, deviceNetwork, deviceLocation, ownershipProfile);

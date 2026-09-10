@@ -1,37 +1,26 @@
 package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 
-import java.time.Instant;
-import java.util.Set;
-
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
-
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.Instant;
+import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "mobiles")
-public class MobileEntity {
+public class MobileEntity extends BelongsToOperator {
 
     public DeviceId getId() {
         return deviceId;

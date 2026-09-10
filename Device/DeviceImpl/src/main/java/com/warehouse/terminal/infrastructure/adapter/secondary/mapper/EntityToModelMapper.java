@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
@@ -31,7 +32,7 @@ public class EntityToModelMapper {
                 mapNetwork(entity.getNetwork()),
                 mapSecurity(entity.getSecurity()),
                 mapLocation(entity.getLocation()),
-                mapOwnership(entity.getUserId(), entity.getDepartmentCode(), entity.getOwnership()),
+                mapOwnership(entity.getUserId(), entity.getDepartmentCode(), entity.getOwnership(), entity.operatorId()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 coalesce(entity.getVersion(), appVersion(entity.getSoftware())),
@@ -50,7 +51,7 @@ public class EntityToModelMapper {
                 mapNetwork(entity.getNetwork()),
                 mapSecurity(entity.getSecurity()),
                 mapLocation(entity.getLocation()),
-                mapOwnership(entity.getUserId(), entity.getDepartmentCode(), entity.getOwnership()),
+                mapOwnership(entity.getUserId(), entity.getDepartmentCode(), entity.getOwnership(), entity.operatorId()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 coalesce(entity.getVersion(), appVersion(entity.getSoftware())),
@@ -66,7 +67,7 @@ public class EntityToModelMapper {
                 mapIdentity(entity.getIdentity()),
                 mapHardware(entity.getHardware()),
                 mapNetwork(entity.getNetwork()),
-                mapOwnership(entity.getUserId(), entity.getDepartmentCode(), entity.getOwnership()),
+                mapOwnership(entity.getUserId(), entity.getDepartmentCode(), entity.getOwnership(), entity.operatorId()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getScanType(),
@@ -189,7 +190,8 @@ public class EntityToModelMapper {
 
     private OwnershipProfile mapOwnership(final UserId userId,
                                           final DepartmentCode departmentCode,
-                                          final Ownership ownership) {
+                                          final Ownership ownership,
+                                          final OperatorId operatorId) {
         return new OwnershipProfile(
                 ownership != null ? ownership.getAssignedAt() : null,
                 ownership != null ? ownership.getAssignedRole() : null,
@@ -198,6 +200,7 @@ public class EntityToModelMapper {
                 ownership != null ? ownership.getTeamId() : null,
                 ownership != null ? ownership.getUnassignedAt() : null,
                 userId,
-                ownership != null ? ownership.getVehicleId() : null);
+                ownership != null ? ownership.getVehicleId() : null,
+                operatorId);
     }
 }

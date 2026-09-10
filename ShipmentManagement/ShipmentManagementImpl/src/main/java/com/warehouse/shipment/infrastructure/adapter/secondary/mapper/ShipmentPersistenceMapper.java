@@ -28,15 +28,9 @@ public class ShipmentPersistenceMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getLocked(),
-                entity.getTargetDepartmentId(),
-                entity.getOriginDepartmentId(),
                 entity.getSignatureRequired(),
                 entity.getShipmentPriority(),
                 entity.getTrackingNumber(),
-                entity.getPickupMethod(),
-                entity.getDeliveryMethod(),
-                entity.getPickupPointId(),
-                entity.getDeliveryPickupPointId(),
                 new ExternalId<>(UUID.fromString(entity.getExternalId().value())),
                 entity.getAcceptedAt(),
                 entity.getCancelledAt(),
@@ -63,15 +57,9 @@ public class ShipmentPersistenceMapper {
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getLocked(),
-                entity.getTargetDepartmentId(),
-                entity.getOriginDepartmentId(),
                 entity.getSignatureRequired(),
                 entity.getShipmentPriority(),
                 entity.getTrackingNumber(),
-                entity.getPickupMethod(),
-                entity.getDeliveryMethod(),
-                entity.getPickupPointId(),
-                entity.getDeliveryPickupPointId(),
                 new ExternalId<>(UUID.fromString(entity.getExternalId().value())),
                 entity.getAcceptedAt(),
                 entity.getCancelledAt(),
@@ -91,12 +79,6 @@ public class ShipmentPersistenceMapper {
                 .shipmentId(shipment.getShipmentId())
                 .sender(partyEntity(shipment.getSender()))
                 .recipient(partyEntity(shipment.getRecipient()))
-                .targetDepartmentId(shipment.getTargetDepartmentId())
-                .originDepartmentId(shipment.getOriginDepartmentId())
-                .pickupPointId(shipment.getPickupPointId())
-                .deliveryPickupPointId(shipment.getDeliveryPickupPointId())
-                .pickupMethod(shipment.getPickupMethod())
-                .deliveryMethod(shipment.getDeliveryMethod())
                 .shipmentStatus(shipment.getShipmentStatus())
                 .shipmentType(shipment.getShipmentType())
                 .shipmentRelatedId(shipment.getShipmentRelatedId())
@@ -127,12 +109,6 @@ public class ShipmentPersistenceMapper {
                 .shipmentId(snapshot.shipmentId())
                 .sender(partyEntity(snapshot.sender()))
                 .recipient(partyEntity(snapshot.recipient()))
-                .targetDepartmentId(snapshot.destinationDepartmentId())
-                .originDepartmentId(snapshot.originDepartmentId())
-                .pickupPointId(snapshot.pickupPointId())
-                .deliveryPickupPointId(snapshot.deliveryPickupPointId())
-                .pickupMethod(snapshot.pickupMethod())
-                .deliveryMethod(snapshot.deliveryMethod())
                 .shipmentStatus(snapshot.shipmentStatus())
                 .shipmentType(snapshot.shipmentType())
                 .shipmentRelatedId(snapshot.shipmentRelatedId())
