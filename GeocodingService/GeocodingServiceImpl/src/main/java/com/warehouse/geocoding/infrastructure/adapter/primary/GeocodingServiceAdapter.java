@@ -2,7 +2,7 @@ package com.warehouse.geocoding.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.enumeration.GeocodingProvider;
 import com.warehouse.geocoding.domain.model.GeocodingConfiguration;
-import com.warehouse.geocoding.domain.port.primary.GeocodingPort;
+import com.warehouse.geocoding.application.port.primary.GeocodingPort;
 import com.warehouse.geocoding.infrastructure.adapter.primary.mapper.GeocodingConfigurationApiMapper;
 import com.warehouse.infrastructure.GeocodingApiService;
 import com.warehouse.infrastructure.dto.GeocodingConfigurationDto;

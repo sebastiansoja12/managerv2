@@ -26,7 +26,7 @@ import com.warehouse.pickuppoint.infrastructure.adapter.secondary.PickupPointSea
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.entity.PickupPointEntity;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.entity.PickupPointReadEntity;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.mapper.PickupPointPersistenceMapper;
-import com.warehouse.voronoi.VoronoiCoordinatesService;
+import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -95,7 +95,7 @@ public class PickupPointConfiguration {
 
     @Bean
     public PickupPointCoordinatesServicePort pickupPointCoordinatesServicePort(
-            @Qualifier("voronoiCoordinatesService") final VoronoiCoordinatesService coordinatesService) {
+            final GeocodingCoordinatesService coordinatesService) {
         return new PickupPointCoordinatesServiceAdapter(coordinatesService);
     }
 

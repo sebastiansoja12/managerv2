@@ -3,7 +3,7 @@ package com.warehouse.geocoding.infrastructure.adapter.primary;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.warehouse.geocoding.domain.port.primary.GeocodingPort;
+import com.warehouse.geocoding.application.port.primary.GeocodingPort;
 import com.warehouse.geocoding.infrastructure.adapter.primary.mapper.GeocodingConfigurationApiMapper;
 import com.warehouse.infrastructure.event.OperatorGeocodingConfigurationCreateEvent;
 

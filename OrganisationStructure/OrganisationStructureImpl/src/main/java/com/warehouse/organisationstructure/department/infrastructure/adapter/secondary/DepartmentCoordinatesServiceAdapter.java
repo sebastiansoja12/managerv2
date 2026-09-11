@@ -3,25 +3,22 @@ package com.warehouse.organisationstructure.department.infrastructure.adapter.se
 import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentCoordinatesServicePort;
 import com.warehouse.organisationstructure.department.domain.vo.Address;
 import com.warehouse.organisationstructure.department.domain.vo.Coordinates;
-import com.warehouse.voronoi.VoronoiCoordinatesService;
-import com.warehouse.voronoi.VoronoiRequestDto;
-import com.warehouse.voronoi.dto.CoordinatesDto;
-
-import java.util.Collections;
+import com.warehouse.geocoding.api.GeocodingAddressDto;
+import com.warehouse.geocoding.api.GeocodingCoordinatesDto;
+import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 
 public class DepartmentCoordinatesServiceAdapter implements DepartmentCoordinatesServicePort {
 
-    private final VoronoiCoordinatesService voronoiCoordinatesService;
+    private final GeocodingCoordinatesService geocodingCoordinatesService;
 
-    public DepartmentCoordinatesServiceAdapter(final VoronoiCoordinatesService voronoiCoordinatesService) {
-        this.voronoiCoordinatesService = voronoiCoordinatesService;
+    public DepartmentCoordinatesServiceAdapter(final GeocodingCoordinatesService geocodingCoordinatesService) {
+        this.geocodingCoordinatesService = geocodingCoordinatesService;
     }
 
     @Override
     public Coordinates getCoordinates(final Address address) {
-        final VoronoiRequestDto request = new VoronoiRequestDto(address.city(), address.street(), address.postalCode(),
-                Collections.emptyList());
-        final CoordinatesDto coordinates = this.voronoiCoordinatesService.findCoordinates(request);
+        final GeocodingAddressDto request = new GeocodingAddressDto(address.city(), address.street(), address.postalCode());
+        final GeocodingCoordinatesDto coordinates = this.geocodingCoordinatesService.findCoordinates(request);
         return new Coordinates(coordinates.latitude(), coordinates.longitude());
     }
 }

@@ -89,7 +89,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>PathFinderCore</artifactId>
+            <artifactId>PathFinderImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

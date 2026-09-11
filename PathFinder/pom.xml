@@ -16,7 +16,7 @@
 
     <modules>
         <module>PathFinderApi</module>
-        <module>PathFinderCore</module>
+        <module>PathFinderImpl</module>
     </modules>
 
 </project>

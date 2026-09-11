@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>PathFinderApi</artifactId>
+            <artifactId>GeocodingServiceApi</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
