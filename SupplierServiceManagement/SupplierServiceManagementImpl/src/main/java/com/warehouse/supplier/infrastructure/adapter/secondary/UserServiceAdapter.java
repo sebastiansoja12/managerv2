@@ -1,27 +1,36 @@
 package com.warehouse.supplier.infrastructure.adapter.secondary;
 
-import org.springframework.web.client.RestClient;
-
+import com.warehouse.auth.SupplierUserEventPublisher;
+import com.warehouse.auth.event.SupplierCreatedEvent;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.supplier.domain.port.secondary.UserServicePort;
 import com.warehouse.supplier.domain.vo.SupplierSnapshot;
-import com.warehouse.supplier.infrastructure.adapter.secondary.api.RegisterRequestDto;
-import com.warehouse.supplier.infrastructure.adapter.secondary.mapper.OutputRequestMapper;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.atomic.AtomicReference;
 
-@Slf4j
 public class UserServiceAdapter implements UserServicePort {
 
-    private final RestClient restClient;
+    private final SupplierUserEventPublisher supplierUserEventPublisher;
 
-    public UserServiceAdapter() {
-        this.restClient = RestClient.builder().baseUrl("http://localhost:8080").build();
+    public UserServiceAdapter(final SupplierUserEventPublisher supplierUserEventPublisher) {
+        this.supplierUserEventPublisher = supplierUserEventPublisher;
     }
 
     @Override
     public UserId createUserForSupplier(final SupplierSnapshot snapshot) {
-        final RegisterRequestDto registerRequest = OutputRequestMapper.map(snapshot);
-        return null;
+        final AtomicReference<UserId> userCreatedId = new AtomicReference<>();
+        this.supplierUserEventPublisher.sendEvent(new SupplierCreatedEvent(
+                snapshot.supplierId(),
+                snapshot.supplierCode(),
+                snapshot.firstName(),
+                snapshot.lastName(),
+                snapshot.email(),
+                snapshot.departmentId(),
+                userCreatedId::set));
+        final UserId userId = userCreatedId.get();
+        if (userId == null) {
+            throw new IllegalStateException("Supplier user was not created");
+        }
+        return userId;
     }
 }

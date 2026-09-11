@@ -11,12 +11,14 @@ import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
 import com.warehouse.supplier.domain.port.secondary.DepartmentServicePort;
+import com.warehouse.supplier.domain.port.secondary.UserServicePort;
 import com.warehouse.supplier.domain.service.DriverLicenseService;
 import com.warehouse.supplier.domain.service.SupplierCodeGeneratorService;
 import com.warehouse.supplier.domain.service.SupplierService;
 import com.warehouse.supplier.domain.service.SupplierValidatorService;
 import com.warehouse.supplier.domain.vo.*;
 import com.warehouse.supplier.infrastructure.adapter.secondary.exception.SupplierNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
 import java.util.List;
@@ -35,35 +37,42 @@ public class SupplyPortImpl implements SupplyPort {
 
     private final DepartmentServicePort departmentServicePort;
 
+    private final UserServicePort userServicePort;
+
     public SupplyPortImpl(final SupplierService supplierService,
                           final SupplierCodeGeneratorService generatorService,
                           final SupplierValidatorService validatorService,
                           final DriverLicenseService driverLicenseService,
                           final DeviceServicePort deviceServicePort,
-                          final DepartmentServicePort departmentServicePort) {
+                          final DepartmentServicePort departmentServicePort,
+                          final UserServicePort userServicePort) {
         this.supplierService = supplierService;
         this.generatorService = generatorService;
         this.validatorService = validatorService;
         this.driverLicenseService = driverLicenseService;
         this.deviceServicePort = deviceServicePort;
         this.departmentServicePort = departmentServicePort;
+        this.userServicePort = userServicePort;
     }
 
     @Override
+    @Transactional
     public SupplierCreateResponse create(final SupplierCreateCommand supplierCreateCommand) {
         final SupplierCode supplierCode = this.generatorService.generate(supplierCreateCommand.supplierCode());
         validateNotExists(supplierCode);
         final String firstName = supplierCreateCommand.firstName();
         final String lastName = supplierCreateCommand.lastName();
         final String telephoneNumber = supplierCreateCommand.telephoneNumber();
+        final String email = supplierCreateCommand.email();
         final DepartmentCode departmentCode = supplierCreateCommand.departmentCode();
         if (!validatorService.validateDepartmentExistsByDepartmentCode(departmentCode)) {
             throw new RestClientException("Department not found");
         }
         final SupplierId supplierId = this.supplierService.nextSupplierId();
-		final Supplier supplier = new Supplier(supplierId, supplierCode, firstName, lastName, telephoneNumber);
         final DepartmentId departmentId = departmentServicePort.getDepartmentId(departmentCode);
-        supplier.changeDepartment(departmentId);
+        final Supplier supplier = new Supplier(supplierId, supplierCode, firstName, lastName, telephoneNumber, email,
+                departmentId);
+        supplier.markUserCreated(this.userServicePort.createUserForSupplier(supplier.snapshot()));
 
         this.supplierService.create(supplier);
 

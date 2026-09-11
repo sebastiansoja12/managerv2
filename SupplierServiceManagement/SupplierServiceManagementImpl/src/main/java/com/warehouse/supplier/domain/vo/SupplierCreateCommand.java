@@ -8,12 +8,13 @@ public record SupplierCreateCommand(
         String firstName,
         String lastName,
         String telephoneNumber,
+        String email,
         DepartmentCode departmentCode) {
 
     public SupplierCreateCommand(final SupplierCode supplierCode,
                                  final String firstName,
                                  final String lastName,
                                  final String telephoneNumber) {
-        this(supplierCode, firstName, lastName, telephoneNumber, null);
+        this(supplierCode, firstName, lastName, telephoneNumber, null, null);
     }
 }

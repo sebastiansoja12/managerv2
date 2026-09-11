@@ -23,6 +23,7 @@ public abstract class ResponseMapper {
                 supplier.getFirstName(),
                 supplier.getLastName(),
                 supplier.getTelephoneNumber(),
+                supplier.getEmail(),
                 departmentCode != null ? new DepartmentCodeApi(departmentCode.getValue()) : null,
                 supplier.getStatus() != null ? supplier.getStatus().name() : null,
                 supplier.getUserStatus() != null ? supplier.getUserStatus().name() : null,

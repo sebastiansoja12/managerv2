@@ -20,6 +20,7 @@ public class ModelToEntityMapper {
                 supplier.getFirstName(),
                 supplier.getLastName(),
                 supplier.getTelephoneNumber(),
+                supplier.getEmail(),
                 supplier.getStatus(),
                 supplier.getUserStatus(),
                 supplier.getVehicleId(),

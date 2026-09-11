@@ -33,5 +33,6 @@ public record SupplierSnapshot(
         Boolean termsAccepted,
         Instant createdAt,
         Instant updatedAt,
-        UserId createdUserId
+        UserId createdUserId,
+        String email
 ) {}
