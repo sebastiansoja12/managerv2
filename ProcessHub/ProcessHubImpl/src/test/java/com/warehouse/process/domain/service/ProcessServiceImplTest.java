@@ -6,9 +6,13 @@ import static com.warehouse.process.ProcessHubTestFixtures.processId;
 import static com.warehouse.process.ProcessHubTestFixtures.processLog;
 import static com.warehouse.process.ProcessHubTestFixtures.shipmentUpdated;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,10 +21,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.warehouse.commonassets.enumeration.ServiceType;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.process.domain.exception.ProcessLogNotFoundException;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.ProcessLog;
+import com.warehouse.process.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,12 +40,50 @@ class ProcessServiceImplTest {
     @Mock
     private ProcessRepository processRepository;
 
+    @Mock
+    private CurrentUserServicePort currentUserServicePort;
+
     private ProcessServiceImpl processService;
 
     @BeforeEach
     void setUp() {
         initializeDomainContext();
-        processService = new ProcessServiceImpl(processRepository);
+        processService = new ProcessServiceImpl(processRepository, currentUserServicePort);
+    }
+
+    @Test
+    void shouldReturnOnlyOwnProcessesForSupplier() {
+        final Pageable pageable = PageRequest.of(0, 20);
+        final Page<ProcessLog> ownProcesses = new PageImpl<>(List.of(processLog()));
+        when(currentUserServicePort.isCurrentUserSupplier()).thenReturn(true);
+        when(currentUserServicePort.getCurrentUserId()).thenReturn(new UserId(100L));
+        when(processRepository.findAllForUser(pageable, new UserId(100L))).thenReturn(ownProcesses);
+
+        final Page<ProcessLog> processes = processService.findAllForCurrentDepartment(pageable);
+
+        assertThat(processes).isSameAs(ownProcesses);
+        verify(processRepository, never()).findAllForCurrentDepartment(any());
+    }
+
+    @Test
+    void shouldReturnOperatorProcessesForWarehouseUser() {
+        final Pageable pageable = PageRequest.of(0, 20);
+        final Page<ProcessLog> operatorProcesses = new PageImpl<>(List.of(processLog()));
+        when(currentUserServicePort.isCurrentUserSupplier()).thenReturn(false);
+        when(processRepository.findAllForCurrentDepartment(pageable)).thenReturn(operatorProcesses);
+
+        assertThat(processService.findAllForCurrentDepartment(pageable)).isSameAs(operatorProcesses);
+    }
+
+    @Test
+    void shouldNotFindProcessOfAnotherCourierForSupplier() {
+        when(currentUserServicePort.isCurrentUserSupplier()).thenReturn(true);
+        when(currentUserServicePort.getCurrentUserId()).thenReturn(new UserId(200L));
+        when(processRepository.findByIdForUser(processId(), new UserId(200L))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> processService.findByIdForCurrentDepartment(processId()))
+                .isInstanceOf(ProcessLogNotFoundException.class);
+        verify(processRepository, never()).findByIdForCurrentDepartment(any());
     }
 
     @Test

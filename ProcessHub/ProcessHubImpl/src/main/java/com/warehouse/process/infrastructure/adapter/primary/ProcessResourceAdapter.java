@@ -8,6 +8,7 @@ import com.warehouse.process.domain.port.primary.ProcessPort;
 import com.warehouse.process.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.process.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.process.infrastructure.dto.InitializeProcessRequestDto;
+import com.warehouse.process.infrastructure.dto.ProcessDetailsDto;
 import com.warehouse.process.infrastructure.dto.ProcessIdDto;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,5 +30,10 @@ public class ProcessResourceAdapter implements ProcessHubApiService {
         final InitializeProcessCommand command = RequestMapper.map(request, currentOperatorService.getCurrentOperatorId());
         final ProcessId processId = this.processPort.initialize(command);
         return ResponseMapper.map(processId);
+    }
+
+    @Override
+    public ProcessDetailsDto getProcess(final ProcessIdDto processId) {
+        return ResponseMapper.map(this.processPort.findByIdForCurrentDepartment(new ProcessId(processId.value())));
     }
 }

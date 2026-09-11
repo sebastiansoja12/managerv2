@@ -6,6 +6,8 @@ import com.warehouse.process.domain.port.secondary.CurrentUserServicePort;
 
 public class CurrentUserServiceAdapter implements CurrentUserServicePort {
 
+    private static final String SUPPLIER_ROLE = "SUPPLIER";
+
     private final CurrentUserApiService currentUserApiService;
 
     public CurrentUserServiceAdapter(final CurrentUserApiService currentUserApiService) {
@@ -15,5 +17,10 @@ public class CurrentUserServiceAdapter implements CurrentUserServicePort {
     @Override
     public UserId getCurrentUserId() {
         return currentUserApiService.getCurrentUserId();
+    }
+
+    @Override
+    public boolean isCurrentUserSupplier() {
+        return SUPPLIER_ROLE.equalsIgnoreCase(currentUserApiService.getCurrentUser().role());
     }
 }

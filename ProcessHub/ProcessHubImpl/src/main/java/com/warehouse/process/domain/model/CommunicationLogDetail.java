@@ -95,6 +95,9 @@ public class CommunicationLogDetail {
         this.deviceId = deviceValidation.deviceId();
         this.sourceService = deviceValidation.sourceServiceType().name();
         this.targetService = deviceValidation.targetServiceType().name();
+        this.request = deviceValidation.request();
+        this.response = deviceValidation.response();
+        this.faultDescription = deviceValidation.faultDescription();
         this.createdAt = Instant.now();
         this.updatedBy = DomainContext.currentUserServicePort().getCurrentUserId();
         this.createdBy = DomainContext.currentUserServicePort().getCurrentUserId();

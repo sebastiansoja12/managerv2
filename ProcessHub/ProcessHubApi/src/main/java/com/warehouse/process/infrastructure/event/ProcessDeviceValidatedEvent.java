@@ -15,14 +15,33 @@ public class ProcessDeviceValidatedEvent implements ProcessLogEvent {
     private final ServiceType sourceServiceType;
     private final ServiceType targetServiceType = ServiceType.TERMINAL;
     private final LocalDateTime timestamp;
+    private final String request;
+    private final String response;
+    private final String faultDescription;
 
     public ProcessDeviceValidatedEvent(final ProcessId processId, final DeviceId deviceId, final ProcessType processType,
-                                       final ServiceType sourceServiceType) {
+                                       final ServiceType sourceServiceType, final String request,
+                                       final String response, final String faultDescription) {
         this.processId = processId;
         this.deviceId = deviceId;
         this.processType = processType;
         this.sourceServiceType = sourceServiceType;
         this.timestamp = LocalDateTime.now();
+        this.request = request;
+        this.response = response;
+        this.faultDescription = faultDescription;
+    }
+
+    public String getRequest() {
+        return request;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public String getFaultDescription() {
+        return faultDescription;
     }
 
     public ProcessId getProcessId() {
