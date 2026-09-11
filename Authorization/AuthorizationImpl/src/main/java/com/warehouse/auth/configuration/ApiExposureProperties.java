@@ -2,6 +2,7 @@ package com.warehouse.auth.configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -13,7 +14,7 @@ public class ApiExposureProperties {
     private String internalPrefix = "/internal";
 
     private List<String> internalControllerPaths = new ArrayList<>(List.of(
-            "/device-pairings",
+            "/device-activations",
             "/device-pairing-verifications",
             "/shipments/read-sync"
     ));
@@ -22,8 +23,12 @@ public class ApiExposureProperties {
             "/device-pairing-verifications"
     ));
 
+    private List<String> mcpPaths = new ArrayList<>(List.of(
+            "/mcp"
+    ));
+
     private List<PublicEndpoint> publicEndpoints = new ArrayList<>(List.of(
-            new PublicEndpoint("POST", "/device-pairings")
+            new PublicEndpoint("POST", "/device-activations")
     ));
 
     public String getInternalPrefix() {
@@ -48,6 +53,28 @@ public class ApiExposureProperties {
 
     public void setPairKeyControllerPaths(final List<String> pairKeyControllerPaths) {
         this.pairKeyControllerPaths = pairKeyControllerPaths;
+    }
+
+    public List<String> getMcpPaths() {
+        return mcpPaths;
+    }
+
+    public void setMcpPaths(final List<String> mcpPaths) {
+        this.mcpPaths = mcpPaths;
+    }
+
+    public boolean isMcpPath(final HttpServletRequest request) {
+        final String normalizedPath = requestPathWithoutContext(request);
+        return mcpPaths.stream()
+                .map(this::normalizePath)
+                .anyMatch(path -> normalizedPath.equals(path) || normalizedPath.startsWith(path + "/"));
+    }
+
+    public String[] mcpSecurityMatchers() {
+        return mcpPaths.stream()
+                .map(this::normalizePath)
+                .flatMap(path -> Stream.of(path, path + "/**"))
+                .toArray(String[]::new);
     }
 
     public List<PublicEndpoint> getPublicEndpoints() {

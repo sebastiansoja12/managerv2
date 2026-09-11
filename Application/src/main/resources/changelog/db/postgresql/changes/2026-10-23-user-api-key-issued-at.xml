@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-23-users-api-key-issued-at" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="users" columnName="api_key_issued_at"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="users">
+            <column name="api_key_issued_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2026-10-23-users-api-key-index" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="users" indexName="idx_users_api_key"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="users" indexName="idx_users_api_key">
+            <column name="api_key"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

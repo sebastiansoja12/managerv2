@@ -40,6 +40,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
     private String language;
 
     private String apiKey;
+    private Instant apiKeyIssuedAt;
 
     private Set<RolePermission> permissions;
 
@@ -235,6 +236,14 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         this.apiKey = apiKey;
     }
 
+    public Instant getApiKeyIssuedAt() {
+        return apiKeyIssuedAt;
+    }
+
+    public void setApiKeyIssuedAt(final Instant apiKeyIssuedAt) {
+        this.apiKeyIssuedAt = apiKeyIssuedAt;
+    }
+
     public String getLanguage() {
         return language == null || language.isBlank() ? "pl" : language;
     }
@@ -343,7 +352,18 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
 
     public void changeApiKey(final String apiKey) {
         this.apiKey = apiKey;
+        this.apiKeyIssuedAt = null;
         markAsModified();
+    }
+
+    public void issueApiKey(final String apiKeyHash, final Instant issuedAt) {
+        this.apiKey = apiKeyHash;
+        this.apiKeyIssuedAt = issuedAt;
+        markAsModified();
+    }
+
+    public boolean canAuthenticateWithApiKey() {
+        return hasApiKey() && apiKeyIssuedAt != null && !Boolean.TRUE.equals(deleted);
     }
 
     public OrganizationUser changeRole(final Role role) {
@@ -369,6 +389,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
         this.departmentId = source.departmentId;
         this.language = source.language;
         this.apiKey = source.apiKey;
+        this.apiKeyIssuedAt = source.apiKeyIssuedAt;
         this.permissions = new HashSet<>(source.getPermissions());
         this.deleted = source.deleted;
         this.initial = source.initial;
@@ -417,6 +438,7 @@ public abstract class OrganizationUser extends BelongsToOperator implements Acco
     public void markAsDeleted() {
         this.deleted = true;
         this.apiKey = null;
+        this.apiKeyIssuedAt = null;
         getPermissions().clear();
         markAsModified();
     }
