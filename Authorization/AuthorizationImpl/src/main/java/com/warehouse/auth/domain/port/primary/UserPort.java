@@ -1,7 +1,7 @@
 package com.warehouse.auth.domain.port.primary;
 
 import com.warehouse.auth.domain.helper.Result;
-import com.warehouse.auth.domain.model.FullNameRequest;
+import com.warehouse.auth.domain.model.FullNameChangeCommand;
 import com.warehouse.auth.domain.model.User;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
@@ -22,11 +22,13 @@ public interface UserPort {
 
     User update(final UpdateUserCommand command);
 
-    void updateFullName(final FullNameRequest request);
-
     void changePassword(final UserId userId, final String encodedPassword);
 
     void changeLanguage(final UserId userId, final String language);
+
+    String regenerateApiKey(final UserId userId);
+
+    void deleteApiKey(final UserId userId);
 
     void changeRole(final UserId userId, final User.Role role);
 
@@ -39,4 +41,6 @@ public interface UserPort {
     void deleteDataForDepartment(final DepartmentCode departmentCode);
 
     DepartmentCode getDepartmentCode(final DepartmentId departmentId);
+
+    void changeFullName(final FullNameChangeCommand fullNameChangeCommand);
 }

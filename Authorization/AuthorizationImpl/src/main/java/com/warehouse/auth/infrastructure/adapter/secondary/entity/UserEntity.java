@@ -55,7 +55,7 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
     @Column(name = "language", nullable = false)
     private String language;
 
-    @Column(name = "api_key", nullable = false)
+    @Column(name = "api_key")
     private String apiKey;
 
     @ManyToMany(fetch = FetchType.EAGER)

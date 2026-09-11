@@ -2,20 +2,17 @@ package com.warehouse.auth.domain.model;
 
 import com.warehouse.commonassets.identificator.UserId;
 
-public class FullNameRequest {
+public class FullNameChangeCommand {
     private UserId userId;
 
     private String firstName;
 
     private String lastName;
 
-    private String username;
-
-    public FullNameRequest(final String firstName, final String lastName, final String username,
-                           final UserId userId) {
+    public FullNameChangeCommand(final String firstName, final String lastName,
+                                 final UserId userId) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.username = username;
         this.userId = userId;
     }
 
@@ -41,13 +38,5 @@ public class FullNameRequest {
 
     public UserId getUserId() {
         return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(final String username) {
-        this.username = username;
     }
 }
