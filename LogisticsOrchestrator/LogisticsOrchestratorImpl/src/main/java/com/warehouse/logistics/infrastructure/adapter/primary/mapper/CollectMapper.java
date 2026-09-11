@@ -47,7 +47,6 @@ public class CollectMapper {
     private CollectResponseDetailType map(final ShipmentCollectDetail detail) {
         final CollectResponseDetailType responseDetail = new CollectResponseDetailType();
         responseDetail.setTrackingNumber(detail.trackingNumber().value());
-        responseDetail.setShipmentID(detail.shipmentId() != null ? detail.shipmentId().getValue() : null);
         responseDetail.setSuccess(detail.collected());
         responseDetail.setErrorMessage(detail.errorMessage());
         return responseDetail;

@@ -21,6 +21,9 @@ import com.warehouse.deliveryreject.domain.vo.ShipmentRejectResponse;
 import com.warehouse.terminal.DeviceInformation;
 
 import lombok.extern.slf4j.Slf4j;
+import com.warehouse.deliveryreject.domain.exception.ShipmentNotIdentifiedException;
+import com.warehouse.deliveryreject.domain.port.secondary.ShipmentIdentificationServicePort;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 @Slf4j
 public class DeliveryRejectPortImpl implements DeliveryRejectPort {
@@ -32,15 +35,18 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
     private final PersonShipmentServicePort personShipmentServicePort;
 
     private final DeliveryRejectConverterService deliveryRejectConverterService;
+    private final ShipmentIdentificationServicePort shipmentIdentificationServicePort;
 
     public DeliveryRejectPortImpl(final RejectService rejectService,
                                   final RejectShipmentServicePort rejectShipmentServicePort,
                                   final PersonShipmentServicePort personShipmentServicePort,
-                                  final DeliveryRejectConverterService deliveryRejectConverterService) {
+                                  final DeliveryRejectConverterService deliveryRejectConverterService,
+                                  final ShipmentIdentificationServicePort shipmentIdentificationServicePort) {
         this.rejectService = rejectService;
         this.rejectShipmentServicePort = rejectShipmentServicePort;
         this.personShipmentServicePort = personShipmentServicePort;
         this.deliveryRejectConverterService = deliveryRejectConverterService;
+        this.shipmentIdentificationServicePort = shipmentIdentificationServicePort;
     }
 
     @Override
@@ -49,6 +55,7 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
         final DeviceInformation device = deliveryRejectRequest.getDeviceInformation();
 
         deliveryRejectRequest.validateStatuses();
+        identifyShipments(deliveryRejectRequest);
 
         deliveryRejectRequest.rewriteDepartmentCodeFromDevice();
 
@@ -67,13 +74,25 @@ public class DeliveryRejectPortImpl implements DeliveryRejectPort {
                 .stream()
                 .collect(Collectors.toMap(response -> response.shipmentId().getValue(), Function.identity()));
 
+        final Map<Long, TrackingNumber> trackingNumbers = deliveryRejectRequest.getDeliveryRejectDetails().stream()
+                .collect(Collectors.toMap(detail -> detail.getShipmentId().getValue(), DeliveryRejectDetails::getTrackingNumber,
+                        (first, second) -> first));
+
         final List<DeliveryRejectResponseDetails> rejectResponseDetails = deliveryRejects.stream()
                 .map(deliveryReject -> deliveryRejectConverterService.convertToDeliveryRejectResponseDetails(
                         deliveryReject,
-                        shipmentRejectResponses.get(deliveryReject.getShipmentId().getValue())))
+                        shipmentRejectResponses.get(deliveryReject.getShipmentId().getValue()),
+                        trackingNumbers.get(deliveryReject.getShipmentId().getValue())))
                 .toList();
 
         return new DeliveryRejectResponse(rejectResponseDetails, deliveryRejectRequest.getDeviceInformation());
+    }
+
+    private void identifyShipments(final DeliveryRejectRequest deliveryRejectRequest) {
+        for (final DeliveryRejectDetails detail : deliveryRejectRequest.getDeliveryRejectDetails()) {
+            detail.setShipmentId(this.shipmentIdentificationServicePort.findShipmentId(detail.getTrackingNumber())
+                    .orElseThrow(() -> new ShipmentNotIdentifiedException(detail.getTrackingNumber())));
+        }
     }
 
     private List<ShipmentRejectResponse> notifyShipmentReject(final DeliveryRejectRequest deliveryRejectRequest) {

@@ -3,34 +3,34 @@ package com.warehouse.logistics.infrastructure.adapter.primary.process;
 import com.warehouse.logistics.domain.vo.ReturnToken;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.identificator.SupplierCode;
 
 public class DeliveryReturnDetails {
-    private ShipmentId shipmentId;
+    private TrackingNumber trackingNumber;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
     private DeliveryStatus deliveryStatus;
     private ReturnToken returnToken;
 
-    public DeliveryReturnDetails(final ShipmentId shipmentId,
+    public DeliveryReturnDetails(final TrackingNumber trackingNumber,
                                  final DepartmentCode departmentCode,
                                  final SupplierCode supplierCode,
                                  final DeliveryStatus deliveryStatus,
                                  final ReturnToken returnToken) {
-        this.shipmentId = shipmentId;
+        this.trackingNumber = trackingNumber;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deliveryStatus = deliveryStatus;
         this.returnToken = returnToken;
     }
 
-    public ShipmentId getShipmentId() {
-        return shipmentId;
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
     }
 
-    public void setShipmentId(final ShipmentId shipmentId) {
-        this.shipmentId = shipmentId;
+    public void setTrackingNumber(final TrackingNumber trackingNumber) {
+        this.trackingNumber = trackingNumber;
     }
 
     public DepartmentCode getDepartmentCode() {

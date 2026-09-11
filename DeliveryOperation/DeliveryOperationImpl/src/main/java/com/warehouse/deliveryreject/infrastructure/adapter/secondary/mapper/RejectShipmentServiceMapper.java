@@ -9,6 +9,7 @@ import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestItemDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseItemDto;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 public class RejectShipmentServiceMapper {
 
@@ -40,7 +41,8 @@ public class RejectShipmentServiceMapper {
                 new ShipmentId(response.newShipmentId()),
                 response.loggedInTracker(),
                 response.success(),
-                response.errorMessage()
+                response.errorMessage(),
+                response.newTrackingNumber() == null ? null : new TrackingNumber(response.newTrackingNumber())
         );
     }
 }

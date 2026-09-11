@@ -10,6 +10,7 @@ import com.warehouse.deliverymissed.domain.service.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedServiceImpl;
 import com.warehouse.deliverymissed.domain.service.SuggestedActionDetermineService;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.*;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
 
 @Configuration
@@ -18,9 +19,15 @@ public class DeliveryMissedConfiguration {
 	@Bean
 	public DeliveryMissedPort deliveryMissedPort(final DeliveryMissedService deliveryMissedService,
 												 final DeliveryInstructionServicePort deliveryInstructionServicePort,
-												 final SuggestedActionDetermineService suggestedActionDetermineService) {
+												 final SuggestedActionDetermineService suggestedActionDetermineService,
+												 final ShipmentIdentificationServicePort shipmentIdentificationServicePort) {
 		return new DeliveryMissedPortImpl(deliveryMissedService, deliveryInstructionServicePort,
-				suggestedActionDetermineService);
+				suggestedActionDetermineService, shipmentIdentificationServicePort);
+	}
+
+	@Bean("deliveryMissed.shipmentIdentificationServicePort")
+	public ShipmentIdentificationServicePort shipmentIdentificationServicePort(final ShipmentApiService shipmentApiService) {
+		return new ShipmentIdentificationServiceAdapter(shipmentApiService);
 	}
 
 	@Bean

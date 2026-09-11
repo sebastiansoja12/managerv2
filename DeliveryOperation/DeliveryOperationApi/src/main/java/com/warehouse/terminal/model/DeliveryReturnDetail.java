@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DeliveryReturnDetail {
 
-    @XmlElement(name = "ShipmentID")
-    private Long shipmentId;
+    @XmlElement(name = "TrackingNumber")
+    private String trackingNumber;
 
     @XmlElement(name = "DeliveryStatus")
     private String deliveryStatus;

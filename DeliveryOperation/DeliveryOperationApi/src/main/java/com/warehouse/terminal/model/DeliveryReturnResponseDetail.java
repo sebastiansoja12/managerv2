@@ -23,8 +23,11 @@ public class DeliveryReturnResponseDetail {
     @XmlElement(name = "DepartmentCode")
     private String departmentCode;
 
-    @XmlElement(name = "ShipmentID")
-    private Long shipmentId;
+    @XmlElement(name = "TrackingNumber")
+    private String trackingNumber;
+
+    @XmlElement(name = "NewTrackingNumber")
+    private String newTrackingNumber;
 
     @XmlElement(name = "ReturnToken")
     private String returnToken;

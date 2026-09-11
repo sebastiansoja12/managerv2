@@ -4,6 +4,7 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 public class DeliveryRejectResponseDetails {
     private final RejectReasonId rejectReasonId;
@@ -15,6 +16,8 @@ public class DeliveryRejectResponseDetails {
     private final DeliveryStatus deliveryStatus;
     private final Boolean success;
     private final String errorMessage;
+    private final TrackingNumber trackingNumber;
+    private final TrackingNumber newTrackingNumber;
 
     public DeliveryRejectResponseDetails(final RejectReasonId rejectReasonId,
                                          final ShipmentId shipmentId,
@@ -24,7 +27,7 @@ public class DeliveryRejectResponseDetails {
                                          final RejectReason rejectReason,
                                          final DeliveryStatus deliveryStatus) {
         this(rejectReasonId, shipmentId, newShipmentId, supplierCode, departmentCode, rejectReason, deliveryStatus,
-                null, null);
+                null, null, null, null);
     }
 
     public DeliveryRejectResponseDetails(final RejectReasonId rejectReasonId,
@@ -35,7 +38,9 @@ public class DeliveryRejectResponseDetails {
                                          final RejectReason rejectReason,
                                          final DeliveryStatus deliveryStatus,
                                          final Boolean success,
-                                         final String errorMessage) {
+                                         final String errorMessage,
+                                         final TrackingNumber trackingNumber,
+                                         final TrackingNumber newTrackingNumber) {
         this.rejectReasonId = rejectReasonId;
         this.shipmentId = shipmentId;
         this.newShipmentId = newShipmentId;
@@ -45,6 +50,16 @@ public class DeliveryRejectResponseDetails {
         this.deliveryStatus = deliveryStatus;
         this.success = success;
         this.errorMessage = errorMessage;
+        this.trackingNumber = trackingNumber;
+        this.newTrackingNumber = newTrackingNumber;
+    }
+
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public TrackingNumber getNewTrackingNumber() {
+        return newTrackingNumber;
     }
 
     public RejectReasonId getRejectReasonId() {

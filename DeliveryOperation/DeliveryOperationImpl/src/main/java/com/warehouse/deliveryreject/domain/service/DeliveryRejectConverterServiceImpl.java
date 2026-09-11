@@ -9,6 +9,7 @@ import com.warehouse.deliveryreject.domain.model.DeliveryRejectDetails;
 import com.warehouse.deliveryreject.domain.vo.DeliveryRejectResponseDetails;
 import com.warehouse.deliveryreject.domain.vo.Person;
 import com.warehouse.deliveryreject.domain.vo.RejectReasonId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 @Service
 public class DeliveryRejectConverterServiceImpl implements DeliveryRejectConverterService {
@@ -20,12 +21,17 @@ public class DeliveryRejectConverterServiceImpl implements DeliveryRejectConvert
     }
 
     @Override
-    public DeliveryRejectResponseDetails convertToDeliveryRejectResponseDetails(final DeliveryReject deliveryReject, final ShipmentRejectResponse response) {
+    public DeliveryRejectResponseDetails convertToDeliveryRejectResponseDetails(final DeliveryReject deliveryReject,
+                                                                        final ShipmentRejectResponse response,
+                                                                        final TrackingNumber trackingNumber) {
         final RejectReasonId rejectReasonId = deliveryReject.getRejectReasonId();
         final ShipmentId shipmentId = deliveryReject.getShipmentId();
         final ShipmentId newShipmentId = response == null || response.newShipmentId() == null
                 ? shipmentId
                 : response.newShipmentId();
+        final TrackingNumber newTrackingNumber = response != null && response.newTrackingNumber() != null
+                ? response.newTrackingNumber()
+                : newShipmentId.equals(shipmentId) ? trackingNumber : null;
 
         return new DeliveryRejectResponseDetails(
                 rejectReasonId,
@@ -36,7 +42,9 @@ public class DeliveryRejectConverterServiceImpl implements DeliveryRejectConvert
                 deliveryReject.getRejectReason(),
                 deliveryReject.getDeliveryStatus(),
                 response == null ? null : response.success(),
-                response == null ? null : response.errorMessage()
+                response == null ? null : response.errorMessage(),
+                trackingNumber,
+                newTrackingNumber
         );
     }
 }
