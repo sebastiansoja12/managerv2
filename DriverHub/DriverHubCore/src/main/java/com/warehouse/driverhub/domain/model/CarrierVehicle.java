@@ -12,18 +12,23 @@ public class CarrierVehicle {
 
     private final VehicleId vehicleId;
     private String registrationNumber;
+    private String brand;
+    private String model;
     private VehicleType vehicleType;
     private String trailerRegistrationNumber;
     private BigDecimal maxLoadKg;
     private boolean active;
 
-    public CarrierVehicle(final VehicleId vehicleId, final String registrationNumber, final VehicleType vehicleType,
-                          final String trailerRegistrationNumber, final BigDecimal maxLoadKg, final boolean active) {
+    public CarrierVehicle(final VehicleId vehicleId, final String registrationNumber, final String brand,
+                          final String model, final VehicleType vehicleType, final String trailerRegistrationNumber,
+                          final BigDecimal maxLoadKg, final boolean active) {
         if (vehicleId == null || vehicleId.value() == null) {
             throw new IllegalArgumentException("Vehicle id is required");
         }
         this.vehicleId = vehicleId;
         this.registrationNumber = requiredRegistration(registrationNumber);
+        this.brand = Text.trim(brand);
+        this.model = Text.trim(model);
         this.vehicleType = vehicleType == null ? VehicleType.TRUCK : vehicleType;
         this.trailerRegistrationNumber = optionalRegistration(trailerRegistrationNumber);
         this.maxLoadKg = validMaxLoad(maxLoadKg);
@@ -42,6 +47,8 @@ public class CarrierVehicle {
             }
             case VehicleChange.TrailerRegistrationNumber trailerChange ->
                     this.trailerRegistrationNumber = optionalRegistration(trailerChange.value());
+            case VehicleChange.Brand brandChange -> this.brand = Text.trim(brandChange.value());
+            case VehicleChange.Model modelChange -> this.model = Text.trim(modelChange.value());
             case VehicleChange.MaxLoad maxLoadChange -> this.maxLoadKg = validMaxLoad(maxLoadChange.value());
             case VehicleChange.Active activeChange -> this.active = activeChange.value();
         }
@@ -75,6 +82,14 @@ public class CarrierVehicle {
 
     public String getRegistrationNumber() {
         return registrationNumber;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public String getModel() {
+        return model;
     }
 
     public VehicleType getVehicleType() {

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Envers writes one audit row per collection element, so the element must be part of the key.
+        Without it, saving a delivery area with two or more postal codes (or two or more package types)
+        in one revision violated the primary key.
+    -->
+    <changeSet id="2026-10-24-delivery-area-postal-codes-aud-key" author="s-soja">
+        <delete tableName="delivery_area_postal_codes_aud">
+            <where>postal_code IS NULL</where>
+        </delete>
+        <addNotNullConstraint tableName="delivery_area_postal_codes_aud" columnName="postal_code" columnDataType="VARCHAR(20)"/>
+        <dropPrimaryKey tableName="delivery_area_postal_codes_aud" constraintName="pk_delivery_area_postal_codes_aud"/>
+        <addPrimaryKey tableName="delivery_area_postal_codes_aud" constraintName="pk_delivery_area_postal_codes_aud"
+                       columnNames="rev, delivery_area_id, postal_code"/>
+    </changeSet>
+    <changeSet id="2026-10-24-carrier-vehicles-brand-model" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="carrier_vehicles" columnName="brand"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="carrier_vehicles">
+            <column name="brand" type="VARCHAR(64)"/>
+            <column name="model" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2026-10-24-suppliers-supported-package-types-aud-key" author="s-soja">
+        <delete tableName="suppliers_supported_package_types_aud">
+            <where>package_type IS NULL</where>
+        </delete>
+        <addNotNullConstraint tableName="suppliers_supported_package_types_aud" columnName="package_type" columnDataType="VARCHAR(50)"/>
+        <dropPrimaryKey tableName="suppliers_supported_package_types_aud" constraintName="pk_suppliers_supported_package_types_aud"/>
+        <addPrimaryKey tableName="suppliers_supported_package_types_aud" constraintName="pk_suppliers_supported_package_types_aud"
+                       columnNames="rev, supplier_id, package_type"/>
+    </changeSet>
+</databaseChangeLog>

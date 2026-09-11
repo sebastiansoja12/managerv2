@@ -15,6 +15,12 @@ public sealed interface VehicleChange {
     record TrailerRegistrationNumber(String value) implements VehicleChange {
     }
 
+    record Brand(String value) implements VehicleChange {
+    }
+
+    record Model(String value) implements VehicleChange {
+    }
+
     record MaxLoad(BigDecimal value) implements VehicleChange {
     }
 
