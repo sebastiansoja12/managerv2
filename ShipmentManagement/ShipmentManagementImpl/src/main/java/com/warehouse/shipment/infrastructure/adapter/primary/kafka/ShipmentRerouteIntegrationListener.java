@@ -41,6 +41,6 @@ public class ShipmentRerouteIntegrationListener {
         }
 
         operatorContext.runAs(context.operatorId(), null, null, () -> shipmentPort.reroute(mapper.map(event)));
-        log.info("Shipment {} rerouted (reroute token {})", event.trackingNumber(), event.rerouteTokenId());
+        log.info("Shipment {} rerouted by {}", event.trackingNumber(), event.sender().email());
     }
 }
