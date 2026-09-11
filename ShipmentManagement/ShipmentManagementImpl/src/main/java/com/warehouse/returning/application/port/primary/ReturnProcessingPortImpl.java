@@ -34,7 +34,8 @@ public class ReturnProcessingPortImpl implements ReturnProcessingPort {
         operatorContext.runAs(command.operatorId(), command.userId(), command.departmentId(),
                 () -> transactionTemplate.executeWithoutResult(status -> {
                     if (!returnConsumedEventServicePort.lockAndCheckCancelled(command.returnPackageId())
-                            && returnConsumedEventServicePort.tryConsume(command.eventId())) {
+                            && returnConsumedEventServicePort.tryConsume(command.eventId())
+                            && !alreadyReturned(command.shipmentId())) {
                         shipmentServicePort.markReturned(command.shipmentId());
                     }
                 }));
@@ -62,6 +63,11 @@ public class ReturnProcessingPortImpl implements ReturnProcessingPort {
             case CREATED, PROCESSING -> { }
         }
     }
+    // A courier may already have returned the shipment from the terminal, which created the return shipment.
+    private boolean alreadyReturned(final ShipmentId shipmentId) {
+        return shipmentServicePort.getShipment(shipmentId).status() == ShipmentStatus.RETURN;
+    }
+
     private void cancelShipmentReturn(final ShipmentId shipmentId) {
         final ReturnableShipment shipment = shipmentServicePort.getShipment(shipmentId);
         if (shipment.status() == ShipmentStatus.RETURN) {

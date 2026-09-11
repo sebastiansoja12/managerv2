@@ -68,6 +68,8 @@ class ReturnConsumedEventTransactionTest {
             }
             return null;
         }).when(shipments).markReturned(new ShipmentId(1L));
+        when(shipments.getShipment(new ShipmentId(1L))).thenAnswer(invocation -> new com.warehouse.returning.domain.model.ReturnableShipment(
+                new ShipmentId(1L), ShipmentStatus.valueOf(jdbc.queryForObject("SELECT status FROM test_shipment", String.class)), null));
         final ReturnProcessingPortImpl port = new ReturnProcessingPortImpl(
                 shipments, consumed, new OperatorContext(), transactions);
         final ApplyReturnProcessingStartedCommand command = new ApplyReturnProcessingStartedCommand(

@@ -3,6 +3,7 @@ package com.warehouse.deliveryreturn.infrastructure.api.dto;
 import com.warehouse.delivery.dto.DeliveryStatusDto;
 import com.warehouse.delivery.dto.DepartmentCodeDto;
 import com.warehouse.delivery.dto.SupplierCodeDto;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 public class DeliveryReturnResponseDetailsDto {
     private final ProcessIdDto processId;
@@ -13,6 +14,9 @@ public class DeliveryReturnResponseDetailsDto {
     private final ReturnTokenDto returnToken;
     private final UpdateStatusDto updateStatus;
     private final String errorMessage;
+    private final TrackingNumber trackingNumber;
+    private final ShipmentIdDto newShipmentId;
+    private final TrackingNumber newTrackingNumber;
 
 
     public DeliveryReturnResponseDetailsDto(final ProcessIdDto processId,
@@ -22,7 +26,10 @@ public class DeliveryReturnResponseDetailsDto {
                                             final DeliveryStatusDto deliveryStatus,
                                             final ReturnTokenDto returnToken,
                                             final UpdateStatusDto updateStatus,
-                                            final String errorMessage) {
+                                            final String errorMessage,
+                                            final TrackingNumber trackingNumber,
+                                            final ShipmentIdDto newShipmentId,
+                                            final TrackingNumber newTrackingNumber) {
         this.processId = processId;
         this.shipmentId = shipmentId;
         this.departmentCode = departmentCode;
@@ -31,6 +38,21 @@ public class DeliveryReturnResponseDetailsDto {
         this.returnToken = returnToken;
         this.updateStatus = updateStatus;
         this.errorMessage = errorMessage;
+        this.trackingNumber = trackingNumber;
+        this.newShipmentId = newShipmentId;
+        this.newTrackingNumber = newTrackingNumber;
+    }
+
+    public ShipmentIdDto getNewShipmentId() {
+        return newShipmentId;
+    }
+
+    public TrackingNumber getNewTrackingNumber() {
+        return newTrackingNumber;
+    }
+
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
     }
 
     public SupplierCodeDto getSupplierCode() {

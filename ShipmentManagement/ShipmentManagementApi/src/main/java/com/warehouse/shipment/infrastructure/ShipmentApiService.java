@@ -6,9 +6,12 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDocumentDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentHandoverRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRerouteDetailsDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentReturnResponseDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentTrackingDto;
 import com.warehouse.shipment.infrastructure.dto.SourceShipmentDto;
 
 public interface ShipmentApiService {
@@ -16,7 +19,11 @@ public interface ShipmentApiService {
 
     ShipmentDocumentDto getShipmentDocument(final ShipmentId shipmentId);
 
+    ShipmentTrackingDto getShipmentTracking(final TrackingNumber trackingNumber);
+
     ShipmentDetailsDto collectShipment(final TrackingNumber trackingNumber);
+
+    ShipmentDetailsDto handOverShipment(final ShipmentHandoverRequestDto shipmentHandoverRequest);
 
     ShipmentDetailsDto loadShipmentOnPallet(final ShipmentId shipmentId);
 
@@ -27,6 +34,9 @@ public interface ShipmentApiService {
     ShipmentRejectResponseDto rejectShipment(final ShipmentRejectRequestDto shipmentRejectRequest);
 
     void markReturned(final ShipmentId shipmentId);
+
+    // Ends the shipment's lifecycle as returned and creates the return shipment (recipient -> sender).
+    ShipmentReturnResponseDto returnShipment(final ShipmentId shipmentId);
 
     void markDelivered(final ShipmentId shipmentId);
 
