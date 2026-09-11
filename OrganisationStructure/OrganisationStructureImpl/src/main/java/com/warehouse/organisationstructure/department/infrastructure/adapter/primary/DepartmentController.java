@@ -19,7 +19,7 @@ import com.warehouse.organisationstructure.department.domain.exception.RestExcep
 import com.warehouse.organisationstructure.department.domain.helper.Result;
 import com.warehouse.organisationstructure.department.domain.model.Department;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreateCommand;
-import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.application.port.primary.DepartmentPort;
 import com.warehouse.organisationstructure.department.domain.vo.*;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.api.dto.*;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.mapper.RequestMapper;

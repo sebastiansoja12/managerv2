@@ -6,7 +6,7 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
 import com.warehouse.organisationstructure.department.domain.event.*;
 import com.warehouse.organisationstructure.department.domain.model.Department;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentRepository;
 import com.warehouse.organisationstructure.department.domain.registry.DomainRegistry;
 import com.warehouse.organisationstructure.department.domain.vo.Address;
 import com.warehouse.organisationstructure.department.domain.vo.TaxId;

@@ -1,4 +1,4 @@
-package com.warehouse.organisationstructure.department.domain.listener;
+package com.warehouse.organisationstructure.department.application.listener;
 
 import com.warehouse.organisationstructure.department.domain.event.*;
 import org.springframework.context.event.EventListener;

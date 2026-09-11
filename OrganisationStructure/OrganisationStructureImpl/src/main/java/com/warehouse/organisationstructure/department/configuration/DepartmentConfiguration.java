@@ -1,19 +1,18 @@
 package com.warehouse.organisationstructure.department.configuration;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
-import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
-import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPortImpl;
-import com.warehouse.organisationstructure.department.domain.port.secondary.CurrentUserServicePort;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentCoordinatesServicePort;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentReadRepository;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentRepository;
-import com.warehouse.organisationstructure.department.domain.port.secondary.TenantAdminProvisioningPort;
+import com.warehouse.organisationstructure.department.application.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.application.port.primary.DepartmentPortImpl;
+import com.warehouse.organisationstructure.department.application.port.secondary.CurrentUserServicePort;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentCoordinatesServicePort;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentReadRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.organisationstructure.department.domain.service.AuthenticationService;
 import com.warehouse.organisationstructure.department.domain.service.AuthenticationServiceImpl;
 import com.warehouse.organisationstructure.department.domain.service.DepartmentService;

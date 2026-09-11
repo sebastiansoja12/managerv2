@@ -1,6 +1,6 @@
 package com.warehouse.organisationstructure.department.infrastructure.adapter.secondary;
 
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentCoordinatesServicePort;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentCoordinatesServicePort;
 import com.warehouse.organisationstructure.department.domain.vo.Address;
 import com.warehouse.organisationstructure.department.domain.vo.Coordinates;
 import com.warehouse.geocoding.api.GeocodingAddressDto;

@@ -10,7 +10,7 @@ import com.warehouse.organisationstructure.department.api.event.OperatorInitialD
 import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreate;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreateCommand;
-import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.application.port.primary.DepartmentPort;
 
 @Component
 public class OperatorDepartmentEventListener {

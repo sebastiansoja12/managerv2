@@ -1,4 +1,4 @@
-package com.warehouse.organisationstructure.department.domain.port.primary;
+package com.warehouse.organisationstructure.department.application.port.primary;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -9,9 +9,9 @@ import com.warehouse.organisationstructure.department.domain.exception.Departmen
 import com.warehouse.organisationstructure.department.domain.model.Department;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreate;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreateCommand;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentCoordinatesServicePort;
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentRepository;
-import com.warehouse.organisationstructure.department.domain.port.secondary.TenantAdminProvisioningPort;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentCoordinatesServicePort;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentRepository;
+import com.warehouse.organisationstructure.department.application.port.secondary.TenantAdminProvisioningPort;
 import com.warehouse.organisationstructure.department.domain.registry.DomainRegistry;
 import com.warehouse.organisationstructure.department.domain.service.DepartmentService;
 import com.warehouse.organisationstructure.department.domain.validator.Validator;
