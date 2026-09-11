@@ -94,6 +94,17 @@ class DeliveryPortImplTest {
     }
 
     @Test
+    void shouldFindDeliveriesAssignedToSupplier() {
+        final SupplierId supplierId = new SupplierId(7L);
+        final Delivery delivery = courierShipmentDelivery(new ShipmentId(10L));
+        when(this.deliveryRepository.findBySupplier(supplierId, 0, 50)).thenReturn(List.of(delivery));
+
+        final List<DeliverySnapshot> deliveries = this.deliveryPort.findDeliveriesBySupplier(supplierId, 0, 50);
+
+        assertThat(deliveries).extracting(DeliverySnapshot::deliveryId).containsExactly(delivery.getDeliveryId());
+    }
+
+    @Test
     void shouldThrowExceptionWhenDeliveryForShipmentAlreadyExists() {
         final ShipmentId shipmentId = new ShipmentId(10L);
         when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.shipment(shipmentId), DeliveryType.OUTBOUND))

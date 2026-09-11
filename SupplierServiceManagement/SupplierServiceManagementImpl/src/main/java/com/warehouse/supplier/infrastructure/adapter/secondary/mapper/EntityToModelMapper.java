@@ -18,6 +18,7 @@ public class EntityToModelMapper {
                 entity.getFirstName(),
                 entity.getLastName(),
                 entity.getTelephoneNumber(),
+                entity.getEmail(),
                 entity.getDepartmentId(),
                 entity.getStatus(),
                 entity.getUserStatus(),

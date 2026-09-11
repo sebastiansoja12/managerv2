@@ -42,10 +42,26 @@ public class DeviceAgentServiceAdapter implements DeviceAgentServicePort {
         final DeviceValidationRequestDto deviceValidationRequest = new DeviceValidationRequestDto(
                 deviceId, departmentCode, username, version, deviceUserType, deviceType, true
         );
-        deviceEventPublisher.send(new DeviceValidationEvent(deviceValidationRequest, Instant.now(), command.getProcessId(),
-                processType, ServiceType.LOGISTICS_ORCHESTRATOR));
-		processHubEventPublisher.publish(new ProcessDeviceValidatedEvent(command.getProcessId(), deviceInformation.getDeviceId(),
-				processType, ServiceType.LOGISTICS_ORCHESTRATOR));
+        final String requestLog = ("DeviceValidationRequest{deviceId=%s, username=%s, departmentCode=%s, version=%s, "
+                + "deviceType=%s, deviceUserType=%s}").formatted(deviceId.value(), username.value(),
+                departmentCode.value(), version.value(), deviceType, deviceUserType);
+        try {
+            deviceEventPublisher.send(new DeviceValidationEvent(deviceValidationRequest, Instant.now(),
+                    command.getProcessId(), processType, ServiceType.LOGISTICS_ORCHESTRATOR));
+        } catch (final RuntimeException exception) {
+            publishDeviceValidated(command, requestLog, null, exception.getMessage());
+            throw exception;
+        }
+        publishDeviceValidated(command, requestLog, "DeviceValidationResponse{valid=true}", null);
+    }
+
+    private void publishDeviceValidated(final DeviceValidateCommand command,
+                                        final String requestLog,
+                                        final String responseLog,
+                                        final String faultDescription) {
+        processHubEventPublisher.publish(new ProcessDeviceValidatedEvent(command.getProcessId(),
+                command.getDeviceInformation().getDeviceId(), command.getProcessType(),
+                ServiceType.LOGISTICS_ORCHESTRATOR, requestLog, responseLog, faultDescription));
     }
 
     @Override

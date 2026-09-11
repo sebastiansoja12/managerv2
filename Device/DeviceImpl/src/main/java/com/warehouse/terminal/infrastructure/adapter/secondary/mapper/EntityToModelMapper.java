@@ -201,6 +201,7 @@ public class EntityToModelMapper {
                 ownership != null ? ownership.getUnassignedAt() : null,
                 userId,
                 ownership != null ? ownership.getVehicleId() : null,
-                operatorId);
+                operatorId,
+                ownership != null ? ownership.getAssignmentMode() : null);
     }
 }

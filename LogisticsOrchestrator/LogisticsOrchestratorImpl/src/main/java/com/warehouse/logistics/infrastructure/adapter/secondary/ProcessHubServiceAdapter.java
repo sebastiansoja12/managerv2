@@ -1,14 +1,19 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
-import com.warehouse.logistics.application.port.secondary.ProcessHubServicePort;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 import com.warehouse.auth.UserApiService;
 import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.logistics.application.port.secondary.ProcessHubServicePort;
+import com.warehouse.logistics.domain.vo.ProcessCommunication;
 import com.warehouse.process.ProcessHubApiService;
+import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.dto.*;
+import com.warehouse.process.infrastructure.event.ProcessCommunicationEvent;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.DeviceUserType;
 
@@ -21,10 +26,27 @@ public class ProcessHubServiceAdapter implements ProcessHubServicePort {
 
     private final UserApiService userApiService;
 
+    private final ProcessHubEventPublisher processHubEventPublisher;
+
     public ProcessHubServiceAdapter(final ProcessHubApiService processHubApiService,
-                                    final UserApiService userApiService) {
+                                    final UserApiService userApiService,
+                                    final ProcessHubEventPublisher processHubEventPublisher) {
         this.processHubApiService = processHubApiService;
         this.userApiService = userApiService;
+        this.processHubEventPublisher = processHubEventPublisher;
+    }
+
+    @Override
+    public void registerCommunication(final ProcessCommunication communication) {
+        this.processHubEventPublisher.publish(new ProcessCommunicationEvent(
+                communication.processId(),
+                ServiceType.LOGISTICS_ORCHESTRATOR,
+                communication.targetService(),
+                communication.processType(),
+                LocalDateTime.now(),
+                communication.request(),
+                communication.response(),
+                communication.faultDescription()));
     }
 
     @Override

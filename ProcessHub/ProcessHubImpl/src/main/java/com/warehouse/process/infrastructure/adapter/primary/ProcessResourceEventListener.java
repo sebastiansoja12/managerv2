@@ -94,6 +94,9 @@ public class ProcessResourceEventListener {
                 .targetServiceType(event.getTargetServiceType())
                 .timestamp(event.getCreatedAt())
                 .processType(event.getProcessType())
+                .request(event.getRequest())
+                .response(event.getResponse())
+                .faultDescription(event.getFaultDescription())
                 .build();
         this.processPort.assignProcessDeviceValidation(command);
     }

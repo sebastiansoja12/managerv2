@@ -3,6 +3,7 @@ package com.warehouse.auth.domain.port.primary;
 import com.warehouse.auth.domain.exception.UserAccessDeniedException;
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
+import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -31,7 +32,7 @@ class UserPortImplAccessTest {
 
     private final AuthenticationService authenticationService = mock(AuthenticationService.class);
 
-    private final UserPort userPort = new UserPortImpl(userService, authenticationService);
+    private final UserPort userPort = new UserPortImpl(userService, authenticationService, mock(ApiKeyEncoder.class));
 
     @Test
     void shouldReturnUsersOfAllDepartmentsForDirectory() {

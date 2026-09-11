@@ -34,7 +34,7 @@ public class DeliveryReturnCreator implements DeliveryCreator {
 
     private LogisticsRequest map(final ProcessType processType,
                                  final DeliveryReturnResponseDetails returnResponseDetails) {
-        return new LogisticsRequest(returnResponseDetails.getShipmentId(), null, returnResponseDetails.getDepartmentCode(),
+        return new LogisticsRequest(returnResponseDetails.getShipmentId(), returnResponseDetails.getNewShipmentId(), returnResponseDetails.getDepartmentCode(),
                 returnResponseDetails.getSupplierCode(), returnResponseDetails.getDeliveryStatus(),
                 processType, new ReturnToken(returnResponseDetails.getReturnToken().value()), null, null);
     }

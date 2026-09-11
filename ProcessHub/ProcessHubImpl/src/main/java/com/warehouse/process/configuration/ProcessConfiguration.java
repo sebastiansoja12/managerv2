@@ -47,8 +47,9 @@ public class ProcessConfiguration {
     }
 
     @Bean
-    public ProcessService processService(final ProcessRepository processRepository) {
-        return new ProcessServiceImpl(processRepository);
+    public ProcessService processService(final ProcessRepository processRepository,
+                                         final CurrentUserServicePort currentUserServicePort) {
+        return new ProcessServiceImpl(processRepository, currentUserServicePort);
     }
 
     @Bean

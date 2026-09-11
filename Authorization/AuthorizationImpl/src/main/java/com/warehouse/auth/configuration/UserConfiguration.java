@@ -28,8 +28,9 @@ public class UserConfiguration {
 
     @Bean
     public UserPort userPort(final UserService userService,
-                             final AuthenticationService authenticationService) {
-        return new UserPortImpl(userService, authenticationService);
+                             final AuthenticationService authenticationService,
+                             final ApiKeyEncoder apiKeyEncoder) {
+        return new UserPortImpl(userService, authenticationService, apiKeyEncoder);
     }
 
     @Bean
@@ -44,9 +45,8 @@ public class UserConfiguration {
 
     @Bean
     public UserRepository userRepository(final OperatorFilteredRepository<UserEntity> repository,
-                                         final NoOperatorContextRepository<UserEntity> noOperatorContextRepository,
-                                         final ApiKeyEncoder apiKeyEncoder) {
-        return new UserRepositoryImpl(repository, noOperatorContextRepository, apiKeyEncoder);
+                                         final NoOperatorContextRepository<UserEntity> noOperatorContextRepository) {
+        return new UserRepositoryImpl(repository, noOperatorContextRepository);
     }
 
     @Bean

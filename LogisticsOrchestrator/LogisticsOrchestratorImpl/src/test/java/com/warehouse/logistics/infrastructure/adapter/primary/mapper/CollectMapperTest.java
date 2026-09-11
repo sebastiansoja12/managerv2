@@ -6,7 +6,6 @@ import com.warehouse.logistics.application.port.primary.result.ShipmentCollectRe
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -60,9 +59,9 @@ class CollectMapperTest {
                 () -> assertFalse(collectResponse.isSuccess()),
                 () -> assertEquals(2, details.size()),
                 () -> assertTrue(details.get(0).isSuccess()),
-                () -> assertEquals(100L, details.get(0).getShipmentID()),
+                () -> assertEquals("TRK-001", details.get(0).getTrackingNumber()),
                 () -> assertFalse(details.get(1).isSuccess()),
-                () -> assertNull(details.get(1).getShipmentID()),
+                () -> assertEquals("TRK-002", details.get(1).getTrackingNumber()),
                 () -> assertEquals("Shipment was not found", details.get(1).getErrorMessage())
         );
     }

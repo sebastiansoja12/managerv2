@@ -6,6 +6,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
+import com.warehouse.shipment.application.port.primary.command.ShipmentHandoverCommand;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
@@ -40,8 +41,21 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     }
 
     @Override
+    public ShipmentTrackingDto getShipmentTracking(final TrackingNumber trackingNumber) {
+        return mapper.mapTracking(shipmentPort.loadShipmentWithRouteLog(trackingNumber));
+    }
+
+    @Override
     public ShipmentDetailsDto collectShipment(final TrackingNumber trackingNumber) {
         return mapper.map(shipmentPort.collectShipment(trackingNumber));
+    }
+
+    @Override
+    public ShipmentDetailsDto handOverShipment(final ShipmentHandoverRequestDto shipmentHandoverRequest) {
+        return mapper.map(shipmentPort.handOverShipment(new ShipmentHandoverCommand(
+                shipmentHandoverRequest.trackingNumber(),
+                shipmentHandoverRequest.recipientName(),
+                shipmentHandoverRequest.signature())));
     }
 
     @Override
@@ -85,15 +99,39 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
             final ShipmentId relatedShipmentId = shipment.snapshot().shipmentRelatedId();
             final ShipmentId newShipmentId = relatedShipmentId == null ? shipmentId : relatedShipmentId;
 
-            return new ShipmentRejectResponseItemDto(shipmentId.getValue(), newShipmentId.getValue(), shipment.getExternalRouteId() != null, true, null);
+            return new ShipmentRejectResponseItemDto(shipmentId.getValue(), newShipmentId.getValue(), shipment.getExternalRouteId() != null, true, null,
+                    trackingNumber(relatedShipmentId == null ? shipment : loadRelatedShipment(relatedShipmentId)));
         } catch (final RuntimeException e) {
             return new ShipmentRejectResponseItemDto(shipmentId.getValue(), shipmentId.getValue(), false, false,
-                    e.getMessage());
+                    e.getMessage(), null);
         }
     }
+    // The rejection already happened; a missing related shipment must not turn it into a failure.
+    private ShipmentResult loadRelatedShipment(final ShipmentId relatedShipmentId) {
+        try {
+            return this.shipmentPort.loadShipment(relatedShipmentId);
+        } catch (final RuntimeException exception) {
+            return null;
+        }
+    }
+
+    private static String trackingNumber(final ShipmentResult shipment) {
+        return shipment == null || shipment.snapshot().trackingNumber() == null
+                ? null
+                : shipment.snapshot().trackingNumber().value();
+    }
+
     @Override
     public void markReturned(final ShipmentId shipmentId) {
         shipmentPort.markReturned(shipmentId);
+    }
+
+    @Override
+    public ShipmentReturnResponseDto returnShipment(final ShipmentId shipmentId) {
+        shipmentPort.markReturned(shipmentId);
+        final ShipmentId returnShipmentId = shipmentPort.loadShipment(shipmentId).snapshot().shipmentRelatedId();
+        return new ShipmentReturnResponseDto(shipmentId, returnShipmentId,
+                returnShipmentId == null ? null : trackingNumber(loadRelatedShipment(returnShipmentId)));
     }
 
     @Override

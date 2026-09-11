@@ -387,6 +387,12 @@ public class Delivery {
         deliverySteps.add(deliveryStep);
     }
 
+    public void ensureRecipientSignature(final boolean recipientSigned) {
+        if (Boolean.TRUE.equals(signatureRequired) && !recipientSigned) {
+            throw new DeliveryModificationException("Recipient signature is required for this delivery");
+        }
+    }
+
     private void ensureCanBeModified() {
         if (status == DeliveryLifecycleStatus.CANCELED || status == DeliveryLifecycleStatus.COMPLETED) {
             throw new DeliveryModificationException("Delivery cannot be modified when its status is " + status);

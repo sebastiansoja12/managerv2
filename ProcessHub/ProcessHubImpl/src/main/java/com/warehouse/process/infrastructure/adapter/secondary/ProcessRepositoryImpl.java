@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.process.domain.model.ProcessLog;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
@@ -99,6 +100,18 @@ public class ProcessRepositoryImpl implements ProcessRepository {
         final OperatorId operatorId = getOperatorId();
 
         return readRepository.findAllByOperatorId(operatorId, pageable)
+                .map(ProcessLogToModelMapper::map);
+    }
+
+    @Override
+    public Optional<ProcessLog> findByIdForUser(final ProcessId processId, final UserId userId) {
+        return readRepository.findByIdAndOperatorIdAndUserId(processId, getOperatorId(), userId.value())
+                .map(ProcessLogToModelMapper::map);
+    }
+
+    @Override
+    public Page<ProcessLog> findAllForUser(final Pageable pageable, final UserId userId) {
+        return readRepository.findAllByOperatorIdAndUserId(getOperatorId(), userId.value(), pageable)
                 .map(ProcessLogToModelMapper::map);
     }
 

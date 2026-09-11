@@ -24,6 +24,7 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.terminal.configuration.DeviceTestConfiguration;
+import com.warehouse.terminal.domain.enumeration.DeviceAssignmentMode;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.enumeration.NetworkType;
 import com.warehouse.terminal.infrastructure.adapter.secondary.MobileReadRepository;
@@ -298,7 +299,8 @@ class MobileReadRepositoryTest {
                 new VehicleId(9101L),
                 "COURIER",
                 BASE_TIME,
-                null
+                null,
+                DeviceAssignmentMode.PERSONAL
         ));
 
         return entity;

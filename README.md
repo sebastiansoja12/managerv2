@@ -34,6 +34,7 @@ under `/v1/api`.
 | `ProcessHub` | Process logs and process details used by the GUI. |
 | `DepartmentMap` | Department floor plans (`department_maps`, elements), storage-location occupancy with optimistic locking, pallet placement, reservations and location history (`/department-maps`). |
 | `Device` | Device pairing, device verification and terminal/device access validation. |
+| `McpServer` | Read-only MCP server (`/v1/api/mcp`) exposing shipment, process and device lookups to AI assistants. |
 | `SupplierServiceManagement` | Suppliers, package types, delivery areas, vehicle data and supplier updates. |
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
 | `PathFinder` and `DestinationDetermination` | Routing, delivery-department determination, address coordinates and area calculation support. |
@@ -183,6 +184,28 @@ Separate Dockerfiles are available for:
 
 - `Gateway` on port `8088`
 - `EurekaServer` on port `8761`
+
+## MCP Server
+
+`McpServer` exposes a stateless MCP endpoint (Spring AI MCP Server, streamable HTTP) at `/v1/api/mcp`.
+Requests are authenticated with a user API key sent as `Authorization: Bearer <key>`; the key is generated
+with `POST /v1/api/auth/me/api-key` (revoked with `DELETE`) and stored only as an HMAC hash
+with its issue date. Keys created before the issue date was introduced, and the keys assigned automatically at
+sign-up, are not accepted. Operator blocking and session revocation also invalidate API keys issued earlier.
+
+| Tool | Parameters | Notes |
+| --- | --- | --- |
+| `whoami` | none | Current user, role, department and operator. |
+| `find_shipment` | `trackingNumber` | Status, dates, masked sender/recipient (initials, city, postal code) and the 10 newest events. |
+| `get_process` | `processId` (UUID) | Process status, fault, device and communication steps without request payloads. |
+| `list_devices` | optional `status`, `departmentCode` | Up to 50 devices with assignment mode, heartbeat and signed-in operator; requires MANAGER or higher. |
+
+All tools are read-only and run in the operator context of the API key owner. Disable the endpoint with
+`MCP_SERVER_ENABLED=false`. Example for Claude Code:
+
+```bash
+claude mcp add --transport http manager https://manager.example.com/v1/api/mcp --header "Authorization: Bearer <api-key>"
+```
 
 ## API and Documentation
 

@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.filter;
 
+import com.warehouse.auth.configuration.ApiExposureProperties;
 import com.warehouse.auth.configuration.AuthCookieService;
 import com.warehouse.auth.configuration.AuthProperties;
 import com.warehouse.auth.domain.model.OrganizationUser;
@@ -52,7 +53,7 @@ class JwtAuthenticationFilterImpersonationTest {
         jwtService = new JwtServiceImpl(jwtProvider);
         filter = new JwtAuthenticationFilter(jwtService, userService,
                 new AuthCookieService(new AuthProperties(), jwtProvider), platformOwnerAuthenticationPort,
-                operatorAccessPolicy);
+                operatorAccessPolicy, new ApiExposureProperties());
         superadmin = OrganizationUser.of(new UserId(5L), "superadmin", "password", "Super", "Admin",
                 "superadmin@test.pl", OrganizationUser.Role.SUPERADMIN, new DepartmentId(10L), "api-key");
         superadmin.assignOperator(OperatorId.of(20L));

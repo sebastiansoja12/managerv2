@@ -436,6 +436,22 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     @Override
     @Transactional
+    public ShipmentResult handOverShipment(final ShipmentHandoverCommand command) {
+        final Shipment shipment = this.find(command.trackingNumber());
+        shipment.ensureCanBeHandedOver();
+        if (command.signature() != null && !command.signature().isBlank()) {
+            this.signatureService.createSignature(new Signature(
+                    command.recipientName(),
+                    SignatureMethod.HANDWRITTEN,
+                    null,
+                    shipment.getShipmentId(),
+                    command.signature().getBytes(StandardCharsets.UTF_8)));
+        }
+        return this.shipmentResultFactory.create(shipment);
+    }
+
+    @Override
+    @Transactional
     public ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId) {
         final Shipment shipment = this.find(shipmentId);
         if (shipment.notifyShipmentLoadedOnPallet()) {

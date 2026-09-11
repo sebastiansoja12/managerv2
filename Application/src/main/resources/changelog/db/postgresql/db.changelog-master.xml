@@ -99,4 +99,9 @@
     <include file="changes/2026-10-19-delivery-shipment-routing.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-20-delivery-read-model.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-21-delivery-history.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-22-supplier-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-22-supplier-user-account.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-23-device-activation.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-23-user-api-key-issued-at.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-24-courier-vehicle-and-audit-keys.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

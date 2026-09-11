@@ -22,11 +22,11 @@ public class DeliveryRejectResponseDetail {
     @XmlElement(name = "DepartmentCode")
     private String departmentCode;
 
-    @XmlElement(name = "ShipmentID")
-    private Long shipmentId;
+    @XmlElement(name = "TrackingNumber")
+    private String trackingNumber;
 
-    @XmlElement(name = "NewShipmentID")
-    private Long newShipmentId;
+    @XmlElement(name = "NewTrackingNumber")
+    private String newTrackingNumber;
 
     @XmlElement(name = "DeliveryStatus")
     private String deliveryStatus;

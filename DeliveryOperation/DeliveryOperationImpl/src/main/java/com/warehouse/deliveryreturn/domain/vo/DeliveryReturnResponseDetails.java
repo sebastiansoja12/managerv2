@@ -4,6 +4,7 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.*;
 
 import lombok.Builder;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 
 
 @Builder
@@ -17,6 +18,9 @@ public class DeliveryReturnResponseDetails {
     private ReturnToken returnToken;
     private UpdateStatus updateStatus;
     private String errorMessage;
+    private TrackingNumber trackingNumber;
+    private ShipmentId newShipmentId;
+    private TrackingNumber newTrackingNumber;
 
     public DeliveryReturnResponseDetails(final ProcessId processId,
                                          final DeliveryId deliveryId,
@@ -26,7 +30,10 @@ public class DeliveryReturnResponseDetails {
                                          final DeliveryStatus deliveryStatus,
                                          final ReturnToken returnToken,
                                          final UpdateStatus updateStatus,
-                                         final String errorMessage) {
+                                         final String errorMessage,
+                                         final TrackingNumber trackingNumber,
+                                         final ShipmentId newShipmentId,
+                                         final TrackingNumber newTrackingNumber) {
         this.processId = processId;
         this.deliveryId = deliveryId;
         this.departmentCode = departmentCode;
@@ -36,9 +43,14 @@ public class DeliveryReturnResponseDetails {
         this.returnToken = returnToken;
         this.updateStatus = updateStatus;
         this.errorMessage = errorMessage;
+        this.trackingNumber = trackingNumber;
+        this.newShipmentId = newShipmentId;
+        this.newTrackingNumber = newTrackingNumber;
     }
 
-    public static DeliveryReturnResponseDetails from(final DeliveryReturn deliveryReturn, final UpdateStatus updateStatus) {
+    public static DeliveryReturnResponseDetails from(final DeliveryReturn deliveryReturn,
+                                                     final ShipmentReturnResult returnResult,
+                                                     final TrackingNumber trackingNumber) {
         final ProcessId id = deliveryReturn.getProcessId() == null ? null : new ProcessId(deliveryReturn.getProcessId());
         final ShipmentId shipmentIdentificator = new ShipmentId(deliveryReturn.getShipmentId());
         final DeliveryStatus status = DeliveryStatus.valueOf(deliveryReturn.getDeliveryStatus());
@@ -46,7 +58,8 @@ public class DeliveryReturnResponseDetails {
         final DepartmentCode departmentCode = new DepartmentCode(deliveryReturn.getDepartmentCode());
         final SupplierCode supplierCode = new SupplierCode(deliveryReturn.getSupplierCode());
         return new DeliveryReturnResponseDetails(id, null, departmentCode, supplierCode,
-                shipmentIdentificator, status, token, updateStatus, null);
+                shipmentIdentificator, status, token, returnResult.updateStatus(), returnResult.errorMessage(),
+                trackingNumber, returnResult.newShipmentId(), returnResult.newTrackingNumber());
     }
 
     public static DeliveryReturnResponseDetails wrongReturnToken(final ProcessId processId,
@@ -55,7 +68,8 @@ public class DeliveryReturnResponseDetails {
                                                                  final SupplierCode supplierCode,
                                                                  final DeliveryStatus deliveryStatus,
                                                                  final ReturnToken returnToken,
-                                                                 final String message) {
+                                                                 final String message,
+                                                                 final TrackingNumber trackingNumber) {
         return new DeliveryReturnResponseDetails(
                 processId,
                 null,
@@ -65,7 +79,10 @@ public class DeliveryReturnResponseDetails {
                 deliveryStatus,
                 returnToken,
                 UpdateStatus.NOT_OK,
-                message
+                message,
+                trackingNumber,
+                null,
+                null
         );
     }
 
@@ -75,6 +92,18 @@ public class DeliveryReturnResponseDetails {
 
     public DeliveryId getDeliveryId() {
         return deliveryId;
+    }
+
+    public ShipmentId getNewShipmentId() {
+        return newShipmentId;
+    }
+
+    public TrackingNumber getNewTrackingNumber() {
+        return newTrackingNumber;
+    }
+
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
     }
 
     public ShipmentId getShipmentId() {

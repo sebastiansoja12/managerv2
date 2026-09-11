@@ -361,7 +361,7 @@ public class Terminal implements Device, DeviceHandler, ExecutionSourceResolver 
 
     @Override
     public void assignUser(final UserId userId) {
-        ensureOwnership().setUserId(userId);
+        ensureOwnership().reassignTo(userId, Instant.now());
         markAsModified();
     }
 

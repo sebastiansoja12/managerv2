@@ -1,5 +1,6 @@
 package com.warehouse.supplier.configuration;
 
+import com.warehouse.auth.SupplierUserEventPublisher;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.supplier.infrastructure.adapter.primary.SupplierApiServiceAdapter;
@@ -30,9 +31,15 @@ public class SupplierConfiguration {
                                  final SupplierValidatorService validatorService,
                                  final DriverLicenseService driverLicenseService,
                                  final DeviceServicePort deviceServicePort,
-                                 @Qualifier("supplier.departmentServicePort") final DepartmentServicePort departmentServicePort) {
+                                 @Qualifier("supplier.departmentServicePort") final DepartmentServicePort departmentServicePort,
+                                 @Qualifier("supplier.userServicePort") final UserServicePort userServicePort) {
         return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort,
-                departmentServicePort);
+                departmentServicePort, userServicePort);
+    }
+
+    @Bean("supplier.userServicePort")
+    public UserServicePort userServicePort(final SupplierUserEventPublisher supplierUserEventPublisher) {
+        return new UserServiceAdapter(supplierUserEventPublisher);
     }
 
     @Bean
@@ -57,11 +64,6 @@ public class SupplierConfiguration {
     public SupplierNoDepartmentContextRepository supplierNoDepartmentContextRepository(
             final SupplierReadRepository supplierReadRepository) {
         return new SupplierNoDepartmentContextRepositoryImpl(supplierReadRepository);
-    }
-
-    @Bean("supplier.userServicePort")
-    public UserServicePort userServicePort() {
-        return new UserServiceAdapter();
     }
 
     @Bean
@@ -97,10 +99,5 @@ public class SupplierConfiguration {
     @Bean(name = "supplier.departmentServicePort")
     public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService) {
         return new DepartmentServiceAdapter(departmentApiService);
-    }
-
-    @Bean("supplier.mailServicePort")
-    public MailServicePort mailServicePort() {
-        return new MailServiceAdapter();
     }
 }

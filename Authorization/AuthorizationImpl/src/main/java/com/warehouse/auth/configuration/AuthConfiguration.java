@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.auth.OperatorUserEventPublisher;
+import com.warehouse.auth.SupplierUserEventPublisher;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
 import com.warehouse.auth.domain.port.primary.CurrentOperatorPort;
@@ -152,6 +153,11 @@ public class AuthConfiguration  {
     @Bean
     public OperatorUserEventPublisher operatorUserEventPublisher(final ApplicationEventPublisher eventPublisher) {
         return new OperatorUserEventPublisherAdapter(eventPublisher);
+    }
+
+    @Bean
+    public SupplierUserEventPublisher supplierUserEventPublisher(final ApplicationEventPublisher eventPublisher) {
+        return new SupplierUserEventPublisherAdapter(eventPublisher);
     }
 
     @Bean

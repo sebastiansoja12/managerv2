@@ -12,14 +12,14 @@
     <DeliveryReturnRequest>
         <DeliveryReturnDetails>
             <DeliveryReturnDetail>
-                <ShipmentID>1000000002</ShipmentID>
+                <TrackingNumber>FTM-2026-001202</TrackingNumber>
                 <DeliveryStatus>RETURN</DeliveryStatus>
                 <DepartmentCode>KT1</DepartmentCode>
                 <SupplierCode>SUP-01</SupplierCode>
                 <ReturnToken>12345</ReturnToken>
             </DeliveryReturnDetail>
             <DeliveryReturnDetail>
-                <ShipmentID>1000000003</ShipmentID>
+                <TrackingNumber>FTM-2026-001203</TrackingNumber>
                 <DeliveryStatus>RETURN</DeliveryStatus>
                 <DepartmentCode>KT1</DepartmentCode>
                 <SupplierCode>SUP-01</SupplierCode>

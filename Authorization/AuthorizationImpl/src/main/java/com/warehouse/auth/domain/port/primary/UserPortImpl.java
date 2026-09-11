@@ -6,6 +6,7 @@ import com.warehouse.auth.domain.model.FullNameChangeCommand;
 import com.warehouse.auth.domain.model.RolePermission;
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
+import com.warehouse.auth.domain.service.ApiKeyEncoder;
 import com.warehouse.auth.domain.service.AuthenticationService;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
@@ -16,6 +17,7 @@ import com.warehouse.commonassets.identificator.UserId;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 
@@ -29,12 +31,16 @@ public class UserPortImpl implements UserPort {
 
     private final AuthenticationService authenticationService;
 
+    private final ApiKeyEncoder apiKeyEncoder;
+
     private final SecureRandom secureRandom;
 
     public UserPortImpl(final UserService userService,
-                        final AuthenticationService authenticationService) {
+                        final AuthenticationService authenticationService,
+                        final ApiKeyEncoder apiKeyEncoder) {
         this.userService = userService;
         this.authenticationService = authenticationService;
+        this.apiKeyEncoder = apiKeyEncoder;
         this.secureRandom = new SecureRandom();
     }
 
@@ -77,7 +83,7 @@ public class UserPortImpl implements UserPort {
     @Override
     public String regenerateApiKey(final UserId userId) {
         final String apiKey = generateApiKey();
-        this.userService.changeApiKey(userId, apiKey);
+        this.userService.issueApiKey(userId, this.apiKeyEncoder.encode(userId, apiKey).key(), Instant.now());
         return apiKey;
     }
 

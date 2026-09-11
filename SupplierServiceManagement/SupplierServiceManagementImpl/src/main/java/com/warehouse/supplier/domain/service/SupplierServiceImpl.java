@@ -166,6 +166,11 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    public Supplier findByUserId(final UserId userId) {
+        return supplierRepository.findByUserId(userId);
+    }
+
+    @Override
     public List<Supplier> findAllByCurrentDepartment() {
         return supplierRepository.findAllByCurrentDepartment();
     }

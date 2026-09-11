@@ -13,9 +13,12 @@ import org.apache.commons.lang3.Validate;
 
 import java.time.Instant;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 
 public class Supplier {
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
     private SupplierId supplierId;
 
@@ -26,6 +29,8 @@ public class Supplier {
     private String lastName;
 
     private String telephoneNumber;
+
+    private String email;
 
     private DepartmentId departmentId;
 
@@ -64,6 +69,7 @@ public class Supplier {
             final String firstName,
             final String lastName,
             final String telephoneNumber,
+            final String email,
             final DepartmentId departmentId,
             final SupplierStatus status,
             final UserStatus userStatus,
@@ -84,6 +90,7 @@ public class Supplier {
         this.firstName = firstName;
         this.lastName = lastName;
         this.telephoneNumber = telephoneNumber;
+        this.email = email;
         this.departmentId = departmentId;
         this.status = status;
         this.userStatus = userStatus;
@@ -107,18 +114,32 @@ public class Supplier {
             final String lastName,
             final String telephoneNumber
     ) {
+        this(supplierId, supplierCode, firstName, lastName, telephoneNumber, null, null);
+    }
+
+    public Supplier(
+            final SupplierId supplierId,
+            final SupplierCode supplierCode,
+            final String firstName,
+            final String lastName,
+            final String telephoneNumber,
+            final String email,
+            final DepartmentId departmentId
+    ) {
         Validate.notNull(supplierId, "SupplierId cannot be null");
         Validate.notNull(supplierCode, "SupplierCode cannot be null");
         Validate.notNull(firstName, "First name cannot be null");
         Validate.notNull(lastName, "Last name cannot be null");
         Validate.notNull(telephoneNumber, "Telephone number cannot be null");
+        Validate.isTrue(email == null || EMAIL_PATTERN.matcher(email).matches(), "Email is invalid");
 
         this.supplierId = supplierId;
         this.supplierCode = supplierCode;
         this.firstName = firstName;
         this.lastName = lastName;
         this.telephoneNumber = telephoneNumber;
-        this.departmentId = null;
+        this.email = email;
+        this.departmentId = departmentId;
         this.status = SupplierStatus.INACTIVE;
         this.userStatus = UserStatus.USER_NOT_CREATED;
         this.vehicleId = null;
@@ -137,7 +158,7 @@ public class Supplier {
 	public SupplierSnapshot snapshot() {
 		return new SupplierSnapshot(supplierId, supplierCode, firstName, lastName, telephoneNumber, departmentId,
 				status, userStatus, vehicleId, deviceId, dangerousGoodCertification, driverLicense, deliveryArea,
-				supportedPackageTypes, apiKey, termsAccepted, createdAt, updatedAt, createdUserId);
+				supportedPackageTypes, apiKey, termsAccepted, createdAt, updatedAt, createdUserId, email);
 	}
 
     public void markAsActive() {
@@ -165,6 +186,7 @@ public class Supplier {
         this.firstName = "Deleted";
         this.lastName = "Courier";
         this.telephoneNumber = "erased";
+        this.email = null;
         this.driverLicense = null;
         this.dangerousGoodCertification = null;
         this.apiKey = null;
@@ -402,6 +424,10 @@ public class Supplier {
 
     public String getTelephoneNumber() {
         return telephoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public Boolean termsAccepted() {

@@ -1,6 +1,7 @@
 package com.warehouse.deliverymissed.domain.model;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.deliverymissed.domain.vo.*;
 import lombok.Builder;
 
@@ -19,12 +20,13 @@ public class DeliveryMissedDetails {
     private SuggestedAction suggestedAction;
     private IncidentReport incidentReport;
     private ShipmentId shipmentId;
+    private TrackingNumber trackingNumber;
 
 	public DeliveryMissedDetails(final DeliveryMissedDetailId deliveryMissedDetailId, final Instant plannedDeliveryDate,
 			final Instant deliveryDate, final Instant created, final Instant newProposedDate,
 			final Boolean addressChanged, final DeliveryAttemptNumber deliveryAttemptNumber,
 			final PenaltyFee penaltyFee, final SuggestedAction suggestedAction, final IncidentReport incidentReport,
-			final ShipmentId shipmentId) {
+			final ShipmentId shipmentId, final TrackingNumber trackingNumber) {
         this.deliveryMissedDetailId = deliveryMissedDetailId;
         this.plannedDeliveryDate = plannedDeliveryDate;
         this.deliveryDate = deliveryDate;
@@ -36,6 +38,7 @@ public class DeliveryMissedDetails {
         this.suggestedAction = suggestedAction;
         this.incidentReport = incidentReport;
         this.shipmentId = shipmentId;
+        this.trackingNumber = trackingNumber;
     }
 
     public DeliveryMissedDetailId getDeliveryMissedDetailId() {
@@ -116,6 +119,10 @@ public class DeliveryMissedDetails {
 
     public void setIncidentReport(final IncidentReport incidentReport) {
         this.incidentReport = incidentReport;
+    }
+
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
     }
 
     public ShipmentId getShipmentId() {

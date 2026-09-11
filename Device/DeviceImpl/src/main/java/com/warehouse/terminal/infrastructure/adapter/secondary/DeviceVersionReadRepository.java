@@ -9,5 +9,5 @@ import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceVers
 
 public interface DeviceVersionReadRepository extends JpaRepository<DeviceVersionEntity, Long> {
 
-    Optional<DeviceVersionEntity> findByDeviceId(final DeviceId deviceId);
+    Optional<DeviceVersionEntity> findFirstByDeviceIdOrderByIdDesc(final DeviceId deviceId);
 }

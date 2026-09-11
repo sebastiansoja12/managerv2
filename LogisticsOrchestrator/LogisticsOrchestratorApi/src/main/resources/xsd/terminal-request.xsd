@@ -59,7 +59,53 @@
     <xs:complexType name="CollectResponseDetailType">
         <xs:sequence>
             <xs:element name="TrackingNumber" type="xs:string"/>
-            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="Success" type="xs:boolean"/>
+            <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="HandoverRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="DeviceInformation" type="DeviceType"/>
+                <xs:element name="HandoverDetails" type="HandoverDetailsType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="HandoverResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ProcessId" type="xs:string"/>
+                <xs:element name="Success" type="xs:boolean"/>
+                <xs:element name="HandoverResponseDetails" type="HandoverResponseDetailsType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="HandoverDetailsType">
+        <xs:sequence>
+            <xs:element name="RecipientName" type="xs:string" minOccurs="0"/>
+            <xs:element name="Signature" type="xs:string" minOccurs="0"/>
+            <xs:element name="HandoverDetail" type="HandoverDetailType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="HandoverDetailType">
+        <xs:sequence>
+            <xs:element name="TrackingNumber" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="HandoverResponseDetailsType">
+        <xs:sequence>
+            <xs:element name="HandoverResponseDetail" type="HandoverResponseDetailType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="HandoverResponseDetailType">
+        <xs:sequence>
+            <xs:element name="TrackingNumber" type="xs:string"/>
             <xs:element name="Success" type="xs:boolean"/>
             <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
         </xs:sequence>
@@ -98,7 +144,7 @@
 
     <xs:complexType name="PalletScanResponseDetailType">
         <xs:sequence>
-            <xs:element name="ShipmentID" type="xs:long"/>
+            <xs:element name="TrackingNumber" type="xs:string"/>
             <xs:element name="Success" type="xs:boolean"/>
             <xs:element name="ShipmentStatus" type="xs:string" minOccurs="0"/>
             <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
@@ -140,7 +186,7 @@
 
     <xs:complexType name="DeliveryRejectDetailType">
         <xs:sequence>
-            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="TrackingNumber" type="xs:string"/>
             <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
             <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
             <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
@@ -162,7 +208,7 @@
 
     <xs:complexType name="DeliveryReturnDetailType">
         <xs:sequence>
-            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="TrackingNumber" type="xs:string"/>
             <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
             <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
             <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
@@ -184,7 +230,7 @@
 
     <xs:complexType name="DeliveryMissedDetailType">
         <xs:sequence>
-            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="TrackingNumber" type="xs:string"/>
             <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
             <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
             <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
@@ -207,8 +253,8 @@
         <xs:sequence>
             <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
             <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
-            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
-            <xs:element name="NewShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="TrackingNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="NewTrackingNumber" type="xs:string" minOccurs="0"/>
             <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
             <xs:element name="RejectReason" type="xs:string" minOccurs="0"/>
         </xs:sequence>
@@ -230,7 +276,8 @@
         <xs:sequence>
             <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
             <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
-            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="TrackingNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="NewTrackingNumber" type="xs:string" minOccurs="0"/>
             <xs:element name="ReturnToken" type="xs:string" minOccurs="0"/>
             <xs:element name="UpdateStatus" type="xs:string" minOccurs="0"/>
             <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>

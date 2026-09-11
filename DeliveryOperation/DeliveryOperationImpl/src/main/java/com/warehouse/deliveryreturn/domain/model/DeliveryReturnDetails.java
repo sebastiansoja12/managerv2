@@ -5,6 +5,7 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
 import com.warehouse.deliveryreturn.domain.vo.ReturnToken;
 
@@ -12,22 +13,29 @@ import lombok.Builder;
 
 @Builder
 public class DeliveryReturnDetails {
+    private TrackingNumber trackingNumber;
     private ShipmentId shipmentId;
     private DeliveryStatus deliveryStatus;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
     private ReturnToken returnToken;
 
-    public DeliveryReturnDetails(final ShipmentId shipmentId,
+    public DeliveryReturnDetails(final TrackingNumber trackingNumber,
+                                 final ShipmentId shipmentId,
                                  final DeliveryStatus deliveryStatus,
                                  final DepartmentCode departmentCode,
                                  final SupplierCode supplierCode,
                                  final ReturnToken returnToken) {
+        this.trackingNumber = trackingNumber;
         this.shipmentId = shipmentId;
         this.deliveryStatus = deliveryStatus;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.returnToken = returnToken;
+    }
+
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
     }
 
     public ShipmentId getShipmentId() {
@@ -79,6 +87,7 @@ public class DeliveryReturnDetails {
     public DeliveryReturnDetails updateDeliveryStatus() {
         return DeliveryReturnDetails.builder()
                 .deliveryStatus(DeliveryStatus.RETURN)
+                .trackingNumber(trackingNumber)
                 .shipmentId(shipmentId)
                 .supplierCode(supplierCode)
                 .departmentCode(departmentCode)

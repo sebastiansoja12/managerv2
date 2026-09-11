@@ -59,7 +59,7 @@ public class PickupPointController {
     }
 
     @GetMapping
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ, UserPermission.ROLE_SUPPLIER_READ})
     public ResponseEntity<PickupPointPageApiResponse> search(
             @RequestParam(required = false) final String query,
             @RequestParam(required = false) final PickupPointType type,
@@ -90,7 +90,7 @@ public class PickupPointController {
     }
 
     @GetMapping("/eligible")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ, UserPermission.ROLE_SUPPLIER_READ})
     public ResponseEntity<PickupPointPageApiResponse> findEligible(
             @RequestParam final PickupPointCapability capability,
             @RequestParam final PickupPointType type,
@@ -121,7 +121,7 @@ public class PickupPointController {
     }
 
     @GetMapping("/{pickupPointId}")
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ})
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ, UserPermission.ROLE_SUPPLIER_READ})
     public ResponseEntity<PickupPointApiResponse> get(@PathVariable final UUID pickupPointId) {
         final PickupPointResult result = this.pickupPointPort.get(new PickupPointId(pickupPointId))
                 .orElseThrow(() -> new PickupPointNotFoundException(new PickupPointId(pickupPointId)));

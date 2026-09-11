@@ -11,6 +11,7 @@ import org.springframework.ws.transport.context.TransportContext;
 import org.springframework.ws.transport.context.TransportContextHolder;
 import org.springframework.ws.transport.http.HttpServletConnection;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
@@ -54,10 +55,13 @@ public class DeviceContextAuthenticator {
         }
 
         final Long userId = authentication.userId() != null ? authentication.userId().value() : null;
+        if (userId == null) {
+            throw new IllegalArgumentException("No operator signed in on device");
+        }
         final String username = authentication.username() != null ? authentication.username().value() : null;
         final String deviceId = authentication.deviceId() != null ? authentication.deviceId().value() : null;
 
-        setSecurityContext(pairKey, operatorId, userId, deviceId);
+        setSecurityContext(pairKey, operatorId, authentication.departmentId(), userId, deviceId);
         setMdc(operatorId, userId, username, deviceId);
         log.info("Device context initialized for device {}, user {}, department {}",
                 deviceId, username != null ? username : userId, departmentCode);
@@ -71,6 +75,7 @@ public class DeviceContextAuthenticator {
 
     private void setSecurityContext(final String pairKey,
                                     final OperatorId operatorId,
+                                    final DepartmentId departmentId,
                                     final Long userId,
                                     final String deviceId) {
         final Object principal = userId != null ? new UserId(userId) : "device:" + fallback(deviceId);
@@ -78,6 +83,7 @@ public class DeviceContextAuthenticator {
         context.setAuthentication(new UsernameTenantPasswordAuthenticationToken(
                 principal,
                 operatorId,
+                departmentId,
                 pairKey,
                 Collections.emptyList()));
         SecurityContextHolder.setContext(context);
