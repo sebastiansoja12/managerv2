@@ -173,6 +173,26 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     }
 
     @Override
+    public UserId createSupplierUser(final CreateSupplierUserCommand command) {
+        final UserId userId = userService.nextUserId();
+        final String password = passwordEncoder.encode(RandomPasswordService.generatePassword(32, true, true, true));
+        final OrganizationUser user = OrganizationUser.createWithRole(
+                userId,
+                command.username(),
+                password,
+                command.firstName(),
+                command.lastName(),
+                command.email(),
+                OrganizationUser.Role.SUPPLIER,
+                command.departmentId(),
+                apiKeyEncoder.encode(userId, command.username()).key(),
+                command.language()
+        );
+        userService.create(user);
+        return userId;
+    }
+
+    @Override
     public UserId createAdminUser(final AdminCreateRequest request) {
 
         final UserId userId = this.userService.nextUserId();
