@@ -383,11 +383,9 @@ public class ShipmentPortImpl implements ShipmentPort {
     public ShipmentRerouteResult reroute(final ShipmentRerouteCommand command) {
         final Party sender = command.sender();
         final Party recipient = command.recipient();
-        final OperatorShipmentConfiguration shipmentConfiguration =
-                this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration();
 
         final Result<Void, ErrorCode> addressValidation = this.addressValidationService
-                .validateAddresses(Address.from(sender), Address.from(recipient), shipmentConfiguration.validationRules());
+                .validateAddresses(Address.from(sender), Address.from(recipient), null);
         if (addressValidation.isFailure()) {
             throw new RestException(400, addressValidation.getFailure().getMessage());
         }

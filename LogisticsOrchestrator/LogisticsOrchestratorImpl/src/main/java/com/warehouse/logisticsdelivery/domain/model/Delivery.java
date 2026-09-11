@@ -70,7 +70,7 @@ public class Delivery {
         this.deliveryPickupPointId = deliveryPickupPointId;
         this.signatureRequired = Boolean.TRUE.equals(signatureRequired);
         this.deliverySteps.add(DeliveryStep.created(deliveryId, createdAt, signatureId,
-                "DeliverableShipment created", userId));
+                "", userId));
     }
 
     public Delivery(final DeliveryId deliveryId,
