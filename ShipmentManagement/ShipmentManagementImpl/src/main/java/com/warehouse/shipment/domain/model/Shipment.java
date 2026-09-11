@@ -601,6 +601,15 @@ public class Shipment {
         return true;
     }
 
+    public void ensureCanBeHandedOver() {
+        if (!ShipmentStatus.SENT.equals(this.shipmentStatus)
+                && !ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)
+                && !ShipmentStatus.REROUTE.equals(this.shipmentStatus)
+                && !ShipmentStatus.REDIRECT.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be handed over from status " + shipmentStatus);
+        }
+    }
+
     public void notifyShipmentCollected() {
         if (!ShipmentStatus.CREATED.equals(this.shipmentStatus) && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be collected from status " + shipmentStatus);

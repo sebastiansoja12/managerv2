@@ -41,6 +41,8 @@ public interface ShipmentPort {
 
     ShipmentResult collectShipment(final TrackingNumber trackingNumber);
 
+    ShipmentResult handOverShipment(final ShipmentHandoverCommand command);
+
     ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId);
 
     Optional<OperatorId> findOperator(final TrackingNumber trackingNumber);

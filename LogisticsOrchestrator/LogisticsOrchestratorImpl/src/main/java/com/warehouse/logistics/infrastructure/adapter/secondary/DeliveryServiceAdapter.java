@@ -9,9 +9,11 @@ import com.warehouse.logistics.domain.enumeration.UpdateStatus;
 import com.warehouse.logistics.domain.vo.DeliveryTarget;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.logisticsdelivery.api.DeliveryApiService;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptRequestDto;
+import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryCompletionRequestDto;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptResultDto;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryTargetDto;
 
@@ -43,5 +45,11 @@ public class DeliveryServiceAdapter implements DeliveryServicePort {
         return new LogisticsResponse(attemptResult.deliveryId(), UpdateStatus.OK, attemptResult.shipmentId(),
                 DeliverySaveStatus.SAVED, new DeliveryTarget(
                         DeliveryTargetType.valueOf(attemptResult.target().type().name()), attemptResult.target().id()));
+    }
+
+    @Override
+    public void completeShipmentDelivery(final ShipmentId shipmentId, final boolean recipientSigned) {
+        this.deliveryApiService.completeShipmentDelivery(
+                new ShipmentDeliveryCompletionRequestDto(shipmentId, recipientSigned));
     }
 }

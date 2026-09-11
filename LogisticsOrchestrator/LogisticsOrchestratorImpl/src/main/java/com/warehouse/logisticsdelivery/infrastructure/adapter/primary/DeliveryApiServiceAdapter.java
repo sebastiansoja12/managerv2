@@ -4,8 +4,11 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logisticsdelivery.api.DeliveryApiService;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptRequestDto;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptResultDto;
+import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryCompletionRequestDto;
+import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryCompletionResultDto;
 import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryDto;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
+import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryApiMapper;
 
 public class DeliveryApiServiceAdapter implements DeliveryApiService {
@@ -22,6 +25,14 @@ public class DeliveryApiServiceAdapter implements DeliveryApiService {
     @Override
     public DeliveryAttemptResultDto recordAttempt(final DeliveryAttemptRequestDto attemptRequest) {
         return this.deliveryApiMapper.map(this.deliveryPort.recordAttempt(this.deliveryApiMapper.map(attemptRequest)));
+    }
+
+    @Override
+    public ShipmentDeliveryCompletionResultDto completeShipmentDelivery(
+            final ShipmentDeliveryCompletionRequestDto shipmentDeliveryCompletionRequest) {
+        final DeliverySnapshot delivery = this.deliveryPort.completeShipmentDelivery(
+                shipmentDeliveryCompletionRequest.shipmentId(), shipmentDeliveryCompletionRequest.recipientSigned());
+        return new ShipmentDeliveryCompletionResultDto(delivery.deliveryId(), delivery.shipmentId());
     }
 
     @Override
