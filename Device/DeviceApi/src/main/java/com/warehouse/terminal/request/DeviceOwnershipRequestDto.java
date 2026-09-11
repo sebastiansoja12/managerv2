@@ -13,6 +13,7 @@ public record DeviceOwnershipRequestDto(
         Long vehicleId,
         String assignedRole,
         Instant assignedAt,
-        Instant unassignedAt
+        Instant unassignedAt,
+        String assignmentMode
 ) {
 }

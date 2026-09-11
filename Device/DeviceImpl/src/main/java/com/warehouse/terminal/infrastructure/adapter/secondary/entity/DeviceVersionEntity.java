@@ -46,6 +46,13 @@ public class DeviceVersionEntity {
                 deviceVersion.getDeviceId());
     }
 
+    public DeviceVersionEntity update(final DeviceType deviceType, final String version) {
+        this.deviceType = deviceType;
+        this.version = version;
+        this.lastUpdate = Instant.now();
+        return this;
+    }
+
     public Instant getLastUpdate() {
         return lastUpdate;
     }

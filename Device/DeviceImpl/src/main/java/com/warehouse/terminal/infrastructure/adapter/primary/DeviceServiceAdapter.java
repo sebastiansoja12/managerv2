@@ -1,18 +1,22 @@
 package com.warehouse.terminal.infrastructure.adapter.primary;
 
+import java.time.Instant;
 import java.util.List;
 import com.warehouse.terminal.dto.DeviceAccessDto;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.DeviceApiService;
+import com.warehouse.terminal.domain.enumeration.DeviceAssignmentMode;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
+import com.warehouse.terminal.domain.port.secondary.DepartmentRepository;
 import com.warehouse.terminal.domain.service.DeviceGenericService;
 import com.warehouse.terminal.domain.service.DevicePairService;
 import com.warehouse.terminal.domain.service.UserService;
@@ -31,15 +35,18 @@ public class DeviceServiceAdapter implements DeviceApiService {
     private final DevicePairService devicePairService;
     private final DeviceGenericService deviceGenericService;
     private final UserService userService;
+    private final DepartmentRepository departmentRepository;
     private final OperatorContext operatorContext;
 
     public DeviceServiceAdapter(final DevicePairService devicePairService,
                                 final DeviceGenericService deviceGenericService,
                                 final UserService userService,
+                                final DepartmentRepository departmentRepository,
                                 final OperatorContext operatorContext) {
         this.devicePairService = devicePairService;
         this.deviceGenericService = deviceGenericService;
         this.userService = userService;
+        this.departmentRepository = departmentRepository;
         this.operatorContext = operatorContext;
     }
 
@@ -56,21 +63,26 @@ public class DeviceServiceAdapter implements DeviceApiService {
         }
 
         return this.devicePairService.findValidByPairKey(pairKey)
-                .map(DevicePair::getDeviceId)
                 .flatMap(this::resolveDeviceContext)
                 .orElseGet(DeviceAuthenticationResponseDto::invalid);
     }
 
-    private Optional<DeviceAuthenticationResponseDto> resolveDeviceContext(final DeviceId deviceId) {
-        return this.deviceGenericService.findByDeviceIdForAuthentication(deviceId)
+    private Optional<DeviceAuthenticationResponseDto> resolveDeviceContext(final DevicePair devicePair) {
+        return this.deviceGenericService.findByDeviceIdForAuthentication(devicePair.getDeviceId())
                 .filter(device -> DeviceStatus.ACTIVE.equals(device.getStatus()))
-                .map(device -> toAuthenticationResponse(deviceId, device.getOwnership()));
+                .map(device -> toAuthenticationResponse(devicePair.getDeviceId(), device.getOwnership(),
+                        resolveOperatorUserId(devicePair, device.getOwnership())));
+    }
+
+    private UserId resolveOperatorUserId(final DevicePair devicePair, final OwnershipProfile ownership) {
+        return devicePair.activeOperator(Instant.now())
+                .orElseGet(() -> ownership != null && !ownership.isShared() ? ownership.getUserId() : null);
     }
 
     private DeviceAuthenticationResponseDto toAuthenticationResponse(final DeviceId deviceId,
-                                                                     final OwnershipProfile ownership) {
+                                                                     final OwnershipProfile ownership,
+                                                                     final UserId userId) {
         final DepartmentCode departmentCode = ownership != null ? ownership.getDepartmentCode() : null;
-        final UserId userId = ownership != null ? ownership.getUserId() : null;
         final OperatorId operatorId = ownership != null ? ownership.getOperatorId() : null;
         final User user = resolveUser(operatorId, userId);
         final Username username = user != null ? user.username() : null;
@@ -81,8 +93,21 @@ public class DeviceServiceAdapter implements DeviceApiService {
                 mapDepartmentCode(departmentCode),
                 mapUserId(userId),
                 mapUsername(username),
-                operatorId
+                operatorId,
+                resolveDepartmentId(operatorId, departmentCode)
         );
+    }
+
+    private DepartmentId resolveDepartmentId(final OperatorId operatorId, final DepartmentCode departmentCode) {
+        if (operatorId == null || departmentCode == null) {
+            return null;
+        }
+        try {
+            return this.operatorContext.runAs(operatorId,
+                    () -> this.departmentRepository.findByDepartmentCode(departmentCode).getDepartmentId());
+        } catch (final RuntimeException ex) {
+            return null;
+        }
     }
 
     private User resolveUser(final OperatorId operatorId, final UserId userId) {
@@ -142,6 +167,7 @@ public class DeviceServiceAdapter implements DeviceApiService {
 
     private DeviceAccessDto toAccess(final Device device) {
         final Optional<DevicePair> devicePair = devicePairService.findExistingByDeviceId(device.getDeviceId());
+        final Optional<UserId> activeOperator = devicePair.flatMap(pair -> pair.activeOperator(Instant.now()));
         return new DeviceAccessDto(
                 device.getDeviceId() != null ? device.getDeviceId().value() : null,
                 device.getDeviceType() != null ? device.getDeviceType().name() : null,
@@ -152,7 +178,20 @@ public class DeviceServiceAdapter implements DeviceApiService {
                 lastUpdateOf(device),
                 devicePair.map(DevicePair::isPaired).orElse(false),
                 devicePair.map(DevicePair::getPairKeyExpiresAt).orElse(null),
-                devicePair.map(DevicePair::getLoginTime).orElse(null));
+                devicePair.map(DevicePair::getLoginTime).orElse(null),
+                assignmentModeOf(device),
+                devicePair.map(DevicePair::getLastSeenAt).orElse(null),
+                activeOperator.map(UserId::value).orElse(null),
+                activeOperator.isPresent()
+                        ? devicePair.map(DevicePair::getOperatorSessionExpiresAt).orElse(null)
+                        : null);
+    }
+
+    private String assignmentModeOf(final Device device) {
+        final OwnershipProfile ownership = device.getOwnership();
+        return ownership != null && ownership.isShared()
+                ? DeviceAssignmentMode.SHARED.name()
+                : DeviceAssignmentMode.PERSONAL.name();
     }
 
     private String versionOf(final Device device) {

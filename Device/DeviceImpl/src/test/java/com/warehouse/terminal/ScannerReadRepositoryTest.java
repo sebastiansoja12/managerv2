@@ -27,6 +27,7 @@ import com.warehouse.commonassets.identificator.TeamId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.terminal.configuration.DeviceTestConfiguration;
+import com.warehouse.terminal.domain.enumeration.DeviceAssignmentMode;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.enumeration.NetworkType;
 import com.warehouse.terminal.domain.model.device.Scanner;
@@ -253,7 +254,8 @@ class ScannerReadRepositoryTest {
                 new VehicleId(9201L),
                 "PICKER",
                 BASE_TIME,
-                null
+                null,
+                DeviceAssignmentMode.PERSONAL
         ));
 
         entity.setScanType(Scanner.ScanType.BARCODE);

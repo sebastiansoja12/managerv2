@@ -1,5 +1,6 @@
 package com.warehouse.terminal.configuration;
 
+import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,9 +32,24 @@ public class TerminalConfiguration {
                                            final UserService userService,
                                            final DevicePairService devicePairService,
                                            final DeviceVersionService deviceVersionService,
-                                           final DevicePairValidationService devicePairValidationService) {
+                                           final DevicePairValidationService devicePairValidationService,
+                                           final DeviceActivationService deviceActivationService,
+                                           final OperatorContext operatorContext) {
         return new DevicePairPortImpl(deviceGenericService, userService, devicePairService, deviceVersionService,
-                devicePairValidationService);
+                devicePairValidationService, deviceActivationService, operatorContext);
+    }
+
+    @Bean
+    public DeviceActivationService deviceActivationService(
+            final DeviceActivationCodeRepository deviceActivationCodeRepository,
+            @Value("${device.activation.code-validity:PT15M}") final Duration activationCodeValidity) {
+        return new DeviceActivationServiceImpl(deviceActivationCodeRepository, activationCodeValidity);
+    }
+
+    @Bean
+    public DeviceActivationCodeRepository deviceActivationCodeRepository(
+            final DeviceActivationCodeReadRepository deviceActivationCodeReadRepository) {
+        return new DeviceActivationCodeRepositoryImpl(deviceActivationCodeReadRepository);
     }
 
     @Bean
@@ -91,16 +107,18 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public DevicePairService devicePairService(final DevicePairRepository devicePairRepository,
-                                               final DevicePairKeyService devicePairKeyService) {
-        return new DevicePairServiceImpl(devicePairRepository, devicePairKeyService);
+    public DevicePairService devicePairService(
+            final DevicePairRepository devicePairRepository,
+            final DevicePairKeyService devicePairKeyService,
+            @Value("${device.activation.pair-key-validity:P180D}") final Duration activatedPairKeyValidity,
+            @Value("${device.operator-session.validity:PT12H}") final Duration operatorSessionValidity) {
+        return new DevicePairServiceImpl(devicePairRepository, devicePairKeyService, activatedPairKeyValidity,
+                operatorSessionValidity);
     }
 
     @Bean
-    public DevicePairValidationService devicePairValidationService(final DeviceGenericService deviceGenericService,
-                                                                   final UserService userService,
-                                                                   final DepartmentRepository departmentRepository) {
-        return new DevicePairValidationServiceImpl(deviceGenericService, userService, departmentRepository);
+    public DevicePairValidationService devicePairValidationService(final UserService userService) {
+        return new DevicePairValidationServiceImpl(userService);
     }
 
     @Bean
@@ -125,8 +143,10 @@ public class TerminalConfiguration {
     public DeviceApiService deviceApiService(final DevicePairService devicePairService,
                                              final DeviceGenericService deviceGenericService,
                                              final UserService userService,
+                                             final DepartmentRepository departmentRepository,
                                              final OperatorContext operatorContext) {
-        return new DeviceServiceAdapter(devicePairService, deviceGenericService, userService, operatorContext);
+        return new DeviceServiceAdapter(devicePairService, deviceGenericService, userService, departmentRepository,
+                operatorContext);
     }
 
     @Bean

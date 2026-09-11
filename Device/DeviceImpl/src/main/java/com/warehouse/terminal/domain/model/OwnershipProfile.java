@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.TeamId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.identificator.VehicleId;
+import com.warehouse.terminal.domain.enumeration.DeviceAssignmentMode;
 
 public class OwnershipProfile {
     private UserId userId;
@@ -18,10 +19,11 @@ public class OwnershipProfile {
     private Instant assignedAt;
     private Instant unassignedAt;
     private final OperatorId operatorId;
+    private DeviceAssignmentMode assignmentMode;
 
 	public OwnershipProfile(final Instant assignedAt, final String assignedRole, final DepartmentCode departmentCode,
 			final UserId previousUserId, final TeamId teamId, final Instant unassignedAt, final UserId userId,
-			final VehicleId vehicleId, final OperatorId operatorId) {
+			final VehicleId vehicleId, final OperatorId operatorId, final DeviceAssignmentMode assignmentMode) {
         this.assignedAt = assignedAt;
         this.assignedRole = assignedRole;
         this.departmentCode = departmentCode;
@@ -31,6 +33,7 @@ public class OwnershipProfile {
         this.userId = userId;
         this.vehicleId = vehicleId;
         this.operatorId = operatorId;
+        this.assignmentMode = assignmentMode;
     }
 
     public static OwnershipProfile initializeOwnership(final String assignedRole,
@@ -39,11 +42,33 @@ public class OwnershipProfile {
                                                        final VehicleId vehicleId,
                                                        final OperatorId operatorId) {
         return new OwnershipProfile(Instant.now(), assignedRole, departmentCode, null, null, null, userId, null,
-                operatorId);
+                operatorId, DeviceAssignmentMode.PERSONAL);
     }
 
     public OperatorId getOperatorId() {
         return operatorId;
+    }
+
+    public DeviceAssignmentMode getAssignmentMode() {
+        return assignmentMode;
+    }
+
+    public void setAssignmentMode(final DeviceAssignmentMode assignmentMode) {
+        this.assignmentMode = assignmentMode;
+    }
+
+    public void reassignTo(final UserId newUserId, final Instant timestamp) {
+        if (newUserId == null || newUserId.equals(this.userId)) {
+            return;
+        }
+        this.previousUserId = this.userId;
+        this.userId = newUserId;
+        this.assignedAt = timestamp;
+        this.unassignedAt = null;
+    }
+
+    public boolean isShared() {
+        return DeviceAssignmentMode.SHARED.equals(assignmentMode);
     }
 
     public Instant getAssignedAt() {
@@ -134,6 +159,9 @@ public class OwnershipProfile {
         }
         if (ownership.getUnassignedAt() != null) {
             this.unassignedAt = ownership.getUnassignedAt();
+        }
+        if (ownership.getAssignmentMode() != null) {
+            this.assignmentMode = ownership.getAssignmentMode();
         }
         return this;
     }

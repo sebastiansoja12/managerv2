@@ -3,6 +3,7 @@ package com.warehouse.terminal.infrastructure.adapter.secondary.entity;
 import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.DevicePair;
 import com.warehouse.terminal.domain.model.device.Terminal;
 import com.warehouse.terminal.domain.vo.DevicePairId;
@@ -40,6 +41,16 @@ public class DevicePairEntity {
 
     @Column(name = "pair_key_expires_at")
     private Instant pairKeyExpiresAt;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "operator_user_id"))
+    private UserId operatorUserId;
+
+    @Column(name = "operator_session_expires_at")
+    private Instant operatorSessionExpiresAt;
+
+    @Column(name = "last_seen_at")
+    private Instant lastSeenAt;
 
     public DevicePairEntity() {
     }
@@ -92,7 +103,7 @@ public class DevicePairEntity {
     }
 
     public static DevicePairEntity from(final DevicePair devicePair, final Terminal terminal) {
-        return new DevicePairEntity(
+        final DevicePairEntity entity = new DevicePairEntity(
                 devicePair.getDevicePairId(),
                 terminal.getDeviceId(),
                 devicePair.isPaired(),
@@ -100,10 +111,13 @@ public class DevicePairEntity {
                 devicePair.getErrorDescription(),
                 devicePair.getPairKey(),
                 devicePair.getPairKeyExpiresAt());
+        entity.applyOperatorSession(devicePair.getOperatorUserId(), devicePair.getOperatorSessionExpiresAt(),
+                devicePair.getLastSeenAt());
+        return entity;
     }
 
     public static DevicePairEntity from(final DevicePair devicePair) {
-        return new DevicePairEntity(
+        final DevicePairEntity entity = new DevicePairEntity(
                 devicePair.getDevicePairId(),
                 devicePair.getDeviceId(),
                 devicePair.isPaired(),
@@ -111,6 +125,17 @@ public class DevicePairEntity {
                 devicePair.getErrorDescription(),
                 devicePair.getPairKey(),
                 devicePair.getPairKeyExpiresAt());
+        entity.applyOperatorSession(devicePair.getOperatorUserId(), devicePair.getOperatorSessionExpiresAt(),
+                devicePair.getLastSeenAt());
+        return entity;
+    }
+
+    private void applyOperatorSession(final UserId operatorUserId,
+                                      final Instant operatorSessionExpiresAt,
+                                      final Instant lastSeenAt) {
+        this.operatorUserId = operatorUserId;
+        this.operatorSessionExpiresAt = operatorSessionExpiresAt;
+        this.lastSeenAt = lastSeenAt;
     }
 
     public Long getDevicePairId() {
@@ -159,6 +184,18 @@ public class DevicePairEntity {
 
     public Instant getPairKeyExpiresAt() {
         return pairKeyExpiresAt;
+    }
+
+    public UserId getOperatorUserId() {
+        return operatorUserId;
+    }
+
+    public Instant getOperatorSessionExpiresAt() {
+        return operatorSessionExpiresAt;
+    }
+
+    public Instant getLastSeenAt() {
+        return lastSeenAt;
     }
 
     public void pair() {

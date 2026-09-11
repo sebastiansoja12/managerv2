@@ -11,5 +11,9 @@ public record DeviceAccessDto(String deviceId,
                               Instant lastUpdate,
                               boolean paired,
                               Instant pairKeyExpiresAt,
-                              Instant lastLoginAt) {
+                              Instant lastLoginAt,
+                              String assignmentMode,
+                              Instant lastSeenAt,
+                              Long operatorUserId,
+                              Instant operatorSessionExpiresAt) {
 }

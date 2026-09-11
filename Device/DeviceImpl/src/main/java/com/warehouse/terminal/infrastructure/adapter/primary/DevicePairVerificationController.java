@@ -5,6 +5,9 @@ import static org.mapstruct.factory.Mappers.getMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,13 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.Username;
 import com.warehouse.terminal.domain.model.DeviceVersion;
+import com.warehouse.terminal.domain.model.command.DeviceHeartbeatCommand;
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.vo.DeviceInformationResponse;
+import com.warehouse.terminal.domain.vo.DevicePairKey;
 import com.warehouse.terminal.infrastructure.adapter.primary.mapper.TerminalResponseMapper;
+import com.warehouse.terminal.request.DeviceHeartbeatRequestDto;
 
 @RestController
 @RequestMapping("${api.exposure.internal-prefix}/device-pairing-verifications")
 public class DevicePairVerificationController {
+
+    private static final String HEADER_DEVICE_PAIR_KEY = "X-DEVICE-PAIR-KEY";
 
     private final DevicePairPort devicePairPort;
 
@@ -76,6 +84,15 @@ public class DevicePairVerificationController {
     public ResponseEntity<?> validateByPairKey() {
         final DeviceInformationResponse response = new DeviceInformationResponse(true);
         return ResponseEntity.ok().body(responseMapper.map(response));
+    }
+
+    @PostMapping("/heartbeats")
+    public ResponseEntity<?> heartbeat(@RequestHeader(HEADER_DEVICE_PAIR_KEY) final String pairKey,
+                                       @RequestBody final DeviceHeartbeatRequestDto heartbeatRequest) {
+        final DeviceHeartbeatCommand command = new DeviceHeartbeatCommand(new DevicePairKey(pairKey),
+                heartbeatRequest.version(), heartbeatRequest.manufacturer(), heartbeatRequest.model(),
+                heartbeatRequest.osName(), heartbeatRequest.osVersion());
+        return ResponseEntity.ok().body(responseMapper.map(this.devicePairPort.heartbeat(command)));
     }
 
     @GetMapping("/paired")
