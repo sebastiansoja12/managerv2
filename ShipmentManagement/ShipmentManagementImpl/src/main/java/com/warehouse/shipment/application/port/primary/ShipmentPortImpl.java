@@ -16,18 +16,15 @@ import com.warehouse.shipment.application.port.secondary.*;
 import com.warehouse.shipment.application.service.DepartmentCountryAvailabilityService;
 import com.warehouse.shipment.application.service.ShipmentDepartmentResolutionService;
 import com.warehouse.shipment.application.service.ShipmentResultFactory;
-import com.warehouse.shipment.application.service.SignatureService;
 import com.warehouse.shipment.application.service.TrackingNumberGenerationService;
 import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrategyResolver;
 import com.warehouse.shipment.application.service.status.ShipmentStatusChangeStrategyResolver;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
-import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.service.AddressValidationService;
 import com.warehouse.shipment.domain.service.ShipmentStateValidatorServiceImpl;
 import com.warehouse.shipment.domain.vo.Address;
@@ -40,7 +37,6 @@ import com.warehouse.shipment.domain.vo.conf.ShipmentMetrics;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -55,8 +51,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     private final PathFinderServicePort pathFinderServicePort;
 
     private final DepartmentCountryAvailabilityService departmentCountryAvailabilityService;
-
-    private final SignatureService signatureService;
 
     private final ShipmentResultFactory shipmentResultFactory;
 
@@ -84,7 +78,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
                             final DepartmentCountryAvailabilityService departmentCountryAvailabilityService,
-                            final SignatureService signatureService,
                             final ShipmentResultFactory shipmentResultFactory,
                             final MailNotificationServicePort mailNotificationServicePort,
                             final TrackingNumberGenerationService trackingNumberGenerationService,
@@ -100,7 +93,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
         this.departmentCountryAvailabilityService = departmentCountryAvailabilityService;
-        this.signatureService = signatureService;
         this.shipmentResultFactory = shipmentResultFactory;
         this.mailNotificationServicePort = mailNotificationServicePort;
         this.trackingNumberGenerationService = trackingNumberGenerationService;
@@ -360,17 +352,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
-    public void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod) {
-        final Signature signature = new Signature(
-                request.getSignerName(),
-                signatureMethod,
-                request.getDocumentReference(),
-                request.getShipmentId(),
-                request.getSignature().getBytes(StandardCharsets.UTF_8));
-        this.signatureService.createSignature(signature);
-    }
-
-    @Override
     public ShipmentResult loadShipment(final ShipmentId shipmentId) {
         return this.shipmentResultFactory.create(this.find(shipmentId));
     }
@@ -467,14 +448,6 @@ public class ShipmentPortImpl implements ShipmentPort {
     public ShipmentResult handOverShipment(final ShipmentHandoverCommand command) {
         final Shipment shipment = this.find(command.trackingNumber());
         shipment.ensureCanBeHandedOver();
-        if (command.signature() != null && !command.signature().isBlank()) {
-            this.signatureService.createSignature(new Signature(
-                    command.recipientName(),
-                    SignatureMethod.HANDWRITTEN,
-                    null,
-                    shipment.getShipmentId(),
-                    command.signature().getBytes(StandardCharsets.UTF_8)));
-        }
         return this.shipmentResultFactory.create(shipment);
     }
 

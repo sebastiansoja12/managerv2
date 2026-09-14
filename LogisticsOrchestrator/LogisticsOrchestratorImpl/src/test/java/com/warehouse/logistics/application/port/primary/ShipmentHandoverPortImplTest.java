@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -54,8 +55,8 @@ class ShipmentHandoverPortImplTest {
 
         final ShipmentHandoverResult result = shipmentHandoverPort.handOver(command);
 
-        verify(deliveryServicePort).completeShipmentDelivery(new ShipmentId(100L), true);
-        verify(deliveryServicePort, never()).completeShipmentDelivery(eq(null), anyBoolean());
+        verify(deliveryServicePort).completeShipmentDelivery(new ShipmentId(100L), true, "Jan Kowalski", "<svg/>");
+        verify(deliveryServicePort, never()).completeShipmentDelivery(eq(null), anyBoolean(), any(), any());
         final ArgumentCaptor<ProcessCommunication> communication = ArgumentCaptor.forClass(ProcessCommunication.class);
         verify(processHubServicePort).registerCommunication(communication.capture());
         assertEquals(PROCESS_ID, communication.getValue().processId());
@@ -73,7 +74,7 @@ class ShipmentHandoverPortImplTest {
         when(deliveryHandoverServicePort.handOver(command)).thenReturn(new ShipmentHandoverResult(List.of(
                 new ShipmentHandoverDetail(DELIVERED, new ShipmentId(100L), true, null)), false));
         doThrow(new IllegalStateException("Recipient signature is required for this delivery"))
-                .when(deliveryServicePort).completeShipmentDelivery(new ShipmentId(100L), false);
+                .when(deliveryServicePort).completeShipmentDelivery(new ShipmentId(100L), false, null, null);
 
         final ShipmentHandoverResult result = shipmentHandoverPort.handOver(command);
 

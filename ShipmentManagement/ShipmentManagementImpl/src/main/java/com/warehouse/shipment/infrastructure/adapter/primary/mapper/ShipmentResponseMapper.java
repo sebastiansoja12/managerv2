@@ -7,7 +7,6 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
@@ -30,11 +29,6 @@ public interface ShipmentResponseMapper {
     }
 
     default ShipmentDto map(final ShipmentSnapshot shipment) {
-        return map(shipment, null);
-    }
-
-    default ShipmentDto map(final ShipmentSnapshot shipment,
-                            final com.warehouse.shipment.domain.model.Signature signature) {
         if (shipment == null) {
             return null;
         }
@@ -50,7 +44,6 @@ public interface ShipmentResponseMapper {
                 shipment.trackingNumber() == null ? null : new TrackingNumberDto(shipment.trackingNumber().value()),
                 map(shipment.price()),
                 shipment.locked(),
-                map(signature),
                 shipment.createdAt(),
                 shipment.updatedAt(),
                 map(shipment.dimensions()),
@@ -66,7 +59,7 @@ public interface ShipmentResponseMapper {
     }
 
     default ShipmentDto map(final ShipmentResult shipmentResult) {
-        return map(shipmentResult.snapshot(), shipmentResult.signature());
+        return map(shipmentResult.snapshot());
     }
 
     default PersonApi map(final Party person) {
@@ -96,14 +89,6 @@ public interface ShipmentResponseMapper {
 
     default List<String> map(String value) {
         return List.of(value);
-    }
-
-    default SignatureDto map(final Signature signature) {
-        if (signature == null) {
-            return null;
-        }
-        return new SignatureDto(signature.getSignerName(), signature.getSignedAt(), signature.getSignatureMethod().name(),
-                map(signature.getSignature()));
     }
 
     default String map(final byte[] bytes) {

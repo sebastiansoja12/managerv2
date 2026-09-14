@@ -6,6 +6,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SignatureId;
 import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.VehicleId;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryCommentCode;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryDerivationType;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
@@ -76,6 +77,16 @@ class DeliveryTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenCompletingCompletedDeliveryAgain() {
+        final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
+        delivery.complete(null, USER_ID, null);
+
+        assertThatThrownBy(() -> delivery.complete(null, USER_ID, null))
+                .isInstanceOf(DeliveryModificationException.class);
+        assertThat(delivery.getDeliverySteps()).hasSize(2);
+    }
+
+    @Test
     void shouldRecordAttemptAsNextStep() {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
 
@@ -142,6 +153,9 @@ class DeliveryTest {
 
         assertThat(replaced.isActive()).isFalse();
         assertThat(replaced.getReplacedByDeliveryId()).isEqualTo(palletDelivery.getDeliveryId());
+        final DeliveryStepSnapshot replacementStep = replaced.snapshot().deliverySteps().getLast();
+        assertThat(replacementStep.commentCode()).isEqualTo(DeliveryCommentCode.REPLACED_BY_PALLET_DELIVERY);
+        assertThat(replacementStep.comment()).isNull();
         assertThat(replaced.replaceByPalletDelivery(replaced.getDeliveryId(), USER_ID)).isFalse();
     }
 

@@ -1,4 +1,4 @@
-package com.warehouse.shipment.domain.enumeration;
+package com.warehouse.logisticsdelivery.domain.enumeration;
 
 public enum SignatureMethod {
     DIGITAL,

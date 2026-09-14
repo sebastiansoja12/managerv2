@@ -95,7 +95,7 @@ class ShipmentApiServiceAdapterTest {
                 .thenReturn(shipmentResult(new ShipmentId(99L)));
         when(this.shipmentPort.loadShipment(new ShipmentId(99L)))
                 .thenReturn(new ShipmentResult(new Shipment(new ShipmentId(99L), null, null, null, null, false, null,
-                        new TrackingNumber("FTM-REDIRECT-99"), null).snapshot(), null));
+                        new TrackingNumber("FTM-REDIRECT-99"), null).snapshot()));
 
         final ShipmentRejectResponseItemDto response = reject(1L, "REJECTED").shipments().getFirst();
 
@@ -159,7 +159,7 @@ class ShipmentApiServiceAdapterTest {
         final Shipment shipment = new Shipment(
                 new ShipmentId(1L), null, null, relatedShipmentId, null,
                 false, null, null, null);
-        return new ShipmentResult(shipment.snapshot(), null);
+        return new ShipmentResult(shipment.snapshot());
     }
 
     @Test

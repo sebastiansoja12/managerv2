@@ -20,6 +20,7 @@ import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.Delive
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryStepSignatureRequestDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliveryStepStatusRequestDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.DeliverySupplierRequestDto;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.api.SignatureResponseDto;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryRequestMapper;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
 import org.springframework.http.HttpStatus;
@@ -168,6 +169,11 @@ public class DeliveryController {
         }
         return responseMapper.map(deliveryPort.attachStepSignature(
                 requestMapper.map(new DeliveryId(deliveryId), stepNumber, request)));
+    }
+
+    @GetMapping("/{deliveryId}/signature")
+    public ResponseEntity<SignatureResponseDto> findSignature(@PathVariable final String deliveryId) {
+        return ResponseEntity.of(deliveryPort.findSignature(new DeliveryId(deliveryId)).map(responseMapper::map));
     }
 
     @PutMapping("/{deliveryId}/steps/{stepNumber}/carrier")

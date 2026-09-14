@@ -3,7 +3,6 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.SignatureId;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
@@ -104,7 +103,7 @@ public class ShipmentPersistenceMapper {
         return entity;
     }
 
-    public ShipmentReadEntity toReadEntity(final ShipmentSnapshot snapshot, final SignatureId signatureId) {
+    public ShipmentReadEntity toReadEntity(final ShipmentSnapshot snapshot) {
         return ShipmentReadEntity.builder()
                 .shipmentId(snapshot.shipmentId())
                 .sender(partyEntity(snapshot.sender()))
@@ -127,7 +126,6 @@ public class ShipmentPersistenceMapper {
                 .serviceLevel(snapshot.serviceLevel())
                 .packagingType(snapshot.packagingType())
                 .price(snapshot.price())
-                .signatureId(signatureId)
                 .signatureRequired(snapshot.signatureRequired())
                 .externalId(new ExternalId<>(snapshot.externalShipmentId().value().toString()))
                 .trackingNumber(snapshot.trackingNumber())

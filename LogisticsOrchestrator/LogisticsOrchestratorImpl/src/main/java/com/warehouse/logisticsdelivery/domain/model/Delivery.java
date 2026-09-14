@@ -2,6 +2,7 @@ package com.warehouse.logisticsdelivery.domain.model;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryCommentCode;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryDerivationType;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
@@ -119,6 +120,167 @@ public class Delivery {
         this.replacedByDeliveryId = replacedByDeliveryId;
     }
 
+    public static Delivery forPallet(final DeliveryTarget target, final UserId userId) {
+        if (target.type() != DeliveryTargetType.PALLET) {
+            throw new DeliveryModificationException("Pallet delivery requires pallet target");
+        }
+        return new Delivery(target, null, DeliveryType.OUTBOUND, null, null, null, DeliveryMethod.COURIER,
+                null, null, null, false, userId);
+    }
+
+    public static Delivery derivedFrom(final Delivery source, final ShipmentId shipmentId,
+                                       final DeliveryDerivationType derivationType, final Boolean signatureRequired,
+                                       final UserId userId) {
+        final DeliveryTarget target = DeliveryTarget.shipment(shipmentId);
+        if (derivationType.reversesRoute()) {
+            return new Delivery(target, shipmentId, DeliveryType.OUTBOUND, source.destinationDepartmentId,
+                    source.originDepartmentId, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null, null,
+                    signatureRequired, userId);
+        }
+        return new Delivery(target, shipmentId, DeliveryType.OUTBOUND, source.originDepartmentId,
+                source.destinationDepartmentId, source.pickupMethod, source.method, source.pickupPointId,
+                source.deliveryPickupPointId, null, signatureRequired, userId);
+    }
+
+    public boolean assignSupplier(final SupplierId supplierId, final VehicleId vehicleId) {
+        if (Objects.equals(this.supplierId, supplierId) && Objects.equals(this.vehicleId, vehicleId)) {
+            return false;
+        }
+        ensureCanBeModified();
+        this.supplierId = supplierId;
+        this.vehicleId = vehicleId;
+        markAsModified();
+        return true;
+    }
+
+    public boolean unassignSupplier() {
+        return assignSupplier(null, null);
+    }
+
+    public boolean changeRoute(final DepartmentId originDepartmentId,
+                               final DepartmentId destinationDepartmentId,
+                               final PickupMethod pickupMethod,
+                               final PickupPointId pickupPointId,
+                               final PickupPointId deliveryPickupPointId) {
+        if (Objects.equals(this.originDepartmentId, originDepartmentId)
+                && Objects.equals(this.destinationDepartmentId, destinationDepartmentId)
+                && Objects.equals(this.pickupMethod, pickupMethod)
+                && Objects.equals(this.pickupPointId, pickupPointId)
+                && Objects.equals(this.deliveryPickupPointId, deliveryPickupPointId)) {
+            return false;
+        }
+        ensureCanBeModified();
+        this.originDepartmentId = originDepartmentId;
+        this.destinationDepartmentId = destinationDepartmentId;
+        this.pickupMethod = pickupMethod;
+        this.pickupPointId = pickupPointId;
+        this.deliveryPickupPointId = deliveryPickupPointId;
+        markAsModified();
+        return true;
+    }
+
+    public boolean changeDestinationDepartment(final DepartmentId destinationDepartmentId) {
+        return changeRoute(originDepartmentId, destinationDepartmentId, pickupMethod, pickupPointId,
+                deliveryPickupPointId);
+    }
+
+    public boolean changeConditions(final DeliveryMethod method,
+                                    final Boolean signatureRequired,
+                                    final String instructions,
+                                    final LocalDateTime plannedAt) {
+        if (method == null) {
+            throw new DeliveryModificationException("Delivery method is required");
+        }
+        if (Objects.equals(this.method, method)
+                && Objects.equals(this.signatureRequired, signatureRequired)
+                && Objects.equals(this.instructions, instructions)
+                && Objects.equals(this.plannedAt, plannedAt)) {
+            return false;
+        }
+        ensureCanBeModified();
+        this.method = method;
+        this.signatureRequired = Boolean.TRUE.equals(signatureRequired);
+        this.instructions = instructions;
+        this.plannedAt = plannedAt;
+        markAsModified();
+        return true;
+    }
+
+    public boolean commentStep(final int stepNumber, final String comment) {
+        return step(stepNumber).changeComment(comment);
+    }
+
+    public boolean correctStepStatus(final int stepNumber, final DeliveryStatus correctedStatus) {
+        ensureCanBeModified();
+        return markAsModifiedWhen(step(stepNumber).correctStatus(correctedStatus));
+    }
+
+    public boolean attachStepSignature(final int stepNumber, final SignatureId signatureId) {
+        ensureCanBeModified();
+        return markAsModifiedWhen(step(stepNumber).attachSignature(signatureId));
+    }
+
+    public boolean reassignStepCarrier(final int stepNumber, final SupplierId supplierId, final VehicleId vehicleId) {
+        ensureCanBeModified();
+        return markAsModifiedWhen(step(stepNumber).reassignCarrier(supplierId, vehicleId));
+    }
+
+    public void recordAttempt(final DeliveryStatus attemptStatus, final UserId userId, final SupplierId supplierId,
+                              final DepartmentId departmentId, final VehicleId vehicleId, final String comment,
+                              final String token) {
+        addStep(DeliveryStep.attempt(deliveryId, attemptStatus, userId, supplierId, departmentId, vehicleId, comment,
+                token, deliverySteps.size()));
+    }
+
+    public void complete(final SupplierId supplierId, final UserId userId, final DepartmentId departmentId) {
+        complete(supplierId, userId, departmentId, null);
+    }
+
+    public void complete(final SupplierId supplierId, final UserId userId, final DepartmentId departmentId,
+                         final SignatureId signatureId) {
+        ensureCanBeModified();
+        final DeliveryStep completionStep = DeliveryStep.complete(deliveryId, supplierId, userId, departmentId,
+                deliverySteps.size());
+        completionStep.attachSignature(signatureId);
+        addStep(completionStep);
+        markAsCompleted();
+    }
+
+    public boolean replaceByPalletDelivery(final DeliveryId palletDeliveryId, final UserId userId) {
+        if (!isActive()) {
+            return false;
+        }
+        addStep(DeliveryStep.attempt(deliveryId, deliveryStatus, userId, supplierId, null, vehicleId,
+                DeliveryCommentCode.REPLACED_BY_PALLET_DELIVERY, deliverySteps.size()));
+        this.replacedByDeliveryId = palletDeliveryId;
+        markAsCanceled();
+        return true;
+    }
+
+    public void markAsCanceled() {
+        if (status == DeliveryLifecycleStatus.COMPLETED) {
+            throw new DeliveryModificationException("Completed delivery cannot be canceled");
+        }
+        this.status = DeliveryLifecycleStatus.CANCELED;
+    }
+
+    public boolean isActive() {
+        return status != DeliveryLifecycleStatus.CANCELED && status != DeliveryLifecycleStatus.COMPLETED;
+    }
+
+    public void ensureRecipientSignature(final boolean recipientSigned) {
+        if (Boolean.TRUE.equals(signatureRequired) && !recipientSigned) {
+            throw new DeliveryModificationException("Recipient signature is required for this delivery");
+        }
+    }
+
+    public DeliverySnapshot snapshot() {
+        return new DeliverySnapshot(deliveryId, target, shipmentId, type, createdAt, supplierId, vehicleId,
+                deliveryStatus, status, originDepartmentId, destinationDepartmentId, pickupMethod, method,
+                pickupPointId, deliveryPickupPointId, signatureRequired, instructions, plannedAt, deliveredAt, token,
+                deliverySteps.stream().map(DeliveryStep::snapshot).toList());
+    }
+
     public DeliveryId getReplacedByDeliveryId() {
         return replacedByDeliveryId;
     }
@@ -207,95 +369,17 @@ public class Delivery {
         return token;
     }
 
-    public boolean assignSupplier(final SupplierId supplierId, final VehicleId vehicleId) {
-        if (Objects.equals(this.supplierId, supplierId) && Objects.equals(this.vehicleId, vehicleId)) {
-            return false;
-        }
-        ensureCanBeModified();
-        this.supplierId = supplierId;
-        this.vehicleId = vehicleId;
-        markAsModified();
-        return true;
-    }
-
-    public boolean unassignSupplier() {
-        return assignSupplier(null, null);
-    }
-
-    public boolean changeRoute(final DepartmentId originDepartmentId,
-                               final DepartmentId destinationDepartmentId,
-                               final PickupMethod pickupMethod,
-                               final PickupPointId pickupPointId,
-                               final PickupPointId deliveryPickupPointId) {
-        if (Objects.equals(this.originDepartmentId, originDepartmentId)
-                && Objects.equals(this.destinationDepartmentId, destinationDepartmentId)
-                && Objects.equals(this.pickupMethod, pickupMethod)
-                && Objects.equals(this.pickupPointId, pickupPointId)
-                && Objects.equals(this.deliveryPickupPointId, deliveryPickupPointId)) {
-            return false;
-        }
-        ensureCanBeModified();
-        this.originDepartmentId = originDepartmentId;
-        this.destinationDepartmentId = destinationDepartmentId;
-        this.pickupMethod = pickupMethod;
-        this.pickupPointId = pickupPointId;
-        this.deliveryPickupPointId = deliveryPickupPointId;
-        markAsModified();
-        return true;
-    }
-
-    public boolean changeDestinationDepartment(final DepartmentId destinationDepartmentId) {
-        return changeRoute(originDepartmentId, destinationDepartmentId, pickupMethod, pickupPointId,
-                deliveryPickupPointId);
-    }
-
-    public boolean changeConditions(final DeliveryMethod method,
-                                    final Boolean signatureRequired,
-                                    final String instructions,
-                                    final LocalDateTime plannedAt) {
-        if (method == null) {
-            throw new DeliveryModificationException("Delivery method is required");
-        }
-        if (Objects.equals(this.method, method)
-                && Objects.equals(this.signatureRequired, signatureRequired)
-                && Objects.equals(this.instructions, instructions)
-                && Objects.equals(this.plannedAt, plannedAt)) {
-            return false;
-        }
-        ensureCanBeModified();
-        this.method = method;
-        this.signatureRequired = Boolean.TRUE.equals(signatureRequired);
-        this.instructions = instructions;
-        this.plannedAt = plannedAt;
-        markAsModified();
-        return true;
-    }
-
-    public boolean commentStep(final int stepNumber, final String comment) {
-        return step(stepNumber).changeComment(comment);
-    }
-
-    public boolean correctStepStatus(final int stepNumber, final DeliveryStatus correctedStatus) {
-        ensureCanBeModified();
-        return markAsModifiedWhen(step(stepNumber).correctStatus(correctedStatus));
-    }
-
-    public boolean attachStepSignature(final int stepNumber, final SignatureId signatureId) {
-        ensureCanBeModified();
-        return markAsModifiedWhen(step(stepNumber).attachSignature(signatureId));
-    }
-
-    public boolean reassignStepCarrier(final int stepNumber, final SupplierId supplierId, final VehicleId vehicleId) {
-        ensureCanBeModified();
-        return markAsModifiedWhen(step(stepNumber).reassignCarrier(supplierId, vehicleId));
-    }
-
     private DeliveryStep step(final int stepNumber) {
         return deliverySteps.stream()
                 .filter(deliveryStep -> deliveryStep.deliveryStep() == stepNumber)
                 .findFirst()
                 .orElseThrow(() -> new DeliveryStepNotFoundException("Delivery step " + stepNumber
                         + " was not found in delivery " + deliveryId.getId()));
+    }
+
+    private void addStep(final DeliveryStep deliveryStep) {
+        ensureCanBeModified();
+        deliverySteps.add(deliveryStep);
     }
 
     private boolean markAsModifiedWhen(final boolean changed) {
@@ -306,95 +390,17 @@ public class Delivery {
     }
 
     private void markAsModified() {
-        ensureCanBeModified();
         this.status = DeliveryLifecycleStatus.MODIFIED;
     }
 
-    public static Delivery forPallet(final DeliveryTarget target, final UserId userId) {
-        if (target.type() != DeliveryTargetType.PALLET) {
-            throw new DeliveryModificationException("Pallet delivery requires pallet target");
-        }
-        return new Delivery(target, null, DeliveryType.OUTBOUND, null, null, null, DeliveryMethod.COURIER,
-                null, null, null, false, userId);
-    }
-
-    public static Delivery derivedFrom(final Delivery source, final ShipmentId shipmentId,
-                                       final DeliveryDerivationType derivationType, final Boolean signatureRequired,
-                                       final UserId userId) {
-        final DeliveryTarget target = DeliveryTarget.shipment(shipmentId);
-        if (derivationType.reversesRoute()) {
-            return new Delivery(target, shipmentId, DeliveryType.OUTBOUND, source.destinationDepartmentId,
-                    source.originDepartmentId, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null, null,
-                    signatureRequired, userId);
-        }
-        return new Delivery(target, shipmentId, DeliveryType.OUTBOUND, source.originDepartmentId,
-                source.destinationDepartmentId, source.pickupMethod, source.method, source.pickupPointId,
-                source.deliveryPickupPointId, null, signatureRequired, userId);
-    }
-
-    public boolean isActive() {
-        return status != DeliveryLifecycleStatus.CANCELED && status != DeliveryLifecycleStatus.COMPLETED;
-    }
-
-    public boolean replaceByPalletDelivery(final DeliveryId palletDeliveryId, final UserId userId) {
-        if (!isActive()) {
-            return false;
-        }
-        addStep(DeliveryStep.attempt(deliveryId, deliveryStatus, userId, supplierId, null, vehicleId,
-                "Replaced by pallet delivery " + palletDeliveryId.getId(), null, deliverySteps.size()));
-        this.replacedByDeliveryId = palletDeliveryId;
-        markAsCanceled();
-        return true;
-    }
-
-    public void markAsCanceled() {
-        if (status == DeliveryLifecycleStatus.COMPLETED) {
-            throw new DeliveryModificationException("Completed delivery cannot be canceled");
-        }
-        this.status = DeliveryLifecycleStatus.CANCELED;
-    }
-
     private void markAsCompleted() {
-        if (status == DeliveryLifecycleStatus.CANCELED) {
-            throw new DeliveryModificationException("Canceled delivery cannot be completed");
-        }
         this.status = DeliveryLifecycleStatus.COMPLETED;
         this.deliveryStatus = DeliveryStatus.DELIVERED;
         this.deliveredAt = LocalDateTime.now();
     }
 
-    public void recordAttempt(final DeliveryStatus attemptStatus, final UserId userId, final SupplierId supplierId,
-                              final DepartmentId departmentId, final VehicleId vehicleId, final String comment,
-                              final String token) {
-        addStep(DeliveryStep.attempt(deliveryId, attemptStatus, userId, supplierId, departmentId, vehicleId, comment,
-                token, deliverySteps.size()));
-    }
-
-    public void complete(final SupplierId supplierId, final UserId userId, final DepartmentId departmentId) {
-        addStep(DeliveryStep.complete(deliveryId, supplierId, userId, departmentId, deliverySteps.size()));
-        markAsCompleted();
-    }
-
-    public DeliverySnapshot snapshot() {
-        return new DeliverySnapshot(deliveryId, target, shipmentId, type, createdAt, supplierId, vehicleId,
-                deliveryStatus, status, originDepartmentId, destinationDepartmentId, pickupMethod, method,
-                pickupPointId, deliveryPickupPointId, signatureRequired, instructions, plannedAt, deliveredAt, token,
-                deliverySteps.stream().map(DeliveryStep::snapshot).toList());
-    }
-
-    private void addStep(final DeliveryStep deliveryStep) {
-        ensureCanBeModified();
-        deliverySteps.add(deliveryStep);
-    }
-
-    public void ensureRecipientSignature(final boolean recipientSigned) {
-        if (Boolean.TRUE.equals(signatureRequired) && !recipientSigned) {
-            throw new DeliveryModificationException("Recipient signature is required for this delivery");
-        }
-    }
-
     private void ensureCanBeModified() {
-        if (status == DeliveryLifecycleStatus.CANCELED || status == DeliveryLifecycleStatus.COMPLETED) {
+        if (!isActive()) {
             throw new DeliveryModificationException("Delivery cannot be modified when its status is " + status);
         }
     }

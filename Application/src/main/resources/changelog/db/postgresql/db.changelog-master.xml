@@ -107,4 +107,6 @@
     <include file="changes/2026-10-26-supplier-driver-license-mail.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-26-postal-codes.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-26-mail-templates-shipment-status-reroute.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-27-signature-delivery.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-28-delivery-step-comment-code.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
