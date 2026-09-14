@@ -29,6 +29,7 @@ import com.warehouse.logistics.application.port.secondary.PalletScanServicePort;
 import com.warehouse.logistics.application.port.secondary.ProcessHubServicePort;
 import com.warehouse.logistics.application.port.secondary.ShipmentIdentificationServicePort;
 import com.warehouse.logistics.application.port.secondary.SupplierRepository;
+import com.warehouse.logistics.application.port.secondary.SupplierServicePort;
 import com.warehouse.logistics.application.service.LogisticsService;
 import com.warehouse.logistics.application.service.LogisticsServiceImpl;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValidatorAspect;
@@ -51,6 +52,7 @@ import com.warehouse.logistics.infrastructure.adapter.secondary.ProcessHubServic
 import com.warehouse.logistics.infrastructure.adapter.secondary.ShipmentIdentificationServiceAdapter;
 import com.warehouse.logistics.infrastructure.adapter.secondary.SupplierReadRepository;
 import com.warehouse.logistics.infrastructure.adapter.secondary.SupplierRepositoryImpl;
+import com.warehouse.logistics.infrastructure.adapter.secondary.SupplierServiceAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -61,6 +63,7 @@ import com.warehouse.logisticsdelivery.api.DeliveryApiService;
 import com.warehouse.palletmanagement.api.PalletApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.process.ProcessHubApiService;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
@@ -202,8 +205,16 @@ public class LogisticsConfiguration {
     }
 
     @Bean
-    public ShipmentCollectPort shipmentCollectPort(final DeliveryCollectServicePort deliveryCollectServicePort) {
-        return new ShipmentCollectPortImpl(deliveryCollectServicePort);
+    public ShipmentCollectPort shipmentCollectPort(final DeliveryCollectServicePort deliveryCollectServicePort,
+                                                   final DeliveryServicePort deliveryServicePort,
+                                                   final SupplierServicePort supplierServicePort) {
+        return new ShipmentCollectPortImpl(deliveryCollectServicePort, deliveryServicePort, supplierServicePort);
+    }
+
+    @Bean
+    public SupplierServicePort supplierServicePort(final SupplierApiService supplierApiService,
+                                                   final OperatorContextProvider operatorContextProvider) {
+        return new SupplierServiceAdapter(supplierApiService, operatorContextProvider);
     }
 
     @Bean

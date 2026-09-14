@@ -95,6 +95,7 @@ public class SupplierApiServiceAdapter implements SupplierApiService {
                 supplier.getFirstName(),
                 supplier.getLastName(),
                 supplier.getDepartmentId(),
-                supplier.getStatus() != null ? supplier.getStatus().name() : null);
+                supplier.getStatus() != null ? supplier.getStatus().name() : null,
+                supplier.getVehicleId());
     }
 }
