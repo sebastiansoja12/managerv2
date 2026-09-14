@@ -1,6 +1,6 @@
 package com.warehouse.platformadministration.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.asyncjob.api.ReadModelRebuildApiService;
 import com.warehouse.auth.OperatorSessionApiService;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;

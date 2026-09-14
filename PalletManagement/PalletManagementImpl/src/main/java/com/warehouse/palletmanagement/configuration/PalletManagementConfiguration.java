@@ -20,7 +20,7 @@ import com.warehouse.palletmanagement.infrastructure.adapter.secondary.document.
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import org.springframework.beans.factory.annotation.Value;
 import java.time.ZoneId;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.resilience.CircuitBreakerExecutor;

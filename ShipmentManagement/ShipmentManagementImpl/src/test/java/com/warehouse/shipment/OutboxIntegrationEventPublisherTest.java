@@ -9,8 +9,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
 import com.warehouse.commonassets.identificator.DepartmentId;
@@ -41,7 +42,7 @@ class OutboxIntegrationEventPublisherTest {
         final Environment environment = mock(Environment.class);
         final TransactionalKafkaOutboxWriter outboxWriter = mock(TransactionalKafkaOutboxWriter.class);
         final OperatorContextProvider contextProvider = mock(OperatorContextProvider.class);
-        final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+        final ObjectMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
         when(environment.getProperty("manager.kafka.integration-events.routes.shipment.changed"))
                 .thenReturn("shipment.events");
         when(contextProvider.currentContext()).thenReturn(Optional.of(new OperatorDetails(
@@ -99,7 +100,7 @@ class OutboxIntegrationEventPublisherTest {
                 .thenReturn("shipment.read-model.sync");
         when(contextProvider.currentContext()).thenReturn(Optional.empty());
         final OutboxIntegrationEventPublisher publisher = new OutboxIntegrationEventPublisher(
-                environment, new ObjectMapper().findAndRegisterModules(), outboxWriter, contextProvider);
+                environment, JsonMapper.builder().configureForJackson2().build(), outboxWriter, contextProvider);
         final ShipmentReadModelData snapshot = new ShipmentReadModelData(
                 DataTestCreator.shipment().getShipmentId());
         final ShipmentReadModelChanged event = new ShipmentReadModelChanged(snapshot, java.time.Instant.EPOCH);
@@ -114,7 +115,7 @@ class OutboxIntegrationEventPublisherTest {
         assertThat(record.eventType()).isEqualTo("shipment.read-model.changed");
         assertThat(record.headers())
                 .containsEntry(KafkaEventHeaders.TYPE_ID, ShipmentReadModelChanged.class.getName());
-        final JsonNode payload = new ObjectMapper().findAndRegisterModules().readTree(record.payload());
+        final JsonNode payload = JsonMapper.builder().configureForJackson2().build().readTree(record.payload());
         assertThat(payload.path("snapshot").size()).isEqualTo(1);
         assertThat(payload.path("snapshot").path("shipmentId").path("value").asLong())
                 .isEqualTo(snapshot.shipmentId().getValue());
@@ -125,7 +126,7 @@ class OutboxIntegrationEventPublisherTest {
         final TransactionalKafkaOutboxWriter outboxWriter = mock(TransactionalKafkaOutboxWriter.class);
         final OutboxIntegrationEventPublisher publisher = new OutboxIntegrationEventPublisher(
                 mock(Environment.class),
-                new ObjectMapper(),
+                JsonMapper.builder().configureForJackson2().build(),
                 outboxWriter,
                 mock(OperatorContextProvider.class));
         final IntegrationEvent eventWithoutType = new IntegrationEvent() {

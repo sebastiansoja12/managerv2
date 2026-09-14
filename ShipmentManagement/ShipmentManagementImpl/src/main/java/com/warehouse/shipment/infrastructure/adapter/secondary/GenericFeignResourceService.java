@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class GenericFeignResourceService {
 
@@ -24,7 +24,7 @@ public class GenericFeignResourceService {
 
 		try {
 			return objectMapper.readValue(responseBody, responseType);
-		} catch (final JsonProcessingException e) {
+		} catch (final JacksonException e) {
 			throw new IllegalStateException("Cannot deserialize Feign response to " + responseType.getSimpleName(), e);
 		}
 	}

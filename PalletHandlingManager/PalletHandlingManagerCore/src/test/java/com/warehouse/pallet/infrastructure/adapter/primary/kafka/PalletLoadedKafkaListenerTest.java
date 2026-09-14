@@ -1,6 +1,6 @@
 package com.warehouse.pallet.infrastructure.adapter.primary.kafka;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.pallet.configuration.identificator.PalletId;
 import com.warehouse.pallet.domain.model.PalletLoadedRequest;
 import com.warehouse.pallet.domain.port.primary.PalletPort;
@@ -32,7 +32,7 @@ class PalletLoadedKafkaListenerTest {
     void shouldDeserializeMonolithEventAndMarkPalletLoaded() throws Exception {
         final PalletPort palletPort = mock(PalletPort.class);
         final PalletLoadedKafkaListener listener = new PalletLoadedKafkaListener(palletPort);
-        final PalletLoadedIntegrationEvent event = new ObjectMapper()
+        final PalletLoadedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build()
                 .readValue(MESSAGE, PalletLoadedIntegrationEvent.class);
 
         listener.handle(event);

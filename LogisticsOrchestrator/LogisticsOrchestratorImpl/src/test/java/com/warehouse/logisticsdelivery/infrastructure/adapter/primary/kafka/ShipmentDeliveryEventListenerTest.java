@@ -1,6 +1,6 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.primary.kafka;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.PickupPointId;
@@ -42,7 +42,7 @@ class ShipmentDeliveryEventListenerTest {
                 }
                 """;
 
-        final ShipmentCreatedIntegrationEvent event = new ObjectMapper().findAndRegisterModules()
+        final ShipmentCreatedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build()
                 .readValue(json, ShipmentCreatedIntegrationEvent.class);
 
         assertEquals(new ShipmentId(42L), event.payload().shipmentId());
@@ -57,7 +57,7 @@ class ShipmentDeliveryEventListenerTest {
     void shouldCreateDeliveryFromShipmentCreatedEvent() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
         final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
-        final ShipmentCreatedIntegrationEvent event = new ObjectMapper().readValue("""
+        final ShipmentCreatedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}},
                   "delivery": {
@@ -94,7 +94,7 @@ class ShipmentDeliveryEventListenerTest {
     void shouldCreateDerivedDeliveryWhenShipmentCreatedEventHasNoDeliveryData() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
         final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
-        final ShipmentCreatedIntegrationEvent event = new ObjectMapper().readValue("""
+        final ShipmentCreatedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 43}, "signatureRequired": true},
                   "operatorId": {"value": 7},
@@ -117,7 +117,7 @@ class ShipmentDeliveryEventListenerTest {
     void shouldChangeDestinationDepartmentFromDestinationChangedEvent() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
         final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
-        final ShipmentDestinationChangedIntegrationEvent event = new ObjectMapper().readValue("""
+        final ShipmentDestinationChangedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}},
                   "destinationDepartmentId": {"value": 9},
@@ -137,7 +137,7 @@ class ShipmentDeliveryEventListenerTest {
     void shouldCancelShipmentDeliveriesFromShipmentCanceledEvent() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
         final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
-        final ShipmentCanceledIntegrationEvent event = new ObjectMapper().readValue("""
+        final ShipmentCanceledIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}},
                   "operatorId": {"value": 7},

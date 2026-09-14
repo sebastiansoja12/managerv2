@@ -15,9 +15,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
@@ -247,7 +247,7 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
     private String serializeHeaders(final Map<String, String> headers) {
         try {
             return this.objectMapper.writeValueAsString(headers);
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Cannot serialize Kafka event headers", exception);
         }
     }
@@ -255,7 +255,7 @@ public class JdbcKafkaOutboxAdapter implements KafkaOutboxPort {
     private Map<String, String> deserializeHeaders(final String headers) {
         try {
             return this.objectMapper.readValue(headers, HEADERS_TYPE);
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Cannot deserialize Kafka event headers", exception);
         }
     }

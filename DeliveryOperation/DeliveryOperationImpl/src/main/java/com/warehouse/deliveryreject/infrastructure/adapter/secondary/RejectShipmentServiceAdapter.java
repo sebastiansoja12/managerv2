@@ -3,8 +3,8 @@ package com.warehouse.deliveryreject.infrastructure.adapter.secondary;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.deliveryreject.domain.model.ShipmentRejectRequest;
@@ -26,7 +26,7 @@ public class RejectShipmentServiceAdapter implements RejectShipmentServicePort {
     private final ShipmentApiService shipmentApiService;
     private final RejectShipmentServiceMapper mapper;
     private final ProcessHubEventPublisher processHubEventPublisher;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
 
     public RejectShipmentServiceAdapter(final ShipmentApiService shipmentApiService,
                                         final RejectShipmentServiceMapper mapper,
@@ -67,7 +67,7 @@ public class RejectShipmentServiceAdapter implements RejectShipmentServicePort {
     private String writeAsString(final Object value) {
         try {
             return objectMapper.writeValueAsString(value);
-        } catch (final JsonProcessingException e) {
+        } catch (final JacksonException e) {
             log.warn("Cannot serialize shipment rejection process payload", e);
             return String.valueOf(value);
         }

@@ -1,6 +1,6 @@
 package com.warehouse.shipment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.JdbcKafkaOutboxAdapter;
@@ -59,7 +59,7 @@ class JdbcKafkaOutboxAdapterTest {
                 )
                 """);
         this.adapter = new JdbcKafkaOutboxAdapter(
-                this.jdbcTemplate, new ObjectMapper().findAndRegisterModules());
+                this.jdbcTemplate, JsonMapper.builder().configureForJackson2().build());
     }
 
     @AfterEach

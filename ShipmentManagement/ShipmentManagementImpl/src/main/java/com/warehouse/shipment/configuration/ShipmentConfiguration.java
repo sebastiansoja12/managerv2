@@ -3,14 +3,16 @@ package com.warehouse.shipment.configuration;
 import com.warehouse.returning.api.ReturningApiService;
 
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.boot.http.converter.autoconfigure.ClientHttpMessageConvertersCustomizer;
+import org.springframework.cloud.openfeign.support.FeignHttpMessageConverters;
+import org.springframework.cloud.openfeign.support.HttpMessageConverterCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
 import com.warehouse.commonassets.context.OperatorContext;
@@ -320,7 +322,14 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public GenericFeignClientFactory genericFeignClientFactory(final ObjectFactory<HttpMessageConverters> messageConverters,
+	public FeignHttpMessageConverters feignHttpMessageConverters(
+			final ObjectProvider<ClientHttpMessageConvertersCustomizer> clientHttpMessageConvertersCustomizers,
+			final ObjectProvider<HttpMessageConverterCustomizer> httpMessageConverterCustomizers) {
+		return new FeignHttpMessageConverters(clientHttpMessageConvertersCustomizers, httpMessageConverterCustomizers);
+	}
+
+	@Bean
+	public GenericFeignClientFactory genericFeignClientFactory(final ObjectProvider<FeignHttpMessageConverters> messageConverters,
 															  final CurrentUserApiService currentUserApiService) {
 		return new GenericFeignClientFactory(messageConverters, currentUserApiService);
 	}
