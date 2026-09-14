@@ -105,4 +105,6 @@
     <include file="changes/2026-10-23-user-api-key-issued-at.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-24-courier-vehicle-and-audit-keys.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-26-supplier-driver-license-mail.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-26-postal-codes.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-26-mail-templates-shipment-status-reroute.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

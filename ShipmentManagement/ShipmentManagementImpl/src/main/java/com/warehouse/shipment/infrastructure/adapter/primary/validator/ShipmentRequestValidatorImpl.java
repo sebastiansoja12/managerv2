@@ -125,10 +125,6 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.add("Postal code is required");
         }
 
-        if (person.countryCode() == null) {
-            errors.add("Country code is required");
-        }
-
         return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
     }
 

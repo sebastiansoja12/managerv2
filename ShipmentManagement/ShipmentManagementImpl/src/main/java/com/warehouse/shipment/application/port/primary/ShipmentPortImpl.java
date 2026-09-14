@@ -78,6 +78,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final AddressValidationService addressValidationService;
 
+    private final PostalCodeServicePort postalCodeServicePort;
+
 	public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
@@ -92,7 +94,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final DomainEventPublisher domainEventPublisher,
                             final DepartmentServicePort departmentServicePort,
                             final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
-                            final AddressValidationService addressValidationService) {
+                            final AddressValidationService addressValidationService,
+                            final PostalCodeServicePort postalCodeServicePort) {
 		this.shipmentRepository = shipmentRepository;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -108,6 +111,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.departmentServicePort = departmentServicePort;
         this.shipmentDepartmentResolutionService = shipmentDepartmentResolutionService;
         this.addressValidationService = addressValidationService;
+        this.postalCodeServicePort = postalCodeServicePort;
     }
 
     @Override
@@ -117,8 +121,20 @@ public class ShipmentPortImpl implements ShipmentPort {
         final OperatorShipmentConfiguration shipmentConfiguration =
                 this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration();
 
-        final Party sender = command.getSender();
-        final Party recipient = command.getRecipient();
+        final Result<Party, ErrorCode> senderWithCountry =
+                assignCountry(command.getSender(), ErrorCode.SENDER_POSTAL_CODE_NOT_FOUND);
+        if (senderWithCountry.isFailure()) {
+            return Result.failure(senderWithCountry.getFailure());
+        }
+
+        final Result<Party, ErrorCode> recipientWithCountry =
+                assignCountry(command.getRecipient(), ErrorCode.RECIPIENT_POSTAL_CODE_NOT_FOUND);
+        if (recipientWithCountry.isFailure()) {
+            return Result.failure(recipientWithCountry.getFailure());
+        }
+
+        final Party sender = senderWithCountry.getSuccess();
+        final Party recipient = recipientWithCountry.getSuccess();
 
         final Result<Void, ErrorCode> addressValidation = this.addressValidationService
                 .validateAddresses(Address.from(sender), Address.from(recipient), shipmentConfiguration.validationRules());
@@ -201,6 +217,20 @@ public class ShipmentPortImpl implements ShipmentPort {
                 shipment.getTrackingNumber().value()));
     }
 
+    private Result<Party, ErrorCode> assignCountry(final Party party, final ErrorCode postalCodeNotFound) {
+        return this.postalCodeServicePort.findCountryCode(party.getPostalCode(), party.getCity())
+                .map(countryCode -> Result.<Party, ErrorCode>success(party.withCountryCode(countryCode)))
+                .orElseGet(() -> Result.failure(postalCodeNotFound));
+    }
+
+    private Party assignCountryOrThrow(final Party party, final ErrorCode postalCodeNotFound) {
+        final Result<Party, ErrorCode> partyWithCountry = assignCountry(party, postalCodeNotFound);
+        if (partyWithCountry.isFailure()) {
+            throw new RestException(400, partyWithCountry.getFailure().getMessage());
+        }
+        return partyWithCountry.getSuccess();
+    }
+
     private Result<Void, ErrorCode> validateCountries(
             final CountryCode senderCountryCode, final CountryCode recipientCountryCode) {
 
@@ -268,9 +298,9 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public void changePersonTo(final Party party, final PersonType personType, final ShipmentId shipmentId) {
         if (personType == PersonType.SENDER) {
-            changeSenderTo(shipmentId, party);
+            changeSenderTo(shipmentId, assignCountryOrThrow(party, ErrorCode.SENDER_POSTAL_CODE_NOT_FOUND));
         } else if (personType == PersonType.RECIPIENT) {
-            changeRecipientTo(shipmentId, party);
+            changeRecipientTo(shipmentId, assignCountryOrThrow(party, ErrorCode.RECIPIENT_POSTAL_CODE_NOT_FOUND));
         }
     }
 
@@ -381,8 +411,8 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     @Transactional
     public ShipmentRerouteResult reroute(final ShipmentRerouteCommand command) {
-        final Party sender = command.sender();
-        final Party recipient = command.recipient();
+        final Party sender = assignCountryOrThrow(command.sender(), ErrorCode.SENDER_POSTAL_CODE_NOT_FOUND);
+        final Party recipient = assignCountryOrThrow(command.recipient(), ErrorCode.RECIPIENT_POSTAL_CODE_NOT_FOUND);
 
         final Result<Void, ErrorCode> addressValidation = this.addressValidationService
                 .validateAddresses(Address.from(sender), Address.from(recipient), null);

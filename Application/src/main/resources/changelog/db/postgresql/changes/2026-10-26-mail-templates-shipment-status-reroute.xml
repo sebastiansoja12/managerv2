@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-26-mail-templates-shipment-status-reroute-sender" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'shipment.status.reroute.sender'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="8ef29c1a-38c9-4140-9b9e-b4102c6e182b"/>
+            <column name="template_key" value="shipment.status.reroute.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Dane przesyłki {{trackingNumber}} zostały zaktualizowane"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Zmiana danych przesyłki została zapisana, a przesyłka otrzymała status „Zmodyfikowana”. Aktualne dane:
+
+Nadawca: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Odbiorca: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+Jeśli to nie Ty zgłaszałeś zmianę, skontaktuj się z nami.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="98e37be3-b988-4ef0-8d79-5e414de3c7f9"/>
+            <column name="template_key" value="shipment.status.reroute.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} details have been updated"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+The shipment details change has been saved and the shipment status is now “Rerouting”. Current details:
+
+Sender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Recipient: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+If you did not request this change, please contact us.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="1aee57e6-66a6-408e-b410-5a4aabea886d"/>
+            <column name="template_key" value="shipment.status.reroute.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Die Daten der Sendung {{trackingNumber}} wurden aktualisiert"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Die Änderung der Sendungsdaten wurde gespeichert und die Sendung hat jetzt den Status „Routenänderung läuft“. Aktuelle Daten:
+
+Absender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Empfänger: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+Falls Sie diese Änderung nicht beantragt haben, kontaktieren Sie uns bitte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+    <changeSet id="2026-10-26-mail-templates-shipment-status-reroute-recipient" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'shipment.status.reroute.recipient'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="817f22ab-7e4c-4875-bdd3-6099301823ac"/>
+            <column name="template_key" value="shipment.status.reroute.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Dane przesyłki {{trackingNumber}} zostały zaktualizowane"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Zmiana danych przesyłki została zapisana, a przesyłka otrzymała status „Zmodyfikowana”. Aktualne dane:
+
+Nadawca: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Odbiorca: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+Jeśli to nie Ty zgłaszałeś zmianę, skontaktuj się z nami.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="56f23cae-25f4-4d90-a89f-ccf80c694d5c"/>
+            <column name="template_key" value="shipment.status.reroute.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} details have been updated"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+The shipment details change has been saved and the shipment status is now “Rerouting”. Current details:
+
+Sender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Recipient: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+If you did not request this change, please contact us.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="4ae9d7e4-1d97-4efa-890f-bc4f464ac5f6"/>
+            <column name="template_key" value="shipment.status.reroute.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Die Daten der Sendung {{trackingNumber}} wurden aktualisiert"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Die Änderung der Sendungsdaten wurde gespeichert und die Sendung hat jetzt den Status „Routenänderung läuft“. Aktuelle Daten:
+
+Absender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Empfänger: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+Falls Sie diese Änderung nicht beantragt haben, kontaktieren Sie uns bitte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
