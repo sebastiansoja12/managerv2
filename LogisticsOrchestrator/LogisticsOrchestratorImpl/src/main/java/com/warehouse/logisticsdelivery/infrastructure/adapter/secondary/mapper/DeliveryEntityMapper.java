@@ -35,7 +35,7 @@ public interface DeliveryEntityMapper {
         return new DeliveryStep(entity.getId(), entity.getDeliveryId(), entity.getAttemptedAt(),
                 entity.getOutcome(), entity.getDeliveryStatus(), entity.getSignatureId(), entity.getUserId(), entity.getSupplierId(),
                 entity.getDepartmentId(), entity.getVehicleId(),
-                entity.getComment(), entity.getFailureReason(), entity.getToken(), entity.getStepNumber() - 1);
+                entity.getComment(), entity.getCommentCode(), entity.getFailureReason(), entity.getToken(), entity.getStepNumber() - 1);
     }
 
     default DeliveryEntity toEntity(final Delivery delivery) {
@@ -84,6 +84,7 @@ public interface DeliveryEntityMapper {
                 .departmentId(step.departmentId())
                 .vehicleId(step.vehicleId())
                 .comment(step.comment())
+                .commentCode(step.commentCode())
                 .failureReason(step.failureReason())
                 .token(step.token())
                 .build();

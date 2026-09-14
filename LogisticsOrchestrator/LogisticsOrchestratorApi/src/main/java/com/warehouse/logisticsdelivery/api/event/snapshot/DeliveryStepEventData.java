@@ -18,6 +18,7 @@ public record DeliveryStepEventData(
         DepartmentId departmentId,
         VehicleId vehicleId,
         String comment,
-        String failureReason
+        String failureReason,
+        String commentCode
 ) {
 }
