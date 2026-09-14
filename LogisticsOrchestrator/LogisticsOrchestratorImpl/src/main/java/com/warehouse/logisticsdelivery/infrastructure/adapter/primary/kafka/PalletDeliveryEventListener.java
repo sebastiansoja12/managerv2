@@ -1,6 +1,5 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.primary.kafka;
 
-import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
@@ -13,12 +12,9 @@ import org.springframework.stereotype.Component;
 public class PalletDeliveryEventListener {
 
     private final DeliveryPort deliveryPort;
-    private final OperatorContext operatorContext;
 
-    public PalletDeliveryEventListener(final DeliveryPort deliveryPort,
-                                       final OperatorContext operatorContext) {
+    public PalletDeliveryEventListener(final DeliveryPort deliveryPort) {
         this.deliveryPort = deliveryPort;
-        this.operatorContext = operatorContext;
     }
 
     @KafkaEventListener(
@@ -31,7 +27,6 @@ public class PalletDeliveryEventListener {
                 payload.palletId(),
                 payload.shipmentIds().stream().map(ShipmentId::new).toList(),
                 event.userId());
-        this.operatorContext.runAs(event.operatorId(), event.userId(), event.departmentId(),
-                () -> deliveryPort.createPalletDelivery(command));
+        deliveryPort.createPalletDelivery(command);
     }
 }

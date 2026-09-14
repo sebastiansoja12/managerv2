@@ -1,18 +1,17 @@
 package com.warehouse.commonassets.kafka.infrastructure.adapter.primary;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.header.Header;
-import org.springframework.kafka.listener.RecordInterceptor;
-
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.kafka.domain.model.KafkaEventHeaders;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Header;
+import org.springframework.kafka.listener.RecordInterceptor;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class KafkaOperatorContextRecordInterceptor implements RecordInterceptor<String, String> {
 
@@ -25,10 +24,21 @@ public class KafkaOperatorContextRecordInterceptor implements RecordInterceptor<
     @Override
     public ConsumerRecord<String, String> intercept(final ConsumerRecord<String, String> record,
                                                    final Consumer<String, String> consumer) {
-        operatorId(record).ifPresent(operatorId -> this.operatorContext.assignOperatorContext(
-                operatorId,
-                userId(record).orElse(null),
-                departmentId(record).orElse(null)));
+        final Optional<OperatorId> operatorId = operatorId(record);
+        final Optional<UserId> userId = userId(record);
+        final Optional<DepartmentId> departmentId = departmentId(record);
+        if (operatorId.isEmpty()) {
+            if (userId.isPresent() || departmentId.isPresent()) {
+                throw new IllegalStateException("Kafka record " + coordinates(record)
+                        + " has user or department headers without " + KafkaEventHeaders.OPERATOR_ID);
+            }
+            this.operatorContext.clear();
+            return record;
+        }
+        this.operatorContext.assignOperatorContext(
+                operatorId.get(),
+                userId.orElse(null),
+                departmentId.orElse(null));
         return record;
     }
 
@@ -56,6 +66,16 @@ public class KafkaOperatorContextRecordInterceptor implements RecordInterceptor<
             return Optional.empty();
         }
 
-        return Optional.of(Long.valueOf(new String(header.value(), StandardCharsets.UTF_8)));
+        final String value = header.value() == null ? null : new String(header.value(), StandardCharsets.UTF_8);
+        try {
+            return Optional.of(Long.valueOf(value));
+        } catch (final NumberFormatException exception) {
+            throw new IllegalStateException("Kafka record " + coordinates(record)
+                    + " has invalid " + headerName + " header: " + value, exception);
+        }
+    }
+
+    private String coordinates(final ConsumerRecord<String, String> record) {
+        return record.topic() + "-" + record.partition() + "@" + record.offset();
     }
 }

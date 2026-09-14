@@ -5,6 +5,7 @@ import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
 import com.warehouse.reroute.api.event.ShipmentRerouteRequestedIntegrationEvent;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
+import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
 import com.warehouse.shipment.infrastructure.adapter.primary.kafka.mapper.ShipmentRerouteEventMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +30,8 @@ public class ShipmentRerouteIntegrationListener {
     }
 
     @KafkaEventListener(
-            topics = "shipment.reroute.requested",
-            groupId = "manager-shipment-reroute"
+            topics = "${manager.kafka.topics.shipment-reroute-requested:shipment.reroute.requested}",
+            groupId = "${manager.kafka.consumer-groups.shipment-reroute-requested:manager-shipment-reroute}"
     )
     public void handle(final ShipmentRerouteRequestedIntegrationEvent event) {
         final TrackingNumber trackingNumber = mapper.mapTrackingNumber(event);
@@ -40,7 +41,12 @@ public class ShipmentRerouteIntegrationListener {
             return;
         }
 
-        operatorContext.runAs(context.operatorId(), null, null, () -> shipmentPort.reroute(mapper.map(event)));
+        try {
+            operatorContext.runAs(context.operatorId(), null, null, () -> shipmentPort.reroute(mapper.map(event)));
+        } catch (final ShipmentModificationException exception) {
+            log.warn("Reroute skipped, shipment {} cannot be rerouted: {}", event.trackingNumber(), exception.getMessage());
+            return;
+        }
         log.info("Shipment {} rerouted by {}", event.trackingNumber(), event.sender().email());
     }
 }
