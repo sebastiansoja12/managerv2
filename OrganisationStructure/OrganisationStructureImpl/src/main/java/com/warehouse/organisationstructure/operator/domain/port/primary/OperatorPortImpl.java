@@ -12,6 +12,8 @@ import com.warehouse.organisationstructure.operator.domain.vo.OperatorProvisioni
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class OperatorPortImpl implements OperatorPort {
 
@@ -59,6 +61,11 @@ public class OperatorPortImpl implements OperatorPort {
     public Operator update(final OperatorId operatorId, final UpdateOperatorCommand command) {
         validateUpdateCommand(command);
         return operatorService.update(operatorId, command);
+    }
+
+    @Override
+    public Set<OperatorId> findAllActive() {
+        return operatorService.getAll().stream().map(Operator::getOperatorId).collect(Collectors.toSet());
     }
 
     private void validateCreateCommand(final CreateOperatorCommand command) {

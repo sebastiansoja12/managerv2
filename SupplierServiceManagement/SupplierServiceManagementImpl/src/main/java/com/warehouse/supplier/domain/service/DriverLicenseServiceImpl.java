@@ -3,6 +3,8 @@ package com.warehouse.supplier.domain.service;
 import com.warehouse.commonassets.helper.Result;
 import com.warehouse.supplier.domain.vo.DriverLicense;
 
+import java.time.Instant;
+
 public class DriverLicenseServiceImpl implements DriverLicenseService {
 
 
@@ -13,6 +15,8 @@ public class DriverLicenseServiceImpl implements DriverLicenseService {
             result = Result.success();
         } else if (driverLicense.acquiredDate().isAfter(driverLicense.drivingLicenseExpiryDate())) {
             result = Result.failure("Acquired date is after expiry date");
+        } else if (driverLicense.drivingLicenseExpiryDate().isBefore(Instant.now())) {
+            result = Result.failure("Driver license is invalid");
         }
         else if (driverLicense.number().length() < 14) {
             result = Result.failure("Wrong driver license number");
