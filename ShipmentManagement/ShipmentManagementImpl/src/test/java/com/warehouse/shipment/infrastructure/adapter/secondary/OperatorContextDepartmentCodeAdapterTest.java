@@ -2,15 +2,21 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.commonassets.repository.OperatorDetails;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,22 +32,22 @@ class OperatorContextDepartmentCodeAdapterTest {
     void shouldLoadDepartmentCodeForCurrentOperatorContext() {
         final DepartmentId departmentId = new DepartmentId(7L);
         final DepartmentCode departmentCode = new DepartmentCode("PO1");
-        when(operatorContextProvider.currentDepartmentId()).thenReturn(departmentId);
+        when(operatorContextProvider.currentContext())
+                .thenReturn(Optional.of(new OperatorDetails(new OperatorId(1L), null, departmentId)));
         when(departmentServicePort.getDepartmentCode(departmentId)).thenReturn(departmentCode);
 
-        final DepartmentCode result = adapter().currentDepartmentCode();
+        final Optional<DepartmentCode> result = adapter().currentDepartmentCode();
 
-        assertThat(result).isEqualTo(departmentCode);
+        assertThat(result).contains(departmentCode);
     }
 
     @Test
-    void shouldRejectMissingDepartmentContext() {
-        when(operatorContextProvider.currentDepartmentId())
-                .thenThrow(new IllegalStateException("Department context is required"));
+    void shouldReturnEmptyWhenContextHasNoDepartment() {
+        when(operatorContextProvider.currentContext())
+                .thenReturn(Optional.of(new OperatorDetails(new OperatorId(1L), null, null)));
 
-        assertThatThrownBy(() -> adapter().currentDepartmentCode())
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Department context is required");
+        assertThat(adapter().currentDepartmentCode()).isEmpty();
+        verify(departmentServicePort, never()).getDepartmentCode(any());
     }
 
     private OperatorContextDepartmentCodeAdapter adapter() {

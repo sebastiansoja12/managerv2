@@ -677,8 +677,10 @@ public class Shipment {
         return isLocked() && ShipmentStatus.DELIVERY.equals(this.shipmentStatus);
     }
 
-    public boolean recipientCityMatches(final String city) {
-        return this.recipient.getCity().equals(city);
+    public boolean recipientAddressMatches(final Party recipient) {
+        return Objects.equals(this.recipient.getCity(), recipient.getCity())
+                && Objects.equals(this.recipient.getStreet(), recipient.getStreet())
+                && Objects.equals(this.recipient.getPostalCode(), recipient.getPostalCode());
     }
 
     public void notifyShipmentReturnCompleted() {
