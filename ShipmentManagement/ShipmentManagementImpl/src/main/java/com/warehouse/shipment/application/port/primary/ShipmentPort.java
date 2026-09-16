@@ -78,5 +78,7 @@ public interface ShipmentPort {
 
     boolean hasAnyShipment();
 
+    boolean isOperatorActive(final OperatorId operatorId);
+
     ShipmentOwnerContext findContext(final TrackingNumber trackingNumber);
 }

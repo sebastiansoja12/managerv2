@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 public class ShipmentMailRequestMapper {
 
+    private static final String EXTERNAL_SOURCE = "EXTERNAL";
     private static final MailParty EMPTY_PARTY = new MailParty(null, null, null, null, null, null, null, null);
 
     private final MailLocaleResolver mailLocaleResolver;
@@ -33,7 +34,12 @@ public class ShipmentMailRequestMapper {
     }
 
     public List<MailRequest> mapCreated(final ShipmentEventData shipment) {
-        return shipment.shipmentRelatedId() == null ? map("shipment.created", shipment) : List.of();
+        if (shipment.shipmentRelatedId() != null) {
+            return List.of();
+        }
+        return EXTERNAL_SOURCE.equals(shipment.source())
+                ? map("shipment.created.external", shipment)
+                : map("shipment.created", shipment);
     }
 
     public List<MailRequest> mapStatusChanged(final ShipmentEventData shipment) {

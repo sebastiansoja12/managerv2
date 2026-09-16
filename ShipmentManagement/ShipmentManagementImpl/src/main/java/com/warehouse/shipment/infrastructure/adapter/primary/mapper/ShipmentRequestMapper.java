@@ -3,6 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import com.warehouse.commonassets.enumeration.Currency;
@@ -14,6 +15,7 @@ import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
 import com.warehouse.shipment.domain.vo.Party;
@@ -30,11 +32,18 @@ import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ShipmentRequestMapper {
 
+    @Mapping(target = "source", ignore = true)
     ShipmentCreateCommand map(final ShipmentCreateRequestApi requestDto);
 
     default ShipmentCreateCommand mapCreateRequest(final ShipmentCreateRequestApi shipmentRequest) {
         final ShipmentCreateCommand command = map(shipmentRequest);
         command.setDeliveryPickupPointId(shipmentRequest.deliveryPickupPointId());
+        return command;
+    }
+
+    default ShipmentCreateCommand mapExternalCreateRequest(final ShipmentCreateRequestApi shipmentRequest) {
+        final ShipmentCreateCommand command = mapCreateRequest(shipmentRequest);
+        command.setSource(ShipmentSource.EXTERNAL);
         return command;
     }
 

@@ -74,6 +74,9 @@ class ShipmentPortImplTest {
     @Mock
     private MailNotificationServicePort mailNotificationServicePort;
 
+    @Mock
+    private OperatorServicePort operatorServicePort;
+
 
     @Mock
     private OperatorContextProvider operatorContextProvider;
@@ -136,7 +139,7 @@ class ShipmentPortImplTest {
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
                 this.domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService,
-                this.postalCodeServicePort);
+                this.postalCodeServicePort, operatorServicePort);
         lenient().when(this.postalCodeServicePort.findCountryCode("00-000", "test"))
                 .thenReturn(Optional.of(CountryCode.PL), Optional.of(CountryCode.DE));
 	}

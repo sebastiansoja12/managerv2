@@ -23,6 +23,7 @@ import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
+import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.pickuppoint.api.PickupPointApiService;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
@@ -116,7 +117,8 @@ public class ShipmentConfiguration {
                                      final DomainEventPublisher domainEventPublisher,
                                      final DepartmentServicePort departmentServicePort,
                                      final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
-                                     final PostalCodeServicePort postalCodeServicePort) {
+                                     final PostalCodeServicePort postalCodeServicePort,
+                                     final OperatorServicePort shipmentOperatorServicePort) {
 		final AddressValidationService addressValidationService = new AddressValidationService();
 		return new ShipmentPortImpl(shipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
@@ -125,8 +127,13 @@ public class ShipmentConfiguration {
 				shipmentConfigurationServicePort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
                 domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService,
-                postalCodeServicePort);
+                postalCodeServicePort, shipmentOperatorServicePort);
 	}
+
+    @Bean
+    public OperatorServicePort shipmentOperatorServicePort(final OperatorApiService operatorApiService) {
+        return new OperatorServiceAdapter(operatorApiService);
+    }
 
     @Bean
     public ShipmentDepartmentResolutionService shipmentDepartmentResolutionService(

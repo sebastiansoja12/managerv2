@@ -3,6 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 import java.util.UUID;
 
 import com.warehouse.commonassets.identificator.ExternalId;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
@@ -40,7 +41,8 @@ public class ShipmentPersistenceMapper {
                 entity.getContentDescription(),
                 entity.getDeclaredValue(),
                 entity.getServiceLevel(),
-                entity.getPackagingType()
+                entity.getPackagingType(),
+                entity.getSource()
         );
     }
 
@@ -69,7 +71,8 @@ public class ShipmentPersistenceMapper {
                 entity.getContentDescription(),
                 entity.getDeclaredValue(),
                 entity.getServiceLevel(),
-                entity.getPackagingType()
+                entity.getPackagingType(),
+                entity.getSource()
         );
     }
 
@@ -95,6 +98,7 @@ public class ShipmentPersistenceMapper {
                 .shipmentPriority(shipment.getShipmentPriority())
                 .serviceLevel(shipment.getServiceLevel())
                 .packagingType(shipment.getPackagingType())
+                .source(shipment.getSource())
                 .price(shipment.getPrice())
                 .signatureRequired(shipment.getSignatureRequired())
                 .externalId(new ExternalId<>(shipment.getExternalShipmentId().value().toString()))
@@ -125,6 +129,7 @@ public class ShipmentPersistenceMapper {
                 .shipmentPriority(snapshot.shipmentPriority())
                 .serviceLevel(snapshot.serviceLevel())
                 .packagingType(snapshot.packagingType())
+                .source(snapshot.source() == null ? ShipmentSource.WEB : snapshot.source())
                 .price(snapshot.price())
                 .signatureRequired(snapshot.signatureRequired())
                 .externalId(new ExternalId<>(snapshot.externalShipmentId().value().toString()))

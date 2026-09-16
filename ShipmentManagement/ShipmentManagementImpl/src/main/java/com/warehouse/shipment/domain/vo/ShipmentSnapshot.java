@@ -10,6 +10,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -36,5 +37,6 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                String contentDescription,
                                Money declaredValue,
                                ShipmentServiceLevel serviceLevel,
-                               PackagingType packagingType) {
+                               PackagingType packagingType,
+                               ShipmentSource source) {
 }

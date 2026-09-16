@@ -74,6 +74,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final PostalCodeServicePort postalCodeServicePort;
 
+    private final OperatorServicePort operatorServicePort;
+
 	public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
@@ -88,7 +90,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final DepartmentServicePort departmentServicePort,
                             final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
                             final AddressValidationService addressValidationService,
-                            final PostalCodeServicePort postalCodeServicePort) {
+                            final PostalCodeServicePort postalCodeServicePort,
+                            final OperatorServicePort operatorServicePort) {
 		this.shipmentRepository = shipmentRepository;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -104,6 +107,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentDepartmentResolutionService = shipmentDepartmentResolutionService;
         this.addressValidationService = addressValidationService;
         this.postalCodeServicePort = postalCodeServicePort;
+        this.operatorServicePort = operatorServicePort;
     }
 
     @Override
@@ -164,7 +168,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
 
         final Result<DepartmentId, ErrorCode> originDepartment =
-                shipmentDepartmentResolutionService.resolveOriginDepartmentId(command);
+                shipmentDepartmentResolutionService.resolveOriginDepartmentId(command, sender);
         if (originDepartment.isFailure()) {
             return Result.failure(originDepartment.getFailure());
         }
@@ -189,7 +193,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                 command.getContentDescription(),
                 command.getDeclaredValue(),
                 command.getServiceLevel() == null ? workflowSettings.defaultServiceLevel() : command.getServiceLevel(),
-                command.getPackagingType()
+                command.getPackagingType(),
+                command.getSource()
         );
 
         this.shipmentRepository.createOrUpdate(shipment);
@@ -578,6 +583,11 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public boolean hasAnyShipment() {
         return shipmentRepository.existsAny();
+    }
+
+    @Override
+    public boolean isOperatorActive(final OperatorId operatorId) {
+        return operatorServicePort.isActive(operatorId);
     }
 
     @Override

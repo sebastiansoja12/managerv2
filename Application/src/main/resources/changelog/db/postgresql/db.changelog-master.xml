@@ -109,4 +109,6 @@
     <include file="changes/2026-10-26-mail-templates-shipment-status-reroute.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-27-signature-delivery.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-28-delivery-step-comment-code.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-28-shipment-source.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-28-mail-templates-shipment-created-external.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

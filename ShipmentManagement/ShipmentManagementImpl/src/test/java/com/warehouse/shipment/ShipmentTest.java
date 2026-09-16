@@ -1,6 +1,7 @@
 package com.warehouse.shipment;
 
 import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
@@ -35,7 +36,7 @@ class ShipmentTest {
                 money(), false,
                 ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
                 dimensions, weight, customerReference, "Electronics", declaredValue,
-                ShipmentServiceLevel.EXPRESS, PackagingType.BOX
+                ShipmentServiceLevel.EXPRESS, PackagingType.BOX, ShipmentSource.WEB
         );
 
         assertAll(
