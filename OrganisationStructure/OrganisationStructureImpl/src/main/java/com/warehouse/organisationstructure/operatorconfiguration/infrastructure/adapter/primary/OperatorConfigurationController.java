@@ -1,5 +1,8 @@
 package com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessUserControl;
+import com.warehouse.commonassets.enumeration.UserPermission;
+import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
@@ -41,6 +44,21 @@ public class OperatorConfigurationController {
         return ResponseEntity.ok(OperatorMapper.toDtoShipmentConfiguration(
                 operatorConfigurationPort.updateCurrentShipmentConfiguration(
                         OperatorMapper.toModelShipmentConfiguration(request)).getShipmentConfiguration()));
+    }
+
+    @GetMapping("/departments")
+    public ResponseEntity<DepartmentConfigurationDto> getCurrentDepartmentConfiguration() {
+        return ResponseEntity.ok(OperatorMapper.toDtoDepartmentConfiguration(
+                operatorConfigurationPort.getCurrentDepartmentConfiguration()));
+    }
+
+    @PutMapping("/departments")
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    public ResponseEntity<DepartmentConfigurationDto> updateCurrentDepartmentConfiguration(
+            @RequestBody final DepartmentConfigurationDto request) {
+        return ResponseEntity.ok(OperatorMapper.toDtoDepartmentConfiguration(
+                operatorConfigurationPort.updateCurrentDepartmentConfiguration(
+                        OperatorMapper.toModelDepartmentConfiguration(request))));
     }
 
     @GetMapping("/shipment/limits")

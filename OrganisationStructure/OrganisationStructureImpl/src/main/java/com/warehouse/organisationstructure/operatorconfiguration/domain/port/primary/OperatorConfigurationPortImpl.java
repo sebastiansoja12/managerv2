@@ -2,6 +2,7 @@ package com.warehouse.organisationstructure.operatorconfiguration.domain.port.pr
 
 import com.warehouse.auth.CurrentOperatorService;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.service.OperatorConfigurationService;
@@ -33,8 +34,27 @@ public class OperatorConfigurationPortImpl implements OperatorConfigurationPort 
         return operatorConfigurationService.create(operatorId, new OperatorConfiguration(
                 currentConfiguration.getShippingCapabilities(),
                 shipmentConfiguration,
-                currentConfiguration.getDeliveryTimeConfiguration()
+                currentConfiguration.getDeliveryTimeConfiguration(),
+                currentConfiguration.getDepartmentConfiguration()
         ));
+    }
+
+    @Override
+    public DepartmentConfiguration getCurrentDepartmentConfiguration() {
+        return getCurrent()
+                .map(OperatorConfiguration::getDepartmentConfiguration)
+                .orElseGet(DepartmentConfiguration::defaultConfiguration);
+    }
+
+    @Override
+    public DepartmentConfiguration updateCurrentDepartmentConfiguration(
+            final DepartmentConfiguration departmentConfiguration) {
+        final OperatorId operatorId = currentOperatorService.getCurrentOperatorId();
+        final OperatorConfiguration currentConfiguration = operatorConfigurationService.getByOperatorId(operatorId)
+                .orElseGet(() -> OperatorConfiguration.defaultFor(false, false, false));
+        return operatorConfigurationService.create(operatorId,
+                currentConfiguration.withDepartmentConfiguration(departmentConfiguration))
+                .getDepartmentConfiguration();
     }
 
     @Override
