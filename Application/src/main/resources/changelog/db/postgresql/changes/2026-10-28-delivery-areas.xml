@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-28-postgresql-table-delivery-area" author="s-soja">
+        <createTable tableName="delivery_area">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_delivery_area"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="delivery_area" indexName="idx_delivery_area_operator_department">
+            <column name="operator_id"/>
+            <column name="department_id"/>
+        </createIndex>
+
+        <createTable tableName="delivery_area_point">
+            <column name="delivery_area_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_delivery_area_point"
+                             foreignKeyName="fk_delivery_area_point_area" references="delivery_area(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="point_index" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_delivery_area_point"/>
+            </column>
+            <column name="latitude" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="longitude" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
