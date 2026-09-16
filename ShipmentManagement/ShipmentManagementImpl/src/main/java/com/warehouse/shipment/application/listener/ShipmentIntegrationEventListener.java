@@ -54,4 +54,10 @@ public class ShipmentIntegrationEventListener {
                 event.getDepartmentCode()
         ));
     }
+
+    @EventListener
+    public void handle(final ShipmentReturned event) {
+        this.integrationEventPublisher.publish(
+                new ShipmentStatusChangedIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
+    }
 }
