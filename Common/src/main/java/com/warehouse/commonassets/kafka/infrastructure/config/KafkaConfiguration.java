@@ -5,6 +5,7 @@ import java.time.Duration;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -18,6 +19,7 @@ import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.converter.StringJacksonJsonMessageConverter;
 import org.springframework.kafka.support.mapping.DefaultJacksonJavaTypeMapper;
 import org.springframework.kafka.support.mapping.JacksonJavaTypeMapper;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.backoff.FixedBackOff;
 
 import tools.jackson.databind.json.JsonMapper;
@@ -27,6 +29,17 @@ import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaOper
 @Configuration
 @EnableKafka
 public class KafkaConfiguration {
+
+    @Bean("kafkaOutboxTaskExecutor")
+    @ConditionalOnProperty(name = "manager.kafka.outbox.enabled", havingValue = "true")
+    public ThreadPoolTaskExecutor kafkaOutboxTaskExecutor() {
+        final ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(2);
+        taskExecutor.setMaxPoolSize(2);
+        taskExecutor.setQueueCapacity(1000);
+        taskExecutor.setThreadNamePrefix("kafka-outbox-");
+        return taskExecutor;
+    }
 
     @Bean
     public RecordMessageConverter kafkaRecordMessageConverter(final JsonMapper jsonMapper) {
