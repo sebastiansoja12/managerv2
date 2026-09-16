@@ -21,7 +21,7 @@
 - Liquibase changesets author as 's-soja'
 - Add finals in interface method args
 - Do not use simple identificators (Long, String etc) when there is available identificator object (OperatorId, ShipmentId etc.), when not - create one
-- Do not add comments
+- Do NOT add comments
 
 ---
 
@@ -343,3 +343,4 @@ Structure test methods with blank lines between setup, action, and assertion. Do
 - Do not introduce a new authorization mechanism.
 - Do not run build or test commands unless explicitly asked by the user.
 - Do not commit changes unless explicitly asked by the user.
+- DO NOT add comments
