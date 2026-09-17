@@ -614,6 +614,15 @@ public class Shipment {
         return true;
     }
 
+    public boolean revertLoadingFromPallet(final ShipmentWorkflowSettings shipmentWorkflowSettings) {
+        if (!ShipmentStatus.SENT.equals(this.shipmentStatus)) {
+            return false;
+        }
+        this.shipmentStatus = shipmentWorkflowSettings.defaultStatus();
+        markAsModified();
+        return true;
+    }
+
     public void ensureCanBeHandedOver() {
         if (!ShipmentStatus.SENT.equals(this.shipmentStatus)
                 && !ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)

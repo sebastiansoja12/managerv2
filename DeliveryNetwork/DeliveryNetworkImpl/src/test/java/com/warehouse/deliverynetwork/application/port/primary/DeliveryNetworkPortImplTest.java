@@ -3,8 +3,11 @@ package com.warehouse.deliverynetwork.application.port.primary;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.deliverynetwork.application.exception.ShipmentOriginDepartmentNotAssignedException;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCommand;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCodeCommand;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentImportCommand;
@@ -12,8 +15,11 @@ import com.warehouse.deliverynetwork.application.port.primary.command.ReplaceDel
 import com.warehouse.deliverynetwork.application.port.primary.command.ReplaceDeliveryNetworkCommand;
 import com.warehouse.deliverynetwork.application.port.primary.result.DeliveryNetworkExportResult;
 import com.warehouse.deliverynetwork.application.port.primary.result.DeliveryNetworkResult;
+import com.warehouse.deliverynetwork.application.port.primary.result.ShipmentDeliveryRouteResult;
 import com.warehouse.deliverynetwork.application.port.secondary.DeliveryNetworkRepository;
 import com.warehouse.deliverynetwork.application.port.secondary.DepartmentDirectoryServicePort;
+import com.warehouse.deliverynetwork.application.port.secondary.ShipmentDeliveryServicePort;
+import com.warehouse.deliverynetwork.application.service.ShipmentRouteDocumentService;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentStatus;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentType;
 import com.warehouse.deliverynetwork.domain.model.DeliveryNetwork;
@@ -22,6 +28,7 @@ import com.warehouse.deliverynetwork.domain.service.DeliveryPathFinder;
 import com.warehouse.deliverynetwork.domain.vo.DeliveryPath;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentConnection;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentNode;
+import com.warehouse.deliverynetwork.domain.vo.ShipmentDepartments;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,6 +62,12 @@ class DeliveryNetworkPortImplTest {
     @Mock
     private DomainEventPublisher domainEventPublisher;
 
+    @Mock
+    private ShipmentDeliveryServicePort shipmentDeliveryServicePort;
+
+    @Mock
+    private ShipmentRouteDocumentService shipmentRouteDocumentService;
+
     private DeliveryNetworkPort deliveryNetworkPort;
 
     @BeforeEach
@@ -64,7 +77,9 @@ class DeliveryNetworkPortImplTest {
                 this.departmentDirectoryServicePort,
                 this.operatorContextProvider,
                 new DeliveryPathFinder(),
-                this.domainEventPublisher);
+                this.domainEventPublisher,
+                this.shipmentDeliveryServicePort,
+                this.shipmentRouteDocumentService);
     }
 
     @Test
@@ -155,11 +170,48 @@ class DeliveryNetworkPortImplTest {
         when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
         when(this.deliveryNetworkRepository.find())
                 .thenReturn(Optional.of(deliveryNetwork));
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                branch(1L, "KT1"),
+                sortingFacility(2L, "NCS"),
+                branch(3L, "WA1")));
 
         final DeliveryPath deliveryPath = this.deliveryNetworkPort.findDeliveryPath(
                 departmentId(1L), departmentId(3L));
 
         assertEquals(List.of(departmentId(1L), departmentId(2L), departmentId(3L)), deliveryPath.departmentIds());
+    }
+
+    @Test
+    void shouldFindShipmentDeliveryRouteThroughSortingFacility() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TN-1");
+        final DeliveryNetwork deliveryNetwork = new DeliveryNetwork(OPERATOR_ID, Set.of(
+                connection(1L, 2L),
+                connection(2L, 3L)));
+        when(this.shipmentDeliveryServicePort.getShipmentDepartments(trackingNumber)).thenReturn(
+                new ShipmentDepartments(new ShipmentId(100L), trackingNumber, departmentId(1L), departmentId(3L)));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
+        when(this.deliveryNetworkRepository.find()).thenReturn(Optional.of(deliveryNetwork));
+        when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
+                branch(1L, "KT1"),
+                sortingFacility(2L, "NCS"),
+                branch(3L, "WA1")));
+
+        final ShipmentDeliveryRouteResult result = this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber);
+
+        assertEquals(List.of("KT1", "NCS", "WA1"), result.departments().stream()
+                .map(department -> department.departmentCode().getValue())
+                .toList());
+        assertEquals(new ShipmentId(100L), result.shipmentId());
+    }
+
+    @Test
+    void shouldRejectShipmentDeliveryRouteWithoutOriginDepartment() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TN-1");
+        when(this.shipmentDeliveryServicePort.getShipmentDepartments(trackingNumber)).thenReturn(
+                new ShipmentDepartments(new ShipmentId(100L), trackingNumber, null, departmentId(3L)));
+
+        assertThrows(ShipmentOriginDepartmentNotAssignedException.class,
+                () -> this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber));
     }
 
     @Test

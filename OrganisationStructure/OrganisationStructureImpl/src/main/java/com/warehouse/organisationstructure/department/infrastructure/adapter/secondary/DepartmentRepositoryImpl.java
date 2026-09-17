@@ -13,6 +13,7 @@ import com.warehouse.organisationstructure.department.infrastructure.adapter.sec
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.mapper.DepartmentToModelMapper;
 
 import java.util.List;
+import java.util.Optional;
 
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
@@ -59,6 +60,15 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
                 .one()
                 .map(DepartmentToModelMapper::map)
                 .orElse(null);
+    }
+
+    @Override
+    public Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId) {
+        return repository.createCriteria(DepartmentEntity.class)
+                .eq("departmentId.value", departmentId.getValue())
+                .one()
+                .map(DepartmentToModelMapper::map)
+                .map(Department::getDepartmentCode);
     }
 
     @Override

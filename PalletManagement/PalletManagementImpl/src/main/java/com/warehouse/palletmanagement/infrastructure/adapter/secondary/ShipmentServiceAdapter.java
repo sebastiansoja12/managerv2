@@ -34,6 +34,18 @@ public class ShipmentServiceAdapter implements ShipmentServicePort {
     }
 
     @Override
+    public ShipmentLoadResult revertLoadingFromPallet(final ShipmentId shipmentId) {
+        try {
+            final ShipmentDetailsDto shipment = this.shipmentApiService.revertShipmentLoadingFromPallet(shipmentId);
+            return ShipmentLoadResult.loaded(shipmentId, shipment.status().name());
+        } catch (final RuntimeException exception) {
+            log.warn("Shipment {} loading from pallet could not be reverted: {}", shipmentId.getValue(),
+                    exception.getMessage());
+            return ShipmentLoadResult.failed(shipmentId, exception.getMessage());
+        }
+    }
+
+    @Override
     public Optional<PalletDocumentShipment> describeShipment(final ShipmentId shipmentId) {
         try {
             return Optional.ofNullable(this.shipmentApiService.getShipment(shipmentId))

@@ -49,7 +49,8 @@ public record PalletDetails(PalletId palletId,
     }
 
     public boolean transportLocked() {
-        return palletStatus == PalletStatus.IN_TRANSIT || palletStatus == PalletStatus.DELIVERED
+        return palletStatus == PalletStatus.LOADED || palletStatus == PalletStatus.IN_TRANSIT
+                || palletStatus == PalletStatus.DELIVERED
                 || palletStatus == PalletStatus.CANCELLED;
     }
 }

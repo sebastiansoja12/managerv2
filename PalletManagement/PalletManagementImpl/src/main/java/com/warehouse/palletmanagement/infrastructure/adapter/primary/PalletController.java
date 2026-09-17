@@ -99,6 +99,12 @@ public class PalletController {
         return ResponseEntity.ok(this.palletResponseMapper.map(pallet));
     }
 
+    @PutMapping("/{palletId}/revert-loading")
+    public ResponseEntity<PalletResponseApi> revertLoading(@PathVariable final String palletId) {
+        final PalletDetails pallet = this.palletScanPort.revertLoading(new PalletId(palletId));
+        return ResponseEntity.ok(this.palletResponseMapper.map(pallet));
+    }
+
     @PutMapping("/{palletId}/shipments")
     public ResponseEntity<PalletResponseApi> addShipments(@PathVariable final String palletId,
                                                           @RequestBody final PalletShipmentsRequestApi request) {

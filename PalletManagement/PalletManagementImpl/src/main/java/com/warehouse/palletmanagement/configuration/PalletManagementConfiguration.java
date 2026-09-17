@@ -117,9 +117,10 @@ public class PalletManagementConfiguration {
     @Bean("palletManagement.palletScanPort")
     public PalletScanPort palletScanPort(final PalletHandlingManagerServicePort palletHandlingManagerServicePort,
                                          final ShipmentServicePort palletShipmentServicePort,
+                                         final PalletTransportService palletTransportService,
                                          final DomainEventPublisher domainEventPublisher) {
         return new PalletScanPortImpl(palletHandlingManagerServicePort, palletShipmentServicePort,
-                domainEventPublisher);
+                palletTransportService, domainEventPublisher);
     }
 
     @Bean

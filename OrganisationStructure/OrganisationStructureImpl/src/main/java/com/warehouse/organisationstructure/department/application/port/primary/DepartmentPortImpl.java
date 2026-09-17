@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 public class DepartmentPortImpl implements DepartmentPort {
@@ -56,6 +57,11 @@ public class DepartmentPortImpl implements DepartmentPort {
     @Override
     public Department findByDepartmentId(final DepartmentId departmentId) {
         return this.departmentRepository.findByDepartmentId(departmentId);
+    }
+
+    @Override
+    public Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId) {
+        return this.departmentRepository.findDepartmentCode(departmentId);
     }
 
     @Override

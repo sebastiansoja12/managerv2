@@ -22,6 +22,7 @@ public interface PalletHandlingManagerServicePort {
     PalletDetails getByTrackingNumber(final PalletTrackingNumber trackingNumber);
     PalletPage findPallets(final PalletSearchCriteria criteria);
     PalletDetails cancelPallet(final PalletId palletId);
+    PalletDetails revertLoading(final PalletId palletId);
     PalletDetails addShipments(final PalletId palletId, final List<ShipmentId> shipmentIds);
     PalletDetails removeShipment(final PalletId palletId, final ShipmentId shipmentId);
     PalletDetails changeGrossWeight(final PalletId palletId, final PalletWeight grossWeight);

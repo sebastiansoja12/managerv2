@@ -22,6 +22,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDe
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RecordDeliveryAttemptCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.RevertPalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
 import com.warehouse.logisticsdelivery.application.port.secondary.SignatureRepository;
@@ -111,15 +112,43 @@ public class DeliveryPortImpl implements DeliveryPort {
     @Transactional
     public void createPalletDelivery(final CreatePalletDeliveryCommand command) {
         final DeliveryTarget target = DeliveryTarget.pallet(command.palletId());
-        final Delivery palletDelivery = findOutbound(target).orElseGet(() -> {
-            final Delivery delivery = Delivery.forPallet(target, command.userId());
-            save(delivery, DeliveryCreated::new);
-            log.info("Pallet delivery {} created for pallet {}", delivery.getDeliveryId().getId(), command.palletId());
-            return delivery;
-        });
+        final Delivery palletDelivery = findOutbound(target)
+                .map(delivery -> reopen(delivery, command))
+                .orElseGet(() -> {
+                    final Delivery delivery = Delivery.forPallet(target, command.originDepartmentId(),
+                            command.destinationDepartmentId(), command.userId());
+                    save(delivery, DeliveryCreated::new);
+                    log.info("Pallet delivery {} created for pallet {}", delivery.getDeliveryId().getId(),
+                            command.palletId());
+                    return delivery;
+                });
         command.shipmentIds().forEach(shipmentId -> findOutbound(DeliveryTarget.shipment(shipmentId))
                 .filter(delivery -> delivery.replaceByPalletDelivery(palletDelivery.getDeliveryId(), command.userId()))
                 .ifPresent(delivery -> save(delivery, DeliveryCanceled::new)));
+    }
+
+    @Override
+    @Transactional
+    public void revertPalletDelivery(final RevertPalletDeliveryCommand command) {
+        findOutbound(DeliveryTarget.pallet(command.palletId()))
+                .filter(Delivery::isActive)
+                .ifPresent(palletDelivery -> {
+                    cancel(palletDelivery);
+                    command.shipmentIds().forEach(shipmentId -> findOutbound(DeliveryTarget.shipment(shipmentId))
+                            .filter(delivery -> delivery.restoreReplacedByPalletDelivery(
+                                    palletDelivery.getDeliveryId(), command.userId()))
+                            .ifPresent(delivery -> save(delivery, DeliveryModified::new)));
+                    log.info("Pallet delivery {} reverted for pallet {}", palletDelivery.getDeliveryId().getId(),
+                            command.palletId());
+                });
+    }
+
+    private Delivery reopen(final Delivery delivery, final CreatePalletDeliveryCommand command) {
+        if (delivery.reopenPalletDelivery(command.originDepartmentId(), command.destinationDepartmentId())) {
+            save(delivery, DeliveryModified::new);
+            log.info("Pallet delivery {} reopened for pallet {}", delivery.getDeliveryId().getId(), command.palletId());
+        }
+        return delivery;
     }
 
     @Override

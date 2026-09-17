@@ -10,12 +10,15 @@ import com.warehouse.organisationstructure.department.domain.model.DepartmentCre
 import com.warehouse.organisationstructure.department.domain.vo.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DepartmentPort {
 
     Department findByDepartmentCode(final DepartmentCode departmentCode);
 
     Department findByDepartmentId(final DepartmentId departmentId);
+
+    Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId);
 
     List<Department> findAll();
 

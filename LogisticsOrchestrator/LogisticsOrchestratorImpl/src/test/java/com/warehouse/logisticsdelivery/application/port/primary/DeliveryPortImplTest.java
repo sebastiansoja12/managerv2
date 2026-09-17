@@ -16,6 +16,9 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.Complete
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
+import com.warehouse.logisticsdelivery.domain.model.DeliveryStep;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryCommentCode;
+import com.warehouse.logisticsdelivery.application.port.primary.command.RevertPalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RecordDeliveryAttemptCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryRelation;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
@@ -194,13 +197,16 @@ class DeliveryPortImplTest {
                 DeliveryType.OUTBOUND)).thenReturn(Optional.empty());
 
         this.deliveryPort.createPalletDelivery(new CreatePalletDeliveryCommand("pallet-1",
-                List.of(new ShipmentId(10L), new ShipmentId(11L)), USER_ID));
+                List.of(new ShipmentId(10L), new ShipmentId(11L)), ORIGIN_DEPARTMENT_ID, DESTINATION_DEPARTMENT_ID,
+                USER_ID));
 
         final ArgumentCaptor<Delivery> saved = ArgumentCaptor.forClass(Delivery.class);
         verify(this.deliveryRepository, times(2)).createOrUpdate(saved.capture());
         final Delivery palletDelivery = saved.getAllValues().get(0);
         assertThat(palletDelivery.getTarget().type()).isEqualTo(DeliveryTargetType.PALLET);
         assertThat(palletDelivery.getShipmentId()).isNull();
+        assertThat(palletDelivery.getOriginDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
+        assertThat(palletDelivery.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
         assertThat(saved.getAllValues().get(1)).isSameAs(shipmentDelivery);
         assertThat(shipmentDelivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.CANCELED);
         assertThat(shipmentDelivery.getDeliverySteps()).hasSize(2);
@@ -212,7 +218,7 @@ class DeliveryPortImplTest {
 
     @Test
     void shouldNotDuplicatePalletDeliveryOnRepeatedEvent() {
-        final Delivery existing = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), USER_ID);
+        final Delivery existing = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), null, null, USER_ID);
         final Delivery replaced = courierShipmentDelivery(new ShipmentId(10L));
         replaced.markAsCanceled();
         when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
@@ -221,6 +227,64 @@ class DeliveryPortImplTest {
                 DeliveryType.OUTBOUND)).thenReturn(Optional.of(replaced));
 
         this.deliveryPort.createPalletDelivery(new CreatePalletDeliveryCommand("pallet-1",
+                List.of(new ShipmentId(10L)), ORIGIN_DEPARTMENT_ID, DESTINATION_DEPARTMENT_ID, USER_ID));
+
+        verify(this.deliveryRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(this.domainEventPublisher);
+    }
+
+    @Test
+    void shouldReopenCanceledPalletDeliveryWhenPalletIsLoadedAgain() {
+        final Delivery existing = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), null, null, USER_ID);
+        existing.markAsCanceled();
+        when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(existing));
+        when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.shipment(new ShipmentId(10L)),
+                DeliveryType.OUTBOUND)).thenReturn(Optional.empty());
+
+        this.deliveryPort.createPalletDelivery(new CreatePalletDeliveryCommand("pallet-1",
+                List.of(new ShipmentId(10L)), ORIGIN_DEPARTMENT_ID, DESTINATION_DEPARTMENT_ID, USER_ID));
+
+        verify(this.deliveryRepository).createOrUpdate(existing);
+        assertThat(existing.isActive()).isTrue();
+        assertThat(existing.getOriginDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
+        assertThat(existing.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
+        assertThat(publishedEvent(DeliveryModified.class).getSnapshot().deliveryId())
+                .isEqualTo(existing.getDeliveryId());
+    }
+
+    @Test
+    void shouldCancelPalletDeliveryAndRestoreReplacedShipmentDeliveriesWhenLoadingIsReverted() {
+        final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), null, null, USER_ID);
+        final Delivery shipmentDelivery = courierShipmentDelivery(new ShipmentId(10L));
+        shipmentDelivery.replaceByPalletDelivery(palletDelivery.getDeliveryId(), USER_ID);
+        when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(palletDelivery));
+        when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.shipment(new ShipmentId(10L)),
+                DeliveryType.OUTBOUND)).thenReturn(Optional.of(shipmentDelivery));
+
+        this.deliveryPort.revertPalletDelivery(new RevertPalletDeliveryCommand("pallet-1",
+                List.of(new ShipmentId(10L)), USER_ID));
+
+        assertThat(palletDelivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.CANCELED);
+        assertThat(shipmentDelivery.isActive()).isTrue();
+        assertThat(shipmentDelivery.getReplacedByDeliveryId()).isNull();
+        assertThat(shipmentDelivery.getDeliverySteps()).last()
+                .extracting(DeliveryStep::commentCode).isEqualTo(DeliveryCommentCode.PALLET_LOADING_REVERTED);
+        assertThat(publishedEvent(DeliveryCanceled.class).getSnapshot().deliveryId())
+                .isEqualTo(palletDelivery.getDeliveryId());
+        assertThat(publishedEvent(DeliveryModified.class).getSnapshot().deliveryId())
+                .isEqualTo(shipmentDelivery.getDeliveryId());
+    }
+
+    @Test
+    void shouldIgnoreRevertWhenPalletDeliveryIsAlreadyCanceled() {
+        final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("pallet-1"), null, null, USER_ID);
+        palletDelivery.markAsCanceled();
+        when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.pallet("pallet-1"), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(palletDelivery));
+
+        this.deliveryPort.revertPalletDelivery(new RevertPalletDeliveryCommand("pallet-1",
                 List.of(new ShipmentId(10L)), USER_ID));
 
         verify(this.deliveryRepository, never()).createOrUpdate(any());
@@ -500,7 +564,7 @@ class DeliveryPortImplTest {
 
     @Test
     void shouldNotMarkShipmentDeliveredWhenFinishingPalletDelivery() {
-        final Delivery delivery = Delivery.forPallet(DeliveryTarget.pallet("p-1"), USER_ID);
+        final Delivery delivery = Delivery.forPallet(DeliveryTarget.pallet("p-1"), null, null, USER_ID);
         when(this.deliveryRepository.findById(delivery.getDeliveryId())).thenReturn(Optional.of(delivery));
         when(this.operatorContextProvider.currentUserId()).thenReturn(USER_ID);
         when(this.operatorContextProvider.currentDepartmentId()).thenReturn(new DepartmentId(7L));
@@ -532,7 +596,7 @@ class DeliveryPortImplTest {
         final Delivery delivery = shipmentDelivery(shipmentId);
         final Delivery source = shipmentDelivery(sourceShipmentId);
         final Delivery derived = shipmentDelivery(derivedShipmentId);
-        final Delivery pallet = Delivery.forPallet(DeliveryTarget.pallet("p-1"), USER_ID);
+        final Delivery pallet = Delivery.forPallet(DeliveryTarget.pallet("p-1"), null, null, USER_ID);
         delivery.replaceByPalletDelivery(pallet.getDeliveryId(), USER_ID);
         when(this.deliveryRepository.findById(delivery.getDeliveryId())).thenReturn(Optional.of(delivery));
         when(this.deliveryRepository.findById(pallet.getDeliveryId())).thenReturn(Optional.of(pallet));

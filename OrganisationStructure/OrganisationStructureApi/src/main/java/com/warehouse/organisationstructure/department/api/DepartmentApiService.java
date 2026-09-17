@@ -10,12 +10,14 @@ import com.warehouse.organisationstructure.department.api.dto.DepartmentDirector
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DepartmentApiService {
     List<DepartmentDto> getAllDepartments();
     List<DepartmentDirectoryEntryDto> getDepartmentDirectory();
     DepartmentDto getDepartmentByCode(final DepartmentCode departmentCode);
     DepartmentDto getDepartmentById(final DepartmentId departmentId);
+    Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId);
     Boolean checkIfDepartmentExists(final DepartmentCode departmentCode);
     Boolean checkIfDepartmentExists(final DepartmentId departmentId);
     boolean checkIfAnyExistsWithCountryCode(final CountryCode countryCode);

@@ -48,6 +48,8 @@ public interface PalletStorageService {
     Pallet findByTrackingNumber(final TrackingNumber trackingNumber);
     PalletPage search(final PalletSearchCriteria criteria);
     Pallet cancel(final PalletId palletId);
+
+    Pallet revertLoading(final PalletId palletId);
     boolean markLoaded(final PalletId palletId);
     Pallet changeGrossWeight(final PalletId palletId, final Weight grossWeight);
     Pallet defineMaxGrossWeight(final PalletId palletId, final BigDecimal maxGrossWeight);

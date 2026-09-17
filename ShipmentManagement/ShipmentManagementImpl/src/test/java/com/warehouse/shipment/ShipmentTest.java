@@ -253,6 +253,29 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldRevertPalletLoadingToConfiguredDefaultStatus() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentLoadedOnPallet();
+
+        final boolean changed = shipment.revertLoadingFromPallet(
+                new ShipmentWorkflowSettings(ShipmentStatus.PREPARED, null, false, false, true, 0, null));
+
+        assertAll(
+                () -> assertTrue(changed),
+                () -> assertEquals(ShipmentStatus.PREPARED, shipment.getShipmentStatus())
+        );
+    }
+
+    @Test
+    void shouldIgnorePalletLoadingRevertOfShipmentThatIsNotSent() {
+        final Shipment shipment = shipment(null);
+        shipment.changeShipmentStatus(ShipmentStatus.ACCEPTED);
+
+        assertFalse(shipment.revertLoadingFromPallet(ShipmentWorkflowSettings.defaults()));
+        assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus());
+    }
+
+    @Test
     void shouldRejectPalletLoadingOfDeliveredShipment() {
         final Shipment shipment = shipment(null);
         shipment.markAsDelivered();

@@ -15,6 +15,7 @@ import com.warehouse.organisationstructure.department.infrastructure.adapter.pri
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.mapper.ResponseMapper;
 
 import java.util.List;
+import java.util.Optional;
 
 public class DepartmentServiceAdapter implements DepartmentApiService {
 
@@ -49,7 +50,12 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     @Override
     public DepartmentDto getDepartmentById(final DepartmentId departmentId) {
         final Department department = this.departmentPort.findByDepartmentId(departmentId);
-        return ResponseMapper.mapToDto(department);
+        return department == null ? null : ResponseMapper.mapToDto(department);
+    }
+
+    @Override
+    public Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId) {
+        return this.departmentPort.findDepartmentCode(departmentId);
     }
 
     @Override

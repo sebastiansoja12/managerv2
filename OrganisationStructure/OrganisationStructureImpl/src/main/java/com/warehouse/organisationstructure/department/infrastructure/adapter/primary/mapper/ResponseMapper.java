@@ -40,7 +40,9 @@ public abstract class ResponseMapper {
 
     public static DepartmentDto mapToDto(final Department department) {
         final String departmentCode = department.getDepartmentCode().getValue();
-        final CoordinatesDto coordinates = new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
+        final CoordinatesDto coordinates = department.getCoordinates() == null
+                ? null
+                : new CoordinatesDto(department.getCoordinates().lat(), department.getCoordinates().lon());
         return new DepartmentDto(department.getDepartmentId().getValue(), departmentCode,
                 department.getCity(), department.getStreet(),
                 department.getPostalCode(), department.getCountryCode().name(), coordinates);

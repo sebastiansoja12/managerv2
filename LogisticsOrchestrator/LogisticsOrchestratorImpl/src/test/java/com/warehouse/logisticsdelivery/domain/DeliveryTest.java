@@ -148,7 +148,7 @@ class DeliveryTest {
     @Test
     void shouldNotReplaceInactiveDeliveryByPalletDelivery() {
         final Delivery replaced = shipmentDelivery(new ShipmentId(10L));
-        final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("p"), USER_ID);
+        final Delivery palletDelivery = Delivery.forPallet(DeliveryTarget.pallet("p"), null, null, USER_ID);
         replaced.replaceByPalletDelivery(palletDelivery.getDeliveryId(), USER_ID);
 
         assertThat(replaced.isActive()).isFalse();

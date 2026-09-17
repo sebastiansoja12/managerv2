@@ -11,7 +11,15 @@ public record DepartmentNode(
         DepartmentId departmentId,
         DepartmentCode departmentCode,
         DepartmentType departmentType,
-        DepartmentStatus status) {
+        DepartmentStatus status,
+        DepartmentLocation location) {
+
+    public DepartmentNode(final DepartmentId departmentId,
+                          final DepartmentCode departmentCode,
+                          final DepartmentType departmentType,
+                          final DepartmentStatus status) {
+        this(departmentId, departmentCode, departmentType, status, null);
+    }
 
     public DepartmentNode {
         Objects.requireNonNull(departmentId, "Department ID cannot be null");
@@ -28,5 +36,12 @@ public record DepartmentNode(
 
     public boolean participatesInDeliveryNetwork() {
         return this.status.participatesInDeliveryNetwork();
+    }
+
+    public double distanceInKilometersTo(final DepartmentNode department) {
+        if (this.location == null || department.location() == null) {
+            return 0;
+        }
+        return this.location.distanceInKilometersTo(department.location());
     }
 }

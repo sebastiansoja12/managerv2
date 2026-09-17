@@ -113,6 +113,20 @@ class PalletPortImplTest {
     }
 
     @Test
+    void shouldRevertLoadingOfOwnedPalletAndRecordHistory() {
+        final Pallet pallet = Pallet.withShipments(PALLET_ID, TRACKING_NUMBER, new OperatorId(1L),
+                List.of(new ShipmentId(1L)));
+        when(this.palletStorageService.find(PALLET_ID)).thenReturn(pallet);
+        when(this.palletStorageService.revertLoading(PALLET_ID)).thenReturn(pallet);
+
+        this.palletPort.revertLoading(PALLET_ID, new OperatorId(1L));
+
+        final ArgumentCaptor<PalletHistoryEntry> entry = ArgumentCaptor.forClass(PalletHistoryEntry.class);
+        verify(this.palletHistoryRepository).append(entry.capture());
+        assertThat(entry.getValue().eventType()).isEqualTo(PalletHistoryEventType.LOADING_REVERTED);
+    }
+
+    @Test
     void shouldRecordHistoryWithUserFromJwt() {
         final OperatorId operatorId = new OperatorId(1L);
         final Pallet pallet = Pallet.empty(PALLET_ID, TRACKING_NUMBER, operatorId);

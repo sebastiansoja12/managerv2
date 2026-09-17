@@ -120,12 +120,13 @@ public class Delivery {
         this.replacedByDeliveryId = replacedByDeliveryId;
     }
 
-    public static Delivery forPallet(final DeliveryTarget target, final UserId userId) {
+    public static Delivery forPallet(final DeliveryTarget target, final DepartmentId originDepartmentId,
+                                     final DepartmentId destinationDepartmentId, final UserId userId) {
         if (target.type() != DeliveryTargetType.PALLET) {
             throw new DeliveryModificationException("Pallet delivery requires pallet target");
         }
-        return new Delivery(target, null, DeliveryType.OUTBOUND, null, null, null, DeliveryMethod.COURIER,
-                null, null, null, false, userId);
+        return new Delivery(target, null, DeliveryType.OUTBOUND, originDepartmentId, destinationDepartmentId, null,
+                DeliveryMethod.COURIER, null, null, null, false, userId);
     }
 
     public static Delivery derivedFrom(final Delivery source, final ShipmentId shipmentId,
@@ -254,6 +255,28 @@ public class Delivery {
                 DeliveryCommentCode.REPLACED_BY_PALLET_DELIVERY, deliverySteps.size()));
         this.replacedByDeliveryId = palletDeliveryId;
         markAsCanceled();
+        return true;
+    }
+
+    public boolean reopenPalletDelivery(final DepartmentId originDepartmentId,
+                                        final DepartmentId destinationDepartmentId) {
+        if (target.type() != DeliveryTargetType.PALLET || status != DeliveryLifecycleStatus.CANCELED) {
+            return false;
+        }
+        markAsModified();
+        this.originDepartmentId = originDepartmentId;
+        this.destinationDepartmentId = destinationDepartmentId;
+        return true;
+    }
+
+    public boolean restoreReplacedByPalletDelivery(final DeliveryId palletDeliveryId, final UserId userId) {
+        if (status != DeliveryLifecycleStatus.CANCELED || !Objects.equals(replacedByDeliveryId, palletDeliveryId)) {
+            return false;
+        }
+        markAsModified();
+        this.replacedByDeliveryId = null;
+        addStep(DeliveryStep.attempt(deliveryId, deliveryStatus, userId, supplierId, null, vehicleId,
+                DeliveryCommentCode.PALLET_LOADING_REVERTED, deliverySteps.size()));
         return true;
     }
 

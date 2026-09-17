@@ -6,11 +6,15 @@ import com.warehouse.palletmanagement.PalletFixture;
 import com.warehouse.palletmanagement.application.port.primary.command.PalletScanCommand;
 import com.warehouse.palletmanagement.application.port.primary.result.PalletScanResult;
 import com.warehouse.palletmanagement.application.port.secondary.PalletHandlingManagerServicePort;
+import com.warehouse.palletmanagement.application.port.secondary.PalletTransportRepository;
 import com.warehouse.palletmanagement.application.port.secondary.ShipmentServicePort;
+import com.warehouse.palletmanagement.application.service.PalletTransportService;
 import com.warehouse.palletmanagement.domain.enumeration.PalletLoadBlockReason;
 import com.warehouse.palletmanagement.domain.enumeration.PalletScanErrorCode;
 import com.warehouse.palletmanagement.domain.enumeration.PalletStatus;
 import com.warehouse.palletmanagement.domain.event.PalletLoaded;
+import com.warehouse.palletmanagement.domain.event.PalletLoadingReverted;
+import com.warehouse.palletmanagement.domain.vo.PalletDetails;
 import com.warehouse.palletmanagement.domain.exception.PalletRequestRejectedException;
 import com.warehouse.palletmanagement.domain.vo.ShipmentLoadResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +45,7 @@ class PalletScanPortImplTest {
         this.shipmentServicePort = mock(ShipmentServicePort.class);
         this.domainEventPublisher = mock(DomainEventPublisher.class);
         this.palletScanPort = new PalletScanPortImpl(this.palletHandlingManagerServicePort, this.shipmentServicePort,
-                this.domainEventPublisher);
+                new PalletTransportService(mock(PalletTransportRepository.class)), this.domainEventPublisher);
     }
 
     @Test
@@ -123,6 +127,35 @@ class PalletScanPortImplTest {
 
         assertThatThrownBy(() -> this.palletScanPort.scan(COMMAND))
                 .isInstanceOf(PalletRequestRejectedException.class);
+        verifyNoInteractions(this.shipmentServicePort, this.domainEventPublisher);
+    }
+
+    @Test
+    void shouldRevertPalletAndShipmentsAndPublishPalletLoadingReverted() {
+        when(this.palletHandlingManagerServicePort.revertLoading(PalletFixture.PALLET_ID))
+                .thenReturn(PalletFixture.readyPallet(1L, 2L));
+        when(this.shipmentServicePort.revertLoadingFromPallet(any())).thenAnswer(invocation ->
+                ShipmentLoadResult.loaded(invocation.getArgument(0), "CREATED"));
+
+        final PalletDetails pallet = this.palletScanPort.revertLoading(PalletFixture.PALLET_ID);
+
+        final ArgumentCaptor<PalletLoadingReverted> event = ArgumentCaptor.forClass(PalletLoadingReverted.class);
+        verify(this.domainEventPublisher).publish(event.capture());
+        verify(this.shipmentServicePort).revertLoadingFromPallet(new ShipmentId(1L));
+        verify(this.shipmentServicePort).revertLoadingFromPallet(new ShipmentId(2L));
+        assertThat(pallet.palletStatus()).isEqualTo(PalletStatus.READY);
+        assertThat(event.getValue().getSnapshot().palletId()).isEqualTo(PalletFixture.PALLET_ID);
+        assertThat(event.getValue().getSnapshot().shipmentIds()).containsExactly(new ShipmentId(1L), new ShipmentId(2L));
+    }
+
+    @Test
+    void shouldNotTouchShipmentsWhenPalletLoadingCannotBeReverted() {
+        when(this.palletHandlingManagerServicePort.revertLoading(PalletFixture.PALLET_ID))
+                .thenThrow(new PalletRequestRejectedException(409, "PALLET_STATUS_TRANSITION_NOT_ALLOWED", "rejected"));
+
+        assertThatThrownBy(() -> this.palletScanPort.revertLoading(PalletFixture.PALLET_ID))
+                .isInstanceOf(PalletRequestRejectedException.class);
+
         verifyNoInteractions(this.shipmentServicePort, this.domainEventPublisher);
     }
 }

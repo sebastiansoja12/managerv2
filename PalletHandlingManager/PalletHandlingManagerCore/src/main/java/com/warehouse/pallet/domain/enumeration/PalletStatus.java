@@ -37,7 +37,7 @@ public enum PalletStatus {
             case PREPARING -> EnumSet.of(PREPARING, NOT_READY, READY, CANCELLED);
             case NOT_READY -> EnumSet.of(PREPARING, NOT_READY, READY, CANCELLED);
             case READY -> EnumSet.of(PREPARING, NOT_READY, READY, LOADED, CANCELLED);
-            case LOADED -> EnumSet.of(IN_TRANSIT);
+            case LOADED -> EnumSet.of(IN_TRANSIT, READY);
             case IN_TRANSIT -> EnumSet.of(DELIVERED);
             case DELIVERED, CANCELLED -> EnumSet.noneOf(PalletStatus.class);
             case EMPTY -> EnumSet.of(PREPARING, NOT_READY, READY, CANCELLED);
