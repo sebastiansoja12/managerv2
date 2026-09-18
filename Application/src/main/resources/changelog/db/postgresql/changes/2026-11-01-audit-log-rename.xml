@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-01-postgresql-rename-activity-stream-to-audit-log" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="activity_stream_entry"/>
+            <tableExists tableName="activity_stream_change"/>
+            <not>
+                <tableExists tableName="audit_log_entry"/>
+            </not>
+        </preConditions>
+        <renameTable oldTableName="activity_stream_entry" newTableName="audit_log_entry"/>
+        <renameTable oldTableName="activity_stream_change" newTableName="audit_log_change"/>
+        <renameColumn tableName="audit_log_change" oldColumnName="activity_stream_entry_id"
+                      newColumnName="audit_log_entry_id" columnDataType="BIGINT"/>
+        <sql>
+            ALTER INDEX idx_activity_stream_entry_resource RENAME TO idx_audit_log_entry_resource;
+            ALTER INDEX idx_activity_stream_entry_operator_occurred_at RENAME TO idx_audit_log_entry_operator_occurred_at;
+            ALTER INDEX idx_activity_stream_entry_user RENAME TO idx_audit_log_entry_user;
+            ALTER TABLE audit_log_change RENAME CONSTRAINT fk_activity_stream_change_entry TO fk_audit_log_change_entry;
+            ALTER TABLE audit_log_change RENAME CONSTRAINT pk_activity_stream_change TO pk_audit_log_change;
+        </sql>
+    </changeSet>
+    <changeSet id="2026-11-01-postgresql-audit-log-entry-kafka-event" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="audit_log_entry"/>
+            <not>
+                <columnExists tableName="audit_log_entry" columnName="event_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="audit_log_entry">
+            <column name="event_id" type="UUID">
+                <constraints unique="true" uniqueConstraintName="uk_audit_log_entry_event_id"/>
+            </column>
+        </addColumn>
+        <dropColumn tableName="audit_log_entry" columnName="reason"/>
+        <dropColumn tableName="audit_log_entry" columnName="channel"/>
+        <dropColumn tableName="audit_log_entry" columnName="request_method"/>
+        <dropColumn tableName="audit_log_entry" columnName="request_path"/>
+    </changeSet>
+</databaseChangeLog>
