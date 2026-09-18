@@ -6,6 +6,7 @@ import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public class ShipmentChanged implements ShipmentEvent {
 
@@ -15,7 +16,16 @@ public class ShipmentChanged implements ShipmentEvent {
     @NotNull
     private final Instant timestamp;
 
+    private final ShipmentSnapshot previousSnapshot;
+
     public ShipmentChanged(final ShipmentSnapshot snapshot, final Instant timestamp) {
+        this(null, snapshot, timestamp);
+    }
+
+    public ShipmentChanged(final ShipmentSnapshot previousSnapshot,
+                           final ShipmentSnapshot snapshot,
+                           final Instant timestamp) {
+        this.previousSnapshot = previousSnapshot;
         this.snapshot = snapshot;
         this.timestamp = timestamp;
     }
@@ -26,6 +36,10 @@ public class ShipmentChanged implements ShipmentEvent {
 
     public Instant getTimestamp() {
         return timestamp;
+    }
+
+    public Optional<ShipmentSnapshot> getPreviousSnapshot() {
+        return Optional.ofNullable(previousSnapshot);
     }
 
     public ShipmentId shipmentId() {

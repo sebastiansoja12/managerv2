@@ -8,4 +8,10 @@ public class ShipmentTypeChanged extends ShipmentChanged implements ShipmentEven
     public ShipmentTypeChanged(final ShipmentSnapshot snapshot, final Instant timestamp) {
         super(snapshot, timestamp);
     }
+
+    public ShipmentTypeChanged(final ShipmentSnapshot previousSnapshot,
+                               final ShipmentSnapshot snapshot,
+                               final Instant timestamp) {
+        super(previousSnapshot, snapshot, timestamp);
+    }
 }
