@@ -1,5 +1,6 @@
 package com.warehouse.shipment;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.shipment.application.port.primary.ShipmentQueryPort;
 import com.warehouse.shipment.application.port.primary.ShipmentQueryPortImpl;
@@ -9,6 +10,8 @@ import com.warehouse.shipment.application.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.application.service.RouteLogService;
 import com.warehouse.shipment.application.service.ShipmentResultFactory;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.ShipmentDeliveryDetails;
+import com.warehouse.shipment.domain.vo.ShipmentListEntry;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -17,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 class ShipmentQueryPortImplTest {
 
-    private final SpecificationRepository<ShipmentSearchCriteria, Shipment> repository = mock(SpecificationRepository.class);
+    private final SpecificationRepository<ShipmentSearchCriteria, ShipmentListEntry> repository = mock(SpecificationRepository.class);
     private final ShipmentResultFactory factory = new ShipmentResultFactory(mock(DepartmentServicePort.class),
             mock(RouteLogService.class), mock(ReturningServicePort.class));
     private final ShipmentQueryPort queryPort = new ShipmentQueryPortImpl(repository, factory);
@@ -26,13 +29,16 @@ class ShipmentQueryPortImplTest {
     void shouldSearchShipmentsAndMapResults() {
         final ShipmentSearchCriteria criteria = criteria(0, 50);
         final Shipment shipment = DataTestCreator.shipment();
-        when(repository.list(criteria)).thenReturn(List.of(shipment));
+        final ShipmentDeliveryDetails deliveryDetails = new ShipmentDeliveryDetails(new DepartmentId(3L),
+                new DepartmentId(5L), null, null);
+        when(repository.list(criteria)).thenReturn(List.of(new ShipmentListEntry(shipment, deliveryDetails)));
         when(repository.count(criteria)).thenReturn(1L);
 
         final ShipmentPageResult result = queryPort.searchShipments(criteria);
 
         assertEquals(1, result.content().size());
         assertEquals(shipment.snapshot(), result.content().getFirst().snapshot());
+        assertEquals(deliveryDetails, result.content().getFirst().deliveryDetails());
         verify(repository).list(criteria);
     }
 
@@ -66,6 +72,6 @@ class ShipmentQueryPortImplTest {
 
     private ShipmentSearchCriteria criteria(final Integer page, final Integer size) {
         return new ShipmentSearchCriteria(null, null, List.of(), List.of(), null, null,
-                null, null, null, null, null, null, page, size);
+                null, null, null, null, null, null, null, page, size);
     }
 }
