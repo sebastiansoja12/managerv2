@@ -1,5 +1,6 @@
 package com.warehouse.pickuppoint.configuration;
 
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
@@ -9,6 +10,7 @@ import com.warehouse.pickuppoint.api.PickupPointApiService;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointPort;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointPortImpl;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointReadModelSyncPort;
+import com.warehouse.pickuppoint.application.port.secondary.AuditLogServicePort;
 import com.warehouse.pickuppoint.application.port.secondary.DepartmentDirectoryServicePort;
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointCoordinatesServicePort;
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointReadModelRepository;
@@ -18,6 +20,7 @@ import com.warehouse.pickuppoint.application.service.PickupPointReadModelSyncSer
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.PickupPointApiServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.mapper.PickupPointApiMapper;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.mapper.PickupPointWebMapper;
+import com.warehouse.pickuppoint.infrastructure.adapter.secondary.AuditLogServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.DepartmentDirectoryServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.PickupPointCoordinatesServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.PickupPointReadModelRepositoryImpl;
@@ -29,6 +32,7 @@ import com.warehouse.pickuppoint.infrastructure.adapter.secondary.mapper.PickupP
 import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -91,6 +95,15 @@ public class PickupPointConfiguration {
     public DepartmentDirectoryServicePort pickupPointDepartmentDirectoryServicePort(
             final DepartmentApiService departmentApiService) {
         return new DepartmentDirectoryServiceAdapter(departmentApiService);
+    }
+
+    @Bean("pickupPointAuditLogServicePort")
+    @ConditionalOnProperty(
+            name = {"manager.kafka.integration-events.enabled", "manager.kafka.outbox.enabled"},
+            havingValue = "true")
+    public AuditLogServicePort pickupPointAuditLogServicePort(
+            final IntegrationEventPublisher integrationEventPublisher) {
+        return new AuditLogServiceAdapter(integrationEventPublisher);
     }
 
     @Bean
