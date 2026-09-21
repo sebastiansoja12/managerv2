@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "shipment_rd")
@@ -144,5 +144,19 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Column(name = "tracking_number", nullable = false)
     @AttributeOverride(name = "value", column = @Column(name = "tracking_number"))
     private TrackingNumber trackingNumber;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
+    private DepartmentId originDepartmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "destination_department_id"))
+    private DepartmentId destinationDepartmentId;
+
+    @Column(name = "planned_delivery_at")
+    private LocalDateTime plannedDeliveryAt;
+
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
 
 }
