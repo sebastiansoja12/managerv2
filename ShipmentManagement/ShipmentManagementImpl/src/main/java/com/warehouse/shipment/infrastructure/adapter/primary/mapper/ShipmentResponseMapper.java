@@ -60,7 +60,24 @@ public interface ShipmentResponseMapper {
     }
 
     default ShipmentDto map(final ShipmentResult shipmentResult) {
-        return map(shipmentResult.snapshot());
+        final ShipmentDto shipment = map(shipmentResult.snapshot());
+        if (shipment == null || shipmentResult.deliveryDetails() == null) {
+            return shipment;
+        }
+        return new ShipmentDto(shipment.getShipmentId(), shipment.getSender(), shipment.getRecipient(),
+                shipment.getShipmentStatus(), shipment.getShipmentRelatedId(), shipment.getShipmentPriority(),
+                shipment.getTrackingNumber(), shipment.getPrice(), shipment.getLocked(), shipment.getCreatedAt(),
+                shipment.getUpdatedAt(), shipment.getDimensions(), shipment.getWeight(),
+                shipment.getCustomerReference(), shipment.getContentDescription(), shipment.getDeclaredValue(),
+                shipment.getPackagingType(), shipment.getServiceLevel(), map(shipmentResult.deliveryDetails()));
+    }
+
+    default ShipmentDeliveryApi map(final ShipmentDeliveryDetails deliveryDetails) {
+        return new ShipmentDeliveryApi(
+                DepartmentIdDto.from(deliveryDetails.originDepartmentId()),
+                DepartmentIdDto.from(deliveryDetails.destinationDepartmentId()),
+                deliveryDetails.plannedDeliveryAt(),
+                deliveryDetails.deliveredAt());
     }
 
     default ShipmentPageDto map(final ShipmentPageResult shipmentPage) {

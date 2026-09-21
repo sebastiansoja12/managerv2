@@ -103,7 +103,7 @@ public interface ShipmentRequestMapper {
         if (request == null) {
             return new ShipmentSearchCriteria(
                     null, null, List.of(), List.of(), null, null,
-                    null, null, null, null, null, null, null, null
+                    null, null, null, null, null, null, null, null, null
             );
         }
 
@@ -120,6 +120,7 @@ public interface ShipmentRequestMapper {
                 request.locked(),
                 request.createdFrom(),
                 request.createdTo(),
+                request.departmentId() == null ? null : request.departmentId().toDepartmentId(),
                 request.page(),
                 request.size()
         );
