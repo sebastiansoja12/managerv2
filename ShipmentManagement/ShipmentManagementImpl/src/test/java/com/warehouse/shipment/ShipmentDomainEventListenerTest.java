@@ -2,7 +2,6 @@ package com.warehouse.shipment;
 
 import com.warehouse.shipment.application.listener.ShipmentDomainEventListener;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
-import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.domain.event.ShipmentLocked;
 import com.warehouse.shipment.domain.event.ShipmentRedirected;
 import com.warehouse.shipment.domain.event.ShipmentReturned;
@@ -16,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentDomainEventListenerTest {
@@ -24,14 +22,11 @@ class ShipmentDomainEventListenerTest {
     @Mock
     private ShipmentPort shipmentPort;
 
-    @Mock
-    private PathFinderServicePort pathFinderServicePort;
-
     private ShipmentDomainEventListener listener;
 
     @BeforeEach
     void setUp() {
-        this.listener = new ShipmentDomainEventListener(this.shipmentPort, this.pathFinderServicePort);
+        this.listener = new ShipmentDomainEventListener(this.shipmentPort);
     }
 
     @Test
@@ -41,7 +36,6 @@ class ShipmentDomainEventListenerTest {
         this.listener.handle(new ShipmentReturned(shipment.snapshot(), Instant.now()));
 
         verify(this.shipmentPort).returnToSender(shipment.getShipmentId());
-        verifyNoInteractions(this.pathFinderServicePort);
     }
 
     @Test

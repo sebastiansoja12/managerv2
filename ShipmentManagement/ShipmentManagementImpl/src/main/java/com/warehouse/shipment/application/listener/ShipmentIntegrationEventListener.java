@@ -37,8 +37,7 @@ public class ShipmentIntegrationEventListener {
     @EventListener
     public void handle(final ShipmentDestinationChanged event) {
         shipmentIntegrationEventServicePort.publishEvent(
-                new ShipmentDestinationChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot()),
-                        event.getDestinationDepartmentId()));
+                new ShipmentDestinationChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
     }
 
     @EventListener

@@ -1,17 +1,5 @@
 package com.warehouse.shipment;
 
-import java.util.Arrays;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.env.Environment;
-import org.springframework.transaction.event.TransactionalEventListener;
-
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
 import com.warehouse.commonassets.identificator.DepartmentId;
@@ -27,13 +15,21 @@ import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
 import com.warehouse.shipment.api.event.snapshot.ShipmentReadModelData;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
+import org.springframework.transaction.event.TransactionalEventListener;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class OutboxIntegrationEventPublisherTest {
 
@@ -74,7 +70,7 @@ class OutboxIntegrationEventPublisherTest {
 
         final JsonNode payload = objectMapper.readTree(record.payload());
         assertThat(payload.has("payload")).isTrue();
-        assertThat(payload.path("payload").size()).isEqualTo(16);
+        assertThat(payload.path("payload").size()).isEqualTo(17);
         assertThat(java.time.LocalDateTime.parse(payload.path("payload").path("updatedAt").asText()))
                 .isEqualTo(event.payload().updatedAt());
         assertThat(payload.path("payload").has("eventType")).isFalse();
