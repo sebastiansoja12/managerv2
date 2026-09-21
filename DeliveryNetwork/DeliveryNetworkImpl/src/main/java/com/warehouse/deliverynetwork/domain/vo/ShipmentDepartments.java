@@ -15,4 +15,8 @@ public record ShipmentDepartments(
     public Optional<DepartmentId> originDepartment() {
         return Optional.ofNullable(this.originDepartmentId);
     }
+
+    public Optional<DepartmentId> destinationDepartment() {
+        return Optional.ofNullable(this.destinationDepartmentId);
+    }
 }
