@@ -12,6 +12,7 @@ public enum PalletHistoryEventType {
     STATUS_CHANGED,
     LOADED,
     LOADING_REVERTED,
+    UNLOADED,
     CANCELLED,
     UNKNOWN
 }
