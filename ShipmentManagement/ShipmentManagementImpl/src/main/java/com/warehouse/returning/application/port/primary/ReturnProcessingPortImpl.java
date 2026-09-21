@@ -63,7 +63,7 @@ public class ReturnProcessingPortImpl implements ReturnProcessingPort {
             case CREATED, PROCESSING -> { }
         }
     }
-    // A courier may already have returned the shipment from the terminal, which created the return shipment.
+
     private boolean alreadyReturned(final ShipmentId shipmentId) {
         return shipmentServicePort.getShipment(shipmentId).status() == ShipmentStatus.RETURN;
     }

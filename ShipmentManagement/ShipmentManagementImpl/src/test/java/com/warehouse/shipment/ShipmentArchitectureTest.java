@@ -224,7 +224,7 @@ class ShipmentArchitectureTest {
                 "src/main/java/com/warehouse/shipment/application/listener/ShipmentDomainEventListener.java"));
         assertThat(domainListenerSource)
                 .contains("ShipmentPort")
-                .contains("PathFinderServicePort")
+                .doesNotContain("PathFinderServicePort")
                 .doesNotContain("IntegrationEventPublisher")
                 .doesNotContain("IntegrationEvent");
 
@@ -496,8 +496,7 @@ class ShipmentArchitectureTest {
                 java.util.UUID.class,
                 String.class,
                 Throwable.class,
-                java.time.Instant.class,
-                int.class))
+                java.time.Instant.class))
                 .isEqualTo(Propagation.REQUIRES_NEW);
     }
 

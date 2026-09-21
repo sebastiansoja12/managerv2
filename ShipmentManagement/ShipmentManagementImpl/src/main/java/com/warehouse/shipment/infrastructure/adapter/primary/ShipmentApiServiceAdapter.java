@@ -67,6 +67,11 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     }
 
     @Override
+    public ShipmentDetailsDto unloadShipmentFromPallet(final ShipmentId shipmentId) {
+        return mapper.map(shipmentPort.unloadShipmentFromPallet(shipmentId));
+    }
+
+    @Override
     public Optional<ShipmentRerouteDetailsDto> getShipmentForReroute(final TrackingNumber trackingNumber) {
         return shipmentPort.findOperator(trackingNumber)
                 .map(operatorId -> operatorContext.runAs(operatorId,
