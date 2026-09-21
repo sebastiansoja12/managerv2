@@ -5,6 +5,7 @@ import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.deliverynetwork.application.exception.DepartmentDirectoryImportMismatchException;
 import com.warehouse.deliverynetwork.application.exception.IncompleteDepartmentDirectoryImportException;
+import com.warehouse.deliverynetwork.application.exception.ShipmentDestinationDepartmentNotAssignedException;
 import com.warehouse.deliverynetwork.application.exception.ShipmentOriginDepartmentNotAssignedException;
 import com.warehouse.deliverynetwork.application.exception.UnknownDepartmentCodeException;
 import com.warehouse.deliverynetwork.application.port.primary.DeliveryNetworkPort;
@@ -195,6 +196,7 @@ public class DeliveryNetworkController {
 
     @ExceptionHandler({
             ShipmentOriginDepartmentNotAssignedException.class,
+            ShipmentDestinationDepartmentNotAssignedException.class,
             DeliveryPathNotFoundException.class
     })
     public ResponseEntity<String> handleUnavailableRoute(final RuntimeException exception) {
