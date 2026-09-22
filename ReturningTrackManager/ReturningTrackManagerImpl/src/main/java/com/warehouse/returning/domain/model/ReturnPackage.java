@@ -1,7 +1,11 @@
 package com.warehouse.returning.domain.model;
 
 
+
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
+import com.warehouse.returning.domain.event.ReturnPackageProcessingStarted;
 import com.warehouse.returning.domain.exception.StatusChangeException;
 import com.warehouse.returning.domain.vo.*;
 
@@ -13,12 +17,12 @@ public class ReturnPackage {
     private String reason;
     private ReturnStatus returnStatus;
     private ReturnToken returnToken;
-    private DepartmentCode assignedDepartmentCode;
-    private DepartmentCode returnedDepartmentCode;
+    private DepartmentId assignedDepartmentId;
+    private DepartmentId returnedDepartmentId;
     private UserId assignedTo;
     private UserId processedBy;
     private ReasonCode reasonCode;
-    private Long operatorId;
+    private OperatorId operatorId;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -26,32 +30,32 @@ public class ReturnPackage {
                          final ShipmentId shipmentId,
                          final String reason,
                          final ReturnToken returnToken,
-                         final DepartmentCode assignedDepartmentCode,
-                         final DepartmentCode returnedDepartmentCode,
+                         final DepartmentId assignedDepartmentId,
+                         final DepartmentId returnedDepartmentId,
                          final UserId assignedTo,
                          final UserId processedBy,
                          final ReasonCode reasonCode) {
-        this(returnPackageId, shipmentId, reason, returnToken, assignedDepartmentCode,
-                returnedDepartmentCode, assignedTo, processedBy, reasonCode, null);
+        this(returnPackageId, shipmentId, reason, returnToken, assignedDepartmentId,
+                returnedDepartmentId, assignedTo, processedBy, reasonCode, null);
     }
 
     public ReturnPackage(final ReturnPackageId returnPackageId,
                          final ShipmentId shipmentId,
                          final String reason,
                          final ReturnToken returnToken,
-                         final DepartmentCode assignedDepartmentCode,
-                         final DepartmentCode returnedDepartmentCode,
+                         final DepartmentId assignedDepartmentId,
+                         final DepartmentId returnedDepartmentId,
                          final UserId assignedTo,
                          final UserId processedBy,
                          final ReasonCode reasonCode,
-                         final Long operatorId) {
+                         final OperatorId operatorId) {
         this.returnPackageId = returnPackageId;
         this.shipmentId = shipmentId;
         this.reason = reason;
         this.returnStatus = ReturnStatus.CREATED;
         this.returnToken = returnToken;
-        this.assignedDepartmentCode = assignedDepartmentCode;
-        this.returnedDepartmentCode = returnedDepartmentCode;
+        this.assignedDepartmentId = assignedDepartmentId;
+        this.returnedDepartmentId = returnedDepartmentId;
         this.assignedTo = assignedTo;
         this.processedBy = processedBy;
         this.reasonCode = reasonCode;
@@ -65,12 +69,12 @@ public class ReturnPackage {
                          final String reason,
                          final ReturnStatus returnStatus,
                          final ReturnToken returnToken,
-                         final DepartmentCode assignedDepartmentCode,
-                         final DepartmentCode returnedDepartmentCode,
+                         final DepartmentId assignedDepartmentId,
+                         final DepartmentId returnedDepartmentId,
                          final UserId assignedTo,
                          final UserId processedBy,
                          final ReasonCode reasonCode,
-                         final Long operatorId,
+                         final OperatorId operatorId,
                          final Instant createdAt,
                          final Instant updatedAt) {
         this.returnPackageId = returnPackageId;
@@ -78,8 +82,8 @@ public class ReturnPackage {
         this.reason = reason;
         this.returnStatus = returnStatus;
         this.returnToken = returnToken;
-        this.assignedDepartmentCode = assignedDepartmentCode;
-        this.returnedDepartmentCode = returnedDepartmentCode;
+        this.assignedDepartmentId = assignedDepartmentId;
+        this.returnedDepartmentId = returnedDepartmentId;
         this.assignedTo = assignedTo;
         this.processedBy = processedBy;
         this.reasonCode = reasonCode;
@@ -88,8 +92,8 @@ public class ReturnPackage {
         this.updatedAt = updatedAt;
     }
 
-    public DepartmentCode getAssignedDepartmentCode() {
-        return assignedDepartmentCode;
+    public DepartmentId getAssignedDepartmentId() {
+        return assignedDepartmentId;
     }
 
     public UserId getAssignedTo() {
@@ -112,12 +116,12 @@ public class ReturnPackage {
         return reasonCode;
     }
 
-    public Long getOperatorId() {
+    public OperatorId getOperatorId() {
         return operatorId;
     }
 
-    public DepartmentCode getReturnedDepartmentCode() {
-        return returnedDepartmentCode;
+    public DepartmentId getReturnedDepartmentId() {
+        return returnedDepartmentId;
     }
 
     public ReturnPackageId getReturnPackageId() {
@@ -148,12 +152,13 @@ public class ReturnPackage {
         markAsModified();
     }
 
-    public void markAsProcessing() {
+    public ReturnPackageProcessingStarted markAsProcessing() {
         if (this.returnStatus != ReturnStatus.CREATED) {
             throw new StatusChangeException("Only a created return package can start processing");
         }
         changeReturnStatus(ReturnStatus.PROCESSING);
         markAsModified();
+        return new ReturnPackageProcessingStarted(toSnapshot(), updatedAt);
     }
 
     public void markAsCompleted() {
@@ -183,8 +188,8 @@ public class ReturnPackage {
                 reason,
                 returnStatus,
                 returnToken,
-                assignedDepartmentCode,
-                returnedDepartmentCode,
+                assignedDepartmentId,
+                returnedDepartmentId,
                 assignedTo,
                 processedBy,
                 reasonCode,
@@ -204,8 +209,8 @@ public class ReturnPackage {
         this.reason = builder.reason;
         this.returnStatus = builder.returnStatus;
         this.returnToken = builder.returnToken;
-        this.assignedDepartmentCode = builder.assignedDepartmentCode;
-        this.returnedDepartmentCode = builder.returnedDepartmentCode;
+        this.assignedDepartmentId = builder.assignedDepartmentId;
+        this.returnedDepartmentId = builder.returnedDepartmentId;
         this.assignedTo = builder.assignedTo;
         this.processedBy = builder.processedBy;
         this.reasonCode = builder.reasonCode;
@@ -229,12 +234,12 @@ public class ReturnPackage {
         private String reason;
         private ReturnStatus returnStatus;
         private ReturnToken returnToken;
-        private DepartmentCode assignedDepartmentCode;
-        private DepartmentCode returnedDepartmentCode;
+        private DepartmentId assignedDepartmentId;
+        private DepartmentId returnedDepartmentId;
         private UserId assignedTo;
         private UserId processedBy;
         private ReasonCode reasonCode;
-        private Long operatorId;
+        private OperatorId operatorId;
         private Instant createdAt;
         private Instant updatedAt;
 
@@ -263,13 +268,13 @@ public class ReturnPackage {
             return this;
         }
 
-        public ReturnPackageBuilder assignedDepartmentCode(DepartmentCode assignedDepartmentCode) {
-            this.assignedDepartmentCode = assignedDepartmentCode;
+        public ReturnPackageBuilder assignedDepartmentId(final DepartmentId assignedDepartmentId) {
+            this.assignedDepartmentId = assignedDepartmentId;
             return this;
         }
 
-        public ReturnPackageBuilder returnedDepartmentCode(DepartmentCode returnedDepartmentCode) {
-            this.returnedDepartmentCode = returnedDepartmentCode;
+        public ReturnPackageBuilder returnedDepartmentId(final DepartmentId returnedDepartmentId) {
+            this.returnedDepartmentId = returnedDepartmentId;
             return this;
         }
 
@@ -288,7 +293,7 @@ public class ReturnPackage {
             return this;
         }
 
-        public ReturnPackageBuilder operatorId(final Long operatorId) {
+        public ReturnPackageBuilder operatorId(final OperatorId operatorId) {
             this.operatorId = operatorId;
             return this;
         }
