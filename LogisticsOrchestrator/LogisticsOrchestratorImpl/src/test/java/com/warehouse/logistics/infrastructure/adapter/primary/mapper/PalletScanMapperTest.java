@@ -1,12 +1,18 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.logistics.application.port.primary.command.PalletScanCommand;
+import com.warehouse.logistics.application.port.primary.command.PalletUnloadCommand;
 import com.warehouse.logistics.application.port.primary.result.PalletScanDetail;
 import com.warehouse.logistics.application.port.primary.result.PalletScanOutcome;
+import com.warehouse.logistics.application.port.primary.result.PalletUnloadOutcome;
+import com.warehouse.commonassets.identificator.PalletId;
+import com.warehouse.commonassets.identificator.PalletTrackingNumber;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.terminal.jaxb.PalletScanRequest;
 import com.warehouse.terminal.jaxb.PalletScanResponse;
+import com.warehouse.terminal.jaxb.PalletUnloadRequest;
+import com.warehouse.terminal.jaxb.PalletUnloadResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -50,5 +56,34 @@ class PalletScanMapperTest {
                 .isEqualTo("TRK-1");
         assertThat(response.getPalletScanResponseDetails().getPalletScanResponseDetail().get(1).getErrorMessage())
                 .isEqualTo("Delivered shipment cannot be changed");
+    }
+
+    @Test
+    void shouldMapUnloadRequestWithTrimmedTrackingNumber() {
+        final PalletUnloadRequest request = new PalletUnloadRequest();
+        request.setPalletTrackingNumber(" PAL000000000001 ");
+
+        final PalletUnloadCommand command = this.mapper.map(PROCESS_ID, request);
+
+        assertThat(command.processId()).isEqualTo(PROCESS_ID);
+        assertThat(command.trackingNumber()).isEqualTo(new PalletTrackingNumber("PAL000000000001"));
+    }
+
+    @Test
+    void shouldMapUnloadOutcome() {
+        final PalletUnloadOutcome outcome = new PalletUnloadOutcome(new PalletTrackingNumber("PAL1"),
+                new PalletId("pallet-1"), "DELIVERED", true, false,
+                null, null, List.of(new PalletScanDetail(new ShipmentId(1L), true, "ACCEPTED", null)));
+
+        final PalletUnloadResponse response = this.mapper.map(PROCESS_ID, outcome,
+                shipmentId -> "TRK-" + shipmentId.getValue());
+
+        assertThat(response.isSuccess()).isTrue();
+        assertThat(response.isAlreadyUnloaded()).isFalse();
+        assertThat(response.getPalletStatus()).isEqualTo("DELIVERED");
+        assertThat(response.getPalletID()).isEqualTo("pallet-1");
+        assertThat(response.getPalletTrackingNumber()).isEqualTo("PAL1");
+        assertThat(response.getPalletScanResponseDetails().getPalletScanResponseDetail().getFirst().getTrackingNumber())
+                .isEqualTo("TRK-1");
     }
 }
