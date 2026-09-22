@@ -12,6 +12,7 @@ import com.warehouse.organisationstructure.OperatorTestFixtures;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.LabelFormat;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberDateFormat;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberPrefixMode;
 import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.OperatorConfigurationEntity;
 
 class OperatorConfigurationMapperTest {
@@ -33,6 +34,8 @@ class OperatorConfigurationMapperTest {
         assertTrue(configuration.getShipmentConfiguration().getValidationConfiguration().isRequireRecipientPhone());
         assertEquals(LabelFormat.PDF_A6,
                 configuration.getShipmentConfiguration().getLabelConfiguration().getLabelFormat());
+        assertEquals(TrackingNumberPrefixMode.CUSTOM,
+                configuration.getShipmentConfiguration().getTrackingNumberRule().getPrefixMode());
         assertEquals(7, configuration.getDeliveryTimeConfiguration().getInternationalDeliveryDays());
     }
 
