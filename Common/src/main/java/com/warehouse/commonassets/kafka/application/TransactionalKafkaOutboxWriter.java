@@ -4,6 +4,7 @@ import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
 import com.warehouse.commonassets.kafka.domain.port.KafkaOutboxPort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -20,6 +21,7 @@ public class TransactionalKafkaOutboxWriter {
         this.outboxPublicationService = outboxPublicationService;
     }
 
+    @Transactional
     public void append(final KafkaOutboxRecord record) {
         requireActiveTransaction();
         this.outboxPort.save(record);
