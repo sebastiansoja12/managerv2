@@ -1,25 +1,25 @@
 package com.warehouse.returning.domain.service;
 
-import java.util.Optional;
-
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.model.ReturnPackage;
-import com.warehouse.returning.domain.vo.DepartmentCode;
-import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
+import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ShipmentId;
+
+import java.util.Optional;
 
 public interface ReturnService {
 
     ReturnPackage getReturn(final ReturnPackageId returnId);
 
-    Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final Long operatorId);
+    Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final OperatorId operatorId);
 
-    ReturnPage getReturns(final DepartmentCode departmentCode, final Long operatorId, final int page, final int size);
+    ReturnPage getReturns(final DepartmentId departmentId, final OperatorId operatorId, final int page, final int size);
 
     boolean existsForShipment(final ShipmentId shipmentId);
 
-    void deleteReturn(final ReturnPackageId returnPackageId);
 
     void changeReasonCode(final ReturnPackageId returnPackageId, final ReasonCode reasonCode);
 
@@ -27,11 +27,8 @@ public interface ReturnService {
 
     void saveOrUpdate(final ReturnPackage returnPackage);
 
-    void startProcessingReturn(final ShipmentId shipmentId);
+    void completeReturn(final ReturnPackageId returnPackageId);
 
-    void completeReturn(final ShipmentId shipmentId);
-
-    void cancelReturn(final ShipmentId shipmentId);
 
     ReturnPackage findByShipmentId(final ShipmentId shipmentId);
 }

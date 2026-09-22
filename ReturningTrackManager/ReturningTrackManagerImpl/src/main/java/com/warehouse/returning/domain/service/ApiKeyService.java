@@ -1,12 +1,14 @@
 package com.warehouse.returning.domain.service;
 
 import java.security.Key;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.provider.JwtProvider;
 import com.warehouse.returning.domain.vo.DecodedApiOperator;
-import com.warehouse.returning.domain.vo.DepartmentCode;
 import com.warehouse.returning.domain.vo.UserId;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.RestException;
 
@@ -35,11 +37,15 @@ public class ApiKeyService {
                     .getBody();
 
             final UserId userId = new UserId(claims.get("userId", Long.class));
-            final DepartmentCode departmentCode = new DepartmentCode(claims.get("tenant", String.class));
-            final Long operatorId = extractLongClaim(claims, "operatorId", "operator_id");
+            final DepartmentId departmentId = Optional.ofNullable(extractLongClaim(claims, "departmentId"))
+                    .map(DepartmentId::new)
+                    .orElseThrow(() -> new IllegalArgumentException("Department ID is required"));
+            final OperatorId operatorId = Optional.ofNullable(extractLongClaim(claims, "operatorId", "operator_id"))
+                    .map(OperatorId::of)
+                    .orElse(null);
             final String issuer = claims.get("username", String.class);
 
-            return new DecodedApiOperator(userId, departmentCode, operatorId, issuer);
+            return new DecodedApiOperator(userId, departmentId, operatorId, issuer);
         } catch (SignatureException | IllegalArgumentException e) {
             throw new RestException(401, "Invalid or expired JWT token");
         }
