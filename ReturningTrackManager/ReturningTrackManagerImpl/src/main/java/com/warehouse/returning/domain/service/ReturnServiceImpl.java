@@ -1,20 +1,18 @@
 package com.warehouse.returning.domain.service;
 
-import java.util.Optional;
-
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
-import com.warehouse.returning.domain.event.ReturnPackageCanceled;
 import com.warehouse.returning.domain.event.ReturnPackageCompleted;
-import com.warehouse.returning.domain.event.ReturnPackageProcessingStarted;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.registry.DomainRegistry;
-import com.warehouse.returning.domain.vo.DepartmentCode;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnPage;
 import com.warehouse.returning.domain.vo.ShipmentId;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ReturnServiceImpl implements ReturnService {
@@ -26,7 +24,7 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
-    public Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final Long operatorId) {
+    public Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final OperatorId operatorId) {
         return this.returnRepository.findLatestByShipmentIdAndOperatorId(
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
                         shipmentId.value()), operatorId);
@@ -39,8 +37,8 @@ public class ReturnServiceImpl implements ReturnService {
 
     @Override
     public ReturnPage getReturns(
-            final DepartmentCode departmentCode, final Long operatorId, final int page, final int size) {
-        return this.returnRepository.findByDepartmentCodeAndOperatorId(departmentCode, operatorId, page, size);
+            final DepartmentId departmentId, final OperatorId operatorId, final int page, final int size) {
+        return this.returnRepository.findByDepartmentIdAndOperatorId(departmentId, operatorId, page, size);
     }
 
     @Override
@@ -48,14 +46,6 @@ public class ReturnServiceImpl implements ReturnService {
 		return returnRepository.existsForShipment(
 				new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
 						shipmentId.value()));
-    }
-
-    @Override
-    public void deleteReturn(final ReturnPackageId returnPackageId) {
-        final ReturnPackage returnPackage = this.returnRepository.findById(returnPackageId);
-        returnPackage.markAsCanceled();
-        this.saveOrUpdate(returnPackage);
-        DomainRegistry.publish(new ReturnPackageCanceled(returnPackage.toSnapshot(), Instant.now()));
     }
 
     @Override
@@ -76,27 +66,11 @@ public class ReturnServiceImpl implements ReturnService {
     }
 
     @Override
-    public void startProcessingReturn(final ShipmentId shipmentId) {
-        final ReturnPackage returnPackage = this.findByShipmentId(shipmentId);
-        returnPackage.markAsProcessing();
-        this.saveOrUpdate(returnPackage);
-        DomainRegistry.publish(new ReturnPackageProcessingStarted(returnPackage.toSnapshot(), Instant.now()));
-    }
-
-    @Override
-    public void completeReturn(final ShipmentId shipmentId) {
-        final ReturnPackage returnPackage = this.findByShipmentId(shipmentId);
+    public void completeReturn(final ReturnPackageId returnPackageId) {
+        final ReturnPackage returnPackage = this.returnRepository.findDetailsById(returnPackageId);
         returnPackage.markAsCompleted();
         this.saveOrUpdate(returnPackage);
         DomainRegistry.publish(new ReturnPackageCompleted(returnPackage.toSnapshot(), Instant.now()));
-    }
-
-    @Override
-    public void cancelReturn(final ShipmentId shipmentId) {
-        final ReturnPackage returnPackage = this.findByShipmentId(shipmentId);
-        returnPackage.markAsCanceled();
-        this.saveOrUpdate(returnPackage);
-        DomainRegistry.publish(new ReturnPackageCanceled(returnPackage.toSnapshot(), Instant.now()));
     }
 
     @Override
