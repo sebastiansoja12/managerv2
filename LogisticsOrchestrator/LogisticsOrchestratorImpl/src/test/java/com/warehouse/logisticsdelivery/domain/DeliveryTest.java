@@ -18,18 +18,53 @@ import com.warehouse.logisticsdelivery.domain.model.Delivery;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryStepSnapshot;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryTarget;
+import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static com.warehouse.logisticsdelivery.DeliveryFixture.DELIVERY_PICKUP_POINT_ID;
 import static com.warehouse.logisticsdelivery.DeliveryFixture.DESTINATION_DEPARTMENT_ID;
 import static com.warehouse.logisticsdelivery.DeliveryFixture.ORIGIN_DEPARTMENT_ID;
 import static com.warehouse.logisticsdelivery.DeliveryFixture.PICKUP_POINT_ID;
 import static com.warehouse.logisticsdelivery.DeliveryFixture.USER_ID;
+import static com.warehouse.logisticsdelivery.DeliveryFixture.courierShipmentDelivery;
 import static com.warehouse.logisticsdelivery.DeliveryFixture.shipmentDelivery;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DeliveryTest {
+
+    private static final RecipientAddress RECIPIENT_ADDRESS = new RecipientAddress("Poznań", "Długa 1", "60-001", "PL");
+
+    @Test
+    void shouldAssignResolvedDestinationToCourierDelivery() {
+        final Delivery delivery = courierShipmentDelivery(new ShipmentId(10L));
+
+        delivery.assignDestinationDepartment(DESTINATION_DEPARTMENT_ID);
+
+        assertThat(delivery.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
+        assertThat(delivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.MODIFIED);
+    }
+
+    @Test
+    void shouldKeepDeliveryUnchangedWhenResolvedDestinationIsTheSame() {
+        final Delivery delivery = courierShipmentDelivery(new ShipmentId(10L));
+        delivery.assignDestinationDepartment(DESTINATION_DEPARTMENT_ID);
+        final DeliverySnapshot before = delivery.snapshot();
+
+        delivery.assignDestinationDepartment(DESTINATION_DEPARTMENT_ID);
+
+        assertThat(delivery.snapshot()).isEqualTo(before);
+    }
+
+    @Test
+    void shouldRejectResolvedDestinationForPickupPointDelivery() {
+        final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
+
+        assertThatThrownBy(() -> delivery.assignDestinationDepartment(new DepartmentId(9L)))
+                .isInstanceOf(DeliveryModificationException.class);
+    }
 
     @Test
     void shouldKeepRouteOnDeliveryAndNotOnCreatedStep() {
@@ -46,33 +81,44 @@ class DeliveryTest {
     }
 
     @Test
-    void shouldChangeDestinationDepartmentWhenDeliveryIsActive() {
-        final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
-        final DepartmentId newDestinationDepartmentId = new DepartmentId(8L);
+    void shouldRecalculateDestinationOfCourierDeliveryWhenRecipientAddressChanges() {
+        final Delivery delivery = courierShipmentDelivery(new ShipmentId(10L));
 
-        final boolean changed = delivery.changeDestinationDepartment(newDestinationDepartmentId);
+        delivery.changeRecipientAddress(RECIPIENT_ADDRESS, address -> Optional.of(new DepartmentId(8L)));
 
-        assertThat(changed).isTrue();
-        assertThat(delivery.getDestinationDepartmentId()).isEqualTo(newDestinationDepartmentId);
+        assertThat(delivery.getDestinationDepartmentId()).isEqualTo(new DepartmentId(8L));
         assertThat(delivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.MODIFIED);
     }
 
     @Test
-    void shouldNotReportChangeWhenDestinationDepartmentIsTheSame() {
+    void shouldKeepDestinationWhenItCannotBeRecalculated() {
+        final Delivery delivery = courierShipmentDelivery(new ShipmentId(10L));
+        delivery.assignDestinationDepartment(DESTINATION_DEPARTMENT_ID);
+
+        delivery.changeRecipientAddress(RECIPIENT_ADDRESS, address -> Optional.empty());
+
+        assertThat(delivery.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
+    }
+
+    @Test
+    void shouldIgnoreRecipientAddressChangeOfPickupPointDelivery() {
         final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
 
-        final boolean changed = delivery.changeDestinationDepartment(DESTINATION_DEPARTMENT_ID);
+        delivery.changeRecipientAddress(RECIPIENT_ADDRESS, address -> {
+            throw new AssertionError("Destination of pickup point delivery must not be recalculated");
+        });
 
-        assertThat(changed).isFalse();
+        assertThat(delivery.getDestinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
         assertThat(delivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.CREATED);
     }
 
     @Test
-    void shouldThrowExceptionWhenChangingDestinationDepartmentOfCompletedDelivery() {
-        final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
+    void shouldRejectRecipientAddressChangeOfCompletedCourierDelivery() {
+        final Delivery delivery = courierShipmentDelivery(new ShipmentId(10L));
         delivery.complete(null, USER_ID, null);
 
-        assertThatThrownBy(() -> delivery.changeDestinationDepartment(new DepartmentId(8L)))
+        assertThatThrownBy(() -> delivery.changeRecipientAddress(RECIPIENT_ADDRESS,
+                address -> Optional.of(new DepartmentId(8L))))
                 .isInstanceOf(DeliveryModificationException.class);
     }
 
@@ -157,6 +203,51 @@ class DeliveryTest {
         assertThat(replacementStep.commentCode()).isEqualTo(DeliveryCommentCode.REPLACED_BY_PALLET_DELIVERY);
         assertThat(replacementStep.comment()).isNull();
         assertThat(replaced.replaceByPalletDelivery(replaced.getDeliveryId(), USER_ID)).isFalse();
+    }
+
+    @Test
+    void shouldContinueReplacedDeliveryFromUnloadDepartmentAfterPalletUnloading() {
+        final DepartmentId unloadDepartmentId = new DepartmentId(8L);
+        final Delivery replaced = shipmentDelivery(new ShipmentId(10L));
+        replaced.replaceByPalletDelivery(
+                Delivery.forPallet(DeliveryTarget.pallet("p"), null, null, USER_ID).getDeliveryId(), USER_ID);
+
+        final Delivery continuation = Delivery.continuedAfterPalletUnloading(replaced, unloadDepartmentId, USER_ID);
+
+        final DeliverySnapshot snapshot = continuation.snapshot();
+        assertThat(snapshot.deliveryId()).isNotEqualTo(replaced.getDeliveryId());
+        assertThat(snapshot.target()).isEqualTo(replaced.getTarget());
+        assertThat(snapshot.status()).isEqualTo(DeliveryLifecycleStatus.CREATED);
+        assertThat(snapshot.originDepartmentId()).isEqualTo(unloadDepartmentId);
+        assertThat(snapshot.destinationDepartmentId()).isEqualTo(DESTINATION_DEPARTMENT_ID);
+        assertThat(snapshot.method()).isEqualTo(DeliveryMethod.LOCKER);
+        assertThat(snapshot.deliveryPickupPointId()).isEqualTo(DELIVERY_PICKUP_POINT_ID);
+        assertThat(continuation.getReplacedByDeliveryId()).isNull();
+        final DeliveryStepSnapshot continuationStep = snapshot.deliverySteps().getLast();
+        assertThat(continuationStep.commentCode()).isEqualTo(DeliveryCommentCode.UNLOADED_FROM_PALLET);
+        assertThat(continuationStep.departmentId()).isEqualTo(unloadDepartmentId);
+    }
+
+    @Test
+    void shouldContinueReplacedDeliveryFromOriginalOriginWhenPalletLoadingIsReverted() {
+        final Delivery replaced = shipmentDelivery(new ShipmentId(10L));
+        replaced.replaceByPalletDelivery(
+                Delivery.forPallet(DeliveryTarget.pallet("p"), null, null, USER_ID).getDeliveryId(), USER_ID);
+
+        final DeliverySnapshot snapshot = Delivery.continuedAfterPalletLoadingReverted(replaced, USER_ID).snapshot();
+
+        assertThat(snapshot.originDepartmentId()).isEqualTo(ORIGIN_DEPARTMENT_ID);
+        assertThat(snapshot.deliverySteps().getLast().commentCode())
+                .isEqualTo(DeliveryCommentCode.PALLET_LOADING_REVERTED);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenContinuingDeliveryNotReplacedByPallet() {
+        final Delivery canceled = shipmentDelivery(new ShipmentId(10L));
+        canceled.markAsCanceled();
+
+        assertThatThrownBy(() -> Delivery.continuedAfterPalletUnloading(canceled, ORIGIN_DEPARTMENT_ID, USER_ID))
+                .isInstanceOf(DeliveryModificationException.class);
     }
 
     @Test
