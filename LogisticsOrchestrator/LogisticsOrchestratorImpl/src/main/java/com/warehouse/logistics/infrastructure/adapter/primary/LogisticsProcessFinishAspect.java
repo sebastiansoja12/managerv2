@@ -15,6 +15,7 @@ import com.warehouse.process.infrastructure.event.ProcessFinishEvent;
 import com.warehouse.terminal.jaxb.CollectResponse;
 import com.warehouse.terminal.jaxb.HandoverResponse;
 import com.warehouse.terminal.jaxb.PalletScanResponse;
+import com.warehouse.terminal.jaxb.PalletUnloadResponse;
 import com.warehouse.terminal.response.TerminalResponse;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,10 @@ public class LogisticsProcessFinishAspect {
             if (response instanceof PalletScanResponse palletScanResponse) {
                 publishProcessFinishEvent(palletScanResponse.getProcessId(),
                         palletScanResponse.isSuccess() ? null : palletScanResponse.getErrorMessage());
+            }
+            if (response instanceof PalletUnloadResponse palletUnloadResponse) {
+                publishProcessFinishEvent(palletUnloadResponse.getProcessId(),
+                        palletUnloadResponse.isSuccess() ? null : palletUnloadResponse.getErrorMessage());
             }
         } finally {
             LogisticsProcessContext.clear();
