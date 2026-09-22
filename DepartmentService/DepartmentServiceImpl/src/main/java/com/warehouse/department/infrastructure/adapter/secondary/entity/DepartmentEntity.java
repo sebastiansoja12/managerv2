@@ -28,7 +28,8 @@ public class DepartmentEntity extends BelongsToOperator {
     @AttributeOverrides({
             @AttributeOverride(name = "city", column = @Column(name = "city", nullable = false)),
             @AttributeOverride(name = "street", column = @Column(name = "street", nullable = false)),
-            @AttributeOverride(name = "postalCode", column = @Column(name = "postal_code", nullable = false))
+            @AttributeOverride(name = "postalCode", column = @Column(name = "postal_code", nullable = false)),
+            @AttributeOverride(name = "countryCode", column = @Column(name = "country_code", nullable = false))
     })
     private DepartmentAddress departmentAddress;
 
