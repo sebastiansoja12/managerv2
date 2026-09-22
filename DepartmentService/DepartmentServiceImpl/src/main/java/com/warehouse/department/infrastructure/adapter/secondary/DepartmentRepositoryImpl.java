@@ -1,5 +1,6 @@
 package com.warehouse.department.infrastructure.adapter.secondary;
 
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
@@ -75,6 +76,15 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     @Override
     public Boolean checkExists(final DepartmentCode departmentCode) {
         return findByDepartmentCode(departmentCode) != null;
+    }
+
+    @Override
+    public boolean checkExistsAnyWithCountryCode(final CountryCode countryCode) {
+        return !repository.createCriteria(DepartmentEntity.class)
+                .eq("departmentAddress.countryCode", countryCode)
+                .notIn("status", EXCLUDED_STATUSES)
+                .list()
+                .isEmpty();
     }
 
     @Override

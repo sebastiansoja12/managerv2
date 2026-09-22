@@ -1,7 +1,6 @@
 package com.warehouse.department.infrastructure.adapter.primary;
 
-import java.util.List;
-
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.department.api.DepartmentApiService;
@@ -10,6 +9,8 @@ import com.warehouse.department.api.dto.DepartmentDto;
 import com.warehouse.department.domain.model.Department;
 import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.department.infrastructure.adapter.primary.mapper.ResponseMapper;
+
+import java.util.List;
 
 public class DepartmentServiceAdapter implements DepartmentApiService {
 
@@ -55,5 +56,10 @@ public class DepartmentServiceAdapter implements DepartmentApiService {
     @Override
     public Boolean checkIfDepartmentExists(final DepartmentId departmentId) {
         return this.departmentPort.findByDepartmentId(departmentId) != null;
+    }
+
+    @Override
+    public boolean checkIfAnyExistsWithCountryCode(final CountryCode countryCode) {
+        return this.departmentPort.checkExistsAnyWithCountryCode(countryCode);
     }
 }
