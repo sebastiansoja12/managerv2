@@ -1,5 +1,6 @@
 package com.warehouse.department.domain.port.primary;
 
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -164,6 +165,11 @@ public class DepartmentPortImpl implements DepartmentPort {
     @Override
     public Boolean checkExists(final DepartmentCode departmentCode) {
         return this.departmentService.checkExists(departmentCode);
+    }
+
+    @Override
+    public boolean checkExistsAnyWithCountryCode(final CountryCode countryCode) {
+        return this.departmentRepository.checkExistsAnyWithCountryCode(countryCode);
     }
 
     private void validateAddress(final Address address) {

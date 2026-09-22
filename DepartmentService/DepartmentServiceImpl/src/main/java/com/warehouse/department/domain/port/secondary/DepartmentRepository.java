@@ -1,10 +1,11 @@
 package com.warehouse.department.domain.port.secondary;
 
-import java.util.List;
-
+import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.department.domain.model.Department;
+
+import java.util.List;
 
 public interface DepartmentRepository {
 
@@ -21,4 +22,6 @@ public interface DepartmentRepository {
     List<Department> findAllArchived();
 
     Boolean checkExists(final DepartmentCode departmentCode);
+
+    boolean checkExistsAnyWithCountryCode(final CountryCode countryCode);
 }
