@@ -1,9 +1,11 @@
 package com.warehouse.returning.domain.vo;
 
-import java.time.Instant;
-
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.model.ReturnStatus;
+
+import java.time.Instant;
 
 public record ReturnPackageSnapshot(
         ReturnPackageId returnPackageId,
@@ -11,12 +13,12 @@ public record ReturnPackageSnapshot(
         String reason,
         ReturnStatus returnStatus,
         ReturnToken returnToken,
-        DepartmentCode assignedDepartmentCode,
-        DepartmentCode returnedDepartmentCode,
+        DepartmentId assignedDepartmentId,
+        DepartmentId returnedDepartmentId,
         UserId assignedTo,
         UserId processedBy,
         ReasonCode reasonCode,
-        Long operatorId,
+        OperatorId operatorId,
         Instant createdAt,
         Instant updatedAt
 ) {}
