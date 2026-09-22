@@ -1,15 +1,15 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.entity;
 
-import java.time.Instant;
-
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.enumeration.Status;
-import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.DepartmentCode;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ReturnId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.UserId;
-
 import jakarta.persistence.*;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "returning_return_package")
@@ -32,11 +32,13 @@ public class ReturnPackageEntity {
     @AttributeOverride(name = "value", column = @Column(name = "return_token"))
     private ReturnToken returnToken;
 
-    @AttributeOverride(name = "value", column = @Column(name = "assigned_department"))
-    private DepartmentCode assignedDepartmentCode;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "assigned_department_id"))
+    private DepartmentId assignedDepartmentId;
 
-    @AttributeOverride(name = "value", column = @Column(name = "returned_department"))
-    private DepartmentCode returnedDepartmentCode;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "returned_department_id"))
+    private DepartmentId returnedDepartmentId;
 
     @AttributeOverride(name = "value", column = @Column(name = "assigned_to"))
     private UserId assignedTo;
@@ -48,8 +50,9 @@ public class ReturnPackageEntity {
     @Enumerated(EnumType.STRING)
     private ReasonCode reasonCode;
 
-    @Column(name = "operator_id")
-    private Long operatorId;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "operator_id"))
+    private OperatorId operatorId;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
@@ -67,30 +70,12 @@ public class ReturnPackageEntity {
             final String reason,
             final Status returnStatus,
             final ReturnToken returnToken,
-            final DepartmentCode assignedDepartmentCode,
-            final DepartmentCode returnedDepartmentCode,
+            final DepartmentId assignedDepartmentId,
+            final DepartmentId returnedDepartmentId,
             final UserId assignedTo,
             final UserId processedBy,
             final ReasonCode reasonCode,
-            final Instant createdAt,
-            final Instant updatedAt
-    ) {
-        this(returnId, shipmentId, reason, returnStatus, returnToken, assignedDepartmentCode,
-                returnedDepartmentCode, assignedTo, processedBy, reasonCode, null, createdAt, updatedAt);
-    }
-
-    public ReturnPackageEntity(
-            final ReturnId returnId,
-            final ShipmentId shipmentId,
-            final String reason,
-            final Status returnStatus,
-            final ReturnToken returnToken,
-            final DepartmentCode assignedDepartmentCode,
-            final DepartmentCode returnedDepartmentCode,
-            final UserId assignedTo,
-            final UserId processedBy,
-            final ReasonCode reasonCode,
-            final Long operatorId,
+            final OperatorId operatorId,
             final Instant createdAt,
             final Instant updatedAt
     ) {
@@ -99,8 +84,8 @@ public class ReturnPackageEntity {
         this.reason = reason;
         this.returnStatus = returnStatus;
         this.returnToken = returnToken;
-        this.assignedDepartmentCode = assignedDepartmentCode;
-        this.returnedDepartmentCode = returnedDepartmentCode;
+        this.assignedDepartmentId = assignedDepartmentId;
+        this.returnedDepartmentId = returnedDepartmentId;
         this.assignedTo = assignedTo;
         this.processedBy = processedBy;
         this.reasonCode = reasonCode;
@@ -109,8 +94,8 @@ public class ReturnPackageEntity {
         this.updatedAt = updatedAt;
     }
 
-    public DepartmentCode getAssignedDepartmentCode() {
-        return assignedDepartmentCode;
+    public DepartmentId getAssignedDepartmentId() {
+        return assignedDepartmentId;
     }
 
     public UserId getAssignedTo() {
@@ -133,12 +118,12 @@ public class ReturnPackageEntity {
         return reasonCode;
     }
 
-    public Long getOperatorId() {
+    public OperatorId getOperatorId() {
         return operatorId;
     }
 
-    public DepartmentCode getReturnedDepartmentCode() {
-        return returnedDepartmentCode;
+    public DepartmentId getReturnedDepartmentId() {
+        return returnedDepartmentId;
     }
 
     public ReturnId getReturnId() {
