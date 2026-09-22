@@ -213,6 +213,14 @@ public class PalletStorageServiceImpl implements PalletStorageService {
     }
 
     @Override
+    public Pallet unload(final PalletId palletId) {
+        final Pallet pallet = find(palletId);
+        pallet.unload();
+        this.palletRepository.createOrUpdate(pallet);
+        return pallet;
+    }
+
+    @Override
     public boolean markLoaded(final PalletId palletId) {
         final Pallet pallet = find(palletId);
         final boolean changed = pallet.markLoaded();
