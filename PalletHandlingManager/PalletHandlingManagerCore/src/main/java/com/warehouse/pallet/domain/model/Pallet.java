@@ -328,6 +328,20 @@ public class Pallet {
         evaluateReadiness();
     }
 
+    public boolean isUnloaded() {
+        return PalletStatus.DELIVERED.equals(this.palletStatus);
+    }
+
+    public void unload() {
+        if (isUnloaded()) {
+            return;
+        }
+        if (!PalletStatus.IN_TRANSIT.equals(this.palletStatus)) {
+            throw new PalletStatusTransitionException("Pallet cannot be unloaded in status " + this.palletStatus);
+        }
+        changePalletStatus(PalletStatus.DELIVERED);
+    }
+
     public boolean cancel() {
         if (PalletStatus.CANCELLED.equals(this.palletStatus)) {
             return false;

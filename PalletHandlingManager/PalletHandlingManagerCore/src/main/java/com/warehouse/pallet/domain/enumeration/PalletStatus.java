@@ -24,7 +24,7 @@ public enum PalletStatus {
     }
 
     public boolean isManuallySettable() {
-        return this == IN_TRANSIT || this == DELIVERED;
+        return this == IN_TRANSIT;
     }
 
     public boolean isFinished() {
