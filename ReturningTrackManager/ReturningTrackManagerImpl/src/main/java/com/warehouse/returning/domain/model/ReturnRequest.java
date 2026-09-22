@@ -2,38 +2,39 @@ package com.warehouse.returning.domain.model;
 
 import java.util.List;
 
-import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.vo.UserId;
 
 
 public class ReturnRequest {
     private List<ReturnPackageRequest> requests;
-    private DepartmentCode issuerDepartmentCode;
+    private DepartmentId issuerDepartmentId;
     private UserId issuerUserId;
-    private Long operatorId;
+    private OperatorId operatorId;
 
     public ReturnRequest() {
     }
 
-    public ReturnRequest(final DepartmentCode issuerDepartmentCode, final UserId issuerUserId,
+    public ReturnRequest(final DepartmentId issuerDepartmentId, final UserId issuerUserId,
                          final List<ReturnPackageRequest> requests) {
-        this(issuerDepartmentCode, issuerUserId, null, requests);
+        this(issuerDepartmentId, issuerUserId, null, requests);
     }
 
-    public ReturnRequest(final DepartmentCode issuerDepartmentCode, final UserId issuerUserId,
-                         final Long operatorId, final List<ReturnPackageRequest> requests) {
-        this.issuerDepartmentCode = issuerDepartmentCode;
+    public ReturnRequest(final DepartmentId issuerDepartmentId, final UserId issuerUserId,
+                         final OperatorId operatorId, final List<ReturnPackageRequest> requests) {
+        this.issuerDepartmentId = issuerDepartmentId;
         this.issuerUserId = issuerUserId;
         this.operatorId = operatorId;
         this.requests = requests;
     }
 
-    public DepartmentCode getIssuerDepartmentCode() {
-        return issuerDepartmentCode;
+    public DepartmentId getIssuerDepartmentId() {
+        return issuerDepartmentId;
     }
 
-    public void setIssuerDepartmentCode(final DepartmentCode issuerDepartmentCode) {
-        this.issuerDepartmentCode = issuerDepartmentCode;
+    public void setIssuerDepartmentId(final DepartmentId issuerDepartmentId) {
+        this.issuerDepartmentId = issuerDepartmentId;
     }
 
     public UserId getIssuerUserId() {
@@ -44,11 +45,11 @@ public class ReturnRequest {
         this.issuerUserId = issuerUserId;
     }
 
-    public Long getOperatorId() {
+    public OperatorId getOperatorId() {
         return operatorId;
     }
 
-    public void setOperatorId(final Long operatorId) {
+    public void setOperatorId(final OperatorId operatorId) {
         this.operatorId = operatorId;
     }
 
