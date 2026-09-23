@@ -1,5 +1,13 @@
 package com.warehouse.shipment.domain.enumeration;
 
 public enum ReasonCode {
-    DAMAGED, WRONG_ITEM, NO_LONGER_NEEDED
+    DAMAGED,
+    WRONG_ITEM,
+    NO_LONGER_NEEDED,
+    RECIPIENT_REFUSED,
+    RECIPIENT_UNAVAILABLE,
+    INVALID_ADDRESS,
+    UNCLAIMED,
+    SENDER_REQUESTED,
+    OTHER
 }
