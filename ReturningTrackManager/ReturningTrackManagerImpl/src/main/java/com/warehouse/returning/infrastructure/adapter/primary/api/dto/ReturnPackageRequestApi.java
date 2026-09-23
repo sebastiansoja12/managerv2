@@ -1,5 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
+import com.warehouse.common.DepartmentId;
 import lombok.Builder;
 import lombok.NonNull;
 
@@ -7,7 +8,7 @@ import lombok.NonNull;
 public record ReturnPackageRequestApi(
         ShipmentIdApi shipmentId,
         String reason,
-        DepartmentCodeApi departmentCode,
+        DepartmentId departmentId,
         UserIdApi userId,
         ReasonCodeApi reasonCode
 ) {
@@ -17,7 +18,7 @@ public record ReturnPackageRequestApi(
         return "ReturnPackageRequestApi{" +
                 "shipmentId=" + shipmentId +
                 ", reason='" + reason + '\'' +
-                ", departmentCode=" + departmentCode +
+                ", departmentId=" + departmentId +
                 ", userId=" + userId +
                 ", reasonCode=" + reasonCode +
                 '}';
