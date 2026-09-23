@@ -1,9 +1,11 @@
 package com.warehouse.returning.configuration;
 
+import com.warehouse.common.DepartmentId;
 import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -16,6 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @Slf4j
 public class WebMvcConfiguration implements WebMvcConfigurer {
+
+    @Override
+    public void addFormatters(final FormatterRegistry registry) {
+        registry.addConverter(String.class, DepartmentId.class,
+                source -> new DepartmentId(Long.valueOf(source)));
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
