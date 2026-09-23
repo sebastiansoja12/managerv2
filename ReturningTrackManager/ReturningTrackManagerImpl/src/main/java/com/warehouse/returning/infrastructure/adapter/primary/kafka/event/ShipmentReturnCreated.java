@@ -2,10 +2,11 @@ package com.warehouse.returning.infrastructure.adapter.primary.kafka.event;
 
 import java.time.Instant;
 
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.warehouse.returning.domain.vo.DepartmentCode;
 import com.warehouse.returning.domain.vo.UserId;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -13,20 +14,23 @@ public class ShipmentReturnCreated extends ShipmentEvent {
 
     private final String reasonCode;
     private final String reason;
-    private final DepartmentCode departmentCode;
+    private final DepartmentId assignedDepartmentId;
+    private final DepartmentId departmentId;
 
     @JsonCreator
     public ShipmentReturnCreated(@JsonProperty("snapshot") final ShipmentSnapshot snapshot,
                                  @JsonProperty("timestamp") final Instant timestamp,
                                  @JsonProperty("reasonCode") final String reasonCode,
                                  @JsonProperty("reason") final String reason,
-                                 @JsonProperty("departmentCode") final DepartmentCode departmentCode,
+                                 @JsonProperty("assignedDepartmentId") final DepartmentId assignedDepartmentId,
+                                 @JsonProperty("departmentId") final DepartmentId departmentId,
                                  @JsonProperty("userId") final UserId userId,
                                  @JsonProperty("operatorId") final OperatorId operatorId) {
         super(snapshot, timestamp, userId, operatorId);
         this.reasonCode = reasonCode;
         this.reason = reason;
-        this.departmentCode = departmentCode;
+        this.assignedDepartmentId = assignedDepartmentId;
+        this.departmentId = departmentId;
     }
 
     public String reasonCode() {
@@ -37,7 +41,11 @@ public class ShipmentReturnCreated extends ShipmentEvent {
         return reason;
     }
 
-    public DepartmentCode departmentCode() {
-        return departmentCode;
+    public DepartmentId departmentId() {
+        return departmentId;
+    }
+
+    public DepartmentId assignedDepartmentId() {
+        return assignedDepartmentId;
     }
 }
