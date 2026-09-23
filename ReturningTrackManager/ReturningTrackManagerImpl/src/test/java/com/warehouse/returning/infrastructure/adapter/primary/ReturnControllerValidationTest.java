@@ -13,7 +13,8 @@ import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.domain.service.ApiKeyService;
 import com.warehouse.returning.domain.vo.DecodedApiOperator;
-import com.warehouse.returning.domain.vo.DepartmentCode;
+import com.warehouse.common.DepartmentId;
+import com.warehouse.common.OperatorId;
 import com.warehouse.returning.domain.vo.ShipmentId;
 import com.warehouse.returning.domain.vo.UserId;
 import com.warehouse.returning.infrastructure.adapter.primary.api.dto.ReturnPackageApi;
@@ -24,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 class ReturnControllerValidationTest {
 
@@ -35,8 +36,8 @@ class ReturnControllerValidationTest {
         final ReturnController controller = new ReturnController(returnPort, Set.of(), apiKeyService);
         final ReturnPackage returnPackage = ReturnLookupFixture.cancelledReturn();
         when(apiKeyService.decodeJwt(null)).thenReturn(
-                new DecodedApiOperator(new UserId(1L), new DepartmentCode("KT1"), 7L, "operator"));
-        when(returnPort.findLatestReturn(returnPackage.getShipmentId(), 7L)).thenReturn(Optional.of(returnPackage));
+                new DecodedApiOperator(new UserId(1L), new DepartmentId(1L), new OperatorId(7L), "operator"));
+        when(returnPort.findLatestReturn(returnPackage.getShipmentId(), new OperatorId(7L))).thenReturn(Optional.of(returnPackage));
 
         final ResponseEntity<ReturnPackageApi> response = controller.getByShipmentId(returnPackage.getShipmentId().value());
 
@@ -44,7 +45,7 @@ class ReturnControllerValidationTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().returnPackageId().value()).isEqualTo(9223372036854775001L);
         assertThat(response.getBody().returnStatus()).isEqualTo(ReturnStatusApi.CANCELLED);
-        verify(returnPort).findLatestReturn(new ShipmentId(6805406359141427429L), 7L);
+        verify(returnPort).findLatestReturn(new ShipmentId(6805406359141427429L), new OperatorId(7L));
     }
 
     @Test
@@ -53,8 +54,8 @@ class ReturnControllerValidationTest {
         final ApiKeyService apiKeyService = mock(ApiKeyService.class);
         final ReturnController controller = new ReturnController(returnPort, Set.of(), apiKeyService);
         when(apiKeyService.decodeJwt(null)).thenReturn(
-                new DecodedApiOperator(new UserId(1L), new DepartmentCode("KT1"), 7L, "operator"));
-        when(returnPort.findLatestReturn(new ShipmentId(42L), 7L)).thenReturn(Optional.empty());
+                new DecodedApiOperator(new UserId(1L), new DepartmentId(1L), new OperatorId(7L), "operator"));
+        when(returnPort.findLatestReturn(new ShipmentId(42L), new OperatorId(7L))).thenReturn(Optional.empty());
 
         final ResponseEntity<ReturnPackageApi> response = controller.getByShipmentId(42L);
 
@@ -68,7 +69,7 @@ class ReturnControllerValidationTest {
         final ApiKeyService apiKeyService = mock(ApiKeyService.class);
         final ReturnController controller = new ReturnController(returnPort, Set.of(), apiKeyService);
         when(apiKeyService.decodeJwt(null)).thenReturn(
-                new DecodedApiOperator(new UserId(1L), new DepartmentCode("KT1"), null, "operator"));
+                new DecodedApiOperator(new UserId(1L), new DepartmentId(1L), null, "operator"));
 
         assertThatThrownBy(() -> controller.getByShipmentId(42L))
                 .isInstanceOf(IllegalArgumentException.class).hasMessage("Operator ID is required");
@@ -78,12 +79,27 @@ class ReturnControllerValidationTest {
     @Test
     void shouldDeclareReturnsQueryValidationAtTheControllerBoundary() throws NoSuchMethodException {
         final Method getAll = ReturnController.class.getMethod(
-                "getAll", String.class, int.class, int.class);
+                "getAll", DepartmentId.class, int.class, int.class);
         final Parameter[] parameters = getAll.getParameters();
 
-        assertThat(parameters[0].getAnnotation(NotBlank.class)).isNotNull();
+        assertThat(parameters[0].getAnnotation(NotNull.class)).isNotNull();
         assertThat(parameters[1].getAnnotation(Min.class).value()).isZero();
         assertThat(parameters[2].getAnnotation(Min.class).value()).isEqualTo(1L);
         assertThat(parameters[2].getAnnotation(Max.class).value()).isEqualTo(100L);
+    }
+
+    @Test
+    void shouldProcessAndCompleteByReturnPackageId() {
+        final ReturnPort port = mock(ReturnPort.class);
+        final ReturnController controller = new ReturnController(port, Set.of(), mock(ApiKeyService.class));
+
+        assertThat(controller.startProcessingReturn(123L).getStatusCode().value()).isEqualTo(204);
+        assertThat(controller.completeReturn(123L).getStatusCode().value()).isEqualTo(204);
+        controller.delete(123L);
+
+        verify(port).startProcessing(new com.warehouse.returning.domain.vo.ReturnPackageId(123L));
+        verify(port).complete(new com.warehouse.returning.domain.vo.ReturnPackageId(123L));
+        verify(port).delete(new com.warehouse.returning.domain.vo.ReturnPackageId(123L));
+        verifyNoMoreInteractions(port);
     }
 }
