@@ -27,6 +27,7 @@
     </properties>
 
     <modules>
+        <module>ReturningTrackManagerApi</module>
         <module>ReturningTrackManagerImpl</module>
     </modules>
 
