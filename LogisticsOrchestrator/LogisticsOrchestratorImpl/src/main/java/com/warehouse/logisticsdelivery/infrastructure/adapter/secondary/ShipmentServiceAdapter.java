@@ -5,6 +5,7 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
 import com.warehouse.logisticsdelivery.application.port.secondary.SourceShipment;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryDerivationType;
+import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
 
@@ -29,6 +30,21 @@ public class ShipmentServiceAdapter implements ShipmentServicePort {
     public Optional<ShipmentId> findDerivedShipment(final ShipmentId shipmentId) {
         return Optional.ofNullable(this.shipmentApiService.getShipment(shipmentId))
                 .map(ShipmentDetailsDto::relatedShipmentId);
+    }
+
+    @Override
+    public Optional<RecipientAddress> findRecipientAddress(final ShipmentId shipmentId) {
+        return Optional.ofNullable(this.shipmentApiService.getShipment(shipmentId))
+                .map(shipment -> new RecipientAddress(shipment.recipientCity(), shipment.recipientStreet(),
+                        shipment.recipientPostalCode(), shipment.recipientCountryCode()));
+    }
+
+    @Override
+    public boolean isCanceled(final ShipmentId shipmentId) {
+        return Optional.ofNullable(this.shipmentApiService.getShipment(shipmentId))
+                .map(ShipmentDetailsDto::status)
+                .filter(ShipmentStatus.CANCELED::equals)
+                .isPresent();
     }
 
     @Override
