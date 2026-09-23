@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TrackingNumberServiceImpl implements TrackingNumberService {
 
@@ -32,13 +34,15 @@ public class TrackingNumberServiceImpl implements TrackingNumberService {
                                              final Long sequenceValue) {
         final TrackingNumberRule trackingNumberRule = Objects.requireNonNullElse(rule, TrackingNumberRule.defaults());
         final String separator = trackingNumberRule.separator();
-        final String datePart = trackingNumberRule.includeDate()
-                ? separator + formatCurrentDate(trackingNumberRule.dateFormat())
-                : "";
-        final String trackingNumber = trackingNumberRule.key()
-                + datePart
-                + separator
-                + nextValueFor(trackingNumberRule, shipmentId, sequenceValue);
+        final String trackingNumber = Stream.of(
+                        trackingNumberRule.prefix(),
+                        trackingNumberRule.includeDate()
+                                ? formatCurrentDate(trackingNumberRule.dateFormat())
+                                : "",
+                        nextValueFor(trackingNumberRule, shipmentId, sequenceValue)
+                )
+                .filter(part -> !part.isEmpty())
+                .collect(Collectors.joining(separator));
 
         return new TrackingNumber(trackingNumberRule.uppercase()
                 ? trackingNumber.toUpperCase(Locale.ROOT)
