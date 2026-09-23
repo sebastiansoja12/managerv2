@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
+import com.warehouse.logisticsdelivery.domain.vo.RecipientAddress;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
@@ -119,8 +120,8 @@ class ShipmentDeliveryEventListenerTest {
         final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
         final ShipmentDestinationChangedIntegrationEvent event = JsonMapper.builder().configureForJackson2().build().readValue("""
                 {
-                  "payload": {"shipmentId": {"value": 42}},
-                  "destinationDepartmentId": {"value": 9},
+                  "payload": {"shipmentId": {"value": 42}, "recipient": {"city": "Poznań", "street": "Długa 1",
+                              "postalCode": "60-001", "countryCode": "PL"}},
                   "operatorId": {"value": 7},
                   "userId": {"value": 42},
                   "departmentId": {"value": 12}
@@ -129,7 +130,8 @@ class ShipmentDeliveryEventListenerTest {
 
         listener.handle(event);
 
-        verify(deliveryPort).changeDestinationDepartment(new ShipmentId(42L), new DepartmentId(9L));
+        verify(deliveryPort).changeRecipientAddress(new ShipmentId(42L),
+                new RecipientAddress("Poznań", "Długa 1", "60-001", "PL"));
         verify(deliveryPort, never()).completeDelivery(any());
     }
 
