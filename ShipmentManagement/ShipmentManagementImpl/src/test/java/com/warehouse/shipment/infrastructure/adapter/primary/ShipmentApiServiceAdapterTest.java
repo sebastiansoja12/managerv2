@@ -24,6 +24,7 @@ import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryC
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentApiServiceMapper;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestItemDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseDto;
@@ -39,7 +40,7 @@ class ShipmentApiServiceAdapterTest {
 
     @BeforeEach
     void setUp() {
-        this.adapter = new ShipmentApiServiceAdapter(this.shipmentPort);
+        this.adapter = new ShipmentApiServiceAdapter(this.shipmentPort, new ShipmentApiServiceMapper());
     }
 
     @Test
