@@ -63,4 +63,34 @@ public class ShipmentConfiguration {
     public ShipmentNotificationConfiguration getNotificationConfiguration() {
         return notificationConfiguration;
     }
+
+    public ShipmentConfiguration withValidationConfiguration(final ShipmentValidationConfiguration validationConfiguration) {
+        return new ShipmentConfiguration(validationConfiguration, labelConfiguration, shipmentLimits,
+                workflowConfiguration, trackingNumberRule, notificationConfiguration);
+    }
+
+    public ShipmentConfiguration withLabelConfiguration(final ShipmentLabelConfiguration labelConfiguration) {
+        return new ShipmentConfiguration(validationConfiguration, labelConfiguration, shipmentLimits,
+                workflowConfiguration, trackingNumberRule, notificationConfiguration);
+    }
+
+    public ShipmentConfiguration withShipmentLimits(final ShipmentLimits shipmentLimits) {
+        return new ShipmentConfiguration(validationConfiguration, labelConfiguration, shipmentLimits,
+                workflowConfiguration, trackingNumberRule, notificationConfiguration);
+    }
+
+    public ShipmentConfiguration withWorkflowConfiguration(final ShipmentWorkflowConfiguration workflowConfiguration) {
+        return new ShipmentConfiguration(validationConfiguration, labelConfiguration, shipmentLimits,
+                workflowConfiguration, trackingNumberRule, notificationConfiguration);
+    }
+
+    public ShipmentConfiguration withTrackingNumberRule(final TrackingNumberRule trackingNumberRule) {
+        return new ShipmentConfiguration(validationConfiguration, labelConfiguration, shipmentLimits,
+                workflowConfiguration, trackingNumberRule, notificationConfiguration);
+    }
+
+    public ShipmentConfiguration withNotificationConfiguration(final ShipmentNotificationConfiguration notificationConfiguration) {
+        return new ShipmentConfiguration(validationConfiguration, labelConfiguration, shipmentLimits,
+                workflowConfiguration, trackingNumberRule, notificationConfiguration);
+    }
 }

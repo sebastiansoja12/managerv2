@@ -80,6 +80,11 @@ public class OperatorConfiguration {
         return departmentConfiguration;
     }
 
+    public OperatorConfiguration withShipmentConfiguration(final ShipmentConfiguration shipmentConfiguration) {
+        return new OperatorConfiguration(shippingCapabilities, shipmentConfiguration, deliveryTimeConfiguration,
+                departmentConfiguration);
+    }
+
     public OperatorConfiguration withDepartmentConfiguration(final DepartmentConfiguration departmentConfiguration) {
         return new OperatorConfiguration(shippingCapabilities, shipmentConfiguration, deliveryTimeConfiguration,
                 departmentConfiguration);

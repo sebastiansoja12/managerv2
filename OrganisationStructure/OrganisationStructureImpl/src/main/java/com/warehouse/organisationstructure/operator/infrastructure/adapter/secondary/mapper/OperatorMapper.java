@@ -183,7 +183,7 @@ public final class OperatorMapper {
         );
     }
 
-    private static ShipmentLimits toModelShipmentLimits(
+    public static ShipmentLimits toModelShipmentLimits(
             final ShipmentLimitsDto shipmentLimits) {
         if (shipmentLimits == null) {
             return null;
@@ -214,7 +214,7 @@ public final class OperatorMapper {
         );
     }
 
-    private static ShipmentValidationConfiguration toModelShipmentValidationConfiguration(
+    public static ShipmentValidationConfiguration toModelShipmentValidationConfiguration(
             final ShipmentValidationConfigurationDto validationConfiguration) {
         if (validationConfiguration == null) {
             return null;
@@ -229,7 +229,7 @@ public final class OperatorMapper {
         );
     }
 
-    private static ShipmentLabelConfiguration toModelShipmentLabelConfiguration(
+    public static ShipmentLabelConfiguration toModelShipmentLabelConfiguration(
             final ShipmentLabelConfigurationDto labelConfiguration) {
         if (labelConfiguration == null) {
             return null;
@@ -244,7 +244,7 @@ public final class OperatorMapper {
         );
     }
 
-    private static ShipmentWorkflowConfiguration toModelShipmentWorkflowConfiguration(
+    public static ShipmentWorkflowConfiguration toModelShipmentWorkflowConfiguration(
             final ShipmentWorkflowConfigurationDto workflowConfiguration) {
         if (workflowConfiguration == null) {
             return null;
@@ -264,7 +264,7 @@ public final class OperatorMapper {
         );
     }
 
-    private static TrackingNumberRule toModelTrackingNumberRule(
+    public static TrackingNumberRule toModelTrackingNumberRule(
             final TrackingNumberRuleDto trackingNumberRule) {
         if (trackingNumberRule == null) {
             return null;
@@ -287,7 +287,7 @@ public final class OperatorMapper {
         );
     }
 
-    private static ShipmentNotificationConfiguration toModelShipmentNotificationConfiguration(
+    public static ShipmentNotificationConfiguration toModelShipmentNotificationConfiguration(
             final ShipmentNotificationConfigurationDto notificationConfiguration) {
         if (notificationConfiguration == null) {
             return null;
@@ -444,6 +444,10 @@ public final class OperatorMapper {
                 rule.getDateFormat() != null ? TrackingNumberDateFormatDto.valueOf(rule.getDateFormat().name()) : null,
                 rule.isUppercase()
         );
+    }
+
+    public static ShipmentNotificationConfigurationDto mapShipmentNotificationConfiguration(final ShipmentNotificationConfiguration configuration) {
+        return toDtoShipmentNotificationConfiguration(configuration);
     }
 
     private static ShipmentNotificationConfigurationDto toDtoShipmentNotificationConfiguration(

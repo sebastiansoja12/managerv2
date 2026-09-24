@@ -18,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class DeliveryAreaEntity extends BelongsToOperator {
     private DeliveryAreaSource source;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @BatchSize(size = 100)
     @CollectionTable(name = "delivery_area_point", joinColumns = @JoinColumn(name = "delivery_area_id"))
     @OrderColumn(name = "point_index")
     private List<DeliveryAreaPointEmbeddable> points = new ArrayList<>();

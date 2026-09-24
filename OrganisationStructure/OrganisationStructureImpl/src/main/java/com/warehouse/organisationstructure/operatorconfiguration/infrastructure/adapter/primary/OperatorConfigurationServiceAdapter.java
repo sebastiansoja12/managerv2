@@ -1,10 +1,12 @@
 package com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.primary;
 
 import com.warehouse.auth.OperatorCapabilityService;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
+import com.warehouse.organisationstructure.api.dto.ShipmentNotificationConfigurationDto;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper.OperatorMapper;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShippingCapabilities;
@@ -45,6 +47,12 @@ public class OperatorConfigurationServiceAdapter implements OperatorConfiguratio
     public Optional<ShipmentLimitsDto> getCurrentShipmentLimits() {
         return operatorConfigurationPort.getCurrent()
                 .map(OperatorMapper::toDtoCurrentShipmentLimits);
+    }
+
+    @Override
+    public ShipmentNotificationConfigurationDto getShipmentNotificationConfiguration(final OperatorId operatorId) {
+        return OperatorMapper.mapShipmentNotificationConfiguration(
+                operatorConfigurationPort.getShipmentNotificationConfiguration(operatorId));
     }
 
     @Override
