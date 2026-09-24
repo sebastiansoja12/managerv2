@@ -17,7 +17,6 @@ public class ShipmentReturnedStatusChangeStrategy implements ShipmentStatusChang
 
     @Override
     public ShipmentEvent process(final Shipment shipment) {
-        shipment.notifyShipmentReturned();
-        return new ShipmentReturned(shipment.snapshot(), Instant.now());
+        throw new IllegalStateException("Return requires an RTM pickupId and a new return shipment");
     }
 }
