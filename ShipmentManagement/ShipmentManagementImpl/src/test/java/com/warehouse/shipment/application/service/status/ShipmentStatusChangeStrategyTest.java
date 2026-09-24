@@ -5,7 +5,6 @@ import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.event.ShipmentDelivered;
 import com.warehouse.shipment.domain.event.ShipmentRedirected;
 import com.warehouse.shipment.domain.event.ShipmentRerouted;
-import com.warehouse.shipment.domain.event.ShipmentReturned;
 import com.warehouse.shipment.domain.event.ShipmentSent;
 import com.warehouse.shipment.domain.event.ShipmentStatusChanged;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -114,16 +113,14 @@ class ShipmentStatusChangeStrategyTest {
 
         assertInstanceOf(ShipmentDelivered.class, deliveredStrategy.process(shipment));
 
-        verify(shipment).notifyShipmentDelivered();
+        verify(shipment).markAsDelivered();
     }
 
     @Test
     void shouldApplyReturnedStrategy() {
         final Shipment shipment = mock(Shipment.class);
 
-        assertInstanceOf(ShipmentReturned.class, returnedStrategy.process(shipment));
-
-        verify(shipment).notifyShipmentReturned();
+        assertThrows(IllegalStateException.class, () -> returnedStrategy.process(shipment));
     }
 
     @Test
