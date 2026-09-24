@@ -3,18 +3,19 @@ package com.warehouse.auth.configuration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.MDC;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.warehouse.auth.domain.model.PlatformOwner;
-import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
-import com.warehouse.auth.domain.service.JwtDecodeService;
-import com.warehouse.auth.domain.vo.DecodedApiTenant;
-import com.warehouse.exceptionhandler.exception.RestException;
+import com.warehouse.auth.infrastructure.adapter.secondary.filter.JwtAuthenticationFilter;
+import com.warehouse.auth.infrastructure.adapter.secondary.filter.PlatformOwnerAuthenticationFilter;
+import com.warehouse.commonassets.identificator.PlatformOwnerId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
@@ -24,13 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class TenantMdcFilter extends OncePerRequestFilter {
 
-    private final JwtDecodeService jwtDecodeService;
-
     private final ApiExposureProperties apiExposureProperties;
-
-    private final AuthCookieService authCookieService;
-
-    private final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort;
 
     private final Logger log = org.slf4j.LoggerFactory.getLogger("");
 
@@ -56,14 +51,8 @@ public class TenantMdcFilter extends OncePerRequestFilter {
             "/ws"
     );
 
-    public TenantMdcFilter(final JwtDecodeService jwtDecodeService,
-                           final ApiExposureProperties apiExposureProperties,
-                           final AuthCookieService authCookieService,
-                           final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort) {
-        this.jwtDecodeService = jwtDecodeService;
+    public TenantMdcFilter(final ApiExposureProperties apiExposureProperties) {
         this.apiExposureProperties = apiExposureProperties;
-        this.authCookieService = authCookieService;
-        this.platformOwnerAuthenticationPort = platformOwnerAuthenticationPort;
     }
 
     @Override
@@ -79,28 +68,25 @@ public class TenantMdcFilter extends OncePerRequestFilter {
                 return;
             }
 
-            if (authCookieService.readAccessToken(request).isEmpty()) {
-                final Optional<PlatformOwner> platformOwner = authenticatePlatformOwner(request);
-                if (platformOwner.isPresent()) {
-                    initPlatformOwnerMdc(platformOwner.get(), request);
-                    log.info("Incoming {} platform owner request", request.getMethod());
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-            }
-
-            final DecodedApiTenant tenantInfo = authenticateWithJwt(request, response);
-            if (tenantInfo == null) {
-                log.warn("Authentication failed for URI: {}", uri);
-                if (!response.isCommitted()) {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("Authentication failed");
-                }
+            final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication instanceof UsernameTenantPasswordAuthenticationToken token) {
+                initMdc(token, request);
+                log.info("Incoming {} request", request.getMethod());
+                filterChain.doFilter(request, response);
                 return;
             }
-            initMdc(tenantInfo, request);
-            log.info("Incoming {} request", request.getMethod());
-            filterChain.doFilter(request, response);
+            if (authentication != null && authentication.getPrincipal() instanceof PlatformOwnerId platformOwnerId) {
+                initPlatformOwnerMdc(platformOwnerId, request);
+                log.info("Incoming {} platform owner request", request.getMethod());
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            log.warn("Authentication failed for URI: {}", uri);
+            if (!response.isCommitted()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Authentication failed");
+            }
 
         } catch (final Exception e) {
             log.error("Error during request processing", e);
@@ -111,54 +97,26 @@ public class TenantMdcFilter extends OncePerRequestFilter {
         }
     }
 
-    private void initMdc(final DecodedApiTenant tenant, final HttpServletRequest request) {
-        MDC.put("operator", tenant.operatorId() != null ? tenant.operatorId().toString() : "N/A");
-        MDC.put("user", tenant.userId().value().toString());
-        MDC.put("username", tenant.username());
+    private void initMdc(final UsernameTenantPasswordAuthenticationToken token, final HttpServletRequest request) {
+        MDC.put("operator", token.getOperatorId() != null ? String.valueOf(token.getOperatorId().value()) : "N/A");
+        MDC.put("user", token.getPrincipal() instanceof UserId userId ? String.valueOf(userId.value()) : "N/A");
+        MDC.put("username", requestAttribute(request, JwtAuthenticationFilter.USERNAME_ATTRIBUTE));
         MDC.put("uri", request.getRequestURL().toString());
         MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         MDC.put("method", request.getMethod());
     }
 
-    private Optional<PlatformOwner> authenticatePlatformOwner(final HttpServletRequest request) {
-        try {
-            return authCookieService.readPlatformOwnerAccessToken(request)
-                    .flatMap(platformOwnerAuthenticationPort::authenticate);
-        } catch (final RuntimeException exception) {
-            log.warn("Invalid or expired platform owner access token");
-            return Optional.empty();
-        }
-    }
-
-    private void initPlatformOwnerMdc(final PlatformOwner platformOwner, final HttpServletRequest request) {
+    private void initPlatformOwnerMdc(final PlatformOwnerId platformOwnerId, final HttpServletRequest request) {
         MDC.put("operator", "PLATFORM");
-        MDC.put("user", "platform-owner-" + platformOwner.getPlatformOwnerId().value());
-        MDC.put("username", platformOwner.getUsername());
+        MDC.put("user", "platform-owner-" + platformOwnerId.value());
+        MDC.put("username", requestAttribute(request, PlatformOwnerAuthenticationFilter.PLATFORM_OWNER_USERNAME_ATTRIBUTE));
         MDC.put("uri", request.getRequestURL().toString());
         MDC.put("time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         MDC.put("method", request.getMethod());
     }
 
-    private DecodedApiTenant authenticateWithJwt(final HttpServletRequest request,
-                                                  final HttpServletResponse response) throws IOException, java.io.IOException {
-
-        final String token = authCookieService.readAccessToken(request).orElse(null);
-        if (token == null) {
-            unauthorized(response, "Missing access token");
-            return null;
-        }
-        try {
-            return jwtDecodeService.decodeJwt(token);
-        } catch (final RestException exception) {
-            unauthorized(response, "Invalid or expired access token");
-        }
-        return null;
-    }
-
-    private void unauthorized(final HttpServletResponse response, final String message) throws IOException, java.io.IOException {
-        log.warn("Unauthorized request: {}", message);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write(message);
+    private static String requestAttribute(final HttpServletRequest request, final String name) {
+        return request.getAttribute(name) instanceof String value ? value : "N/A";
     }
 
     private boolean isWhitelisted(final HttpServletRequest request) {
