@@ -1,23 +1,19 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import java.time.LocalDateTime;
 import com.warehouse.commonassets.enumeration.*;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.PickupPointId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
-
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -92,10 +88,6 @@ public class ShipmentReadEntity extends BelongsToOperator {
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
     private DepartmentId targetDepartmentId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_department_id", referencedColumnName = "department_id", insertable = false, updatable = false)
-    private DepartmentEntity targetDepartment;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
