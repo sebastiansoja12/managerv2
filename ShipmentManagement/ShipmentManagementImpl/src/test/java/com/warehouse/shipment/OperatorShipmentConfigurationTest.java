@@ -36,7 +36,7 @@ class OperatorShipmentConfigurationTest {
         assertThat(configuration.workflowSettings().defaultStatus()).isEqualTo(ShipmentStatus.CREATED);
         assertThat(configuration.workflowSettings().defaultServiceLevel()).isEqualTo(ShipmentServiceLevel.STANDARD);
         assertThat(configuration.workflowSettings().pickupCutoffTime()).isEqualTo("16:00");
-        assertThat(configuration.trackingNumberRule().key()).isEqualTo("MGR");
+        assertThat(configuration.trackingNumberRule().key()).isEmpty();
         assertThat(configuration.trackingNumberRule().separator()).isEqualTo("-");
         assertThat(configuration.trackingNumberRule().source()).isEqualTo(TrackingNumberSource.SEQUENCE);
         assertThat(configuration.trackingNumberRule().dateFormat()).isEqualTo(TrackingNumberDateFormat.YYYYMMDD);

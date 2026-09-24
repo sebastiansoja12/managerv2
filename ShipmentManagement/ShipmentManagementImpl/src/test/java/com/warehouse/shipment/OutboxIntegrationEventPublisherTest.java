@@ -73,7 +73,7 @@ class OutboxIntegrationEventPublisherTest {
 
         final JsonNode payload = objectMapper.readTree(record.payload());
         assertThat(payload.has("payload")).isTrue();
-        assertThat(payload.path("payload").size()).isEqualTo(21);
+        assertThat(payload.path("payload").size()).isEqualTo(25);
         assertThat(java.time.LocalDateTime.parse(payload.path("payload").path("updatedAt").asText()))
                 .isEqualTo(event.payload().updatedAt());
         assertThat(payload.path("payload").has("eventType")).isFalse();
