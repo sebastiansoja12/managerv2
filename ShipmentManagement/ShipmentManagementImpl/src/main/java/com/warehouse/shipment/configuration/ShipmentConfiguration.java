@@ -1,5 +1,7 @@
 package com.warehouse.shipment.configuration;
 
+import com.warehouse.returning.api.ReturningApiService;
+
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
-import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
@@ -21,18 +22,22 @@ import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
+import com.warehouse.shipment.application.port.primary.ShipmentQueryPort;
+import com.warehouse.shipment.application.port.primary.ShipmentQueryPortImpl;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
 import com.warehouse.shipment.application.port.primary.ShipmentPortImpl;
 import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 import com.warehouse.shipment.application.port.secondary.*;
 import com.warehouse.shipment.application.service.*;
 import com.warehouse.shipment.application.service.delivery.*;
-import com.warehouse.shipment.application.service.returning.*;
 import com.warehouse.shipment.application.service.status.*;
 import com.warehouse.shipment.domain.service.*;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentApiServiceAdapter;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
+import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentApiServiceMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidator;
 import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentRequestValidatorImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.*;
@@ -41,12 +46,10 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentRe
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OperatorShipmentConfigurationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.SignaturePersistenceMapper;
-import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
 
 import java.util.List;
-
 
 @Configuration
 public class ShipmentConfiguration {
@@ -69,8 +72,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public CountryServiceAvailabilityService countryServiceAvailabilityService(final DepartmentRepository departmentRepository) {
-		return new CountryServiceAvailabilityServiceImpl(departmentRepository);
+	public DepartmentCountryAvailabilityService countryServiceAvailabilityService(final DepartmentServicePort departmentServicePort) {
+		return new DepartmentCountryAvailabilityServiceImpl(departmentServicePort);
 	}
 
 	@Bean
@@ -84,9 +87,8 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ReturningServicePort returningServicePort(final ExternalFeignClient externalFeignClient,
-											 final ReturnProperties returnProperties) {
-		return new ReturningServiceClient(externalFeignClient, returnProperties);
+	public ReturningServicePort returningServicePort(final ReturningApiService returningApiService) {
+		return new ReturningServiceClient(returningApiService);
 	}
 
 	@Bean
@@ -98,29 +100,26 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentPort shipmentPort(final ShipmentRepository shipmentRepository,
-									 final SpecificationRepository specificationShipmentRepository,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final PriceService priceService,
-									 final CountryServiceAvailabilityService countryServiceAvailabilityService,
+									 final DepartmentCountryAvailabilityService departmentCountryAvailabilityService,
 									 final SignatureService signatureService,
 									 final ShipmentResultFactory shipmentResultFactory,
-									 final ReturningServicePort returningServicePort,
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberGenerationService trackingNumberGenerationService,
                                      final ShipmentConfigurationPort shipmentConfigurationServicePort,
                                      final OperatorContextProvider operatorContextProvider,
                                      final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
                                      final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
-                                     final ShipmentReturnStrategyResolver shipmentReturnStrategyResolver,
                                      final DomainEventPublisher domainEventPublisher,
                                      final DepartmentServicePort departmentServicePort) {
-		return new ShipmentPortImpl(shipmentRepository, specificationShipmentRepository,
+		return new ShipmentPortImpl(shipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort, priceService,
-				countryServiceAvailabilityService, signatureService, shipmentResultFactory, returningServicePort,
+				departmentCountryAvailabilityService, signatureService, shipmentResultFactory,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 operatorContextProvider, shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                shipmentReturnStrategyResolver, domainEventPublisher, departmentServicePort);
+                domainEventPublisher, departmentServicePort);
 	}
 
     @Bean
@@ -190,6 +189,11 @@ public class ShipmentConfiguration {
     }
 
     @Bean
+    public ShipmentStatusChangeStrategy shipmentUndeliverableStatusChangeStrategy() {
+        return new ShipmentUndeliverableStatusChangeStrategy();
+    }
+
+    @Bean
     public ShipmentStatusChangeStrategy shipmentReturnedStatusChangeStrategy() {
         return new ShipmentReturnedStatusChangeStrategy();
     }
@@ -210,38 +214,23 @@ public class ShipmentConfiguration {
         return new ShipmentStatusChangeStrategyResolver(strategies);
     }
 
-    @Bean
-    public ShipmentReturnStrategy shipmentReturnCreatedStrategy() {
-        return new ShipmentReturnCreatedStrategy();
-    }
-
-    @Bean
-    public ShipmentReturnStrategy shipmentReturnCompletedStrategy() {
-        return new ShipmentReturnCompletedStrategy();
-    }
-
-    @Bean
-    public ShipmentReturnStrategy shipmentReturnCancelledStrategy() {
-        return new ShipmentReturnCancelledStrategy();
-    }
-
-    @Bean
-    public ShipmentReturnStrategy shipmentReturnUnchangedStrategy() {
-        return new ShipmentReturnUnchangedStrategy();
-    }
-
-    @Bean
-    public ShipmentReturnStrategyResolver shipmentReturnStrategyResolver(
-            final List<ShipmentReturnStrategy> strategies) {
-        return new ShipmentReturnStrategyResolver(strategies);
-    }
-
 	@Bean
 	public ShipmentConfigurationPort shipmentConfigurationServicePort(
 			final OperatorConfigurationApiService operatorConfigurationApiService,
-			final OperatorShipmentConfigurationMapper operatorShipmentConfigurationMapper) {
-		return new ShipmentConfigurationServiceAdapter(operatorConfigurationApiService, operatorShipmentConfigurationMapper);
+			final OperatorShipmentConfigurationMapper operatorShipmentConfigurationMapper,
+            final CurrentDepartmentCodePort currentDepartmentCodePort) {
+		return new ShipmentConfigurationServiceAdapter(
+                operatorConfigurationApiService,
+                operatorShipmentConfigurationMapper,
+                currentDepartmentCodePort);
 	}
+
+    @Bean
+    public CurrentDepartmentCodePort currentDepartmentCodePort(
+            final OperatorContextProvider operatorContextProvider,
+            final DepartmentServicePort departmentServicePort) {
+        return new OperatorContextDepartmentCodeAdapter(operatorContextProvider, departmentServicePort);
+    }
 
 	@Bean
 	public OperatorShipmentConfigurationMapper operatorShipmentConfigurationMapper() {
@@ -249,9 +238,15 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public ShipmentApiService shipmentApiService(final ShipmentPort shipmentPort) {
-		return new ShipmentApiServiceAdapter(shipmentPort);
+	public ShipmentApiService shipmentApiService(final ShipmentPort shipmentPort,
+                                                final ShipmentApiServiceMapper shipmentApiServiceMapper) {
+		return new ShipmentApiServiceAdapter(shipmentPort, shipmentApiServiceMapper);
 	}
+
+    @Bean
+    public ShipmentApiServiceMapper shipmentApiServiceMapper() {
+        return new ShipmentApiServiceMapper();
+    }
 
 	@Bean
 	public TrackingSequenceRepository trackingSequenceRepository(final TrackingSequenceReadRepository repository) {
@@ -338,7 +333,7 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public DepartmentServicePort shipmentDepartmentServicePort(final DepartmentApiService departmentApiService) {
-		return new DepartmentServiceClient(departmentApiService);
+		return new DepartmentServiceAdapter(departmentApiService);
 	}
 
 	@Bean
@@ -396,7 +391,7 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public SpecificationRepository specificationShipmentRepository(
+	public SpecificationRepository<ShipmentSearchCriteria, Shipment> specificationShipmentRepository(
 			final OperatorFilteredRepository<ShipmentReadEntity> repository,
             final ShipmentPersistenceMapper persistenceMapper) {
 		return new SpecificationShipmentRepositoryImpl(repository, persistenceMapper);
@@ -432,4 +427,11 @@ public class ShipmentConfiguration {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock path finder service");
 		return new PathFinderMockAdapter(pathFinderMockService);
 	}
+    @Bean
+    public ShipmentQueryPort shipmentQueryPort(
+            final SpecificationRepository<ShipmentSearchCriteria, Shipment> specificationShipmentRepository,
+            final ShipmentResultFactory shipmentResultFactory) {
+        return new ShipmentQueryPortImpl(specificationShipmentRepository, shipmentResultFactory);
+    }
+
 }
