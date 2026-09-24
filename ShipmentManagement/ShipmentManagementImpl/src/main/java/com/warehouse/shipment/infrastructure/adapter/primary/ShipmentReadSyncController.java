@@ -1,5 +1,6 @@
 package com.warehouse.shipment.infrastructure.adapter.primary;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,14 +25,11 @@ class ShipmentReadSyncController {
         this.operatorContext = operatorContext;
     }
 
-    @PostMapping("/{operatorId}")
-    ResponseEntity<ShipmentReadSyncResponse> sync(@PathVariable final Long operatorId) {
-        return operatorContext.runAs(OperatorId.of(operatorId), () -> {
-            final int syncedShipments = syncPort.syncReadModels();
-            return ResponseEntity.ok(new ShipmentReadSyncResponse(operatorId, syncedShipments));
+    @PostMapping("/{operatorId}/{shipmentId}")
+    ResponseEntity<?> syncReadModelForShipment(@PathVariable final Long operatorId, @PathVariable final Long shipmentId) {
+        operatorContext.runAs(OperatorId.of(operatorId), () -> {
+            syncPort.syncReadModel(new ShipmentId(shipmentId));
         });
-    }
-
-    record ShipmentReadSyncResponse(Long operatorId, int syncedShipments) {
+        return ResponseEntity.ok().build();
     }
 }
