@@ -12,7 +12,7 @@ import com.warehouse.department.domain.port.primary.DepartmentPort;
 import com.warehouse.mail.domain.service.MailService;
 import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
-import com.warehouse.shipment.infrastructure.adapter.secondary.ExternalFeignClient;
+import com.warehouse.returning.api.ReturningApiService;
 import com.warehouse.tools.returning.ReturnProperties;
 import com.warehouse.voronoi.VoronoiService;
 
@@ -40,8 +40,8 @@ public class ShipmentTestConfiguration {
     public RouteLogServicePort routeLogServicePort;
 
     @Bean
-    ExternalFeignClient externalMicroserviceFeignClient() {
-        return Mockito.mock(ExternalFeignClient.class);
+    ReturningApiService externalMicroserviceFeignClient() {
+        return Mockito.mock(ReturningApiService.class);
     }
 
     @Bean
