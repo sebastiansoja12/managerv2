@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
-import com.warehouse.shipment.application.port.primary.result.ShipmentControlCenterResult;
+import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -11,6 +11,8 @@ import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import org.mapstruct.Mapper;
+import org.mapstruct.Context;
+import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -25,44 +27,6 @@ public interface ShipmentResponseMapper {
     default ShipmentCreateResponseDto map(final ShipmentCreateResponse response) {
         return new ShipmentCreateResponseDto(response.shipmentId().value().toString(),
                 response.trackingNumber());
-    }
-
-    default ShipmentReturnDetailsApi map(final ShipmentReturnDetails response) {
-        return new ShipmentReturnDetailsApi(
-                new ShipmentReturnDetailsApi.LongValueApi(response.returnPackageId().getId()),
-                map(response.shipmentId()),
-                response.reason(),
-                response.returnStatus(),
-                response.returnToken() == null
-                        ? null
-                        : new ShipmentReturnDetailsApi.StringValueApi(response.returnToken()),
-                response.assignedDepartmentCode() == null
-                        ? null
-                        : new DepartmentCodeDto(response.assignedDepartmentCode().value()),
-                response.returnedDepartmentCode() == null
-                        ? null
-                        : new DepartmentCodeDto(response.returnedDepartmentCode().value()),
-                response.assignedTo() == null
-                        ? null
-                        : new ShipmentReturnDetailsApi.LongValueApi(response.assignedTo().value()),
-                response.processedBy() == null
-                        ? null
-                        : new ShipmentReturnDetailsApi.LongValueApi(response.processedBy().value()),
-                response.reasonCode() == null
-                        ? null
-                        : new ShipmentReturnDetailsApi.StringValueApi(response.reasonCode().name()),
-                response.operatorId(),
-                response.createdAt(),
-                response.updatedAt());
-    }
-
-    default ShipmentReturnPageApi map(final ShipmentReturnPage response) {
-        return new ShipmentReturnPageApi(
-                response.content().stream().map(this::map).toList(),
-                response.page(),
-                response.size(),
-                response.totalElements(),
-                response.totalPages());
     }
 
     default ShipmentDto map(final ShipmentSnapshot shipment, final DepartmentCode departmentCode) {
@@ -140,9 +104,10 @@ public interface ShipmentResponseMapper {
         );
     }
 
-    default ShipmentControlCenterResponseApi mapControlCenter(final ShipmentControlCenterResult controlCenter) {
-        return new ShipmentControlCenterResponseApi(map(controlCenter.shipment()), controlCenter.routeLog(),
-                controlCenter.returnPackage() == null ? null : map(controlCenter.returnPackage()));
+    default ShipmentRouteLogResponseApi mapShipmentRouteLog(final ShipmentRouteLog shipmentRouteLog,
+                                                            @Context final DepartmentServicePort departmentServicePort) {
+        return new ShipmentRouteLogResponseApi(map(shipmentRouteLog.shipment()), shipmentRouteLog.routeLog(),
+                shipmentRouteLog.returnPackage());
     }
 
     default List<String> map(String value) {
