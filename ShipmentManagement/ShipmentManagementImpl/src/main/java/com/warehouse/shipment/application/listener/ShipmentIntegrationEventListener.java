@@ -33,31 +33,19 @@ public class ShipmentIntegrationEventListener {
     }
 
     @EventListener
-    public void handle(final ShipmentReturnCanceled event) {
-        this.integrationEventPublisher.publish(
-                new ShipmentReturnCanceledIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
-    }
-
-    @EventListener
     public void handle(final ShipmentStatusChanged event) {
         this.integrationEventPublisher.publish(
                 new ShipmentStatusChangedIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
     }
 
     @EventListener
-    public void handle(final ShipmentReturnCreated event) {
-        this.integrationEventPublisher.publish(new ShipmentReturnCreatedIntegrationEvent(
-                ShipmentEventData.from(event.getSnapshot()),
-                event.getTimestamp(),
-                event.getReasonCode().name(),
-                event.getReason(),
-                event.getDepartmentCode()
-        ));
-    }
-
-    @EventListener
     public void handle(final ShipmentReturned event) {
         this.integrationEventPublisher.publish(
                 new ShipmentStatusChangedIntegrationEvent(ShipmentEventData.from(event.getSnapshot())));
+    }
+
+    @EventListener
+    public void handle(final ShipmentReturnedCompleted event) {
+
     }
 }
