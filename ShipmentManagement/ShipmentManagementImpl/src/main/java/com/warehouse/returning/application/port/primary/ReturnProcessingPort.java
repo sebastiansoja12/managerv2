@@ -13,4 +13,3 @@ public interface ReturnProcessingPort {
     void applyStatusChanged(final ShipmentId shipmentId,
                             final ReturnStatus status);
 }
-
