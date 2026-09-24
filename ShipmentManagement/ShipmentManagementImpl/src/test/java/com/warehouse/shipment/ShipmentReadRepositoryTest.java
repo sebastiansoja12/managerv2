@@ -32,7 +32,7 @@ import com.warehouse.shipment.application.port.secondary.PriceRepository;
 import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.application.port.secondary.SignatureRepository;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
-import com.warehouse.shipment.infrastructure.adapter.secondary.ExternalFeignClient;
+import com.warehouse.returning.api.ReturningApiService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PriceReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PriceRepositoryImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
@@ -93,8 +93,8 @@ public class ShipmentReadRepositoryTest {
         }
 
         @Bean
-        public ExternalFeignClient externalMicroserviceFeignClient() {
-            return Mockito.mock(ExternalFeignClient.class);
+        public ReturningApiService externalMicroserviceFeignClient() {
+            return Mockito.mock(ReturningApiService.class);
         }
 
         @Bean
