@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.organisationstructure.api.dto.DefaultShipmentStatusDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLabelConfigurationDto;
@@ -12,6 +13,7 @@ import com.warehouse.organisationstructure.api.dto.ShipmentServiceLevelDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentValidationConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentWorkflowConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberDateFormatDto;
+import com.warehouse.organisationstructure.api.dto.TrackingNumberPrefixModeDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberRuleDto;
 import com.warehouse.organisationstructure.api.dto.TrackingNumberSourceDto;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
@@ -24,12 +26,14 @@ import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberDateFormat;
+import com.warehouse.shipment.domain.vo.conf.TrackingNumberPrefixMode;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberRule;
 import com.warehouse.shipment.domain.vo.conf.TrackingNumberSource;
 
 public class OperatorShipmentConfigurationMapper {
 
-    public OperatorShipmentConfiguration map(final ShipmentConfigurationDto configuration) {
+    public OperatorShipmentConfiguration map(final ShipmentConfigurationDto configuration,
+                                             final DepartmentCode currentDepartmentCode) {
         if (configuration == null) {
             return OperatorShipmentConfiguration.defaults();
         }
@@ -39,7 +43,7 @@ public class OperatorShipmentConfigurationMapper {
                 map(configuration.labelConfiguration()),
                 map(configuration.shipmentLimits()),
                 map(configuration.workflowConfiguration()),
-                map(configuration.trackingNumberRule()),
+                map(configuration.trackingNumberRule(), currentDepartmentCode),
                 map(configuration.notificationConfiguration())
         );
     }
@@ -104,12 +108,14 @@ public class OperatorShipmentConfigurationMapper {
         );
     }
 
-    private TrackingNumberRule map(final TrackingNumberRuleDto rule) {
+    private TrackingNumberRule map(final TrackingNumberRuleDto rule,
+                                   final DepartmentCode currentDepartmentCode) {
         if (rule == null) {
             return TrackingNumberRule.defaults();
         }
 
         return new TrackingNumberRule(
+                map(rule.prefixMode()),
                 rule.key(),
                 rule.separator(),
                 map(rule.source()),
@@ -117,7 +123,7 @@ public class OperatorShipmentConfigurationMapper {
                 rule.includeDate(),
                 map(rule.dateFormat()),
                 rule.uppercase()
-        );
+        ).withDepartmentCode(currentDepartmentCode);
     }
 
     private ShipmentNotificationSettings map(final ShipmentNotificationConfigurationDto configuration) {
@@ -152,6 +158,10 @@ public class OperatorShipmentConfigurationMapper {
 
     private TrackingNumberDateFormat map(final TrackingNumberDateFormatDto dateFormat) {
         return dateFormat == null ? null : TrackingNumberDateFormat.valueOf(dateFormat.name());
+    }
+
+    private TrackingNumberPrefixMode map(final TrackingNumberPrefixModeDto prefixMode) {
+        return prefixMode == null ? null : TrackingNumberPrefixMode.valueOf(prefixMode.name());
     }
 
     private ShipmentNotificationChannel map(final ShipmentNotificationChannelDto channel) {
