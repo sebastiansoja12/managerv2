@@ -65,5 +65,8 @@
     <include file="changes/2026-09-10-shipment-target-department-required.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-10-shipment-delivery-pickup-point.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-11-user-api-key-optional.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-23-return-shipment-link.xml" relativeToChangelogFile="true"/>
 
+    <include file="changes/2026-09-27-return-cancellation-state.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-28-tracking-number-prefix-mode.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
