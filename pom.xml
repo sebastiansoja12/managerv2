@@ -18,6 +18,7 @@
 	<modules>
 		<module>Application</module>
 		<module>ShipmentManagement</module>
+        <module>ReturningTrackManager</module>
 		<module>DeliveryNetwork</module>
 		<module>PickupPointManagement</module>
 		<module>MailService</module>
@@ -363,6 +364,11 @@
 			<dependency>
 				<groupId>io.github.resilience4j</groupId>
 				<artifactId>resilience4j-core</artifactId>
+				<version>1.7.1</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-circuitbreaker</artifactId>
 				<version>1.7.1</version>
 			</dependency>
 			<dependency>
