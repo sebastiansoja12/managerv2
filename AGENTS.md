@@ -326,7 +326,26 @@ Structure test methods with blank lines between setup, action, and assertion. Do
 
 ---
 
-## 12. What NOT to Do
+## 12. Creating methods in aggregates for DDD
+
+DO NOT DO LIKE THIS
+```java
+public boolean unloadFromPallet() {
+  if (ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)) {
+    return false;
+  }
+  if (!ShipmentStatus.SENT.equals(this.shipmentStatus)) {
+    throw new ShipmentModificationException("Shipment cannot be unloaded from pallet in status "
+            + shipmentStatus);
+  }
+  this.shipmentStatus = ShipmentStatus.ACCEPTED;
+  markAsModified();
+  return true;
+}
+```
+Prefer changing state of aggregate instead of checking something and updating state at the same time.
+
+## 13. What NOT to Do
 
 - Do not use `var`.
 - Do not use `@Autowired`.
@@ -343,4 +362,4 @@ Structure test methods with blank lines between setup, action, and assertion. Do
 - Do not introduce a new authorization mechanism.
 - Do not run build or test commands unless explicitly asked by the user.
 - Do not commit changes unless explicitly asked by the user.
-- DO NOT add comments
+- DO NOT add comments in code
