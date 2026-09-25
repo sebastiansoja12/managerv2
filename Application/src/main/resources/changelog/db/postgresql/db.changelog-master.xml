@@ -113,4 +113,10 @@
     <include file="changes/2026-10-28-mail-templates-shipment-created-external.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-28-delivery-areas.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-28-operator-department-configuration.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-29-delivery-current-target-unique.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-29-shipment-read-model-delivery.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-30-delivery-rd-missing-destination.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-31-mail-templates-shipment-status-collected.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-31-activity-stream.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-11-01-audit-log-rename.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
