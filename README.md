@@ -1,11 +1,41 @@
 # Manager 2.0 Backend
 
+**English** | [Polski](README.pl.md) | [Deutsch](README.de.md)
+
 **Development Version 2026.4 - 10th September, 2026**
 
 Manager 2.0 is a Java 21 / Spring Boot backend for warehouse and logistics
 operations. The repository is a multi-module Maven project. The main runtime is
 the `Application` module, which assembles the domain modules into one API served
 under `/v1/api`.
+
+## About the Backend
+
+Manager 2.0 runs the day-to-day work of a parcel logistics operator. The backend
+keeps the shipment lifecycle from registration through sorting, pallet transport
+and delivery to returns and rejections, and it decides which department delivers
+a shipment and which route it takes through the delivery network. It also manages
+the organization itself: operators, departments with their delivery areas and
+warehouse floor plans, pickup points and lockers, users, roles and paired
+terminals. Couriers and warehouse staff scan parcels on mobile terminals through
+a SOAP endpoint, while office staff use the React GUI over REST.
+
+Domain modules communicate through Kafka events, so read models, the audit log,
+process logs and e-mail notifications stay up to date without tight coupling.
+Every request runs in the context of one operator, which keeps data of different
+companies apart. An MCP server lets AI assistants look up shipments, routes, deliveries,
+processes, devices, departments, couriers and configuration, and, for managers, make changes.
+
+## Screenshots
+
+| | |
+| --- | --- |
+| [![OpenAPI documentation in Swagger UI](docs/screenshots/swagger.png)](docs/screenshots/swagger.png) | [![Services registered in Eureka](docs/screenshots/eureka.png)](docs/screenshots/eureka.png) |
+| **Swagger UI**: OpenAPI documentation of the API under `/v1/api/swagger-ui/index.html` | **Eureka**: Manager, Gateway and the related services registered on port `8761` |
+
+[![Kafka topics in Kafka UI](docs/screenshots/kafka-topics.png)](docs/screenshots/kafka-topics.png)
+
+**Kafka UI**: domain event topics (shipments, deliveries, pallets, returns, audit log) with their dead-letter topics, available on port `8090` in the Docker stack.
 
 ## Technology
 
@@ -35,7 +65,7 @@ under `/v1/api`.
 | `DepartmentMap` | Department floor plans (`department_maps`, elements), storage-location occupancy with optimistic locking, pallet placement, reservations and location history (`/department-maps`). |
 | `Device` | Device pairing, device verification and terminal/device access validation. |
 | `AuditLog` | Shared operator-scoped audit log (`/audit-log`): what was done (resource, action, changed fields) and who did it (user, department). Modules translate their domain events into `AuditLogEntryIntegrationEvent`, publish it through the Kafka outbox (`audit-log.entries`) and `AuditLogKafkaEventListener` stores it idempotently by event ID. |
-| `McpServer` | Read-only MCP server (`/v1/api/mcp`) exposing shipment, process and device lookups to AI assistants. |
+| `McpServer` | MCP server (`/v1/api/mcp`) that lets AI assistants look up and change shipments, deliveries, departments, couriers and configuration. |
 | `SupplierServiceManagement` | Suppliers, package types, delivery areas, vehicle data and supplier updates. |
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
 | `PathFinder` and `DestinationDetermination` | Routing, delivery-department determination, address coordinates and area calculation support. |
@@ -200,9 +230,33 @@ sign-up, are not accepted. Operator blocking and session revocation also invalid
 | `find_shipment` | `trackingNumber` | Status, dates, masked sender/recipient (initials, city, postal code) and the 10 newest events. |
 | `get_process` | `processId` (UUID) | Process status, fault, device and communication steps without request payloads. |
 | `list_devices` | optional `status`, `departmentCode` | Up to 50 devices with assignment mode, heartbeat and signed-in operator; requires MANAGER or higher. |
+| `get_shipment_route` | `trackingNumber` | Departments the shipment passes from origin to destination, in order, with the total distance in km. |
+| `list_departments` | optional `status`, `type` | Up to 100 departments with code, type and status. |
+| `get_department` | `departmentCode` | Department address and coordinates. |
+| `list_deliveries` | optional `departmentCode`, `courierCode`, `limit` | Newest deliveries (25 by default, at most 100) with route, courier, conditions and steps. |
+| `get_delivery` | `deliveryId` or `trackingNumber` | One delivery with all steps. |
+| `list_couriers` | none | Couriers of the caller's department; requires MANAGER or higher. |
+| `get_configuration` | `section` | One operator configuration section: `SHIPMENT`, `DEPARTMENTS`, `FLEET`, `COMMUNICATION`, `REGIONAL`, `SORTING` or `PICKUP_POINTS`. |
 
-All tools are read-only and run in the operator context of the API key owner. Disable the endpoint with
-`MCP_SERVER_ENABLED=false`. Example for Claude Code:
+Tools that change data require MANAGER or higher (`change_department_status` requires ADMIN). Optional fields that are
+left out keep their current values.
+
+| Tool | Parameters | Notes |
+| --- | --- | --- |
+| `assign_delivery_courier` / `unassign_delivery_courier` | `deliveryId`, `courierCode`, optional `vehicleId` | Assigns or removes the courier of a delivery. |
+| `change_delivery_route` | `deliveryId`, optional origin/destination department codes, pickup method and pickup points | Changes the delivery route. |
+| `change_delivery_conditions` | `deliveryId`, optional `method`, `signatureRequired`, `instructions`, `plannedAt` | Changes delivery conditions. |
+| `comment_delivery_step` / `correct_delivery_step_status` | `deliveryId`, `stepNumber`, `comment` or `deliveryStatus` | Comments a step or corrects its status. |
+| `cancel_delivery` | `deliveryId` | Cancels a delivery. |
+| `create_shipment` | sender, recipient, dimensions (cm), weight (kg), price, optional service fields | Creates a shipment and returns its tracking number. |
+| `change_shipment_party` | `trackingNumber`, `party` (`SENDER`/`RECIPIENT`), fields to change | Changes sender or recipient data. |
+| `change_department_address`, `change_department_type`, `change_department_email`, `change_department_status`, `set_department_active` | `departmentCode` and the new value | Edit a department. |
+| `create_courier` | `firstName`, `lastName`, `telephoneNumber`, `email`, optional `departmentCode`, `courierCode` | Adds a courier and the courier's user account. |
+| `update_courier` / `set_courier_active` | `courierCode` and the fields to change / `active` | Edit, activate or deactivate a courier. |
+| `update_configuration` | `section`, `changes` (JSON object) | Changes only the given fields of a configuration section; unknown fields are rejected. |
+
+All tools run in the operator context of the API key owner. Disable the endpoint with
+`MCP_SERVER_ENABLED=false`, or only the tools that change data with `MCP_WRITE_ENABLED=false`. Example for Claude Code:
 
 ```bash
 claude mcp add --transport http manager https://manager.example.com/v1/api/mcp --header "Authorization: Bearer <api-key>"
