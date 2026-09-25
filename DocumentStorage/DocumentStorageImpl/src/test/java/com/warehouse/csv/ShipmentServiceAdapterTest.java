@@ -33,7 +33,7 @@ class ShipmentServiceAdapterTest {
         final ShipmentPartyDto recipient = new ShipmentPartyDto("Anna", "Nowak", "anna@test.pl", "222",
                 "Krakow", "30-000", "Florianska 2", "PL");
         when(shipmentApiService.getShipmentDocument(shipmentId))
-                .thenReturn(new ShipmentDocumentDto(shipmentId, null, null, null, null, sender, recipient));
+                .thenReturn(new ShipmentDocumentDto(shipmentId, null, null, null, null, sender, recipient, null, null, null));
 
         final ParcelCsv parcel = adapter.find(1L);
 

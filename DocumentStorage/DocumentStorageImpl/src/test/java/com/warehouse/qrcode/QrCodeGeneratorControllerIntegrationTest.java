@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.qrcode.domain.port.secondary.DeliveryServicePort;
+import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDocumentDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentPartyDto;
@@ -45,7 +45,7 @@ public class QrCodeGeneratorControllerIntegrationTest {
     private ShipmentApiService shipmentApiService;
 
     @MockitoBean
-    private DeliveryServicePort deliveryServicePort;
+    private OperatorConfigurationApiService operatorConfigurationApiService;
 
     @Test
     void shouldGenerateQrCodeForParcel() {
@@ -54,7 +54,7 @@ public class QrCodeGeneratorControllerIntegrationTest {
         final ShipmentPartyDto party = new ShipmentPartyDto("Jan", "Kowalski", "jan@test.pl", "123456789",
                 "Katowice", "40-000", "Mariacka 1", "PL");
         when(shipmentApiService.getShipmentDocument(any())).thenReturn(new ShipmentDocumentDto(
-                new ShipmentId(parcelId), null, null, "INP000000001", null, party, party));
+                new ShipmentId(parcelId), null, null, "INP000000001", null, party, party, null, null, null));
         // when
         final ResponseEntity<Void> qrCode = restClient.get()
                 .uri("/v1/api/qrcodes/{id}", parcelId)
