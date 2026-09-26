@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-03-operator-fleet-communication-regional-configuration" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations"/>
+                <not>
+                    <columnExists tableName="operator_configurations" columnName="fleet_vehicle_inspection_reminder_days"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations">
+            <column name="fleet_vehicle_inspection_reminder_days" type="INT" defaultValueNumeric="30">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fleet_vehicle_insurance_reminder_days" type="INT" defaultValueNumeric="30">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fleet_max_driver_shift_hours" type="INT" defaultValueNumeric="9">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fleet_required_break_minutes" type="INT" defaultValueNumeric="45">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fleet_require_pre_trip_checklist" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fleet_gps_position_interval_seconds" type="INT" defaultValueNumeric="30">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fleet_default_vehicle_pallet_capacity" type="INT" defaultValueNumeric="18">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_sender_name" type="VARCHAR(120)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_reply_to_email" type="VARCHAR(255)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_email_footer" type="VARCHAR(1000)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_logo_url" type="VARCHAR(500)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_accent_color" type="VARCHAR(7)" defaultValue="#1E88E5">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_default_customer_language" type="VARCHAR(32)" defaultValue="PL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_chat_message_retention_days" type="INT" defaultValueNumeric="365">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_chat_attachments_allowed" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="communication_chat_max_attachment_size_mb" type="INT" defaultValueNumeric="10">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_time_zone" type="VARCHAR(64)" defaultValue="Europe/Warsaw">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_date_format" type="VARCHAR(32)" defaultValue="DD_MM_YYYY">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_currency" type="VARCHAR(32)" defaultValue="PLN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_weight_unit" type="VARCHAR(32)" defaultValue="KG">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_length_unit" type="VARCHAR(32)" defaultValue="CM">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_working_day_start" type="VARCHAR(5)" defaultValue="08:00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_working_day_end" type="VARCHAR(5)" defaultValue="16:00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_saturday_working_day" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="regional_sunday_working_day" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2026-11-03-operator-fleet-communication-regional-configuration-aud" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="operator_configurations_aud"/>
+                <not>
+                    <columnExists tableName="operator_configurations_aud" columnName="fleet_vehicle_inspection_reminder_days"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="operator_configurations_aud">
+            <column name="fleet_vehicle_inspection_reminder_days" type="INT"/>
+            <column name="fleet_vehicle_insurance_reminder_days" type="INT"/>
+            <column name="fleet_max_driver_shift_hours" type="INT"/>
+            <column name="fleet_required_break_minutes" type="INT"/>
+            <column name="fleet_require_pre_trip_checklist" type="BOOLEAN"/>
+            <column name="fleet_gps_position_interval_seconds" type="INT"/>
+            <column name="fleet_default_vehicle_pallet_capacity" type="INT"/>
+            <column name="communication_sender_name" type="VARCHAR(120)"/>
+            <column name="communication_reply_to_email" type="VARCHAR(255)"/>
+            <column name="communication_email_footer" type="VARCHAR(1000)"/>
+            <column name="communication_logo_url" type="VARCHAR(500)"/>
+            <column name="communication_accent_color" type="VARCHAR(7)"/>
+            <column name="communication_default_customer_language" type="VARCHAR(32)"/>
+            <column name="communication_chat_message_retention_days" type="INT"/>
+            <column name="communication_chat_attachments_allowed" type="BOOLEAN"/>
+            <column name="communication_chat_max_attachment_size_mb" type="INT"/>
+            <column name="regional_time_zone" type="VARCHAR(64)"/>
+            <column name="regional_date_format" type="VARCHAR(32)"/>
+            <column name="regional_currency" type="VARCHAR(32)"/>
+            <column name="regional_weight_unit" type="VARCHAR(32)"/>
+            <column name="regional_length_unit" type="VARCHAR(32)"/>
+            <column name="regional_working_day_start" type="VARCHAR(5)"/>
+            <column name="regional_working_day_end" type="VARCHAR(5)"/>
+            <column name="regional_saturday_working_day" type="BOOLEAN"/>
+            <column name="regional_sunday_working_day" type="BOOLEAN"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
