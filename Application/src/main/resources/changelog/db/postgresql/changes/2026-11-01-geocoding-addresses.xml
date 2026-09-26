@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-11-01-postgresql-table-geocoding-addresses" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="geocoding_addresses"/>
+            </not>
+        </preConditions>
+        <createTable tableName="geocoding_addresses">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_geocoding_addresses"/>
+            </column>
+            <column name="country_code" type="VARCHAR(2)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="postal_code" type="VARCHAR(20)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city" type="VARCHAR(180)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="street" type="VARCHAR(255)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="house_number" type="VARCHAR(40)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latitude" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="longitude" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provider" type="VARCHAR(40)"/>
+            <column name="geocoded_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="geocoding_addresses"
+                             constraintName="uk_geocoding_addresses_address"
+                             columnNames="country_code, postal_code, city, street, house_number"/>
+    </changeSet>
+</databaseChangeLog>
