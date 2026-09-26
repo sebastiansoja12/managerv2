@@ -15,10 +15,12 @@ import com.warehouse.asyncjob.infrastructure.adapter.secondary.AsyncJobRepositor
 import com.warehouse.asyncjob.infrastructure.adapter.secondary.AsyncJobSchedulerServiceAdapter;
 import com.warehouse.asyncjob.infrastructure.adapter.secondary.DeliveryReadModelRebuildServiceAdapter;
 import com.warehouse.asyncjob.infrastructure.adapter.secondary.DepartmentReadModelRebuildServiceAdapter;
+import com.warehouse.asyncjob.infrastructure.adapter.secondary.PickupPointReadModelRebuildServiceAdapter;
 import com.warehouse.asyncjob.infrastructure.adapter.secondary.ShipmentReadModelRebuildServiceAdapter;
 import com.warehouse.asyncjob.infrastructure.adapter.secondary.mapper.AsyncJobEntityMapper;
 import com.warehouse.logisticsdelivery.api.DeliveryReadModelRebuildApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentReadModelRebuildApiService;
+import com.warehouse.pickuppoint.api.PickupPointReadModelRebuildApiService;
 import com.warehouse.shipment.infrastructure.ShipmentReadModelRebuildApiService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -69,6 +71,12 @@ public class AsyncJobConfiguration {
     public ReadModelRebuildServicePort deliveryReadModelRebuildServicePort(
             final DeliveryReadModelRebuildApiService rebuildApiService) {
         return new DeliveryReadModelRebuildServiceAdapter(rebuildApiService);
+    }
+
+    @Bean
+    public ReadModelRebuildServicePort pickupPointReadModelRebuildServicePort(
+            final PickupPointReadModelRebuildApiService rebuildApiService) {
+        return new PickupPointReadModelRebuildServiceAdapter(rebuildApiService);
     }
 
     @Bean
