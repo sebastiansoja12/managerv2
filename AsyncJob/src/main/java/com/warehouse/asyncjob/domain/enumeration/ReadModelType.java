@@ -3,5 +3,6 @@ package com.warehouse.asyncjob.domain.enumeration;
 public enum ReadModelType {
     SHIPMENT,
     DEPARTMENT,
-    DELIVERY
+    DELIVERY,
+    PICKUP_POINT
 }
