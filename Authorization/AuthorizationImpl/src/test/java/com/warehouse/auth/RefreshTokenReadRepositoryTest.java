@@ -77,6 +77,19 @@ public class RefreshTokenReadRepositoryTest {
     }
 
     @Test
+    void shouldShortenExpiryOnly() {
+        // given
+        final String token = "12345";
+        final LocalDateTime shortenedExpiry = LocalDateTime.now().plusSeconds(60);
+        // when
+        repository.shortenExpiry(token, shortenedExpiry);
+        repository.shortenExpiry(token, shortenedExpiry.plusDays(1));
+        // then
+        assertThat(repository.findByToken(token).orElseThrow().getExpiryDate())
+                .isEqualToIgnoringNanos(shortenedExpiry);
+    }
+
+    @Test
     @DirtiesContext
     public void testDeleteAllExpiredSince() {
         // given
