@@ -53,7 +53,7 @@ public class ResponseMapper {
                 userDto.role(),
                 userDto.departmentCode(),
                 userDto.language(),
-                user.getApiKey(),
+                user.canAuthenticateWithApiKey(),
                 userDto.rolePermissions(),
                 userDto.deleted(),
                 userDto.operatorId(),
