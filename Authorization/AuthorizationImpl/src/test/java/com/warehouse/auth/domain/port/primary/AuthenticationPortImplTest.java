@@ -3,6 +3,7 @@ package com.warehouse.auth.domain.port.primary;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +90,8 @@ class AuthenticationPortImplTest {
         final AuthenticationService authenticationService = new AuthenticationServiceImpl(
                 refreshTokenRepository,
                 refreshTokenGenerator,
-                userRepository
+                userRepository,
+                Duration.ofSeconds(60)
         );
         jwtService = new JwtServiceImpl(jwtProvider);
         final DepartmentService departmentService = new DepartmentService(departmentServicePort);
@@ -138,8 +140,34 @@ class AuthenticationPortImplTest {
         assertThat(refreshResponse.accessToken()).isNotEmpty();
         assertThat(jwtService.extractUsername(refreshResponse.accessToken())).isEqualTo("s-soja");
         assertThat(refreshResponse.refreshToken()).isNotEqualTo(loginResponse.refreshToken());
-        assertThat(refreshTokenRepository.find(loginResponse.refreshToken())).isEmpty();
+        assertThat(refreshTokenRepository.find(loginResponse.refreshToken()).orElseThrow().getExpiryDate())
+                .isBefore(LocalDateTime.now().plusSeconds(61));
         assertThat(refreshTokenRepository.find(refreshResponse.refreshToken())).isPresent();
+    }
+
+    @Test
+    void shouldAllowConcurrentRefreshWithRotatedTokenWithinGracePeriod() {
+        givenUser("s-soja", "raw-password", OrganizationUser.Role.MANAGER, OperatorId.of(100L));
+        final AuthenticationResponse loginResponse = port.login(new LoginRequest("s-soja", "raw-password"));
+
+        final AuthenticationResponse firstRefresh = port.refresh(loginResponse.refreshToken());
+        final AuthenticationResponse secondRefresh = port.refresh(loginResponse.refreshToken());
+
+        assertThat(secondRefresh.refreshToken()).isNotEqualTo(firstRefresh.refreshToken());
+        assertThat(refreshTokenRepository.find(firstRefresh.refreshToken())).isPresent();
+        assertThat(refreshTokenRepository.find(secondRefresh.refreshToken())).isPresent();
+    }
+
+    @Test
+    void shouldRejectRotatedTokenAfterGracePeriod() {
+        givenUser("s-soja", "raw-password", OrganizationUser.Role.MANAGER, OperatorId.of(100L));
+        final AuthenticationResponse loginResponse = port.login(new LoginRequest("s-soja", "raw-password"));
+        port.refresh(loginResponse.refreshToken());
+
+        refreshTokenRepository.find(loginResponse.refreshToken()).orElseThrow()
+                .setExpiryDate(LocalDateTime.now().minusSeconds(1));
+
+        assertThrows(AuthenticationErrorException.class, () -> port.refresh(loginResponse.refreshToken()));
     }
 
     @Test
@@ -305,6 +333,14 @@ class AuthenticationPortImplTest {
         @Override
         public void delete(final String refreshToken) {
             refreshTokens.remove(refreshToken);
+        }
+
+        @Override
+        public void expireAt(final String refreshToken, final LocalDateTime expiryDate) {
+            final RefreshToken token = refreshTokens.get(refreshToken);
+            if (token != null && token.getExpiryDate().isAfter(expiryDate)) {
+                token.setExpiryDate(expiryDate);
+            }
         }
 
         @Override
