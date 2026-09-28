@@ -12,28 +12,47 @@ import com.warehouse.auth.infrastructure.adapter.secondary.OperatorSessionReposi
 import com.warehouse.auth.infrastructure.adapter.secondary.OperatorSessionRevocationReadRepository;
 import com.warehouse.auth.infrastructure.adapter.secondary.OperatorStatusServiceAdapter;
 import com.warehouse.auth.infrastructure.adapter.secondary.RefreshTokenReadRepository;
+import com.warehouse.auth.infrastructure.adapter.secondary.cache.InMemoryOperatorAccessCache;
+import com.warehouse.auth.infrastructure.adapter.secondary.cache.OperatorAccessCache;
+import com.warehouse.auth.infrastructure.adapter.secondary.cache.RedisOperatorAccessCache;
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Clock;
 
 @Configuration
 public class OperatorAccessConfiguration {
 
+    @Bean("auth.inMemoryOperatorAccessCache")
+    @ConditionalOnProperty(name = "manager.redis.enabled", havingValue = "false", matchIfMissing = true)
+    public OperatorAccessCache inMemoryOperatorAccessCache() {
+        return new InMemoryOperatorAccessCache(Clock.systemUTC());
+    }
+
+    @Bean("auth.redisOperatorAccessCache")
+    @ConditionalOnProperty(name = "manager.redis.enabled", havingValue = "true")
+    public OperatorAccessCache redisOperatorAccessCache(final StringRedisTemplate stringRedisTemplate) {
+        return new RedisOperatorAccessCache(stringRedisTemplate);
+    }
+
     @Bean("auth.operatorSessionRepository")
     public OperatorSessionRepository operatorSessionRepository(
             final RefreshTokenReadRepository refreshTokenReadRepository,
-            final OperatorSessionRevocationReadRepository operatorSessionRevocationReadRepository) {
+            final OperatorSessionRevocationReadRepository operatorSessionRevocationReadRepository,
+            final OperatorAccessCache operatorAccessCache) {
         return new OperatorSessionRepositoryImpl(refreshTokenReadRepository, operatorSessionRevocationReadRepository,
-                Clock.systemUTC());
+                operatorAccessCache);
     }
 
     @Bean("auth.operatorStatusServicePort")
     public OperatorStatusServicePort operatorStatusServicePort(
-            final ObjectProvider<OperatorApiService> operatorApiService) {
-        return new OperatorStatusServiceAdapter(operatorApiService, Clock.systemUTC());
+            final ObjectProvider<OperatorApiService> operatorApiService,
+            final OperatorAccessCache operatorAccessCache) {
+        return new OperatorStatusServiceAdapter(operatorApiService, operatorAccessCache);
     }
 
     @Bean
