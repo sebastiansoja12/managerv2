@@ -15,6 +15,9 @@ import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToke
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -25,12 +28,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
 
+    private final Duration rotationGracePeriod;
+
     public AuthenticationServiceImpl(final RefreshTokenRepository refreshTokenRepository,
                                      final RefreshTokenGenerator refreshTokenGenerator,
-                                     final UserRepository userRepository) {
+                                     final UserRepository userRepository,
+                                     final Duration rotationGracePeriod) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.refreshTokenGenerator = refreshTokenGenerator;
         this.userRepository = userRepository;
+        this.rotationGracePeriod = rotationGracePeriod;
     }
 
     @Override
@@ -48,16 +55,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public LoginResponse refresh(final String refreshTokenValue) {
+        final LocalDateTime now = LocalDateTime.now();
         final RefreshToken currentRefreshToken = refreshTokenRepository.find(refreshTokenValue)
-                .filter(RefreshToken::isActual)
-                .filter(refreshToken -> refreshToken.getExpiryDate().isAfter(java.time.LocalDateTime.now()))
-                .orElseThrow(() -> new AuthenticationErrorException("Invalid or expired refresh token"));
+                .orElseThrow(() -> new AuthenticationErrorException("Unknown refresh token"));
+        if (!currentRefreshToken.isActual() || !currentRefreshToken.getExpiryDate().isAfter(now)) {
+            throw new AuthenticationErrorException("Expired refresh token");
+        }
         final OrganizationUser user = userRepository.findByUsername(currentRefreshToken.getUsername());
         if (user == null || Boolean.TRUE.equals(user.isDeleted())) {
-            throw new AuthenticationErrorException("Invalid or expired refresh token");
+            throw new AuthenticationErrorException("Refresh token owner is missing or deleted");
         }
 
-        refreshTokenRepository.delete(refreshTokenValue);
+        // Rotated token stays valid for a short grace period, so concurrent refreshes (several browser tabs,
+        // parallel terminal requests, a lost response) don't end the session.
+        refreshTokenRepository.expireAt(refreshTokenValue, now.plus(rotationGracePeriod));
         final RefreshToken rotatedRefreshToken = RefreshToken.builder()
                 .username(user.getUsername())
                 .expired(false)
