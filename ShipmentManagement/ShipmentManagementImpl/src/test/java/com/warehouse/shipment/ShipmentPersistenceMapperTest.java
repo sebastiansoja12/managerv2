@@ -76,13 +76,11 @@ class ShipmentPersistenceMapperTest {
 
     @Test
     void shouldPersistAndRehydrateNewShipmentDetails() {
-        final Shipment original = DataTestCreator.shipment();
         final Dimensions dimensions = new Dimensions(
                 new BigDecimal("40"), new BigDecimal("30"), new BigDecimal("20"), LengthUnit.CM);
         final Weight weight = new Weight(new BigDecimal("5.5"), WeightUnit.KG);
         final Money declaredValue = new Money(new BigDecimal("2500.00"), Currency.PLN);
-        original.changeShipmentDetails(dimensions, weight, new CustomerReference("ORDER-2026-12345"),
-                "Electronics", declaredValue);
+        final Shipment original = DataTestCreator.shipmentWithParcelDetails();
 
         final Shipment rehydrated = this.mapper.toDomain(this.mapper.toEntity(original));
 
@@ -96,12 +94,10 @@ class ShipmentPersistenceMapperTest {
 
     @Test
     void shouldCopyNewShipmentDetailsToReadModel() {
-        final Shipment original = DataTestCreator.shipment();
+        final Shipment original = DataTestCreator.shipmentWithParcelDetails();
         final Dimensions dimensions = new Dimensions(
                 new BigDecimal("40"), new BigDecimal("30"), new BigDecimal("20"), LengthUnit.CM);
         final Weight weight = new Weight(new BigDecimal("5.5"), WeightUnit.KG);
-        original.changeShipmentDetails(dimensions, weight, new CustomerReference("ORDER-2026-12345"),
-                "Electronics", new Money(new BigDecimal("2500.00"), Currency.PLN));
 
         final Shipment rehydrated = this.mapper.toDomain(this.mapper.toReadEntity(original.snapshot()));
 

@@ -185,10 +185,13 @@ public class ShipmentPortImpl implements ShipmentPort {
                 pickupMethod,
                 command.getDeliveryMethod(),
                 pickupMethod.isPickupPointBased() ? command.getPickupPointId() : null,
-                command.getDeliveryMethod().isPickupPointBased() ? command.getDeliveryPickupPointId() : null
+                command.getDeliveryMethod().isPickupPointBased() ? command.getDeliveryPickupPointId() : null,
+                command.getDimensions(),
+                command.getWeight(),
+                command.getCustomerReference(),
+                command.getContentDescription(),
+                command.getDeclaredValue()
         );
-        shipment.changeShipmentDetails(command.getDimensions(), command.getWeight(), command.getCustomerReference(),
-                command.getContentDescription(), command.getDeclaredValue());
 
         this.shipmentRepository.createOrUpdate(shipment);
         logCreatedShipment(shipment);
@@ -234,7 +237,9 @@ public class ShipmentPortImpl implements ShipmentPort {
                 shipmentPrice.getMoney(),
                 command.getDangerousGood(),
                 targetDepartmentId,
-                false
+                shipment.getSignatureRequired(),
+                command.getDimensions(), command.getWeight(), command.getCustomerReference(),
+                command.getContentDescription(), command.getDeclaredValue()
         );
 
         this.shipmentRepository.createOrUpdate(shipment);

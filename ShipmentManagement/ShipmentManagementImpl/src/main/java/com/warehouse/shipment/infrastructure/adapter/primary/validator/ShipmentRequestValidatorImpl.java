@@ -145,6 +145,41 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     @Override
     public void validateBody(final ShipmentUpdateRequestApi shipmentRequest) {
         validateRequestObj(shipmentRequest);
+        final List<String> errors = new ArrayList<>();
+
+        if (shipmentRequest.dimensions() == null) {
+            errors.add("Dimensions are required");
+        } else {
+            validatePositive(shipmentRequest.dimensions().length(), "Length", errors);
+            validatePositive(shipmentRequest.dimensions().width(), "Width", errors);
+            validatePositive(shipmentRequest.dimensions().height(), "Height", errors);
+            if (shipmentRequest.dimensions().unit() == null) {
+                errors.add("Dimensions unit is required");
+            }
+        }
+
+        if (shipmentRequest.weight() == null) {
+            errors.add("Weight is required");
+        } else {
+            validatePositive(shipmentRequest.weight().value(), "Weight", errors);
+            if (shipmentRequest.weight().unit() == null) {
+                errors.add("Weight unit is required");
+            }
+        }
+
+        if (shipmentRequest.customerReference() != null && StringUtils.isBlank(shipmentRequest.customerReference())) {
+            errors.add("Customer reference cannot be blank");
+        }
+        if (validateShipmentPrice(shipmentRequest.price())) {
+            errors.add("Invalid price");
+        }
+        if (shipmentRequest.declaredValue() != null && validateShipmentPrice(shipmentRequest.declaredValue())) {
+            errors.add("Invalid declared value");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ShipmentValidationException(errors, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override
