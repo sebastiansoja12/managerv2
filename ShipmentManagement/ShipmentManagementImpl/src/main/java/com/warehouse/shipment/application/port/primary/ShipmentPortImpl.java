@@ -117,8 +117,11 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(countryValidation.getFailure());
         }
 
+        final ShipmentMetrics shipmentMetrics = command.getDimensions() != null && command.getWeight() != null
+                ? ShipmentMetrics.from(command.getDimensions(), command.getWeight(), command.getDeclaredValue())
+                : ShipmentMetrics.from(command.getShipmentSize());
         final Result<Void, String> shipmentLimitationValidationResult = new ShipmentStateValidatorServiceImpl()
-                .validateShipmentLimitations(shipmentConfiguration, ShipmentMetrics.from(command.getShipmentSize()));
+                .validateShipmentLimitations(shipmentConfiguration, shipmentMetrics);
 
         if (shipmentLimitationValidationResult.isFailure()) {
             return Result.failure(ErrorCode.SHIPMENT_EXTENDED_LIMITATIONS);
@@ -142,9 +145,9 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
 
         final Money price = command.getPrice();
-        final Price shipmentPrice =
-                isPriceDefined(price) ? resolveShipmentPrice(command.getShipmentSize())
-                : new Price(price);
+        final Money shipmentPrice = isPriceDefined(price) && command.getShipmentSize() != null
+                ? resolveShipmentPrice(command.getShipmentSize()).getMoney()
+                : price;
 
         final DepartmentId targetDepartmentId = departmentServicePort.getDepartmentId(
                 voronoiResponse.getSuccess().getDepartmentCodeResult());
@@ -170,7 +173,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                 null,
                 issuerCountryCode,
                 receiverCountryCode,
-                shipmentPrice.getMoney(),
+                shipmentPrice,
                 false,
                 targetDepartmentId,
                 originDepartmentId,
@@ -184,6 +187,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                 pickupMethod.isPickupPointBased() ? command.getPickupPointId() : null,
                 command.getDeliveryMethod().isPickupPointBased() ? command.getDeliveryPickupPointId() : null
         );
+        shipment.changeShipmentDetails(command.getDimensions(), command.getWeight(), command.getCustomerReference(),
+                command.getContentDescription(), command.getDeclaredValue());
 
         this.shipmentRepository.createOrUpdate(shipment);
         logCreatedShipment(shipment);

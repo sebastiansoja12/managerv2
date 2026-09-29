@@ -52,6 +52,16 @@ public class ShipmentDto {
 
     private final LocalDateTime updatedAt;
 
+    private final DimensionsApi dimensions;
+
+    private final WeightApi weight;
+
+    private final String customerReference;
+
+    private final String contentDescription;
+
+    private final MoneyApi declaredValue;
+
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
                        final ShipmentSizeDto shipmentSize, final DepartmentCodeDto destination,
                        final DepartmentId originDepartmentId, final PickupPointId pickupPointId,
@@ -62,7 +72,10 @@ public class ShipmentDto {
                        final TrackingNumberDto trackingNumber,
                        final MoneyApi price, final Boolean locked,
                        final SignatureDto signature, final DangerousGoodApi dangerousGood,
-                       final LocalDateTime createdAt, final LocalDateTime updatedAt) {
+                       final LocalDateTime createdAt, final LocalDateTime updatedAt,
+                       final DimensionsApi dimensions, final WeightApi weight,
+                       final String customerReference, final String contentDescription,
+                       final MoneyApi declaredValue) {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -84,6 +97,11 @@ public class ShipmentDto {
         this.dangerousGood = dangerousGood;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.dimensions = dimensions;
+        this.weight = weight;
+        this.customerReference = customerReference;
+        this.contentDescription = contentDescription;
+        this.declaredValue = declaredValue;
     }
 
     public ShipmentIdDto getShipmentId() {
@@ -180,5 +198,25 @@ public class ShipmentDto {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public DimensionsApi getDimensions() {
+        return dimensions;
+    }
+
+    public WeightApi getWeight() {
+        return weight;
+    }
+
+    public String getCustomerReference() {
+        return customerReference;
+    }
+
+    public String getContentDescription() {
+        return contentDescription;
+    }
+
+    public MoneyApi getDeclaredValue() {
+        return declaredValue;
     }
 }

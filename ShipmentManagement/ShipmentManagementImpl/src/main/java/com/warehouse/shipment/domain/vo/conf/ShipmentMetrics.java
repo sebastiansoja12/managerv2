@@ -1,7 +1,12 @@
 package com.warehouse.shipment.domain.vo.conf;
 
 import com.warehouse.commonassets.enumeration.ShipmentSize;
+import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.helper.Result;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.LengthUnit;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
 
 public record ShipmentMetrics(double maxWeight,
                               double minWeight,
@@ -18,6 +23,28 @@ public record ShipmentMetrics(double maxWeight,
             case AVERAGE -> new ShipmentMetrics(80.0, 1.0, 80.0, 80.0, 80.0, 4);
             case BIG -> new ShipmentMetrics(100, 50, 100, 100, 100, 5);
             case CUSTOM, TEST -> throw new UnsupportedOperationException("Not supported");
+        };
+    }
+
+    public static ShipmentMetrics from(final Dimensions dimensions, final Weight weight,
+                                       final Money declaredValue) {
+        final double lengthCm = toCentimeters(dimensions.length().doubleValue(), dimensions.unit());
+        final double widthCm = toCentimeters(dimensions.width().doubleValue(), dimensions.unit());
+        final double heightCm = toCentimeters(dimensions.height().doubleValue(), dimensions.unit());
+        final double weightKg = weight.unit() == WeightUnit.G
+                ? weight.value().doubleValue() / 1000.0
+                : weight.value().doubleValue();
+        final double declaredAmount = declaredValue == null || declaredValue.getAmount() == null
+                ? 0.0
+                : declaredValue.getAmount().doubleValue();
+        return new ShipmentMetrics(weightKg, weightKg, lengthCm, widthCm, heightCm, declaredAmount);
+    }
+
+    private static double toCentimeters(final double value, final LengthUnit unit) {
+        return switch (unit) {
+            case MM -> value / 10.0;
+            case CM -> value;
+            case M -> value * 100.0;
         };
     }
 

@@ -86,7 +86,7 @@ public class ShipmentEntity extends BelongsToOperator {
     @Column(name = "recipient_postal_code", nullable = false)
     private String recipientPostalCode;
 
-    @Column(name = "parcel_size", nullable = false)
+    @Column(name = "parcel_size")
     @Enumerated(EnumType.STRING)
     private ShipmentSize shipmentSize;
 
