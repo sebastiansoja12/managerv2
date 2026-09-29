@@ -44,8 +44,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final PathFinderServicePort pathFinderServicePort;
 
-    private final PriceService priceService;
-
     private final DepartmentCountryAvailabilityService departmentCountryAvailabilityService;
 
     private final SignatureService signatureService;
@@ -71,7 +69,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 	public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
-                            final PriceService priceService,
                             final DepartmentCountryAvailabilityService departmentCountryAvailabilityService,
                             final SignatureService signatureService,
                             final ShipmentResultFactory shipmentResultFactory,
@@ -86,7 +83,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.shipmentRepository = shipmentRepository;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
-        this.priceService = priceService;
         this.departmentCountryAvailabilityService = departmentCountryAvailabilityService;
         this.signatureService = signatureService;
         this.shipmentResultFactory = shipmentResultFactory;
@@ -117,9 +113,8 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(countryValidation.getFailure());
         }
 
-        final ShipmentMetrics shipmentMetrics = command.getDimensions() != null && command.getWeight() != null
-                ? ShipmentMetrics.from(command.getDimensions(), command.getWeight(), command.getDeclaredValue())
-                : ShipmentMetrics.from(command.getShipmentSize());
+        final ShipmentMetrics shipmentMetrics = ShipmentMetrics.from(
+                command.getDimensions(), command.getWeight(), command.getDeclaredValue());
         final Result<Void, String> shipmentLimitationValidationResult = new ShipmentStateValidatorServiceImpl()
                 .validateShipmentLimitations(shipmentConfiguration, shipmentMetrics);
 
@@ -144,10 +139,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(voronoiResponse.getFailure());
         }
 
-        final Money price = command.getPrice();
-        final Money shipmentPrice = isPriceDefined(price) && command.getShipmentSize() != null
-                ? resolveShipmentPrice(command.getShipmentSize()).getMoney()
-                : price;
+        final Money shipmentPrice = command.getPrice();
 
         final DepartmentId targetDepartmentId = departmentServicePort.getDepartmentId(
                 voronoiResponse.getSuccess().getDepartmentCodeResult());
@@ -169,7 +161,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                 shipmentId,
                 sender,
                 recipient,
-                command.getShipmentSize(),
                 null,
                 issuerCountryCode,
                 receiverCountryCode,
@@ -224,17 +215,14 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final DepartmentId targetDepartmentId = resolveTargetDepartmentId(command, shipment, configuration);
 
-        final Money price = command.getPrice();
-        final Price shipmentPrice = isPriceDefined(price) ?
-                resolveShipmentPrice(command.getShipmentSize()) : new Price(price);
+        final Money shipmentPrice = command.getPrice();
 
         shipment.update(
                 command.getSender(),
                 command.getRecipient(),
                 command.getShipmentStatus(),
                 command.getShipmentPriority(),
-                command.getShipmentSize(),
-                shipmentPrice.getMoney(),
+                shipmentPrice,
                 command.getDangerousGood(),
                 targetDepartmentId,
                 shipment.getSignatureRequired(),
@@ -246,10 +234,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.domainEventPublisher.publish(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
 
         return Result.success();
-    }
-
-    private boolean isPriceDefined(final Money price) {
-        return price == null || !price.isDefined();
     }
 
     private Result<Void, ErrorCode> validateCountries(
@@ -264,10 +248,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
 
         return Result.success();
-    }
-
-    private Price resolveShipmentPrice(final ShipmentSize shipmentSize) {
-        return this.priceService.determineShipmentPrice(shipmentSize, Currency.PLN);
     }
 
     @Override
@@ -368,7 +348,7 @@ public class ShipmentPortImpl implements ShipmentPort {
             final TrackingNumber trackingNumber = this.trackingNumberGenerationService.generate(
                     shipmentConfiguration.trackingNumberRule(), shipmentId);
 			final Shipment newShipment = Shipment.parentShipment(shipmentId, shipment.getSender(),
-					shipment.getRecipient(), shipment.getShipmentSize(), shipment.getShipmentId(),
+					shipment.getRecipient(), shipment.getShipmentId(),
 					shipment.getOriginCountry(), shipment.getDestinationCountry(), shipment.getPrice(),
 					shipment.getTargetDepartmentId(), shipment.getOriginDepartmentId(),
                     shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber,

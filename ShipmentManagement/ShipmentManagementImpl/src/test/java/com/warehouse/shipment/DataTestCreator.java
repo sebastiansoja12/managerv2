@@ -53,7 +53,6 @@ public class DataTestCreator {
     static Parcel createParcel() {
         return Parcel.builder()
                 .recipient(recipient())
-                .shipmentSize(ShipmentSize.TEST)
                 .sender(sender())
                 .shipmentStatus(ShipmentStatus.CREATED)
                 .build();
@@ -84,7 +83,6 @@ public class DataTestCreator {
                 shipmentId(),
                 sender(),
                 recipient(),
-                ShipmentSize.SMALL,
                 relatedShipmentId,
                 CountryCode.PL,
                 CountryCode.DE,
@@ -101,7 +99,7 @@ public class DataTestCreator {
 
     static Shipment shipmentWithParcelDetails() {
         return new Shipment(
-                shipmentId(), sender(), recipient(), ShipmentSize.SMALL, null,
+                shipmentId(), sender(), recipient(), null,
                 CountryCode.PL, CountryCode.DE, money(), false,
                 new DepartmentId(10L), new DepartmentId(9L), null,
                 ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,

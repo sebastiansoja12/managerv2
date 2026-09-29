@@ -26,7 +26,11 @@ import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.LengthUnit;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.conf.ShipmentLimits;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
@@ -84,9 +88,6 @@ class ShipmentPortImplTest {
     private DepartmentCountryAvailabilityService departmentCountryAvailabilityService;
 
     @Mock
-    private PriceService priceService;
-
-    @Mock
     private SignatureService signatureService;
 
     @Mock
@@ -119,7 +120,7 @@ class ShipmentPortImplTest {
 		final ShipmentResultFactory shipmentResultFactory = new ShipmentResultFactory(
 				departmentServicePort, routeLogService, returningServicePort);
 		shipmentPort = new ShipmentPortImpl(shipmentRepository,
-				this.logger, pathFinderServicePort, this.priceService, this.departmentCountryAvailabilityService,
+				this.logger, pathFinderServicePort, this.departmentCountryAvailabilityService,
 				this.signatureService, shipmentResultFactory, mailNotificationServicePort,
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 operatorContextProvider, shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
@@ -734,16 +735,19 @@ class ShipmentPortImplTest {
     }
 
     private ShipmentCreateCommand shipmentCreateCommand() {
-        return new ShipmentCreateCommand(
+        final ShipmentCreateCommand command = new ShipmentCreateCommand(
                 null,
                 DataTestCreator.money(),
                 recipient(),
                 sender(),
-                ShipmentSize.SMALL,
                 CountryCode.PL,
                 CountryCode.DE,
                 ShipmentPriority.MEDIUM
         );
+        command.setDimensions(new Dimensions(new java.math.BigDecimal("20"), new java.math.BigDecimal("20"),
+                new java.math.BigDecimal("20"), LengthUnit.CM));
+        command.setWeight(new Weight(new java.math.BigDecimal("5"), WeightUnit.KG));
+        return command;
     }
 
     private Shipment plannedShipment() {
@@ -751,7 +755,6 @@ class ShipmentPortImplTest {
                 shipmentId(),
                 sender(),
                 recipient(),
-                ShipmentSize.SMALL,
                 null,
                 CountryCode.PL,
                 CountryCode.DE,

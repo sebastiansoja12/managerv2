@@ -101,7 +101,6 @@ public class ShipmentConfiguration {
 	@Bean
 	public ShipmentPort shipmentPort(final ShipmentRepository shipmentRepository,
 									 final PathFinderServicePort pathFinderServicePort,
-									 final PriceService priceService,
 									 final DepartmentCountryAvailabilityService departmentCountryAvailabilityService,
 									 final SignatureService signatureService,
 									 final ShipmentResultFactory shipmentResultFactory,
@@ -114,7 +113,7 @@ public class ShipmentConfiguration {
                                      final DomainEventPublisher domainEventPublisher,
                                      final DepartmentServicePort departmentServicePort) {
 		return new ShipmentPortImpl(shipmentRepository,
-				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort, priceService,
+				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				departmentCountryAvailabilityService, signatureService, shipmentResultFactory,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,

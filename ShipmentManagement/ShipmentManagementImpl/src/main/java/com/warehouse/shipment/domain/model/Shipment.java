@@ -23,8 +23,6 @@ public class Shipment {
 
     private Recipient recipient;
 
-    private ShipmentSize shipmentSize;
-
     private DepartmentId destinationDepartmentId;
 
     private DepartmentId originDepartmentId;
@@ -86,7 +84,6 @@ public class Shipment {
     private Shipment(final ShipmentId shipmentId,
                     final Sender sender,
                     final Recipient recipient,
-                    final ShipmentSize shipmentSize,
                     final ShipmentStatus shipmentStatus,
                     final ShipmentType shipmentType,
                     final ShipmentId shipmentRelatedId,
@@ -111,7 +108,6 @@ public class Shipment {
         this.shipmentId = shipmentId;
 		this.sender = sender;
 		this.recipient = recipient;
-		this.shipmentSize = shipmentSize;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
 		this.shipmentType = shipmentType;
@@ -138,7 +134,6 @@ public class Shipment {
     public Shipment(final ShipmentId shipmentId,
                     final Sender sender,
                     final Recipient recipient,
-                    final ShipmentSize shipmentSize,
                     final ShipmentId shipmentRelatedId,
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
@@ -149,7 +144,7 @@ public class Shipment {
                     final ShipmentPriority shipmentPriority,
                     final TrackingNumber trackingNumber,
                     final ShipmentStatus status) {
-        this(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
+        this(shipmentId, sender, recipient, shipmentRelatedId, originCountry, destinationCountry,
                 price, locked, targetDepartmentId, null, signature, shipmentPriority,
                 trackingNumber, status);
     }
@@ -157,7 +152,6 @@ public class Shipment {
     public Shipment(final ShipmentId shipmentId,
                     final Sender sender,
                     final Recipient recipient,
-                    final ShipmentSize shipmentSize,
                     final ShipmentId shipmentRelatedId,
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
@@ -172,7 +166,6 @@ public class Shipment {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
-        this.shipmentSize = shipmentSize;
         this.shipmentStatus = status;
         this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentType = shipmentRelatedId != null ? ShipmentType.CHILD : ShipmentType.PARENT;
@@ -196,7 +189,6 @@ public class Shipment {
     public Shipment(final ShipmentId shipmentId,
                     final Sender sender,
                     final Recipient recipient,
-                    final ShipmentSize shipmentSize,
                     final ShipmentId shipmentRelatedId,
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
@@ -209,7 +201,7 @@ public class Shipment {
                     final TrackingNumber trackingNumber,
                     final ShipmentStatus status,
                     final DangerousGood dangerousGood) {
-        this(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
+        this(shipmentId, sender, recipient, shipmentRelatedId, originCountry, destinationCountry,
                 price, locked, targetDepartmentId, originDepartmentId, signature, shipmentPriority,
                 trackingNumber, status, dangerousGood, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null);
     }
@@ -217,7 +209,6 @@ public class Shipment {
     public Shipment(final ShipmentId shipmentId,
                     final Sender sender,
                     final Recipient recipient,
-                    final ShipmentSize shipmentSize,
                     final ShipmentId shipmentRelatedId,
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
@@ -233,7 +224,7 @@ public class Shipment {
                     final PickupMethod pickupMethod,
                     final DeliveryMethod deliveryMethod,
                     final PickupPointId pickupPointId) {
-        this(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
+        this(shipmentId, sender, recipient, shipmentRelatedId, originCountry, destinationCountry,
                 price, locked, targetDepartmentId, originDepartmentId, signature, shipmentPriority,
                 trackingNumber, status, dangerousGood, pickupMethod, deliveryMethod, pickupPointId, null,
                 null, null, null, null, null);
@@ -242,7 +233,6 @@ public class Shipment {
     public Shipment(final ShipmentId shipmentId,
                     final Sender sender,
                     final Recipient recipient,
-                    final ShipmentSize shipmentSize,
                     final ShipmentId shipmentRelatedId,
                     final CountryCode originCountry,
                     final CountryCode destinationCountry,
@@ -267,7 +257,6 @@ public class Shipment {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
-        this.shipmentSize = shipmentSize;
         this.shipmentStatus = status;
         this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentType = shipmentRelatedId != null ? ShipmentType.CHILD : ShipmentType.PARENT;
@@ -299,7 +288,6 @@ public class Shipment {
     public static Shipment parentShipment(final ShipmentId shipmentId,
                                           final Sender sender,
                                           final Recipient recipient,
-                                          final ShipmentSize shipmentSize,
                                           final ShipmentId shipmentRelatedId,
                                           final CountryCode originCountry,
                                           final CountryCode destinationCountry,
@@ -310,7 +298,7 @@ public class Shipment {
                                           final ShipmentPriority shipmentPriority,
                                           final TrackingNumber trackingNumber,
                                           final ShipmentStatus status) {
-        return new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentRelatedId, originCountry, destinationCountry,
+        return new Shipment(shipmentId, sender, recipient, shipmentRelatedId, originCountry, destinationCountry,
                 price, false, targetDepartmentId, originDepartmentId, signature,
                 shipmentPriority, trackingNumber, status);
 	}
@@ -318,7 +306,6 @@ public class Shipment {
     public static Shipment rehydrate(final ShipmentId shipmentId,
                                      final Sender sender,
                                      final Recipient recipient,
-                                     final ShipmentSize shipmentSize,
                                      final ShipmentStatus shipmentStatus,
                                      final ShipmentType shipmentType,
                                      final ShipmentId shipmentRelatedId,
@@ -348,7 +335,7 @@ public class Shipment {
                                      final CustomerReference customerReference,
                                      final String contentDescription,
                                      final Money declaredValue) {
-        final Shipment shipment = new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentStatus, shipmentType,
+        final Shipment shipment = new Shipment(shipmentId, sender, recipient, shipmentStatus, shipmentType,
                 shipmentRelatedId, price, createdAt, updatedAt, locked, originCountry, destinationCountry,
                 targetDepartmentId, originDepartmentId, signature, signatureRequired,
                 shipmentPriority, dangerousGood,
@@ -366,7 +353,7 @@ public class Shipment {
     }
 
 	public ShipmentSnapshot snapshot() {
-		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destinationDepartmentId, originDepartmentId, shipmentStatus,
+		return new ShipmentSnapshot(shipmentId, sender, recipient, destinationDepartmentId, originDepartmentId, shipmentStatus,
                 shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
                 shipmentPriority, originCountry, destinationCountry, signature,
                 trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
@@ -380,10 +367,6 @@ public class Shipment {
 
     public Recipient getRecipient() {
         return recipient;
-    }
-
-    public ShipmentSize getShipmentSize() {
-        return shipmentSize;
     }
 
     public DepartmentId getTargetDepartmentId() {
@@ -570,12 +553,6 @@ public class Shipment {
         markAsModified();
     }
 
-    public void changeShipmentSize(final ShipmentSize shipmentSize) {
-        ensureCanBeModified();
-        this.shipmentSize = shipmentSize;
-        markAsModified();
-    }
-
     public void changePrice(final Money price) {
         ensureCanBeModified();
         this.price = price;
@@ -600,7 +577,7 @@ public class Shipment {
     }
 
     public void update(final Sender sender, final Recipient recipient, final ShipmentStatus shipmentStatus,
-                       final ShipmentPriority shipmentPriority, final ShipmentSize shipmentSize,
+                       final ShipmentPriority shipmentPriority,
                        final Money price, final DangerousGood dangerousGood,
                        final DepartmentId targetDepartmentId, final Boolean signatureRequired,
                        final Dimensions dimensions, final Weight weight,
@@ -611,7 +588,6 @@ public class Shipment {
         this.sender = sender;
         this.shipmentStatus = shipmentStatus;
         this.shipmentPriority = shipmentPriority;
-        this.shipmentSize = shipmentSize;
         this.price = price;
         this.dangerousGood = dangerousGood;
         this.destinationDepartmentId = targetDepartmentId;

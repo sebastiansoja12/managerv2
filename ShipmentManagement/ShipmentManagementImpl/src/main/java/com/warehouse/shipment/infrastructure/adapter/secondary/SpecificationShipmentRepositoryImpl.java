@@ -43,9 +43,6 @@ public class SpecificationShipmentRepositoryImpl
             shipmentCriteria.in("shipmentStatus", criteria.shipmentStatuses());
         }
 
-        if (hasElements(criteria.shipmentSizes())) {
-            shipmentCriteria.in("shipmentSize", criteria.shipmentSizes());
-        }
 
         if (hasElements(criteria.shipmentPriorities())) {
             shipmentCriteria.in("shipmentPriority", criteria.shipmentPriorities());

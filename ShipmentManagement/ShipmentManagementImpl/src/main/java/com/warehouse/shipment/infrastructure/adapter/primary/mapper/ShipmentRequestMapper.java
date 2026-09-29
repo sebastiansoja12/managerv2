@@ -8,7 +8,6 @@ import org.mapstruct.ReportingPolicy;
 import com.warehouse.commonassets.enumeration.Currency;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ShipmentPriority;
-import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
@@ -133,7 +132,7 @@ public interface ShipmentRequestMapper {
     default ShipmentSearchCriteria map(final ShipmentSearchRequestApi request) {
         if (request == null) {
             return new ShipmentSearchCriteria(
-                    null, null, List.of(), List.of(), List.of(), null, null, null,
+                    null, null, List.of(), List.of(), null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null, null
             );
         }
@@ -142,7 +141,6 @@ public interface ShipmentRequestMapper {
                 request.shipmentId(),
                 request.trackingNumber(),
                 mapStatuses(request.shipmentStatuses()),
-                mapSizes(request.shipmentSizes()),
                 mapPriorities(request.shipmentPriorities()),
                 request.senderName(),
                 request.recipientName(),
@@ -166,12 +164,6 @@ public interface ShipmentRequestMapper {
     private List<ShipmentStatus> mapStatuses(final List<ShipmentStatusDto> statuses) {
         return statuses == null ? List.of() : statuses.stream()
                 .map(status -> ShipmentStatus.valueOf(status.name()))
-                .toList();
-    }
-
-    private List<ShipmentSize> mapSizes(final List<ShipmentSizeDto> sizes) {
-        return sizes == null ? List.of() : sizes.stream()
-                .map(size -> ShipmentSize.valueOf(size.name()))
                 .toList();
     }
 

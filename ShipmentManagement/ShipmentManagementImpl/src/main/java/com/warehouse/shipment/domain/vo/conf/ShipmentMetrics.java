@@ -1,6 +1,5 @@
 package com.warehouse.shipment.domain.vo.conf;
 
-import com.warehouse.commonassets.enumeration.ShipmentSize;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.vo.Dimensions;
@@ -14,17 +13,6 @@ public record ShipmentMetrics(double maxWeight,
                               double maxWidth,
                               double maxHeight,
                               double maxShipmentValue) {
-
-    public static ShipmentMetrics from(final ShipmentSize shipmentSize) {
-        return switch (shipmentSize) {
-            case SMALL -> new ShipmentMetrics(20.0, 1.0, 20.0, 20.0, 20.0, 1.0);
-            case TINY -> new ShipmentMetrics(40.0, 1.0, 40.0, 40.0, 40.0, 2);
-            case MEDIUM -> new ShipmentMetrics(60.0, 1.0, 60.0, 60.0, 60.0, 3);
-            case AVERAGE -> new ShipmentMetrics(80.0, 1.0, 80.0, 80.0, 80.0, 4);
-            case BIG -> new ShipmentMetrics(100, 50, 100, 100, 100, 5);
-            case CUSTOM, TEST -> throw new UnsupportedOperationException("Not supported");
-        };
-    }
 
     public static ShipmentMetrics from(final Dimensions dimensions, final Weight weight,
                                        final Money declaredValue) {

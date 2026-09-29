@@ -20,7 +20,6 @@ import com.warehouse.shipment.domain.enumeration.PickupMethod;
 public record ShipmentSnapshot(ShipmentId shipmentId,
                                Sender sender,
                                Recipient recipient,
-                               ShipmentSize shipmentSize,
                                DepartmentId destinationDepartmentId,
                                DepartmentId originDepartmentId,
                                ShipmentStatus shipmentStatus,

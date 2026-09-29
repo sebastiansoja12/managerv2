@@ -12,7 +12,6 @@ public record ShipmentEventData(
         ShipmentId shipmentId,
         SenderSnapshot sender,
         RecipientSnapshot recipient,
-        ShipmentSize shipmentSize,
         DepartmentId targetDepartmentId,
         DepartmentId originDepartmentId,
         ShipmentStatus shipmentStatus,
