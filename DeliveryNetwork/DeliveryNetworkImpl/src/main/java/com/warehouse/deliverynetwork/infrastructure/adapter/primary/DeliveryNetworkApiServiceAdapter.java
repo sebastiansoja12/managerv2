@@ -1,10 +1,12 @@
 package com.warehouse.deliverynetwork.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.deliverynetwork.api.DeliveryNetworkApiService;
 import com.warehouse.deliverynetwork.api.dto.DepartmentIdDto;
 import com.warehouse.deliverynetwork.api.dto.DeliveryNetworkDto;
 import com.warehouse.deliverynetwork.api.dto.DeliveryPathDto;
+import com.warehouse.deliverynetwork.api.dto.ShipmentDeliveryRouteDto;
 import com.warehouse.deliverynetwork.application.port.primary.DeliveryNetworkPort;
 import com.warehouse.deliverynetwork.infrastructure.adapter.primary.mapper.DeliveryNetworkApiMapper;
 
@@ -43,5 +45,10 @@ public class DeliveryNetworkApiServiceAdapter implements DeliveryNetworkApiServi
         final DepartmentId targetDepartment = this.deliveryNetworkApiMapper.toModel(targetDepartmentId);
         return this.deliveryNetworkApiMapper.toDto(
                 this.deliveryNetworkPort.findDeliveryPath(sourceDepartment, targetDepartment));
+    }
+
+    @Override
+    public ShipmentDeliveryRouteDto findShipmentDeliveryRoute(final TrackingNumber trackingNumber) {
+        return this.deliveryNetworkApiMapper.toDto(this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber));
     }
 }
