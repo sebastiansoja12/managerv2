@@ -19,9 +19,7 @@ import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
 import com.warehouse.shipment.application.port.primary.command.ShipmentUpdateCommand;
 import com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
-import com.warehouse.shipment.domain.vo.Person;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;
 import com.warehouse.shipment.domain.vo.Weight;
@@ -100,16 +98,7 @@ public interface ShipmentRequestMapper {
 
     ShipmentUpdateType map(final ShipmentUpdateTypeApi shipmentUpdateType);
     
-    Sender mapToSender(final PersonApi person);
-
-    Recipient mapToRecipient(final PersonApi person);
-
-    default Person map(final PersonApi person, final PersonType personType) {
-        return switch (personType) {
-            case SENDER -> mapToSender(person);
-            case RECIPIENT -> mapToRecipient(person);
-        };
-    }
+    Party mapToParty(final PersonApi person);
 
     default ShipmentStatusRequest map(final ShipmentStatusRequestApi shipmentStatusRequest) {
         return new ShipmentStatusRequest(

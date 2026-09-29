@@ -10,8 +10,7 @@ import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.ShipmentUpdate;
 import com.warehouse.shipment.domain.model.Signature;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentCountryRequest;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.domain.vo.CustomerReference;
@@ -43,7 +42,7 @@ class ShipmentTest {
 
         final Shipment shipment = new Shipment(
                 shipmentId(), sender(), recipient(), null,
-                CountryCode.PL, CountryCode.DE, money(), false,
+                money(), false,
                 new DepartmentId(10L), new DepartmentId(9L), null,
                 ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
                 null, PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,
@@ -268,8 +267,8 @@ class ShipmentTest {
     @Test
     void shouldRedirectShipmentToSenderAsNewParentShipment() {
         final Shipment shipment = shipment(null);
-        final Sender originalSender = shipment.getSender();
-        final Recipient originalRecipient = shipment.getRecipient();
+        final Party originalSender = shipment.getSender();
+        final Party originalRecipient = shipment.getRecipient();
         final ShipmentId redirectedShipmentId = new ShipmentId(10L);
         final TrackingNumber redirectedTrackingNumber = new TrackingNumber("REDIRECTED-TRACKING-NUMBER");
         final ExternalId<UUID> externalId = new ExternalId<>(UUID.fromString(""));
@@ -366,7 +365,7 @@ class ShipmentTest {
     @Test
     void shouldChangeSender() {
         final Shipment shipment = shipment(null);
-        final Sender newSender = Sender.builder().firstName("new sender").build();
+        final Party newSender = Party.builder().firstName("new sender").build();
 
         shipment.changeSender(newSender);
 
@@ -376,7 +375,7 @@ class ShipmentTest {
     @Test
     void shouldChangeRecipient() {
         final Shipment shipment = shipment(null);
-        final Recipient newRecipient = Recipient.builder().firstName("new recipient").build();
+        final Party newRecipient = Party.builder().firstName("new recipient").build();
 
         shipment.changeRecipient(newRecipient);
 
@@ -420,8 +419,8 @@ class ShipmentTest {
     @Test
     void shouldUpdateSenderAndRecipientFromShipmentUpdate() {
         final Shipment shipment = shipment(null);
-        final Sender newSender = Sender.builder().firstName("updated sender").build();
-        final Recipient newRecipient = Recipient.builder().firstName("updated recipient").build();
+        final Party newSender = Party.builder().firstName("updated sender").build();
+        final Party newRecipient = Party.builder().firstName("updated recipient").build();
 
         shipment.update(new ShipmentUpdate(newSender, newRecipient, "token"));
 
@@ -434,8 +433,8 @@ class ShipmentTest {
     @Test
     void shouldUpdateAllEditableShipmentData() {
         final Shipment shipment = shipment(null);
-        final Sender newSender = Sender.builder().firstName("updated sender").build();
-        final Recipient newRecipient = Recipient.builder().firstName("updated recipient").build();
+        final Party newSender = Party.builder().firstName("updated sender").build();
+        final Party newRecipient = Party.builder().firstName("updated recipient").build();
         final Money newPrice = new Money(BigDecimal.valueOf(99), Currency.GBP);
         final DepartmentId newDestination = new DepartmentId(11L);
         final Dimensions newDimensions = new Dimensions(
@@ -625,8 +624,8 @@ class ShipmentTest {
         shipment.updateCountries(new ShipmentCountryRequest(shipment.getShipmentId(), CountryCode.FR, CountryCode.CZ));
 
         assertAll(
-                () -> assertEquals(CountryCode.FR, shipment.getOriginCountry()),
-                () -> assertEquals(CountryCode.CZ, shipment.getDestinationCountry())
+                () -> assertEquals(CountryCode.FR, shipment.getSender().getAddress().getCountryCode()),
+                () -> assertEquals(CountryCode.CZ, shipment.getRecipient().getAddress().getCountryCode())
         );
     }
 
@@ -670,8 +669,6 @@ class ShipmentTest {
                 sender(),
                 recipient(),
                 relatedShipmentId,
-                CountryCode.PL,
-                CountryCode.DE,
                 money(),
                 false,
                 new DepartmentId(10L),

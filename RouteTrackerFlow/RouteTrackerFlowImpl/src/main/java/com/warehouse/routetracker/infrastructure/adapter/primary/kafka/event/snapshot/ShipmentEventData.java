@@ -10,8 +10,8 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ShipmentEventData(
         ShipmentId shipmentId,
-        SenderSnapshot sender,
-        RecipientSnapshot recipient,
+        PartySnapshot sender,
+        PartySnapshot recipient,
         DepartmentId targetDepartmentId,
         DepartmentId originDepartmentId,
         ShipmentStatus shipmentStatus,
@@ -24,8 +24,6 @@ public record ShipmentEventData(
         DangerousGoodSnapshot dangerousGood,
         Boolean signatureRequired,
         ShipmentPriority shipmentPriority,
-        CountryCode originCountry,
-        CountryCode destinationCountry,
         SignatureSnapshot signature,
         TrackingNumber trackingNumber,
         PickupMethod pickupMethod,

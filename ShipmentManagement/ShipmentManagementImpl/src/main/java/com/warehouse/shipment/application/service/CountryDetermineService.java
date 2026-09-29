@@ -5,11 +5,10 @@ import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.vo.CountryDetermine;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Party;
 
 public interface CountryDetermineService {
-    Result<CountryDetermine, ErrorCode> determineCountry(final Sender sender, final Recipient recipient);
+    Result<CountryDetermine, ErrorCode> determineCountry(final Party sender, final Party recipient);
 
     Country determineCountryByCode(final CountryCode issuerCountryCode);
 }

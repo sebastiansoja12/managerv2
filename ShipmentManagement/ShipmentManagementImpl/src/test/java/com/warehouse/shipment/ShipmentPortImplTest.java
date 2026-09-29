@@ -150,8 +150,8 @@ class ShipmentPortImplTest {
         assertEquals(trackingNumber.value(), response.getSuccess().trackingNumber());
         verify(this.shipmentRepository).createOrUpdate(shipmentCaptor.capture());
         assertEquals(new DepartmentId(12L), shipmentCaptor.getValue().getTargetDepartmentId());
-        assertEquals(CountryCode.PL, shipmentCaptor.getValue().getOriginCountry());
-        assertEquals(CountryCode.DE, shipmentCaptor.getValue().getDestinationCountry());
+        assertEquals(CountryCode.PL, shipmentCaptor.getValue().getSender().getAddress().getCountryCode());
+        assertEquals(CountryCode.DE, shipmentCaptor.getValue().getRecipient().getAddress().getCountryCode());
         verify(this.domainEventPublisher).publish(any(ShipmentCreated.class));
     }
 
@@ -561,8 +561,8 @@ class ShipmentPortImplTest {
     @Test
     void shouldChangeSenderAndPublishEvent() {
         final Shipment shipment = shipment();
-        final com.warehouse.shipment.domain.vo.Sender newSender =
-                com.warehouse.shipment.domain.vo.Sender.builder().firstName("Anna").build();
+        final com.warehouse.shipment.domain.vo.Party newSender =
+                com.warehouse.shipment.domain.vo.Party.builder().firstName("Anna").build();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
         this.shipmentPort.changeSenderTo(shipmentId(), newSender);
@@ -576,7 +576,7 @@ class ShipmentPortImplTest {
     @Test
     void shouldChangeRecipientWithoutReroutingWhenCityIsUnchanged() {
         final Shipment shipment = shipment();
-        final com.warehouse.shipment.domain.vo.Recipient newRecipient = recipient();
+        final com.warehouse.shipment.domain.vo.Party newRecipient = recipient();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
 
         this.shipmentPort.changeRecipientTo(shipmentId(), newRecipient);
@@ -590,8 +590,8 @@ class ShipmentPortImplTest {
     void shouldRerouteShipmentWhenRecipientCityChanges() {
         final Shipment shipment = shipment();
         final DepartmentCode newDestination = new DepartmentCode("PO2");
-        final com.warehouse.shipment.domain.vo.Recipient newRecipient =
-                com.warehouse.shipment.domain.vo.Recipient.builder().firstName("Jan").city("Poznan").build();
+        final com.warehouse.shipment.domain.vo.Party newRecipient =
+                com.warehouse.shipment.domain.vo.Party.builder().firstName("Jan").city("Poznan").build();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
         when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
                 .thenReturn(Result.success(new VoronoiResponse(newDestination)));
@@ -608,8 +608,8 @@ class ShipmentPortImplTest {
     void shouldKeepCurrentDestinationWhenRecipientReroutingFails() {
         final Shipment shipment = shipment();
         final DepartmentId previousDestination = shipment.getTargetDepartmentId();
-        final com.warehouse.shipment.domain.vo.Recipient newRecipient =
-                com.warehouse.shipment.domain.vo.Recipient.builder().firstName("Jan").city("Poznan").build();
+        final com.warehouse.shipment.domain.vo.Party newRecipient =
+                com.warehouse.shipment.domain.vo.Party.builder().firstName("Jan").city("Poznan").build();
         when(this.shipmentRepository.findById(shipmentId())).thenReturn(shipment);
         when(this.pathFinderServicePort.determineDeliveryDepartment(any()))
                 .thenReturn(Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE));
@@ -756,8 +756,6 @@ class ShipmentPortImplTest {
                 sender(),
                 recipient(),
                 null,
-                CountryCode.PL,
-                CountryCode.DE,
                 DataTestCreator.money(),
                 false,
                 new DepartmentId(10L),

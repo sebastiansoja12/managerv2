@@ -1,18 +1,17 @@
 package com.warehouse.shipment.domain.model;
 
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Party;
 
 public class ShipmentUpdate {
 
-    private Sender sender;
+    private Party sender;
     
-    private Recipient recipient;
+    private Party recipient;
     
     private String token;
 
-	public ShipmentUpdate(final Sender sender,
-                          final Recipient recipient,
+	public ShipmentUpdate(final Party sender,
+                          final Party recipient,
                           final String token) {
         this.sender = sender;
         this.recipient = recipient;
@@ -23,11 +22,11 @@ public class ShipmentUpdate {
         return token;
     }
 
-    public Sender getSender() {
+    public Party getSender() {
         return sender;
     }
 
-    public Recipient getRecipient() {
+    public Party getRecipient() {
         return recipient;
     }
 

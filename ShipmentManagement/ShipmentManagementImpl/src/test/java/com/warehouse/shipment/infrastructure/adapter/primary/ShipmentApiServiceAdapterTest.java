@@ -108,7 +108,7 @@ class ShipmentApiServiceAdapterTest {
 
     private ShipmentResult shipmentResult(final ShipmentId relatedShipmentId) {
         final Shipment shipment = new Shipment(
-                new ShipmentId(1L), null, null, relatedShipmentId, null, null, null,
+                new ShipmentId(1L), null, null, relatedShipmentId, null,
                 false, null, null, null, null, null, null);
         return new ShipmentResult(shipment.snapshot(), null);
     }

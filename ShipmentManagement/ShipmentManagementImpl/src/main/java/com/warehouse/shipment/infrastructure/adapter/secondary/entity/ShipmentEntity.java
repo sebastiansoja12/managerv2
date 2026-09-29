@@ -175,13 +175,13 @@ public class ShipmentEntity extends BelongsToOperator {
     @Column(name = "locked", nullable = false)
     private Boolean locked;
 
-    @Column(name = "origin_country", nullable = false)
+    @Column(name = "sender_country_code")
     @Enumerated(EnumType.STRING)
-    private CountryCode originCountry;
+    private CountryCode senderCountryCode;
 
-    @Column(name = "destination_country", nullable = false)
+    @Column(name = "recipient_country_code")
     @Enumerated(EnumType.STRING)
-    private CountryCode destinationCountry;
+    private CountryCode recipientCountryCode;
 
     @Column(name = "shipment_priority", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -216,8 +216,8 @@ public class ShipmentEntity extends BelongsToOperator {
 			final String recipientPostalCode, final String recipientTelephone,
 			final DepartmentId targetDepartmentId, final DepartmentId originDepartmentId, final ShipmentStatus shipmentStatus,
             final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
-            final LocalDateTime updatedAt, final Boolean locked, final CountryCode originCountry,
-            final CountryCode destinationCountry, final Money price, final ShipmentPriority shipmentPriority,
+            final LocalDateTime updatedAt, final Boolean locked, final CountryCode senderCountryCode,
+            final CountryCode recipientCountryCode, final Money price, final ShipmentPriority shipmentPriority,
             final DangerousGoodEmbeddable dangerousGood, final ExternalId<String> externalId,
             final TrackingNumber trackingNumber) {
         this.shipmentId = shipmentId;
@@ -243,8 +243,8 @@ public class ShipmentEntity extends BelongsToOperator {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.locked = locked;
-        this.originCountry = originCountry;
-        this.destinationCountry = destinationCountry;
+        this.senderCountryCode = senderCountryCode;
+        this.recipientCountryCode = recipientCountryCode;
         this.shipmentPriority = shipmentPriority;
         this.price = price;
         this.dangerousGood = dangerousGood;

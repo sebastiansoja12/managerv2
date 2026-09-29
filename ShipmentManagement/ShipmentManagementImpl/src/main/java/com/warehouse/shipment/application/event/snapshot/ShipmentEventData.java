@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public record ShipmentEventData(
         ShipmentId shipmentId,
-        SenderSnapshot sender,
-        RecipientSnapshot recipient,
+        PartySnapshot sender,
+        PartySnapshot recipient,
         DepartmentId targetDepartmentId,
         DepartmentId originDepartmentId,
         ShipmentStatus shipmentStatus,
@@ -26,8 +26,6 @@ public record ShipmentEventData(
         DangerousGoodSnapshot dangerousGood,
         Boolean signatureRequired,
         ShipmentPriority shipmentPriority,
-        CountryCode originCountry,
-        CountryCode destinationCountry,
         SignatureSnapshot signature,
         TrackingNumber trackingNumber,
         PickupMethod pickupMethod,
@@ -40,8 +38,8 @@ public record ShipmentEventData(
     public static ShipmentEventData from(final ShipmentSnapshot snapshot) {
         return new ShipmentEventData(
                 snapshot.shipmentId(),
-                SenderSnapshot.from(snapshot.sender()),
-                RecipientSnapshot.from(snapshot.recipient()),
+                PartySnapshot.from(snapshot.sender()),
+                PartySnapshot.from(snapshot.recipient()),
                 snapshot.destinationDepartmentId(),
                 snapshot.originDepartmentId(),
                 snapshot.shipmentStatus(),
@@ -54,8 +52,6 @@ public record ShipmentEventData(
                 DangerousGoodSnapshot.from(snapshot.dangerousGood()),
                 snapshot.signatureRequired(),
                 snapshot.shipmentPriority(),
-                snapshot.originCountry(),
-                snapshot.destinationCountry(),
                 SignatureSnapshot.from(snapshot.signature()),
                 snapshot.trackingNumber(),
                 snapshot.pickupMethod(),

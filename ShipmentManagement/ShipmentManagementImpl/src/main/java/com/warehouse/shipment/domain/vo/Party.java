@@ -2,14 +2,11 @@ package com.warehouse.shipment.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.warehouse.shipment.domain.enumeration.PersonType;
-import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.commonassets.enumeration.CountryCode;
 import lombok.Builder;
 
-import static com.warehouse.shipment.domain.enumeration.PersonType.RECIPIENT;
-
 @Builder
-public class Recipient implements Person {
+public class Party {
 
     private final String firstName;
     private final String lastName;
@@ -18,15 +15,17 @@ public class Recipient implements Person {
     private final String city;
     private final String postalCode;
     private final String street;
+    private final CountryCode countryCode;
 
-	@JsonCreator
-	public Recipient(@JsonProperty("firstName") final String firstName,
-                     @JsonProperty("lastName") final String lastName,
-                     @JsonProperty("email") final String email,
-                     @JsonProperty("telephoneNumber") final String telephoneNumber,
-			         @JsonProperty("city") final String city,
-                     @JsonProperty("postalCode") final String postalCode,
-                     @JsonProperty("street") final String street) {
+    @JsonCreator
+    public Party(@JsonProperty("firstName") final String firstName,
+                 @JsonProperty("lastName") final String lastName,
+                 @JsonProperty("email") final String email,
+                 @JsonProperty("telephoneNumber") final String telephoneNumber,
+                 @JsonProperty("city") final String city,
+                 @JsonProperty("postalCode") final String postalCode,
+                 @JsonProperty("street") final String street,
+                 @JsonProperty("countryCode") final CountryCode countryCode) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -34,49 +33,46 @@ public class Recipient implements Person {
         this.city = city;
         this.postalCode = postalCode;
         this.street = street;
+        this.countryCode = countryCode;
     }
 
-    public static Recipient from(final Shipment shipment) {
-        return shipment.getRecipient();
+    public Party withCountryCode(final CountryCode countryCode) {
+        return new Party(firstName, lastName, email, telephoneNumber, city, postalCode, street, countryCode);
     }
 
-    @Override
+    public Address getAddress() {
+        return new Address(city, street, postalCode, countryCode);
+    }
+
+    public CountryCode getCountryCode() {
+        return countryCode;
+    }
+
     public String getFirstName() {
         return firstName;
     }
 
-    @Override
     public String getLastName() {
         return lastName;
     }
 
-    @Override
     public String getEmail() {
         return email;
     }
 
-    @Override
     public String getTelephoneNumber() {
         return telephoneNumber;
     }
 
-    @Override
     public String getCity() {
         return city;
     }
 
-    @Override
     public String getPostalCode() {
         return postalCode;
     }
 
-    @Override
     public String getStreet() {
         return street;
-    }
-
-    @Override
-    public PersonType getType() {
-        return RECIPIENT;
     }
 }
