@@ -25,7 +25,7 @@ public class Shipment {
 
     private ShipmentSize shipmentSize;
 
-    private DepartmentId targetDepartmentId;
+    private DepartmentId destinationDepartmentId;
 
     private DepartmentId originDepartmentId;
 
@@ -49,6 +49,12 @@ public class Shipment {
 
     private LocalDateTime updatedAt;
 
+    private LocalDateTime acceptedAt;
+
+    private LocalDateTime cancelledAt;
+
+    private CancellationReason cancellationReason;
+
     private Boolean locked;
 
     private DangerousGood dangerousGood;
@@ -66,6 +72,16 @@ public class Shipment {
     private TrackingNumber trackingNumber;
 
     private ExternalId<UUID> externalShipmentId;
+
+    private Dimensions dimensions;
+
+    private Weight weight;
+
+    private CustomerReference customerReference;
+
+    private String contentDescription;
+
+    private Money declaredValue;
 
     private Shipment(final ShipmentId shipmentId,
                     final Sender sender,
@@ -105,7 +121,7 @@ public class Shipment {
 		this.locked = locked;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
-        this.targetDepartmentId = targetDepartmentId;
+        this.destinationDepartmentId = targetDepartmentId;
         this.originDepartmentId = originDepartmentId;
         this.signature = signature;
         this.signatureRequired = signatureRequired;
@@ -167,7 +183,7 @@ public class Shipment {
         this.signature = signature;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
-        this.targetDepartmentId = targetDepartmentId;
+        this.destinationDepartmentId = targetDepartmentId;
         this.originDepartmentId = originDepartmentId;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
@@ -256,7 +272,7 @@ public class Shipment {
         this.signature = signature;
         this.originCountry = originCountry;
         this.destinationCountry = destinationCountry;
-        this.targetDepartmentId = targetDepartmentId;
+        this.destinationDepartmentId = targetDepartmentId;
         this.originDepartmentId = originDepartmentId;
         this.signatureRequired = signature != null;
         this.shipmentPriority = shipmentPriority;
@@ -312,21 +328,39 @@ public class Shipment {
                                      final DeliveryMethod deliveryMethod,
                                      final PickupPointId pickupPointId,
                                      final PickupPointId deliveryPickupPointId,
-                                     final ExternalId<UUID> externalShipmentId) {
-        return new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentStatus, shipmentType,
+                                     final ExternalId<UUID> externalShipmentId,
+                                     final LocalDateTime acceptedAt,
+                                     final LocalDateTime cancelledAt,
+                                     final CancellationReason cancellationReason,
+                                     final Dimensions dimensions,
+                                     final Weight weight,
+                                     final CustomerReference customerReference,
+                                     final String contentDescription,
+                                     final Money declaredValue) {
+        final Shipment shipment = new Shipment(shipmentId, sender, recipient, shipmentSize, shipmentStatus, shipmentType,
                 shipmentRelatedId, price, createdAt, updatedAt, locked, originCountry, destinationCountry,
                 targetDepartmentId, originDepartmentId, signature, signatureRequired,
                 shipmentPriority, dangerousGood,
                 trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
                 externalShipmentId);
+        shipment.acceptedAt = acceptedAt;
+        shipment.cancelledAt = cancelledAt;
+        shipment.cancellationReason = cancellationReason;
+        shipment.dimensions = dimensions;
+        shipment.weight = weight;
+        shipment.customerReference = customerReference;
+        shipment.contentDescription = contentDescription;
+        shipment.declaredValue = declaredValue;
+        return shipment;
     }
 
 	public ShipmentSnapshot snapshot() {
-		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, targetDepartmentId, originDepartmentId, shipmentStatus,
-				shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
-				shipmentPriority, originCountry, destinationCountry, signature,
+		return new ShipmentSnapshot(shipmentId, sender, recipient, shipmentSize, destinationDepartmentId, originDepartmentId, shipmentStatus,
+                shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, dangerousGood, signatureRequired,
+                shipmentPriority, originCountry, destinationCountry, signature,
                 trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
-                externalShipmentId);
+                externalShipmentId, acceptedAt, cancelledAt, cancellationReason, dimensions, weight,
+                customerReference, contentDescription, declaredValue);
 	}
 
     public Sender getSender() {
@@ -342,7 +376,11 @@ public class Shipment {
     }
 
     public DepartmentId getTargetDepartmentId() {
-        return targetDepartmentId;
+        return destinationDepartmentId;
+    }
+
+    public DepartmentId getDestinationDepartmentId() {
+        return destinationDepartmentId;
     }
 
     public DepartmentId getOriginDepartmentId() {
@@ -383,6 +421,18 @@ public class Shipment {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public LocalDateTime getAcceptedAt() {
+        return acceptedAt;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public CancellationReason getCancellationReason() {
+        return cancellationReason;
     }
 
     public Boolean isLocked() {
@@ -431,6 +481,26 @@ public class Shipment {
 
     public ExternalId<UUID> getExternalShipmentId() {
         return externalShipmentId;
+    }
+
+    public Dimensions getDimensions() {
+        return dimensions;
+    }
+
+    public Weight getWeight() {
+        return weight;
+    }
+
+    public CustomerReference getCustomerReference() {
+        return customerReference;
+    }
+
+    public String getContentDescription() {
+        return contentDescription;
+    }
+
+    public Money getDeclaredValue() {
+        return declaredValue;
     }
 
     public void changeSignature(final Signature signature) {
@@ -501,13 +571,25 @@ public class Shipment {
         markAsModified();
     }
 
+    public void changeShipmentDetails(final Dimensions dimensions, final Weight weight,
+                                     final CustomerReference customerReference,
+                                     final String contentDescription, final Money declaredValue) {
+        ensureCanBeModified();
+        this.dimensions = dimensions;
+        this.weight = weight;
+        this.customerReference = customerReference;
+        this.contentDescription = contentDescription;
+        this.declaredValue = declaredValue;
+        markAsModified();
+    }
+
     public void markAsModified() {
         this.updatedAt = LocalDateTime.now();
     }
 
     public void updateDestination(final DepartmentId targetDepartmentId) {
         ensureCanBeModified();
-        this.targetDepartmentId = targetDepartmentId;
+        this.destinationDepartmentId = targetDepartmentId;
         markAsModified();
     }
 
@@ -530,7 +612,7 @@ public class Shipment {
         this.shipmentSize = shipmentSize;
         this.price = price;
         this.dangerousGood = dangerousGood;
-        this.targetDepartmentId = targetDepartmentId;
+        this.destinationDepartmentId = targetDepartmentId;
         this.signatureRequired = signatureRequired;
         markAsModified();
     }
@@ -677,7 +759,7 @@ public class Shipment {
 
     public void changeTargetDepartment(final DepartmentId targetDepartmentId) {
         ensureCanBeModified();
-        this.targetDepartmentId = targetDepartmentId;
+        this.destinationDepartmentId = targetDepartmentId;
         markAsModified();
     }
 
@@ -687,6 +769,7 @@ public class Shipment {
             throw new ShipmentModificationException("Shipment cannot be accepted from status " + shipmentStatus);
         }
         this.shipmentStatus = ShipmentStatus.ACCEPTED;
+        this.acceptedAt = LocalDateTime.now();
         markAsModified();
     }
 
@@ -820,7 +903,7 @@ public class Shipment {
         this.shipmentPriority = shipmentWorkflowSettings.defaultShipmentPriority();
         this.externalShipmentId = externalShipmentId;
         this.trackingNumber = trackingNumber;
-        this.targetDepartmentId = originDepartmentId;
+        this.destinationDepartmentId = originDepartmentId;
         this.shipmentRelatedId = null;
 
         markAsModified();
@@ -835,6 +918,11 @@ public class Shipment {
     }
 
     public void cancel(final ShipmentWorkflowSettings config, final LocalDateTime currentTime) {
+        cancel(config, currentTime, null);
+    }
+
+    public void cancel(final ShipmentWorkflowSettings config, final LocalDateTime currentTime,
+                       final CancellationReason cancellationReason) {
         if (!draftStatuses().contains(this.shipmentStatus)) {
             throw new ShipmentModificationException("Cannot cancel shipment");
         }
@@ -843,13 +931,29 @@ public class Shipment {
         }
         this.locked = true;
         this.shipmentStatus = ShipmentStatus.CANCELED;
+        recordCancellation(currentTime, cancellationReason);
         markAsModified();
     }
 
     public void markAsCanceledWithoutPolicy() {
         this.locked = true;
         this.shipmentStatus = ShipmentStatus.CANCELED;
+        recordCancellation(LocalDateTime.now(), null);
         markAsModified();
+    }
+
+    public void markAsCanceledWithoutPolicy(final CancellationReason cancellationReason,
+                                            final LocalDateTime currentTime) {
+        this.locked = true;
+        this.shipmentStatus = ShipmentStatus.CANCELED;
+        recordCancellation(currentTime, cancellationReason);
+        markAsModified();
+    }
+
+    private void recordCancellation(final LocalDateTime currentTime,
+                                    final CancellationReason cancellationReason) {
+        this.cancelledAt = Objects.requireNonNull(currentTime, "currentTime is required");
+        this.cancellationReason = cancellationReason;
     }
 
     private boolean isCancellationWindowExpired(final int cancellationWindowMinutes, final LocalDateTime currentTime) {

@@ -1,6 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
 import java.util.UUID;
+import java.math.BigDecimal;
 
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.shipment.domain.model.DangerousGood;
@@ -9,6 +10,11 @@ import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.vo.Recipient;
 import com.warehouse.shipment.domain.vo.Sender;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.LengthUnit;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
+import com.warehouse.shipment.domain.vo.CustomerReference;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.DangerousGoodEmbeddable;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
@@ -42,7 +48,15 @@ public class ShipmentPersistenceMapper {
                 entity.getDeliveryMethod(),
                 entity.getPickupPointId(),
                 entity.getDeliveryPickupPointId(),
-                new ExternalId<>(UUID.fromString(entity.getExternalId().value()))
+                new ExternalId<>(UUID.fromString(entity.getExternalId().value())),
+                entity.getAcceptedAt(),
+                entity.getCancelledAt(),
+                entity.getCancellationReason(),
+                dimensions(entity.getLength(), entity.getWidth(), entity.getHeight(), entity.getLengthUnit()),
+                weight(entity.getWeightValue(), entity.getWeightUnit()),
+                customerReference(entity.getCustomerReference()),
+                entity.getContentDescription(),
+                entity.getDeclaredValue()
         );
     }
 
@@ -76,7 +90,15 @@ public class ShipmentPersistenceMapper {
                 entity.getDeliveryMethod(),
                 entity.getPickupPointId(),
                 entity.getDeliveryPickupPointId(),
-                new ExternalId<>(UUID.fromString(entity.getExternalId().value()))
+                new ExternalId<>(UUID.fromString(entity.getExternalId().value())),
+                entity.getAcceptedAt(),
+                entity.getCancelledAt(),
+                entity.getCancellationReason(),
+                dimensions(entity.getLength(), entity.getWidth(), entity.getHeight(), entity.getLengthUnit()),
+                weight(entity.getWeightValue(), entity.getWeightUnit()),
+                customerReference(entity.getCustomerReference()),
+                entity.getContentDescription(),
+                entity.getDeclaredValue()
         );
     }
 
@@ -109,6 +131,18 @@ public class ShipmentPersistenceMapper {
                 .shipmentRelatedId(shipment.getShipmentRelatedId())
                 .createdAt(shipment.getCreatedAt())
                 .updatedAt(shipment.getUpdatedAt())
+                .length(shipment.getDimensions() == null ? null : shipment.getDimensions().length())
+                .width(shipment.getDimensions() == null ? null : shipment.getDimensions().width())
+                .height(shipment.getDimensions() == null ? null : shipment.getDimensions().height())
+                .lengthUnit(shipment.getDimensions() == null ? null : shipment.getDimensions().unit())
+                .weightValue(shipment.getWeight() == null ? null : shipment.getWeight().value())
+                .weightUnit(shipment.getWeight() == null ? null : shipment.getWeight().unit())
+                .customerReference(shipment.getCustomerReference() == null ? null : shipment.getCustomerReference().value())
+                .contentDescription(shipment.getContentDescription())
+                .declaredValue(shipment.getDeclaredValue())
+                .acceptedAt(shipment.getAcceptedAt())
+                .cancelledAt(shipment.getCancelledAt())
+                .cancellationReason(shipment.getCancellationReason())
                 .locked(shipment.getLocked())
                 .originCountry(shipment.getOriginCountry())
                 .destinationCountry(shipment.getDestinationCountry())
@@ -139,7 +173,7 @@ public class ShipmentPersistenceMapper {
                 .recipientStreet(snapshot.recipient().getStreet())
                 .recipientPostalCode(snapshot.recipient().getPostalCode())
                 .shipmentSize(snapshot.shipmentSize())
-                .targetDepartmentId(snapshot.targetDepartmentId())
+                .targetDepartmentId(snapshot.destinationDepartmentId())
                 .originDepartmentId(snapshot.originDepartmentId())
                 .pickupPointId(snapshot.pickupPointId())
                 .deliveryPickupPointId(snapshot.deliveryPickupPointId())
@@ -150,6 +184,18 @@ public class ShipmentPersistenceMapper {
                 .shipmentRelatedId(snapshot.shipmentRelatedId())
                 .createdAt(snapshot.createdAt())
                 .updatedAt(snapshot.updatedAt())
+                .length(snapshot.dimensions() == null ? null : snapshot.dimensions().length())
+                .width(snapshot.dimensions() == null ? null : snapshot.dimensions().width())
+                .height(snapshot.dimensions() == null ? null : snapshot.dimensions().height())
+                .lengthUnit(snapshot.dimensions() == null ? null : snapshot.dimensions().unit())
+                .weightValue(snapshot.weight() == null ? null : snapshot.weight().value())
+                .weightUnit(snapshot.weight() == null ? null : snapshot.weight().unit())
+                .customerReference(snapshot.customerReference() == null ? null : snapshot.customerReference().value())
+                .contentDescription(snapshot.contentDescription())
+                .declaredValue(snapshot.declaredValue())
+                .acceptedAt(snapshot.acceptedAt())
+                .cancelledAt(snapshot.cancelledAt())
+                .cancellationReason(snapshot.cancellationReason())
                 .locked(snapshot.locked())
                 .originCountry(snapshot.originCountry())
                 .destinationCountry(snapshot.destinationCountry())
@@ -191,5 +237,24 @@ public class ShipmentPersistenceMapper {
 
     private DangerousGood dangerousGood(final DangerousGoodEmbeddable embeddable) {
         return embeddable == null ? null : embeddable.toDomain();
+    }
+
+    private Dimensions dimensions(final BigDecimal length, final BigDecimal width, final BigDecimal height,
+                                  final LengthUnit unit) {
+        if (length == null && width == null && height == null && unit == null) {
+            return null;
+        }
+        return new Dimensions(length, width, height, unit);
+    }
+
+    private Weight weight(final BigDecimal value, final WeightUnit unit) {
+        if (value == null && unit == null) {
+            return null;
+        }
+        return new Weight(value, unit);
+    }
+
+    private CustomerReference customerReference(final String value) {
+        return value == null ? null : new CustomerReference(value);
     }
 }

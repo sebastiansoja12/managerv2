@@ -156,7 +156,22 @@ class ShipmentTest {
 
         assertAll(
                 () -> assertEquals(ShipmentStatus.CANCELED, shipment.getShipmentStatus()),
+                () -> assertEquals(shipment.getCreatedAt().plusMinutes(10), shipment.getCancelledAt()),
+                () -> assertNull(shipment.getCancellationReason()),
                 () -> assertTrue(shipment.getLocked())
+        );
+    }
+
+    @Test
+    void shouldRecordCancellationReasonAndTime() {
+        final Shipment shipment = shipment(null);
+        final LocalDateTime cancelledAt = shipment.getCreatedAt().plusMinutes(5);
+
+        shipment.cancel(workflowSettings(30), cancelledAt, CancellationReason.CUSTOMER_REQUEST);
+
+        assertAll(
+                () -> assertEquals(cancelledAt, shipment.getCancelledAt()),
+                () -> assertEquals(CancellationReason.CUSTOMER_REQUEST, shipment.getCancellationReason())
         );
     }
 
@@ -167,6 +182,20 @@ class ShipmentTest {
 
         assertThrows(ShipmentModificationException.class,
                 () -> shipment.cancel(workflowSettings(30), shipment.getCreatedAt().plusMinutes(10)));
+    }
+
+    @Test
+    void shouldRecordWhenShipmentWasAccepted() {
+        final Shipment shipment = shipment(null);
+
+        shipment.prepareShipmentToSend();
+        shipment.notifyShipmentAccepted();
+
+        assertAll(
+                () -> assertEquals(ShipmentStatus.ACCEPTED, shipment.getShipmentStatus()),
+                () -> assertNotNull(shipment.getAcceptedAt()),
+                () -> assertEquals(shipment.getAcceptedAt(), shipment.snapshot().acceptedAt())
+        );
     }
 
     @Test

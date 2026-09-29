@@ -44,7 +44,7 @@ public record ShipmentEventData(
                 SenderSnapshot.from(snapshot.sender()),
                 RecipientSnapshot.from(snapshot.recipient()),
                 snapshot.shipmentSize(),
-                snapshot.targetDepartmentId(),
+                snapshot.destinationDepartmentId(),
                 snapshot.originDepartmentId(),
                 snapshot.shipmentStatus(),
                 snapshot.shipmentType(),
