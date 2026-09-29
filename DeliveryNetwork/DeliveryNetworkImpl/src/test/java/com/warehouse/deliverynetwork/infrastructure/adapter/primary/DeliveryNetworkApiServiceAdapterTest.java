@@ -1,10 +1,18 @@
 package com.warehouse.deliverynetwork.infrastructure.adapter.primary;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.deliverynetwork.api.dto.DepartmentIdDto;
 import com.warehouse.deliverynetwork.api.dto.DeliveryPathDto;
+import com.warehouse.deliverynetwork.api.dto.ShipmentDeliveryRouteDto;
 import com.warehouse.deliverynetwork.application.port.primary.DeliveryNetworkPort;
+import com.warehouse.deliverynetwork.application.port.primary.result.ShipmentDeliveryRouteResult;
+import com.warehouse.deliverynetwork.domain.enumeration.DepartmentStatus;
+import com.warehouse.deliverynetwork.domain.enumeration.DepartmentType;
 import com.warehouse.deliverynetwork.domain.vo.DeliveryPath;
+import com.warehouse.deliverynetwork.domain.vo.DepartmentNode;
 import com.warehouse.deliverynetwork.infrastructure.adapter.primary.mapper.DeliveryNetworkApiMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,5 +70,25 @@ class DeliveryNetworkApiServiceAdapterTest {
         assertEquals(
                 List.of(new DepartmentIdDto(1L), new DepartmentIdDto(2L), new DepartmentIdDto(3L)),
                 deliveryPath.departmentIds());
+    }
+
+    @Test
+    void shouldReturnShipmentDeliveryRouteDepartmentsInOrder() {
+        final TrackingNumber trackingNumber = new TrackingNumber("TRK-001");
+        when(this.deliveryNetworkPort.findShipmentDeliveryRoute(trackingNumber))
+                .thenReturn(new ShipmentDeliveryRouteResult(new ShipmentId(7L), trackingNumber, List.of(
+                        new DepartmentNode(new DepartmentId(1L), new DepartmentCode("KT1"),
+                                DepartmentType.BRANCH, DepartmentStatus.ACTIVE),
+                        new DepartmentNode(new DepartmentId(2L), new DepartmentCode("PO1"),
+                                DepartmentType.BRANCH, DepartmentStatus.ACTIVE)), 300.5));
+
+        final ShipmentDeliveryRouteDto route = this.deliveryNetworkApiServiceAdapter.findShipmentDeliveryRoute(
+                trackingNumber);
+
+        assertEquals(List.of(new DepartmentCode("KT1"), new DepartmentCode("PO1")),
+                route.departments().stream().map(department -> department.departmentCode()).toList());
+        assertEquals(new DepartmentIdDto(1L), route.departments().getFirst().departmentId());
+        assertEquals("BRANCH", route.departments().getFirst().departmentType());
+        assertEquals(300.5, route.distanceInKilometers());
     }
 }
