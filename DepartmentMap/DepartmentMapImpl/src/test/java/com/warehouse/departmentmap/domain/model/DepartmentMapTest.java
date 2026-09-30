@@ -1,5 +1,6 @@
 package com.warehouse.departmentmap.domain.model;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.MapElementId;
 import com.warehouse.departmentmap.domain.enumeration.MapElementType;
 import com.warehouse.departmentmap.domain.exception.DepartmentMapException;
@@ -10,11 +11,16 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.warehouse.departmentmap.DepartmentMapFixture.DEPARTMENT_ID;
+import static com.warehouse.departmentmap.DepartmentMapFixture.DIRECTION_CODES;
+import static com.warehouse.departmentmap.DepartmentMapFixture.KT1;
 import static com.warehouse.departmentmap.DepartmentMapFixture.NOW;
 import static com.warehouse.departmentmap.DepartmentMapFixture.OPERATOR_ID;
+import static com.warehouse.departmentmap.DepartmentMapFixture.PO1;
+import static com.warehouse.departmentmap.DepartmentMapFixture.chute;
 import static com.warehouse.departmentmap.DepartmentMapFixture.emptyMap;
 import static com.warehouse.departmentmap.DepartmentMapFixture.persistedMap;
 import static com.warehouse.departmentmap.DepartmentMapFixture.rack;
+import static com.warehouse.departmentmap.DepartmentMapFixture.ramp;
 import static com.warehouse.departmentmap.DepartmentMapFixture.storageLocation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -50,7 +56,8 @@ class DepartmentMapTest {
         final DepartmentMap departmentMap = emptyMap();
 
         departmentMap.changeLayout("Hall A", 50, 30, 1,
-                List.of(rack("Rack 1"), storageLocation("a-01", 1), storageLocation("A-02", 2)), NOW);
+                List.of(rack("Rack 1"), storageLocation("a-01", 1), storageLocation("A-02", 2)),
+                DIRECTION_CODES, NOW);
 
         final List<StorageLocationDefinition> definitions = departmentMap.storageLocationDefinitions();
         assertEquals(3, departmentMap.getElements().size());
@@ -65,7 +72,7 @@ class DepartmentMapTest {
 
         final DepartmentMapException exception = assertThrows(DepartmentMapException.class,
                 () -> departmentMap.changeLayout("Hall A", 50, 30, 1,
-                        List.of(storageLocation("A-01", 1), storageLocation("a-01", 1)), NOW));
+                        List.of(storageLocation("A-01", 1), storageLocation("a-01", 1)), DIRECTION_CODES, NOW));
 
         assertEquals(DepartmentMapException.Reason.INVALID_REQUEST, exception.reason());
     }
@@ -76,7 +83,8 @@ class DepartmentMapTest {
         final MapElementId elementId = MapElementId.generate();
 
         assertThrows(DepartmentMapException.class, () -> departmentMap.changeLayout("Hall A", 50, 30, 1,
-                List.of(storageLocation(elementId, "A-01", 1), storageLocation(elementId, "A-02", 1)), NOW));
+                List.of(storageLocation(elementId, "A-01", 1), storageLocation(elementId, "A-02", 1)),
+                DIRECTION_CODES, NOW));
     }
 
     @Test
@@ -86,7 +94,7 @@ class DepartmentMapTest {
                 new ElementGeometry(60, 5, 4, 4, 0), null, null, null);
 
         assertThrows(DepartmentMapException.class,
-                () -> departmentMap.changeLayout("Hall A", 50, 30, 1, List.of(outside), NOW));
+                () -> departmentMap.changeLayout("Hall A", 50, 30, 1, List.of(outside), DIRECTION_CODES, NOW));
     }
 
     @Test
@@ -125,10 +133,58 @@ class DepartmentMapTest {
         final MapElement sorter = new MapElement(MapElementId.generate(), MapElementType.SORTER, "Sorter 1",
                 new ElementGeometry(5, 20, 30, 1.2, 180), "#4B5563", "IGNORED", 3);
 
-        departmentMap.changeLayout("Hall A", 50, 30, 1, List.of(sorter, storageLocation("A-01", 1)), NOW);
+        departmentMap.changeLayout("Hall A", 50, 30, 1, List.of(sorter, storageLocation("A-01", 1)),
+                DIRECTION_CODES, NOW);
 
         assertEquals(MapElementType.SORTER, departmentMap.getElements().get(0).getType());
         assertNull(departmentMap.getElements().get(0).getLocationCode());
         assertEquals(1, departmentMap.storageLocationDefinitions().size());
+    }
+
+    @Test
+    void shouldAcceptChutesAndRampsForConnectedDirections() {
+        final DepartmentMap departmentMap = emptyMap();
+
+        departmentMap.changeLayout("Hall A", 50, 30, 1, List.of(chute(KT1), ramp(KT1), ramp(PO1)),
+                DIRECTION_CODES, NOW);
+
+        assertEquals(KT1, departmentMap.getElements().get(0).getDestinationDepartmentCode());
+        assertEquals(PO1, departmentMap.getElements().get(2).getDestinationDepartmentCode());
+    }
+
+    @Test
+    void shouldRejectRampForDepartmentThatIsNotConnected() {
+        final DepartmentMap departmentMap = emptyMap();
+
+        assertThrows(DepartmentMapException.class, () -> departmentMap.changeLayout("Hall A", 50, 30, 1,
+                List.of(ramp(new DepartmentCode("WA1"))), DIRECTION_CODES, NOW));
+    }
+
+    @Test
+    void shouldRejectChuteWithoutRampForItsDirection() {
+        final DepartmentMap departmentMap = emptyMap();
+
+        assertThrows(DepartmentMapException.class, () -> departmentMap.changeLayout("Hall A", 50, 30, 1,
+                List.of(chute(PO1), ramp(KT1)), DIRECTION_CODES, NOW));
+    }
+
+    @Test
+    void shouldRequireDestinationForRampsAndChutes() {
+        assertThrows(DepartmentMapException.class, () -> ramp(null));
+        assertThrows(DepartmentMapException.class, () -> chute(new DepartmentCode(" ")));
+    }
+
+    @Test
+    void shouldAcceptInboundRampAndWorkstationWithoutDestination() {
+        final DepartmentMap departmentMap = emptyMap();
+        final MapElement inboundRamp = new MapElement(MapElementId.generate(), MapElementType.INBOUND_RAMP, "IN 1",
+                new ElementGeometry(2, 0, 3.5, 3, 0), null, null, null, KT1);
+        final MapElement workstation = new MapElement(MapElementId.generate(), MapElementType.WORKSTATION, "S1",
+                new ElementGeometry(4, 6, 1.2, 1.2, 0), null, null, null);
+
+        departmentMap.changeLayout("Hall A", 50, 30, 1, List.of(inboundRamp, workstation), DIRECTION_CODES, NOW);
+
+        assertNull(departmentMap.getElements().get(0).getDestinationDepartmentCode());
+        assertEquals(MapElementType.WORKSTATION, departmentMap.getElements().get(1).getType());
     }
 }
