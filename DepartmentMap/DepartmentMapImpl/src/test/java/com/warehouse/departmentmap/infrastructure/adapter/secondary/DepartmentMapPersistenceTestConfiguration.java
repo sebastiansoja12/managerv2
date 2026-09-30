@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import java.util.List;
 import java.util.Optional;
 
 @Configuration
@@ -73,7 +74,7 @@ public class DepartmentMapPersistenceTestConfiguration {
                                                final CurrentUserServicePort currentUserServicePort) {
         return new DepartmentMapPortImpl(departmentMapRepository, storageLocationRepository,
                 departmentId -> DEPARTMENT_ID.equals(departmentId), currentUserServicePort,
-                new StorageLocationSynchronizer());
+                departmentId -> List.of(), new StorageLocationSynchronizer());
     }
 
     @Bean
