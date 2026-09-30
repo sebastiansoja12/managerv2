@@ -1,5 +1,6 @@
 package com.warehouse.terminal.domain.port.primary;
 
+import java.time.Instant;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -261,10 +262,13 @@ public class DevicePairPortImpl implements DevicePairPort {
         }
         reportHardware(device, command);
         reportSoftware(device, command);
-        this.devicePairService.markSeen(devicePair);
+        this.devicePairService.recordHeartbeat(devicePair);
         final boolean updateRequired = StringUtils.isNotBlank(command.version())
                 && updateRequired(deviceId, new DeviceVersion(command.version(), deviceId));
-        return new DeviceHeartbeatResult(updateRequired);
+        final Instant operatorSessionExpiresAt = devicePair.activeOperator(Instant.now())
+                .map(operator -> devicePair.getOperatorSessionExpiresAt())
+                .orElse(null);
+        return new DeviceHeartbeatResult(updateRequired, operatorSessionExpiresAt);
     }
 
     private void reportHardware(final Device device, final DeviceHeartbeatCommand command) {
