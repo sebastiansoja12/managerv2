@@ -39,13 +39,15 @@ public final class DepartmentMapEntityMapper {
         final ElementGeometry geometry = element.getGeometry();
         return new MapElementEntity(element.getElementId(), departmentMap.getDepartmentMapId(), element.getType(),
                 element.getLabel(), geometry.x(), geometry.y(), geometry.width(), geometry.height(),
-                geometry.rotation(), element.getColor(), element.getLocationCode(), element.getCapacity(), sortOrder);
+                geometry.rotation(), element.getColor(), element.getLocationCode(), element.getCapacity(),
+                element.getDestinationDepartmentCode(), sortOrder);
     }
 
     private static MapElement toModel(final MapElementEntity entity) {
         return new MapElement(entity.getElementId(), entity.getType(), entity.getLabel(),
                 new ElementGeometry(entity.getX(), entity.getY(), entity.getWidth(), entity.getHeight(),
                         entity.getRotation()),
-                entity.getColor(), entity.getLocationCode(), entity.getCapacity());
+                entity.getColor(), entity.getLocationCode(), entity.getCapacity(),
+                entity.getDestinationDepartmentCode());
     }
 }
