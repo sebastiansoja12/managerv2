@@ -155,6 +155,13 @@ public class DevicePair {
 		this.operatorSessionExpiresAt = expiresAt;
 	}
 
+	public void extendOperatorSession(final Instant now, final Instant expiresAt) {
+		if (activeOperator(now).isEmpty() || !expiresAt.isAfter(operatorSessionExpiresAt)) {
+			return;
+		}
+		this.operatorSessionExpiresAt = expiresAt;
+	}
+
 	public void endOperatorSession() {
 		this.operatorUserId = null;
 		this.operatorSessionExpiresAt = null;
