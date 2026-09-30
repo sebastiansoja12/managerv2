@@ -1,5 +1,6 @@
 package com.warehouse.departmentmap.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DepartmentMapId;
 import com.warehouse.commonassets.identificator.MapElementId;
@@ -19,9 +20,11 @@ import com.warehouse.departmentmap.domain.model.MapElement;
 import com.warehouse.departmentmap.domain.model.PalletMovement;
 import com.warehouse.departmentmap.domain.model.PalletPlacement;
 import com.warehouse.departmentmap.domain.model.StorageLocation;
+import com.warehouse.departmentmap.domain.vo.DepartmentDirection;
 import com.warehouse.departmentmap.domain.vo.ElementGeometry;
 import com.warehouse.departmentmap.domain.vo.LocationReservation;
 import com.warehouse.departmentmap.infrastructure.adapter.primary.api.CreateDepartmentMapApiRequest;
+import com.warehouse.departmentmap.infrastructure.adapter.primary.api.DepartmentDirectionApiResponse;
 import com.warehouse.departmentmap.infrastructure.adapter.primary.api.DepartmentMapApiResponse;
 import com.warehouse.departmentmap.infrastructure.adapter.primary.api.DepartmentMapSummaryApiResponse;
 import com.warehouse.departmentmap.infrastructure.adapter.primary.api.LocationReservationApiResponse;
@@ -100,7 +103,8 @@ public final class DepartmentMapApiMapper {
                 departmentMap.getHeight(), departmentMap.getGridSize(), departmentMap.getVersion(),
                 departmentMap.getCreatedAt(), departmentMap.getUpdatedAt(),
                 departmentMap.getElements().stream().map(DepartmentMapApiMapper::map).toList(),
-                view.locations().stream().map(DepartmentMapApiMapper::map).toList());
+                view.locations().stream().map(DepartmentMapApiMapper::map).toList(),
+                view.directions().stream().map(DepartmentMapApiMapper::map).toList());
     }
 
     public static DepartmentMapSummaryApiResponse map(final DepartmentMapSummary summary) {
@@ -155,14 +159,21 @@ public final class DepartmentMapApiMapper {
                 new ElementGeometry(required(element.x(), "x"), required(element.y(), "y"),
                         required(element.width(), "width"), required(element.height(), "height"),
                         element.rotation() == null ? 0 : element.rotation()),
-                element.color(), element.locationCode(), element.capacity());
+                element.color(), element.locationCode(), element.capacity(),
+                destination(element.destinationDepartmentCode()));
     }
 
     private static MapElementApi map(final MapElement element) {
         final ElementGeometry geometry = element.getGeometry();
         return new MapElementApi(element.getElementId().value().toString(), element.getType().name(),
                 element.getLabel(), geometry.x(), geometry.y(), geometry.width(), geometry.height(),
-                geometry.rotation(), element.getColor(), element.getLocationCode(), element.getCapacity());
+                geometry.rotation(), element.getColor(), element.getLocationCode(), element.getCapacity(),
+                element.getDestinationDepartmentCode() == null ? null : element.getDestinationDepartmentCode().value());
+    }
+
+    private static DepartmentDirectionApiResponse map(final DepartmentDirection direction) {
+        return new DepartmentDirectionApiResponse(direction.departmentId().getValue(),
+                direction.departmentCode().value());
     }
 
     private static PalletPlacementApiResponse map(final PalletPlacement placement) {
@@ -185,6 +196,10 @@ public final class DepartmentMapApiMapper {
         } catch (final IllegalArgumentException exception) {
             throw DepartmentMapException.invalid("Unknown element type " + value);
         }
+    }
+
+    private static DepartmentCode destination(final String value) {
+        return value == null || value.isBlank() ? null : new DepartmentCode(value);
     }
 
     private static PalletTrackingNumber optionalPallet(final String value) {
