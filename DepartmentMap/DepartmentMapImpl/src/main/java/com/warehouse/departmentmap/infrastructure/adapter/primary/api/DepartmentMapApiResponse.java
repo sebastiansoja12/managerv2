@@ -14,5 +14,6 @@ public record DepartmentMapApiResponse(UUID mapId,
                                        Instant createdAt,
                                        Instant updatedAt,
                                        List<MapElementApi> elements,
-                                       List<StorageLocationApiResponse> locations) {
+                                       List<StorageLocationApiResponse> locations,
+                                       List<DepartmentDirectionApiResponse> directions) {
 }
