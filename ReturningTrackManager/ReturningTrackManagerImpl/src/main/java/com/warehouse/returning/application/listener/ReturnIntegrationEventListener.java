@@ -1,10 +1,10 @@
 package com.warehouse.returning.application.listener;
 
-import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.returning.api.identificator.DepartmentId;
+import com.warehouse.returning.api.identificator.OperatorId;
+import com.warehouse.returning.api.identificator.ShipmentId;
+import com.warehouse.returning.api.identificator.UserId;
+import com.warehouse.returning.application.port.secondary.ReturnEventPublisherServicePort;
 import com.warehouse.returning.api.event.ReturnProcessingStartedIntegrationEvent;
 import com.warehouse.returning.api.event.ReturnCancelledIntegrationEvent;
 import com.warehouse.returning.domain.event.ReturnPackageCanceled;
@@ -18,9 +18,9 @@ import java.util.UUID;
 @Component
 public class ReturnIntegrationEventListener {
 
-    private final IntegrationEventPublisher integrationEventPublisher;
+    private final ReturnEventPublisherServicePort integrationEventPublisher;
 
-    public ReturnIntegrationEventListener(final IntegrationEventPublisher integrationEventPublisher) {
+    public ReturnIntegrationEventListener(final ReturnEventPublisherServicePort integrationEventPublisher) {
         this.integrationEventPublisher = integrationEventPublisher;
     }
 
