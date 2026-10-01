@@ -1,13 +1,24 @@
 package com.warehouse.commonassets.identificator;
 
-import java.util.Objects;
+import jakarta.persistence.Embeddable;
 
+import java.util.Objects;
+import java.util.UUID;
+
+@Embeddable
 public class DeliveryId {
 
 	private String id;
 
+	protected DeliveryId() {
+	}
+
 	public DeliveryId(String id) {
 		this.id = id;
+	}
+
+	public static DeliveryId generate() {
+		return new DeliveryId(UUID.randomUUID().toString());
 	}
 
 	public String getId() {
