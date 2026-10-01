@@ -3,8 +3,8 @@ package com.warehouse.returning.application.port.primary;
 import com.warehouse.returning.domain.port.primary.ReturnPort;
 import com.warehouse.returning.application.service.ReturnProcessingService;
 
-import com.warehouse.common.DepartmentId;
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.domain.vo.DepartmentId;
+import com.warehouse.returning.domain.vo.OperatorId;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
 import com.warehouse.returning.domain.model.ReturnRequest;
