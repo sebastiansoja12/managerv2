@@ -1,6 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.primary.kafka.event;
 
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.domain.vo.OperatorId;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
