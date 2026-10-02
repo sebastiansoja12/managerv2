@@ -2,8 +2,8 @@ package com.warehouse.returning.domain.port.primary;
 
 import java.util.Optional;
 
-import com.warehouse.common.DepartmentId;
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.domain.vo.DepartmentId;
+import com.warehouse.returning.domain.vo.OperatorId;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.model.ReturnRequest;
 import com.warehouse.returning.domain.vo.*;

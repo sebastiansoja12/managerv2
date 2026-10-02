@@ -1,11 +1,11 @@
 package com.warehouse.returning.domain.port.secondary;
 
-import com.warehouse.common.DepartmentId;
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.domain.vo.DepartmentId;
+import com.warehouse.returning.domain.vo.OperatorId;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnPage;
-import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId;
+import com.warehouse.returning.domain.vo.ShipmentId;
 
 import java.util.Optional;
 
