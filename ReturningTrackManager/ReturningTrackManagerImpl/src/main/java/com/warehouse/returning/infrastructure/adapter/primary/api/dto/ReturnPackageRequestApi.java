@@ -1,6 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.primary.api.dto;
 
-import com.warehouse.common.DepartmentId;
+import com.warehouse.returning.domain.vo.DepartmentId;
 import lombok.Builder;
 import lombok.NonNull;
 
