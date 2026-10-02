@@ -1,6 +1,6 @@
 package com.warehouse.returning;
 
-import com.warehouse.common.DepartmentId;
+import com.warehouse.returning.domain.vo.DepartmentId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
