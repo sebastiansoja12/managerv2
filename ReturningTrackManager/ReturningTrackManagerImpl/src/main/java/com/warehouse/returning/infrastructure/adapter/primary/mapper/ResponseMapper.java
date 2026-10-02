@@ -2,7 +2,7 @@ package com.warehouse.returning.infrastructure.adapter.primary.mapper;
 
 import java.time.Instant;
 
-import com.warehouse.common.DepartmentId;
+import com.warehouse.returning.domain.vo.DepartmentId;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.vo.ReturnResponse;
 import com.warehouse.returning.domain.vo.ReturnPage;

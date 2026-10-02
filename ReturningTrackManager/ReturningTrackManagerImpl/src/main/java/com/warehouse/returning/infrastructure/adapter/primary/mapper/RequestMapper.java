@@ -1,6 +1,6 @@
 package com.warehouse.returning.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.common.DepartmentId;
+import com.warehouse.returning.domain.vo.DepartmentId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.model.ChangeReturnStatusRequest;
 import com.warehouse.returning.domain.model.ReturnPackageRequest;
