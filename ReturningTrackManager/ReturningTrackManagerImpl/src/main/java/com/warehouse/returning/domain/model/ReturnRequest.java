@@ -2,8 +2,8 @@ package com.warehouse.returning.domain.model;
 
 import java.util.List;
 
-import com.warehouse.common.DepartmentId;
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.domain.vo.DepartmentId;
+import com.warehouse.returning.domain.vo.OperatorId;
 import com.warehouse.returning.domain.vo.UserId;
 
 
