@@ -1,7 +1,7 @@
 package com.warehouse.returning;
 
-import com.warehouse.common.DepartmentId;
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.domain.vo.DepartmentId;
+import com.warehouse.returning.domain.vo.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.exception.StatusChangeException;
 import com.warehouse.returning.domain.model.ReturnPackage;
@@ -352,12 +352,14 @@ class ReturnIntegrationTest {
                 reason,
                 status,
                 new ReturnToken(returnToken),
-                assignedDepartment,
-                returnedDepartment,
+                assignedDepartment == null ? null
+                        : new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.DepartmentId(assignedDepartment.value()),
+                returnedDepartment == null ? null
+                        : new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.DepartmentId(returnedDepartment.value()),
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.UserId(assignedTo),
                 new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.UserId(processedBy),
                 reasonCode,
-                new OperatorId(operatorId),
+                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.OperatorId(operatorId),
                 createdAt,
                 updatedAt
         );
