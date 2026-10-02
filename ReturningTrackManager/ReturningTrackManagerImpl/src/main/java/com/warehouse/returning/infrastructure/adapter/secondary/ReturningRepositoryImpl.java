@@ -1,14 +1,14 @@
 package com.warehouse.returning.infrastructure.adapter.secondary;
 
-import com.warehouse.common.DepartmentId;
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.domain.vo.DepartmentId;
+import com.warehouse.returning.domain.vo.OperatorId;
 import com.warehouse.returning.domain.model.ReturnPackage;
 import com.warehouse.returning.domain.port.secondary.ReturnRepository;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.domain.vo.ReturnPage;
+import com.warehouse.returning.domain.vo.ShipmentId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.ReturnPackageEntity;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ReturnId;
-import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId;
 import com.warehouse.returning.infrastructure.adapter.secondary.exception.ReturnPackageNotFoundException;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnPackageToEntityMapper;
 import com.warehouse.returning.infrastructure.adapter.secondary.mapper.ReturnPackageToModelMapper;
@@ -50,14 +50,18 @@ public class ReturningRepositoryImpl implements ReturnRepository {
 
     @Override
     public ReturnPackage findByShipmentId(final ShipmentId shipmentId) {
-        final Optional<ReturnPackageEntity> returnPackage = this.repository.findByShipmentId(shipmentId);
+        final Optional<ReturnPackageEntity> returnPackage = this.repository.findByShipmentId(
+                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(shipmentId.value()));
         return returnPackage.map(ReturnPackageToModelMapper::map).orElse(null);
     }
 
     @Override
     public Optional<ReturnPackage> findLatestByShipmentIdAndOperatorId(
             final ShipmentId shipmentId, final OperatorId operatorId) {
-        return this.repository.findLatestByShipmentIdAndOperatorId(shipmentId, operatorId, PageRequest.of(0, 1))
+        return this.repository.findLatestByShipmentIdAndOperatorId(
+                        new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(shipmentId.value()),
+                        new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.OperatorId(operatorId.value()),
+                        PageRequest.of(0, 1))
                 .stream().findFirst().map(ReturnPackageToModelMapper::map);
     }
 
@@ -66,7 +70,9 @@ public class ReturningRepositoryImpl implements ReturnRepository {
             final DepartmentId departmentId, final OperatorId operatorId, final int page, final int size) {
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
         final Page<ReturnPackageEntity> result = this.repository.findByDepartmentIdAndOperatorId(
-                departmentId, operatorId, pageRequest);
+                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.DepartmentId(departmentId.value()),
+                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.OperatorId(operatorId.value()),
+                pageRequest);
         return new ReturnPage(
                 result.getContent().stream().map(ReturnPackageToModelMapper::map).toList(),
                 result.getNumber(),
@@ -83,7 +89,8 @@ public class ReturningRepositoryImpl implements ReturnRepository {
 
     @Override
     public boolean existsForShipment(final ShipmentId shipmentId) {
-        final Optional<ReturnPackageEntity> returnPackage = this.repository.findByShipmentId(shipmentId);
+        final Optional<ReturnPackageEntity> returnPackage = this.repository.findByShipmentId(
+                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(shipmentId.value()));
         return returnPackage.isPresent();
     }
 }
