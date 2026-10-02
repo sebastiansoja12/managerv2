@@ -1,6 +1,5 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.outbox;
 
-import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
 import com.warehouse.returning.domain.vo.ReturnPackageId;
 import com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ReturnId;
 import jakarta.persistence.*;
@@ -37,7 +36,7 @@ public class ReturningOutboxEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private KafkaOutboxStatus status;
+    private ReturningOutboxStatus status;
 
     @Column(name = "attempt_count", nullable = false)
     private int attemptCount;
@@ -74,11 +73,11 @@ public class ReturningOutboxEntity {
         this.payload = payload;
         this.headers = headers;
         this.createdAt = createdAt;
-        this.status = KafkaOutboxStatus.PENDING;
+        this.status = ReturningOutboxStatus.PENDING;
     }
 
     public ReturningOutboxMessage claim(final Instant lockedUntil) {
-        this.status = KafkaOutboxStatus.PROCESSING;
+        this.status = ReturningOutboxStatus.PROCESSING;
         this.lockToken = UUID.randomUUID();
         this.lockedUntil = lockedUntil;
         this.attemptCount++;

@@ -1,6 +1,5 @@
 package com.warehouse.returning.infrastructure.adapter.secondary.outbox;
 
-import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -29,7 +28,7 @@ public interface ReturningOutboxRepository extends JpaRepository<ReturningOutbox
              WHERE e.eventId = :eventId AND e.lockToken = :lockToken
             """)
     int markPublished(@Param("eventId") final UUID eventId, @Param("lockToken") final UUID lockToken,
-                      @Param("status") final KafkaOutboxStatus status, @Param("publishedAt") final Instant publishedAt);
+                      @Param("status") final ReturningOutboxStatus status, @Param("publishedAt") final Instant publishedAt);
 
     @Modifying
     @Query("""
@@ -39,6 +38,6 @@ public interface ReturningOutboxRepository extends JpaRepository<ReturningOutbox
              WHERE e.eventId = :eventId AND e.lockToken = :lockToken
             """)
     int markFailed(@Param("eventId") final UUID eventId, @Param("lockToken") final UUID lockToken,
-                   @Param("status") final KafkaOutboxStatus status, @Param("lastError") final String lastError,
+                   @Param("status") final ReturningOutboxStatus status, @Param("lastError") final String lastError,
                    @Param("nextAttemptAt") final Instant nextAttemptAt);
 }
