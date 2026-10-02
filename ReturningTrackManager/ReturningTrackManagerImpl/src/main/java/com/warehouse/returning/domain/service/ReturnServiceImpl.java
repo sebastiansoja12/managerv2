@@ -1,7 +1,7 @@
 package com.warehouse.returning.domain.service;
 
-import com.warehouse.common.DepartmentId;
-import com.warehouse.common.OperatorId;
+import com.warehouse.returning.domain.vo.DepartmentId;
+import com.warehouse.returning.domain.vo.OperatorId;
 import com.warehouse.returning.domain.enumeration.ReasonCode;
 import com.warehouse.returning.domain.event.ReturnPackageCompleted;
 import com.warehouse.returning.domain.model.ReturnPackage;
@@ -26,8 +26,7 @@ public class ReturnServiceImpl implements ReturnService {
     @Override
     public Optional<ReturnPackage> findLatestReturn(final ShipmentId shipmentId, final OperatorId operatorId) {
         return this.returnRepository.findLatestByShipmentIdAndOperatorId(
-                new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
-                        shipmentId.value()), operatorId);
+                shipmentId, operatorId);
     }
 
     @Override
@@ -43,9 +42,7 @@ public class ReturnServiceImpl implements ReturnService {
 
     @Override
     public boolean existsForShipment(final ShipmentId shipmentId) {
-		return returnRepository.existsForShipment(
-				new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
-						shipmentId.value()));
+		return returnRepository.existsForShipment(shipmentId);
     }
 
     @Override
@@ -75,8 +72,6 @@ public class ReturnServiceImpl implements ReturnService {
 
     @Override
     public ReturnPackage findByShipmentId(final ShipmentId shipmentId) {
-		return this.returnRepository.findByShipmentId(
-				new com.warehouse.returning.infrastructure.adapter.secondary.entity.identificator.ShipmentId(
-						shipmentId.value()));
+		return this.returnRepository.findByShipmentId(shipmentId);
     }
 }
