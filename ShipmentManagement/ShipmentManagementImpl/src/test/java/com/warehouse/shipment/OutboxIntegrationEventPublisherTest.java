@@ -22,10 +22,10 @@ import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.OutboxIntegrationEventPublisher;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorDetails;
-import com.warehouse.shipment.application.event.ShipmentChangedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentReadModelChanged;
-import com.warehouse.shipment.application.event.snapshot.ShipmentEventData;
-import com.warehouse.shipment.application.event.snapshot.ShipmentReadModelData;
+import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
+import com.warehouse.shipment.api.event.snapshot.ShipmentReadModelData;
+import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -49,7 +49,7 @@ class OutboxIntegrationEventPublisherTest {
         final OutboxIntegrationEventPublisher publisher = new OutboxIntegrationEventPublisher(
                 environment, objectMapper, outboxWriter, contextProvider);
         final ShipmentChangedIntegrationEvent event = new ShipmentChangedIntegrationEvent(
-                ShipmentEventData.from(DataTestCreator.shipment().snapshot()));
+                new ShipmentEventDataMapper().map(DataTestCreator.shipment().snapshot()));
         final ArgumentCaptor<KafkaOutboxRecord> recordCaptor = ArgumentCaptor.forClass(KafkaOutboxRecord.class);
 
         publisher.publish(event);
@@ -73,7 +73,7 @@ class OutboxIntegrationEventPublisherTest {
 
         final JsonNode payload = objectMapper.readTree(record.payload());
         assertThat(payload.has("payload")).isTrue();
-        assertThat(payload.path("payload").size()).isEqualTo(25);
+        assertThat(payload.path("payload").size()).isEqualTo(22);
         assertThat(java.time.LocalDateTime.parse(payload.path("payload").path("updatedAt").asText()))
                 .isEqualTo(event.payload().updatedAt());
         assertThat(payload.path("payload").has("eventType")).isFalse();
