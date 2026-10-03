@@ -1,7 +1,7 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.kafka;
 
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
-import com.warehouse.shipment.application.event.ShipmentReadModelChanged;
+import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
 import com.warehouse.shipment.application.port.primary.ShipmentReadModelSyncPort;
 import org.springframework.stereotype.Component;
 
