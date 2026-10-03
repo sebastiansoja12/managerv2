@@ -1,8 +1,8 @@
 package com.warehouse.shipment.application.listener;
 
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
-import com.warehouse.shipment.application.event.ShipmentReadModelChanged;
-import com.warehouse.shipment.application.event.snapshot.ShipmentReadModelData;
+import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
+import com.warehouse.shipment.api.event.snapshot.ShipmentReadModelData;
 import com.warehouse.shipment.domain.event.ShipmentChanged;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
