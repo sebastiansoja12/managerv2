@@ -9,7 +9,7 @@ public class SignaturePersistenceMapper {
         if (entity == null) {
             return null;
         }
-        return new Signature(entity.getSignerName(), entity.getSignedAt(), entity.getSignatureMethod(),
+        return new Signature(entity.getSignatureId(), entity.getSignerName(), entity.getSignedAt(), entity.getSignatureMethod(),
                 entity.getDocumentReference(), entity.getShipmentId(), entity.getSignature());
     }
 
@@ -17,7 +17,7 @@ public class SignaturePersistenceMapper {
         if (signature == null) {
             return null;
         }
-        return new SignatureEntity(signature.getSignerName(), signature.getSignedAt(), signature.getSignatureMethod(),
+        return new SignatureEntity(signature.getSignatureId(), signature.getSignerName(), signature.getSignedAt(), signature.getSignatureMethod(),
                 signature.getDocumentReference(), signature.getShipmentId(), signature.getSignature());
     }
 }

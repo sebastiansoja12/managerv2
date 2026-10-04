@@ -1,31 +1,26 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
 import java.util.UUID;
-import java.math.BigDecimal;
 
 import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.shipment.domain.model.DangerousGood;
+import com.warehouse.commonassets.identificator.SignatureId;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
-import com.warehouse.shipment.domain.vo.Dimensions;
-import com.warehouse.shipment.domain.vo.LengthUnit;
-import com.warehouse.shipment.domain.vo.Weight;
-import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.domain.vo.CustomerReference;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.DangerousGoodEmbeddable;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.DimensionsEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.PartyEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
-import com.warehouse.shipment.infrastructure.adapter.secondary.entity.SignatureEntity;
+import com.warehouse.shipment.infrastructure.adapter.secondary.entity.WeightEntity;
 
 public class ShipmentPersistenceMapper {
 
     public Shipment toDomain(final ShipmentEntity entity) {
         return Shipment.rehydrate(
                 entity.getShipmentId(),
-                sender(entity),
-                recipient(entity),
+                party(entity.getSender()),
+                party(entity.getRecipient()),
                 entity.getShipmentStatus(),
                 entity.getShipmentType(),
                 entity.getShipmentRelatedId(),
@@ -35,10 +30,8 @@ public class ShipmentPersistenceMapper {
                 entity.getLocked(),
                 entity.getTargetDepartmentId(),
                 entity.getOriginDepartmentId(),
-                signature(entity.getSignature()),
-                entity.getSignature() != null,
+                entity.getSignatureRequired(),
                 entity.getShipmentPriority(),
-                dangerousGood(entity.getDangerousGood()),
                 entity.getTrackingNumber(),
                 entity.getPickupMethod(),
                 entity.getDeliveryMethod(),
@@ -48,23 +41,21 @@ public class ShipmentPersistenceMapper {
                 entity.getAcceptedAt(),
                 entity.getCancelledAt(),
                 entity.getCancellationReason(),
-                dimensions(entity.getLength(), entity.getWidth(), entity.getHeight(), entity.getLengthUnit()),
-                weight(entity.getWeightValue(), entity.getWeightUnit()),
+                entity.getDimensions() == null ? null : entity.getDimensions().toDomain(),
+                entity.getWeight() == null ? null : entity.getWeight().toDomain(),
                 customerReference(entity.getCustomerReference()),
                 entity.getContentDescription(),
-                entity.getDeclaredValue()
+                entity.getDeclaredValue(),
+                entity.getServiceLevel(),
+                entity.getPackagingType()
         );
     }
 
     public Shipment toDomain(final ShipmentReadEntity entity) {
         return Shipment.rehydrate(
                 entity.getShipmentId(),
-                new Party(entity.getFirstName(), entity.getLastName(), entity.getSenderEmail(),
-                        entity.getSenderTelephone(), entity.getSenderCity(), entity.getSenderPostalCode(),
-                        entity.getSenderStreet(), entity.getSenderCountryCode()),
-                new Party(entity.getRecipientFirstName(), entity.getRecipientLastName(),
-                        entity.getRecipientEmail(), entity.getRecipientTelephone(), entity.getRecipientCity(),
-                        entity.getRecipientPostalCode(), entity.getRecipientStreet(), entity.getRecipientCountryCode()),
+                party(entity.getSender()),
+                party(entity.getRecipient()),
                 entity.getShipmentStatus(),
                 entity.getShipmentType(),
                 entity.getShipmentRelatedId(),
@@ -74,10 +65,8 @@ public class ShipmentPersistenceMapper {
                 entity.getLocked(),
                 entity.getTargetDepartmentId(),
                 entity.getOriginDepartmentId(),
-                signature(entity.getSignature()),
-                entity.getSignature() != null,
+                entity.getSignatureRequired(),
                 entity.getShipmentPriority(),
-                dangerousGood(entity.getDangerousGood()),
                 entity.getTrackingNumber(),
                 entity.getPickupMethod(),
                 entity.getDeliveryMethod(),
@@ -87,31 +76,21 @@ public class ShipmentPersistenceMapper {
                 entity.getAcceptedAt(),
                 entity.getCancelledAt(),
                 entity.getCancellationReason(),
-                dimensions(entity.getLength(), entity.getWidth(), entity.getHeight(), entity.getLengthUnit()),
-                weight(entity.getWeightValue(), entity.getWeightUnit()),
+                entity.getDimensions() == null ? null : entity.getDimensions().toDomain(),
+                entity.getWeight() == null ? null : entity.getWeight().toDomain(),
                 customerReference(entity.getCustomerReference()),
                 entity.getContentDescription(),
-                entity.getDeclaredValue()
+                entity.getDeclaredValue(),
+                entity.getServiceLevel(),
+                entity.getPackagingType()
         );
     }
 
     public ShipmentEntity toEntity(final Shipment shipment) {
-        return ShipmentEntity.builder()
+        final ShipmentEntity entity = ShipmentEntity.builder()
                 .shipmentId(shipment.getShipmentId())
-                .firstName(shipment.getSender().getFirstName())
-                .lastName(shipment.getSender().getLastName())
-                .senderTelephone(shipment.getSender().getTelephoneNumber())
-                .senderEmail(shipment.getSender().getEmail())
-                .senderCity(shipment.getSender().getCity())
-                .senderStreet(shipment.getSender().getStreet())
-                .senderPostalCode(shipment.getSender().getPostalCode())
-                .recipientEmail(shipment.getRecipient().getEmail())
-                .recipientTelephone(shipment.getRecipient().getTelephoneNumber())
-                .recipientFirstName(shipment.getRecipient().getFirstName())
-                .recipientLastName(shipment.getRecipient().getLastName())
-                .recipientCity(shipment.getRecipient().getCity())
-                .recipientStreet(shipment.getRecipient().getStreet())
-                .recipientPostalCode(shipment.getRecipient().getPostalCode())
+                .sender(partyEntity(shipment.getSender()))
+                .recipient(partyEntity(shipment.getRecipient()))
                 .targetDepartmentId(shipment.getTargetDepartmentId())
                 .originDepartmentId(shipment.getOriginDepartmentId())
                 .pickupPointId(shipment.getPickupPointId())
@@ -123,12 +102,8 @@ public class ShipmentPersistenceMapper {
                 .shipmentRelatedId(shipment.getShipmentRelatedId())
                 .createdAt(shipment.getCreatedAt())
                 .updatedAt(shipment.getUpdatedAt())
-                .length(shipment.getDimensions() == null ? null : shipment.getDimensions().length())
-                .width(shipment.getDimensions() == null ? null : shipment.getDimensions().width())
-                .height(shipment.getDimensions() == null ? null : shipment.getDimensions().height())
-                .lengthUnit(shipment.getDimensions() == null ? null : shipment.getDimensions().unit())
-                .weightValue(shipment.getWeight() == null ? null : shipment.getWeight().value())
-                .weightUnit(shipment.getWeight() == null ? null : shipment.getWeight().unit())
+                .dimensions(DimensionsEntity.from(shipment.getDimensions()))
+                .weight(WeightEntity.from(shipment.getWeight()))
                 .customerReference(shipment.getCustomerReference() == null ? null : shipment.getCustomerReference().value())
                 .contentDescription(shipment.getContentDescription())
                 .declaredValue(shipment.getDeclaredValue())
@@ -136,34 +111,22 @@ public class ShipmentPersistenceMapper {
                 .cancelledAt(shipment.getCancelledAt())
                 .cancellationReason(shipment.getCancellationReason())
                 .locked(shipment.getLocked())
-                .senderCountryCode(shipment.getSender().getCountryCode())
-                .recipientCountryCode(shipment.getRecipient().getCountryCode())
                 .shipmentPriority(shipment.getShipmentPriority())
-                .dangerousGood(DangerousGoodEmbeddable.from(shipment.getDangerousGood()))
+                .serviceLevel(shipment.getServiceLevel())
+                .packagingType(shipment.getPackagingType())
                 .price(shipment.getPrice())
-                .signature(signatureEntity(shipment.getSignature()))
+                .signatureRequired(shipment.getSignatureRequired())
                 .externalId(new ExternalId<>(shipment.getExternalShipmentId().value().toString()))
                 .trackingNumber(shipment.getTrackingNumber())
                 .build();
+        return entity;
     }
 
-    public ShipmentReadEntity toReadEntity(final ShipmentSnapshot snapshot) {
+    public ShipmentReadEntity toReadEntity(final ShipmentSnapshot snapshot, final SignatureId signatureId) {
         return ShipmentReadEntity.builder()
                 .shipmentId(snapshot.shipmentId())
-                .firstName(snapshot.sender().getFirstName())
-                .lastName(snapshot.sender().getLastName())
-                .senderTelephone(snapshot.sender().getTelephoneNumber())
-                .senderEmail(snapshot.sender().getEmail())
-                .senderCity(snapshot.sender().getCity())
-                .senderStreet(snapshot.sender().getStreet())
-                .senderPostalCode(snapshot.sender().getPostalCode())
-                .recipientEmail(snapshot.recipient().getEmail())
-                .recipientTelephone(snapshot.recipient().getTelephoneNumber())
-                .recipientFirstName(snapshot.recipient().getFirstName())
-                .recipientLastName(snapshot.recipient().getLastName())
-                .recipientCity(snapshot.recipient().getCity())
-                .recipientStreet(snapshot.recipient().getStreet())
-                .recipientPostalCode(snapshot.recipient().getPostalCode())
+                .sender(partyEntity(snapshot.sender()))
+                .recipient(partyEntity(snapshot.recipient()))
                 .targetDepartmentId(snapshot.destinationDepartmentId())
                 .originDepartmentId(snapshot.originDepartmentId())
                 .pickupPointId(snapshot.pickupPointId())
@@ -175,12 +138,8 @@ public class ShipmentPersistenceMapper {
                 .shipmentRelatedId(snapshot.shipmentRelatedId())
                 .createdAt(snapshot.createdAt())
                 .updatedAt(snapshot.updatedAt())
-                .length(snapshot.dimensions() == null ? null : snapshot.dimensions().length())
-                .width(snapshot.dimensions() == null ? null : snapshot.dimensions().width())
-                .height(snapshot.dimensions() == null ? null : snapshot.dimensions().height())
-                .lengthUnit(snapshot.dimensions() == null ? null : snapshot.dimensions().unit())
-                .weightValue(snapshot.weight() == null ? null : snapshot.weight().value())
-                .weightUnit(snapshot.weight() == null ? null : snapshot.weight().unit())
+                .dimensions(DimensionsEntity.from(snapshot.dimensions()))
+                .weight(WeightEntity.from(snapshot.weight()))
                 .customerReference(snapshot.customerReference() == null ? null : snapshot.customerReference().value())
                 .contentDescription(snapshot.contentDescription())
                 .declaredValue(snapshot.declaredValue())
@@ -188,61 +147,40 @@ public class ShipmentPersistenceMapper {
                 .cancelledAt(snapshot.cancelledAt())
                 .cancellationReason(snapshot.cancellationReason())
                 .locked(snapshot.locked())
-                .senderCountryCode(snapshot.sender().getCountryCode())
-                .recipientCountryCode(snapshot.recipient().getCountryCode())
                 .shipmentPriority(snapshot.shipmentPriority())
-                .dangerousGood(DangerousGoodEmbeddable.from(snapshot.dangerousGood()))
+                .serviceLevel(snapshot.serviceLevel())
+                .packagingType(snapshot.packagingType())
                 .price(snapshot.price())
+                .signatureId(signatureId)
+                .signatureRequired(snapshot.signatureRequired())
                 .externalId(new ExternalId<>(snapshot.externalShipmentId().value().toString()))
                 .trackingNumber(snapshot.trackingNumber())
                 .build();
     }
 
-    private Party sender(final ShipmentEntity entity) {
-        return new Party(entity.getFirstName(), entity.getLastName(), entity.getSenderEmail(),
-                entity.getSenderTelephone(), entity.getSenderCity(), entity.getSenderPostalCode(),
-                entity.getSenderStreet(), entity.getSenderCountryCode());
-    }
-
-    private Party recipient(final ShipmentEntity entity) {
-        return new Party(entity.getRecipientFirstName(), entity.getRecipientLastName(),
-                entity.getRecipientEmail(), entity.getRecipientTelephone(), entity.getRecipientCity(),
-                entity.getRecipientPostalCode(), entity.getRecipientStreet(), entity.getRecipientCountryCode());
-    }
-
-    private Signature signature(final SignatureEntity entity) {
+    private Party party(final PartyEntity entity) {
         if (entity == null) {
             return null;
         }
-        return new Signature(entity.getSignerName(), entity.getSignedAt(), entity.getSignatureMethod(),
-                entity.getDocumentReference(), entity.getShipmentId(), entity.getSignature());
+        return new Party(entity.getFirstName(), entity.getLastName(), entity.getEmail(),
+                entity.getTelephoneNumber(), entity.getCity(), entity.getPostalCode(), entity.getStreet(),
+                entity.getCountryCode());
     }
 
-    private SignatureEntity signatureEntity(final Signature signature) {
-        if (signature == null) {
+    private PartyEntity partyEntity(final Party party) {
+        if (party == null) {
             return null;
         }
-        return new SignatureEntity(signature.getSignerName(), signature.getSignedAt(), signature.getSignatureMethod(),
-                signature.getDocumentReference(), signature.getShipmentId(), signature.getSignature());
-    }
-
-    private DangerousGood dangerousGood(final DangerousGoodEmbeddable embeddable) {
-        return embeddable == null ? null : embeddable.toDomain();
-    }
-
-    private Dimensions dimensions(final BigDecimal length, final BigDecimal width, final BigDecimal height,
-                                  final LengthUnit unit) {
-        if (length == null && width == null && height == null && unit == null) {
-            return null;
-        }
-        return new Dimensions(length, width, height, unit);
-    }
-
-    private Weight weight(final BigDecimal value, final WeightUnit unit) {
-        if (value == null && unit == null) {
-            return null;
-        }
-        return new Weight(value, unit);
+        return PartyEntity.builder()
+                .firstName(party.getFirstName())
+                .lastName(party.getLastName())
+                .email(party.getEmail())
+                .telephoneNumber(party.getTelephoneNumber())
+                .city(party.getCity())
+                .street(party.getStreet())
+                .postalCode(party.getPostalCode())
+                .countryCode(party.getCountryCode())
+                .build();
     }
 
     private CustomerReference customerReference(final String value) {
