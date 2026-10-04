@@ -1,11 +1,16 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.enumeration.CancellationReason;
+import com.warehouse.commonassets.enumeration.ShipmentPriority;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -16,7 +21,6 @@ import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
 
 @Getter
 @Builder
@@ -33,58 +37,33 @@ public class ShipmentEntity extends BelongsToOperator {
     @AttributeOverride(name = "value", column = @Column(name = "shipment_id"))
     private ShipmentId shipmentId;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
-
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
-
-    @Column(name = "sender_telephone", nullable = false)
-    private String senderTelephone;
+    @Valid
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "firstName", column = @Column(name = "first_name", nullable = false)),
+            @AttributeOverride(name = "lastName", column = @Column(name = "last_name", nullable = false)),
+            @AttributeOverride(name = "email", column = @Column(name = "sender_email", nullable = false)),
+            @AttributeOverride(name = "telephoneNumber", column = @Column(name = "sender_telephone", nullable = false)),
+            @AttributeOverride(name = "city", column = @Column(name = "sender_city", nullable = false)),
+            @AttributeOverride(name = "street", column = @Column(name = "sender_street", nullable = false)),
+            @AttributeOverride(name = "postalCode", column = @Column(name = "sender_postal_code", nullable = false)),
+            @AttributeOverride(name = "countryCode", column = @Column(name = "sender_country_code"))
+    })
+    private PartyEntity sender;
 
     @Valid
-    @Column(name = "sender_email", nullable = false)
-    private String senderEmail;
-
-    @Valid
-    @Column(name = "sender_city", nullable = false)
-    private String senderCity;
-
-    @Valid
-    @Column(name = "sender_street", nullable = false)
-    private String senderStreet;
-
-    @Valid
-    @Column(name = "sender_postal_code", nullable = false)
-    private String senderPostalCode;
-
-    @Valid
-    @Column(name = "recipient_email", nullable = false)
-    private String recipientEmail;
-
-    @Valid
-    @Column(name = "recipient_telephone", nullable = false)
-    private String recipientTelephone;
-
-    @Valid
-    @Column(name = "recipient_first_name", nullable = false)
-    private String recipientFirstName;
-
-    @Valid
-    @Column(name = "recipient_last_name", nullable = false)
-    private String recipientLastName;
-
-    @Valid
-    @Column(name = "recipient_city", nullable = false)
-    private String recipientCity;
-
-    @Valid
-    @Column(name = "recipient_street", nullable = false)
-    private String recipientStreet;
-
-    @Valid
-    @Column(name = "recipient_postal_code", nullable = false)
-    private String recipientPostalCode;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "firstName", column = @Column(name = "recipient_first_name", nullable = false)),
+            @AttributeOverride(name = "lastName", column = @Column(name = "recipient_last_name", nullable = false)),
+            @AttributeOverride(name = "email", column = @Column(name = "recipient_email", nullable = false)),
+            @AttributeOverride(name = "telephoneNumber", column = @Column(name = "recipient_telephone", nullable = false)),
+            @AttributeOverride(name = "city", column = @Column(name = "recipient_city", nullable = false)),
+            @AttributeOverride(name = "street", column = @Column(name = "recipient_street", nullable = false)),
+            @AttributeOverride(name = "postalCode", column = @Column(name = "recipient_postal_code", nullable = false)),
+            @AttributeOverride(name = "countryCode", column = @Column(name = "recipient_country_code"))
+    })
+    private PartyEntity recipient;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "target_department_id", nullable = false))
@@ -129,25 +108,11 @@ public class ShipmentEntity extends BelongsToOperator {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "length", precision = 19, scale = 3)
-    private BigDecimal length;
+    @Embedded
+    private DimensionsEntity dimensions;
 
-    @Column(name = "width", precision = 19, scale = 3)
-    private BigDecimal width;
-
-    @Column(name = "height", precision = 19, scale = 3)
-    private BigDecimal height;
-
-    @Column(name = "length_unit")
-    @Enumerated(EnumType.STRING)
-    private LengthUnit lengthUnit;
-
-    @Column(name = "weight_value", precision = 19, scale = 3)
-    private BigDecimal weightValue;
-
-    @Column(name = "weight_unit")
-    @Enumerated(EnumType.STRING)
-    private WeightUnit weightUnit;
+    @Embedded
+    private WeightEntity weight;
 
     @Column(name = "customer_reference")
     private String customerReference;
@@ -175,20 +140,17 @@ public class ShipmentEntity extends BelongsToOperator {
     @Column(name = "locked", nullable = false)
     private Boolean locked;
 
-    @Column(name = "sender_country_code")
-    @Enumerated(EnumType.STRING)
-    private CountryCode senderCountryCode;
-
-    @Column(name = "recipient_country_code")
-    @Enumerated(EnumType.STRING)
-    private CountryCode recipientCountryCode;
-
     @Column(name = "shipment_priority", nullable = false)
     @Enumerated(EnumType.STRING)
     private ShipmentPriority shipmentPriority;
 
-    @Embedded
-    private DangerousGoodEmbeddable dangerousGood;
+    @Column(name = "service_level", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ShipmentServiceLevel serviceLevel;
+
+    @Column(name = "packaging_type")
+    @Enumerated(EnumType.STRING)
+    private PackagingType packagingType;
 
     @Embedded
     @AttributeOverrides({
@@ -197,9 +159,8 @@ public class ShipmentEntity extends BelongsToOperator {
     })
     private Money price;
 
-    @OneToOne
-    @JoinColumn(name = "shipment_id", referencedColumnName = "shipment_id", insertable = false)
-    private SignatureEntity signature;
+    @Column(name = "signature_required", nullable = false)
+    private Boolean signatureRequired;
 
     @Column(name = "external_id", nullable = false)
     @AttributeOverride(name = "value", column = @Column(name = "external_id"))
@@ -208,48 +169,4 @@ public class ShipmentEntity extends BelongsToOperator {
     @Column(name = "tracking_number", nullable = false)
     @AttributeOverride(name = "value", column = @Column(name = "tracking_number"))
     private TrackingNumber trackingNumber;
-
-	public ShipmentEntity(final ShipmentId shipmentId, final String senderFirstName, final String senderLastName,
-			final String senderEmail, final String senderCity, final String senderStreet, final String senderPostalCode,
-			final String senderTelephone, final String recipientFirstName, final String recipientLastName,
-			final String recipientEmail, final String recipientCity, final String recipientStreet,
-			final String recipientPostalCode, final String recipientTelephone,
-			final DepartmentId targetDepartmentId, final DepartmentId originDepartmentId, final ShipmentStatus shipmentStatus,
-            final ShipmentType shipmentType, final ShipmentId shipmentRelatedId, final LocalDateTime createdAt,
-            final LocalDateTime updatedAt, final Boolean locked, final CountryCode senderCountryCode,
-            final CountryCode recipientCountryCode, final Money price, final ShipmentPriority shipmentPriority,
-            final DangerousGoodEmbeddable dangerousGood, final ExternalId<String> externalId,
-            final TrackingNumber trackingNumber) {
-        this.shipmentId = shipmentId;
-        this.firstName = senderFirstName;
-        this.lastName = senderLastName;
-        this.senderEmail = senderEmail;
-        this.senderCity = senderCity;
-        this.senderStreet = senderStreet;
-        this.senderPostalCode = senderPostalCode;
-        this.senderTelephone = senderTelephone;
-        this.recipientFirstName = recipientFirstName;
-        this.recipientLastName = recipientLastName;
-        this.recipientEmail = recipientEmail;
-        this.recipientCity = recipientCity;
-        this.recipientStreet = recipientStreet;
-        this.recipientPostalCode = recipientPostalCode;
-        this.recipientTelephone = recipientTelephone;
-        this.targetDepartmentId = targetDepartmentId;
-        this.originDepartmentId = originDepartmentId;
-        this.shipmentStatus = shipmentStatus;
-        this.shipmentType = shipmentType;
-        this.shipmentRelatedId = shipmentRelatedId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.locked = locked;
-        this.senderCountryCode = senderCountryCode;
-        this.recipientCountryCode = recipientCountryCode;
-        this.shipmentPriority = shipmentPriority;
-        this.price = price;
-        this.dangerousGood = dangerousGood;
-        this.externalId = externalId;
-        this.trackingNumber = trackingNumber;
-    }
-
 }
