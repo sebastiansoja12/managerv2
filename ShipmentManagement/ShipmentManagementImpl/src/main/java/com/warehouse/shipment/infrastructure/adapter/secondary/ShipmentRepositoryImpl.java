@@ -28,7 +28,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     @Override
     public void createOrUpdate(final Shipment shipment) {
         final ShipmentEntity entity = this.persistenceMapper.toEntity(shipment);
-        if (writeModelExists(shipment.getShipmentId())) {
+        if (shipmentExists(shipment.getShipmentId())) {
             writeRepository.update(entity);
         } else {
             writeRepository.create(entity);
@@ -98,8 +98,8 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
                 .toList();
     }
 
-    private boolean writeModelExists(final ShipmentId shipmentId) {
-        return shipmentId != null && writeRepository.createCriteria(ShipmentEntity.class)
+    private boolean shipmentExists(final ShipmentId shipmentId) {
+        return shipmentId != null && this.writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("shipmentId.value", shipmentId.getValue())
                 .one()
                 .isPresent();
