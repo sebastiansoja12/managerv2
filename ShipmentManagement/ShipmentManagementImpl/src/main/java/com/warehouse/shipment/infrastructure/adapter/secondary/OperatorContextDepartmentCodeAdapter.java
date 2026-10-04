@@ -19,9 +19,7 @@ public class OperatorContextDepartmentCodeAdapter implements CurrentDepartmentCo
 
     @Override
     public DepartmentCode currentDepartmentCode() {
-        final DepartmentId departmentId = operatorContextProvider.currentDepartmentId()
-                .orElseThrow(() -> new IllegalStateException(
-                        "Department context is required for department based tracking number"));
+        final DepartmentId departmentId = operatorContextProvider.currentDepartmentId();
         return departmentServicePort.getDepartmentCode(departmentId);
     }
 }
