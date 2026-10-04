@@ -9,8 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
@@ -28,7 +26,7 @@ class OperatorContextDepartmentCodeAdapterTest {
     void shouldLoadDepartmentCodeForCurrentOperatorContext() {
         final DepartmentId departmentId = new DepartmentId(7L);
         final DepartmentCode departmentCode = new DepartmentCode("PO1");
-        when(operatorContextProvider.currentDepartmentId()).thenReturn(Optional.of(departmentId));
+        when(operatorContextProvider.currentDepartmentId()).thenReturn(departmentId);
         when(departmentServicePort.getDepartmentCode(departmentId)).thenReturn(departmentCode);
 
         final DepartmentCode result = adapter().currentDepartmentCode();
@@ -38,11 +36,12 @@ class OperatorContextDepartmentCodeAdapterTest {
 
     @Test
     void shouldRejectMissingDepartmentContext() {
-        when(operatorContextProvider.currentDepartmentId()).thenReturn(Optional.empty());
+        when(operatorContextProvider.currentDepartmentId())
+                .thenThrow(new IllegalStateException("Department context is required"));
 
         assertThatThrownBy(() -> adapter().currentDepartmentCode())
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Department context is required for department based tracking number");
+                .hasMessage("Department context is required");
     }
 
     private OperatorContextDepartmentCodeAdapter adapter() {
