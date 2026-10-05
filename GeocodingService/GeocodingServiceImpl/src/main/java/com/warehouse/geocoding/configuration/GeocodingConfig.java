@@ -20,6 +20,7 @@ import com.warehouse.geocoding.application.port.primary.GeocodingPort;
 import com.warehouse.geocoding.application.port.primary.GeocodingPortImpl;
 import com.warehouse.geocoding.application.port.primary.PostalCodePort;
 import com.warehouse.geocoding.application.port.primary.PostalCodePortImpl;
+import com.warehouse.geocoding.application.port.secondary.GeocodingAddressRepository;
 import com.warehouse.geocoding.application.port.secondary.GeocodingRepository;
 import com.warehouse.geocoding.application.port.secondary.PostalCodeRepository;
 import com.warehouse.geocoding.application.service.GeocodingService;
@@ -27,6 +28,8 @@ import com.warehouse.geocoding.application.service.GeocodingServiceImpl;
 import com.warehouse.geocoding.infrastructure.adapter.primary.GeocodingServiceAdapter;
 import com.warehouse.geocoding.infrastructure.adapter.primary.GeocodingCoordinatesServiceAdapter;
 import com.warehouse.geocoding.infrastructure.adapter.primary.PostalCodeServiceAdapter;
+import com.warehouse.geocoding.infrastructure.adapter.secondary.GeocodingAddressReadRepository;
+import com.warehouse.geocoding.infrastructure.adapter.secondary.GeocodingAddressRepositoryImpl;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.GeocodingConfigurationRepositoryImpl;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.GeolocationGeoapifyClientServiceAdapter;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.GeolocationGeocodifyClientServiceAdapter;
@@ -101,9 +104,15 @@ public class GeocodingConfig {
     }
 
     @Bean
+    public GeocodingAddressRepository geocodingAddressRepository(final GeocodingAddressReadRepository repository) {
+        return new GeocodingAddressRepositoryImpl(repository);
+    }
+
+    @Bean
     public GeocodingCoordinatesPort geocodingCoordinatesPort(final GeocodingPort geocodingPort,
-            final Set<GeocodingProviderServicePort> providers) {
-        return new GeocodingCoordinatesPortImpl(geocodingPort, providers);
+            final Set<GeocodingProviderServicePort> providers,
+            final GeocodingAddressRepository geocodingAddressRepository) {
+        return new GeocodingCoordinatesPortImpl(geocodingPort, providers, geocodingAddressRepository);
     }
 
     @Bean
