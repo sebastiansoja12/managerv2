@@ -21,6 +21,7 @@ import com.warehouse.mail.domain.port.primary.MailPort;
 import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
+import com.warehouse.pickuppoint.api.PickupPointApiService;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.ShipmentQueryPort;
 import com.warehouse.shipment.application.port.primary.ShipmentQueryPortImpl;
@@ -94,8 +95,10 @@ public class ShipmentConfiguration {
 	@Bean
 	public ShipmentResultFactory shipmentResultFactory(final DepartmentServicePort departmentServicePort,
 												 final RouteLogService routeLogService,
-												 final ReturningServicePort returningServicePort) {
-		return new ShipmentResultFactory(departmentServicePort, routeLogService, returningServicePort);
+												 final ReturningServicePort returningServicePort,
+												 final SignatureRepository signatureRepository) {
+		return new ShipmentResultFactory(departmentServicePort, routeLogService, returningServicePort,
+				signatureRepository);
 	}
 
 	@Bean
@@ -107,19 +110,34 @@ public class ShipmentConfiguration {
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberGenerationService trackingNumberGenerationService,
                                      final ShipmentConfigurationPort shipmentConfigurationServicePort,
-                                     final OperatorContextProvider operatorContextProvider,
                                      final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
                                      final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
                                      final DomainEventPublisher domainEventPublisher,
-                                     final DepartmentServicePort departmentServicePort) {
+                                     final DepartmentServicePort departmentServicePort,
+                                     final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService) {
 		return new ShipmentPortImpl(shipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				departmentCountryAvailabilityService, signatureService, shipmentResultFactory,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
-                operatorContextProvider, shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                domainEventPublisher, departmentServicePort);
+                shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
+                domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService);
 	}
+
+    @Bean
+    public ShipmentDepartmentResolutionService shipmentDepartmentResolutionService(
+            final PickupPointServicePort pickupPointServicePort,
+            final DepartmentServicePort departmentServicePort,
+            final PathFinderServicePort pathFinderServicePort,
+            final OperatorContextProvider operatorContextProvider) {
+        return new ShipmentDepartmentResolutionService(
+                pickupPointServicePort, departmentServicePort, pathFinderServicePort, operatorContextProvider);
+    }
+
+    @Bean
+    public PickupPointServicePort pickupPointServicePort(final PickupPointApiService pickupPointApiService) {
+        return new PickupPointServiceAdapter(pickupPointApiService);
+    }
 
     @Bean
     public ShipmentDeliveryStrategy shipmentDeliveredStrategy() {
@@ -283,9 +301,10 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public SignatureService signatureService(final SignatureRepository signatureRepository,
-											 final ShipmentRepository shipmentRepository,
+                                             final ShipmentRepository shipmentRepository,
+                                             final ShipmentReadModelRepository shipmentReadModelRepository,
                                              final DomainEventPublisher domainEventPublisher) {
-		return new SignatureServiceImpl(signatureRepository, shipmentRepository, domainEventPublisher);
+		return new SignatureServiceImpl(signatureRepository, shipmentRepository, shipmentReadModelRepository, domainEventPublisher);
 	}
 
 	@Bean
@@ -362,9 +381,10 @@ public class ShipmentConfiguration {
 	@Bean
 	public ShipmentReadModelRepository shipmentReadModelRepository(
 			final OperatorFilteredRepository<ShipmentReadEntity> repository,
-            final ShipmentPersistenceMapper persistenceMapper) {
+            final ShipmentPersistenceMapper persistenceMapper,
+            final SignatureRepository signatureRepository) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment read model repository");
-		return new ShipmentReadModelRepositoryImpl(repository, persistenceMapper);
+		return new ShipmentReadModelRepositoryImpl(repository, persistenceMapper, signatureRepository);
 	}
 
 	@Bean
