@@ -1,17 +1,22 @@
 package com.warehouse.shipment.application.port.primary;
 
-import com.warehouse.commonassets.enumeration.*;
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.enumeration.ShipmentStatus;
+import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.identificator.*;
-import com.warehouse.commonassets.model.Money;
-import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.application.port.primary.command.*;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.secondary.*;
-import com.warehouse.shipment.application.service.*;
+import com.warehouse.shipment.application.service.DepartmentCountryAvailabilityService;
+import com.warehouse.shipment.application.service.ShipmentDepartmentResolutionService;
+import com.warehouse.shipment.application.service.ShipmentResultFactory;
+import com.warehouse.shipment.application.service.SignatureService;
+import com.warehouse.shipment.application.service.TrackingNumberGenerationService;
 import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrategyResolver;
 import com.warehouse.shipment.application.service.status.ShipmentStatusChangeStrategyResolver;
 import com.warehouse.shipment.domain.enumeration.PersonType;
@@ -20,11 +25,12 @@ import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.service.ShipmentStateValidatorServiceImpl;
-import com.warehouse.shipment.domain.vo.*;
+import com.warehouse.shipment.domain.vo.Address;
+import com.warehouse.shipment.domain.vo.Party;
+import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.conf.ShipmentMetrics;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
@@ -33,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 
 public class ShipmentPortImpl implements ShipmentPort {
@@ -56,8 +61,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ShipmentConfigurationPort shipmentConfigurationServicePort;
 
-    private final OperatorContextProvider operatorContextProvider;
-
     private final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver;
 
     private final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver;
@@ -65,6 +68,8 @@ public class ShipmentPortImpl implements ShipmentPort {
     private final DomainEventPublisher domainEventPublisher;
 
     private final DepartmentServicePort departmentServicePort;
+
+    private final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService;
 
 	public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
                             final Logger logger,
@@ -75,11 +80,11 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final MailNotificationServicePort mailNotificationServicePort,
                             final TrackingNumberGenerationService trackingNumberGenerationService,
                             final ShipmentConfigurationPort shipmentConfigurationServicePort,
-                            final OperatorContextProvider operatorContextProvider,
                             final ShipmentDeliveryStrategyResolver shipmentDeliveryStrategyResolver,
                             final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
                             final DomainEventPublisher domainEventPublisher,
-                            final DepartmentServicePort departmentServicePort) {
+                            final DepartmentServicePort departmentServicePort,
+                            final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService) {
 		this.shipmentRepository = shipmentRepository;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -89,11 +94,11 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.mailNotificationServicePort = mailNotificationServicePort;
         this.trackingNumberGenerationService = trackingNumberGenerationService;
         this.shipmentConfigurationServicePort = shipmentConfigurationServicePort;
-        this.operatorContextProvider = operatorContextProvider;
         this.shipmentDeliveryStrategyResolver = shipmentDeliveryStrategyResolver;
         this.shipmentStatusChangeStrategyResolver = shipmentStatusChangeStrategyResolver;
         this.domainEventPublisher = domainEventPublisher;
         this.departmentServicePort = departmentServicePort;
+        this.shipmentDepartmentResolutionService = shipmentDepartmentResolutionService;
     }
 
     @Override
@@ -103,11 +108,11 @@ public class ShipmentPortImpl implements ShipmentPort {
         final OperatorShipmentConfiguration shipmentConfiguration =
                 this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration();
 
-        final CountryCode issuerCountryCode = command.getIssuerCountryCode();
-        final CountryCode receiverCountryCode = command.getReceiverCountryCode();
+        final Party sender = command.getSender();
+        final Party recipient = command.getRecipient();
 
         final Result<Void, ErrorCode> countryValidation =
-                validateCountries(issuerCountryCode, receiverCountryCode);
+                validateCountries(sender.getCountryCode(), recipient.getCountryCode());
 
         if (countryValidation.isFailure()) {
             return Result.failure(countryValidation.getFailure());
@@ -122,35 +127,22 @@ public class ShipmentPortImpl implements ShipmentPort {
             return Result.failure(ErrorCode.SHIPMENT_EXTENDED_LIMITATIONS);
         }
 
-        final Party sender = command.getSender().withCountryCode(issuerCountryCode);
-        final Party recipient = command.getRecipient().withCountryCode(receiverCountryCode);
-        final Address recipientAddress = Address.from(recipient);
-
         final PickupMethod pickupMethod = command.getPickupMethod();
         final ShipmentWorkflowSettings workflowSettings = shipmentConfiguration.workflowSettings();
         final ShipmentStatus initialStatus = pickupMethod.isPickupPointBased()
                 ? ShipmentStatus.PLANNED
                 : workflowSettings.defaultStatus();
 
-        final Result<VoronoiResponse, ErrorCode> voronoiResponse =
-                this.pathFinderServicePort.determineDeliveryDepartment(recipientAddress);
-
-        if (voronoiResponse.isFailure()) {
-            return Result.failure(voronoiResponse.getFailure());
+        final Result<DepartmentId, ErrorCode> targetDepartment =
+                shipmentDepartmentResolutionService.resolveTargetDepartmentId(command, recipient);
+        if (targetDepartment.isFailure()) {
+            return Result.failure(targetDepartment.getFailure());
         }
 
-        final Money shipmentPrice = command.getPrice();
-
-        final DepartmentId targetDepartmentId = departmentServicePort.getDepartmentId(
-                voronoiResponse.getSuccess().getDepartmentCodeResult());
-        if (targetDepartmentId == null || targetDepartmentId.getValue() == null) {
-            return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
-        }
-
-        final DepartmentId originDepartmentId = operatorContextProvider.currentDepartmentId().orElse(null);
-        if (!pickupMethod.isPickupPointBased()
-                && (originDepartmentId == null || originDepartmentId.getValue() == null)) {
-            return Result.failure(ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
+        final Result<DepartmentId, ErrorCode> originDepartment =
+                shipmentDepartmentResolutionService.resolveOriginDepartmentId(command);
+        if (originDepartment.isFailure()) {
+            return Result.failure(originDepartment.getFailure());
         }
 
         final ShipmentId shipmentId = ShipmentId.nextId();
@@ -162,15 +154,13 @@ public class ShipmentPortImpl implements ShipmentPort {
                 sender,
                 recipient,
                 null,
-                shipmentPrice,
+                command.getPrice(),
                 false,
-                targetDepartmentId,
-                originDepartmentId,
-                null,
+                targetDepartment.getSuccess(),
+                originDepartment.getSuccess(),
                 command.getShipmentPriority(),
                 trackingNumber,
                 initialStatus,
-                command.getDangerousGood(),
                 pickupMethod,
                 command.getDeliveryMethod(),
                 pickupMethod.isPickupPointBased() ? command.getPickupPointId() : null,
@@ -179,7 +169,9 @@ public class ShipmentPortImpl implements ShipmentPort {
                 command.getWeight(),
                 command.getCustomerReference(),
                 command.getContentDescription(),
-                command.getDeclaredValue()
+                command.getDeclaredValue(),
+                command.getServiceLevel() == null ? workflowSettings.defaultServiceLevel() : command.getServiceLevel(),
+                command.getPackagingType()
         );
 
         this.shipmentRepository.createOrUpdate(shipment);
@@ -191,79 +183,18 @@ public class ShipmentPortImpl implements ShipmentPort {
                 shipment.getTrackingNumber().value()));
     }
 
-    @Override
-    @Transactional
-    public Result<Void, ErrorCode> update(final ShipmentUpdateCommand command) {
-
-        final Shipment shipment = this.find(command.getShipmentId());
-        if (shipment == null) {
-            return Result.failure(ErrorCode.SHIPMENT_204);
-        }
-
-        final ShipmentConfiguration configuration = command.getShipmentConfiguration();
-
-        final CountryCode issuerCountryCode = command.getIssuerCountryCode();
-        final CountryCode receiverCountryCode = command.getReceiverCountryCode();
-
-        final Result<Void, ErrorCode> countryValidation =
-                validateCountries(issuerCountryCode, receiverCountryCode);
-        if (countryValidation.isFailure()) {
-            return Result.failure(countryValidation.getFailure());
-        }
-
-        final DepartmentId targetDepartmentId = resolveTargetDepartmentId(command, shipment, configuration);
-
-        final Money shipmentPrice = command.getPrice();
-
-        shipment.update(
-                command.getSender().withCountryCode(issuerCountryCode),
-                command.getRecipient().withCountryCode(receiverCountryCode),
-                command.getShipmentStatus(),
-                command.getShipmentPriority(),
-                shipmentPrice,
-                command.getDangerousGood(),
-                targetDepartmentId,
-                shipment.getSignatureRequired(),
-                command.getDimensions(), command.getWeight(), command.getCustomerReference(),
-                command.getContentDescription(), command.getDeclaredValue()
-        );
-
-        this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentUpdated(shipment.snapshot(), Instant.now()));
-
-        return Result.success();
-    }
-
     private Result<Void, ErrorCode> validateCountries(
-            final CountryCode issuerCountryCode, final CountryCode receiverCountryCode) {
+            final CountryCode senderCountryCode, final CountryCode recipientCountryCode) {
 
-        if (!this.departmentCountryAvailabilityService.isCountryAvailable(issuerCountryCode)) {
+        if (!this.departmentCountryAvailabilityService.isCountryAvailable(senderCountryCode)) {
             return Result.failure(ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
         }
 
-        if (!this.departmentCountryAvailabilityService.isCountryAvailable(receiverCountryCode)) {
+        if (!this.departmentCountryAvailabilityService.isCountryAvailable(recipientCountryCode)) {
             return Result.failure(ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
         }
 
         return Result.success();
-    }
-
-    @Override
-    public Optional<DangerousGood> loadDangerousGood(final ShipmentId shipmentId) {
-        return Optional.ofNullable(this.shipmentRepository.findById(shipmentId).getDangerousGood());
-    }
-
-    @Override
-    public void putDangerousGood(final ShipmentId shipmentId, final DangerousGood dangerousGood) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.changeDangerousGood(dangerousGood);
-        this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentDangerousGoodUpdated(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public void deleteDangerousGood(final ShipmentId shipmentId) {
-        this.removeDangerousGood(shipmentId);
     }
 
     @Override
@@ -349,7 +280,7 @@ public class ShipmentPortImpl implements ShipmentPort {
                     shipment.getRecipient(), shipment.getShipmentId(),
                     shipment.getPrice(),
 					shipment.getTargetDepartmentId(), shipment.getOriginDepartmentId(),
-                    shipment.getSignature(), shipment.getShipmentPriority(), trackingNumber,
+                    shipment.getSignatureRequired(), shipment.getShipmentPriority(), trackingNumber,
 					shipmentConfiguration.workflowSettings().defaultStatus());
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.CHILD, shipmentId);
 			this.shipmentRepository.createOrUpdate(newShipment);
@@ -412,25 +343,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                 shipment.getShipmentPriority());
     }
 
-    private DepartmentId resolveTargetDepartmentId(final ShipmentUpdateCommand command,
-                                                   final Shipment shipment,
-                                                   final ShipmentConfiguration configuration) {
-
-        if (configuration.customRerouteDepartment()) {
-            return departmentServicePort.getDepartmentId(command.getDestination());
-        }
-
-        final Address address = Address.from(command.getShipmentStatus()
-                .equals(ShipmentStatus.RETURN) ? command.getSender() : command.getRecipient());
-
-        final Result<VoronoiResponse, ErrorCode> voronoiResult =
-                this.pathFinderServicePort.determineDeliveryDepartment(address);
-
-        return voronoiResult.isSuccess()
-                ? departmentServicePort.getDepartmentId(voronoiResult.getSuccess().getDepartmentCodeResult())
-                : shipment.getTargetDepartmentId();
-    }
-
     private Shipment find(final ShipmentId shipmentId) {
         return this.shipmentRepository.findById(shipmentId);
     }
@@ -451,14 +363,6 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
         this.shipmentRepository.createOrUpdate(shipment);
         this.domainEventPublisher.publish(new ShipmentTypeChanged(shipment.snapshot(), Instant.now()));
-    }
-
-    @Override
-    public void removeDangerousGood(final ShipmentId shipmentId) {
-        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
-        shipment.removeDangerousGood();
-        this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentDangerousGoodRemoved(shipment.snapshot(), Instant.now()));
     }
 
     @Override
