@@ -31,6 +31,10 @@ public class ShipmentDto {
 
     private final ShipmentPriorityDto shipmentPriority;
 
+    private final PackagingTypeDto packagingType;
+
+    private final ShipmentServiceLevelDto serviceLevel;
+
     private final TrackingNumberDto trackingNumber;
 
     private final MoneyApi price;
@@ -38,8 +42,6 @@ public class ShipmentDto {
     private final Boolean locked;
 
     private final SignatureDto signature;
-
-    private final DangerousGoodApi dangerousGood;
 
     private final LocalDateTime createdAt;
 
@@ -63,11 +65,12 @@ public class ShipmentDto {
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
                        final TrackingNumberDto trackingNumber,
                        final MoneyApi price, final Boolean locked,
-                       final SignatureDto signature, final DangerousGoodApi dangerousGood,
+                       final SignatureDto signature,
                        final LocalDateTime createdAt, final LocalDateTime updatedAt,
                        final DimensionsApi dimensions, final WeightApi weight,
                        final String customerReference, final String contentDescription,
-                       final MoneyApi declaredValue) {
+                       final MoneyApi declaredValue, final PackagingTypeDto packagingType,
+                       final ShipmentServiceLevelDto serviceLevel) {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
@@ -79,11 +82,12 @@ public class ShipmentDto {
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentPriority = shipmentPriority;
+        this.packagingType = packagingType;
+        this.serviceLevel = serviceLevel;
         this.trackingNumber = trackingNumber;
         this.price = price;
         this.locked = locked;
         this.signature = signature;
-        this.dangerousGood = dangerousGood;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.dimensions = dimensions;
@@ -157,12 +161,12 @@ public class ShipmentDto {
         return shipmentPriority;
     }
 
+    public PackagingTypeDto getPackagingType() { return packagingType; }
+
+    public ShipmentServiceLevelDto getServiceLevel() { return serviceLevel; }
+
     public SignatureDto getSignature() {
         return signature;
-    }
-
-    public DangerousGoodApi getDangerousGood() {
-        return dangerousGood;
     }
 
     public TrackingNumberDto getTrackingNumber() {
