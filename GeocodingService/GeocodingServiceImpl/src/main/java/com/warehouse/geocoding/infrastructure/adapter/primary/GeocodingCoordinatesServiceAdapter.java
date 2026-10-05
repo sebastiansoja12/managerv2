@@ -18,7 +18,8 @@ public class GeocodingCoordinatesServiceAdapter implements GeocodingCoordinatesS
     @Override
     public GeocodingCoordinatesDto findCoordinates(final GeocodingAddressDto address) {
         final Coordinates coordinates = geocodingCoordinatesPort.obtainCoordinates(
-                new GeocodingAddress(address.city(), address.street(), address.postalCode()));
+                new GeocodingAddress(address.city(), address.street(), address.postalCode(),
+                        address.countryCode()));
         return new GeocodingCoordinatesDto(coordinates.lat(), coordinates.lon());
     }
 }
