@@ -85,6 +85,118 @@ class GeolocationGeocodifyClientServiceAdapterTest {
     }
 
     @Test
+    void shouldPreferAddressMatchOverFallbackFeature() {
+        expectGeocodifyRequest("""
+                {
+                  "meta": {
+                    "code": 200
+                  },
+                  "response": {
+                    "type": "FeatureCollection",
+                    "features": [
+                      {
+                        "type": "Feature",
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [13.40, 52.52]
+                        },
+                        "properties": {
+                          "layer": "locality",
+                          "match_type": "fallback"
+                        }
+                      },
+                      {
+                        "type": "Feature",
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [13.4142133, 52.5432379]
+                        },
+                        "properties": {
+                          "layer": "address",
+                          "match_type": "exact"
+                        }
+                      }
+                    ]
+                  }
+                }
+                """);
+
+        final Coordinates coordinates = adapter.obtainCoordinates(ADDRESS, CONFIG);
+
+        assertEquals(52.5432379, coordinates.lat());
+        assertEquals(13.4142133, coordinates.lon());
+        assertFalse(coordinates.approximate());
+        server.verify();
+    }
+
+    @Test
+    void shouldMarkCoordinatesAsApproximateWhenOnlyFallbackMatchIsReturned() {
+        expectGeocodifyRequest("""
+                {
+                  "meta": {
+                    "code": 200
+                  },
+                  "response": {
+                    "type": "FeatureCollection",
+                    "features": [
+                      {
+                        "type": "Feature",
+                        "geometry": {
+                          "type": "Point",
+                          "coordinates": [13.40, 52.52]
+                        },
+                        "properties": {
+                          "layer": "postalcode",
+                          "match_type": "fallback"
+                        }
+                      }
+                    ]
+                  }
+                }
+                """);
+
+        final Coordinates coordinates = adapter.obtainCoordinates(ADDRESS, CONFIG);
+
+        assertEquals(52.52, coordinates.lat());
+        assertTrue(coordinates.approximate());
+        server.verify();
+    }
+
+    @Test
+    void shouldRestrictSearchToAddressCountry() {
+        server.expect(once(), request -> assertTrue(URLDecoder.decode(request.getURI().getRawQuery(),
+                        StandardCharsets.UTF_8).contains("boundary.country=PL")))
+                .andRespond(withSuccess("""
+                        {
+                          "meta": {
+                            "code": 200
+                          },
+                          "response": {
+                            "type": "FeatureCollection",
+                            "features": [
+                              {
+                                "type": "Feature",
+                                "geometry": {
+                                  "type": "Point",
+                                  "coordinates": [18.629415, 50.1558521]
+                                },
+                                "properties": {
+                                  "layer": "address"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                        """, MediaType.APPLICATION_JSON));
+
+        final Coordinates coordinates = adapter.obtainCoordinates(
+                new GeocodingAddress("Książenice", "Za Torem 16", "44-213", "PL"), CONFIG);
+
+        assertEquals(50.1558521, coordinates.lat());
+        server.verify();
+    }
+
+    @Test
     void shouldThrowWhenGeocodifyReturnsErrorMeta() {
         expectGeocodifyRequest("""
                 {
