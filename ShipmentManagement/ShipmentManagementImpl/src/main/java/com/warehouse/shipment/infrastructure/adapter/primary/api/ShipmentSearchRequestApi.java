@@ -18,11 +18,6 @@ public record ShipmentSearchRequestApi(
         Boolean locked,
         LocalDateTime createdFrom,
         LocalDateTime createdTo,
-        Boolean hasDangerousGoods,
-        String unNumber,
-        String hazardClass,
-        String regulationType,
-        String transportMode,
         Integer page,
         Integer size
 ) {
