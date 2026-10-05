@@ -1,6 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.validator;
 
-import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.shipment.application.service.PriceService;
 import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
@@ -71,13 +70,6 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             errors.add("Delivery pickup point is required for the selected delivery method");
         }
 
-        try {
-            CountryCode.valueOf(request.issuerCountryCode());
-            CountryCode.valueOf(request.receiverCountryCode());
-        } catch (final IllegalArgumentException e) {
-            errors.add("Invalid country code");
-        }
-
         if (!errors.isEmpty()) {
             throw new ShipmentValidationException(errors, HttpStatus.BAD_REQUEST);
         }
@@ -97,19 +89,19 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     private List<String> validatePerson(final PersonApi person) {
         final Set<String> errors = new HashSet<>();
 
-        if (StringUtils.isEmpty(person.getFirstName())) {
+        if (StringUtils.isEmpty(person.firstName())) {
             errors.add("First name is required");
         }
 
-        if (StringUtils.isEmpty(person.getLastName())) {
+        if (StringUtils.isEmpty(person.lastName())) {
             errors.add("Last name is required");
         }
 
-        if (StringUtils.isEmpty(person.getEmail())) {
+        if (StringUtils.isEmpty(person.email())) {
             errors.add("Email is required");
         }
 
-        String telephone = person.getTelephoneNumber();
+        String telephone = person.telephoneNumber();
         if (StringUtils.isEmpty(telephone)) {
             errors.add("Telephone number for sender/recipient is required");
         } else {
@@ -121,16 +113,20 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
             }
         }
 
-        if (StringUtils.isEmpty(person.getCity())) {
+        if (StringUtils.isEmpty(person.city())) {
             errors.add("City is required");
         }
 
-        if (StringUtils.isEmpty(person.getStreet())) {
+        if (StringUtils.isEmpty(person.street())) {
             errors.add("Street is required");
         }
 
-        if (StringUtils.isEmpty(person.getPostalCode())) {
+        if (StringUtils.isEmpty(person.postalCode())) {
             errors.add("Postal code is required");
+        }
+
+        if (person.countryCode() == null) {
+            errors.add("Country code is required");
         }
 
         return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
@@ -140,46 +136,6 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
     @Override
     public void validateRequest(final ShipmentCreateRequestApi shipmentRequest, final ShipmentValidationRules validationRules) {
         validateRequest(shipmentRequest);
-    }
-
-    @Override
-    public void validateBody(final ShipmentUpdateRequestApi shipmentRequest) {
-        validateRequestObj(shipmentRequest);
-        final List<String> errors = new ArrayList<>();
-
-        if (shipmentRequest.dimensions() == null) {
-            errors.add("Dimensions are required");
-        } else {
-            validatePositive(shipmentRequest.dimensions().length(), "Length", errors);
-            validatePositive(shipmentRequest.dimensions().width(), "Width", errors);
-            validatePositive(shipmentRequest.dimensions().height(), "Height", errors);
-            if (shipmentRequest.dimensions().unit() == null) {
-                errors.add("Dimensions unit is required");
-            }
-        }
-
-        if (shipmentRequest.weight() == null) {
-            errors.add("Weight is required");
-        } else {
-            validatePositive(shipmentRequest.weight().value(), "Weight", errors);
-            if (shipmentRequest.weight().unit() == null) {
-                errors.add("Weight unit is required");
-            }
-        }
-
-        if (shipmentRequest.customerReference() != null && StringUtils.isBlank(shipmentRequest.customerReference())) {
-            errors.add("Customer reference cannot be blank");
-        }
-        if (validateShipmentPrice(shipmentRequest.price())) {
-            errors.add("Invalid price");
-        }
-        if (shipmentRequest.declaredValue() != null && validateShipmentPrice(shipmentRequest.declaredValue())) {
-            errors.add("Invalid declared value");
-        }
-
-        if (!errors.isEmpty()) {
-            throw new ShipmentValidationException(errors, HttpStatus.BAD_REQUEST);
-        }
     }
 
     @Override

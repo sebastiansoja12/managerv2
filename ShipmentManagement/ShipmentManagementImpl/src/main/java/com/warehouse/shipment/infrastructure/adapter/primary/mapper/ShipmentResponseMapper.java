@@ -30,6 +30,12 @@ public interface ShipmentResponseMapper {
     }
 
     default ShipmentDto map(final ShipmentSnapshot shipment, final DepartmentCode departmentCode) {
+        return map(shipment, departmentCode, null);
+    }
+
+    default ShipmentDto map(final ShipmentSnapshot shipment,
+                            final DepartmentCode departmentCode,
+                            final com.warehouse.shipment.domain.model.Signature signature) {
         if (shipment == null) {
             return null;
         }
@@ -50,21 +56,24 @@ public interface ShipmentResponseMapper {
                 shipment.trackingNumber() == null ? null : new TrackingNumberDto(shipment.trackingNumber().value()),
                 map(shipment.price()),
                 shipment.locked(),
-                map(shipment.signature()),
-                map(shipment.dangerousGood()),
+                map(signature),
                 shipment.createdAt(),
                 shipment.updatedAt(),
                 map(shipment.dimensions()),
                 map(shipment.weight()),
                 shipment.customerReference() == null ? null : shipment.customerReference().value(),
                 shipment.contentDescription(),
-                map(shipment.declaredValue()));
+                map(shipment.declaredValue()),
+                shipment.packagingType() == null ? null
+                        : PackagingTypeDto.valueOf(shipment.packagingType().name()),
+                shipment.serviceLevel() == null ? null
+                        : ShipmentServiceLevelDto.valueOf(shipment.serviceLevel().name()));
         response.setDeliveryPickupPointId(shipment.deliveryPickupPointId());
         return response;
     }
 
     default ShipmentDto map(final ShipmentResult shipmentResult) {
-        return map(shipmentResult.snapshot(), shipmentResult.destination());
+        return map(shipmentResult.snapshot(), shipmentResult.destination(), shipmentResult.signature());
     }
 
     default PersonApi map(final Party person) {
@@ -84,27 +93,6 @@ public interface ShipmentResponseMapper {
 
     default DepartmentCodeDto map(final DepartmentCode departmentCode) {
         return departmentCode == null ? null : new DepartmentCodeDto(departmentCode.getValue());
-    }
-
-    default DangerousGoodApi map(final com.warehouse.shipment.domain.model.DangerousGood dangerousGood) {
-        if (dangerousGood == null) {
-            return null;
-        }
-        return new DangerousGoodApi(
-                dangerousGood.getUnNumber(), dangerousGood.getProperShippingName(), dangerousGood.getDescription(),
-                dangerousGood.getHazardClass(), dangerousGood.getHazardDivision(), dangerousGood.getSubsidiaryRisk(),
-                dangerousGood.getPackingGroup(), dangerousGood.getQuantity(), dangerousGood.getQuantityUnit(),
-                dangerousGood.getPackageCount(), dangerousGood.getPackagingType(), dangerousGood.isLimitedQuantity(),
-                dangerousGood.isExceptedQuantity(), dangerousGood.isEnvironmentallyHazardous(),
-                dangerousGood.isMarinePollutant(), dangerousGood.getTransportCategory(),
-                dangerousGood.getTunnelRestrictionCode(), dangerousGood.getFlashPoint(),
-                dangerousGood.getEmergencyContact(), dangerousGood.getEmergencyContact24h(),
-                dangerousGood.getSafetyDataSheetReference(), dangerousGood.getDeclarationDocumentReference(),
-                dangerousGood.getRegulationType(), dangerousGood.getTransportMode(), dangerousGood.isFlammable(),
-                dangerousGood.isCorrosive(), dangerousGood.isToxic(), dangerousGood.getHazardSymbols(),
-                dangerousGood.getStorageRequirements(), dangerousGood.getHandlingInstructions(),
-                dangerousGood.getCountryOfOrigin()
-        );
     }
 
     default ShipmentRouteLogResponseApi mapShipmentRouteLog(final ShipmentRouteLog shipmentRouteLog,
