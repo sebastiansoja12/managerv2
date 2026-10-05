@@ -14,6 +14,7 @@ import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryType;
 import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 public record DeliverySnapshot(DeliveryId deliveryId,
@@ -40,6 +41,14 @@ public record DeliverySnapshot(DeliveryId deliveryId,
 
     public DeliverySnapshot {
         deliverySteps = List.copyOf(deliverySteps);
+    }
+
+    public DepartmentId currentDepartmentId() {
+        return deliverySteps.stream()
+                .filter(step -> step.departmentId() != null)
+                .max(Comparator.comparingInt(DeliveryStepSnapshot::stepNumber))
+                .map(DeliveryStepSnapshot::departmentId)
+                .orElse(originDepartmentId);
     }
 
     public boolean describesCurrentShipmentDelivery() {
