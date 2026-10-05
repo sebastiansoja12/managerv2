@@ -12,13 +12,13 @@ import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxRecord;
 import com.warehouse.commonassets.kafka.domain.model.KafkaOutboxStatus;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.JdbcKafkaOutboxAdapter;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.OutboxIntegrationEventPublisher;
-import com.warehouse.shipment.application.event.ShipmentCanceledMessage;
-import com.warehouse.shipment.application.event.ShipmentChangedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentCreatedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentDestinationChangedIntegrationEvent;
-import com.warehouse.shipment.application.event.ShipmentReadModelChanged;
-import com.warehouse.shipment.application.event.ShipmentStatusChangedIntegrationEvent;
-import com.warehouse.shipment.application.event.snapshot.ShipmentEventData;
+import com.warehouse.shipment.api.event.ShipmentCanceledMessage;
+import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
+import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
+import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
 import com.warehouse.shipment.application.listener.ShipmentIntegrationEventListener;
 import com.warehouse.shipment.application.listener.ShipmentReadModelSyncIntegrationEventListener;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
@@ -162,7 +162,6 @@ class ShipmentArchitectureTest {
                 .doesNotContain("public void notifyShipmentSent")
                 .contains("public void notifyShipmentReturnCompleted")
                 .contains("public void notifyShipmentReturnCanceled")
-                .contains("public void notifyShipmentDelivered")
                 .doesNotContain("ApplicationEventPublisher")
                 .doesNotContain("ShipmentEventContext")
                 .contains("DomainEventPublisher")
@@ -185,8 +184,7 @@ class ShipmentArchitectureTest {
                 "src/main/java/com/warehouse/shipment/application/port/primary/ShipmentPort.java"));
         assertThat(shipmentPortContract)
                 .contains("void notifyShipmentReturnCompleted")
-                .contains("void notifyShipmentReturnCanceled")
-                .contains("void notifyShipmentDelivered");
+                .contains("void notifyShipmentReturnCanceled");
 
         final Path shipmentIdGeneratorPort = Path.of(
                 "src/main/java/com/warehouse/shipment/application/port/secondary/ShipmentIdGenerator.java");
@@ -205,14 +203,23 @@ class ShipmentArchitectureTest {
 
         assertThat(listenerSource)
                 .contains("handle(final ShipmentCreated event)")
-                .contains("new ShipmentCreatedIntegrationEvent(")
-                .contains("ShipmentEventData.from(event.getSnapshot())")
-                .contains("IntegrationEventPublisher")
+                .contains("ShipmentIntegrationEventServicePort")
+                .contains("ShipmentEventDataMapperPort")
+                .contains("publishEvent(")
+                .doesNotContain("IntegrationEventPublisher")
                 .doesNotContain("ShipmentPort")
                 .doesNotContain("PathFinderServicePort")
                 .doesNotContain("Optional<")
                 .doesNotContain("TODO")
                 .doesNotContain("handle(final ShipmentEvent event)");
+
+        final String adapterSource = Files.readString(Path.of(
+                "src/main/java/com/warehouse/shipment/infrastructure/adapter/secondary/ShipmentIntegrationEventServiceAdapter.java"));
+        assertThat(adapterSource)
+                .contains("implements ShipmentIntegrationEventServicePort")
+                .contains("publishEvent(final IntegrationEvent event)")
+                .contains("integrationEventPublisher.publish(event)")
+                .contains("IntegrationEventPublisher");
 
         final String domainListenerSource = Files.readString(Path.of(
                 "src/main/java/com/warehouse/shipment/application/listener/ShipmentDomainEventListener.java"));
@@ -223,11 +230,11 @@ class ShipmentArchitectureTest {
                 .doesNotContain("IntegrationEvent");
 
         final String integrationEvent = Files.readString(Path.of(
-                "src/main/java/com/warehouse/shipment/application/event/ShipmentChangedIntegrationEvent.java"));
+                "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/ShipmentChangedIntegrationEvent.java"));
         assertThat(integrationEvent)
                 .contains("@IntegrationEventType(value = \"shipment.changed\", version = 1)")
                 .contains("ShipmentEventData payload")
-                .contains("ShipmentChangedIntegrationEvent(final ShipmentEventData shipmentEventData)")
+                .contains("ShipmentChangedIntegrationEvent(@JsonProperty(\"payload\") final ShipmentEventData shipmentEventData)")
                 .doesNotContain("UUID eventId")
                 .doesNotContain("Instant occurredAt")
                 .doesNotContain("private String eventType")
@@ -241,7 +248,7 @@ class ShipmentArchitectureTest {
                 .doesNotExist();
 
         final String integrationSnapshot = Files.readString(Path.of(
-                "src/main/java/com/warehouse/shipment/application/event/snapshot/ShipmentEventData.java"));
+                "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/snapshot/ShipmentEventData.java"));
         assertThat(integrationSnapshot)
                 .contains("ShipmentId shipmentId")
                 .contains("DepartmentId originDepartmentId")
@@ -251,14 +258,12 @@ class ShipmentArchitectureTest {
                 .doesNotContain("Long shipmentId")
                 .doesNotContain("record SenderSnapshot(")
                 .doesNotContain("record RecipientSnapshot(")
-                .doesNotContain("record DangerousGoodSnapshot(")
                 .doesNotContain("record SignatureSnapshot(");
         final Path snapshotPackage = Path.of(
-                "src/main/java/com/warehouse/shipment/application/event/snapshot");
+                "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/snapshot");
         assertThat(snapshotPackage.resolve("PartySnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("MoneySnapshot.java")).exists();
-        assertThat(snapshotPackage.resolve("DangerousGoodSnapshot.java")).exists();
-        assertThat(snapshotPackage.resolve("SignatureSnapshot.java")).exists();
+        assertThat(Path.of("src/main/java/com/warehouse/shipment/application/event/snapshot/SignatureSnapshot.java")).exists();
     }
 
     @Test
@@ -326,7 +331,7 @@ class ShipmentArchitectureTest {
         assertThat(IntegrationEventKey.class).isAssignableFrom(ShipmentReadModelChanged.class);
 
         final String eventSource = Files.readString(Path.of(
-                "src/main/java/com/warehouse/shipment/application/event/ShipmentReadModelChanged.java"));
+                "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/ShipmentReadModelChanged.java"));
         assertThat(eventSource)
                 .contains("ShipmentReadModelData")
                 .contains("IntegrationEventKey")
@@ -334,7 +339,7 @@ class ShipmentArchitectureTest {
                 .doesNotContain("commonassets.kafka");
 
         final String dataSource = Files.readString(Path.of(
-                "src/main/java/com/warehouse/shipment/application/event/snapshot/ShipmentReadModelData.java"));
+                "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/snapshot/ShipmentReadModelData.java"));
         assertThat(dataSource)
                 .contains("ShipmentId shipmentId")
                 .doesNotContain("shipment.domain")
@@ -416,7 +421,7 @@ class ShipmentArchitectureTest {
                 "src/main/java/com/warehouse/shipment/infrastructure/adapter/secondary/kafka/ShipmentReadModelSyncKafkaPublisher.java"))
                 .doesNotExist();
         assertThat(Path.of(
-                "src/main/java/com/warehouse/shipment/application/event/ShipmentReadModelChanged.java"))
+                "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/ShipmentReadModelChanged.java"))
                 .exists();
         assertThat(Path.of(
                 "src/main/java/com/warehouse/shipment/infrastructure/adapter/primary/kafka/ShipmentReadModelKafkaConfiguration.java"))
