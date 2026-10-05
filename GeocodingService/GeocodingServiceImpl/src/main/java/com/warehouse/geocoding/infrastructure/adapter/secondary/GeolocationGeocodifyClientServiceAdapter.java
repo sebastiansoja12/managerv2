@@ -8,6 +8,7 @@ import com.warehouse.geocoding.domain.vo.GeocodingConfig;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.dto.GeocodifyGeocodingFeature;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.dto.GeocodifyGeocodingFeatureCollection;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.dto.GeocodifyGeocodingMeta;
+import com.warehouse.geocoding.infrastructure.adapter.secondary.dto.GeocodifyGeocodingProperties;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.dto.GeocodifyGeocodingResponse;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.exception.CoordinatesTechnicalException;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 public class GeolocationGeocodifyClientServiceAdapter extends RestGatewaySupport implements GeocodingProviderServicePort {
 
     private static final int STATUS_OK = 200;
+
+    private static final Set<String> PRECISE_LAYERS = Set.of("address", "venue");
+
+    private static final String FALLBACK_MATCH_TYPE = "fallback";
 
     @Override
     public boolean canHandle(final GeocodingProvider geocodingProvider) {
@@ -46,9 +53,13 @@ public class GeolocationGeocodifyClientServiceAdapter extends RestGatewaySupport
     }
 
     private URI requestUri(final GeocodingAddress address, final GeocodingConfig geocodingConfig) {
-        return UriComponentsBuilder.fromUriString(geocodingConfig.baseUrl())
+        final UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(geocodingConfig.baseUrl())
                 .queryParam("api_key", geocodingConfig.apiKey())
-                .queryParam("q", address.formattedAddress())
+                .queryParam("q", address.formattedAddress());
+        if (address.countryCode() != null && !address.countryCode().isBlank()) {
+            builder.queryParam("boundary.country", address.countryCode().trim());
+        }
+        return builder
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUri();
@@ -60,7 +71,9 @@ public class GeolocationGeocodifyClientServiceAdapter extends RestGatewaySupport
                 || featureCollection.features().isEmpty()) {
             throw new CoordinatesTechnicalException("Geocodify returned no coordinates for address: " + requestText);
         }
-        final GeocodifyGeocodingFeature feature = featureCollection.features().getFirst();
+        final GeocodifyGeocodingFeature feature = featureCollection.features().stream()
+                .min(Comparator.comparing(this::approximate))
+                .orElseThrow();
         if (feature.geometry() == null || feature.geometry().coordinates() == null
                 || feature.geometry().coordinates().size() < 2) {
             throw new CoordinatesTechnicalException("Failed to retrieve coordinates from the API.");
@@ -72,6 +85,16 @@ public class GeolocationGeocodifyClientServiceAdapter extends RestGatewaySupport
         return Coordinates.builder()
                 .lat(coordinates.get(1))
                 .lon(coordinates.get(0))
+                .approximate(approximate(feature))
                 .build();
+    }
+
+    private boolean approximate(final GeocodifyGeocodingFeature feature) {
+        final GeocodifyGeocodingProperties properties = feature.properties();
+        if (properties == null) {
+            return false;
+        }
+        return FALLBACK_MATCH_TYPE.equals(properties.matchType())
+                || (properties.layer() != null && !PRECISE_LAYERS.contains(properties.layer()));
     }
 }
