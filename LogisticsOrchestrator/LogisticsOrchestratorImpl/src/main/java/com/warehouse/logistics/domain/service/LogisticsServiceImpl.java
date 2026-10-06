@@ -1,81 +1,90 @@
 package com.warehouse.logistics.domain.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.logistics.domain.model.LogisticsRequest;
-import com.warehouse.logistics.domain.model.LogisticsResponse;
+import com.warehouse.commonassets.enumeration.ProcessType;
+import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.logistics.domain.enumeration.DeliveryStatus;
+import com.warehouse.logistics.domain.enumeration.DeliveryType;
+import com.warehouse.logistics.domain.model.*;
 import com.warehouse.logistics.domain.port.secondary.DeliveryTokenServicePort;
+import com.warehouse.logistics.domain.port.secondary.DepartmentRepository;
 import com.warehouse.logistics.domain.port.secondary.LogisticsRepository;
-import com.warehouse.logistics.domain.vo.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LogisticsServiceImpl implements LogisticsService {
 
     private final LogisticsRepository logisticsRepository;
 
     private final DeliveryTokenServicePort deliveryTokenServicePort;
+    private final DepartmentRepository departmentRepository;
+    private final OperatorContextProvider operatorContextProvider;
 
     public LogisticsServiceImpl(final LogisticsRepository logisticsRepository,
-                                final DeliveryTokenServicePort deliveryTokenServicePort) {
+                                final DeliveryTokenServicePort deliveryTokenServicePort,
+                                final DepartmentRepository departmentRepository,
+                                final OperatorContextProvider operatorContextProvider) {
         this.logisticsRepository = logisticsRepository;
         this.deliveryTokenServicePort = deliveryTokenServicePort;
+        this.departmentRepository = departmentRepository;
+        this.operatorContextProvider = operatorContextProvider;
     }
 
     @Override
     public Set<LogisticsResponse> save(final Set<LogisticsRequest> logisticsRequests) {
-		return logisticsRequests.stream()
-                .map(logisticsRepository::create)
+        return logisticsRequests.stream()
+                .map(this::process)
                 .collect(Collectors.toSet());
     }
 
-    private DeliveryTokenRequest buildTokenRequest(final Set<LogisticsRequest> deliveries) {
-        final List<DeliveryPackageRequest> deliveryPackageRequests = deliveries
-                .stream()
-                .map(this::createDeliveryPackageRequests)
-                .flatMap(Collection::stream)
-                .toList();
-        return DeliveryTokenRequest.builder()
-                .deliveryPackageRequests(deliveryPackageRequests)
-                .build();
+    private LogisticsResponse process(final LogisticsRequest request) {
+        operatorContextProvider.currentOperatorId();
+        final UserId userId = operatorContextProvider.currentContext()
+                .orElseThrow(() -> new IllegalStateException("Operator context is required")).userId();
+        final DepartmentId departmentId = departmentRepository.findIdByCode(request.getDepartmentCode());
+        final DeliveryTarget target = request.getTarget();
+        final DeliveryType type = request.getProcessType() == ProcessType.RETURN
+                ? DeliveryType.RETURN : DeliveryType.OUTBOUND;
+        final Delivery delivery = logisticsRepository.findByTargetAndType(target, type)
+                .orElseGet(() -> new Delivery(target, request.getShipmentId(), type, null));
+        final DeliveryStatus deliveryStatus = request.getDeliveryStatus() == null
+                ? delivery.getDeliveryStatus()
+                : DeliveryStatus.valueOf(request.getDeliveryStatus().name());
+        final String comment = request.getRejectReason() == null ? null : request.getRejectReason().value();
+        final String token = request.getDeliveryToken() == null ? null : request.getDeliveryToken().getValue();
+        final DeliveryStep deliveryStep = DeliveryStep.attempt(delivery.getDeliveryId(),
+                delivery.getDeliverySteps().size() + 1,
+                LocalDateTime.now(), deliveryStatus, userId, request.getSupplierId(), departmentId, request.getVehicleId(),
+                delivery.getMethod(), comment, token);
+        delivery.addStep(deliveryStep);
+        logisticsRepository.createOrUpdate(delivery);
+        return new LogisticsResponse(delivery.getDeliveryId(), null, delivery.getShipmentId(),
+                com.warehouse.logistics.domain.enumeration.DeliverySaveStatus.SAVED, delivery.getTarget());
     }
 
-    private List<DeliveryPackageRequest> createDeliveryPackageRequests(LogisticsRequest delivery) {
-        return List.of(createDeliveryPackageRequest(delivery));
+    @Override
+    public void createOrUpdate(final Delivery delivery) {
+        this.logisticsRepository.createOrUpdate(delivery);
     }
 
-    private DeliveryPackageRequest createDeliveryPackageRequest(LogisticsRequest delivery) {
-        return DeliveryPackageRequest.builder()
-                .delivery(buildDeliveryInformation(delivery))
-                .build();
+    @Override
+    public Optional<Delivery> findById(final DeliveryId deliveryId) {
+        return logisticsRepository.findById(deliveryId);
     }
 
-    private DeliveryInformation buildDeliveryInformation(LogisticsRequest delivery) {
-        return DeliveryInformation.builder()
-                .build();
+    @Override
+    public Optional<Delivery> findByTargetAndType(final DeliveryTarget target, final DeliveryType type) {
+        return this.logisticsRepository.findByTargetAndType(target, type);
     }
 
-    private void assignTokenToDelivery(final Map<ShipmentId, SupplierSignature> supplierTokenResponseMap,
-			Set<LogisticsRequest> deliveries) {
-		deliveries.forEach(delivery -> {
-			final SupplierSignature supplierSignature = supplierTokenResponseMap.get(delivery.getShipmentId());
-
-		});
-	}
-
-    private Map<ShipmentId, SupplierSignature> assignToHashMap(DeliveryTokenResponse responses) {
-        return responses.getSupplierSignature().stream()
-                .collect(Collectors.toMap(this::generateKeyFromResponse, Function.identity()));
+    @Override
+    public List<Delivery> findRecent(final int offset, final int limit) {
+        return logisticsRepository.findRecent(offset, limit);
     }
-
-    private ShipmentId generateKeyFromResponse(final SupplierSignature supplierSignature) {
-		if (supplierSignature != null) {
-			return null;
-		}
-		return null;
-	}
 }
