@@ -22,16 +22,6 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DeliveryOperationApi</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>DeliveryOperationImpl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
             <artifactId>Common</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -96,6 +86,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.persistence</groupId>
@@ -179,6 +173,12 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>DeliveryOperationImpl</artifactId>
+            <version>2026.4-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
