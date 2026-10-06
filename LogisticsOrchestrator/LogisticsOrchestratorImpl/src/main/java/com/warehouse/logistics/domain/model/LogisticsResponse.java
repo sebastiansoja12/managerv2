@@ -11,6 +11,7 @@ public class LogisticsResponse {
     private UpdateStatus updateStatus;
     private ShipmentId shipmentId;
     private DeliverySaveStatus deliverySaveStatus;
+    private DeliveryTarget target;
 
     public LogisticsResponse(final DeliveryId deliveryId,
                              final UpdateStatus updateStatus,
@@ -20,6 +21,19 @@ public class LogisticsResponse {
         this.updateStatus = updateStatus;
         this.shipmentId = shipmentId;
         this.deliverySaveStatus = deliverySaveStatus;
+        this.target = shipmentId == null ? null : DeliveryTarget.shipment(shipmentId);
+    }
+
+    public LogisticsResponse(final DeliveryId deliveryId,
+                             final UpdateStatus updateStatus,
+                             final ShipmentId shipmentId,
+                             final DeliverySaveStatus deliverySaveStatus,
+                             final DeliveryTarget target) {
+        this.deliveryId = deliveryId;
+        this.updateStatus = updateStatus;
+        this.shipmentId = shipmentId;
+        this.deliverySaveStatus = deliverySaveStatus;
+        this.target = target;
     }
 
     public DeliverySaveStatus getDeliverySaveStatus() {
@@ -32,6 +46,10 @@ public class LogisticsResponse {
 
     public ShipmentId getShipmentId() {
         return shipmentId;
+    }
+
+    public DeliveryTarget getTarget() {
+        return target;
     }
 
     public void setShipmentId(final ShipmentId shipmentId) {
