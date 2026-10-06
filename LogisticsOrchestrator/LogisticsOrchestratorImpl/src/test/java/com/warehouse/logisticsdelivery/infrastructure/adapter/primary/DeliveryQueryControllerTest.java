@@ -26,7 +26,7 @@ class DeliveryQueryControllerTest {
     void shouldPassMissingDestinationFilterToReadModel() {
         when(deliveryReadModelPort.search(any())).thenReturn(new DeliveryReadPage(List.of(), 0, 25, false));
 
-        controller.query(0, 25, null, null, null, true, true, null, null, null, null, null, true, null, null,
+        controller.query(0, 25, null, null, null, true, true, null, null, null, null, null, null, true, null, null,
                 "CREATED", "desc");
 
         final ArgumentCaptor<SearchDeliveriesCommand> command = ArgumentCaptor.forClass(SearchDeliveriesCommand.class);
