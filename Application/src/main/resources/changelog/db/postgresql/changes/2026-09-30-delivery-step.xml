@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-30-delivery-step" author="s-soja">
+        <dropNotNullConstraint tableName="delivery" columnName="token" columnDataType="VARCHAR(255)"/>
+        <addColumn tableName="delivery">
+            <column name="status" type="VARCHAR(32)" defaultValue="CREATED">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <dropColumn tableName="delivery" columnName="supplier_code"/>
+        <dropColumn tableName="delivery" columnName="department_id"/>
+        <createTable tableName="delivery_step">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_delivery_step"/>
+            </column>
+            <column name="delivery_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="step_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempted_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="outcome" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delivery_status" type="VARCHAR(32)"/>
+            <column name="signature_id" type="BIGINT"/>
+            <column name="supplier_id" type="BIGINT"/>
+            <column name="department_id" type="BIGINT"/>
+            <column name="vehicle_id" type="BIGINT"/>
+            <column name="operator_id" type="BIGINT"/>
+            <column name="delivery_method" type="VARCHAR(32)"/>
+            <column name="comment" type="VARCHAR(1000)"/>
+            <column name="failure_reason" type="VARCHAR(1000)"/>
+            <column name="token" type="VARCHAR(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="delivery_step" baseColumnNames="delivery_id"
+                                 referencedTableName="delivery" referencedColumnNames="id"
+                                 constraintName="fk_delivery_step_delivery" onDelete="CASCADE"/>
+        <createIndex tableName="delivery_step" indexName="idx_delivery_step_delivery_number">
+            <column name="delivery_id"/>
+            <column name="step_number"/>
+        </createIndex>
+        <sql>
+            INSERT INTO delivery_step (
+                id, delivery_id, step_number, attempted_at, outcome, delivery_status, signature_id,
+                operator_id, delivery_method, comment
+            )
+            SELECT gen_random_uuid(), d.id, 1, d.created, 'IN_PROGRESS', 'DEPOT', d.signature_id,
+                   d.operator_id, d.delivery_method,
+                   CASE WHEN d.target_type = 'SHIPMENT' THEN 'Shipment created' ELSE 'Delivery created' END
+            FROM delivery d
+        </sql>
+        <dropColumn tableName="delivery" columnName="signature_id"/>
+    </changeSet>
+</databaseChangeLog>
