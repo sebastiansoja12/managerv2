@@ -7,18 +7,18 @@ import lombok.Builder;
 
 
 @Builder
-public class Shipment {
+public class DeliverableShipment {
     private ShipmentId shipmentId;
     private String senderEmail;
     private String recipientEmail;
     private String shipmentStatus;
     private Boolean locked;
 
-    public Shipment(final ShipmentId shipmentId,
-                    final String senderEmail,
-                    final String recipientEmail,
-                    final String shipmentStatus,
-                    final Boolean locked) {
+    public DeliverableShipment(final ShipmentId shipmentId,
+                               final String senderEmail,
+                               final String recipientEmail,
+                               final String shipmentStatus,
+                               final Boolean locked) {
         this.shipmentId = shipmentId;
         this.senderEmail = senderEmail;
         this.recipientEmail = recipientEmail;
@@ -46,9 +46,9 @@ public class Shipment {
         return locked;
     }
 
-    public static Shipment from(final ShipmentDto shipment) {
+    public static DeliverableShipment from(final ShipmentDto shipment) {
         final ShipmentId id = new ShipmentId(shipment.shipmentId().getValue());
-		return new Shipment(id, shipment.sender().getEmail(),
+		return new DeliverableShipment(id, shipment.sender().getEmail(),
 				shipment.recipient().getEmail(), shipment.shipmentStatus().name(), shipment.locked());
 	}
 }

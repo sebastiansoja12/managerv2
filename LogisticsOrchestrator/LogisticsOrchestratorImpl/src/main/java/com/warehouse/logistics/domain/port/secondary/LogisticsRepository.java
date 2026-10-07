@@ -1,5 +1,6 @@
 package com.warehouse.logistics.domain.port.secondary;
 
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.model.Delivery;
 import com.warehouse.logistics.domain.model.DeliveryTarget;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
@@ -17,4 +18,5 @@ public interface LogisticsRepository {
 
     void createOrUpdate(final Delivery delivery);
 
+    Optional<Delivery> findByShipmentId(final ShipmentId shipmentId);
 }

@@ -1,28 +1,13 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.identificator.DeliveryId;
-import com.warehouse.commonassets.identificator.PickupPointId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.VehicleId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.BelongsToOperator;
-import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.enumeration.DeliveryLifecycleStatus;
+import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
 import com.warehouse.logistics.domain.model.DeliveryTargetType;
 import com.warehouse.logistics.infrastructure.adapter.secondary.enumeration.Status;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -97,7 +82,7 @@ public class DeliveryEntity extends BelongsToOperator {
     @Column(name = "token")
     private String token;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "delivery_id", referencedColumnName = "id", nullable = false)
     @OrderBy("stepNumber ASC")
     private List<DeliveryStepEntity> deliverySteps;

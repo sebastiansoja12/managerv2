@@ -3,16 +3,18 @@ package com.warehouse.logistics.domain.service;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
-import com.warehouse.logistics.domain.enumeration.DeliveryStatus;
+import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
+import com.warehouse.logistics.domain.enumeration.DeliverySaveStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
 import com.warehouse.logistics.domain.model.*;
 import com.warehouse.logistics.domain.port.secondary.DeliveryTokenServicePort;
 import com.warehouse.logistics.domain.port.secondary.DepartmentRepository;
 import com.warehouse.logistics.domain.port.secondary.LogisticsRepository;
+import com.warehouse.logistics.infrastructure.adapter.secondary.api.UpdateStatus;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,34 +46,37 @@ public class LogisticsServiceImpl implements LogisticsService {
     }
 
     private LogisticsResponse process(final LogisticsRequest request) {
-        operatorContextProvider.currentOperatorId();
-        final UserId userId = operatorContextProvider.currentContext()
-                .orElseThrow(() -> new IllegalStateException("Operator context is required")).userId();
+        final UserId userId = operatorContextProvider.currentUserId();
         final DepartmentId departmentId = departmentRepository.findIdByCode(request.getDepartmentCode());
         final DeliveryTarget target = request.getTarget();
-        final DeliveryType type = request.getProcessType() == ProcessType.RETURN
-                ? DeliveryType.RETURN : DeliveryType.OUTBOUND;
+        final DeliveryType type = determineDeliveryType(request);
         final Delivery delivery = logisticsRepository.findByTargetAndType(target, type)
-                .orElseGet(() -> new Delivery(target, request.getShipmentId(), type,
-                        null, null, null, null, false, userId));
-        final DeliveryStatus deliveryStatus = request.getDeliveryStatus() == null
-                ? delivery.getDeliveryStatus()
-                : DeliveryStatus.valueOf(request.getDeliveryStatus().name());
+                .orElseThrow(() -> new RuntimeException("Delivery for shipment: " + request.getShipmentId().toString() + " not found"));
+
         final String comment = request.getRejectReason() == null ? null : request.getRejectReason().value();
         final String token = request.getDeliveryToken() == null ? null : request.getDeliveryToken().getValue();
-        final DeliveryStep deliveryStep = DeliveryStep.attempt(delivery.getDeliveryId(),
-                delivery.getDeliverySteps().size() + 1,
-                LocalDateTime.now(), deliveryStatus, userId, request.getSupplierId(), departmentId, request.getVehicleId(),
-                delivery.getMethod(), comment, token);
+        final DeliveryStep deliveryStep = DeliveryStep.attempt(delivery.getDeliveryId(), request.getDeliveryStatus(),
+                userId, request.getSupplierId(), departmentId,
+                request.getVehicleId(), DeliveryMethod.COURIER, comment, token, delivery.getDeliverySteps().size());
         delivery.addStep(deliveryStep);
         logisticsRepository.createOrUpdate(delivery);
-        return new LogisticsResponse(delivery.getDeliveryId(), null, delivery.getShipmentId(),
-                com.warehouse.logistics.domain.enumeration.DeliverySaveStatus.SAVED, delivery.getTarget());
+        return new LogisticsResponse(delivery.getDeliveryId(), UpdateStatus.OK, delivery.getShipmentId(),
+                DeliverySaveStatus.SAVED, delivery.getTarget());
+    }
+
+    private DeliveryType determineDeliveryType(final LogisticsRequest request) {
+        return request.getProcessType() == ProcessType.RETURN
+                ? DeliveryType.RETURN : DeliveryType.OUTBOUND;
     }
 
     @Override
     public void createOrUpdate(final Delivery delivery) {
         this.logisticsRepository.createOrUpdate(delivery);
+    }
+
+    @Override
+    public Optional<Delivery> findByShipmentId(final ShipmentId shipmentId) {
+        return this.logisticsRepository.findByShipmentId(shipmentId);
     }
 
     @Override

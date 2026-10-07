@@ -1,23 +1,10 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.DeliveryId;
-import com.warehouse.commonassets.identificator.DeliveryStepId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.identificator.VehicleId;
+import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
-import com.warehouse.logistics.domain.enumeration.DeliveryStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryStepOutcome;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -51,7 +38,7 @@ public class DeliveryStepEntity {
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "signature_id"))
-    private ShipmentId signatureId;
+    private SignatureId signatureId;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "user_id"))
@@ -92,7 +79,7 @@ public class DeliveryStepEntity {
                                final LocalDateTime attemptedAt,
                                final DeliveryStepOutcome outcome,
                                final DeliveryStatus deliveryStatus,
-                               final ShipmentId signatureId,
+                               final SignatureId signatureId,
                                final UserId userId,
                                final SupplierId supplierId,
                                final DepartmentId departmentId,
@@ -124,7 +111,7 @@ public class DeliveryStepEntity {
     public LocalDateTime getAttemptedAt() { return attemptedAt; }
     public DeliveryStepOutcome getOutcome() { return outcome; }
     public DeliveryStatus getDeliveryStatus() { return deliveryStatus; }
-    public ShipmentId getSignatureId() { return signatureId; }
+    public SignatureId getSignatureId() { return signatureId; }
     public UserId getUserId() { return userId; }
     public SupplierId getSupplierId() { return supplierId; }
     public DepartmentId getDepartmentId() { return departmentId; }

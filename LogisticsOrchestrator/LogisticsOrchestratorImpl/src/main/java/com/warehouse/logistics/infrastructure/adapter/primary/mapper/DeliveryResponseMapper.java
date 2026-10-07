@@ -24,7 +24,7 @@ public class DeliveryResponseMapper {
     }
 
     public DeliveryStepResponseDto map(final DeliveryStep step) {
-        return new DeliveryStepResponseDto(step.stepNumber(), step.attemptedAt(), step.outcome().name(),
+        return new DeliveryStepResponseDto(step.deliveryStep(), step.attemptedAt(), step.outcome().name(),
                 step.deliveryStatus() == null ? null : step.deliveryStatus().name(),
                 step.userId() == null ? null : String.valueOf(step.userId().value()),
                 step.departmentId() == null ? null : String.valueOf(step.departmentId().getValue()),

@@ -1,6 +1,7 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
 import com.warehouse.logistics.domain.model.Delivery;
@@ -63,6 +64,14 @@ public class LogisticsRepositoryImpl implements LogisticsRepository {
         } else {
             repository.create(entity);
         }
+    }
+
+    @Override
+    public Optional<Delivery> findByShipmentId(final ShipmentId shipmentId) {
+        return repository.createCriteria(DeliveryEntity.class)
+                .eq("shipmentId", shipmentId.getValue())
+                .one()
+                .map(mapper::toDomain);
     }
 
     private boolean deliveryExists(final DeliveryId deliveryId) {

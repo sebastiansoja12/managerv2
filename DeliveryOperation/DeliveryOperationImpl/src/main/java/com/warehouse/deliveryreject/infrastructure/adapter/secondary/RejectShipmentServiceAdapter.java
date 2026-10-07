@@ -46,7 +46,7 @@ public class RejectShipmentServiceAdapter implements RejectShipmentServicePort {
             return mapper.mapResponse(rejectResponse);
         } catch (final RuntimeException e) {
             publishFailureEvent(processId, shipmentRejectRequest, e);
-            log.error("Shipment rejection notification failed for {} shipments", requests.size(), e);
+            log.error("DeliverableShipment rejection notification failed for {} shipments", requests.size(), e);
             throw e;
         }
     }

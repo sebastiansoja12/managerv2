@@ -1,11 +1,6 @@
 package com.warehouse.logistics.domain.model;
 
-import com.warehouse.commonassets.identificator.DeliveryId;
-import com.warehouse.commonassets.identificator.PickupPointId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.SupplierId;
-import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.commonassets.identificator.VehicleId;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.logistics.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.enumeration.DeliveryStatus;
@@ -42,7 +37,7 @@ public class Delivery {
                     final DeliveryMethod method,
                     final PickupPointId pickupPointId,
                     final PickupPointId deliveryPickupPointId,
-                    final ShipmentId signatureId,
+                    final SignatureId signatureId,
                     final Boolean signatureRequired,
                     final UserId userId) {
         this.deliveryId = DeliveryId.generate();
@@ -58,7 +53,7 @@ public class Delivery {
         this.deliveryPickupPointId = deliveryPickupPointId;
         this.signatureRequired = Boolean.TRUE.equals(signatureRequired);
         this.deliverySteps.add(DeliveryStep.created(deliveryId, createdAt, signatureId, method,
-                "Shipment created", userId));
+                "DeliverableShipment created", userId));
     }
 
     public Delivery(final DeliveryId deliveryId,
@@ -219,7 +214,7 @@ public class Delivery {
         this.status = DeliveryLifecycleStatus.CANCELED;
     }
 
-    private void markAsCompleted() {
+    public void markAsCompleted() {
         if (status == DeliveryLifecycleStatus.CANCELED) {
             throw new IllegalStateException("Canceled delivery cannot be completed");
         }
@@ -230,26 +225,7 @@ public class Delivery {
 
     public void addStep(final DeliveryStep deliveryStep) {
         ensureCanBeModified();
-        if (!deliveryId.equals(deliveryStep.deliveryId())) {
-            throw new IllegalArgumentException("Delivery step belongs to another delivery");
-        }
-        if (deliveryStep.stepNumber() != deliverySteps.size() + 1) {
-            throw new IllegalArgumentException("Delivery step number must follow the existing steps");
-        }
         deliverySteps.add(deliveryStep);
-        if (deliveryStep.deliveryStatus() != null) {
-            this.deliveryStatus = deliveryStep.deliveryStatus();
-        }
-        this.supplierId = deliveryStep.supplierId();
-        this.vehicleId = deliveryStep.vehicleId();
-        if (deliveryStep.token() != null) {
-            this.token = deliveryStep.token();
-        }
-        if (deliveryStep.deliveryStatus() == DeliveryStatus.DELIVERED) {
-            markAsCompleted();
-        } else if (deliverySteps.size() > 1) {
-            markAsModified();
-        }
     }
 
     private void ensureCanBeModified() {
