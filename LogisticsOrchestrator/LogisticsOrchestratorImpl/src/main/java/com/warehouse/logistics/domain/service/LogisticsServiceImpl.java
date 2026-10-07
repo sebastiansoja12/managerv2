@@ -52,7 +52,8 @@ public class LogisticsServiceImpl implements LogisticsService {
         final DeliveryType type = request.getProcessType() == ProcessType.RETURN
                 ? DeliveryType.RETURN : DeliveryType.OUTBOUND;
         final Delivery delivery = logisticsRepository.findByTargetAndType(target, type)
-                .orElseGet(() -> new Delivery(target, request.getShipmentId(), type, null));
+                .orElseGet(() -> new Delivery(target, request.getShipmentId(), type,
+                        null, null, null, null, false, userId));
         final DeliveryStatus deliveryStatus = request.getDeliveryStatus() == null
                 ? delivery.getDeliveryStatus()
                 : DeliveryStatus.valueOf(request.getDeliveryStatus().name());

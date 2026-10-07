@@ -5,6 +5,7 @@ import com.warehouse.logistics.domain.model.Delivery;
 import com.warehouse.logistics.domain.model.LogisticsRequest;
 import com.warehouse.logistics.domain.model.LogisticsResponse;
 import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public interface LogisticsPort {
     List<Delivery> findRecentDeliveries(final int offset, final int limit);
 
     Delivery findDelivery(final DeliveryId deliveryId);
+
+    Delivery findDeliveryByShipmentId(final ShipmentId shipmentId);
 
     Delivery changeDeliveryMethod(final DeliveryId deliveryId, final DeliveryMethod method);
 

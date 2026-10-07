@@ -1,7 +1,11 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.logistics.domain.model.CreateDeliveryCommand;
 import com.warehouse.logistics.domain.port.primary.LogisticsPort;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
@@ -25,6 +29,7 @@ class ShipmentCreatedIntegrationEventTest {
                   },
                   "operatorId": {"value": 7},
                   "userId": {"value": 42},
+                  "departmentId": {"value": 12},
                   "eventType": "shipment.created"
                 }
                 """;
@@ -33,6 +38,9 @@ class ShipmentCreatedIntegrationEventTest {
                 .readValue(json, ShipmentCreatedIntegrationEvent.class);
 
         assertEquals(new ShipmentId(42L), event.payload().shipmentId());
+        assertEquals(OperatorId.of(7L), event.operatorId());
+        assertEquals(new UserId(42L), event.userId());
+        assertEquals(new DepartmentId(12L), event.departmentId());
         assertEquals(42L, event.userId().value());
         assertEquals("42", event.eventKey());
     }
@@ -41,12 +49,13 @@ class ShipmentCreatedIntegrationEventTest {
     void shouldCreateDeliveryFromShipmentCreatedEvent() throws Exception {
         final LogisticsPort logisticsPort = mock(LogisticsPort.class);
         final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(
-                logisticsPort);
+                logisticsPort, new OperatorContext());
         final ShipmentCreatedIntegrationEvent event = new ObjectMapper().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}, "deliveryMethod": "COURIER"},
                   "operatorId": {"value": 7},
-                  "userId": {"value": 42}
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
                 }
                 """, ShipmentCreatedIntegrationEvent.class);
 

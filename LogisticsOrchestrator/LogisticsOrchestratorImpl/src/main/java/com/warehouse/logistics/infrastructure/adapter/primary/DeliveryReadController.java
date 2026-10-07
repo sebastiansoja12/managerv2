@@ -1,6 +1,7 @@
 package com.warehouse.logistics.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.identificator.DeliveryId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.logistics.domain.port.primary.LogisticsPort;
 import com.warehouse.logistics.infrastructure.adapter.primary.dto.DeliveryMethodUpdateRequestDto;
 import com.warehouse.logistics.infrastructure.adapter.primary.dto.DeliveryResponseDto;
@@ -47,6 +48,11 @@ public class DeliveryReadController {
     @GetMapping("/{deliveryId}")
     public DeliveryResponseDto findById(@PathVariable final String deliveryId) {
         return responseMapper.map(logisticsPort.findDelivery(new DeliveryId(deliveryId)));
+    }
+
+    @GetMapping("/by-shipment/{shipmentId}")
+    public DeliveryResponseDto findByShipmentId(@PathVariable final Long shipmentId) {
+        return responseMapper.map(logisticsPort.findDeliveryByShipmentId(new ShipmentId(shipmentId)));
     }
 
     @PutMapping("/{deliveryId}/method")

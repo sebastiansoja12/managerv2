@@ -13,9 +13,12 @@ import org.springframework.stereotype.Component;
 public class ShipmentDeliveryEventListener {
 
     private final LogisticsPort logisticsPort;
+    private final OperatorContext operatorContext;
 
-    public ShipmentDeliveryEventListener(final LogisticsPort logisticsPort) {
+    public ShipmentDeliveryEventListener(final LogisticsPort logisticsPort,
+                                         final OperatorContext operatorContext) {
         this.logisticsPort = logisticsPort;
+        this.operatorContext = operatorContext;
     }
 
     @KafkaEventListener(
@@ -32,6 +35,6 @@ public class ShipmentDeliveryEventListener {
                 null,
                 payload.signatureRequired(),
                 event.userId());
-        new OperatorContext().runAs(event.operatorId(), event.userId(), () -> logisticsPort.createDelivery(command));
+        this.operatorContext.runAs(event.operatorId(), event.userId(), event.departmentId(), () -> logisticsPort.createDelivery(command));
     }
 }
