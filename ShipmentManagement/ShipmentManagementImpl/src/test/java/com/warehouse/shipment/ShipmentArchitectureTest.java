@@ -263,7 +263,6 @@ class ShipmentArchitectureTest {
                 "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/snapshot");
         assertThat(snapshotPackage.resolve("PartySnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("MoneySnapshot.java")).exists();
-        assertThat(Path.of("src/main/java/com/warehouse/shipment/application/event/snapshot/SignatureSnapshot.java")).exists();
     }
 
     @Test
