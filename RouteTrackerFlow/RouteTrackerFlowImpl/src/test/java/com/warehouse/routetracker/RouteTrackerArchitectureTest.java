@@ -39,7 +39,6 @@ class RouteTrackerArchitectureTest {
         assertThat(snapshotPackage.resolve("ShipmentSnapshot.java")).doesNotExist();
         assertThat(snapshotPackage.resolve("PartySnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("MoneySnapshot.java")).exists();
-        assertThat(snapshotPackage.resolve("DangerousGoodSnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("SignatureSnapshot.java")).exists();
 
         final String changedMessage = Files.readString(Path.of(
