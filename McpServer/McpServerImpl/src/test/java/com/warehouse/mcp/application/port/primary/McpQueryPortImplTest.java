@@ -16,11 +16,19 @@ import com.warehouse.mcp.McpFixture;
 import com.warehouse.mcp.application.port.primary.result.DeviceList;
 import com.warehouse.mcp.application.port.primary.result.ShipmentOverview;
 import com.warehouse.mcp.application.port.secondary.CurrentUserServicePort;
+import com.warehouse.mcp.application.port.secondary.ConfigurationServicePort;
+import com.warehouse.mcp.application.port.secondary.CourierServicePort;
+import com.warehouse.mcp.application.port.secondary.DeliveryNetworkServicePort;
+import com.warehouse.mcp.application.port.secondary.DeliveryServicePort;
+import com.warehouse.mcp.application.port.secondary.DepartmentServicePort;
 import com.warehouse.mcp.application.port.secondary.DeviceServicePort;
 import com.warehouse.mcp.application.port.secondary.ProcessServicePort;
 import com.warehouse.mcp.application.port.secondary.ShipmentServicePort;
 import com.warehouse.mcp.domain.exception.McpToolAccessException;
 import com.warehouse.mcp.domain.service.PersonalDataMasking;
+import com.warehouse.mcp.application.port.primary.result.DepartmentList;
+import com.warehouse.mcp.domain.vo.DepartmentEntry;
+import com.warehouse.mcp.domain.vo.DepartmentFilter;
 import com.warehouse.mcp.domain.vo.DeviceAccess;
 import com.warehouse.mcp.domain.vo.DeviceFilter;
 
@@ -30,8 +38,12 @@ class McpQueryPortImplTest {
     private final ShipmentServicePort shipmentServicePort = mock(ShipmentServicePort.class);
     private final ProcessServicePort processServicePort = mock(ProcessServicePort.class);
     private final DeviceServicePort deviceServicePort = mock(DeviceServicePort.class);
+    private final DepartmentServicePort departmentServicePort = mock(DepartmentServicePort.class);
+    private final DeliveryNetworkServicePort deliveryNetworkServicePort = mock(DeliveryNetworkServicePort.class);
     private final McpQueryPortImpl port = new McpQueryPortImpl(currentUserServicePort, shipmentServicePort,
-            processServicePort, deviceServicePort, new PersonalDataMasking());
+            processServicePort, deviceServicePort, departmentServicePort, deliveryNetworkServicePort,
+            mock(DeliveryServicePort.class), mock(CourierServicePort.class), mock(ConfigurationServicePort.class),
+            new PersonalDataMasking());
 
     @Test
     void shouldMaskPartiesAndLimitShipmentEvents() {
@@ -73,6 +85,26 @@ class McpQueryPortImplTest {
         assertThat(active.devices()).allSatisfy(device -> {
             assertThat(device.status()).isEqualTo("ACTIVE");
             assertThat(device.departmentCode()).isEqualTo("KT1");
+        });
+    }
+
+    @Test
+    void shouldFilterAndLimitDepartments() {
+        final List<DepartmentEntry> departments = IntStream.range(0, 120)
+                .mapToObj(index -> McpFixture.department("D" + index, index % 3 == 0 ? "WAREHOUSE" : "BRANCH",
+                        index < 110 ? "ACTIVE" : "SUSPENDED"))
+                .toList();
+        when(departmentServicePort.findAllDepartments()).thenReturn(departments);
+
+        final DepartmentList all = port.listDepartments(new DepartmentFilter(null, null));
+        final DepartmentList warehouses = port.listDepartments(new DepartmentFilter("active", "warehouse"));
+
+        assertThat(all.totalDepartments()).isEqualTo(120);
+        assertThat(all.departments()).hasSize(McpQueryPortImpl.MAX_DEPARTMENTS);
+        assertThat(warehouses.totalDepartments()).isEqualTo(37);
+        assertThat(warehouses.departments()).allSatisfy(department -> {
+            assertThat(department.type()).isEqualTo("WAREHOUSE");
+            assertThat(department.status()).isEqualTo("ACTIVE");
         });
     }
 }
