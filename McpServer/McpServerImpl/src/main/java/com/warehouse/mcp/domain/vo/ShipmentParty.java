@@ -6,5 +6,6 @@ public record ShipmentParty(String firstName,
                             String telephoneNumber,
                             String city,
                             String postalCode,
+                            String street,
                             String countryCode) {
 }
