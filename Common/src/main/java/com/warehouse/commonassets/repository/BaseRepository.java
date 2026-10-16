@@ -48,9 +48,7 @@ public class BaseRepository<T extends BelongsToOperator> implements OperatorFilt
     @Override
     public Criteria<T> createCriteria(final Class<T> clazz) {
         final Criteria<T> criteria = new Criteria<>(entityManager, clazz);
-        operatorContextProvider.currentContext()
-                .map(OperatorDetails::operatorId)
-                .ifPresent(operatorId -> criteria.eq("operatorId.value", operatorId.getValue()));
+        criteria.eq("operatorId.value", operatorContextProvider.currentOperatorId().getValue());
         return criteria;
     }
 }
