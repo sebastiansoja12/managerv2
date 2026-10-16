@@ -306,7 +306,7 @@ class AuthenticationPortImplTest {
         }
 
         @Override
-        public Boolean departmentExists(final DepartmentId departmentId) {
+        public Boolean departmentExists(final DepartmentId departmentId, final OperatorId operatorId) {
             return departmentExists;
         }
 

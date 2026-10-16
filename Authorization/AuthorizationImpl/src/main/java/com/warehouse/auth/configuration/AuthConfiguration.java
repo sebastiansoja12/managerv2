@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.CurrentOperatorService;
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.auth.OperatorUserEventPublisher;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
@@ -115,8 +116,9 @@ public class AuthConfiguration  {
     }
 
     @Bean(name = "authentication.departmentServicePort")
-    public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService) {
-        return new DepartmentServiceAdapter(departmentApiService);
+    public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService,
+                                                       final OperatorContext operatorContext) {
+        return new DepartmentServiceAdapter(departmentApiService, operatorContext);
     }
 
 }
