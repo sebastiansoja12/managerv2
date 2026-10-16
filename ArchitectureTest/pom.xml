@@ -49,12 +49,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>CsvFileGenerator</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>BarcodeGenerator</artifactId>
+            <artifactId>DocumentStorageImpl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
