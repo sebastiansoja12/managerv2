@@ -1,6 +1,7 @@
 package com.warehouse.returning.infrastructure.adapter.primary;
 
 import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.returning.api.dto.ReturnDetailsDto;
@@ -20,12 +21,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/returns/packages")
+@AccessUserControl
+@PreAuthorize("@operatorCapabilityPolicy.supportsReturnShipments()")
 public class ReturnPackageController {
 
     private final ReturnPort returnPort;
