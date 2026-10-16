@@ -1,5 +1,6 @@
 package com.warehouse.organisationstructure.operator;
 
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.cache.NoOpOperatorConfigurationCache;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -163,7 +164,7 @@ class OperatorPortIntegrationTest {
         @Bean
         OperatorConfigurationRepository operatorConfigurationRepository(
                 final OperatorConfigurationReadRepository readRepository) {
-            return new OperatorConfigurationRepositoryImpl(readRepository);
+            return new OperatorConfigurationRepositoryImpl(readRepository, new NoOpOperatorConfigurationCache());
         }
 
         @Bean
