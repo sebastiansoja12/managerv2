@@ -27,7 +27,7 @@ under `/v2/api`.
 | `Authorization` | Login, JWT/cookie authentication, refresh tokens, current user/operator context and permissions. |
 | `OrganisationStructure` | Operator management, operator configuration and provisioning of initial operator data. |
 | `DepartmentService` | Departments, department identifiers, coordinates and read-model synchronization. |
-| `ShipmentManagement` | Shipments, dangerous goods, pickup and delivery methods, pickup-point assignment, return summaries, shipment status and tracking integrations. |
+| `ShipmentManagement` | Shipments, dangerous goods, pickup and delivery methods, pickup-point assignment, return summaries, shipment status, notes, document links and tracking integrations. |
 | `PickupPointManagement` | Pickup-point aggregate, lifecycle, address geocoding, operator-scoped persistence, Kafka-projected search model and REST API. |
 | `OrganizationChat` | Persistent direct conversations, organization-user discovery, WebSocket presence and message notifications. |
 | `DeliveryOperation` | Delivery, return and rejection process handling. |
@@ -37,7 +37,7 @@ under `/v2/api`.
 | `SupplierServiceManagement` | Suppliers, package types, delivery areas, vehicle data and supplier updates. |
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
 | `PathFinder` and `DestinationDetermination` | Routing, delivery-department determination, address coordinates and area calculation support. |
-| `DocumentManager` | Barcode and CSV generation utilities. |
+| `DocumentStorage` | Barcode and CSV generation utilities, plus shared operator-scoped document storage (`DocumentStorageApi` and `DocumentStorageImpl`). |
 | `MessageProvider` and `MailService` | Message and mail infrastructure. |
 | `Common` | Shared value objects, enums, exceptions, repository helpers, operator context and security utilities. |
 | `Gateway` | Gateway service on port `8088`; routes requests to manager and related services. |

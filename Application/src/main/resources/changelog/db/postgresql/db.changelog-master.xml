@@ -83,4 +83,5 @@
     <include file="changes/2026-10-03-signature-read-model-id.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-07-delivery-step-owner.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-07-delivery-step-user.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-16-shipment-content.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
