@@ -3,8 +3,8 @@ package com.warehouse.shipment.infrastructure.adapter.secondary;
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.department.api.DepartmentApiService;
-import com.warehouse.department.api.dto.DepartmentDto;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
 
 public class DepartmentServiceAdapter implements DepartmentServicePort {

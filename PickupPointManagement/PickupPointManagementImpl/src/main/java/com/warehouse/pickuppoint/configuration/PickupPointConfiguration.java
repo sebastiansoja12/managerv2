@@ -4,7 +4,7 @@ import com.warehouse.commonassets.event.application.port.secondary.DomainEventPu
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.pickuppoint.api.PickupPointApiService;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointPort;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointPortImpl;

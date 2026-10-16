@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import com.warehouse.department.domain.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
 import com.warehouse.reroute.domain.port.secondary.MailServicePort;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.voronoi.VoronoiService;

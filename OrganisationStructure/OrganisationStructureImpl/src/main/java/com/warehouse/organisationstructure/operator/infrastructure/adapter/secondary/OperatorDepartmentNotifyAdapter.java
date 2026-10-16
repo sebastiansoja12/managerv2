@@ -3,7 +3,7 @@ package com.warehouse.organisationstructure.operator.infrastructure.adapter.seco
 import org.springframework.context.ApplicationEventPublisher;
 
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.department.api.event.OperatorInitialDepartmentCreateEvent;
+import com.warehouse.organisationstructure.department.api.event.OperatorInitialDepartmentCreateEvent;
 import com.warehouse.organisationstructure.operator.domain.port.secondary.OperatorDepartmentNotifyPort;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper.OperatorDepartmentNotifyMapper;

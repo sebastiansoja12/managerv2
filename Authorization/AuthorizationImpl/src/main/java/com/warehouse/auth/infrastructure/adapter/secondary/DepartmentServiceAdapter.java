@@ -5,7 +5,7 @@ import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 
 
 public class DepartmentServiceAdapter implements DepartmentServicePort {

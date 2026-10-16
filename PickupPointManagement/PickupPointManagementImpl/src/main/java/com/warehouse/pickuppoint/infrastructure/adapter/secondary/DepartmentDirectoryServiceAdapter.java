@@ -2,9 +2,9 @@ package com.warehouse.pickuppoint.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.department.api.DepartmentApiService;
-import com.warehouse.department.api.dto.DepartmentDirectoryEntryDto;
-import com.warehouse.department.api.dto.DepartmentStatusDto;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentStatusDto;
 import com.warehouse.pickuppoint.application.port.secondary.DepartmentDirectoryServicePort;
 import com.warehouse.pickuppoint.domain.vo.PickupPointDepartment;
 

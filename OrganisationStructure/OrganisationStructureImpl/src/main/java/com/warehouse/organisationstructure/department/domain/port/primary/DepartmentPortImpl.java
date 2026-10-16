@@ -1,0 +1,178 @@
+package com.warehouse.organisationstructure.department.domain.port.primary;
+
+import com.warehouse.commonassets.enumeration.CountryCode;
+import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.organisationstructure.department.domain.enumeration.DepartmentType;
+import com.warehouse.organisationstructure.department.domain.exception.DepartmentAlreadyExistsException;
+import com.warehouse.organisationstructure.department.domain.model.Department;
+import com.warehouse.organisationstructure.department.domain.model.DepartmentCreate;
+import com.warehouse.organisationstructure.department.domain.model.DepartmentCreateCommand;
+import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentCoordinatesServicePort;
+import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentRepository;
+import com.warehouse.organisationstructure.department.domain.port.secondary.TenantAdminProvisioningPort;
+import com.warehouse.organisationstructure.department.domain.registry.DomainRegistry;
+import com.warehouse.organisationstructure.department.domain.service.DepartmentService;
+import com.warehouse.organisationstructure.department.domain.validator.Validator;
+import com.warehouse.organisationstructure.department.domain.vo.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
+public class DepartmentPortImpl implements DepartmentPort {
+
+    private final DepartmentRepository departmentRepository;
+
+    private final DepartmentService departmentService;
+
+    private final TenantAdminProvisioningPort tenantAdminProvisioningPort;
+
+    private final Validator validator;
+
+    private final DepartmentCoordinatesServicePort departmentCoordinatesServicePort;
+
+    public DepartmentPortImpl(final DepartmentRepository departmentRepository,
+                              final DepartmentService departmentService,
+                              final TenantAdminProvisioningPort tenantAdminProvisioningPort,
+                              final Validator validator,
+                              final DepartmentCoordinatesServicePort departmentCoordinatesServicePort) {
+        this.departmentRepository = departmentRepository;
+        this.departmentService = departmentService;
+        this.tenantAdminProvisioningPort = tenantAdminProvisioningPort;
+        this.validator = validator;
+        this.departmentCoordinatesServicePort = departmentCoordinatesServicePort;
+    }
+
+    @Override
+    public Department findByDepartmentCode(final DepartmentCode departmentCode) {
+        return this.departmentRepository.findByDepartmentCode(departmentCode);
+    }
+
+    @Override
+    public Department findByDepartmentId(final DepartmentId departmentId) {
+        return this.departmentRepository.findByDepartmentId(departmentId);
+    }
+
+    @Override
+    public List<Department> findAll() {
+        return this.departmentRepository.findAll();
+    }
+
+    @Override
+    public List<Department> findAllArchived() {
+        return this.departmentRepository.findAllArchived();
+    }
+
+    @Override
+    @Transactional
+    public DepartmentCreateResponse createDepartments(final DepartmentCreateCommand command) {
+
+        validateRequest(command.getDepartments());
+
+        checkIfDepartmentWithGivenCodeAlreadyExists(command.getDepartments());
+
+        final Map<Department, Boolean> createdDepartments = new HashMap<>();
+        for (final DepartmentCreate departmentCreate : command.getDepartments()) {
+            final DepartmentCode departmentCode = departmentCreate.getDepartmentCode();
+			final Department department = new Department(DepartmentId.generate(),
+                    departmentCode, departmentCreate.getCity(),
+					departmentCreate.getStreet(), departmentCreate.getPostalCode(),
+					new TaxId(departmentCreate.getTaxId()), departmentCreate.getTelephoneNumber(),
+					departmentCreate.getOpeningHours(), departmentCreate.getEmail(),
+					departmentCreate.getCountryCode(), departmentCreate.getDepartmentType());
+            department.setAdminUserId(departmentCreate.getAdminUserId());
+            this.departmentService.createDepartment(department);
+
+            createdDepartments.put(department, true);
+		}
+
+        return new DepartmentCreateResponse(createdDepartments);
+    }
+
+    private void validateRequest(final List<DepartmentCreate> departments) {
+        departments.forEach(dep -> validator.validateType(dep.getDepartmentType()));
+    }
+
+    private void checkIfDepartmentWithGivenCodeAlreadyExists(final List<DepartmentCreate> deps) {
+		deps.forEach(dep -> {
+			final Department department = this.departmentService.findByDepartmentCode(dep.getDepartmentCode());
+			if (department != null) {
+				throw new DepartmentAlreadyExistsException(
+						"Department with code " + dep.getDepartmentCode() + " already exists");
+			}
+		});
+    }
+
+    @Override
+    public void changeAddress(final UpdateAddressCommand command) {
+        validateAddress(command.address());
+
+        this.departmentService.changeAddress(command.departmentCode(), command.address());
+    }
+
+    @Override
+    public IdentificationNumberChangeResponse changeIdentificationNumber(final IdentificationNumberChangeCommand command) {
+        final DepartmentCode departmentCode = command.departmentCode();
+        final Department department = this.departmentService.findByDepartmentCode(departmentCode);
+        final TaxId oldIdentificationNumber = department.getTaxId();
+        final TaxId newIdentificationNumber = new TaxId(command.identificationNumber());
+        final boolean identificationNumberChanged = !oldIdentificationNumber.equals(newIdentificationNumber);
+        if (identificationNumberChanged) {
+            this.departmentService.changeTaxId(departmentCode, newIdentificationNumber);
+        }
+        return new IdentificationNumberChangeResponse(departmentCode, oldIdentificationNumber, newIdentificationNumber);
+    }
+
+    @Override
+    public void changeDepartmentActive(final DepartmentCode departmentCode, final Boolean active) {
+        final UserId userId = DomainRegistry.authenticationService().currentUser();
+        if (active) {
+            this.departmentService.activateDepartment(departmentCode, userId);
+        } else {
+            this.departmentService.deactivateDepartment(departmentCode, userId);
+        }
+    }
+
+    @Override
+    public void changeDepartmentType(final DepartmentCode departmentCode, final DepartmentType departmentType) {
+        this.validator.validateType(departmentType);
+        this.departmentService.changeDepartmentType(departmentCode, departmentType);
+    }
+
+    @Override
+    public void changeAdminUser(final DepartmentCode departmentCode, final UserId userId) {
+        this.departmentService.changeAdminUser(departmentCode, userId);
+    }
+
+    @Override
+    @Transactional
+    public void changeStatus(final ChangeDepartmentStatusCommand command) {
+        final DepartmentCode departmentCode = command.departmentCode();
+        final Department.Status status = Department.Status.valueOf(command.status());
+        this.departmentService.changeStatus(departmentCode, status);
+    }
+
+    @Override
+    public void changeEmail(final DepartmentCode departmentCode, final String email) {
+        this.departmentService.changeEmail(departmentCode, email);
+    }
+
+    @Override
+    public Boolean checkExists(final DepartmentCode departmentCode) {
+        return this.departmentService.checkExists(departmentCode);
+    }
+
+    @Override
+    public boolean checkExistsAnyWithCountryCode(final CountryCode countryCode) {
+        return this.departmentRepository.checkExistsAnyWithCountryCode(countryCode);
+    }
+
+    private void validateAddress(final Address address) {
+        address.validate();
+    }
+}

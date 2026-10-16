@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DepartmentServiceApi</artifactId>
+            <artifactId>OrganisationStructureApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

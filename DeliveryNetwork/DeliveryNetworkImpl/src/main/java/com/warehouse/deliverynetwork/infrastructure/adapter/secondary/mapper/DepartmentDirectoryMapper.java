@@ -5,7 +5,7 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentStatus;
 import com.warehouse.deliverynetwork.domain.enumeration.DepartmentType;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentNode;
-import com.warehouse.department.api.dto.DepartmentDirectoryEntryDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
 
 public class DepartmentDirectoryMapper {
 

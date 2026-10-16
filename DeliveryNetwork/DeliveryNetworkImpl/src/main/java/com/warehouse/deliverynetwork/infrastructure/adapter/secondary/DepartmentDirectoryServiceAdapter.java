@@ -3,7 +3,7 @@ package com.warehouse.deliverynetwork.infrastructure.adapter.secondary;
 import com.warehouse.deliverynetwork.application.port.secondary.DepartmentDirectoryServicePort;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentNode;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.mapper.DepartmentDirectoryMapper;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 
 import java.util.List;
 

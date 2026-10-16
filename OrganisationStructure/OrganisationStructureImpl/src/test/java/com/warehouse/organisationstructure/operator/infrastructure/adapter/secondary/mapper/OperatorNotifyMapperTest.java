@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.department.api.event.OperatorInitialDepartmentCreateEvent;
+import com.warehouse.organisationstructure.department.api.event.OperatorInitialDepartmentCreateEvent;
 import com.warehouse.organisationstructure.OperatorTestFixtures;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
 

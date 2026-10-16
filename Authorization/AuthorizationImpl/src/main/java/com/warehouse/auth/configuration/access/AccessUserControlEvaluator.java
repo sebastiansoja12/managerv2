@@ -7,7 +7,7 @@ import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.exception.ProblemDetailsException;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

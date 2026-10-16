@@ -30,7 +30,7 @@ import com.warehouse.auth.infrastructure.adapter.primary.CurrentOperatorServiceA
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 
 import lombok.RequiredArgsConstructor;
 
