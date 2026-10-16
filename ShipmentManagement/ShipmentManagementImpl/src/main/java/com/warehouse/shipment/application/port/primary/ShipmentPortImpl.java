@@ -27,6 +27,7 @@ import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.domain.model.Signature;
+import com.warehouse.shipment.domain.service.AddressValidationService;
 import com.warehouse.shipment.domain.service.ShipmentStateValidatorServiceImpl;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.Party;
@@ -71,6 +72,8 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService;
 
+    private final AddressValidationService addressValidationService;
+
 	public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
                             final Logger logger,
                             final PathFinderServicePort pathFinderServicePort,
@@ -84,7 +87,8 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
                             final DomainEventPublisher domainEventPublisher,
                             final DepartmentServicePort departmentServicePort,
-                            final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService) {
+                            final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
+                            final AddressValidationService addressValidationService) {
 		this.shipmentRepository = shipmentRepository;
 		this.logger = logger;
 		this.pathFinderServicePort = pathFinderServicePort;
@@ -99,6 +103,7 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.domainEventPublisher = domainEventPublisher;
         this.departmentServicePort = departmentServicePort;
         this.shipmentDepartmentResolutionService = shipmentDepartmentResolutionService;
+        this.addressValidationService = addressValidationService;
     }
 
     @Override
@@ -110,6 +115,13 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         final Party sender = command.getSender();
         final Party recipient = command.getRecipient();
+
+        final Result<Void, ErrorCode> addressValidation = this.addressValidationService
+                .validateAddresses(Address.from(sender), Address.from(recipient), shipmentConfiguration.validationRules());
+
+        if (addressValidation.isFailure()) {
+            return Result.failure(addressValidation.getFailure());
+        }
 
         final Result<Void, ErrorCode> countryValidation =
                 validateCountries(sender.getCountryCode(), recipient.getCountryCode());

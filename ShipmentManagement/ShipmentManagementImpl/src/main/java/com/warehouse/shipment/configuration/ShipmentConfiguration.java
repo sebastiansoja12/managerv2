@@ -115,13 +115,14 @@ public class ShipmentConfiguration {
                                      final DomainEventPublisher domainEventPublisher,
                                      final DepartmentServicePort departmentServicePort,
                                      final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService) {
+		final AddressValidationService addressValidationService = new AddressValidationService();
 		return new ShipmentPortImpl(shipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
 				departmentCountryAvailabilityService, signatureService, shipmentResultFactory,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService);
+                domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService);
 	}
 
     @Bean
