@@ -1,14 +1,18 @@
 package com.warehouse.organisationstructure.announcement.domain.port.secondary;
 
+import com.warehouse.commonassets.identificator.AnnouncementId;
 import com.warehouse.organisationstructure.announcement.domain.model.Announcement;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AnnouncementRepository {
 
-    Optional<Announcement> findActive();
+    List<Announcement> findAll();
 
-    Announcement save(Announcement announcement);
+    Optional<Announcement> findById(final AnnouncementId announcementId);
 
-    void clear();
+    Announcement save(final Announcement announcement);
+
+    void delete(final AnnouncementId announcementId);
 }
