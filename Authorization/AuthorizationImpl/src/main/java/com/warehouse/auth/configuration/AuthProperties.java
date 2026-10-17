@@ -17,6 +17,9 @@ public class AuthProperties {
     public static class Cookie {
         private String accessName = "AUTH-TOKEN";
         private String refreshName = "REFRESH-TOKEN";
+        private String platformOwnerAccessName = "PLATFORM-AUTH-TOKEN";
+        private String platformOwnerRefreshName = "PLATFORM-REFRESH-TOKEN";
+        private String platformOwnerRefreshPath = "/v2/api/platform/auth";
         private String accessPath = "/";
         private String refreshPath = "/v2/api/auth";
         private String domain;

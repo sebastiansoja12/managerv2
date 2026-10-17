@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.warehouse.auth.infrastructure.adapter.secondary.filter.JwtAuthenticationFilter;
+import com.warehouse.auth.infrastructure.adapter.secondary.filter.PlatformOwnerAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +33,7 @@ public class SecurityConfiguration {
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter authenticationFilter;
+    private final PlatformOwnerAuthenticationFilter platformOwnerAuthenticationFilter;
     private final ObjectProvider<DeviceTenantMdcFilter> deviceAuthenticationFilter;
     private final ApiExposureProperties apiExposureProperties;
     private final UserAuthenticationEntryPoint authenticationEntryPoint;
@@ -58,6 +60,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/auth/csrf").permitAll()
+                        .requestMatchers("/platform/auth/login", "/platform/auth/refresh", "/platform/auth/logout").permitAll()
+                        .requestMatchers("/platform/**", "/operators", "/operators/**")
+                        .hasAuthority(PlatformOwnerAuthenticationFilter.PLATFORM_OWNER_AUTHORITY)
                         .requestMatchers(
                                 "/v2/api/shipments/**",
                                 "/swagger-ui/**",
@@ -73,6 +78,7 @@ public class SecurityConfiguration {
                         .requestMatchers(apiExposureProperties.pairKeySecurityMatchers(contextPath)).permitAll()
                         .anyRequest().permitAll()
                 )
+                .addFilterBefore(platformOwnerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(departmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(shipmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

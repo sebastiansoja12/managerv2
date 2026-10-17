@@ -35,6 +35,37 @@ public class AuthCookieService {
         return readCookie(request, authProperties.getCookie().getRefreshName());
     }
 
+    public Optional<String> readPlatformOwnerAccessToken(final HttpServletRequest request) {
+        return readCookie(request, authProperties.getCookie().getPlatformOwnerAccessName());
+    }
+
+    public Optional<String> readPlatformOwnerRefreshToken(final HttpServletRequest request) {
+        return readCookie(request, authProperties.getCookie().getPlatformOwnerRefreshName());
+    }
+
+    public void addPlatformOwnerAuthenticationCookies(final HttpServletResponse response,
+                                                      final String accessToken,
+                                                      final String refreshToken) {
+        addCookie(response, buildCookie(authProperties.getCookie().getPlatformOwnerAccessName(), accessToken,
+                authProperties.getCookie().getAccessPath(), jwtProvider.getExpiration()));
+        addCookie(response, buildCookie(authProperties.getCookie().getPlatformOwnerRefreshName(), refreshToken,
+                authProperties.getCookie().getPlatformOwnerRefreshPath(), jwtProvider.getRefreshTokenExpiration()));
+    }
+
+    public void clearPlatformOwnerAuthenticationCookies(final HttpServletResponse response) {
+        addCookie(response, buildCookie(authProperties.getCookie().getPlatformOwnerAccessName(), "",
+                authProperties.getCookie().getAccessPath(), 0L));
+        addCookie(response, buildCookie(authProperties.getCookie().getPlatformOwnerRefreshName(), "",
+                authProperties.getCookie().getPlatformOwnerRefreshPath(), 0L));
+    }
+
+    public void addImpersonationAccessCookie(final HttpServletResponse response, final String accessToken) {
+        addCookie(response, buildCookie(authProperties.getCookie().getAccessName(), accessToken,
+                authProperties.getCookie().getAccessPath(), jwtProvider.getExpiration()));
+        addCookie(response, buildCookie(authProperties.getCookie().getRefreshName(), "",
+                authProperties.getCookie().getRefreshPath(), 0L));
+    }
+
     public void addAuthenticationCookies(final HttpServletResponse response,
                                          final String accessToken,
                                          final String refreshToken) {
