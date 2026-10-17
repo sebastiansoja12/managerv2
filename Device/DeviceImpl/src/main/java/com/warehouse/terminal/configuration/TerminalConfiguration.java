@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.UserApiService;
+import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
@@ -18,6 +20,9 @@ import com.warehouse.terminal.domain.port.secondary.*;
 import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.infrastructure.adapter.primary.DeviceServiceAdapter;
 import com.warehouse.terminal.infrastructure.adapter.secondary.*;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.MobileEntity;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.ScannerEntity;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.TerminalEntity;
 import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
 
 import io.github.resilience4j.retry.RetryConfig;
@@ -78,11 +83,11 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public DeviceVersionRepository deviceVersionRepository(final TerminalReadRepository terminalReadRepository,
-                                                           final MobileReadRepository mobileReadRepository,
-                                                           final ScannerReadRepository scannerReadRepository,
+    public DeviceVersionRepository deviceVersionRepository(final OperatorFilteredRepository<TerminalEntity> terminalRepository,
+                                                           final OperatorFilteredRepository<MobileEntity> mobileRepository,
+                                                           final OperatorFilteredRepository<ScannerEntity> scannerRepository,
                                                            final DeviceVersionReadRepository deviceVersionReadRepository) {
-        return new DeviceVersionRepositoryImpl(terminalReadRepository, mobileReadRepository, scannerReadRepository,
+        return new DeviceVersionRepositoryImpl(terminalRepository, mobileRepository, scannerRepository,
                 deviceVersionReadRepository);
     }
 
@@ -141,8 +146,9 @@ public class TerminalConfiguration {
     @Bean
     public DeviceApiService deviceApiService(final DevicePairService devicePairService,
                                              final DeviceGenericService deviceGenericService,
-                                             final UserService userService) {
-        return new DeviceServiceAdapter(devicePairService, deviceGenericService, userService);
+                                             final UserService userService,
+                                             final OperatorContext operatorContext) {
+        return new DeviceServiceAdapter(devicePairService, deviceGenericService, userService, operatorContext);
     }
 
     @Bean

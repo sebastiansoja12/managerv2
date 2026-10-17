@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
@@ -25,6 +26,11 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     @Override
     public ShipmentDetailsDto getShipment(final ShipmentId shipmentId) {
         return mapper.map(shipmentPort.loadShipment(shipmentId));
+    }
+
+    @Override
+    public ShipmentDetailsDto collectShipment(final TrackingNumber trackingNumber) {
+        return mapper.map(shipmentPort.collectShipment(trackingNumber));
     }
 
     @Override

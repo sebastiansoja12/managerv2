@@ -4,27 +4,33 @@ import java.util.Optional;
 
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.terminal.domain.model.DeviceVersion;
 import com.warehouse.terminal.domain.port.secondary.DeviceVersionRepository;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DeviceVersionEntity;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.MobileEntity;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.ScannerEntity;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.TerminalEntity;
 
 public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
 
-    private final TerminalReadRepository terminalReadRepository;
+    private static final String DEVICE_ID_FIELD = "deviceId.value";
 
-    private final MobileReadRepository mobileReadRepository;
+    private final OperatorFilteredRepository<TerminalEntity> terminalRepository;
 
-    private final ScannerReadRepository scannerReadRepository;
+    private final OperatorFilteredRepository<MobileEntity> mobileRepository;
+
+    private final OperatorFilteredRepository<ScannerEntity> scannerRepository;
 
     private final DeviceVersionReadRepository deviceVersionReadRepository;
 
-    public DeviceVersionRepositoryImpl(final TerminalReadRepository terminalReadRepository,
-                                       final MobileReadRepository mobileReadRepository,
-                                       final ScannerReadRepository scannerReadRepository,
+    public DeviceVersionRepositoryImpl(final OperatorFilteredRepository<TerminalEntity> terminalRepository,
+                                       final OperatorFilteredRepository<MobileEntity> mobileRepository,
+                                       final OperatorFilteredRepository<ScannerEntity> scannerRepository,
                                        final DeviceVersionReadRepository deviceVersionReadRepository) {
-        this.terminalReadRepository = terminalReadRepository;
-        this.mobileReadRepository = mobileReadRepository;
-        this.scannerReadRepository = scannerReadRepository;
+        this.terminalRepository = terminalRepository;
+        this.mobileRepository = mobileRepository;
+        this.scannerRepository = scannerRepository;
         this.deviceVersionReadRepository = deviceVersionReadRepository;
     }
 
@@ -65,17 +71,17 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
     private Optional<String> resolveCurrentVersion(final DeviceId deviceId) {
         final DeviceType type = deviceId.type();
         if (DeviceType.TERMINAL.equals(type)) {
-            return terminalReadRepository.findById(deviceId)
+            return findTerminal(deviceId)
                     .map(entity -> entity.getVersion() != null
                             ? entity.getVersion()
                             : (entity.getSoftware() != null ? entity.getSoftware().getAppVersion() : null));
         }
         if (DeviceType.SCANNER.equals(type)) {
-            return scannerReadRepository.findById(deviceId)
+            return findScanner(deviceId)
                     .map(entity -> (String) null);
         }
         if (DeviceType.MOBILE.equals(type)) {
-            return mobileReadRepository.findById(deviceId)
+            return findMobile(deviceId)
                     .map(entity -> entity.getVersion() != null
                             ? entity.getVersion()
                             : (entity.getSoftware() != null ? entity.getSoftware().getAppVersion() : null));
@@ -86,14 +92,32 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
     private boolean deviceExists(final DeviceId deviceId) {
         final DeviceType type = deviceId.type();
         if (DeviceType.TERMINAL.equals(type)) {
-            return terminalReadRepository.existsById(deviceId);
+            return findTerminal(deviceId).isPresent();
         }
         if (DeviceType.SCANNER.equals(type)) {
-            return scannerReadRepository.existsById(deviceId);
+            return findScanner(deviceId).isPresent();
         }
         if (DeviceType.MOBILE.equals(type)) {
-            return mobileReadRepository.existsById(deviceId);
+            return findMobile(deviceId).isPresent();
         }
         return false;
+    }
+
+    private Optional<TerminalEntity> findTerminal(final DeviceId deviceId) {
+        return terminalRepository.createCriteria(TerminalEntity.class)
+                .eq(DEVICE_ID_FIELD, deviceId.value())
+                .one();
+    }
+
+    private Optional<ScannerEntity> findScanner(final DeviceId deviceId) {
+        return scannerRepository.createCriteria(ScannerEntity.class)
+                .eq(DEVICE_ID_FIELD, deviceId.value())
+                .one();
+    }
+
+    private Optional<MobileEntity> findMobile(final DeviceId deviceId) {
+        return mobileRepository.createCriteria(MobileEntity.class)
+                .eq(DEVICE_ID_FIELD, deviceId.value())
+                .one();
     }
 }

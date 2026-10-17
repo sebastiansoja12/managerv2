@@ -5,6 +5,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator.AuthenticatedDeviceContext;
+import com.warehouse.terminal.jaxb.CollectRequest;
 import com.warehouse.terminal.jaxb.DeviceType;
 import com.warehouse.terminal.jaxb.TerminalRequest;
 
@@ -19,8 +20,7 @@ public class DeviceAccessValidatorAspect {
 
     @Around("@annotation(com.warehouse.commonassets.validator.DeviceAccessValidator)")
     public Object validateDeviceAccess(final ProceedingJoinPoint joinPoint) throws Throwable {
-        final TerminalRequest terminalRequest = resolveTerminalRequest(joinPoint);
-        final DeviceType device = resolveDevice(terminalRequest);
+        final DeviceType device = resolveDevice(joinPoint);
 
         final AuthenticatedDeviceContext authenticatedDevice =
                 deviceContextAuthenticator.authenticateByPairKey(device.getPairKey());
@@ -33,17 +33,19 @@ public class DeviceAccessValidatorAspect {
         }
     }
 
-    private TerminalRequest resolveTerminalRequest(final ProceedingJoinPoint joinPoint) {
+    private DeviceType resolveDevice(final ProceedingJoinPoint joinPoint) {
         for (final Object argument : joinPoint.getArgs()) {
             if (argument instanceof TerminalRequest terminalRequest) {
-                return terminalRequest;
+                return requireDevice(terminalRequest.getDevice());
+            }
+            if (argument instanceof CollectRequest collectRequest) {
+                return requireDevice(collectRequest.getDeviceInformation());
             }
         }
-        throw new IllegalArgumentException("DeviceAccessValidator requires TerminalRequest argument");
+        throw new IllegalArgumentException("DeviceAccessValidator requires TerminalRequest or CollectRequest argument");
     }
 
-    private DeviceType resolveDevice(final TerminalRequest terminalRequest) {
-        final DeviceType device = terminalRequest.getDevice();
+    private DeviceType requireDevice(final DeviceType device) {
         if (device == null) {
             throw new IllegalArgumentException("Missing device data in SOAP request");
         }

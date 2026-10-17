@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.device.Scanner;
 
@@ -28,7 +29,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "scanners")
-public class ScannerEntity {
+public class ScannerEntity extends BelongsToOperator {
 
     public DeviceId getId() {
         return deviceId;

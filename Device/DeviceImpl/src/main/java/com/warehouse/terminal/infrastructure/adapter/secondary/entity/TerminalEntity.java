@@ -7,6 +7,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ExternalId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 
 import jakarta.persistence.AttributeOverride;
@@ -27,7 +28,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "terminals")
-public class TerminalEntity {
+public class TerminalEntity extends BelongsToOperator {
 
     public DeviceId getId() {
         return deviceId;

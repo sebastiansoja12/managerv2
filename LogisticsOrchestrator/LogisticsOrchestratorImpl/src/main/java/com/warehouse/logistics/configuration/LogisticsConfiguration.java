@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.UserApiService;
+import com.warehouse.deliverycollect.api.DeliveryCollectApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.BaseRepository;
@@ -15,6 +16,7 @@ import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValida
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator;
 import com.warehouse.logistics.infrastructure.adapter.primary.LoggingSoapEndpointExceptionResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.CollectMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.DeliveryResponseMapper;
@@ -151,5 +153,20 @@ public class LogisticsConfiguration {
     @Bean
     public DeliveryResponseMapper deliveryResponseMapper() {
         return new DeliveryResponseMapper();
+    }
+
+    @Bean
+    public CollectMapper collectMapper() {
+        return new CollectMapper();
+    }
+
+    @Bean
+    public ShipmentCollectPort shipmentCollectPort(final DeliveryCollectServicePort deliveryCollectServicePort) {
+        return new ShipmentCollectPortImpl(deliveryCollectServicePort);
+    }
+
+    @Bean
+    public DeliveryCollectServicePort deliveryCollectServicePort(final DeliveryCollectApiService deliveryCollectApiService) {
+        return new DeliveryCollectServiceAdapter(deliveryCollectApiService);
     }
 }

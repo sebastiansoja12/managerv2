@@ -26,6 +26,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ExternalId;
@@ -316,7 +317,7 @@ class DeviceControllerRestClientIntegrationTest {
                 null,
                 null,
                 null,
-                OwnershipProfile.initializeOwnership("OPERATOR", new UserId(userId), new DepartmentCode(departmentCode), null)
+                OwnershipProfile.initializeOwnership("OPERATOR", new UserId(userId), new DepartmentCode(departmentCode), null, new OperatorId(1L))
         );
     }
 
@@ -328,7 +329,7 @@ class DeviceControllerRestClientIntegrationTest {
                 null,
                 null,
                 null,
-                OwnershipProfile.initializeOwnership("OPERATOR", new UserId(userId), new DepartmentCode(departmentCode), null)
+                OwnershipProfile.initializeOwnership("OPERATOR", new UserId(userId), new DepartmentCode(departmentCode), null, new OperatorId(1L))
         );
     }
 
@@ -341,7 +342,7 @@ class DeviceControllerRestClientIntegrationTest {
                 null,
                 null,
                 null,
-                OwnershipProfile.initializeOwnership("OPERATOR", new UserId(userId), new DepartmentCode(departmentCode), null),
+                OwnershipProfile.initializeOwnership("OPERATOR", new UserId(userId), new DepartmentCode(departmentCode), null, new OperatorId(1L)),
                 java.time.Instant.now(),
                 java.time.Instant.now(),
                 Scanner.ScanType.BARCODE,

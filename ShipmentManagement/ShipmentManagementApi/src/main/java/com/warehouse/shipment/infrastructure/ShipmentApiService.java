@@ -1,12 +1,15 @@
 package com.warehouse.shipment.infrastructure;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseDto;
 
 public interface ShipmentApiService {
     ShipmentDetailsDto getShipment(final ShipmentId shipmentId);
+
+    ShipmentDetailsDto collectShipment(final TrackingNumber trackingNumber);
 
     ShipmentRejectResponseDto rejectShipment(final ShipmentRejectRequestDto shipmentRejectRequest);
 

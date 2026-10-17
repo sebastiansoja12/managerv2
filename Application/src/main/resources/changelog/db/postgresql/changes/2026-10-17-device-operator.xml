@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-17-postgresql-device-operator-from-owner" author="s-soja">
+        <comment>Assign devices without operator to the operator of the user owning the device</comment>
+        <sql>
+            UPDATE mobiles device SET operator_id = owner.operator_id
+            FROM users owner
+            WHERE device.operator_id IS NULL AND device.user_id = owner.user_id;
+
+            UPDATE scanners device SET operator_id = owner.operator_id
+            FROM users owner
+            WHERE device.operator_id IS NULL AND device.user_id = owner.user_id;
+
+            UPDATE terminals device SET operator_id = owner.operator_id
+            FROM users owner
+            WHERE device.operator_id IS NULL AND device.user_id = owner.user_id;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -190,6 +190,38 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldMarkCreatedShipmentAsSentWhenCollectedFromClient() {
+        final Shipment shipment = shipment(null);
+
+        shipment.notifyShipmentCollected();
+
+        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldMarkPreparedShipmentAsSentWhenCollectedFromClient() {
+        final Shipment shipment = shipment(null);
+        shipment.changeShipmentStatus(ShipmentStatus.PREPARED);
+
+        shipment.notifyShipmentCollected();
+
+        assertEquals(ShipmentStatus.SENT, shipment.getShipmentStatus());
+    }
+
+    @Test
+    void shouldRejectCollectingShipmentThatWasAlreadySent() {
+        final Shipment shipment = shipment(null);
+        shipment.prepareShipmentToSend();
+
+        final ShipmentModificationException exception = assertThrows(
+                ShipmentModificationException.class,
+                shipment::notifyShipmentCollected
+        );
+
+        assertEquals("Shipment cannot be collected from status SENT", exception.getMessage());
+    }
+
+    @Test
     void shouldRejectShipmentCancellationAfterConfiguredCancellationWindow() {
         final Shipment shipment = shipment(null);
 
