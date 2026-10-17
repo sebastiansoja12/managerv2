@@ -3,7 +3,7 @@ package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
-import com.warehouse.reroute.infrastructure.adapter.secondary.api.ShipmentIdDto;
+import com.warehouse.shipment.infrastructure.adapter.secondary.api.ShipmentIdDto;
 import com.warehouse.shipment.domain.vo.ShipmentReturnedCommand;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.infrastructure.adapter.secondary.api.*;

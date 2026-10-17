@@ -4,7 +4,10 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 
 public interface MailNotificationServicePort {
     Result<Void, ErrorCode> notifyRecipient(final DeliveryStatus deliveryStatus, final Shipment shipment);
+
+    void notifySenderShipmentCreated(final ShipmentSnapshot snapshot);
 }

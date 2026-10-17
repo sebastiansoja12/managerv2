@@ -1,13 +1,12 @@
 package com.warehouse.shipment.application.port.secondary;
 
+import com.warehouse.commonassets.identificator.*;
+import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
-import com.warehouse.shipment.domain.model.Shipment;
 
 public interface ShipmentRepository {
 
@@ -23,10 +22,16 @@ public interface ShipmentRepository {
 
     Shipment findByTrackingNumber(final TrackingNumber trackingNumber);
 
+    Optional<OperatorId> findOperatorIdByTrackingNumber(final TrackingNumber trackingNumber);
+
     List<Shipment> findAll();
 
     List<Shipment> findAllCreatedBetween(final LocalDateTime createdFromInclusive,
                                          final LocalDateTime createdToExclusive);
 
     boolean existsAny();
+
+    DepartmentId findOriginDepartmentByTrackingNumber(final TrackingNumber trackingNumber);
+
+    ShipmentOwnerContext findContext(final TrackingNumber trackingNumber);
 }

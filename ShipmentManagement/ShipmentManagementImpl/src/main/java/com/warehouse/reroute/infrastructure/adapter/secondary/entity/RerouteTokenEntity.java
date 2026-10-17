@@ -2,14 +2,19 @@ package com.warehouse.reroute.infrastructure.adapter.secondary.entity;
 
 import java.time.Instant;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@Builder
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "reroute_token")
 @Entity(name = "reroute.RerouteTokenEntity")
 public class RerouteTokenEntity {
@@ -19,18 +24,24 @@ public class RerouteTokenEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "token", nullable = false, updatable = false)
     private Integer token;
 
     @Column(name = "created", updatable = false)
-    private Instant createdDate;
+    private Instant createdAt;
 
     @Column(name = "timeout")
-    private Instant expiryDate;
+    private Instant expiresAt;
 
     @Column(name = "parcel_id", nullable = false, updatable = false)
-    private Long parcelId;
+    private Long shipmentId;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, updatable = false)
     private String email;
+
+    @Column(name = "failed_attempts", nullable = false)
+    private Integer failedAttempts;
+
+    @Column(name = "used_at")
+    private Instant usedAt;
 }

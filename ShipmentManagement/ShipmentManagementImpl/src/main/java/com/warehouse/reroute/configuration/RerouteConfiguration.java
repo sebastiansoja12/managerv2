@@ -1,106 +1,89 @@
 package com.warehouse.reroute.configuration;
 
-import com.warehouse.reroute.domain.port.secondary.*;
-import com.warehouse.reroute.infrastructure.adapter.secondary.*;
-import com.warehouse.tools.routelog.RouteTrackerLogProperties;
-import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
-import io.github.resilience4j.retry.RetryConfig;
-import org.mapstruct.factory.Mappers;
+import java.time.Clock;
+import java.time.Duration;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.warehouse.mail.domain.port.primary.MailPort;
-import com.warehouse.reroute.domain.port.primary.RerouteTokenPort;
-import com.warehouse.reroute.domain.port.primary.RerouteTokenPortImpl;
-import com.warehouse.reroute.domain.service.*;
-import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapper;
-import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenRequestMapperImpl;
-import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapper;
-import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteTokenResponseMapperImpl;
-import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.NotificationMapper;
-import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenMapper;
-
-import java.time.Duration;
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
+import com.warehouse.reroute.application.port.primary.RerouteTokenPort;
+import com.warehouse.reroute.application.port.primary.RerouteTokenPortImpl;
+import com.warehouse.reroute.application.port.secondary.RerouteIntegrationEventServicePort;
+import com.warehouse.reroute.application.port.secondary.RerouteNotificationServicePort;
+import com.warehouse.reroute.application.port.secondary.RerouteTokenRepository;
+import com.warehouse.reroute.application.port.secondary.ShipmentRerouteServicePort;
+import com.warehouse.reroute.domain.service.RerouteTokenValueGenerator;
+import com.warehouse.reroute.domain.vo.RerouteTokenPolicy;
+import com.warehouse.reroute.infrastructure.adapter.primary.ExpiredRerouteTokenCleanupJob;
+import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteApiMapper;
+import com.warehouse.reroute.infrastructure.adapter.primary.validator.RerouteRequestValidator;
+import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteIntegrationEventServiceAdapter;
+import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteNotificationServiceAdapter;
+import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenJpaRepository;
+import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenRepositoryAdapter;
+import com.warehouse.reroute.infrastructure.adapter.secondary.ShipmentRerouteServiceAdapter;
+import com.warehouse.reroute.infrastructure.adapter.secondary.mapper.RerouteTokenPersistenceMapper;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
 
 @Configuration
 public class RerouteConfiguration {
 
-	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
+    @Bean
+    public RerouteTokenPort rerouteTokenPort(final RerouteTokenRepository rerouteTokenRepository,
+                                             final ShipmentRerouteServicePort shipmentRerouteServicePort,
+                                             final RerouteNotificationServicePort rerouteNotificationServicePort,
+                                             final RerouteIntegrationEventServicePort rerouteIntegrationEventServicePort,
+                                             final RerouteTokenPolicy rerouteTokenPolicy) {
+        return new RerouteTokenPortImpl(rerouteTokenRepository, shipmentRerouteServicePort,
+                rerouteNotificationServicePort, rerouteIntegrationEventServicePort, new RerouteTokenValueGenerator(),
+                rerouteTokenPolicy, Clock.systemUTC());
+    }
 
-	@Bean
-	public RerouteTokenRepository rerouteTokenRepository(RerouteTokenReadRepository repository) {
-		final RerouteTokenMapper rerouteTokenMapper = Mappers.getMapper(RerouteTokenMapper.class);
-		return new RerouteTokenRepositoryImpl(rerouteTokenMapper, repository);
-	}
+    @Bean
+    public RerouteIntegrationEventServicePort rerouteIntegrationEventServicePort(
+            final IntegrationEventPublisher integrationEventPublisher) {
+        return new RerouteIntegrationEventServiceAdapter(integrationEventPublisher);
+    }
 
-	@Bean
-	public RerouteTokenPort rerouteTokenPort(MailServicePort mailServicePort,
-			RerouteTokenRepository rerouteTokenRepository, final RerouteTrackerServicePort rerouteTrackerServicePort,
-											 final SoftwareConfigurationServicePort softwareConfigurationServicePort) {
-		final com.warehouse.reroute.domain.service.RerouteService rerouteService = new RerouteServiceImpl(
-				mailServicePort, rerouteTokenRepository);
-		final RerouteTokenGeneratorService rerouteTokenGeneratorService = new RerouteTokenGeneratorServiceImpl();
-		return new RerouteTokenPortImpl(rerouteService, rerouteTokenGeneratorService,
-				LOGGER_FACTORY.getLogger(RerouteTokenPort.class), rerouteTrackerServicePort, softwareConfigurationServicePort);
-	}
+    @Bean
+    public RerouteTokenPolicy rerouteTokenPolicy(
+            @Value("${reroute.token-validity:PT30M}") final Duration tokenValidity,
+            @Value("${reroute.max-failed-attempts:5}") final int maxFailedAttempts) {
+        return new RerouteTokenPolicy(tokenValidity, maxFailedAttempts);
+    }
 
-	@Bean
-	public SoftwareConfigurationServicePort softwareConfigurationServicePort(
-			final SoftwareConfigurationProperties softwareConfigurationProperties) {
-		final RetryConfig config = RetryConfig.custom()
-				.maxAttempts(4)
-				.waitDuration(Duration.ofSeconds(2))
-				.retryExceptions(RuntimeException.class)
-				.writableStackTraceEnabled(true)
-				.build();
-		return new SoftwareConfigurationServiceAdapter(config, softwareConfigurationProperties);
-	}
+    @Bean
+    public RerouteTokenRepository rerouteTokenRepository(final RerouteTokenJpaRepository rerouteTokenJpaRepository) {
+        return new RerouteTokenRepositoryAdapter(rerouteTokenJpaRepository, new RerouteTokenPersistenceMapper());
+    }
 
-	@Bean
-	public RerouteTrackerServicePort rerouteTrackerServicePort() {
-		final RetryConfig config = RetryConfig.custom()
-				.maxAttempts(4)
-				.waitDuration(Duration.ofSeconds(2))
-				.retryExceptions(RuntimeException.class)
-				.writableStackTraceEnabled(true)
-				.build();
-		return new RerouteTrackerServiceAdapter(config);
-	}
+    @Bean
+    public ShipmentRerouteServicePort shipmentRerouteServicePort(final ShipmentApiService shipmentApiService) {
+        return new ShipmentRerouteServiceAdapter(shipmentApiService);
+    }
 
-	@Bean("reroute.routeTrackerLogProperties")
-	public RouteTrackerLogProperties routeTrackerLogProperties() {
-		return new RouteTrackerLogProperties();
-	}
+    @Bean
+    public RerouteNotificationServicePort rerouteNotificationServicePort(
+            final NotificationEventPublisher notificationEventPublisher,
+            @Value("${reroute.shipment-edit-url:http://localhost:3000/shipment-edit}") final String shipmentEditUrl) {
+        return new RerouteNotificationServiceAdapter(notificationEventPublisher, shipmentEditUrl);
+    }
 
-	@Bean(name = "reroute.mailServicePort")
-	public MailServicePort mailServicePort(MailPort mailPort) {
-		return new MailAdapter(mailPort, Mappers.getMapper(NotificationMapper.class));
-	}
+    @Bean
+    public RerouteApiMapper rerouteApiMapper() {
+        return new RerouteApiMapper();
+    }
 
-	@Bean
-	public RerouteTokenValidatorService rerouteTokenValidatorService(RerouteTokenReadRepository repository) {
-		return new RerouteTokenValidatorServiceImpl(repository);
-	}
+    @Bean
+    public RerouteRequestValidator rerouteRequestValidator() {
+        return new RerouteRequestValidator();
+    }
 
-	@Bean
-	public RerouteService rerouteService(MailServicePort mailServicePort,
-			RerouteTokenRepository rerouteTokenRepository) {
-		return new RerouteServiceImpl(mailServicePort, rerouteTokenRepository);
-	}
-
-	@Bean
-	public ExpiredRerouteTokenJobDeleter expiredRerouteTokenJobDeleter(RerouteTokenReadRepository repository) {
-		return new ExpiredRerouteTokenJobDeleter(repository);
-	}
-
-	@Bean
-	public RerouteTokenRequestMapper requestMapper() {
-		return new RerouteTokenRequestMapperImpl();
-	}
-
-	@Bean
-	public RerouteTokenResponseMapper responseMapper() {
-		return new RerouteTokenResponseMapperImpl();
-	}
-
+    @Bean
+    public ExpiredRerouteTokenCleanupJob expiredRerouteTokenCleanupJob(final RerouteTokenPort rerouteTokenPort) {
+        return new ExpiredRerouteTokenCleanupJob(rerouteTokenPort);
+    }
 }

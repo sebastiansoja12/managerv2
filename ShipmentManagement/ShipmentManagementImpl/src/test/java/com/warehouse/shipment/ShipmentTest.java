@@ -190,6 +190,42 @@ class ShipmentTest {
     }
 
     @Test
+    void shouldRerouteCreatedShipmentWithNewPartiesAndRerouteStatus() {
+        final Shipment shipment = shipment(null);
+        final Party newSender = sender();
+        final Party newRecipient = recipient();
+
+        shipment.reroute(newSender, newRecipient);
+
+        assertAll(
+                () -> assertEquals(ShipmentStatus.REROUTE, shipment.getShipmentStatus()),
+                () -> assertSame(newSender, shipment.getSender()),
+                () -> assertSame(newRecipient, shipment.getRecipient()),
+                () -> assertTrue(shipment.canBeRerouted())
+        );
+    }
+
+    @Test
+    void shouldRejectRerouteAfterShipmentWasCollected() {
+        final Shipment shipment = shipment(null);
+        shipment.notifyShipmentCollected();
+
+        assertAll(
+                () -> assertFalse(shipment.canBeRerouted()),
+                () -> assertThrows(ShipmentModificationException.class,
+                        () -> shipment.reroute(sender(), recipient()))
+        );
+    }
+
+    @Test
+    void shouldRejectRerouteOfLockedShipment() {
+        final Shipment shipment = shipment(null);
+        shipment.lockShipment();
+
+        assertThrows(ShipmentModificationException.class, () -> shipment.reroute(sender(), recipient()));
+    }
+
+    @Test
     void shouldMarkCreatedShipmentAsSentWhenCollectedFromClient() {
         final Shipment shipment = shipment(null);
 
