@@ -83,4 +83,21 @@ public class DevicePairServiceImpl implements DevicePairService {
     protected String generateEncryptedPairKey(final Device device, final Instant now) {
         return devicePairKeyService.generateEncryptedPairKey(device.getDeviceId(), now);
     }
+
+    @Override
+    public Optional<DevicePair> findExistingByDeviceId(final DeviceId deviceId) {
+        return this.devicePairRepository.findByDeviceId(deviceId);
+    }
+
+    @Override
+    public boolean revokePairing(final DeviceId deviceId) {
+        return this.devicePairRepository.findByDeviceId(deviceId)
+                .map(devicePair -> {
+                    devicePair.unpair();
+                    devicePair.setPairKeyExpiresAt(Instant.now());
+                    this.devicePairRepository.update(devicePair);
+                    return true;
+                })
+                .orElse(false);
+    }
 }
