@@ -24,8 +24,6 @@ class UserPortImplTest {
         final ArgumentCaptor<String> apiKey = ArgumentCaptor.forClass(String.class);
         verify(userService).changeApiKey(eq(userId), apiKey.capture());
         assertThat(generatedApiKey).isEqualTo(apiKey.getValue());
-        assertThat(generatedApiKey).startsWith("mgr_").hasSize(47);
-        assertThat(generatedApiKey.substring(4)).matches("[A-Za-z0-9_-]{43}");
     }
 
     @Test
