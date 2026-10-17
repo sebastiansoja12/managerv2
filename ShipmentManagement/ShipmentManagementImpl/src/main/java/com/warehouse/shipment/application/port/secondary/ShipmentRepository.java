@@ -27,4 +27,6 @@ public interface ShipmentRepository {
 
     List<Shipment> findAllCreatedBetween(final LocalDateTime createdFromInclusive,
                                          final LocalDateTime createdToExclusive);
+
+    boolean existsAny();
 }

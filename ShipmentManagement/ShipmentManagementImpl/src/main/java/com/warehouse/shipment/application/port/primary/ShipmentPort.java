@@ -61,4 +61,6 @@ public interface ShipmentPort {
     void notifyShipmentReturnCanceled(final ShipmentId shipmentId);
 
     void returnToSender(final ShipmentId shipmentId);
+
+    boolean hasAnyShipment();
 }
