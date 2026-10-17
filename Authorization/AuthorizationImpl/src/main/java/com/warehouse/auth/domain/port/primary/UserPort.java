@@ -2,7 +2,7 @@ package com.warehouse.auth.domain.port.primary;
 
 import com.warehouse.auth.domain.helper.Result;
 import com.warehouse.auth.domain.model.FullNameChangeCommand;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.vo.UserDepartmentUpdateRequest;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -14,13 +14,13 @@ import java.util.List;
 
 public interface UserPort {
 
-    List<User> findAll();
+    List<OrganizationUser> findAll();
 
-    User findUser(String username);
+    OrganizationUser findUser(String username);
 
-    User findUser(UserId userId);
+    OrganizationUser findUser(UserId userId);
 
-    User update(final UpdateUserCommand command);
+    OrganizationUser update(final UpdateUserCommand command);
 
     void changePassword(final UserId userId, final String encodedPassword);
 
@@ -30,7 +30,7 @@ public interface UserPort {
 
     void deleteApiKey(final UserId userId);
 
-    void changeRole(final UserId userId, final User.Role role);
+    void changeRole(final UserId userId, final OrganizationUser.Role role);
 
     void changeAdminDepartmentInfo(final UserDepartmentUpdateRequest request);
 

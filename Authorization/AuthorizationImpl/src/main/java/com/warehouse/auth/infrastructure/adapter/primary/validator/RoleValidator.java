@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.warehouse.auth.domain.helper.Result;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
 public class RoleValidator {
@@ -31,7 +31,7 @@ public class RoleValidator {
         }
 
         try {
-            User.Role.valueOf(role);
+            OrganizationUser.Role.valueOf(role);
         } catch (final IllegalArgumentException e) {
             errors.add("Unknown role: " + role);
         }
