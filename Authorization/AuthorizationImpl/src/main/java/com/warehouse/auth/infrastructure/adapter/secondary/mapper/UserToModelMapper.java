@@ -1,12 +1,12 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.mapper;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 
 public abstract class UserToModelMapper {
 
-    public static User map(final UserEntity entity) {
-        final User user = new User();
+    public static OrganizationUser map(final UserEntity entity) {
+        final OrganizationUser user = OrganizationUser.forRole(UserRoleMapper.map(entity.getRole()));
         user.setUserId(entity.getUserId());
         user.assignOperator(entity.operatorId());
         user.setUsername(entity.getUsername());
@@ -14,7 +14,6 @@ public abstract class UserToModelMapper {
         user.setFirstName(entity.getFirstName());
         user.setLastName(entity.getLastName());
         user.setPassword(entity.getPassword());
-        user.setRole(UserRoleMapper.map(entity.getRole()));
         user.setDepartmentId(entity.getDepartmentId());
         user.setLanguage(entity.getLanguage());
         user.setPermissions(UserPermissionToModelMapper.map(entity.getPermissions()));
