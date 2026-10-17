@@ -1,13 +1,14 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
 import com.warehouse.auth.CurrentUserApiService;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.CurrentUserAuthenticationPort;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.CurrentUserAuthentication;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.ResponseMapper;
 import com.warehouse.auth.infrastructure.dto.CurrentUserAuthenticationDto;
 import com.warehouse.auth.infrastructure.dto.UserDto;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.UserId;
 
 public class CurrentUserApiServiceAdapter implements CurrentUserApiService {
@@ -33,7 +34,7 @@ public class CurrentUserApiServiceAdapter implements CurrentUserApiService {
 
     @Override
     public UserDto getCurrentUser() {
-        final User user = currentUserAuthenticationPort.getCurrentUser();
+        final OrganizationUser user = currentUserAuthenticationPort.getCurrentUser();
         return responseMapper.map(user, userService.getDepartmentCode(user.getDepartmentId()));
     }
 
@@ -45,5 +46,10 @@ public class CurrentUserApiServiceAdapter implements CurrentUserApiService {
                 responseMapper.map(authentication.user(),
                         userService.getDepartmentCode(authentication.user().getDepartmentId()))
         );
+    }
+
+    @Override
+    public boolean canAccessDepartment(final DepartmentId departmentId) {
+        return currentUserAuthenticationPort.getCurrentUser().canAccessDepartment(departmentId);
     }
 }

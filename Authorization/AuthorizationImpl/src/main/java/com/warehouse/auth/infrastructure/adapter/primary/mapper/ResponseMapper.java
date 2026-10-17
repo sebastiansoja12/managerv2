@@ -1,6 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.primary.mapper;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.infrastructure.dto.CurrentUserProfileDto;
 import com.warehouse.auth.infrastructure.dto.OperatorIdDto;
 import com.warehouse.auth.infrastructure.dto.RolePermissionApi;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class ResponseMapper {
 
-    public UserDto map(final User user, final DepartmentCode departmentCode) {
+    public UserDto map(final OrganizationUser user, final DepartmentCode departmentCode) {
         if (user == null) {
             return null;
         }
@@ -38,7 +38,7 @@ public class ResponseMapper {
                 operatorId, createdAt, updatedAt);
     }
 
-    public CurrentUserProfileDto mapCurrentUser(final User user, final DepartmentCode departmentCode) {
+    public CurrentUserProfileDto mapCurrentUser(final OrganizationUser user, final DepartmentCode departmentCode) {
         final UserDto userDto = map(user, departmentCode);
         if (userDto == null) {
             return null;
