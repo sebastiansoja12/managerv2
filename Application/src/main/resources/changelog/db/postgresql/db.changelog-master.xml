@@ -84,4 +84,9 @@
     <include file="changes/2026-10-07-delivery-step-owner.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-07-delivery-step-user.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-16-shipment-content.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-platform-owners-and-superadmin.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-platform-audit-and-refresh-tokens.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-operator-access-and-maintenance.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-operations-and-communication.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-impersonation-consents.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
