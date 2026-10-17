@@ -12,5 +12,7 @@ public interface OperatorConfigurationApiService {
 
     ShipmentConfigurationDto getCurrentShipmentConfiguration();
 
+    ShipmentConfigurationDto updateCurrentShipmentConfiguration(final ShipmentConfigurationDto configuration);
+
     Optional<ShipmentLimitsDto> getCurrentShipmentLimits();
 }

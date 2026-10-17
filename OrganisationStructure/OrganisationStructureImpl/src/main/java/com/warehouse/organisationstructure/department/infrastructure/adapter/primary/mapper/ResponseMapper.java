@@ -2,6 +2,7 @@ package com.warehouse.organisationstructure.department.infrastructure.adapter.pr
 
 import com.warehouse.organisationstructure.department.api.dto.CoordinatesDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentCodeDto;
+import com.warehouse.organisationstructure.department.api.dto.DepartmentDetailsDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentIdDto;
@@ -43,6 +44,22 @@ public abstract class ResponseMapper {
         return new DepartmentDto(department.getDepartmentId().getValue(), departmentCode,
                 department.getCity(), department.getStreet(),
                 department.getPostalCode(), department.getCountryCode().name(), coordinates);
+    }
+
+    public static DepartmentDetailsDto mapToDetailsDto(final Department department) {
+        return new DepartmentDetailsDto(
+                new DepartmentIdDto(department.getDepartmentId().getValue()),
+                new DepartmentCodeDto(department.getDepartmentCode().getValue()),
+                department.getCity(),
+                department.getStreet(),
+                department.getPostalCode(),
+                department.getCountryCode().name(),
+                department.getTaxId().value(),
+                department.getTelephoneNumber(),
+                department.getOpeningHours(),
+                department.getEmail(),
+                DepartmentTypeDto.valueOf(department.getDepartmentType().name()),
+                DepartmentStatusDto.valueOf(department.getStatus().name()));
     }
 
     public static DepartmentDirectoryEntryDto mapToDirectoryEntryDto(final Department department) {

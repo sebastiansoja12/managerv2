@@ -1,5 +1,7 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.primary;
 
+import com.warehouse.auth.AccessAudience;
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.organisationstructure.api.dto.OperatorIdDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/operators")
+@AccessUserControl(audience = AccessAudience.PLATFORM_OWNER)
 public class OperatorController {
 
     private final OperatorPort operatorPort;
