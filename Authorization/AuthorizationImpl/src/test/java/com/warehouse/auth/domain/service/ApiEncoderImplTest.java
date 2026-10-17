@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.provider.ApiKeyProvider;
 import com.warehouse.auth.domain.vo.ApiKey;
 import com.warehouse.commonassets.identificator.DepartmentId;
@@ -15,7 +15,7 @@ class ApiEncoderImplTest {
     @Test
     void shouldHashApiKeyForUserBeforeSaving() {
         final ApiEncoderImpl encoder = new ApiEncoderImpl(apiKeyProvider());
-        final User user = user("plain-api-key");
+        final OrganizationUser user = user("plain-api-key");
 
         final ApiKey apiKey = encoder.encode(user);
 
@@ -64,8 +64,8 @@ class ApiEncoderImplTest {
         return provider;
     }
 
-    private User user(final String apiKey) {
-        return new User(new UserId(10L), "s-soja", "password", "Sebastian", "Soja", "s-soja@test.pl",
-                User.Role.USER, new DepartmentId(10L), apiKey);
+    private OrganizationUser user(final String apiKey) {
+        return OrganizationUser.of(new UserId(10L), "s-soja", "password", "Sebastian", "Soja", "s-soja@test.pl",
+                OrganizationUser.Role.USER, new DepartmentId(10L), apiKey);
     }
 }

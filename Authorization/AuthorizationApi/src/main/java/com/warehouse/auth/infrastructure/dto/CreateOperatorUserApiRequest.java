@@ -10,7 +10,7 @@ public record CreateOperatorUserApiRequest(
         @NotBlank String username,
         @NotBlank String password,
         @NotBlank @Email String email,
-        @NotBlank @Pattern(regexp = "USER|MANAGER|ADMIN|SUPPLIER") String role,
+        @NotBlank @Pattern(regexp = "USER|MANAGER|ADMIN|SUPERADMIN|SUPPLIER") String role,
         @NotBlank String departmentCode,
         @NotBlank String language) {
 }

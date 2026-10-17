@@ -6,7 +6,7 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.provider.ApiKeyProvider;
 import com.warehouse.auth.domain.vo.ApiKey;
 import com.warehouse.commonassets.identificator.UserId;
@@ -22,7 +22,7 @@ public class ApiEncoderImpl implements ApiKeyEncoder {
     }
 
     @Override
-    public ApiKey encode(final User user) {
+    public ApiKey encode(final OrganizationUser user) {
         return encode(user.getUserId(), user.getApiKey());
     }
 

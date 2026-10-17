@@ -1,6 +1,6 @@
 package com.warehouse.auth;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
@@ -53,7 +53,7 @@ public class UserServiceTest {
     @Test
     void shouldCreate() {
         // given
-        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
+        final OrganizationUser user = OrganizationUser.of(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", OrganizationUser.Role.USER,
                 new DepartmentId(10L), "");
 
         when(departmentServicePort.getDepartmentCode(new DepartmentId(10L)))
