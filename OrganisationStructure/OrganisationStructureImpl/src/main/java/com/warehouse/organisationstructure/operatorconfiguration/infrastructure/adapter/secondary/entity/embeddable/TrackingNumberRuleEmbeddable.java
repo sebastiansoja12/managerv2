@@ -1,6 +1,7 @@
 package com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.embeddable;
 
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberDateFormat;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberPrefixMode;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberRule;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.TrackingNumberSource;
 import jakarta.persistence.Column;
@@ -10,6 +11,10 @@ import jakarta.persistence.Enumerated;
 
 @Embeddable
 public class TrackingNumberRuleEmbeddable {
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shipment_tracking_number_prefix_mode")
+    private TrackingNumberPrefixMode prefixMode;
 
     @Column(name = "shipment_tracking_number_key")
     private String key;
@@ -42,6 +47,7 @@ public class TrackingNumberRuleEmbeddable {
                 ? rule
                 : TrackingNumberRule.defaultRule();
         final TrackingNumberRuleEmbeddable embeddable = new TrackingNumberRuleEmbeddable();
+        embeddable.prefixMode = source.getPrefixMode();
         embeddable.key = source.getKey();
         embeddable.separator = source.getSeparator();
         embeddable.source = source.getSource();
@@ -54,6 +60,7 @@ public class TrackingNumberRuleEmbeddable {
 
     public TrackingNumberRule toModel() {
         return new TrackingNumberRule(
+                prefixMode,
                 key,
                 separator,
                 source,

@@ -55,7 +55,7 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
     @Column(name = "language", nullable = false)
     private String language;
 
-    @Column(name = "api_key", nullable = false)
+    @Column(name = "api_key")
     private String apiKey;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -156,6 +156,19 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
         USER(Collections.emptySet()),
 
         ADMIN(
+                Set.of(
+                        Permission.ROLE_ADMIN_READ,
+                        Permission.ROLE_ADMIN_UPDATE,
+                        Permission.ROLE_ADMIN_DELETE,
+                        Permission.ROLE_ADMIN_CREATE,
+                        Permission.ROLE_MANAGER_READ,
+                        Permission.ROLE_MANAGER_UPDATE,
+                        Permission.ROLE_MANAGER_DELETE,
+                        Permission.ROLE_MANAGER_CREATE
+                )
+        ),
+
+        SUPERADMIN(
                 Set.of(
                         Permission.ROLE_ADMIN_READ,
                         Permission.ROLE_ADMIN_UPDATE,

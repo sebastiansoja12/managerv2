@@ -2,11 +2,12 @@ package com.warehouse.auth.domain.port.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.OperatorId;
 
 public interface DepartmentServicePort {
     Boolean departmentExists(final DepartmentCode departmentCode);
 
-    Boolean departmentExists(final DepartmentId departmentId);
+    Boolean departmentExists(final DepartmentId departmentId, final OperatorId operatorId);
 
     DepartmentId getDepartmentId(final DepartmentCode departmentCode);
 

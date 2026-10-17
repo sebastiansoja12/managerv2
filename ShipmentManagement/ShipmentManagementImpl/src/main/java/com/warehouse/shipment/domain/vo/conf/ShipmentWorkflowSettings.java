@@ -1,5 +1,6 @@
 package com.warehouse.shipment.domain.vo.conf;
 
+import com.warehouse.commonassets.enumeration.ShipmentPriority;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 
 import java.util.Objects;
@@ -21,6 +22,14 @@ public record ShipmentWorkflowSettings(
         }
         defaultServiceLevel = Objects.requireNonNullElse(defaultServiceLevel, ShipmentServiceLevel.STANDARD);
         pickupCutoffTime = pickupCutoffTime == null || pickupCutoffTime.isBlank() ? "16:00" : pickupCutoffTime;
+    }
+
+    public ShipmentPriority defaultShipmentPriority() {
+        return switch (defaultServiceLevel) {
+            case ECONOMY -> ShipmentPriority.LOW;
+            case STANDARD -> ShipmentPriority.MEDIUM;
+            case EXPRESS -> ShipmentPriority.EXPRESS;
+        };
     }
 
     public static ShipmentWorkflowSettings defaults() {

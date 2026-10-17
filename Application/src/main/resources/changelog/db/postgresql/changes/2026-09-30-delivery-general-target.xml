@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-09-30-delivery-general-target" author="s-soja">
+        <addColumn tableName="delivery">
+            <column name="target_type" type="VARCHAR(32)"/>
+            <column name="target_id" type="VARCHAR(255)"/>
+            <column name="delivery_type" type="VARCHAR(32)"/>
+            <column name="attempt_count" type="INT"/>
+            <column name="supplier_id" type="BIGINT"/>
+            <column name="vehicle_id" type="BIGINT"/>
+            <column name="delivery_method" type="VARCHAR(32)"/>
+            <column name="pickup_point_id" type="UUID"/>
+            <column name="delivery_pickup_point_id" type="UUID"/>
+            <column name="signature_id" type="BIGINT"/>
+            <column name="signature_required" type="BOOLEAN"/>
+            <column name="delivery_instructions" type="VARCHAR(1000)"/>
+            <column name="planned_delivery_at" type="TIMESTAMP"/>
+            <column name="delivered_at" type="TIMESTAMP"/>
+        </addColumn>
+        <sql>UPDATE delivery
+             SET target_type = 'SHIPMENT',
+                 target_id = CAST(shipment_id AS VARCHAR(255)),
+                 delivery_type = CASE WHEN delivery_status = 8 THEN 'RETURN' ELSE 'OUTBOUND' END,
+                 attempt_count = COALESCE((
+                     SELECT MAX(details.delivery_attempt_number)
+                     FROM delivery_missed_details details
+                     WHERE details.shipment_id = delivery.shipment_id
+                 ), 0),
+                 signature_required = FALSE</sql>
+        <sql>
+            UPDATE delivery d
+            SET delivery_method = s.delivery_method,
+                pickup_point_id = s.pickup_point_id,
+                delivery_pickup_point_id = s.delivery_pickup_point_id,
+                signature_id = s.signature_id,
+                signature_required = s.signature_required
+            FROM shipment s
+            WHERE d.shipment_id = s.shipment_id
+        </sql>
+        <addNotNullConstraint tableName="delivery" columnName="target_type" columnDataType="VARCHAR(32)"/>
+        <addNotNullConstraint tableName="delivery" columnName="target_id" columnDataType="VARCHAR(255)"/>
+        <addNotNullConstraint tableName="delivery" columnName="delivery_type" columnDataType="VARCHAR(32)"/>
+        <addNotNullConstraint tableName="delivery" columnName="attempt_count" columnDataType="INT"/>
+        <addNotNullConstraint tableName="delivery" columnName="signature_required" columnDataType="BOOLEAN"/>
+        <dropNotNullConstraint tableName="delivery" columnName="shipment_id" columnDataType="BIGINT"/>
+        <dropForeignKeyConstraint baseTableName="delivery" constraintName="fk_delivery_shipment"/>
+    </changeSet>
+</databaseChangeLog>

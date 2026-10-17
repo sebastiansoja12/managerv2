@@ -1,6 +1,7 @@
 package com.warehouse.asyncjob.domain.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -38,6 +39,11 @@ public class AsyncJobService {
     public AsyncJob get(final UUID jobId) {
         return this.asyncJobRepository.findById(jobId)
                 .orElseThrow(() -> new AsyncJobNotFoundException(jobId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AsyncJob> findLatest(final Long operatorId, final int limit) {
+        return this.asyncJobRepository.findLatestByOperatorId(operatorId, Math.max(1, Math.min(limit, 100)));
     }
 
     private void scheduleAfterCommit(final UUID jobId) {

@@ -7,7 +7,7 @@ RUN cd ReturningTrackManager && mvn -pl ReturningTrackManagerImpl -am package -D
 
 FROM eclipse-temurin:21-jre
 
-COPY --from=build /workspace/ReturningTrackManager/ReturningTrackManagerImpl/target/ReturningTrackManagerImpl-2026.3-SNAPSHOT.jar /app.jar
+COPY --from=build /workspace/ReturningTrackManager/ReturningTrackManagerImpl/target/ReturningTrackManagerImpl-2026.4-SNAPSHOT.jar /app.jar
 
 EXPOSE 8070
 

@@ -11,17 +11,16 @@ import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.DangerousGood;
-import com.warehouse.shipment.domain.model.Signature;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ShipmentSnapshot(ShipmentId shipmentId,
-                               Sender sender,
-                               Recipient recipient,
-                               ShipmentSize shipmentSize,
-                               DepartmentId targetDepartmentId,
+                               Party sender,
+                               Party recipient,
+                               DepartmentId destinationDepartmentId,
                                DepartmentId originDepartmentId,
                                ShipmentStatus shipmentStatus,
                                ShipmentType shipmentType,
@@ -30,16 +29,22 @@ public record ShipmentSnapshot(ShipmentId shipmentId,
                                LocalDateTime createdAt,
                                LocalDateTime updatedAt,
                                Boolean locked,
-                               DangerousGood dangerousGood,
                                Boolean signatureRequired,
                                ShipmentPriority shipmentPriority,
-                               CountryCode originCountry,
-                               CountryCode destinationCountry,
-                               Signature signature,
                                TrackingNumber trackingNumber,
                                PickupMethod pickupMethod,
                                DeliveryMethod deliveryMethod,
                                PickupPointId pickupPointId,
                                PickupPointId deliveryPickupPointId,
-                               ExternalId<UUID> externalShipmentId) {
+                               ExternalId<UUID> externalShipmentId,
+                               LocalDateTime acceptedAt,
+                               LocalDateTime cancelledAt,
+                               CancellationReason cancellationReason,
+                               Dimensions dimensions,
+                               Weight weight,
+                               CustomerReference customerReference,
+                               String contentDescription,
+                               Money declaredValue,
+                               ShipmentServiceLevel serviceLevel,
+                               PackagingType packagingType) {
 }

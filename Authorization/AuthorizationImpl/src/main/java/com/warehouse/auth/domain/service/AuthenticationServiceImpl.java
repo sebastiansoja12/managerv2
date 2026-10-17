@@ -2,7 +2,7 @@ package com.warehouse.auth.domain.service;
 
 import com.warehouse.auth.domain.event.UserLoggedOutEvent;
 import com.warehouse.auth.domain.model.RefreshToken;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.registry.DomainRegistry;
@@ -52,7 +52,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .filter(RefreshToken::isActual)
                 .filter(refreshToken -> refreshToken.getExpiryDate().isAfter(java.time.LocalDateTime.now()))
                 .orElseThrow(() -> new AuthenticationErrorException("Invalid or expired refresh token"));
-        final User user = userRepository.findByUsername(currentRefreshToken.getUsername());
+        final OrganizationUser user = userRepository.findByUsername(currentRefreshToken.getUsername());
         if (user == null || Boolean.TRUE.equals(user.isDeleted())) {
             throw new AuthenticationErrorException("Invalid or expired refresh token");
         }
@@ -77,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         refreshTokenRepository.delete(refreshTokenValue);
-        final User user = this.userRepository.findByUsername(refreshToken.getUsername());
+        final OrganizationUser user = this.userRepository.findByUsername(refreshToken.getUsername());
         if (user != null) {
             user.markAsLoggedOut();
             this.userRepository.createOrUpdate(user);

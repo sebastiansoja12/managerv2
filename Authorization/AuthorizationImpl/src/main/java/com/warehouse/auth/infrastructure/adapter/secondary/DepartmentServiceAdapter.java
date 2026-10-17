@@ -1,17 +1,23 @@
 package com.warehouse.auth.infrastructure.adapter.secondary;
 
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 
 
 public class DepartmentServiceAdapter implements DepartmentServicePort {
 
     private final DepartmentApiService departmentApiService;
 
-    public DepartmentServiceAdapter(final DepartmentApiService departmentApiService) {
+    private final OperatorContext operatorContext;
+
+    public DepartmentServiceAdapter(final DepartmentApiService departmentApiService,
+                                    final OperatorContext operatorContext) {
         this.departmentApiService = departmentApiService;
+        this.operatorContext = operatorContext;
     }
 
     @Override
@@ -20,8 +26,8 @@ public class DepartmentServiceAdapter implements DepartmentServicePort {
     }
 
     @Override
-    public Boolean departmentExists(final DepartmentId departmentId) {
-        return this.departmentApiService.checkIfDepartmentExists(departmentId);
+    public Boolean departmentExists(final DepartmentId departmentId, final OperatorId operatorId) {
+        return operatorContext.runAs(operatorId, () -> departmentApiService.checkIfDepartmentExists(departmentId));
     }
 
     @Override

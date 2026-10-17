@@ -21,7 +21,7 @@ public class ShipmentDeliveredStrategy implements ShipmentDeliveryStrategy {
 
     @Override
     public Optional<ShipmentEvent> process(final Shipment shipment) {
-        shipment.notifyShipmentDelivered();
+        shipment.markAsDelivered();
         return Optional.of(new ShipmentDelivered(shipment.snapshot(), Instant.now()));
     }
 }

@@ -1,6 +1,6 @@
 package com.warehouse.auth;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import com.warehouse.auth.domain.service.RefreshTokenGeneratorImpl;
 import com.warehouse.commonassets.identificator.DepartmentId;
@@ -22,7 +22,7 @@ public class RefreshTokenGeneratorImplTest {
     @Test
     void shouldGenerateRandomToken() {
         // given
-        final User user = new User(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", User.Role.USER,
+        final OrganizationUser user = OrganizationUser.of(null, "s-soja", "test", "Sebastian", "Soja", "sebastian5152@wp.pl", OrganizationUser.Role.USER,
                 new DepartmentId(10L), "");
         // when
         final String token = refreshTokenGenerator.generateToken(user);

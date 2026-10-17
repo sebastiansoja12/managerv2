@@ -37,10 +37,8 @@ class RouteTrackerArchitectureTest {
                 "src/main/java/com/warehouse/routetracker/infrastructure/adapter/primary/kafka/event/snapshot");
         assertThat(snapshotPackage.resolve("ShipmentEventData.java")).exists();
         assertThat(snapshotPackage.resolve("ShipmentSnapshot.java")).doesNotExist();
-        assertThat(snapshotPackage.resolve("SenderSnapshot.java")).exists();
-        assertThat(snapshotPackage.resolve("RecipientSnapshot.java")).exists();
+        assertThat(snapshotPackage.resolve("PartySnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("MoneySnapshot.java")).exists();
-        assertThat(snapshotPackage.resolve("DangerousGoodSnapshot.java")).exists();
         assertThat(snapshotPackage.resolve("SignatureSnapshot.java")).exists();
 
         final String changedMessage = Files.readString(Path.of(

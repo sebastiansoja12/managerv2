@@ -33,8 +33,8 @@ public class ReturnRequestApiValidator extends RequestValidator<ReturnRequestApi
             if (StringUtils.isEmpty(request.reason())) {
                 errors.add("Reason must be provided");
             }
-            if (request.departmentCode() == null || StringUtils.isEmpty(request.departmentCode().value())) {
-                errors.add("Department code must be provided");
+            if (request.departmentId() == null || request.departmentId().value() == null) {
+                errors.add("Department ID must be provided");
             }
             if (request.userId() == null || request.userId().value() == null) {
                 errors.add("User id must be provided");

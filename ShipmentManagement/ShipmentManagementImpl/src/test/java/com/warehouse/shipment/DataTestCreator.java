@@ -7,11 +7,16 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.domain.model.DangerousGood;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
+import com.warehouse.shipment.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.domain.vo.CustomerReference;
+import com.warehouse.shipment.domain.vo.Dimensions;
+import com.warehouse.shipment.domain.vo.LengthUnit;
 import com.warehouse.shipment.domain.vo.Parcel;
-import com.warehouse.shipment.domain.vo.Recipient;
-import com.warehouse.shipment.domain.vo.Sender;
+import com.warehouse.shipment.domain.vo.Party;
+import com.warehouse.shipment.domain.vo.Weight;
+import com.warehouse.shipment.domain.vo.WeightUnit;
 
 public class DataTestCreator {
 
@@ -19,8 +24,8 @@ public class DataTestCreator {
         return new ShipmentId(1L);
     }
 
-    static Recipient recipient() {
-        return Recipient.builder()
+    static Party recipient() {
+        return Party.builder()
                 .firstName("test")
                 .lastName("test")
                 .city("test")
@@ -28,11 +33,12 @@ public class DataTestCreator {
                 .postalCode("00-000")
                 .telephoneNumber("123")
                 .email("test@test.pl")
+                .countryCode(CountryCode.DE)
                 .build();
     }
 
-    static Sender sender() {
-        return Sender.builder()
+    static Party sender() {
+        return Party.builder()
                 .firstName("updatedTest")
                 .lastName("test")
                 .city("test")
@@ -40,13 +46,13 @@ public class DataTestCreator {
                 .postalCode("00-000")
                 .telephoneNumber("123")
                 .email("test@test.pl")
+                .countryCode(CountryCode.PL)
                 .build();
     }
 
     static Parcel createParcel() {
         return Parcel.builder()
                 .recipient(recipient())
-                .shipmentSize(ShipmentSize.TEST)
                 .sender(sender())
                 .shipmentStatus(ShipmentStatus.CREATED)
                 .build();
@@ -77,58 +83,30 @@ public class DataTestCreator {
                 shipmentId(),
                 sender(),
                 recipient(),
-                ShipmentSize.SMALL,
                 relatedShipmentId,
-                CountryCode.PL,
-                CountryCode.DE,
                 money(),
                 locked,
                 new DepartmentId(10L),
                 new DepartmentId(9L),
-                null,
                 ShipmentPriority.MEDIUM,
                 trackingNumber(),
                 ShipmentStatus.CREATED
         );
     }
 
-    static DangerousGood dangerousGood() {
-        return dangerousGood("Rechargeable battery");
-    }
-
-    static DangerousGood dangerousGood(final String description) {
-        return new DangerousGood(
-                "UN3480",
-                "Lithium ion batteries",
-                description,
-                "9",
-                null,
-                null,
-                "II",
-                BigDecimal.ONE,
-                "KILOGRAM",
-                1,
-                "BOX",
-                false,
-                false,
-                false,
-                false,
-                "2",
-                null,
-                null,
-                "112",
-                null,
-                "sds",
-                null,
-                "ADR",
-                "ROAD",
-                true,
-                false,
-                false,
-                "flammable",
-                "KEEP_DRY",
-                "Handle with care",
-                CountryCode.PL
+    static Shipment shipmentWithParcelDetails() {
+        return new Shipment(
+                shipmentId(), sender(), recipient(), null,
+                money(), false,
+                new DepartmentId(10L), new DepartmentId(9L),
+                ShipmentPriority.MEDIUM, trackingNumber(), ShipmentStatus.CREATED,
+                PickupMethod.DEPARTMENT, DeliveryMethod.COURIER, null, null,
+                new Dimensions(new BigDecimal("40"), new BigDecimal("30"), new BigDecimal("20"), LengthUnit.CM),
+                new Weight(new BigDecimal("5.5"), WeightUnit.KG),
+                new CustomerReference("ORDER-2026-12345"), "Electronics",
+                new Money(new BigDecimal("2500.00"), Currency.PLN),
+                null, null
         );
     }
+
 }

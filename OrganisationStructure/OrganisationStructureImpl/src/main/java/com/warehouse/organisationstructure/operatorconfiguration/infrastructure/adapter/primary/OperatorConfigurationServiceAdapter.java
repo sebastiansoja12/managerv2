@@ -1,15 +1,18 @@
 package com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.primary;
 
+import com.warehouse.auth.OperatorCapabilityService;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.ShipmentLimitsDto;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper.OperatorMapper;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShippingCapabilities;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary.OperatorConfigurationPort;
 
 import java.util.Optional;
 
-public class OperatorConfigurationServiceAdapter implements OperatorConfigurationApiService {
+public class OperatorConfigurationServiceAdapter implements OperatorConfigurationApiService, OperatorCapabilityService {
 
     private final OperatorConfigurationPort operatorConfigurationPort;
 
@@ -32,8 +35,23 @@ public class OperatorConfigurationServiceAdapter implements OperatorConfiguratio
     }
 
     @Override
+    public ShipmentConfigurationDto updateCurrentShipmentConfiguration(final ShipmentConfigurationDto configuration) {
+        return OperatorMapper.toDtoShipmentConfiguration(operatorConfigurationPort
+                .updateCurrentShipmentConfiguration(OperatorMapper.toModelShipmentConfiguration(configuration))
+                .getShipmentConfiguration());
+    }
+
+    @Override
     public Optional<ShipmentLimitsDto> getCurrentShipmentLimits() {
         return operatorConfigurationPort.getCurrent()
                 .map(OperatorMapper::toDtoCurrentShipmentLimits);
+    }
+
+    @Override
+    public boolean supportsReturnShipments() {
+        return operatorConfigurationPort.getCurrent()
+                .map(OperatorConfiguration::getShippingCapabilities)
+                .map(ShippingCapabilities::isSupportsReturnShipments)
+                .orElse(false);
     }
 }

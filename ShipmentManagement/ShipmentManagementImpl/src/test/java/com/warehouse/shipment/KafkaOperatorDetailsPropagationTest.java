@@ -12,7 +12,7 @@ import com.warehouse.commonassets.kafka.infrastructure.adapter.secondary.KafkaTe
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorDetails;
-import com.warehouse.shipment.application.event.ShipmentReadModelChanged;
+import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterEach;

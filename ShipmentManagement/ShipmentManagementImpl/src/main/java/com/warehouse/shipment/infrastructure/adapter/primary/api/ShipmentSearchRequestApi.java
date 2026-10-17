@@ -8,7 +8,6 @@ public record ShipmentSearchRequestApi(
         Long shipmentId,
         String trackingNumber,
         List<ShipmentStatusDto> shipmentStatuses,
-        List<ShipmentSizeDto> shipmentSizes,
         List<ShipmentPriorityDto> shipmentPriorities,
         String senderName,
         String recipientName,
@@ -19,11 +18,6 @@ public record ShipmentSearchRequestApi(
         Boolean locked,
         LocalDateTime createdFrom,
         LocalDateTime createdTo,
-        Boolean hasDangerousGoods,
-        String unNumber,
-        String hazardClass,
-        String regulationType,
-        String transportMode,
         Integer page,
         Integer size
 ) {

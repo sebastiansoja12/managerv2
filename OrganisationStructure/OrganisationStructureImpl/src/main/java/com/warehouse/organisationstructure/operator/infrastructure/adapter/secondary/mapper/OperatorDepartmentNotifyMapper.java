@@ -2,7 +2,7 @@ package com.warehouse.organisationstructure.operator.infrastructure.adapter.seco
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.department.api.event.OperatorInitialDepartmentCreateEvent;
+import com.warehouse.organisationstructure.department.api.event.OperatorInitialDepartmentCreateEvent;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorProvisioningDetails;
 import com.warehouse.organisationstructure.operator.domain.vo.OperatorSnapshot;
 

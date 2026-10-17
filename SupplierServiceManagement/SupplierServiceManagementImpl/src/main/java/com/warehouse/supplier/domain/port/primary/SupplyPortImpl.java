@@ -205,4 +205,9 @@ public class SupplyPortImpl implements SupplyPort {
             throw new SupplierNotFoundException(supplierCode.value());
         }
     }
+
+    @Override
+    public int anonymizeAll() {
+        return supplierService.anonymizeAll();
+    }
 }

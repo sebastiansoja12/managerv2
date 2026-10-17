@@ -13,6 +13,8 @@ public enum ShipmentStatus {
 
     SENT,
 
+    UNDELIVERABLE,
+
     DELIVERY,
 
     RETURN,

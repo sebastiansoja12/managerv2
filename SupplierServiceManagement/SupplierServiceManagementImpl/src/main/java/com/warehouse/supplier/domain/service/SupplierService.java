@@ -39,4 +39,6 @@ public interface SupplierService {
 
     void changeDepartment(final SupplierId supplierId, final DepartmentId departmentId);
     void changeDepartment(final SupplierCode supplierCode, final DepartmentId departmentId);
+
+    int anonymizeAll();
 }

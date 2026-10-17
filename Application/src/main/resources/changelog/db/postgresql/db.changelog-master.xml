@@ -64,5 +64,29 @@
     <include file="changes/2026-09-06-shipment-planned.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-10-shipment-target-department-required.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-09-10-shipment-delivery-pickup-point.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-11-user-api-key-optional.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-23-return-shipment-link.xml" relativeToChangelogFile="true"/>
 
+    <include file="changes/2026-09-27-return-cancellation-state.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-28-tracking-number-prefix-mode.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-29-shipment-lifecycle-timestamps.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-29-shipment-parcel-details.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-29-shipment-parcel-size-optional.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-29-shipment-parcel-size-removed.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-29-shipment-party-country.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-29-shipment-dangerous-good-table.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-30-delivery-general-target.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-30-shipment-service-and-packaging.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-09-30-delivery-step.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-01-shipment-dangerous-good-operator.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-02-remove-shipment-dangerous-good.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-03-signature-read-model-id.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-07-delivery-step-owner.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-07-delivery-step-user.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-16-shipment-content.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-platform-owners-and-superadmin.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-platform-audit-and-refresh-tokens.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-operator-access-and-maintenance.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-operations-and-communication.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-17-impersonation-consents.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

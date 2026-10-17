@@ -26,8 +26,8 @@ public class CountryDetermineServiceImpl implements CountryDetermineService {
     }
 
     public CountryDetermine determineCountry(final Shipment shipment) {
-        final Sender sender = shipment.getSender();
-        final Recipient recipient = shipment.getRecipient();
+        final Party sender = shipment.getSender();
+        final Party recipient = shipment.getRecipient();
 
         final LocationInfo locationInfo = LocationInfo.from(sender, recipient);
         final ShipmentCountry shipmentCountry = countryDetermineServicePort.determineCountry(locationInfo);
@@ -36,7 +36,7 @@ public class CountryDetermineServiceImpl implements CountryDetermineService {
     }
 
     @Override
-    public Result<CountryDetermine, ErrorCode> determineCountry(final Sender sender, final Recipient recipient) {
+    public Result<CountryDetermine, ErrorCode> determineCountry(final Party sender, final Party recipient) {
         final LocationInfo locationInfo = LocationInfo.from(sender, recipient);
         final ShipmentCountry shipmentCountry = countryDetermineServicePort.determineCountry(locationInfo);
         return Result.success();

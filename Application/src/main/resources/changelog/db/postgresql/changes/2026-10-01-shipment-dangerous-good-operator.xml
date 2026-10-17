@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-01-shipment-dangerous-good-operator" author="s-soja"
+               logicalFilePath="changelog/db/postgresql/changes/2026-10-01-shipment-dangerous-good-operator.xml">
+        <sql>
+            ALTER TABLE shipment_dangerous_good ADD COLUMN IF NOT EXISTS operator_id BIGINT;
+            UPDATE shipment_dangerous_good dangerous_good
+            SET operator_id = shipment.operator_id
+            FROM shipment
+            WHERE dangerous_good.shipment_id = shipment.shipment_id;
+            ALTER TABLE shipment_dangerous_good ALTER COLUMN operator_id SET NOT NULL;
+
+            ALTER TABLE shipment_dangerous_good_aud ADD COLUMN IF NOT EXISTS operator_id BIGINT;
+            UPDATE shipment_dangerous_good_aud dangerous_good
+            SET operator_id = shipment.operator_id
+            FROM shipment
+            WHERE dangerous_good.shipment_id = shipment.shipment_id;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

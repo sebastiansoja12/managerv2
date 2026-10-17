@@ -1,8 +1,6 @@
 package com.warehouse.shipment;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
@@ -32,7 +30,7 @@ import com.warehouse.shipment.application.port.secondary.PriceRepository;
 import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.application.port.secondary.SignatureRepository;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
-import com.warehouse.shipment.infrastructure.adapter.secondary.ExternalFeignClient;
+import com.warehouse.returning.api.ReturningApiService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PriceReadRepository;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PriceRepositoryImpl;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentReadRepository;
@@ -93,8 +91,8 @@ public class ShipmentReadRepositoryTest {
         }
 
         @Bean
-        public ExternalFeignClient externalMicroserviceFeignClient() {
-            return Mockito.mock(ExternalFeignClient.class);
+        public ReturningApiService externalMicroserviceFeignClient() {
+            return Mockito.mock(ReturningApiService.class);
         }
 
         @Bean
@@ -119,17 +117,6 @@ public class ShipmentReadRepositoryTest {
         final ShipmentId shipmentId = new ShipmentId(100001L);
         final Optional<ShipmentEntity> parcel = repository.findById(shipmentId);
         assertTrue(parcel.isPresent());
-        assertNull(parcel.orElseThrow().getDangerousGood());
-    }
-
-    @Test
-    void shouldReadEmbeddedDangerousGood() {
-        final ShipmentId shipmentId = new ShipmentId(100002L);
-        final ShipmentEntity shipment = repository.findById(shipmentId).orElseThrow();
-
-        assertEquals("UN3480", shipment.getDangerousGood().toDomain().getUnNumber());
-        assertEquals("Lithium ion batteries",
-                shipment.getDangerousGood().toDomain().getProperShippingName());
     }
 
     @Test

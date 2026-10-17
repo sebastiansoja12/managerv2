@@ -17,8 +17,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="return_token" type="VARCHAR(255)"/>
-            <column name="assigned_department" type="VARCHAR(255)"/>
-            <column name="returned_department" type="VARCHAR(255)"/>
+            <column name="assigned_department_id" type="BIGINT"/>
+            <column name="returned_department_id" type="BIGINT"/>
             <column name="assigned_to" type="BIGINT"/>
             <column name="processed_by" type="BIGINT"/>
             <column name="reason_code" type="VARCHAR(64)"/>

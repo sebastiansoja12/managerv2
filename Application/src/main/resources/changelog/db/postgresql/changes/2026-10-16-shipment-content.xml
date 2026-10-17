@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-16-shipment-content" author="s-soja">
+        <createTable tableName="shipment_note">
+            <column name="note_id" type="UUID"><constraints primaryKey="true" nullable="false" /></column>
+            <column name="shipment_id" type="BIGINT"><constraints nullable="false" /></column>
+            <column name="operator_id" type="BIGINT"><constraints nullable="false" /></column>
+            <column name="body" type="VARCHAR(4000)"><constraints nullable="false" /></column>
+            <column name="internal" type="BOOLEAN"><constraints nullable="false" /></column>
+            <column name="author_user_id" type="BIGINT"><constraints nullable="false" /></column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false" /></column>
+        </createTable>
+        <createIndex tableName="shipment_note" indexName="idx_shipment_note_owner_created">
+            <column name="operator_id" /><column name="shipment_id" /><column name="created_at" />
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="shipment_note" baseColumnNames="shipment_id"
+                                 constraintName="fk_shipment_note_shipment" referencedTableName="shipment"
+                                 referencedColumnNames="shipment_id" onDelete="RESTRICT" />
+
+        <createTable tableName="document">
+            <column name="document_id" type="UUID"><constraints primaryKey="true" nullable="false" /></column>
+            <column name="operator_id" type="BIGINT"><constraints nullable="false" /></column>
+            <column name="filename" type="VARCHAR(255)"><constraints nullable="false" /></column>
+            <column name="content_type" type="VARCHAR(255)"><constraints nullable="false" /></column>
+            <column name="size_bytes" type="BIGINT"><constraints nullable="false" /></column>
+            <column name="content" type="BYTEA"><constraints nullable="false" /></column>
+            <column name="uploaded_by_user_id" type="BIGINT"><constraints nullable="false" /></column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false" /></column>
+        </createTable>
+
+        <createTable tableName="shipment_document">
+            <column name="shipment_document_id" type="UUID"><constraints primaryKey="true" nullable="false" /></column>
+            <column name="shipment_id" type="BIGINT"><constraints nullable="false" /></column>
+            <column name="document_id" type="UUID"><constraints nullable="false" /></column>
+            <column name="operator_id" type="BIGINT"><constraints nullable="false" /></column>
+        </createTable>
+        <addUniqueConstraint tableName="shipment_document" columnNames="shipment_id, document_id"
+                             constraintName="uk_shipment_document_pair" />
+        <createIndex tableName="shipment_document" indexName="idx_shipment_document_owner_shipment">
+            <column name="operator_id" /><column name="shipment_id" />
+        </createIndex>
+        <addForeignKeyConstraint baseTableName="shipment_document" baseColumnNames="shipment_id"
+                                 constraintName="fk_shipment_document_shipment" referencedTableName="shipment"
+                                 referencedColumnNames="shipment_id" onDelete="RESTRICT" />
+        <addForeignKeyConstraint baseTableName="shipment_document" baseColumnNames="document_id"
+                                 constraintName="fk_shipment_document_document" referencedTableName="document"
+                                 referencedColumnNames="document_id" onDelete="RESTRICT" />
+    </changeSet>
+</databaseChangeLog>

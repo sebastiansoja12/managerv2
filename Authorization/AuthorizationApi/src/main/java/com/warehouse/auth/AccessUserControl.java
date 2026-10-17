@@ -1,5 +1,6 @@
 package com.warehouse.auth;
 
+import com.warehouse.commonassets.enumeration.AccountLevel;
 import com.warehouse.commonassets.enumeration.UserPermission;
 
 import java.lang.annotation.ElementType;
@@ -16,4 +17,8 @@ public @interface AccessUserControl {
     UserPermission[] permissions() default {};
 
     boolean requireAllPermissions() default false;
+
+    AccountLevel minimumLevel() default AccountLevel.USER;
+
+    AccessAudience audience() default AccessAudience.ORGANIZATION_USER;
 }

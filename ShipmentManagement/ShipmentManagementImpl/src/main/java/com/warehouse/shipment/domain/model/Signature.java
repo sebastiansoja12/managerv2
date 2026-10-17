@@ -3,11 +3,13 @@ package com.warehouse.shipment.domain.model;
 import java.time.Instant;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SignatureId;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.vo.SignatureSnapshot;
 
 public class Signature {
 
+    private SignatureId signatureId;
     private String signerName;
     private Instant signedAt;
     private SignatureMethod signatureMethod;
@@ -18,12 +20,14 @@ public class Signature {
     public Signature() {
     }
 
-    public Signature(final String signerName,
+    public Signature(final SignatureId signatureId,
+                     final String signerName,
                      final Instant signedAt,
                      final SignatureMethod signatureMethod,
                      final String documentReference,
                      final ShipmentId shipmentId,
                      final byte[] signature) {
+        this.signatureId = signatureId;
         this.signerName = signerName;
         this.signedAt = signedAt;
         this.signatureMethod = signatureMethod;
@@ -33,25 +37,34 @@ public class Signature {
     }
 
     public Signature(final String signerName,
+                     final Instant signedAt,
                      final SignatureMethod signatureMethod,
                      final String documentReference,
                      final ShipmentId shipmentId,
                      final byte[] signature) {
-        this.signerName = signerName;
-        this.signedAt = Instant.now();
-        this.signatureMethod = signatureMethod;
-        this.documentReference = documentReference;
-        this.shipmentId = shipmentId;
-        this.signature = signature;
+        this(SignatureId.nextId(), signerName, signedAt, signatureMethod, documentReference, shipmentId, signature);
+    }
+
+    public Signature(final String signerName,
+                     final SignatureMethod signatureMethod,
+                     final String documentReference,
+                     final ShipmentId shipmentId,
+                     final byte[] signature) {
+        this(SignatureId.nextId(), signerName, Instant.now(), signatureMethod,
+                documentReference, shipmentId, signature);
     }
 
     public static Signature from(final SignatureSnapshot snapshot) {
-        return new Signature(snapshot.signerName(), snapshot.signedAt(), snapshot.signatureMethod(),
+        return new Signature(snapshot.signatureId(), snapshot.signerName(), snapshot.signedAt(), snapshot.signatureMethod(),
                 snapshot.documentReference(), snapshot.shipmentId(), snapshot.signature());
     }
 
     public SignatureSnapshot snapshot() {
-        return new SignatureSnapshot(shipmentId, signerName, documentReference, signatureMethod, signedAt, signature);
+        return new SignatureSnapshot(signatureId, shipmentId, signerName, documentReference, signatureMethod, signedAt, signature);
+    }
+
+    public SignatureId getSignatureId() {
+        return signatureId;
     }
 
     public ShipmentId getShipmentId() {

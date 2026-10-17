@@ -8,7 +8,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import com.warehouse.auth.domain.model.RolePermission;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.vo.RolePermissionId;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.commonassets.enumeration.UserPermission;
@@ -20,9 +20,10 @@ class UserMapperTest {
 
     @Test
     void shouldMapUserToEntityWithOperatorAndFlags() {
-        final User user = new User(new UserId(7L), "supplier", "password", "Supplier", "User",
-                "supplier@test.pl", User.Role.SUPPLIER, new DepartmentId(10L), "api-key", "PL",
-                Set.of(new RolePermission(new RolePermissionId(5L), UserPermission.ROLE_SUPPLIER_READ)));
+        final OrganizationUser user = OrganizationUser.of(new UserId(7L), "supplier", "password", "Supplier", "User",
+                "supplier@test.pl", OrganizationUser.Role.SUPPLIER, new DepartmentId(10L), "api-key");
+        user.setLanguage("PL");
+        user.setPermissions(Set.of(new RolePermission(new RolePermissionId(5L), UserPermission.ROLE_SUPPLIER_READ)));
         user.assignOperator(OperatorId.of(200L));
         user.setInitial(true);
 
@@ -59,11 +60,11 @@ class UserMapperTest {
                 .build();
         entity.assignOperator(OperatorId.of(300L));
 
-        final User user = UserToModelMapper.map(entity);
+        final OrganizationUser user = UserToModelMapper.map(entity);
 
         assertThat(user.getUserId()).isEqualTo(new UserId(8L));
         assertThat(user.operatorId()).isEqualTo(OperatorId.of(300L));
-        assertThat(user.getRole()).isEqualTo(User.Role.MANAGER);
+        assertThat(user.getRole()).isEqualTo(OrganizationUser.Role.MANAGER);
         assertThat(user.isInitial()).isTrue();
         assertThat(user.createdAt()).isEqualTo(createdAt);
         assertThat(user.updatedAt()).isEqualTo(updatedAt);

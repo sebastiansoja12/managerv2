@@ -31,7 +31,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.transaction.TestTransaction;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.warehouse.chat.ChatFixture.*;
@@ -89,11 +88,11 @@ class OrganizationChatPersistenceIntegrationTest {
         assertThat(participantExists(CURRENT_USER_ID)).isTrue();
         assertThat(participantExists(PARTICIPANT_USER_ID)).isTrue();
         assertThat(repository.findMessage(CURRENT_USER_ID, CLIENT_MESSAGE_ID)).contains(message);
-        when(operatorContextProvider.currentOperatorId()).thenReturn(Optional.of(OperatorId.of(99L)));
+        when(operatorContextProvider.currentOperatorId()).thenReturn(OperatorId.of(99L));
         assertThat(repository.findConversation(CONVERSATION_ID)).isEmpty();
         assertThat(repository.findMessage(CURRENT_USER_ID, CLIENT_MESSAGE_ID)).isEmpty();
         assertThat(participantExists(CURRENT_USER_ID)).isFalse();
-        when(operatorContextProvider.currentOperatorId()).thenReturn(Optional.of(OPERATOR_ID));
+        when(operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
     }
 
     @Test
@@ -167,7 +166,7 @@ class OrganizationChatPersistenceIntegrationTest {
         @Bean
         OperatorContextProvider operatorContextProvider() {
             final OperatorContextProvider provider = mock(OperatorContextProvider.class);
-            when(provider.currentOperatorId()).thenReturn(Optional.of(OPERATOR_ID));
+            when(provider.currentOperatorId()).thenReturn(OPERATOR_ID);
             return provider;
         }
 

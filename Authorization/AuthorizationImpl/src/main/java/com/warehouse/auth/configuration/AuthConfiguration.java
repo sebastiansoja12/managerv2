@@ -14,13 +14,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.CurrentOperatorService;
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.auth.OperatorUserEventPublisher;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.port.primary.AuthenticationPortImpl;
 import com.warehouse.auth.domain.port.primary.CurrentOperatorPort;
 import com.warehouse.auth.domain.port.primary.CurrentOperatorPortImpl;
+import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
+import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPortImpl;
+import com.warehouse.auth.domain.port.primary.PlatformOwnerManagementPort;
+import com.warehouse.auth.domain.port.primary.PlatformOwnerManagementPortImpl;
+import com.warehouse.auth.PlatformActorService;
+import com.warehouse.auth.PlatformOwnerApiService;
+import com.warehouse.auth.infrastructure.adapter.primary.PlatformActorServiceAdapter;
+import com.warehouse.auth.infrastructure.adapter.primary.PlatformOwnerApiServiceAdapter;
 import com.warehouse.auth.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.auth.domain.port.secondary.MailServicePort;
+import com.warehouse.auth.domain.port.secondary.PlatformOwnerRefreshTokenRepository;
+import com.warehouse.auth.domain.port.secondary.PlatformOwnerRepository;
 import com.warehouse.auth.domain.port.secondary.RefreshTokenRepository;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
 import com.warehouse.auth.domain.provider.JwtProvider;
@@ -29,7 +40,7 @@ import com.warehouse.auth.infrastructure.adapter.primary.CurrentOperatorServiceA
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapper;
 import com.warehouse.auth.infrastructure.adapter.primary.mapper.AuthenticationResponseMapperImpl;
 import com.warehouse.auth.infrastructure.adapter.secondary.*;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,9 +59,54 @@ public class AuthConfiguration  {
                                                  final PasswordEncoder passwordEncoder,
                                                  final DepartmentService departmentService,
                                                  final MailServicePort mailServicePort,
-                                                 final ApiKeyEncoder apiKeyEncoder) {
+                                                 final ApiKeyEncoder apiKeyEncoder,
+                                                 final OperatorAccessPolicy operatorAccessPolicy) {
 		return new AuthenticationPortImpl(authenticationService, userService, jwtService,
-				passwordEncoder, departmentService, mailServicePort, apiKeyEncoder);
+				passwordEncoder, departmentService, mailServicePort, apiKeyEncoder, operatorAccessPolicy);
+    }
+
+    @Bean
+    public PlatformOwnerRepository platformOwnerRepository(final PlatformOwnerReadRepository platformOwnerReadRepository) {
+        return new PlatformOwnerRepositoryImpl(platformOwnerReadRepository);
+    }
+
+    @Bean
+    public PlatformOwnerRefreshTokenRepository platformOwnerRefreshTokenRepository(
+            final PlatformOwnerRefreshTokenReadRepository platformOwnerRefreshTokenReadRepository,
+            final JwtProvider jwtProvider) {
+        return new PlatformOwnerRefreshTokenRepositoryImpl(platformOwnerRefreshTokenReadRepository, jwtProvider);
+    }
+
+    @Bean
+    public PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort(
+            final PlatformOwnerRepository platformOwnerRepository,
+            final PlatformOwnerRefreshTokenRepository platformOwnerRefreshTokenRepository,
+            final UserRepository userRepository,
+            final JwtService jwtService,
+            final PasswordEncoder passwordEncoder,
+            final com.warehouse.auth.domain.port.primary.ImpersonationConsentPort impersonationConsentPort) {
+        return new PlatformOwnerAuthenticationPortImpl(platformOwnerRepository, platformOwnerRefreshTokenRepository,
+                userRepository, jwtService, passwordEncoder, impersonationConsentPort);
+    }
+
+    @Bean
+    public PlatformOwnerManagementPort platformOwnerManagementPort(
+            final PlatformOwnerRepository platformOwnerRepository,
+            final PlatformOwnerRefreshTokenRepository platformOwnerRefreshTokenRepository,
+            final PasswordEncoder passwordEncoder) {
+        return new PlatformOwnerManagementPortImpl(platformOwnerRepository, platformOwnerRefreshTokenRepository,
+                passwordEncoder);
+    }
+
+    @Bean
+    public PlatformOwnerApiService platformOwnerApiService(final PlatformOwnerManagementPort platformOwnerManagementPort) {
+        return new PlatformOwnerApiServiceAdapter(platformOwnerManagementPort);
+    }
+
+    @Bean
+    public PlatformActorService platformActorService(
+            final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort) {
+        return new PlatformActorServiceAdapter(platformOwnerAuthenticationPort);
     }
 
     @Bean
@@ -115,8 +171,9 @@ public class AuthConfiguration  {
     }
 
     @Bean(name = "authentication.departmentServicePort")
-    public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService) {
-        return new DepartmentServiceAdapter(departmentApiService);
+    public DepartmentServicePort departmentServicePort(final DepartmentApiService departmentApiService,
+                                                       final OperatorContext operatorContext) {
+        return new DepartmentServiceAdapter(departmentApiService, operatorContext);
     }
 
 }

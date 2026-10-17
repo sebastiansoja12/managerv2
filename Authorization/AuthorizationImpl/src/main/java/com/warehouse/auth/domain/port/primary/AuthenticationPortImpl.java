@@ -4,6 +4,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
+import com.warehouse.auth.domain.exception.UserAccessDeniedException;
 import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.port.secondary.MailServicePort;
 import com.warehouse.auth.domain.service.*;
@@ -29,13 +30,16 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     private final ApiKeyEncoder apiKeyEncoder;
 
+    private final OperatorAccessPolicy operatorAccessPolicy;
+
     public AuthenticationPortImpl(final AuthenticationService authenticationService,
                                   final UserService userService,
                                   final JwtService jwtService,
                                   final PasswordEncoder passwordEncoder,
                                   final DepartmentService departmentService,
                                   final MailServicePort mailServicePort,
-                                  final ApiKeyEncoder apiKeyEncoder) {
+                                  final ApiKeyEncoder apiKeyEncoder,
+                                  final OperatorAccessPolicy operatorAccessPolicy) {
         this.authenticationService = authenticationService;
         this.userService = userService;
         this.jwtService = jwtService;
@@ -43,18 +47,21 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         this.departmentService = departmentService;
         this.mailServicePort = mailServicePort;
         this.apiKeyEncoder = apiKeyEncoder;
+        this.operatorAccessPolicy = operatorAccessPolicy;
     }
 
     @Override
     public AuthenticationResponse login(final LoginRequest loginRequest) {
-        final User user = userService.findUser(loginRequest.username());
+        final OrganizationUser user = userService.findUser(loginRequest.username());
 
         if (user == null || user.isDeleted()) {
             throw new AuthenticationErrorException("Invalid username or password");
         } else if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             throw new AuthenticationErrorException("Invalid username or password");
-        } else if (!departmentService.existsByDepartmentId(user.getDepartmentId())) {
+        } else if (!departmentService.existsByDepartmentId(user.getDepartmentId(), user.operatorId())) {
             throw new AuthenticationErrorException("Invalid username or password");
+        } else if (!operatorAccessPolicy.allowsAccess(user.operatorId(), java.time.Instant.now(), false)) {
+            throw new AuthenticationErrorException("Operator access is blocked");
         }
 
         final String accessToken = jwtService.generateToken(user);
@@ -68,7 +75,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     @Override
     public AuthenticationResponse refresh(final String refreshToken) {
         final LoginResponse loginResponse = authenticationService.refresh(refreshToken);
-        final User user = userService.findUser(loginResponse.username());
+        final OrganizationUser user = userService.findUser(loginResponse.username());
+        if (!operatorAccessPolicy.allowsAccess(user.operatorId(), java.time.Instant.now(), false)) {
+            authenticationService.logout(loginResponse.refreshToken().value());
+            throw new AuthenticationErrorException("Operator access is blocked");
+        }
         final String accessToken = jwtService.generateToken(user);
         return new AuthenticationResponse(accessToken, loginResponse.refreshToken().value());
     }
@@ -88,7 +99,11 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
         final String lastName = request.getLastName();
 
-        final User.Role role = mapRole(request.getRole());
+        final OrganizationUser.Role role = mapRole(request.getRole());
+
+        if (OrganizationUser.Role.SUPERADMIN.equals(role)) {
+            throw new AuthenticationErrorException("Superadmin cannot be registered through signup");
+        }
 
         final DepartmentCode departmentCode = request.getDepartmentCode();
 
@@ -97,7 +112,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         validateDepartmentCode(departmentCode);
         final DepartmentId departmentId = departmentService.getDepartmentId(departmentCode);
 
-        final User user = User.createWithRole(
+        final OrganizationUser user = OrganizationUser.createWithRole(
                 userId, username, password, firstName, lastName, email, role, departmentId,
                 apiKeyEncoder.encode(userId, username).key(), language
         );
@@ -108,11 +123,16 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     @Override
     public UserId createUser(final CreateUserCommand command) {
         final UserId userId = userService.nextUserId();
-        final User.Role role = mapRole(command.role());
+        final OrganizationUser.Role role = mapRole(command.role());
         final String password = passwordEncoder.encode(command.password());
         validateDepartmentCode(command.departmentCode());
         final DepartmentId departmentId = departmentService.getDepartmentId(command.departmentCode());
-        final User user = User.createWithRole(
+        final OrganizationUser currentUser = userService.findUserById(authenticationService.currentUserId());
+        if (!currentUser.canAssignRole(role) || !currentUser.canAccessDepartment(departmentId)) {
+            throw new UserAccessDeniedException("Current user cannot create user with role " + role
+                    + " in department " + command.departmentCode().getValue());
+        }
+        final OrganizationUser user = OrganizationUser.createWithRole(
                 userId,
                 command.username(),
                 password,
@@ -132,10 +152,10 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     public UserId createOperatorUser(final CreateOperatorUserCommand command) {
         final UserId userId = userService.nextUserId();
         final String password = passwordEncoder.encode(command.password());
-        final User.Role role = mapRole(command.role());
+        final OrganizationUser.Role role = mapRole(command.role());
         validateDepartmentCode(command.departmentCode());
         final DepartmentId departmentId = departmentService.getDepartmentId(command.departmentCode());
-        final User user = User.createWithRole(
+        final OrganizationUser user = OrganizationUser.createWithRole(
                 userId,
                 command.username(),
                 password,
@@ -174,7 +194,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         validateDepartmentCode(departmentCode);
         final DepartmentId departmentId = departmentService.getDepartmentId(departmentCode);
 
-        final User user = User.createAdmin(userId, username, password, firstName, lastName, email, departmentId,
+        final OrganizationUser user = OrganizationUser.createAdmin(userId, username, password, firstName, lastName, email, departmentId,
                 language, apiKeyEncoder.encode(userId, username).key());
 
         this.userService.create(user);
@@ -191,20 +211,21 @@ public class AuthenticationPortImpl implements AuthenticationPort {
 
     @Override
     public void initiatePasswordReset(final String email) {
-        final User user = this.userService.findByEmail(email);
+        final OrganizationUser user = this.userService.findByEmail(email);
         if (user == null) {
             throw new AuthenticationErrorException("User with email " + email + " does not exist");
         }
 
     }
 
-    private User.Role mapRole(final String value) {
+    private OrganizationUser.Role mapRole(final String value) {
         final String role = value.toUpperCase();
         return switch (role) {
-            case "ADMIN" -> User.Role.ADMIN;
-            case "MANAGER" -> User.Role.MANAGER;
-            case "SUPPLIER" -> User.Role.SUPPLIER;
-            default -> User.Role.USER;
+            case "SUPERADMIN" -> OrganizationUser.Role.SUPERADMIN;
+            case "ADMIN" -> OrganizationUser.Role.ADMIN;
+            case "MANAGER" -> OrganizationUser.Role.MANAGER;
+            case "SUPPLIER" -> OrganizationUser.Role.SUPPLIER;
+            default -> OrganizationUser.Role.USER;
         };
     }
 

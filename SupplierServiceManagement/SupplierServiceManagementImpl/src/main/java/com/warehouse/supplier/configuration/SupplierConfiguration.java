@@ -1,6 +1,8 @@
 package com.warehouse.supplier.configuration;
 
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.supplier.api.SupplierApiService;
+import com.warehouse.supplier.infrastructure.adapter.primary.SupplierApiServiceAdapter;
 import com.warehouse.supplier.domain.port.primary.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +33,11 @@ public class SupplierConfiguration {
                                  @Qualifier("supplier.departmentServicePort") final DepartmentServicePort departmentServicePort) {
         return new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService, deviceServicePort,
                 departmentServicePort);
+    }
+
+    @Bean
+    public SupplierApiService supplierApiService(final SupplyPort supplyPort) {
+        return new SupplierApiServiceAdapter(supplyPort);
     }
 
     @Bean

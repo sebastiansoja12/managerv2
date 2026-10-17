@@ -1,13 +1,15 @@
 package com.warehouse.auth.configuration.access;
 
+import com.warehouse.auth.AccessAudience;
 import com.warehouse.auth.AccessUserControl;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.exception.ProblemDetailsException;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.PlatformOwnerId;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.department.api.DepartmentApiService;
+import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,11 +41,33 @@ public class AccessUserControlEvaluator {
 
         validateAuthentication(authentication);
 
+        if (authentication.getPrincipal() instanceof PlatformOwnerId) {
+            validatePlatformOwnerAudience(accessUserControl);
+            return;
+        }
+
+        if (AccessAudience.PLATFORM_OWNER.equals(accessUserControl.audience())) {
+            throw forbidden("Platform owner is required");
+        }
+
         final UserId userId = resolveUserId(authentication);
-        final User user = userService.findUserById(userId);
+        final OrganizationUser user = userService.findUserById(userId);
         validateActiveUser(user);
         validateActiveDepartment(user.getDepartmentId());
+        validateLevel(user, accessUserControl);
         validatePermissions(user, accessUserControl);
+    }
+
+    private void validatePlatformOwnerAudience(final AccessUserControl accessUserControl) {
+        if (AccessAudience.ORGANIZATION_USER.equals(accessUserControl.audience())) {
+            throw forbidden("Organization user is required");
+        }
+    }
+
+    private void validateLevel(final OrganizationUser user, final AccessUserControl accessUserControl) {
+        if (!user.getLevel().isAtLeast(accessUserControl.minimumLevel())) {
+            throw forbidden("User does not have required account level");
+        }
     }
 
     private void validateAuthentication(final Authentication authentication) {
@@ -60,7 +84,7 @@ public class AccessUserControlEvaluator {
         throw unauthorized("Authenticated user identifier is missing");
     }
 
-    private void validateActiveUser(final User user) {
+    private void validateActiveUser(final OrganizationUser user) {
         if (user == null || Boolean.TRUE.equals(user.isDeleted())) {
             throw forbidden("User is inactive or deleted");
         }
@@ -76,7 +100,7 @@ public class AccessUserControlEvaluator {
         }
     }
 
-    private void validatePermissions(final User user,
+    private void validatePermissions(final OrganizationUser user,
                                      final AccessUserControl accessUserControl) {
         final Set<String> requiredPermissions = resolveRequiredPermissions(accessUserControl);
         if (requiredPermissions.isEmpty()) {

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.warehouse.shipment.domain.model.Notification;
 import com.warehouse.shipment.domain.vo.Parcel;
-import com.warehouse.shipment.domain.vo.Recipient;
+import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.service.NotificationCreatorProvider;
 import com.warehouse.shipment.domain.service.NotificationCreatorProviderImpl;
 
@@ -19,7 +19,7 @@ public class NotificationCreatorProviderTest {
     @Test
     void shouldBuildNotification() {
         final String subject = "Została nadana do państwa przesyłka: ";
-        final Recipient recipient = Recipient.builder()
+        final Party recipient = Party.builder()
                 .email("test@test.pl")
                 .build();
         final Parcel parcel = Parcel.builder()

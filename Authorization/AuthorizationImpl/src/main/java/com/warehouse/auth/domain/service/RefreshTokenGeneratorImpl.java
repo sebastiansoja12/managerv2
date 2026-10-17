@@ -1,6 +1,6 @@
 package com.warehouse.auth.domain.service;
 
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.provider.RefreshTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -16,7 +16,7 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
     private final RefreshTokenProvider refreshTokenProvider;
 
     @Override
-    public String generateToken(User user) {
+    public String generateToken(OrganizationUser user) {
         final String input = user.getUsername() +
                 user.getPassword() +
                 user.getFirstName() +

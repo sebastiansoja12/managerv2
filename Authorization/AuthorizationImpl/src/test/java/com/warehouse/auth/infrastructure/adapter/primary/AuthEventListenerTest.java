@@ -1,7 +1,7 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
 import com.warehouse.auth.domain.model.RolePermission;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.AuthenticationPort;
 import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.service.*;
@@ -55,7 +55,7 @@ class AuthEventListenerTest {
 
         final ApiKeyEncoder apiKeyEncoder = new ApiKeyEncoder() {
             @Override
-            public com.warehouse.auth.domain.vo.ApiKey encode(final User user) {
+            public com.warehouse.auth.domain.vo.ApiKey encode(final OrganizationUser user) {
                 return new com.warehouse.auth.domain.vo.ApiKey(user.getUserId(), "encoded-api-key");
             }
 
@@ -103,16 +103,16 @@ class AuthEventListenerTest {
             assertThat(resourcesProvisioned.get()).isTrue();
             return new DepartmentId(91L);
         });
-        when(userService.create(any(User.class))).thenReturn(new RegisterResponse(UserResponse.builder().build()));
+        when(userService.create(any(OrganizationUser.class))).thenReturn(new RegisterResponse(UserResponse.builder().build()));
 
         listener.handle(event);
 
-        final ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        final ArgumentCaptor<OrganizationUser> userCaptor = ArgumentCaptor.forClass(OrganizationUser.class);
         verify(userService).create(userCaptor.capture());
-        final User createdUser = userCaptor.getValue();
+        final OrganizationUser createdUser = userCaptor.getValue();
         assertThat(createdUser.getUserId()).isEqualTo(new UserId(77L));
         assertThat(createdUser.operatorId()).isEqualTo(OperatorId.of(500L));
-        assertThat(createdUser.getRole()).isEqualTo(User.Role.ADMIN);
+        assertThat(createdUser.getRole()).isEqualTo(OrganizationUser.Role.SUPERADMIN);
         assertThat(createdUser.isInitial()).isTrue();
         assertThat(createdUser.getPassword()).isEqualTo("encoded-password");
         assertThat(createdUser.getApiKey()).isEqualTo("encoded-api-key");

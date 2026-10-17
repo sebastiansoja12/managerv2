@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.warehouse</groupId>
         <artifactId>OrganisationStructure</artifactId>
-        <version>2026.3-SNAPSHOT</version>
+        <version>2026.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>OrganisationStructureImpl</artifactId>
@@ -30,7 +30,12 @@
         </dependency>
         <dependency>
             <groupId>com.warehouse</groupId>
-            <artifactId>DepartmentServiceApi</artifactId>
+            <artifactId>AuthorizationImpl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>PathFinderApi</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -53,6 +58,14 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-envers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

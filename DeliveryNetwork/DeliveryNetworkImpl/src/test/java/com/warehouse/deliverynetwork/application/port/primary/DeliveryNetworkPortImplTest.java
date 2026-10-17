@@ -5,7 +5,6 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
-import com.warehouse.deliverynetwork.application.exception.MissingOperatorContextException;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCommand;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentConnectionCodeCommand;
 import com.warehouse.deliverynetwork.application.port.primary.command.DepartmentImportCommand;
@@ -70,7 +69,7 @@ class DeliveryNetworkPortImplTest {
 
     @Test
     void shouldReplaceAndPersistCurrentOperatorNetwork() {
-        when(this.operatorContextProvider.currentOperatorId()).thenReturn(Optional.of(OPERATOR_ID));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
         when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
         when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
                 branch(1L, "KT1"),
@@ -94,7 +93,7 @@ class DeliveryNetworkPortImplTest {
 
     @Test
     void shouldReturnEmptyNetworkWhenOperatorHasNoConfiguration() {
-        when(this.operatorContextProvider.currentOperatorId()).thenReturn(Optional.of(OPERATOR_ID));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
         when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
 
         final DeliveryNetworkResult result = this.deliveryNetworkPort.getCurrentNetwork();
@@ -104,7 +103,7 @@ class DeliveryNetworkPortImplTest {
 
     @Test
     void shouldReplaceNetworkUsingCaseInsensitiveDepartmentCodes() {
-        when(this.operatorContextProvider.currentOperatorId()).thenReturn(Optional.of(OPERATOR_ID));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
         when(this.deliveryNetworkRepository.find()).thenReturn(Optional.empty());
         when(this.departmentDirectoryServicePort.getCurrentOperatorDepartments()).thenReturn(List.of(
                 branch(1L, "KT1"),
@@ -131,7 +130,7 @@ class DeliveryNetworkPortImplTest {
 
     @Test
     void shouldExportNetworkUsingDepartmentCodes() {
-        when(this.operatorContextProvider.currentOperatorId()).thenReturn(Optional.of(OPERATOR_ID));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
         when(this.deliveryNetworkRepository.find()).thenReturn(Optional.of(new DeliveryNetwork(
                 OPERATOR_ID,
                 Set.of(connection(1L, 2L)))));
@@ -153,7 +152,7 @@ class DeliveryNetworkPortImplTest {
         final DeliveryNetwork deliveryNetwork = new DeliveryNetwork(OPERATOR_ID, Set.of(
                 connection(1L, 2L),
                 connection(2L, 3L)));
-        when(this.operatorContextProvider.currentOperatorId()).thenReturn(Optional.of(OPERATOR_ID));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
         when(this.deliveryNetworkRepository.find())
                 .thenReturn(Optional.of(deliveryNetwork));
 
@@ -169,7 +168,7 @@ class DeliveryNetworkPortImplTest {
                 connection(1L, 2L),
                 connection(2L, 3L),
                 connection(3L, 4L)));
-        when(this.operatorContextProvider.currentOperatorId()).thenReturn(Optional.of(OPERATOR_ID));
+        when(this.operatorContextProvider.currentOperatorId()).thenReturn(OPERATOR_ID);
         when(this.deliveryNetworkRepository.find()).thenReturn(Optional.of(deliveryNetwork));
 
         this.deliveryNetworkPort.removeDepartmentConnections(departmentId(2L));
@@ -182,9 +181,10 @@ class DeliveryNetworkPortImplTest {
 
     @Test
     void shouldRequireCurrentOperatorContext() {
-        when(this.operatorContextProvider.currentOperatorId()).thenReturn(Optional.empty());
+        when(this.operatorContextProvider.currentOperatorId())
+                .thenThrow(new IllegalStateException("Operator context is required"));
 
-        assertThrows(MissingOperatorContextException.class, () -> this.deliveryNetworkPort.getCurrentNetwork());
+        assertThrows(IllegalStateException.class, () -> this.deliveryNetworkPort.getCurrentNetwork());
     }
 
     private static DepartmentNode branch(final Long departmentId, final String departmentCode) {

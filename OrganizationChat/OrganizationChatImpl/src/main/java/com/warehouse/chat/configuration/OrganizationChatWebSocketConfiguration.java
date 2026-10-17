@@ -25,7 +25,7 @@ class OrganizationChatWebSocketConfiguration implements WebSocketMessageBrokerCo
     private final String[] allowedOrigins;
 
     OrganizationChatWebSocketConfiguration(
-            @Value("${auth.cors.allowed-origins:http://localhost:3000,https://managerv2gui.onrender.com}")
+            @Value("${auth.cors.allowed-origins:http://localhost:3000,https://managerv2gui.onrender.com, https://neighbors-billing-ownership-houston.trycloudflare.com/}")
             final String[] allowedOrigins) {
         this.allowedOrigins = allowedOrigins;
     }

@@ -4,7 +4,6 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.domain.event.ShipmentDelivered;
 import com.warehouse.shipment.domain.event.ShipmentRedirected;
-import com.warehouse.shipment.domain.event.ShipmentReturned;
 import com.warehouse.shipment.domain.event.ShipmentSent;
 import com.warehouse.shipment.domain.model.Shipment;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -58,16 +58,14 @@ class ShipmentDeliveryStrategyTest {
 
         assertInstanceOf(ShipmentDelivered.class, deliveredStrategy.process(shipment).orElseThrow());
 
-        verify(shipment).notifyShipmentDelivered();
+        verify(shipment).markAsDelivered();
     }
 
     @Test
     void shouldApplyReturnedStrategy() {
         final Shipment shipment = mock(Shipment.class);
 
-        assertInstanceOf(ShipmentReturned.class, returnedStrategy.process(shipment).orElseThrow());
-
-        verify(shipment).notifyShipmentReturned();
+        assertThrows(IllegalStateException.class, () -> returnedStrategy.process(shipment));
     }
 
     @Test
@@ -94,7 +92,7 @@ class ShipmentDeliveryStrategyTest {
 
         assertTrue(unchangedStrategy.process(shipment).isEmpty());
 
-        verify(shipment, never()).notifyShipmentDelivered();
+        verify(shipment, never()).markAsDelivered();
         verify(shipment, never()).notifyShipmentReturned();
         verify(shipment, never()).notifyShipmentSent();
         verify(shipment, never()).notifyRelatedShipmentRedirected(any(ShipmentId.class));

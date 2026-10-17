@@ -1,7 +1,6 @@
 package com.warehouse.organisationstructure.operatorconfiguration.configuration;
 
 import com.warehouse.auth.CurrentOperatorService;
-import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary.OperatorConfigurationPort;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.primary.OperatorConfigurationPortImpl;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.port.secondary.OperatorConfigurationRepository;
@@ -36,7 +35,7 @@ public class OperatorConfigurationConfiguration {
     }
 
     @Bean
-    public OperatorConfigurationApiService operatorConfigurationApiService(
+    public OperatorConfigurationServiceAdapter operatorConfigurationApiService(
             final OperatorConfigurationPort operatorConfigurationPort) {
         return new OperatorConfigurationServiceAdapter(operatorConfigurationPort);
     }

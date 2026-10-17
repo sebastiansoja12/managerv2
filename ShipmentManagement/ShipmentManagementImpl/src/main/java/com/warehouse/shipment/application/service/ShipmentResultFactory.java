@@ -1,13 +1,13 @@
 package com.warehouse.shipment.application.service;
 
-import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.shipment.application.port.primary.result.ShipmentControlCenterResult;
+import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
+import com.warehouse.shipment.application.port.secondary.SignatureRepository;
 import com.warehouse.shipment.application.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.domain.model.Shipment;
-import com.warehouse.shipment.domain.vo.ShipmentReturnDetails;
+import com.warehouse.returning.api.dto.ReturnDetailsDto;
 
 public class ShipmentResultFactory {
 
@@ -16,24 +16,34 @@ public class ShipmentResultFactory {
     private final RouteLogService routeLogService;
 
     private final ReturningServicePort returningServicePort;
+    private final SignatureRepository signatureRepository;
+
+    public ShipmentResultFactory(final DepartmentServicePort departmentServicePort,
+                                 final RouteLogService routeLogService,
+                                 final ReturningServicePort returningServicePort,
+                                 final SignatureRepository signatureRepository) {
+        this.departmentServicePort = departmentServicePort;
+        this.routeLogService = routeLogService;
+        this.returningServicePort = returningServicePort;
+        this.signatureRepository = signatureRepository;
+    }
 
     public ShipmentResultFactory(final DepartmentServicePort departmentServicePort,
                                  final RouteLogService routeLogService,
                                  final ReturningServicePort returningServicePort) {
-        this.departmentServicePort = departmentServicePort;
-        this.routeLogService = routeLogService;
-        this.returningServicePort = returningServicePort;
+        this(departmentServicePort, routeLogService, returningServicePort, null);
     }
 
     public ShipmentResult create(final Shipment shipment) {
-        return new ShipmentResult(shipment.snapshot(), resolveDepartmentCode(shipment));
+        return new ShipmentResult(
+                shipment.snapshot(),
+                resolveDepartmentCode(shipment),
+                signatureRepository == null ? null : signatureRepository.get(shipment.getShipmentId()));
     }
 
-    public ShipmentControlCenterResult createControlCenter(final Shipment shipment) {
-        final ShipmentReturnDetails returnDetails = ShipmentStatus.RETURN.equals(shipment.getShipmentStatus())
-                ? this.returningServicePort.findReturnByShipmentId(shipment.getShipmentId()).orElse(null)
-                : null;
-        return new ShipmentControlCenterResult(
+    public ShipmentRouteLog createControlCenter(final Shipment shipment) {
+        final ReturnDetailsDto returnDetails = this.returningServicePort.findReturnByShipmentId(shipment.getShipmentId()).orElse(null);
+        return new ShipmentRouteLog(
                 create(shipment),
                 this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null),
                 returnDetails);
