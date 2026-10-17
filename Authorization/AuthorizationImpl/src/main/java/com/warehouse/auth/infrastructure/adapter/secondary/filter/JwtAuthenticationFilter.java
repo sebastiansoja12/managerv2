@@ -1,9 +1,12 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.filter;
 
 import com.warehouse.auth.configuration.AuthCookieService;
-import com.warehouse.auth.domain.model.User;
+import com.warehouse.auth.domain.model.OrganizationUser;
+import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
 import com.warehouse.auth.domain.service.JwtService;
+import com.warehouse.auth.domain.service.OperatorAccessPolicy;
 import com.warehouse.auth.domain.service.UserService;
+import com.warehouse.auth.domain.vo.Impersonation;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,10 +22,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    public static final String IMPERSONATION_ATTRIBUTE = JwtAuthenticationFilter.class.getName() + ".impersonation";
 
     private static final List<String> DEVICE_ENDPOINTS = List.of(
             "/v2/api/ws"
@@ -33,6 +39,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
 
     private final AuthCookieService authCookieService;
+
+    private final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort;
+
+    private final OperatorAccessPolicy operatorAccessPolicy;
 
 	@Override
 	protected void doFilterInternal(@NonNull final HttpServletRequest request,
@@ -47,9 +57,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		try {
             final String username = jwtService.extractUsername(jwt);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                final User user = this.userService.findUser(username);
+                final OrganizationUser user = this.userService.findUser(username);
 
-                if (jwtService.isTokenValid(jwt, user)) {
+                final Optional<Impersonation> impersonation = jwtService.extractImpersonation(jwt);
+                final boolean impersonationActive = impersonation
+                        .map(value -> platformOwnerAuthenticationPort.isImpersonationActive(value, user.operatorId()))
+                        .orElse(true);
+
+                if (impersonationActive
+                        && jwtService.isTokenValid(jwt, user)
+                        && operatorAccessPolicy.allowsAccess(user.operatorId(),
+                        jwtService.extractIssuedAt(jwt).orElse(null), impersonation.isPresent())) {
+                    impersonation.ifPresent(value -> request.setAttribute(IMPERSONATION_ATTRIBUTE, value));
                     final SecurityContext context = SecurityContextHolder.createEmptyContext();
                     final UsernameTenantPasswordAuthenticationToken authToken = new UsernameTenantPasswordAuthenticationToken(
                             user.getUserId(), user.operatorId(), this.jwtService.extractDepartmentId(jwt).orElse(null),
