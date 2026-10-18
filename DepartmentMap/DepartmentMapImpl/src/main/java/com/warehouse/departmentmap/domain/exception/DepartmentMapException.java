@@ -1,16 +1,22 @@
 package com.warehouse.departmentmap.domain.exception;
 
-import com.warehouse.commonassets.exception.ProblemDetailsException;
+public class DepartmentMapException extends RuntimeException {
 
-import java.util.Map;
+    public enum Reason { INVALID_REQUEST, NOT_FOUND, CONFLICT }
 
-public class DepartmentMapException extends ProblemDetailsException {
+    private static final String INVALID_CODE = "DEPARTMENT_MAP_INVALID";
 
+    private final Reason reason;
     private final String code;
 
-    public DepartmentMapException(final int status, final String code, final String message) {
-        super("about:blank", "Department map request rejected", status, message, null, Map.of("code", code));
+    public DepartmentMapException(final Reason reason, final String code, final String message) {
+        super(message);
+        this.reason = reason;
         this.code = code;
+    }
+
+    public Reason reason() {
+        return reason;
     }
 
     public String getCode() {
@@ -18,14 +24,14 @@ public class DepartmentMapException extends ProblemDetailsException {
     }
 
     public static DepartmentMapException invalid(final String message) {
-        return new DepartmentMapException(400, "DEPARTMENT_MAP_INVALID", message);
+        return new DepartmentMapException(Reason.INVALID_REQUEST, INVALID_CODE, message);
     }
 
     public static DepartmentMapException notFound(final String code, final String message) {
-        return new DepartmentMapException(404, code, message);
+        return new DepartmentMapException(Reason.NOT_FOUND, code, message);
     }
 
     public static DepartmentMapException conflict(final String code, final String message) {
-        return new DepartmentMapException(409, code, message);
+        return new DepartmentMapException(Reason.CONFLICT, code, message);
     }
 }

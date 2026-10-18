@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.warehouse.departmentmap.InMemoryDepartmentMapStore;
 import com.warehouse.departmentmap.application.port.primary.DepartmentMapPortImpl;
 import com.warehouse.departmentmap.application.port.primary.PalletLocationPortImpl;
-import com.warehouse.departmentmap.domain.exception.DepartmentMapException;
 import com.warehouse.departmentmap.domain.service.StorageLocationSynchronizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,6 @@ import static com.warehouse.departmentmap.DepartmentMapFixture.DEPARTMENT_ID;
 import static com.warehouse.departmentmap.DepartmentMapFixture.OPERATOR_ID;
 import static com.warehouse.departmentmap.DepartmentMapFixture.USER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -42,6 +39,7 @@ class DepartmentMapControllerTest {
                 new DepartmentMapPortImpl(store, store, store, store, new StorageLocationSynchronizer()),
                 new PalletLocationPortImpl(store, store, store, store));
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new DepartmentMapExceptionHandler())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
                 .build();
     }
@@ -88,23 +86,23 @@ class DepartmentMapControllerTest {
                         .content("{\"departmentId\":100,\"name\":\"Hall A\",\"width\":40,\"height\":20}"))
                 .andReturn(), 201).get("mapId").asText();
 
-        final Exception exception = assertThrows(Exception.class, () -> mockMvc.perform(put("/department-maps/" + mapId)
+        final JsonNode problem = json(mockMvc.perform(put("/department-maps/" + mapId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\":\"Hall A\",\"width\":40,\"height\":20,\"version\":0,"
-                        + "\"elements\":[{\"type\":\"DOOR\",\"x\":1,\"y\":1,\"width\":1,\"height\":1}]}")));
+                        + "\"elements\":[{\"type\":\"DOOR\",\"x\":1,\"y\":1,\"width\":1,\"height\":1}]}"))
+                .andReturn(), 400);
 
-        final DepartmentMapException cause = assertInstanceOf(DepartmentMapException.class, exception.getCause());
-        assertEquals(400, cause.getStatus());
+        assertEquals("DEPARTMENT_MAP_INVALID", problem.get("properties").get("code").asText());
     }
 
     @Test
-    void shouldRejectMalformedLocationId() {
-        final Exception exception = assertThrows(Exception.class, () -> mockMvc.perform(
-                post("/department-maps/locations/not-a-uuid/pallets")
+    void shouldRejectMalformedLocationId() throws Exception {
+        final JsonNode problem = json(mockMvc.perform(post("/department-maps/locations/not-a-uuid/pallets")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"palletTrackingNumber\":\"PAL1\"}")));
+                        .content("{\"palletTrackingNumber\":\"PAL1\"}"))
+                .andReturn(), 400);
 
-        assertInstanceOf(DepartmentMapException.class, exception.getCause());
+        assertEquals("DEPARTMENT_MAP_INVALID", problem.get("properties").get("code").asText());
     }
 
     private JsonNode json(final MvcResult result, final int expectedStatus) throws Exception {
