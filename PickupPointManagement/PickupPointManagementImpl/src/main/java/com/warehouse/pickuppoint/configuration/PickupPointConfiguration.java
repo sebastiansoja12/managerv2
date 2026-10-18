@@ -1,5 +1,6 @@
 package com.warehouse.pickuppoint.configuration;
 
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
 import com.warehouse.commonassets.repository.BaseRepository;
@@ -7,6 +8,7 @@ import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.pickuppoint.api.PickupPointApiService;
+import com.warehouse.pickuppoint.api.PickupPointReadModelRebuildApiService;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointPort;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointPortImpl;
 import com.warehouse.pickuppoint.application.port.primary.PickupPointReadModelSyncPort;
@@ -18,6 +20,7 @@ import com.warehouse.pickuppoint.application.port.secondary.PickupPointRepositor
 import com.warehouse.pickuppoint.application.port.secondary.PickupPointSearchRepository;
 import com.warehouse.pickuppoint.application.service.PickupPointReadModelSyncServiceImpl;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.PickupPointApiServiceAdapter;
+import com.warehouse.pickuppoint.infrastructure.adapter.primary.PickupPointReadModelRebuildApiServiceAdapter;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.mapper.PickupPointApiMapper;
 import com.warehouse.pickuppoint.infrastructure.adapter.primary.mapper.PickupPointWebMapper;
 import com.warehouse.pickuppoint.infrastructure.adapter.secondary.AuditLogServiceAdapter;
@@ -82,6 +85,13 @@ public class PickupPointConfiguration {
             final PickupPointRepository pickupPointRepository,
             final PickupPointReadModelRepository pickupPointReadModelRepository) {
         return new PickupPointReadModelSyncServiceImpl(pickupPointRepository, pickupPointReadModelRepository);
+    }
+
+    @Bean
+    public PickupPointReadModelRebuildApiService pickupPointReadModelRebuildApiService(
+            final PickupPointReadModelSyncPort pickupPointReadModelSyncPort,
+            final OperatorContext operatorContext) {
+        return new PickupPointReadModelRebuildApiServiceAdapter(pickupPointReadModelSyncPort, operatorContext);
     }
 
     @Bean
