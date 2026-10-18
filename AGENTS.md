@@ -51,7 +51,6 @@ Rules:
 External services / microservices:
 
 - `RouteTrackerFlow`
-- `SoftwareConfiguration`
 - `PalletHandlingManager`
 - `ReturningTrackManager`
 - `DeliveryProtection`
