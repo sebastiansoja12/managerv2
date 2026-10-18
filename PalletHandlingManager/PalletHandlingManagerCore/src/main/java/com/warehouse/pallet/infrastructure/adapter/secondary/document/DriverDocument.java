@@ -1,6 +1,6 @@
 package com.warehouse.pallet.infrastructure.adapter.secondary.document;
 
-import com.warehouse.pallet.configuration.identificator.DepartmentCode;
+import com.warehouse.pallet.configuration.identificator.DepartmentId;
 import com.warehouse.pallet.domain.model.Driver;
 import com.warehouse.pallet.domain.vo.DriverId;
 import com.warehouse.pallet.domain.vo.TruckId;
@@ -14,13 +14,13 @@ public class DriverDocument {
     private DriverId driverId;
     private String firstName;
     private String lastName;
-    private List<DepartmentCode> assignedDepartments;
+    private List<DepartmentId> assignedDepartments;
     private Set<TruckId> assignedTrucks;
 
     public DriverDocument(final DriverId driverId,
                           final String firstName,
                           final String lastName,
-                          final List<DepartmentCode> assignedDepartments,
+                          final List<DepartmentId> assignedDepartments,
                           final Set<TruckId> assignedTrucks) {
         this.driverId = driverId;
         this.firstName = firstName;
@@ -72,11 +72,11 @@ public class DriverDocument {
         this.lastName = lastName;
     }
 
-    public List<DepartmentCode> getAssignedDepartments() {
+    public List<DepartmentId> getAssignedDepartments() {
         return assignedDepartments;
     }
 
-    public void setAssignedDepartments(final List<DepartmentCode> assignedDepartments) {
+    public void setAssignedDepartments(final List<DepartmentId> assignedDepartments) {
         this.assignedDepartments = assignedDepartments;
     }
 
