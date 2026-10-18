@@ -4,12 +4,14 @@ import com.warehouse.commonassets.event.application.port.secondary.IntegrationEv
 import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentDeliveredIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.shipment.application.listener.ShipmentIntegrationEventListener;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentIntegrationEventServiceAdapter;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
 import com.warehouse.shipment.domain.event.ShipmentCreated;
+import com.warehouse.shipment.domain.event.ShipmentDelivered;
 import com.warehouse.shipment.domain.event.ShipmentDestinationChanged;
 import com.warehouse.shipment.domain.event.ShipmentSent;
 import com.warehouse.shipment.domain.model.Shipment;
@@ -65,6 +67,15 @@ class ShipmentIntegrationEventListenerTest {
         this.listener.handle(new ShipmentSent(shipment.snapshot(), Instant.now()));
 
         assertPublishedEvent(ShipmentStatusChangedIntegrationEvent.class, shipment);
+    }
+
+    @Test
+    void shouldPublishDeliveredIntegrationEvent() {
+        final Shipment shipment = DataTestCreator.shipment();
+
+        this.listener.handle(new ShipmentDelivered(shipment.snapshot(), Instant.now()));
+
+        assertPublishedEvent(ShipmentDeliveredIntegrationEvent.class, shipment);
     }
 
     private void assertPublishedEvent(final Class<? extends IntegrationEvent> expectedType,
