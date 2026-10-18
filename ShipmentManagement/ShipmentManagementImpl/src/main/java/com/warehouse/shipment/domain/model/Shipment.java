@@ -720,6 +720,21 @@ public class Shipment {
         markAsModified();
     }
 
+    public boolean notifyShipmentLoadedOnPallet() {
+        if (ShipmentStatus.SENT.equals(this.shipmentStatus)) {
+            return false;
+        }
+        ensureShipmentIsNotDelivered();
+        if (!ShipmentStatus.CREATED.equals(this.shipmentStatus)
+                && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)
+                && !ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be loaded on pallet from status " + shipmentStatus);
+        }
+        this.shipmentStatus = ShipmentStatus.SENT;
+        markAsModified();
+        return true;
+    }
+
     public void notifyShipmentCollected() {
         if (!ShipmentStatus.CREATED.equals(this.shipmentStatus) && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)) {
             throw new ShipmentModificationException("Shipment cannot be collected from status " + shipmentStatus);

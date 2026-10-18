@@ -39,6 +39,8 @@ public interface ShipmentPort {
 
     ShipmentResult collectShipment(final TrackingNumber trackingNumber);
 
+    ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId);
+
     Optional<OperatorId> findOperator(final TrackingNumber trackingNumber);
 
     ShipmentRerouteResult loadShipmentForReroute(final TrackingNumber trackingNumber);
