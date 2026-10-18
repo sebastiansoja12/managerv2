@@ -1,0 +1,913 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-18-postgresql-table-mail-templates" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="mail_templates"/>
+            </not>
+        </preConditions>
+        <createTable tableName="mail_templates">
+            <column name="template_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_mail_templates"/>
+            </column>
+            <column name="template_key" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locale" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="mail_templates" columnNames="template_key, locale"
+                             constraintName="uk_mail_templates_key_locale"/>
+    </changeSet>
+
+    <changeSet id="2026-10-18-postgresql-data-mail-templates-shipment" author="s-soja">
+        <insert tableName="mail_templates">
+            <column name="template_id" value="951e666b-f428-534a-9199-dcce47ea08d2"/>
+            <column name="template_key" value="shipment.created.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została nadana"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została nadana.
+
+Nadawca: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Odbiorca: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}{{#shipmentEditUrl}}
+
+Jeśli dane przesyłki są błędne, możesz je poprawić, dopóki przesyłka nie zostanie odebrana przez kuriera ani umieszczona w paczkomacie:
+{{shipmentEditUrl}}{{/shipmentEditUrl}}
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="d650fecf-322a-5072-a4df-d74b6c2286f1"/>
+            <column name="template_key" value="shipment.created.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been registered"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment has been registered.
+
+Sender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Recipient: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}{{#shipmentEditUrl}}
+
+If the shipment details are wrong, you can correct them until the shipment is picked up by a courier or placed in a parcel locker:
+{{shipmentEditUrl}}{{/shipmentEditUrl}}
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="3ef6e0b1-fc9a-57d0-8ba0-ab7e15f1909d"/>
+            <column name="template_key" value="shipment.created.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wurde aufgegeben"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wurde aufgegeben.
+
+Absender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Empfänger: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}{{#shipmentEditUrl}}
+
+Falls die Sendungsdaten fehlerhaft sind, können Sie sie korrigieren, solange die Sendung nicht vom Kurier abgeholt oder in eine Packstation gelegt wurde:
+{{shipmentEditUrl}}{{/shipmentEditUrl}}
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="781110fa-1910-5129-a429-3824ebd46977"/>
+            <column name="template_key" value="shipment.created.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Nadano do Ciebie przesyłkę {{trackingNumber}}"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+{{senderFirstName}} {{senderLastName}} nadał(a) do Ciebie przesyłkę. Poinformujemy Cię o kolejnych etapach jej drogi.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="45ca0290-4e12-59c9-b7ca-d617cd49c4f3"/>
+            <column name="template_key" value="shipment.created.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="A shipment {{trackingNumber}} is on its way to you"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+{{senderFirstName}} {{senderLastName}} has sent you a shipment. We will keep you informed about its progress.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="acd77cf6-49a5-50a7-8fdc-5d4d09f29974"/>
+            <column name="template_key" value="shipment.created.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Eine Sendung {{trackingNumber}} ist an Sie unterwegs"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+{{senderFirstName}} {{senderLastName}} hat Ihnen eine Sendung geschickt. Wir informieren Sie über die weiteren Schritte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="dfc1b0b6-9b83-53bf-bfff-ae9840ebfba1"/>
+            <column name="template_key" value="shipment.status.accepted.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została przyjęta w oddziale"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została przyjęta w naszym oddziale i wkrótce wyruszy w dalszą drogę.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="a512ad5c-7a49-540a-aed7-f9fdd35dbcca"/>
+            <column name="template_key" value="shipment.status.accepted.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been accepted at our branch"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment has been accepted at our branch and will continue its journey soon.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="b4267767-1340-5c1b-88d5-2b76947f351c"/>
+            <column name="template_key" value="shipment.status.accepted.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wurde in der Filiale angenommen"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wurde in unserer Filiale angenommen und wird bald weitergeleitet.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="f3cb88ed-5e1a-5d38-b3cd-a0b5e1bbb284"/>
+            <column name="template_key" value="shipment.status.sent.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} jest w drodze"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka jest w drodze do oddziału doręczającego.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="51a46058-0aaa-52de-a630-d19b7df99c02"/>
+            <column name="template_key" value="shipment.status.sent.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} is on its way"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment is on its way to the delivery branch.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="cf6539ff-32a8-5de8-8775-91fef7022bfa"/>
+            <column name="template_key" value="shipment.status.sent.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} ist unterwegs"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung ist auf dem Weg zur Zustellfiliale.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="63178b3e-d1d0-5fc5-b253-fe25ecce0786"/>
+            <column name="template_key" value="shipment.status.redirect.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została przekierowana"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została przekierowana zgodnie z nowymi danymi doręczenia.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="b94b6de0-6d20-54bf-a2b4-70a26624b90e"/>
+            <column name="template_key" value="shipment.status.redirect.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been redirected"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment has been redirected according to the new delivery details.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="714195ad-c796-5497-83b7-c5416c3a91b6"/>
+            <column name="template_key" value="shipment.status.redirect.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wurde umgeleitet"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wurde gemäß den neuen Zustelldaten umgeleitet.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="f8bd687e-41f3-5aaf-a1a1-a36c001d635f"/>
+            <column name="template_key" value="shipment.status.undeliverable.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Nie udało się doręczyć przesyłki {{trackingNumber}}"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Nie udało się doręczyć Twojej przesyłki. Skontaktujemy się w sprawie dalszych kroków.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="fefddead-a659-5fce-a52d-9ab5c865b4fa"/>
+            <column name="template_key" value="shipment.status.undeliverable.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} could not be delivered"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+We could not deliver your shipment. We will contact you about the next steps.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="b39625be-c015-5b42-9572-2355e034b6dc"/>
+            <column name="template_key" value="shipment.status.undeliverable.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} konnte nicht zugestellt werden"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung konnte nicht zugestellt werden. Wir melden uns bezüglich der nächsten Schritte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="0a7e1e49-9036-5946-aea9-b9c2433590fe"/>
+            <column name="template_key" value="shipment.status.undeliverable.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Nie udało się doręczyć przesyłki {{trackingNumber}}"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Nie udało się doręczyć Twojej przesyłki do odbiorcy. Skontaktujemy się w sprawie dalszych kroków.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="68d3f831-fce4-5f81-9ed3-7c133735b29a"/>
+            <column name="template_key" value="shipment.status.undeliverable.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} could not be delivered"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+We could not deliver your shipment to the recipient. We will contact you about the next steps.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="617e4b5a-f015-5e0c-9947-9e9d52a3f400"/>
+            <column name="template_key" value="shipment.status.undeliverable.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} konnte nicht zugestellt werden"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung konnte dem Empfänger nicht zugestellt werden. Wir melden uns bezüglich der nächsten Schritte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="74d18071-f6f5-5e19-92ba-598c7931750e"/>
+            <column name="template_key" value="shipment.status.return.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} wraca do nadawcy"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Przesyłka adresowana do Ciebie została skierowana do zwrotu i wraca do nadawcy.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="93fc0338-c95f-575c-90b0-1b2e0f68e8c4"/>
+            <column name="template_key" value="shipment.status.return.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} is being returned to the sender"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+The shipment addressed to you is being returned to the sender.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="a6d64899-3e7c-5be1-ade1-3c5c94fc51b7"/>
+            <column name="template_key" value="shipment.status.return.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wird an den Absender zurückgeschickt"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Die an Sie adressierte Sendung wird an den Absender zurückgeschickt.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="34629b9b-7cbb-5953-a081-6af8512e09bf"/>
+            <column name="template_key" value="shipment.status.return.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} wraca do Ciebie"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została skierowana do zwrotu i wraca do Ciebie.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="ce36d46b-bd10-58df-a359-3a8228f6d804"/>
+            <column name="template_key" value="shipment.status.return.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} is being returned to you"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment is being returned to you.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="4424fa64-dda5-510c-a127-22c5a882f0b6"/>
+            <column name="template_key" value="shipment.status.return.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wird an Sie zurückgeschickt"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wird an Sie zurückgeschickt.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="2315ce21-3dfe-59e1-94fd-18a0a433b7fa"/>
+            <column name="template_key" value="shipment.status.canceled.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została anulowana"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Przesyłka adresowana do Ciebie została anulowana.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="ebda3f93-7502-51d9-8b50-c5cd030d83bb"/>
+            <column name="template_key" value="shipment.status.canceled.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been cancelled"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+The shipment addressed to you has been cancelled.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="f4e42656-d532-54fc-995f-398c731ca6de"/>
+            <column name="template_key" value="shipment.status.canceled.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wurde storniert"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Die an Sie adressierte Sendung wurde storniert.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="4f580067-7aa5-51d0-b538-132916906e2c"/>
+            <column name="template_key" value="shipment.status.canceled.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została anulowana"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została anulowana.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="dfbe63ce-419a-5261-b62b-6514774e1096"/>
+            <column name="template_key" value="shipment.status.canceled.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been cancelled"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment has been cancelled.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="08b455e8-e93c-518b-ab40-2c9e3f7b8bf7"/>
+            <column name="template_key" value="shipment.status.canceled.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wurde storniert"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wurde storniert.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="9f4d5732-6f39-5a01-a578-03c3e03e76ce"/>
+            <column name="template_key" value="shipment.out-for-delivery.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została wydana do doręczenia"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została wydana kurierowi i wkrótce zostanie doręczona.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="ac26b754-20c8-56f2-99e3-c32706184f24"/>
+            <column name="template_key" value="shipment.out-for-delivery.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} is out for delivery"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment has been handed over to the courier and will be delivered soon.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="53feb782-6e1a-5eaf-a6be-53831c8dece8"/>
+            <column name="template_key" value="shipment.out-for-delivery.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} ist in Zustellung"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wurde dem Kurier übergeben und wird in Kürze zugestellt.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="884afd54-40e1-515f-937a-861249d54ef4"/>
+            <column name="template_key" value="shipment.delivered.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została doręczona"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została doręczona. Dziękujemy!
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="8a87c7c8-d12f-5e93-8ff8-a2d227b6fc5b"/>
+            <column name="template_key" value="shipment.delivered.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been delivered"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment has been delivered. Thank you!
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="23db4039-4394-58b4-be40-1632bb7e3785"/>
+            <column name="template_key" value="shipment.delivered.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wurde zugestellt"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wurde zugestellt. Vielen Dank!
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="dd7ef847-f351-5040-8216-28b37f109b78"/>
+            <column name="template_key" value="shipment.delivered.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została doręczona do odbiorcy"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została doręczona do odbiorcy {{recipientFirstName}} {{recipientLastName}}.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="47da3fee-5d4e-5f5c-85c7-b98d5ad763e9"/>
+            <column name="template_key" value="shipment.delivered.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been delivered to the recipient"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment has been delivered to the recipient {{recipientFirstName}} {{recipientLastName}}.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="315f6880-e214-536a-8f93-4ad14366698b"/>
+            <column name="template_key" value="shipment.delivered.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wurde dem Empfänger zugestellt"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wurde dem Empfänger {{recipientFirstName}} {{recipientLastName}} zugestellt.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="25e8866e-3fb8-558d-95b3-ca9a43896169"/>
+            <column name="template_key" value="shipment.reroute.requested.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Dane przesyłki {{trackingNumber}} zostały zmienione"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Przyjęliśmy zgłoszenie zmiany danych przesyłki. Nowe dane:
+
+Nadawca: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Odbiorca: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+Jeśli to nie Ty zgłaszałeś zmianę, skontaktuj się z nami.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="9a4d68d3-4f66-564d-82c2-573347127452"/>
+            <column name="template_key" value="shipment.reroute.requested.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} details have been changed"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+We have received a request to change the shipment details. New details:
+
+Sender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Recipient: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+If you did not request this change, please contact us.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="10e41134-d984-52bf-becb-57792d94e273"/>
+            <column name="template_key" value="shipment.reroute.requested.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Die Daten der Sendung {{trackingNumber}} wurden geändert"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Wir haben eine Anfrage zur Änderung der Sendungsdaten erhalten. Neue Daten:
+
+Absender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Empfänger: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+Falls Sie diese Änderung nicht beantragt haben, kontaktieren Sie uns bitte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="7179369f-4c17-51cf-9844-900c2c92ab7d"/>
+            <column name="template_key" value="shipment.reroute.requested.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Dane przesyłki {{trackingNumber}} zostały zmienione"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Przyjęliśmy zgłoszenie zmiany danych przesyłki. Nowe dane:
+
+Nadawca: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Odbiorca: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+Jeśli to nie Ty zgłaszałeś zmianę, skontaktuj się z nami.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="182630d0-1ee2-57e2-ae7b-3c1dc25f481b"/>
+            <column name="template_key" value="shipment.reroute.requested.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} details have been changed"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+We have received a request to change the shipment details. New details:
+
+Sender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Recipient: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+If you did not request this change, please contact us.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="ff2395d8-33df-5272-ac70-85948850c27e"/>
+            <column name="template_key" value="shipment.reroute.requested.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Die Daten der Sendung {{trackingNumber}} wurden geändert"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Wir haben eine Anfrage zur Änderung der Sendungsdaten erhalten. Neue Daten:
+
+Absender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Empfänger: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}
+
+Falls Sie diese Änderung nicht beantragt haben, kontaktieren Sie uns bitte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="6b64b3fe-a700-5759-8a07-6842df1b56e0"/>
+            <column name="template_key" value="shipment.reroute.token"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Kod do zmiany danych przesyłki {{trackingNumber}}"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+otrzymaliśmy prośbę o zmianę danych przesyłki {{trackingNumber}}.
+
+Kod weryfikacyjny: {{code}}
+
+Kod jest ważny przez {{validMinutes}} min i można go użyć tylko raz. Wpisz go na stronie edycji przesyłki:
+{{shipmentEditUrl}}
+
+Jeśli to nie Ty prosiłeś o zmianę danych, zignoruj tę wiadomość.
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="4a374d0d-5022-5b75-8b4d-58c9912e9404"/>
+            <column name="template_key" value="shipment.reroute.token"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Code to change shipment {{trackingNumber}} details"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+we have received a request to change the details of shipment {{trackingNumber}}.
+
+Verification code: {{code}}
+
+The code is valid for {{validMinutes}} min and can be used only once. Enter it on the shipment edit page:
+{{shipmentEditUrl}}
+
+If you did not request this change, please ignore this message.
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="e5f6b640-2012-5dcd-a328-e159d1e1ba34"/>
+            <column name="template_key" value="shipment.reroute.token"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Code zur Änderung der Sendung {{trackingNumber}}"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+wir haben eine Anfrage zur Änderung der Daten der Sendung {{trackingNumber}} erhalten.
+
+Bestätigungscode: {{code}}
+
+Der Code ist {{validMinutes}} Min. gültig und kann nur einmal verwendet werden. Geben Sie ihn auf der Seite zur Bearbeitung der Sendung ein:
+{{shipmentEditUrl}}
+
+Falls Sie diese Änderung nicht beantragt haben, ignorieren Sie bitte diese Nachricht.
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
