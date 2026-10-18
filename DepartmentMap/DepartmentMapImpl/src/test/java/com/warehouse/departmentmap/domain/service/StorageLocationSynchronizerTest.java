@@ -4,16 +4,12 @@ import com.warehouse.commonassets.identificator.MapElementId;
 import com.warehouse.departmentmap.domain.exception.DepartmentMapException;
 import com.warehouse.departmentmap.domain.model.DepartmentMap;
 import com.warehouse.departmentmap.domain.model.StorageLocation;
+import com.warehouse.departmentmap.domain.vo.Plan;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.warehouse.departmentmap.DepartmentMapFixture.NOW;
-import static com.warehouse.departmentmap.DepartmentMapFixture.USER_ID;
-import static com.warehouse.departmentmap.DepartmentMapFixture.location;
-import static com.warehouse.departmentmap.DepartmentMapFixture.pallet;
-import static com.warehouse.departmentmap.DepartmentMapFixture.persistedMap;
-import static com.warehouse.departmentmap.DepartmentMapFixture.storageLocation;
+import static com.warehouse.departmentmap.DepartmentMapFixture.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -32,12 +28,12 @@ class StorageLocationSynchronizerTest {
                 storageLocation(renamed.getLocationId(), "B-02", 2),
                 storageLocation(newLocationId, "A-04", 1)));
 
-        final StorageLocationSynchronizer.Plan plan = synchronizer.plan(departmentMap,
+        final Plan plan = synchronizer.plan(departmentMap,
                 List.of(unchanged, renamed, removed));
 
         assertEquals(1, plan.created().size());
-        assertEquals(newLocationId, plan.created().get(0).getLocationId());
-        assertEquals(departmentMap.getDepartmentMapId(), plan.created().get(0).getDepartmentMapId());
+        assertEquals(newLocationId, plan.created().getFirst().getLocationId());
+        assertEquals(departmentMap.getDepartmentMapId(), plan.created().getFirst().getDepartmentMapId());
         assertEquals(List.of(renamed), plan.changed());
         assertEquals("B-02", renamed.getCode());
         assertEquals(2, renamed.getCapacity());
