@@ -39,11 +39,6 @@ warehouse:
         service-id: manager-application
         uri: ${MANAGER_API_URL:http://localhost:8080/v2/api}
         health-path: ${MANAGER_API_HEALTH_PATH:/actuator/health}
-      - id: software-configuration
-        path-prefix: software-configuration
-        service-id: software-configuration
-        uri: ${SOFTWARE_CONFIGURATION_URL:http://localhost:8081}
-        health-path: ${SOFTWARE_CONFIGURATION_HEALTH_PATH:/actuator/health}
       - id: delivery-protection
         path-prefix: delivery-protection
         service-id: delivery-protection

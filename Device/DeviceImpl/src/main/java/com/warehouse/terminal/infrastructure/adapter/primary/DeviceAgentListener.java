@@ -7,7 +7,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.terminal.domain.port.primary.DevicePort;
-import com.warehouse.terminal.domain.service.DeviceValidatorConfigurationService;
 import com.warehouse.terminal.domain.service.DeviceValidatorService;
 import com.warehouse.terminal.dto.DeviceSettingsRequestDto;
 import com.warehouse.terminal.dto.DeviceUpdateRequestDto;
@@ -24,15 +23,11 @@ public class DeviceAgentListener {
 
     private final DeviceValidatorService deviceValidatorService;
 
-    private final DeviceValidatorConfigurationService deviceValidatorConfiguration;
-
     private final DevicePort devicePort;
 
     public DeviceAgentListener(final DeviceValidatorService deviceValidatorService,
-                               final DeviceValidatorConfigurationService deviceValidatorConfiguration,
                                final DevicePort devicePort) {
         this.deviceValidatorService = deviceValidatorService;
-        this.deviceValidatorConfiguration = deviceValidatorConfiguration;
         this.devicePort = devicePort;
     }
 

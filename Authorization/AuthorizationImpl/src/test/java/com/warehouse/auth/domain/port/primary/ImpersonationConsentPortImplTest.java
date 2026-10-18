@@ -34,8 +34,22 @@ class ImpersonationConsentPortImplTest {
 
     private final InMemoryRepository repository = new InMemoryRepository();
 
-    private final ImpersonationConsentPort port = new ImpersonationConsentPortImpl(repository,
+    private final List<OperatorId> notifications = new ArrayList<>();
+
+    private final ImpersonationConsentPort port = new ImpersonationConsentPortImpl(repository, notifications::add,
             Clock.fixed(NOW, ZoneOffset.UTC));
+
+    @Test
+    void shouldNotifyOperatorOnlyWhenConsentsChange() {
+        final ImpersonationConsent consent = port.request(OWNER, "owner", OPERATOR, "Problem");
+        port.request(OWNER, "owner", OPERATOR, "Ponownie");
+        port.findPending(OPERATOR);
+        port.findActive(OPERATOR);
+        port.approve(consent.getId(), OPERATOR, SUPERADMIN, "superadmin", 60);
+        port.revoke(consent.getId(), OPERATOR, SUPERADMIN, "superadmin");
+
+        assertThat(notifications).containsExactly(OPERATOR, OPERATOR, OPERATOR);
+    }
 
     @Test
     void shouldReuseOpenRequestInsteadOfCreatingDuplicate() {

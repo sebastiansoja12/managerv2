@@ -119,7 +119,6 @@ services:
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
-      SOFTWARE_CONFIGURATION_URL: ${SOFTWARE_CONFIGURATION_URL:-http://software-configuration:8081}
       RETURNING_TRACK_MANAGER_URL: ${RETURNING_TRACK_MANAGER_URL:-http://returning-manager:8070/v2/api}
       ROUTE_TRACKER_FLOW_URL: ${ROUTE_TRACKER_FLOW_URL:-http://route-tracker:8082/v2/api}
     depends_on:
@@ -128,30 +127,6 @@ services:
       returning-manager:
         condition: service_started
       route-tracker:
-        condition: service_started
-    networks:
-      - manager_network
-
-  software-configuration:
-    build:
-      context: .
-      dockerfile: SoftwareConfiguration/SoftwareConfigurationCore/Dockerfile
-    image: managerv2/software-configuration:local
-    container_name: software-configuration
-    restart: unless-stopped
-    ports:
-      - "${SOFTWARE_CONFIGURATION_PORT:-8081}:8081"
-    environment:
-      SPRING_DATA_MONGODB_URI: ${SOFTWARE_CONFIGURATION_MONGODB_URI:-mongodb://mongodb:27017/warehouse}
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
-      EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
-    depends_on:
-      mongodb:
-        condition: service_started
-      kafka:
-        condition: service_healthy
-      eureka-server:
         condition: service_started
     networks:
       - manager_network
