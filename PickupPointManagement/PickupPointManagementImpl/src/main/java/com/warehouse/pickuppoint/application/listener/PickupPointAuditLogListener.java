@@ -7,6 +7,7 @@ import com.warehouse.pickuppoint.domain.enumeration.PickupPointAuditLogType;
 import com.warehouse.pickuppoint.domain.event.PickupPointChanged;
 import com.warehouse.pickuppoint.domain.event.PickupPointClosed;
 import com.warehouse.pickuppoint.domain.event.PickupPointCreated;
+import com.warehouse.pickuppoint.domain.event.PickupPointDeleted;
 import com.warehouse.pickuppoint.domain.event.PickupPointResumed;
 import com.warehouse.pickuppoint.domain.event.PickupPointSuspended;
 import com.warehouse.pickuppoint.domain.event.PickupPointUpdated;
@@ -47,6 +48,7 @@ public class PickupPointAuditLogListener {
             case final PickupPointSuspended ignored -> PickupPointAuditLogType.SUSPENDED;
             case final PickupPointResumed ignored -> PickupPointAuditLogType.RESUMED;
             case final PickupPointClosed ignored -> PickupPointAuditLogType.CLOSED;
+            case final PickupPointDeleted ignored -> PickupPointAuditLogType.DELETED;
             default -> throw new IllegalArgumentException("Unsupported pickup point event " + event.getClass());
         };
     }
