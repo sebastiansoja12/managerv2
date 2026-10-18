@@ -19,6 +19,7 @@ import com.warehouse.logistics.domain.port.secondary.*;
 import com.warehouse.logistics.domain.service.LogisticsService;
 import com.warehouse.logistics.domain.service.LogisticsServiceImpl;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceAccessValidatorAspect;
+import com.warehouse.logistics.infrastructure.adapter.primary.DeviceTypeResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator;
 import com.warehouse.logistics.infrastructure.adapter.primary.LoggingSoapEndpointExceptionResolver;
 import com.warehouse.logistics.infrastructure.adapter.primary.LogisticsProcessFinishAspect;
@@ -67,9 +68,15 @@ public class LogisticsConfiguration {
     }
 
     @Bean
+    public DeviceTypeResolver deviceTypeResolver() {
+        return new DeviceTypeResolver();
+    }
+
+    @Bean
     public DeviceAccessValidatorAspect deviceAccessValidatorAspect(
-            final DeviceContextAuthenticator deviceContextAuthenticator) {
-        return new DeviceAccessValidatorAspect(deviceContextAuthenticator);
+            final DeviceContextAuthenticator deviceContextAuthenticator,
+            final DeviceTypeResolver deviceTypeResolver) {
+        return new DeviceAccessValidatorAspect(deviceContextAuthenticator, deviceTypeResolver);
     }
 
     @Bean

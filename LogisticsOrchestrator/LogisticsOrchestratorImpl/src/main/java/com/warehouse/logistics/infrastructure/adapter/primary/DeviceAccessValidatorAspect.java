@@ -5,22 +5,24 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
 import com.warehouse.logistics.infrastructure.adapter.primary.DeviceContextAuthenticator.AuthenticatedDeviceContext;
-import com.warehouse.terminal.jaxb.CollectRequest;
 import com.warehouse.terminal.jaxb.DeviceType;
-import com.warehouse.terminal.jaxb.TerminalRequest;
 
 @Aspect
 public class DeviceAccessValidatorAspect {
 
     private final DeviceContextAuthenticator deviceContextAuthenticator;
 
-    public DeviceAccessValidatorAspect(final DeviceContextAuthenticator deviceContextAuthenticator) {
+    private final DeviceTypeResolver deviceTypeResolver;
+
+    public DeviceAccessValidatorAspect(final DeviceContextAuthenticator deviceContextAuthenticator,
+                                       final DeviceTypeResolver deviceTypeResolver) {
         this.deviceContextAuthenticator = deviceContextAuthenticator;
+        this.deviceTypeResolver = deviceTypeResolver;
     }
 
     @Around("@annotation(com.warehouse.commonassets.validator.DeviceAccessValidator)")
     public Object validateDeviceAccess(final ProceedingJoinPoint joinPoint) throws Throwable {
-        final DeviceType device = resolveDevice(joinPoint);
+        final DeviceType device = deviceTypeResolver.resolve(joinPoint.getArgs());
 
         final AuthenticatedDeviceContext authenticatedDevice =
                 deviceContextAuthenticator.authenticateByPairKey(device.getPairKey());
@@ -31,25 +33,6 @@ public class DeviceAccessValidatorAspect {
         } finally {
             deviceContextAuthenticator.clear();
         }
-    }
-
-    private DeviceType resolveDevice(final ProceedingJoinPoint joinPoint) {
-        for (final Object argument : joinPoint.getArgs()) {
-            if (argument instanceof TerminalRequest terminalRequest) {
-                return requireDevice(terminalRequest.getDevice());
-            }
-            if (argument instanceof CollectRequest collectRequest) {
-                return requireDevice(collectRequest.getDeviceInformation());
-            }
-        }
-        throw new IllegalArgumentException("DeviceAccessValidator requires TerminalRequest or CollectRequest argument");
-    }
-
-    private DeviceType requireDevice(final DeviceType device) {
-        if (device == null) {
-            throw new IllegalArgumentException("Missing device data in SOAP request");
-        }
-        return device;
     }
 
     private void applyAuthenticatedDeviceContext(final DeviceType device,
