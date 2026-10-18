@@ -5,6 +5,12 @@ import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.UserApiService;
 import com.warehouse.deliverycollect.api.DeliveryCollectApiService;
+import com.warehouse.logistics.domain.port.primary.PalletScanPort;
+import com.warehouse.logistics.domain.port.primary.PalletScanPortImpl;
+import com.warehouse.logistics.domain.port.secondary.PalletScanServicePort;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.PalletScanMapper;
+import com.warehouse.logistics.infrastructure.adapter.secondary.PalletScanServiceAdapter;
+import com.warehouse.palletmanagement.api.PalletApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.BaseRepository;
@@ -153,6 +159,22 @@ public class LogisticsConfiguration {
     @Bean
     public DeliveryResponseMapper deliveryResponseMapper() {
         return new DeliveryResponseMapper();
+    }
+
+    @Bean
+    public PalletScanMapper palletScanMapper() {
+        return new PalletScanMapper();
+    }
+
+    @Bean
+    public PalletScanPort palletScanPort(final PalletScanServicePort palletScanServicePort) {
+        return new PalletScanPortImpl(palletScanServicePort);
+    }
+
+    @Bean
+    public PalletScanServicePort palletScanServicePort(final PalletApiService palletApiService,
+                                                       final ProcessHubEventPublisher processHubEventPublisher) {
+        return new PalletScanServiceAdapter(palletApiService, processHubEventPublisher);
     }
 
     @Bean

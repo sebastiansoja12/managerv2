@@ -25,7 +25,7 @@ public interface DeliveryEntityMapper {
                 entity.getType(), entity.getDeliverySteps().stream().map(this::toDomain).toList(),
                 entity.getCreated(), entity.getSupplierId(), entity.getVehicleId(),
                 entity.getDeliveryStatus() == null ? null
-                        : com.warehouse.logistics.domain.enumeration.DeliveryStatus.valueOf(entity.getDeliveryStatus().name()),
+                        : DeliveryStatus.valueOf(entity.getDeliveryStatus().name()),
                 entity.getStatus(), entity.getMethod(), entity.getPickupPointId(), entity.getDeliveryPickupPointId(),
                 Boolean.TRUE.equals(entity.getSignatureRequired()), entity.getInstructions(), entity.getPlannedAt(),
                 entity.getDeliveredAt(), entity.getToken());
