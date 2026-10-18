@@ -5,4 +5,6 @@ import com.warehouse.commonassets.identificator.PickupPointId;
 public interface PickupPointReadModelSyncPort {
 
     void syncReadModel(final PickupPointId pickupPointId);
+
+    int syncReadModels();
 }
