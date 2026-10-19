@@ -1,9 +1,8 @@
 package com.warehouse.auth.infrastructure.adapter.primary;
 
-import com.warehouse.auth.domain.model.PlatformOwner;
-import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
 import com.warehouse.auth.domain.vo.Impersonation;
 import com.warehouse.auth.infrastructure.adapter.secondary.filter.JwtAuthenticationFilter;
+import com.warehouse.auth.infrastructure.adapter.secondary.filter.PlatformOwnerAuthenticationFilter;
 import com.warehouse.auth.infrastructure.dto.PlatformActorDto;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.PlatformOwnerId;
@@ -20,14 +19,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class PlatformActorServiceAdapterTest {
 
-    private final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort = mock(PlatformOwnerAuthenticationPort.class);
-
-    private final PlatformActorServiceAdapter adapter = new PlatformActorServiceAdapter(platformOwnerAuthenticationPort);
+    private final PlatformActorServiceAdapter adapter = new PlatformActorServiceAdapter();
 
     @AfterEach
     void tearDown() {
@@ -38,8 +33,9 @@ class PlatformActorServiceAdapterTest {
     @Test
     void shouldReturnPlatformOwnerWorkingInPanel() {
         final PlatformOwnerId platformOwnerId = new PlatformOwnerId(3L);
-        when(platformOwnerAuthenticationPort.getPlatformOwner(platformOwnerId)).thenReturn(
-                PlatformOwner.create(platformOwnerId, "owner", "encoded", "Platform", "Owner", "owner@test.pl"));
+        final MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setAttribute(PlatformOwnerAuthenticationFilter.PLATFORM_OWNER_USERNAME_ATTRIBUTE, "owner");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(platformOwnerId, null, List.of()));
 

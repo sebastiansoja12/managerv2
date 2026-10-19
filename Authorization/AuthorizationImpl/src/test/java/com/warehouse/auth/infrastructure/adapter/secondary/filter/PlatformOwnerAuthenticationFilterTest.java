@@ -58,6 +58,16 @@ class PlatformOwnerAuthenticationFilterTest {
     }
 
     @Test
+    void shouldExposePlatformOwnerUsernameInRequest() throws Exception {
+        final MockHttpServletRequest request = request("GET", "/operators/1/users", true, true);
+
+        filter(request);
+
+        assertThat(request.getAttribute(PlatformOwnerAuthenticationFilter.PLATFORM_OWNER_USERNAME_ATTRIBUTE))
+                .isEqualTo("owner");
+    }
+
+    @Test
     void shouldLeaveOrganizationRequestToOrganizationTokenWhenBothCookiesArePresent() throws Exception {
         final Authentication authentication = filter(request("GET", "/users", true, true));
 

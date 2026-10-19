@@ -1,7 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.filter;
 
 import com.warehouse.auth.configuration.AuthCookieService;
-import com.warehouse.auth.domain.model.PlatformOwner;
 import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,6 +23,9 @@ import java.util.List;
 public class PlatformOwnerAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String PLATFORM_OWNER_AUTHORITY = "ROLE_PLATFORM_OWNER";
+
+    public static final String PLATFORM_OWNER_USERNAME_ATTRIBUTE =
+            PlatformOwnerAuthenticationFilter.class.getName() + ".username";
 
     private static final List<String> PLATFORM_OWNER_PATHS = List.of("/platform", "/operators");
 
@@ -57,10 +59,10 @@ public class PlatformOwnerAuthenticationFilter extends OncePerRequestFilter {
     private void authenticate(final HttpServletRequest request, final String accessToken) {
         try {
             platformOwnerAuthenticationPort.authenticate(accessToken)
-                    .map(PlatformOwner::getPlatformOwnerId)
-                    .ifPresent(platformOwnerId -> {
+                    .ifPresent(platformOwner -> {
+                        request.setAttribute(PLATFORM_OWNER_USERNAME_ATTRIBUTE, platformOwner.getUsername());
                         final UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(platformOwnerId, accessToken,
+                                new UsernamePasswordAuthenticationToken(platformOwner.getPlatformOwnerId(), accessToken,
                                         List.of(new SimpleGrantedAuthority(PLATFORM_OWNER_AUTHORITY)));
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         final SecurityContext context = SecurityContextHolder.createEmptyContext();
