@@ -104,9 +104,18 @@ class SubscriptionAccessInterceptorTest {
     }
 
     @Test
+    void shouldKeepPlatformPathsAvailableWhenOperatorUserHasNoPlan() throws Exception {
+        assertThat(preHandle("POST", "/platform/auth/login")).isTrue();
+        assertThat(preHandle("POST", "/platform/auth/refresh")).isTrue();
+        assertThat(preHandle("GET", "/platform/auth/me")).isTrue();
+        assertThat(preHandle("GET", "/platform/announcements")).isTrue();
+    }
+
+    @Test
     void shouldNotTreatSimilarPathAsAvailablePath() throws Exception {
         store.save(subscription(SubscriptionPlan.BASIC, TODAY.minusMonths(1), TODAY.minusDays(1)));
 
+        assertThat(preHandle("GET", "/platforms")).isFalse();
         assertThat(preHandle("GET", "/subscriptions")).isFalse();
         assertThat(preHandle("GET", "/authors")).isFalse();
         assertThat(preHandle("POST", "/auth/me/api-key")).isFalse();

@@ -39,7 +39,8 @@ public class SubscriptionAccessInterceptor implements HandlerInterceptor {
 
     private static final List<String> ALWAYS_AVAILABLE_PATHS = List.of(
             "/subscription",
-            "/maintenance"
+            "/maintenance",
+            "/platform"
     );
 
     private final OperatorSubscriptionPort operatorSubscriptionPort;
