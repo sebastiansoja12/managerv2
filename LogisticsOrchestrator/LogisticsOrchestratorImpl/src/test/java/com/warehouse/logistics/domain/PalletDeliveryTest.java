@@ -91,6 +91,6 @@ class PalletDeliveryTest {
 
     private Delivery shipmentDelivery(final ShipmentId shipmentId) {
         return new Delivery(DeliveryTarget.shipment(shipmentId), shipmentId, DeliveryType.OUTBOUND,
-                DeliveryMethod.COURIER, null, null, null, false, USER_ID);
+                null, null, null, DeliveryMethod.COURIER, null, null, null, false, USER_ID);
     }
 }

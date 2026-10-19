@@ -4,17 +4,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.commonassets.identificator.PickupPointId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.logistics.domain.enumeration.DeliveryDerivationType;
+import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
+import com.warehouse.logistics.domain.enumeration.PickupMethod;
 import com.warehouse.logistics.domain.model.CreateDeliveryCommand;
+import com.warehouse.logistics.domain.model.CreateDerivedDeliveryCommand;
 import com.warehouse.logistics.domain.port.primary.LogisticsPort;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentDerivedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class ShipmentCreatedIntegrationEventTest {
 
@@ -24,7 +36,6 @@ class ShipmentCreatedIntegrationEventTest {
                 {
                   "payload": {
                     "shipmentId": {"value": 42},
-                    "deliveryMethod": "COURIER",
                     "createdAt": "2026-10-07T12:00:00"
                   },
                   "operatorId": {"value": 7},
@@ -34,7 +45,7 @@ class ShipmentCreatedIntegrationEventTest {
                 }
                 """;
 
-        final ShipmentCreatedIntegrationEvent event = new ObjectMapper()
+        final ShipmentCreatedIntegrationEvent event = new ObjectMapper().findAndRegisterModules()
                 .readValue(json, ShipmentCreatedIntegrationEvent.class);
 
         assertEquals(new ShipmentId(42L), event.payload().shipmentId());
@@ -52,7 +63,15 @@ class ShipmentCreatedIntegrationEventTest {
                 logisticsPort, new OperatorContext());
         final ShipmentCreatedIntegrationEvent event = new ObjectMapper().readValue("""
                 {
-                  "payload": {"shipmentId": {"value": 42}, "deliveryMethod": "COURIER"},
+                  "payload": {"shipmentId": {"value": 42}},
+                  "delivery": {
+                    "originDepartmentId": {"value": 3},
+                    "destinationDepartmentId": {"value": 5},
+                    "pickupMethod": "PICKUP_POINT",
+                    "deliveryMethod": "LOCKER",
+                    "pickupPointId": {"value": "7d4bd2b0-5b55-4c0f-9a43-8a8f8a7e1d10"},
+                    "deliveryPickupPointId": {"value": "0c7a5d0e-4b0f-4c64-9f53-1b2f62c6a8b1"}
+                  },
                   "operatorId": {"value": 7},
                   "userId": {"value": 42},
                   "departmentId": {"value": 12}
@@ -65,5 +84,80 @@ class ShipmentCreatedIntegrationEventTest {
         verify(logisticsPort).createDelivery(command.capture());
         assertEquals(new ShipmentId(42L), command.getValue().shipmentId());
         assertEquals(42L, command.getValue().userId().value());
+        assertEquals(new DepartmentId(3L), command.getValue().originDepartmentId());
+        assertEquals(new DepartmentId(5L), command.getValue().destinationDepartmentId());
+        assertEquals(PickupMethod.PICKUP_POINT, command.getValue().pickupMethod());
+        assertEquals(DeliveryMethod.LOCKER, command.getValue().method());
+        assertEquals(new PickupPointId(UUID.fromString("7d4bd2b0-5b55-4c0f-9a43-8a8f8a7e1d10")),
+                command.getValue().pickupPointId());
+        assertEquals(new PickupPointId(UUID.fromString("0c7a5d0e-4b0f-4c64-9f53-1b2f62c6a8b1")),
+                command.getValue().deliveryPickupPointId());
+    }
+
+    @Test
+    void shouldIgnoreShipmentCreatedEventWithoutDeliveryData() throws Exception {
+        final LogisticsPort logisticsPort = mock(LogisticsPort.class);
+        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(
+                logisticsPort, new OperatorContext());
+        final ShipmentCreatedIntegrationEvent event = new ObjectMapper().readValue("""
+                {
+                  "payload": {"shipmentId": {"value": 43}},
+                  "operatorId": {"value": 7},
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
+                }
+                """, ShipmentCreatedIntegrationEvent.class);
+
+        listener.handle(event);
+
+        verifyNoInteractions(logisticsPort);
+    }
+
+    @Test
+    void shouldCreateDerivedDeliveryFromShipmentDerivedEvent() throws Exception {
+        final LogisticsPort logisticsPort = mock(LogisticsPort.class);
+        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(
+                logisticsPort, new OperatorContext());
+        final ShipmentDerivedIntegrationEvent event = new ObjectMapper().readValue("""
+                {
+                  "payload": {"shipmentId": {"value": 43}, "signatureRequired": true},
+                  "sourceShipmentId": {"value": 42},
+                  "derivationType": "RETURN",
+                  "operatorId": {"value": 7},
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
+                }
+                """, ShipmentDerivedIntegrationEvent.class);
+
+        listener.handle(event);
+
+        final ArgumentCaptor<CreateDerivedDeliveryCommand> command =
+                ArgumentCaptor.forClass(CreateDerivedDeliveryCommand.class);
+        verify(logisticsPort).createDerivedDelivery(command.capture());
+        assertEquals(new ShipmentId(43L), command.getValue().shipmentId());
+        assertEquals(new ShipmentId(42L), command.getValue().sourceShipmentId());
+        assertEquals(DeliveryDerivationType.RETURN, command.getValue().derivationType());
+        assertEquals(Boolean.TRUE, command.getValue().signatureRequired());
+    }
+
+    @Test
+    void shouldChangeDestinationDepartmentFromDestinationChangedEvent() throws Exception {
+        final LogisticsPort logisticsPort = mock(LogisticsPort.class);
+        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(
+                logisticsPort, new OperatorContext());
+        final ShipmentDestinationChangedIntegrationEvent event = new ObjectMapper().readValue("""
+                {
+                  "payload": {"shipmentId": {"value": 42}},
+                  "destinationDepartmentId": {"value": 9},
+                  "operatorId": {"value": 7},
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
+                }
+                """, ShipmentDestinationChangedIntegrationEvent.class);
+
+        listener.handle(event);
+
+        verify(logisticsPort).changeDestinationDepartment(new ShipmentId(42L), new DepartmentId(9L));
+        verify(logisticsPort, never()).completeDelivery(any());
     }
 }

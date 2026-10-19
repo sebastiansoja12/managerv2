@@ -5,6 +5,7 @@ import com.warehouse.commonassets.model.BelongsToOperator;
 import com.warehouse.logistics.domain.enumeration.DeliveryLifecycleStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
+import com.warehouse.logistics.domain.enumeration.PickupMethod;
 import com.warehouse.logistics.domain.model.DeliveryTargetType;
 import com.warehouse.logistics.infrastructure.adapter.secondary.enumeration.Status;
 import jakarta.persistence.*;
@@ -55,6 +56,18 @@ public class DeliveryEntity extends BelongsToOperator {
     @Enumerated(EnumType.STRING)
     private DeliveryLifecycleStatus status;
 
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "origin_department_id"))
+    private DepartmentId originDepartmentId;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "destination_department_id"))
+    private DepartmentId destinationDepartmentId;
+
+    @Column(name = "pickup_method")
+    @Enumerated(EnumType.STRING)
+    private PickupMethod pickupMethod;
+
     @Column(name = "delivery_method")
     @Enumerated(EnumType.STRING)
     private DeliveryMethod method;
@@ -101,6 +114,9 @@ public class DeliveryEntity extends BelongsToOperator {
                            final LocalDateTime created,
                            final Status deliveryStatus,
                            final DeliveryLifecycleStatus status,
+                           final DepartmentId originDepartmentId,
+                           final DepartmentId destinationDepartmentId,
+                           final PickupMethod pickupMethod,
                            final DeliveryMethod method,
                            final PickupPointId pickupPointId,
                            final PickupPointId deliveryPickupPointId,
@@ -120,6 +136,9 @@ public class DeliveryEntity extends BelongsToOperator {
         this.created = created;
         this.deliveryStatus = deliveryStatus;
         this.status = status;
+        this.originDepartmentId = originDepartmentId;
+        this.destinationDepartmentId = destinationDepartmentId;
+        this.pickupMethod = pickupMethod;
         this.method = method;
         this.pickupPointId = pickupPointId;
         this.deliveryPickupPointId = deliveryPickupPointId;
@@ -141,6 +160,9 @@ public class DeliveryEntity extends BelongsToOperator {
     public LocalDateTime getCreated() { return created; }
     public Status getDeliveryStatus() { return deliveryStatus; }
     public DeliveryLifecycleStatus getStatus() { return status; }
+    public DepartmentId getOriginDepartmentId() { return originDepartmentId; }
+    public DepartmentId getDestinationDepartmentId() { return destinationDepartmentId; }
+    public PickupMethod getPickupMethod() { return pickupMethod; }
     public DeliveryMethod getMethod() { return method; }
     public PickupPointId getPickupPointId() { return pickupPointId; }
     public PickupPointId getDeliveryPickupPointId() { return deliveryPickupPointId; }

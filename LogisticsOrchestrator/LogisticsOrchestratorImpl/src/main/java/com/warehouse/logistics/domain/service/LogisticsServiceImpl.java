@@ -6,7 +6,6 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
-import com.warehouse.logistics.domain.enumeration.DeliveryMethod;
 import com.warehouse.logistics.domain.enumeration.DeliverySaveStatus;
 import com.warehouse.logistics.domain.enumeration.DeliveryType;
 import com.warehouse.logistics.domain.model.*;
@@ -57,7 +56,7 @@ public class LogisticsServiceImpl implements LogisticsService {
         final String token = request.getDeliveryToken() == null ? null : request.getDeliveryToken().getValue();
         final DeliveryStep deliveryStep = DeliveryStep.attempt(delivery.getDeliveryId(), request.getDeliveryStatus(),
                 userId, request.getSupplierId(), departmentId,
-                request.getVehicleId(), DeliveryMethod.COURIER, comment, token, delivery.getDeliverySteps().size());
+                request.getVehicleId(), comment, token, delivery.getDeliverySteps().size());
         delivery.addStep(deliveryStep);
         logisticsRepository.createOrUpdate(delivery);
         return new LogisticsResponse(delivery.getDeliveryId(), UpdateStatus.OK, delivery.getShipmentId(),
@@ -92,5 +91,15 @@ public class LogisticsServiceImpl implements LogisticsService {
     @Override
     public List<Delivery> findRecent(final int offset, final int limit) {
         return logisticsRepository.findRecent(offset, limit);
+    }
+
+    @Override
+    public Optional<Delivery> findActiveByTargetAndType(final DeliveryTarget target, final DeliveryType type) {
+        return logisticsRepository.findActiveByTargetAndType(target, type);
+    }
+
+    @Override
+    public List<Delivery> findByDepartment(final DepartmentId departmentId, final int offset, final int limit) {
+        return logisticsRepository.findByDepartment(departmentId, offset, limit);
     }
 }

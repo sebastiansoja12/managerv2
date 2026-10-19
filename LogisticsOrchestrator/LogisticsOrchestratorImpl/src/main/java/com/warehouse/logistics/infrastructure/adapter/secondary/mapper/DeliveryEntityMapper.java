@@ -26,7 +26,8 @@ public interface DeliveryEntityMapper {
                 entity.getCreated(), entity.getSupplierId(), entity.getVehicleId(),
                 entity.getDeliveryStatus() == null ? null
                         : DeliveryStatus.valueOf(entity.getDeliveryStatus().name()),
-                entity.getStatus(), entity.getMethod(), entity.getPickupPointId(), entity.getDeliveryPickupPointId(),
+                entity.getStatus(), entity.getOriginDepartmentId(), entity.getDestinationDepartmentId(),
+                entity.getPickupMethod(), entity.getMethod(), entity.getPickupPointId(), entity.getDeliveryPickupPointId(),
                 Boolean.TRUE.equals(entity.getSignatureRequired()), entity.getInstructions(), entity.getPlannedAt(),
                 entity.getDeliveredAt(), entity.getToken());
     }
@@ -34,7 +35,7 @@ public interface DeliveryEntityMapper {
     default DeliveryStep toDomain(final DeliveryStepEntity entity) {
         return new DeliveryStep(entity.getId(), entity.getDeliveryId(), entity.getAttemptedAt(),
                 entity.getOutcome(), entity.getDeliveryStatus(), entity.getSignatureId(), entity.getUserId(), entity.getSupplierId(),
-                entity.getDepartmentId(), entity.getVehicleId(), entity.getMethod(),
+                entity.getDepartmentId(), entity.getVehicleId(),
                 entity.getComment(), entity.getFailureReason(), entity.getToken(), entity.getStepNumber() - 1);
     }
 
@@ -53,6 +54,9 @@ public interface DeliveryEntityMapper {
                 .deliveryStatus(delivery.getDeliveryStatus() == null ? null
                         : Status.valueOf(delivery.getDeliveryStatus().name()))
                 .status(delivery.getStatus() == null ? DeliveryLifecycleStatus.CREATED : delivery.getStatus())
+                .originDepartmentId(delivery.getOriginDepartmentId())
+                .destinationDepartmentId(delivery.getDestinationDepartmentId())
+                .pickupMethod(delivery.getPickupMethod())
                 .method(delivery.getMethod())
                 .pickupPointId(delivery.getPickupPointId())
                 .deliveryPickupPointId(delivery.getDeliveryPickupPointId())
@@ -78,7 +82,6 @@ public interface DeliveryEntityMapper {
                 .supplierId(step.supplierId())
                 .departmentId(step.departmentId())
                 .vehicleId(step.vehicleId())
-                .method(step.method())
                 .comment(step.comment())
                 .failureReason(step.failureReason())
                 .token(step.token())
