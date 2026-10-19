@@ -19,7 +19,8 @@ public class PickupPointCoordinatesServiceAdapter implements PickupPointCoordina
     public GeoCoordinates getCoordinates(final PickupPointAddress address) {
         final String street = address.street() + " " + address.buildingNumber();
         final GeocodingAddressDto request = new GeocodingAddressDto(
-                address.city(), street, address.postalCode());
+                address.city(), street, address.postalCode(),
+                address.countryCode() == null ? null : address.countryCode().name());
         final GeocodingCoordinatesDto coordinates = this.coordinatesService.findCoordinates(request);
         return new GeoCoordinates(coordinates.latitude(), coordinates.longitude());
     }

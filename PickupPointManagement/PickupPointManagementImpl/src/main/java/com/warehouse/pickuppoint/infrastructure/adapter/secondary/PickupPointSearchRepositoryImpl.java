@@ -73,7 +73,10 @@ public class PickupPointSearchRepositoryImpl implements PickupPointSearchReposit
         if (command.eligibilitySearch()) {
             return entity.getStatus() == PickupPointStatus.ACTIVE;
         }
-        return command.status() == null || entity.getStatus() == command.status();
+        if (command.status() == null) {
+            return entity.getStatus() != PickupPointStatus.DELETED;
+        }
+        return entity.getStatus() == command.status();
     }
 
     private boolean matchesQuery(final PickupPointReadEntity entity, final String query) {
