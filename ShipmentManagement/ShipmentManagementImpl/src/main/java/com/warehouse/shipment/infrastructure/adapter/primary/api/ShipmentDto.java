@@ -1,7 +1,5 @@
 package com.warehouse.shipment.infrastructure.adapter.primary.api;
 
-import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.PickupPointId;
 
 import java.time.LocalDateTime;
 
@@ -12,18 +10,6 @@ public class ShipmentDto {
     private final PersonApi sender;
 
     private final PersonApi recipient;
-
-    private final DepartmentCodeDto destination;
-
-    private final DepartmentId originDepartmentId;
-
-    private final PickupPointId pickupPointId;
-
-    private PickupPointId deliveryPickupPointId;
-
-    private final PickupMethodDto pickupMethod;
-
-    private final DeliveryMethodDto deliveryMethod;
 
     private final ShipmentStatusDto shipmentStatus;
     
@@ -58,9 +44,6 @@ public class ShipmentDto {
     private final MoneyApi declaredValue;
 
 	public ShipmentDto(final ShipmentIdDto shipmentId, final PersonApi sender, final PersonApi recipient,
-                       final DepartmentCodeDto destination,
-                       final DepartmentId originDepartmentId, final PickupPointId pickupPointId,
-                       final PickupMethodDto pickupMethod, final DeliveryMethodDto deliveryMethod,
                        final ShipmentStatusDto shipmentStatus,
                        final ShipmentIdDto shipmentRelatedId, final ShipmentPriorityDto shipmentPriority,
                        final TrackingNumberDto trackingNumber,
@@ -74,11 +57,6 @@ public class ShipmentDto {
         this.shipmentId = shipmentId;
         this.sender = sender;
 		this.recipient = recipient;
-        this.destination = destination;
-        this.originDepartmentId = originDepartmentId;
-        this.pickupPointId = pickupPointId;
-        this.pickupMethod = pickupMethod;
-        this.deliveryMethod = deliveryMethod;
 		this.shipmentStatus = shipmentStatus;
 		this.shipmentRelatedId = shipmentRelatedId;
         this.shipmentPriority = shipmentPriority;
@@ -107,34 +85,6 @@ public class ShipmentDto {
 
     public PersonApi getRecipient() {
         return recipient;
-    }
-
-    public DepartmentCodeDto getDestination() {
-        return destination;
-    }
-
-    public DepartmentId getOriginDepartmentId() {
-        return originDepartmentId;
-    }
-
-    public PickupPointId getPickupPointId() {
-        return pickupPointId;
-    }
-
-    public PickupPointId getDeliveryPickupPointId() {
-        return deliveryPickupPointId;
-    }
-
-    public void setDeliveryPickupPointId(final PickupPointId deliveryPickupPointId) {
-        this.deliveryPickupPointId = deliveryPickupPointId;
-    }
-
-    public PickupMethodDto getPickupMethod() {
-        return pickupMethod;
-    }
-
-    public DeliveryMethodDto getDeliveryMethod() {
-        return deliveryMethod;
     }
 
     public ShipmentStatusDto getShipmentStatus() {

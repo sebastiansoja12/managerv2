@@ -5,14 +5,24 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.warehouse.commonassets.event.integration.annotation.IntegrationEventType;
 import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
+import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryData;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
 
 @IntegrationEventType(value = "shipment.created", version = 1)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShipmentCreatedIntegrationEvent extends ShipmentChangedIntegrationEvent implements IntegrationEvent {
 
+    private final ShipmentDeliveryData delivery;
+
     @JsonCreator
-    public ShipmentCreatedIntegrationEvent(@JsonProperty("payload") final ShipmentEventData shipmentEventData) {
+    public ShipmentCreatedIntegrationEvent(@JsonProperty("payload") final ShipmentEventData shipmentEventData,
+                                           @JsonProperty("delivery") final ShipmentDeliveryData shipmentDeliveryData) {
         super(shipmentEventData);
+        this.delivery = shipmentDeliveryData;
+    }
+
+    @JsonProperty("delivery")
+    public ShipmentDeliveryData delivery() {
+        return delivery;
     }
 }

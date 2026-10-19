@@ -11,7 +11,7 @@ import com.warehouse.reroute.api.event.snapshot.ReroutePartyData;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.command.ShipmentRerouteCommand;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
-import org.junit.Ignore;
+import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,14 +20,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Ignore
 class ShipmentRerouteIntegrationListenerTest {
 
     private static final TrackingNumber TRACKING_NUMBER = new TrackingNumber("TRK-001");
@@ -44,7 +42,7 @@ class ShipmentRerouteIntegrationListenerTest {
 
     @Test
     void shouldRerouteShipmentInOwnerOperatorContext() {
-        when(shipmentPort.findOperator(TRACKING_NUMBER)).thenReturn(Optional.of(OperatorId.of(7L)));
+        when(shipmentPort.findContext(TRACKING_NUMBER)).thenReturn(new ShipmentOwnerContext(OperatorId.of(7L)));
 
         listener.handle(event());
 
@@ -58,7 +56,7 @@ class ShipmentRerouteIntegrationListenerTest {
 
     @Test
     void shouldSkipEventWhenShipmentDoesNotExist() {
-        when(shipmentPort.findOperator(TRACKING_NUMBER)).thenReturn(Optional.empty());
+        when(shipmentPort.findContext(TRACKING_NUMBER)).thenReturn(null);
 
         listener.handle(event());
 
@@ -67,7 +65,7 @@ class ShipmentRerouteIntegrationListenerTest {
 
     @Test
     void shouldNotRetryWhenShipmentCannotBeRerouted() {
-        when(shipmentPort.findOperator(TRACKING_NUMBER)).thenReturn(Optional.of(OperatorId.of(7L)));
+        when(shipmentPort.findContext(TRACKING_NUMBER)).thenReturn(new ShipmentOwnerContext(OperatorId.of(7L)));
         when(shipmentPort.reroute(any())).thenThrow(new ShipmentModificationException("Shipment cannot be rerouted"));
 
         listener.handle(event());
@@ -77,7 +75,7 @@ class ShipmentRerouteIntegrationListenerTest {
 
     @Test
     void shouldPropagateTechnicalFailureForRetry() {
-        when(shipmentPort.findOperator(TRACKING_NUMBER)).thenReturn(Optional.of(OperatorId.of(7L)));
+        when(shipmentPort.findContext(TRACKING_NUMBER)).thenReturn(new ShipmentOwnerContext(OperatorId.of(7L)));
         when(shipmentPort.reroute(any())).thenThrow(new RestException(500, "Database unavailable"));
 
         assertThrows(RestException.class, () -> listener.handle(event()));

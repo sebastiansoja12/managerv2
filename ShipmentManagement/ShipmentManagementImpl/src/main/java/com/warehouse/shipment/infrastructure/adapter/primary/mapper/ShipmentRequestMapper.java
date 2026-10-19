@@ -100,7 +100,7 @@ public interface ShipmentRequestMapper {
     default ShipmentSearchCriteria map(final ShipmentSearchRequestApi request) {
         if (request == null) {
             return new ShipmentSearchCriteria(
-                    null, null, List.of(), List.of(), null, null, null,
+                    null, null, List.of(), List.of(), null, null,
                     null, null, null, null, null, null, null, null
             );
         }
@@ -112,7 +112,6 @@ public interface ShipmentRequestMapper {
                 mapPriorities(request.shipmentPriorities()),
                 request.senderName(),
                 request.recipientName(),
-                request.destination(),
                 request.minPrice(),
                 request.maxPrice(),
                 request.currency() == null || request.currency().isBlank() ? null : Currency.valueOf(request.currency()),

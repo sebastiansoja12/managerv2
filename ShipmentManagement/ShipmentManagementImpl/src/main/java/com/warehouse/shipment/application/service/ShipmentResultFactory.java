@@ -1,6 +1,5 @@
 package com.warehouse.shipment.application.service;
 
-import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
@@ -37,7 +36,6 @@ public class ShipmentResultFactory {
     public ShipmentResult create(final Shipment shipment) {
         return new ShipmentResult(
                 shipment.snapshot(),
-                resolveDepartmentCode(shipment),
                 signatureRepository == null ? null : signatureRepository.get(shipment.getShipmentId()));
     }
 
@@ -47,9 +45,5 @@ public class ShipmentResultFactory {
                 create(shipment),
                 this.routeLogService.findByShipmentId(shipment.getShipmentId()).orElse(null),
                 returnDetails);
-    }
-
-    private DepartmentCode resolveDepartmentCode(final Shipment shipment) {
-        return this.departmentServicePort.getDepartmentCode(shipment.getTargetDepartmentId());
     }
 }
