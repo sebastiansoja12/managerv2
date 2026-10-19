@@ -20,7 +20,7 @@
 - Maven config is manager_settings.xml
 - Liquibase changesets author as 's-soja'
 - Add finals in interface method args
-- Do not use simple identificators (Long, String etc) when there is available identificator object (OperatorId, ShipmentId etc.)
+- Do not use simple identificators (Long, String etc) when there is available identificator object (OperatorId, ShipmentId etc.), when not - create one
 - Do not add comments
 
 ---
