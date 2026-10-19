@@ -25,6 +25,13 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
 
     private static final Pattern PATTERN = Pattern.compile(PATH_PATTERN);
 
+    private static final Set<String> EXTERNAL_SERVICES = Set.of(
+            "RouteTrackerFlow",
+            "PalletHandlingManager",
+            "ReturningTrackManager",
+            "DeliveryProtection"
+    );
+
     private final Set<BoundedContext.BoundedContextBuilder> contexts;
 
     private final List<String> dependencies;
@@ -46,7 +53,7 @@ public class BoundedContextVisitor extends SimpleFileVisitor<Path> implements Fi
         final Path abs = path.toAbsolutePath().normalize();
         if (abs.getParent() != null && abs.getParent().equals(rootPath)) {
             String dirName = abs.getFileName().toString();
-            if (!allowedModules.contains(dirName)) {
+            if (!allowedModules.contains(dirName) || EXTERNAL_SERVICES.contains(dirName)) {
                 return FileVisitResult.SKIP_SUBTREE;
             }
         }
