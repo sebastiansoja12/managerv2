@@ -5,5 +5,6 @@ public enum PickupPointAuditLogType {
     UPDATED,
     SUSPENDED,
     RESUMED,
-    CLOSED
+    CLOSED,
+    DELETED
 }
