@@ -96,4 +96,5 @@
     <include file="changes/2026-10-18-department-maps.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-18-mail-templates.xml" relativeToChangelogFile="true"/>
     <include file="changes/2026-10-19-operator-subscriptions.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2026-10-19-delivery-shipment-routing.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
