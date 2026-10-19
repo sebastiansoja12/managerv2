@@ -1,9 +1,11 @@
 package com.warehouse.chat.configuration;
 
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.organisationstructure.api.OperatorSubscriptionApiService;
 import com.warehouse.chat.infrastructure.adapter.primary.OrganizationChatPresenceWebSocketAdapter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.Message;
@@ -31,17 +33,21 @@ class OrganizationChatWebSocketConfiguration implements WebSocketMessageBrokerCo
 
     private final String[] allowedOrigins;
 
+    private final OperatorSubscriptionApiService operatorSubscriptionApiService;
+
     OrganizationChatWebSocketConfiguration(
             @Value("${auth.cors.allowed-origins:http://localhost:3000,https://managerv2gui.onrender.com, https://neighbors-billing-ownership-houston.trycloudflare.com/}")
-            final String[] allowedOrigins) {
+            final String[] allowedOrigins,
+            final OperatorSubscriptionApiService operatorSubscriptionApiService) {
         this.allowedOrigins = allowedOrigins;
+        this.operatorSubscriptionApiService = operatorSubscriptionApiService;
     }
 
     @Override
     public void registerStompEndpoints(final StompEndpointRegistry registry) {
         registry.addEndpoint("/chat/ws")
                 .setAllowedOrigins(allowedOrigins)
-                .addInterceptors(new AuthenticatedChatHandshakeInterceptor())
+                .addInterceptors(new AuthenticatedChatHandshakeInterceptor(operatorSubscriptionApiService))
                 .setHandshakeHandler(new UserIdHandshakeHandler());
     }
 
@@ -80,14 +86,29 @@ class OrganizationChatWebSocketConfiguration implements WebSocketMessageBrokerCo
 
     private static final class AuthenticatedChatHandshakeInterceptor implements HandshakeInterceptor {
 
+        private final OperatorSubscriptionApiService operatorSubscriptionApiService;
+
+        private AuthenticatedChatHandshakeInterceptor(
+                final OperatorSubscriptionApiService operatorSubscriptionApiService) {
+            this.operatorSubscriptionApiService = operatorSubscriptionApiService;
+        }
+
         @Override
         public boolean beforeHandshake(final ServerHttpRequest request,
                                        final ServerHttpResponse response,
                                        final WebSocketHandler wsHandler,
                                        final Map<String, Object> attributes) {
-            return request.getPrincipal() instanceof Authentication authentication
+            final boolean authenticated = request.getPrincipal() instanceof Authentication authentication
                     && authentication.isAuthenticated()
                     && authentication.getPrincipal() instanceof UserId;
+            if (!authenticated) {
+                return false;
+            }
+            if (!operatorSubscriptionApiService.isCurrentAccessAllowed()) {
+                response.setStatusCode(HttpStatus.PAYMENT_REQUIRED);
+                return false;
+            }
+            return true;
         }
 
         @Override
