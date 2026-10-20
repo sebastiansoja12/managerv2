@@ -55,6 +55,8 @@ import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.geocoding.api.PostalCodeService;
 
 import java.util.List;
+import com.warehouse.shipment.infrastructure.ShipmentManagementApiService;
+import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentManagementApiServiceAdapter;
 
 @Configuration
 public class ShipmentConfiguration {
@@ -270,6 +272,16 @@ public class ShipmentConfiguration {
                                                 final OperatorContext operatorContext) {
 		return new ShipmentApiServiceAdapter(shipmentPort, shipmentApiServiceMapper, operatorContext);
 	}
+
+    @Bean
+    public ShipmentManagementApiService shipmentManagementApiService(
+            final ShipmentPort shipmentPort,
+            final ShipmentRequestValidator shipmentRequestValidator,
+            final ShipmentRequestMapper shipmentRequestMapper,
+            final ShipmentConfigurationPort shipmentConfigurationServicePort) {
+        return new ShipmentManagementApiServiceAdapter(shipmentPort, shipmentRequestValidator, shipmentRequestMapper,
+                shipmentConfigurationServicePort);
+    }
 
     @Bean
     public ShipmentApiServiceMapper shipmentApiServiceMapper() {
