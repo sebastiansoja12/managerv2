@@ -22,6 +22,8 @@ public interface PalletPort {
     PalletDetails createEmptyPallet();
     PalletDetails createPallet(final CreatePalletCommand command);
     PalletDetails getPallet(final PalletTrackingNumber trackingNumber);
+
+    PalletDetails getPallet(final PalletId palletId);
     PalletPage findPallets(final PalletSearchCriteria criteria);
     PalletDetails cancelPallet(final PalletId palletId);
     PalletDetails addShipments(final AddPalletShipmentsCommand command);
