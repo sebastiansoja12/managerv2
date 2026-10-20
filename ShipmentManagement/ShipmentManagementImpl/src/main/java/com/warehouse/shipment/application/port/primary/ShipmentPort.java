@@ -27,6 +27,8 @@ public interface ShipmentPort {
 
     void changeShipmentStatusTo(final ShipmentStatusRequest request);
 
+    void markDelivered(final ShipmentId shipmentId);
+
     void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod);
 
     ShipmentResult loadShipment(final ShipmentId shipmentId);
@@ -42,6 +44,8 @@ public interface ShipmentPort {
     ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId);
 
     Optional<OperatorId> findOperator(final TrackingNumber trackingNumber);
+
+    Optional<ShipmentResult> findSourceShipment(final ShipmentId shipmentId);
 
     ShipmentRerouteResult loadShipmentForReroute(final TrackingNumber trackingNumber);
 

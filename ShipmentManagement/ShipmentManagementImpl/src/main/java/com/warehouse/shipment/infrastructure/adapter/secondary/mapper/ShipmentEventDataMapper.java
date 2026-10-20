@@ -1,13 +1,11 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.commonassets.model.Money;
-import com.warehouse.shipment.api.event.ShipmentDerivedIntegrationEvent;
 import com.warehouse.shipment.api.event.snapshot.MoneySnapshot;
 import com.warehouse.shipment.api.event.snapshot.PartySnapshot;
 import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryData;
 import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
 import com.warehouse.shipment.application.port.secondary.ShipmentEventDataMapperPort;
-import com.warehouse.shipment.domain.enumeration.ShipmentDerivationType;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
 import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
@@ -51,11 +49,6 @@ public class ShipmentEventDataMapper implements ShipmentEventDataMapperPort {
                 deliveryPlan.pickupPointId(),
                 deliveryPlan.deliveryPickupPointId()
         );
-    }
-
-    @Override
-    public ShipmentDerivedIntegrationEvent.DerivationType map(final ShipmentDerivationType derivationType) {
-        return ShipmentDerivedIntegrationEvent.DerivationType.valueOf(derivationType.name());
     }
 
     private PartySnapshot partySnapshot(final Party party) {
