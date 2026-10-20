@@ -1,13 +1,13 @@
 package com.warehouse.logistics.infrastructure.adapter.secondary;
 
+import com.warehouse.logistics.application.port.primary.command.ShipmentCollectCommand;
+import com.warehouse.logistics.application.port.primary.result.ShipmentCollectDetail;
+import com.warehouse.logistics.application.port.primary.result.ShipmentCollectResult;
+import com.warehouse.logistics.application.port.secondary.DeliveryCollectServicePort;
 import com.warehouse.deliverycollect.api.DeliveryCollectApiService;
 import com.warehouse.deliverycollect.api.dto.DeliveryCollectRequestDto;
 import com.warehouse.deliverycollect.api.dto.DeliveryCollectResponseDto;
 import com.warehouse.deliverycollect.api.dto.DeliveryCollectResultDto;
-import com.warehouse.logistics.domain.port.secondary.DeliveryCollectServicePort;
-import com.warehouse.logistics.domain.vo.ShipmentCollectCommand;
-import com.warehouse.logistics.domain.vo.ShipmentCollectDetail;
-import com.warehouse.logistics.domain.vo.ShipmentCollectResult;
 
 public class DeliveryCollectServiceAdapter implements DeliveryCollectServicePort {
 

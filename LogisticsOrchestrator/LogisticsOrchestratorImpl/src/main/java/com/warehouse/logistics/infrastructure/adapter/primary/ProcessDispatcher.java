@@ -1,13 +1,13 @@
 package com.warehouse.logistics.infrastructure.adapter.primary;
 
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Request;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Response;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.logistics.domain.model.Request;
-import com.warehouse.logistics.domain.model.Response;
 
 @Component
 public class ProcessDispatcher {

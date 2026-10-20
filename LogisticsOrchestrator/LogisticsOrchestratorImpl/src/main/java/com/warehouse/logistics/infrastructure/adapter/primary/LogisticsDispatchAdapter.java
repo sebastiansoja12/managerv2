@@ -1,5 +1,18 @@
 package com.warehouse.logistics.infrastructure.adapter.primary;
 
+import com.warehouse.logistics.application.port.primary.DeviceAgentPort;
+import com.warehouse.logistics.application.port.primary.DeviceValidatorPort;
+import com.warehouse.logistics.application.port.primary.LogisticsPort;
+import com.warehouse.logistics.application.port.primary.ProcessInitializerPort;
+import com.warehouse.logistics.application.port.primary.command.LogisticsRequest;
+import com.warehouse.logistics.application.port.primary.result.LogisticsResponse;
+import com.warehouse.logistics.configuration.LogisticsSoapWebServiceConfiguration;
+import com.warehouse.logistics.infrastructure.adapter.primary.creator.DeliveryCreator;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Request;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Response;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -13,21 +26,9 @@ import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.validator.DeviceAccessValidator;
-import com.warehouse.logistics.configuration.LogisticsSoapWebServiceConfiguration;
-import com.warehouse.logistics.domain.model.LogisticsRequest;
-import com.warehouse.logistics.domain.model.LogisticsResponse;
-import com.warehouse.logistics.domain.model.Request;
-import com.warehouse.logistics.domain.model.Response;
-import com.warehouse.logistics.domain.port.primary.DeviceAgentPort;
-import com.warehouse.logistics.domain.port.primary.DeviceValidatorPort;
-import com.warehouse.logistics.domain.port.primary.LogisticsPort;
-import com.warehouse.logistics.domain.port.primary.ProcessInitializerPort;
-import com.warehouse.logistics.infrastructure.adapter.primary.creator.DeliveryCreator;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.event.ProcessResponseChangedEvent;
+import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.jaxb.DeviceType;
 import com.warehouse.terminal.jaxb.TerminalRequest;
 import com.warehouse.terminal.response.TerminalResponse;
@@ -89,13 +90,16 @@ public class LogisticsDispatchAdapter extends ProcessDispatcher {
                 device.getDeviceID(), device.getVersion(),
                 device.getResponsibleUser(), device.getDepartmentCode());
 
-        final ProcessId processId = this.processInitializerPort.initializeProcess(terminalRequest);
+        final DeviceInformation deviceInformation = JaxbDeviceInformationMapper.map(device);
+        final ProcessId processId = this.processInitializerPort.initializeProcess(deviceInformation,
+                xmlToStringService.convertToString(terminalRequest));
         LogisticsProcessContext.setProcessId(processId);
         log.info("Process initialized in orchestrator flow: {}", processId.value());
 
-        deviceValidatorPort.validateDevice(processId, terminalRequest);
+        deviceValidatorPort.validateDevice(processId, ProcessType.valueOf(terminalRequest.getProcessType().name()),
+                deviceInformation);
 
-        deviceAgentPort.updateDeviceIfNeed(JaxbDeviceInformationMapper.map(device));
+        deviceAgentPort.updateDeviceIfNeed(deviceInformation);
 
         final Request request = this.requestMapper.map(terminalRequest);
 

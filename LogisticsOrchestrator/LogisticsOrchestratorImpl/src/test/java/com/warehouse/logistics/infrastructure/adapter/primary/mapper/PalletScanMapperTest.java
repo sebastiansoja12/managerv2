@@ -1,10 +1,10 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.logistics.application.port.primary.command.PalletScanCommand;
+import com.warehouse.logistics.application.port.primary.result.PalletScanDetail;
+import com.warehouse.logistics.application.port.primary.result.PalletScanOutcome;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.logistics.domain.vo.PalletScanCommand;
-import com.warehouse.logistics.domain.vo.PalletScanDetail;
-import com.warehouse.logistics.domain.vo.PalletScanOutcome;
 import com.warehouse.terminal.jaxb.PalletScanRequest;
 import com.warehouse.terminal.jaxb.PalletScanResponse;
 import org.junit.jupiter.api.Test;

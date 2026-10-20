@@ -1,5 +1,13 @@
 package com.warehouse.logistics.infrastructure.adapter.primary;
 
+import com.warehouse.logistics.application.port.primary.DeviceAgentPort;
+import com.warehouse.logistics.application.port.primary.DeviceValidatorPort;
+import com.warehouse.logistics.application.port.primary.ProcessInitializerPort;
+import com.warehouse.logistics.application.port.primary.ShipmentCollectPort;
+import com.warehouse.logistics.application.port.primary.result.ShipmentCollectResult;
+import com.warehouse.logistics.configuration.LogisticsSoapWebServiceConfiguration;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.CollectMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
 import java.time.LocalDateTime;
 
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -11,14 +19,6 @@ import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.commonassets.validator.DeviceAccessValidator;
-import com.warehouse.logistics.configuration.LogisticsSoapWebServiceConfiguration;
-import com.warehouse.logistics.domain.port.primary.DeviceAgentPort;
-import com.warehouse.logistics.domain.port.primary.DeviceValidatorPort;
-import com.warehouse.logistics.domain.port.primary.ProcessInitializerPort;
-import com.warehouse.logistics.domain.port.primary.ShipmentCollectPort;
-import com.warehouse.logistics.domain.vo.ShipmentCollectResult;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.CollectMapper;
-import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.event.ProcessResponseChangedEvent;
 import com.warehouse.terminal.DeviceInformation;
