@@ -3,10 +3,12 @@ package com.warehouse.auth.domain.port.primary;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.warehouse.auth.domain.event.UserInvitationRequestedEvent;
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.exception.UserAccessDeniedException;
 import com.warehouse.auth.domain.model.*;
 import com.warehouse.auth.domain.port.secondary.MailServicePort;
+import com.warehouse.auth.domain.registry.DomainRegistry;
 import com.warehouse.auth.domain.service.*;
 import com.warehouse.auth.domain.vo.*;
 import com.warehouse.commonassets.identificator.DepartmentCode;
@@ -124,7 +126,7 @@ public class AuthenticationPortImpl implements AuthenticationPort {
     public UserId createUser(final CreateUserCommand command) {
         final UserId userId = userService.nextUserId();
         final OrganizationUser.Role role = mapRole(command.role());
-        final String password = passwordEncoder.encode(command.password());
+        final String password = passwordEncoder.encode(RandomPasswordService.generatePassword(32, true, true, true));
         validateDepartmentCode(command.departmentCode());
         final DepartmentId departmentId = departmentService.getDepartmentId(command.departmentCode());
         final OrganizationUser currentUser = userService.findUserById(authenticationService.currentUserId());
@@ -145,13 +147,14 @@ public class AuthenticationPortImpl implements AuthenticationPort {
                 command.language()
         );
         userService.create(user);
+        requestInvitation(user);
         return userId;
     }
 
     @Override
     public UserId createOperatorUser(final CreateOperatorUserCommand command) {
         final UserId userId = userService.nextUserId();
-        final String password = passwordEncoder.encode(command.password());
+        final String password = passwordEncoder.encode(RandomPasswordService.generatePassword(32, true, true, true));
         final OrganizationUser.Role role = mapRole(command.role());
         validateDepartmentCode(command.departmentCode());
         final DepartmentId departmentId = departmentService.getDepartmentId(command.departmentCode());
@@ -169,7 +172,13 @@ public class AuthenticationPortImpl implements AuthenticationPort {
         );
         user.assignOperator(command.operatorId());
         userService.create(user);
+        requestInvitation(user);
         return userId;
+    }
+
+    private void requestInvitation(final OrganizationUser user) {
+        DomainRegistry.publish(new UserInvitationRequestedEvent(user.getUserId(), user.getUsername(),
+                user.getFirstName(), user.getEmail(), user.getLanguage()));
     }
 
     @Override
