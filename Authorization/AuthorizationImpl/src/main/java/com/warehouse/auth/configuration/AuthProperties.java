@@ -33,7 +33,7 @@ public class AuthProperties {
                 "https://neighbors-billing-ownership-houston.trycloudflare.com");
         private List<String> allowedMethods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
         private List<String> allowedHeaders = List.of("Content-Type", "X-XSRF-TOKEN", "X-Correlation-ID", "X-Requested-With",
-                "SOAPAction");
+                "SOAPAction", "X-Acting-Department", "X-DEVICE-PAIR-KEY");
         private List<String> exposedHeaders = List.of("X-Correlation-ID");
         private long maxAgeSeconds = 3600;
     }
