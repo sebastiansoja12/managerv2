@@ -1,28 +1,31 @@
 package com.warehouse.mail.infrastructure.adapter.secondary;
 
-import org.springframework.context.ApplicationEventPublisher;
-
+import com.warehouse.mail.infrastructure.adapter.primary.event.MailTemplateNotificationEvent;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEvent;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class NotificationEventPublisherImpl implements NotificationEventPublisher {
 
-	private final ApplicationEventPublisher eventPublisher;
+    private static final Logger log = LoggerFactory.getLogger(NotificationEventPublisherImpl.class);
 
-	public NotificationEventPublisherImpl(final ApplicationEventPublisher eventPublisher) {
-		this.eventPublisher = eventPublisher;
-	}
+    private final ApplicationEventPublisher eventPublisher;
 
-	@Override
-	public void send(final NotificationEvent event) {
-		logEvent(event);
-		eventPublisher.publishEvent(event);
-	}
+    public NotificationEventPublisherImpl(final ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
-	private void logEvent(final NotificationEvent event) {
-		log.info("Publishing event {}", event.getClass().getSimpleName());
-	}
+    @Override
+    public void send(final NotificationEvent event) {
+        log.info("Publishing event {}", event.getClass().getSimpleName());
+        this.eventPublisher.publishEvent(event);
+    }
+
+    @Override
+    public void send(final MailTemplateNotificationEvent event) {
+        log.info("Publishing mail notification {}", event.templateKey());
+        this.eventPublisher.publishEvent(event);
+    }
 }

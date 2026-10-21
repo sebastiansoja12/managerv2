@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-18-postgresql-table-department-maps" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="department_maps"/>
+            </not>
+        </preConditions>
+        <createTable tableName="department_maps">
+            <column name="map_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_department_maps"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="width" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="height" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="grid_size" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="department_maps" indexName="idx_department_maps_operator_department">
+            <column name="operator_id"/>
+            <column name="department_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-10-18-postgresql-table-department-map-elements" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="department_map_elements"/>
+            </not>
+        </preConditions>
+        <createTable tableName="department_map_elements">
+            <column name="element_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_department_map_elements"/>
+            </column>
+            <column name="map_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_department_map_elements_map"
+                             referencedTableName="department_maps" referencedColumnNames="map_id" deleteCascade="true"/>
+            </column>
+            <column name="element_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(120)"/>
+            <column name="pos_x" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pos_y" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="width" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="height" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rotation" type="DOUBLE PRECISION" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="color" type="VARCHAR(7)"/>
+            <column name="location_code" type="VARCHAR(40)"/>
+            <column name="capacity" type="INTEGER"/>
+            <column name="sort_order" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="department_map_elements" indexName="idx_department_map_elements_map">
+            <column name="map_id"/>
+            <column name="sort_order"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-10-18-postgresql-table-department-map-locations" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="department_map_locations"/>
+            </not>
+        </preConditions>
+        <createTable tableName="department_map_locations">
+            <column name="location_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_department_map_locations"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="map_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_department_map_locations_map"
+                             referencedTableName="department_maps" referencedColumnNames="map_id" deleteCascade="true"/>
+            </column>
+            <column name="location_code" type="VARCHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="capacity" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reserved_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="reserved_pallet_tracking_number" type="VARCHAR(64)"/>
+            <column name="reservation_note" type="VARCHAR(255)"/>
+            <column name="reserved_by_user_id" type="BIGINT"/>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="department_map_locations" indexName="idx_department_map_locations_map">
+            <column name="operator_id"/>
+            <column name="map_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-10-18-postgresql-table-department-map-location-pallets" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="department_map_location_pallets"/>
+            </not>
+        </preConditions>
+        <createTable tableName="department_map_location_pallets">
+            <column name="placement_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_department_map_location_pallets"/>
+            </column>
+            <column name="location_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_department_map_location_pallets_location"
+                             referencedTableName="department_map_locations" referencedColumnNames="location_id"
+                             deleteCascade="true"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pallet_tracking_number" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="placed_by_user_id" type="BIGINT"/>
+            <column name="placed_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="department_map_location_pallets"
+                             columnNames="operator_id, pallet_tracking_number"
+                             constraintName="uk_department_map_location_pallets_pallet"/>
+        <createIndex tableName="department_map_location_pallets"
+                     indexName="idx_department_map_location_pallets_location">
+            <column name="location_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-10-18-postgresql-table-department-map-pallet-movements" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="department_map_pallet_movements"/>
+            </not>
+        </preConditions>
+        <createTable tableName="department_map_pallet_movements">
+            <column name="movement_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_department_map_pallet_movements"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pallet_tracking_number" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="movement_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="map_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_location_id" type="UUID"/>
+            <column name="from_location_code" type="VARCHAR(40)"/>
+            <column name="to_location_id" type="UUID"/>
+            <column name="to_location_code" type="VARCHAR(40)"/>
+            <column name="user_id" type="BIGINT"/>
+            <column name="occurred_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="department_map_pallet_movements" indexName="idx_department_map_pallet_movements_pallet">
+            <column name="operator_id"/>
+            <column name="pallet_tracking_number"/>
+            <column name="occurred_at"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

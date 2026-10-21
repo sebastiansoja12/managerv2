@@ -4,9 +4,7 @@ import com.warehouse.commonassets.enumeration.*;
 import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
-import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
-import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
@@ -24,18 +22,6 @@ public class Shipment {
     private Party sender;
 
     private Party recipient;
-
-    private DepartmentId destinationDepartmentId;
-
-    private DepartmentId originDepartmentId;
-
-    private PickupPointId pickupPointId;
-
-    private PickupPointId deliveryPickupPointId;
-
-    private PickupMethod pickupMethod;
-
-    private DeliveryMethod deliveryMethod;
 
     private ShipmentStatus shipmentStatus;
 
@@ -89,15 +75,9 @@ public class Shipment {
                     final LocalDateTime createdAt,
                     final LocalDateTime updatedAt,
                     final Boolean locked,
-                    final DepartmentId targetDepartmentId,
-                    final DepartmentId originDepartmentId,
                     final boolean signatureRequired,
                     final ShipmentPriority shipmentPriority,
                     final TrackingNumber trackingNumber,
-                    final PickupMethod pickupMethod,
-                    final DeliveryMethod deliveryMethod,
-                    final PickupPointId pickupPointId,
-                    final PickupPointId deliveryPickupPointId,
                     final ExternalId<UUID> externalShipmentId) {
         this.shipmentId = shipmentId;
 		this.sender = sender;
@@ -109,16 +89,10 @@ public class Shipment {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.locked = locked;
-        this.destinationDepartmentId = targetDepartmentId;
-        this.originDepartmentId = originDepartmentId;
         this.signatureRequired = signatureRequired;
         this.shipmentPriority = shipmentPriority;
         this.serviceLevel = ShipmentServiceLevel.STANDARD;
         this.trackingNumber = trackingNumber;
-        this.pickupMethod = pickupMethod;
-        this.deliveryMethod = deliveryMethod;
-        this.pickupPointId = pickupPointId;
-        this.deliveryPickupPointId = deliveryPickupPointId;
         this.externalShipmentId = externalShipmentId;
     }
 
@@ -128,23 +102,6 @@ public class Shipment {
                     final ShipmentId shipmentRelatedId,
                     final Money price,
                     final Boolean locked,
-                    final DepartmentId targetDepartmentId,
-                    final ShipmentPriority shipmentPriority,
-                    final TrackingNumber trackingNumber,
-                    final ShipmentStatus status) {
-        this(shipmentId, sender, recipient, shipmentRelatedId,
-                price, locked, targetDepartmentId, null, shipmentPriority,
-                trackingNumber, status);
-    }
-
-    public Shipment(final ShipmentId shipmentId,
-                    final Party sender,
-                    final Party recipient,
-                    final ShipmentId shipmentRelatedId,
-                    final Money price,
-                    final Boolean locked,
-                    final DepartmentId targetDepartmentId,
-                    final DepartmentId originDepartmentId,
                     final ShipmentPriority shipmentPriority,
                     final TrackingNumber trackingNumber,
                     final ShipmentStatus status) {
@@ -158,15 +115,11 @@ public class Shipment {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.locked = locked;
-        this.destinationDepartmentId = targetDepartmentId;
-        this.originDepartmentId = originDepartmentId;
         this.signatureRequired = false;
         this.shipmentPriority = shipmentPriority;
         this.serviceLevel = ShipmentServiceLevel.STANDARD;
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = ExternalId.randomUUID();
-        this.pickupMethod = PickupMethod.DEPARTMENT;
-        this.deliveryMethod = DeliveryMethod.COURIER;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -175,35 +128,9 @@ public class Shipment {
                     final ShipmentId shipmentRelatedId,
                     final Money price,
                     final Boolean locked,
-                    final DepartmentId targetDepartmentId,
-                    final DepartmentId originDepartmentId,
                     final ShipmentPriority shipmentPriority,
                     final TrackingNumber trackingNumber,
                     final ShipmentStatus status,
-                    final PickupMethod pickupMethod,
-                    final DeliveryMethod deliveryMethod,
-                    final PickupPointId pickupPointId) {
-        this(shipmentId, sender, recipient, shipmentRelatedId,
-                price, locked, targetDepartmentId, originDepartmentId, shipmentPriority,
-                trackingNumber, status, pickupMethod, deliveryMethod, pickupPointId, null,
-                null, null, null, null, null, null, null);
-    }
-
-    public Shipment(final ShipmentId shipmentId,
-                    final Party sender,
-                    final Party recipient,
-                    final ShipmentId shipmentRelatedId,
-                    final Money price,
-                    final Boolean locked,
-                    final DepartmentId targetDepartmentId,
-                    final DepartmentId originDepartmentId,
-                    final ShipmentPriority shipmentPriority,
-                    final TrackingNumber trackingNumber,
-                    final ShipmentStatus status,
-                    final PickupMethod pickupMethod,
-                    final DeliveryMethod deliveryMethod,
-                    final PickupPointId pickupPointId,
-                    final PickupPointId deliveryPickupPointId,
                     final Dimensions dimensions,
                     final Weight weight,
                     final CustomerReference customerReference,
@@ -221,18 +148,12 @@ public class Shipment {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = this.createdAt;
         this.locked = locked;
-        this.destinationDepartmentId = targetDepartmentId;
-        this.originDepartmentId = originDepartmentId;
         this.signatureRequired = false;
         this.shipmentPriority = shipmentPriority;
         this.serviceLevel = serviceLevel == null ? ShipmentServiceLevel.STANDARD : serviceLevel;
         this.packagingType = packagingType;
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = ExternalId.randomUUID();
-        this.pickupMethod = pickupMethod;
-        this.deliveryMethod = deliveryMethod;
-        this.pickupPointId = pickupPointId;
-        this.deliveryPickupPointId = deliveryPickupPointId;
         this.dimensions = dimensions;
         this.weight = weight;
         this.customerReference = customerReference;
@@ -245,15 +166,12 @@ public class Shipment {
                                           final Party recipient,
                                           final ShipmentId shipmentRelatedId,
                                           final Money price,
-                                          final DepartmentId targetDepartmentId,
-                                          final DepartmentId originDepartmentId,
                                           final boolean signatureRequired,
                                           final ShipmentPriority shipmentPriority,
                                           final TrackingNumber trackingNumber,
                                           final ShipmentStatus status) {
         final Shipment shipment = new Shipment(shipmentId, sender, recipient, shipmentRelatedId,
-                price, false, targetDepartmentId, originDepartmentId,
-                shipmentPriority, trackingNumber, status);
+                price, false, shipmentPriority, trackingNumber, status);
 		shipment.signatureRequired = signatureRequired;
 		return shipment;
 	}
@@ -268,15 +186,9 @@ public class Shipment {
                                      final LocalDateTime createdAt,
                                      final LocalDateTime updatedAt,
                                      final Boolean locked,
-                                     final DepartmentId targetDepartmentId,
-                                     final DepartmentId originDepartmentId,
                                      final boolean signatureRequired,
                                      final ShipmentPriority shipmentPriority,
                                      final TrackingNumber trackingNumber,
-                                     final PickupMethod pickupMethod,
-                                     final DeliveryMethod deliveryMethod,
-                                     final PickupPointId pickupPointId,
-                                     final PickupPointId deliveryPickupPointId,
                                      final ExternalId<UUID> externalShipmentId,
                                      final LocalDateTime acceptedAt,
                                      final LocalDateTime cancelledAt,
@@ -289,11 +201,8 @@ public class Shipment {
                                      final ShipmentServiceLevel serviceLevel,
                                      final PackagingType packagingType) {
         final Shipment shipment = new Shipment(shipmentId, sender, recipient, shipmentStatus, shipmentType,
-                shipmentRelatedId, price, createdAt, updatedAt, locked,
-                targetDepartmentId, originDepartmentId, signatureRequired,
-                shipmentPriority,
-                trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
-                externalShipmentId);
+                shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
+                shipmentPriority, trackingNumber, externalShipmentId);
         shipment.acceptedAt = acceptedAt;
         shipment.cancelledAt = cancelledAt;
         shipment.cancellationReason = cancellationReason;
@@ -308,12 +217,10 @@ public class Shipment {
     }
 
 	public ShipmentSnapshot snapshot() {
-		return new ShipmentSnapshot(shipmentId, sender, recipient, destinationDepartmentId, originDepartmentId, shipmentStatus,
-                shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
-                shipmentPriority,
-                trackingNumber, pickupMethod, deliveryMethod, pickupPointId, deliveryPickupPointId,
-                externalShipmentId, acceptedAt, cancelledAt, cancellationReason, dimensions, weight,
-                customerReference, contentDescription, declaredValue, serviceLevel, packagingType);
+		return new ShipmentSnapshot(shipmentId, sender, recipient,
+				shipmentStatus, shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
+				shipmentPriority, trackingNumber, externalShipmentId, acceptedAt, cancelledAt, cancellationReason, dimensions, weight, customerReference,
+				contentDescription, declaredValue, serviceLevel, packagingType);
 	}
 
     public Party getSender() {
@@ -322,34 +229,6 @@ public class Shipment {
 
     public Party getRecipient() {
         return recipient;
-    }
-
-    public DepartmentId getTargetDepartmentId() {
-        return destinationDepartmentId;
-    }
-
-    public DepartmentId getDestinationDepartmentId() {
-        return destinationDepartmentId;
-    }
-
-    public DepartmentId getOriginDepartmentId() {
-        return originDepartmentId;
-    }
-
-    public PickupPointId getPickupPointId() {
-        return pickupPointId;
-    }
-
-    public PickupPointId getDeliveryPickupPointId() {
-        return deliveryPickupPointId;
-    }
-
-    public PickupMethod getPickupMethod() {
-        return pickupMethod;
-    }
-
-    public DeliveryMethod getDeliveryMethod() {
-        return deliveryMethod;
     }
 
     public ShipmentStatus getShipmentStatus() {
@@ -500,12 +379,6 @@ public class Shipment {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateDestination(final DepartmentId targetDepartmentId) {
-        ensureCanBeModified();
-        this.destinationDepartmentId = targetDepartmentId;
-        markAsModified();
-    }
-
     public void update(final ShipmentUpdate shipmentUpdate) {
         ensureCanBeModified();
         this.recipient = shipmentUpdate.getRecipient();
@@ -515,19 +388,18 @@ public class Shipment {
 
     public void update(final Party sender, final Party recipient, final ShipmentStatus shipmentStatus,
                        final ShipmentPriority shipmentPriority, final Money price,
-                       final DepartmentId targetDepartmentId,
                        final Boolean signatureRequired, final Dimensions dimensions, final Weight weight,
                        final CustomerReference customerReference, final String contentDescription,
                        final Money declaredValue) {
         update(sender, recipient, shipmentStatus, shipmentPriority, price,
-                targetDepartmentId, signatureRequired, dimensions, weight, customerReference,
+                signatureRequired, dimensions, weight, customerReference,
                 contentDescription, declaredValue, null, null);
     }
 
     public void update(final Party sender, final Party recipient, final ShipmentStatus shipmentStatus,
                        final ShipmentPriority shipmentPriority,
                        final Money price,
-                       final DepartmentId targetDepartmentId, final Boolean signatureRequired,
+                       final Boolean signatureRequired,
                        final Dimensions dimensions, final Weight weight,
                        final CustomerReference customerReference, final String contentDescription,
                        final Money declaredValue, final ShipmentServiceLevel serviceLevel,
@@ -538,7 +410,6 @@ public class Shipment {
         this.shipmentStatus = shipmentStatus;
         this.shipmentPriority = shipmentPriority;
         this.price = price;
-        this.destinationDepartmentId = targetDepartmentId;
         this.signatureRequired = signatureRequired;
         this.dimensions = dimensions;
         this.weight = weight;
@@ -691,12 +562,6 @@ public class Shipment {
         markAsModified();
     }
 
-    public void changeTargetDepartment(final DepartmentId targetDepartmentId) {
-        ensureCanBeModified();
-        this.destinationDepartmentId = targetDepartmentId;
-        markAsModified();
-    }
-
     public void notifyShipmentAccepted() {
         ensureCanBeModified();
         if (!ShipmentStatus.SENT.equals(this.shipmentStatus)) {
@@ -704,6 +569,43 @@ public class Shipment {
         }
         this.shipmentStatus = ShipmentStatus.ACCEPTED;
         this.acceptedAt = LocalDateTime.now();
+        markAsModified();
+    }
+
+    public boolean canBeRerouted() {
+        return !Boolean.TRUE.equals(this.locked) && reroutableStatuses().contains(this.shipmentStatus);
+    }
+
+    public void reroute(final Party sender, final Party recipient) {
+        if (!canBeRerouted()) {
+            throw new ShipmentModificationException("Shipment cannot be rerouted from status " + shipmentStatus);
+        }
+        this.sender = sender;
+        this.recipient = recipient;
+        this.shipmentStatus = ShipmentStatus.REROUTE;
+        markAsModified();
+    }
+
+    public boolean notifyShipmentLoadedOnPallet() {
+        if (ShipmentStatus.SENT.equals(this.shipmentStatus)) {
+            return false;
+        }
+        ensureShipmentIsNotDelivered();
+        if (!ShipmentStatus.CREATED.equals(this.shipmentStatus)
+                && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)
+                && !ShipmentStatus.ACCEPTED.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be loaded on pallet from status " + shipmentStatus);
+        }
+        this.shipmentStatus = ShipmentStatus.SENT;
+        markAsModified();
+        return true;
+    }
+
+    public void notifyShipmentCollected() {
+        if (!ShipmentStatus.CREATED.equals(this.shipmentStatus) && !ShipmentStatus.PREPARED.equals(this.shipmentStatus)) {
+            throw new ShipmentModificationException("Shipment cannot be collected from status " + shipmentStatus);
+        }
+        this.shipmentStatus = ShipmentStatus.SENT;
         markAsModified();
     }
 
@@ -841,7 +743,6 @@ public class Shipment {
         this.shipmentPriority = shipmentWorkflowSettings.defaultShipmentPriority();
         this.externalShipmentId = externalShipmentId;
         this.trackingNumber = trackingNumber;
-        this.destinationDepartmentId = originDepartmentId;
         this.shipmentRelatedId = null;
 
         markAsModified();
@@ -904,5 +805,9 @@ public class Shipment {
 
     private List<ShipmentStatus> draftStatuses() {
         return List.of(ShipmentStatus.PLANNED, ShipmentStatus.CREATED, ShipmentStatus.PREPARED);
+    }
+
+    private List<ShipmentStatus> reroutableStatuses() {
+        return List.of(ShipmentStatus.PLANNED, ShipmentStatus.CREATED, ShipmentStatus.PREPARED, ShipmentStatus.REROUTE);
     }
 }

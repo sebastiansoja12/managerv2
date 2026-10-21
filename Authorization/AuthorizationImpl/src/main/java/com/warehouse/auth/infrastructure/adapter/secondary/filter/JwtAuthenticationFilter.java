@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String IMPERSONATION_ATTRIBUTE = JwtAuthenticationFilter.class.getName() + ".impersonation";
 
     private static final List<String> DEVICE_ENDPOINTS = List.of(
-            "/v2/api/ws"
+            "/v1/api/ws"
     );
 
     private final JwtService jwtService;

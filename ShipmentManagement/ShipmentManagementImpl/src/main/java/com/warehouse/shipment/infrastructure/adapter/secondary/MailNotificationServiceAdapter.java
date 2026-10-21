@@ -8,9 +8,6 @@ import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.shipment.application.port.secondary.MailNotificationServicePort;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class MailNotificationServiceAdapter implements MailNotificationServicePort {
 
     private final NotificationEventPublisher mailEventPublisher;

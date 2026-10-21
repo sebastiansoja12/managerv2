@@ -153,4 +153,23 @@
         </insert>
     </changeSet>
 
+    <changeSet author="s-soja" id="2026-10-21-postgresql-initial-department-type-headquarters">
+        <update tableName="department">
+            <column name="department_type" value="HEADQUARTERS"/>
+            <where>department_type = 'HEADQUARTER'</where>
+        </update>
+        <update tableName="department_aud">
+            <column name="department_type" value="HEADQUARTERS"/>
+            <where>department_type = 'HEADQUARTER'</where>
+        </update>
+        <update tableName="department_rd">
+            <column name="department_type" value="HEADQUARTERS"/>
+            <where>department_type = 'HEADQUARTER'</where>
+        </update>
+        <update tableName="department_rd_aud">
+            <column name="department_type" value="HEADQUARTERS"/>
+            <where>department_type = 'HEADQUARTER'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

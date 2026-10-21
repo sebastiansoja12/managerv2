@@ -1,5 +1,9 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.creator;
 
+import com.warehouse.logistics.application.port.primary.command.LogisticsRequest;
+import com.warehouse.logistics.domain.vo.ReturnToken;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Request;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Response;
 import static com.warehouse.commonassets.enumeration.ProcessType.RETURN;
 
 import java.util.List;
@@ -10,9 +14,6 @@ import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponseDetails;
-import com.warehouse.logistics.domain.model.LogisticsRequest;
-import com.warehouse.logistics.domain.model.Request;
-import com.warehouse.logistics.domain.model.Response;
 
 @Component
 public class DeliveryReturnCreator implements DeliveryCreator {
@@ -27,9 +28,14 @@ public class DeliveryReturnCreator implements DeliveryCreator {
         final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails =
                 response.getDeliveryReturnResponse().getDeliveryReturnResponseDetails();
         return deliveryReturnResponseDetails.stream()
-                .map(returnResponseDetails -> LogisticsRequest.from(
-                        request.getProcessType(), returnResponseDetails
-                ))
+                .map(returnResponseDetails -> map(request.getProcessType(), returnResponseDetails))
                 .collect(Collectors.toSet());
+    }
+
+    private LogisticsRequest map(final ProcessType processType,
+                                 final DeliveryReturnResponseDetails returnResponseDetails) {
+        return new LogisticsRequest(returnResponseDetails.getShipmentId(), null, returnResponseDetails.getDepartmentCode(),
+                returnResponseDetails.getSupplierCode(), returnResponseDetails.getDeliveryStatus(),
+                processType, new ReturnToken(returnResponseDetails.getReturnToken().value()), null, null);
     }
 }

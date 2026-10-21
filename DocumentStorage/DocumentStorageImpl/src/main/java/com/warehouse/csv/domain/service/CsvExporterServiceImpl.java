@@ -2,7 +2,7 @@ package com.warehouse.csv.domain.service;
 
 import java.io.IOException;
 
-import com.warehouse.csv.domain.port.secondary.ParcelRepository;
+import com.warehouse.csv.domain.port.secondary.ShipmentServicePort;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
 
@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CsvExporterServiceImpl implements CsvExporterService {
 
-    private final ParcelRepository parcelRepository;
+    private final ShipmentServicePort shipmentServicePort;
 
     @Override
     public void exportToCSV(HttpServletResponse response, Long id) throws IOException {
@@ -22,7 +22,7 @@ public class CsvExporterServiceImpl implements CsvExporterService {
         final CsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(),
                 CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
 
-        final ParcelCsv parcelCsv = parcelRepository.find(id);
+        final ParcelCsv parcelCsv = shipmentServicePort.find(id);
 
         final String[] csvHeader = {"Kod paczki", "Imie nadawcy", "Nazwisko nadawcy", "Numer tel nadawcy",
                 "Imie odbiorcy", "Nazwisko odbiorcy", "Numer tel odbiorcy", "Miasto", "Ulica", "Email"};

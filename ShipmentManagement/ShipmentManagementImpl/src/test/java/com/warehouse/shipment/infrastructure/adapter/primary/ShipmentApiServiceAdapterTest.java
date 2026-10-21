@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.shipment.application.port.primary.ShipmentPort;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
@@ -29,6 +32,7 @@ import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectRequestItemDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRejectResponseItemDto;
+import com.warehouse.shipment.infrastructure.dto.SourceShipmentDto;
 
 @ExtendWith(MockitoExtension.class)
 class ShipmentApiServiceAdapterTest {
@@ -40,7 +44,25 @@ class ShipmentApiServiceAdapterTest {
 
     @BeforeEach
     void setUp() {
-        this.adapter = new ShipmentApiServiceAdapter(this.shipmentPort, new ShipmentApiServiceMapper());
+        this.adapter = new ShipmentApiServiceAdapter(this.shipmentPort, new ShipmentApiServiceMapper(), new OperatorContext());
+    }
+
+    @Test
+    void shouldReturnSourceShipmentOfRelatedShipment() {
+        when(this.shipmentPort.findSourceShipment(new ShipmentId(2L)))
+                .thenReturn(Optional.of(shipmentResult(new ShipmentId(2L))));
+
+        final Optional<SourceShipmentDto> sourceShipment = this.adapter.findSourceShipment(new ShipmentId(2L));
+
+        assertTrue(sourceShipment.isPresent());
+        assertEquals(new ShipmentId(1L), sourceShipment.get().shipmentId());
+    }
+
+    @Test
+    void shouldReturnEmptyWhenShipmentHasNoSourceShipment() {
+        when(this.shipmentPort.findSourceShipment(new ShipmentId(2L))).thenReturn(Optional.empty());
+
+        assertTrue(this.adapter.findSourceShipment(new ShipmentId(2L)).isEmpty());
     }
 
     @Test
@@ -109,7 +131,15 @@ class ShipmentApiServiceAdapterTest {
     private ShipmentResult shipmentResult(final ShipmentId relatedShipmentId) {
         final Shipment shipment = new Shipment(
                 new ShipmentId(1L), null, null, relatedShipmentId, null,
-                false, null, null, null, null, null);
+                false, null, null, null);
         return new ShipmentResult(shipment.snapshot(), null);
+    }
+
+    @Test
+    void shouldReturnEmptyRerouteDetailsWhenShipmentDoesNotExist() {
+        final TrackingNumber trackingNumber = new TrackingNumber("UNKNOWN");
+        when(shipmentPort.findOperator(trackingNumber)).thenReturn(Optional.empty());
+
+        assertTrue(adapter.getShipmentForReroute(trackingNumber).isEmpty());
     }
 }

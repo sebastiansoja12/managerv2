@@ -53,7 +53,7 @@ public class RouteTrackerIntegrationTest {
         // when
         final ResponseEntity<RouteLogRecord> responseEntity = restClient
                 .get()
-                .uri("/v2/api/routes/{shipmentId}", shipmentId)
+                .uri("/v1/api/routes/{shipmentId}", shipmentId)
                 .retrieve()
                 .toEntity(RouteLogRecord.class);
         // then

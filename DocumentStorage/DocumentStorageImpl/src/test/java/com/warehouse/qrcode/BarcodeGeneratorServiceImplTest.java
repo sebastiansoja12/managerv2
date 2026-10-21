@@ -17,7 +17,7 @@ public class BarcodeGeneratorServiceImplTest {
     public void shouldCreateQrCodeImage() throws BadElementException, IOException {
         // given
         final BarcodeGeneratorService barcodeGeneratorService = new BarcodeGeneratorServiceImpl();
-        final Long barcodeText = 123L;
+        final String barcodeText = "INP000000123";
 
         // when
         final Image resultImage = barcodeGeneratorService.generateQRCodeImage(barcodeText);

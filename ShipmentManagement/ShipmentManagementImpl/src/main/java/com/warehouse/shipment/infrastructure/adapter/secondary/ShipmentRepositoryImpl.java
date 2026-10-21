@@ -1,11 +1,11 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
-import com.warehouse.commonassets.identificator.ExternalId;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.identificator.*;
+import com.warehouse.commonassets.repository.NoOperatorContextRepository;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.shipment.application.port.secondary.ShipmentRepository;
 import com.warehouse.shipment.domain.model.Shipment;
+import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.ShipmentNotFoundException;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
@@ -17,11 +17,14 @@ import java.util.Optional;
 public class ShipmentRepositoryImpl implements ShipmentRepository {
 
     private final OperatorFilteredRepository<ShipmentEntity> writeRepository;
+    private final NoOperatorContextRepository<ShipmentEntity> noOperatorContextRepository;
     private final ShipmentPersistenceMapper persistenceMapper;
 
     public ShipmentRepositoryImpl(final OperatorFilteredRepository<ShipmentEntity> writeRepository,
+                                  final NoOperatorContextRepository<ShipmentEntity> noOperatorContextRepository,
                                   final ShipmentPersistenceMapper persistenceMapper) {
         this.writeRepository = writeRepository;
+        this.noOperatorContextRepository = noOperatorContextRepository;
         this.persistenceMapper = persistenceMapper;
     }
 
@@ -69,12 +72,29 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
     }
 
     @Override
+    public Optional<Shipment> findByShipmentRelatedId(final ShipmentId shipmentRelatedId) {
+        return writeRepository.createCriteria(ShipmentEntity.class)
+                .eq("shipmentRelatedId.value", shipmentRelatedId.getValue())
+                .maxResults(1)
+                .one()
+                .map(this.persistenceMapper::toDomain);
+    }
+
+    @Override
     public Shipment findByTrackingNumber(final TrackingNumber trackingNumber) {
         return writeRepository.createCriteria(ShipmentEntity.class)
                 .eq("trackingNumber.value", trackingNumber.value())
                 .one()
                 .map(this.persistenceMapper::toDomain)
                 .orElseThrow(() -> new ShipmentNotFoundException("Shipment was not found"));
+    }
+
+    @Override
+    public Optional<OperatorId> findOperatorIdByTrackingNumber(final TrackingNumber trackingNumber) {
+        return noOperatorContextRepository.createCriteria(ShipmentEntity.class)
+                .eq("trackingNumber.value", trackingNumber.value())
+                .one()
+                .map(ShipmentEntity::operatorId);
     }
 
     @Override
@@ -111,5 +131,14 @@ public class ShipmentRepositoryImpl implements ShipmentRepository {
                 .maxResults(1)
                 .list()
                 .isEmpty();
+    }
+
+    @Override
+    public ShipmentOwnerContext findContext(final TrackingNumber trackingNumber) {
+        return noOperatorContextRepository.createCriteria(ShipmentEntity.class)
+                .eq("trackingNumber.value", trackingNumber.value())
+                .one()
+                .map(shipment -> new ShipmentOwnerContext(shipment.operatorId()))
+                .orElseThrow(() -> new ShipmentNotFoundException("Shipment: " + trackingNumber.value() + " was not found"));
     }
 }

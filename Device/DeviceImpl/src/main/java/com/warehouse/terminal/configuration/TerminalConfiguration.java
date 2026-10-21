@@ -1,13 +1,13 @@
 package com.warehouse.terminal.configuration;
 
-import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.warehouse.auth.UserApiService;
+import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.terminal.DeviceApiService;
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
@@ -18,9 +18,10 @@ import com.warehouse.terminal.domain.port.secondary.*;
 import com.warehouse.terminal.domain.service.*;
 import com.warehouse.terminal.infrastructure.adapter.primary.DeviceServiceAdapter;
 import com.warehouse.terminal.infrastructure.adapter.secondary.*;
-import com.warehouse.tools.softwareconfiguration.SoftwareConfigurationProperties;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.MobileEntity;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.ScannerEntity;
+import com.warehouse.terminal.infrastructure.adapter.secondary.entity.TerminalEntity;
 
-import io.github.resilience4j.retry.RetryConfig;
 
 @Configuration
 public class TerminalConfiguration {
@@ -49,24 +50,6 @@ public class TerminalConfiguration {
                 userServicePort);
     }
 
-    @Bean("device.softwareConfigurationServicePort")
-    @ConditionalOnProperty(name = "services.mock", havingValue = "false")
-    public SoftwareConfigurationServicePort softwareConfigurationServicePort(final SoftwareConfigurationProperties softwareConfigurationProperties) {
-        final RetryConfig retryConfig = RetryConfig.custom()
-                .maxAttempts(4)
-                .waitDuration(Duration.ofSeconds(2))
-                .retryExceptions(RuntimeException.class)
-                .writableStackTraceEnabled(true)
-                .build();
-        return new SoftwareConfigurationServiceAdapter(retryConfig, softwareConfigurationProperties);
-    }
-
-    @Bean("device.softwareConfigurationServicePort")
-    @ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
-    public SoftwareConfigurationServicePort softwareConfigurationServiceMockPort() {
-        return new SoftwareConfigurationServiceMockAdapter();
-    }
-
     @Bean("terminal.supplierRepository")
     public SupplierRepository supplierRepository(final SupplierReadRepository repository) {
         return new SupplierRepositoryImpl(repository);
@@ -78,11 +61,11 @@ public class TerminalConfiguration {
     }
 
     @Bean
-    public DeviceVersionRepository deviceVersionRepository(final TerminalReadRepository terminalReadRepository,
-                                                           final MobileReadRepository mobileReadRepository,
-                                                           final ScannerReadRepository scannerReadRepository,
+    public DeviceVersionRepository deviceVersionRepository(final OperatorFilteredRepository<TerminalEntity> terminalRepository,
+                                                           final OperatorFilteredRepository<MobileEntity> mobileRepository,
+                                                           final OperatorFilteredRepository<ScannerEntity> scannerRepository,
                                                            final DeviceVersionReadRepository deviceVersionReadRepository) {
-        return new DeviceVersionRepositoryImpl(terminalReadRepository, mobileReadRepository, scannerReadRepository,
+        return new DeviceVersionRepositoryImpl(terminalRepository, mobileRepository, scannerRepository,
                 deviceVersionReadRepository);
     }
 
@@ -141,8 +124,9 @@ public class TerminalConfiguration {
     @Bean
     public DeviceApiService deviceApiService(final DevicePairService devicePairService,
                                              final DeviceGenericService deviceGenericService,
-                                             final UserService userService) {
-        return new DeviceServiceAdapter(devicePairService, deviceGenericService, userService);
+                                             final UserService userService,
+                                             final OperatorContext operatorContext) {
+        return new DeviceServiceAdapter(devicePairService, deviceGenericService, userService, operatorContext);
     }
 
     @Bean

@@ -6,19 +6,20 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.auth.UserApiService;
+import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.commonassets.repository.NoOperatorContextRepository;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.searchobject.SpecificationRepository;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
-import com.warehouse.mail.domain.port.primary.MailPort;
-import com.warehouse.mail.domain.port.primary.MailPortImpl;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.organisationstructure.api.OperatorConfigurationApiService;
 import com.warehouse.pickuppoint.api.PickupPointApiService;
@@ -56,11 +57,6 @@ import java.util.List;
 public class ShipmentConfiguration {
 
 	private final LoggerFactory LOGGER_FACTORY = new LoggerFactoryImpl();
-
-	@Bean(name = "shipment.mailPort")
-	public MailPort mailPort(final com.warehouse.mail.domain.service.MailService mailService) {
-		return new MailPortImpl(mailService);
-	}
 
 	@Bean
 	public NotificationCreatorProvider notificationCreatorService() {
@@ -257,8 +253,9 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentApiService shipmentApiService(final ShipmentPort shipmentPort,
-                                                final ShipmentApiServiceMapper shipmentApiServiceMapper) {
-		return new ShipmentApiServiceAdapter(shipmentPort, shipmentApiServiceMapper);
+                                                final ShipmentApiServiceMapper shipmentApiServiceMapper,
+                                                final OperatorContext operatorContext) {
+		return new ShipmentApiServiceAdapter(shipmentPort, shipmentApiServiceMapper, operatorContext);
 	}
 
     @Bean
@@ -374,9 +371,10 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentRepository shipmentRepository(final OperatorFilteredRepository<ShipmentEntity> repository,
+                                                 final NoOperatorContextRepository<ShipmentEntity> noOperatorContextRepository,
                                                  final ShipmentPersistenceMapper persistenceMapper) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment repository");
-		return new ShipmentRepositoryImpl(repository, persistenceMapper);
+		return new ShipmentRepositoryImpl(repository, noOperatorContextRepository, persistenceMapper);
 	}
 
 	@Bean

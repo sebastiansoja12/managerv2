@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-18-postgresql-table-carriers" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="carriers"/>
+            </not>
+        </preConditions>
+        <createTable tableName="carriers">
+            <column name="carrier_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_carriers"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tax_id" type="VARCHAR(32)"/>
+            <column name="phone" type="VARCHAR(40)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="default_transport_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="carriers" indexName="idx_carriers_operator_active_name">
+            <column name="operator_id"/>
+            <column name="active"/>
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-10-18-postgresql-table-carrier-drivers" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="carrier_drivers"/>
+            </not>
+        </preConditions>
+        <createTable tableName="carrier_drivers">
+            <column name="driver_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_carrier_drivers"/>
+            </column>
+            <column name="carrier_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_carrier_drivers_carrier"
+                             referencedTableName="carriers" referencedColumnNames="carrier_id" deleteCascade="true"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="VARCHAR(40)"/>
+            <column name="license_number" type="VARCHAR(64)"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="carrier_drivers" indexName="idx_carrier_drivers_carrier">
+            <column name="carrier_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-10-18-postgresql-table-carrier-vehicles" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="carrier_vehicles"/>
+            </not>
+        </preConditions>
+        <createTable tableName="carrier_vehicles">
+            <column name="vehicle_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_carrier_vehicles"/>
+            </column>
+            <column name="carrier_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_carrier_vehicles_carrier"
+                             referencedTableName="carriers" referencedColumnNames="carrier_id" deleteCascade="true"/>
+            </column>
+            <column name="registration_number" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vehicle_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trailer_registration_number" type="VARCHAR(32)"/>
+            <column name="max_load_kg" type="NUMERIC(12,3)"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="carrier_vehicles" columnNames="carrier_id, registration_number"
+                             constraintName="uk_carrier_vehicles_registration"/>
+    </changeSet>
+
+    <changeSet id="2026-10-18-postgresql-table-pallet-transports" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="pallet_transports"/>
+            </not>
+        </preConditions>
+        <createTable tableName="pallet_transports">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_pallet_transports"/>
+            </column>
+            <column name="operator_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pallet_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pallet_tracking_number" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="carrier_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="carrier_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transport_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="driver_id" type="BIGINT"/>
+            <column name="driver_name" type="VARCHAR(255)"/>
+            <column name="driver_phone" type="VARCHAR(40)"/>
+            <column name="vehicle_id" type="BIGINT"/>
+            <column name="vehicle_registration_number" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trailer_registration_number" type="VARCHAR(32)"/>
+            <column name="assigned_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assigned_by_user_id" type="BIGINT"/>
+            <column name="assigned_by_username" type="VARCHAR(255)"/>
+            <column name="department_id" type="BIGINT"/>
+        </createTable>
+        <createIndex tableName="pallet_transports" indexName="idx_pallet_transports_pallet">
+            <column name="operator_id"/>
+            <column name="pallet_id"/>
+            <column name="assigned_at"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

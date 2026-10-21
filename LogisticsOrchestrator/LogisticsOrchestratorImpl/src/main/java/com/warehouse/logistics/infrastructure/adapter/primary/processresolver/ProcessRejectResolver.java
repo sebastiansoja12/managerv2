@@ -1,14 +1,14 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.processresolver;
 
+import com.warehouse.logistics.infrastructure.adapter.primary.ProcessHandler;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsRequestMapper;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.LogisticsResponseMapper;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Request;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Response;
 import org.springframework.stereotype.Component;
 
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.logistics.domain.model.Request;
-import com.warehouse.logistics.domain.model.Response;
-import com.warehouse.logistics.infrastructure.adapter.primary.ProcessHandler;
 import com.warehouse.deliveryreject.DeliveryRejectService;
 import com.warehouse.deliveryreject.dto.request.DeliveryRejectRequestDto;
 import com.warehouse.deliveryreject.dto.response.DeliveryRejectResponseDto;

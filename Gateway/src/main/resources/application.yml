@@ -37,27 +37,22 @@ warehouse:
       - id: manager-api
         path-prefix: manager
         service-id: manager-application
-        uri: ${MANAGER_API_URL:http://localhost:8080/v2/api}
+        uri: ${MANAGER_API_URL:http://localhost:8080/v1/api}
         health-path: ${MANAGER_API_HEALTH_PATH:/actuator/health}
-      - id: software-configuration
-        path-prefix: software-configuration
-        service-id: software-configuration
-        uri: ${SOFTWARE_CONFIGURATION_URL:http://localhost:8081}
-        health-path: ${SOFTWARE_CONFIGURATION_HEALTH_PATH:/actuator/health}
       - id: delivery-protection
         path-prefix: delivery-protection
         service-id: delivery-protection
-        uri: ${DELIVERY_PROTECTION_URL:http://localhost:8060/v2/api}
+        uri: ${DELIVERY_PROTECTION_URL:http://localhost:8060/v1/api}
         health-path: ${DELIVERY_PROTECTION_HEALTH_PATH:/actuator/health}
       - id: returning-track-manager
         path-prefix: returning-track-manager
         service-id: returning-track-manager
-        uri: ${RETURNING_TRACK_MANAGER_URL:http://localhost:8070/v2/api}
+        uri: ${RETURNING_TRACK_MANAGER_URL:http://localhost:8070/v1/api}
         health-path: ${RETURNING_TRACK_MANAGER_HEALTH_PATH:/actuator/health}
       - id: route-tracker-flow
         path-prefix: route-tracker-flow
         service-id: route-tracker-flow
-        uri: ${ROUTE_TRACKER_FLOW_URL:http://localhost:8082/v2/api}
+        uri: ${ROUTE_TRACKER_FLOW_URL:http://localhost:8082/v1/api}
         health-path: ${ROUTE_TRACKER_FLOW_HEALTH_PATH:/actuator/health}
       - id: pallet-handling-manager
         path-prefix: pallet-handling-manager

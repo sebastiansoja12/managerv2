@@ -21,7 +21,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
     private final List<ShipmentPriority> shipmentPriorities;
     private final String senderName;
     private final String recipientName;
-    private final String destination;
     private final BigDecimal minPrice;
     private final BigDecimal maxPrice;
     private final Currency currency;
@@ -38,7 +37,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
             final List<ShipmentPriority> shipmentPriorities,
             final String senderName,
             final String recipientName,
-            final String destination,
             final BigDecimal minPrice,
             final BigDecimal maxPrice,
             final Currency currency,
@@ -54,7 +52,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
         this.shipmentPriorities = shipmentPriorities;
         this.senderName = senderName;
         this.recipientName = recipientName;
-        this.destination = destination;
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
         this.currency = currency;
@@ -98,10 +95,6 @@ public class ShipmentSearchCriteria extends SearchCriteria {
 
     public String recipientName() {
         return recipientName;
-    }
-
-    public String destination() {
-        return destination;
     }
 
     public BigDecimal minPrice() {

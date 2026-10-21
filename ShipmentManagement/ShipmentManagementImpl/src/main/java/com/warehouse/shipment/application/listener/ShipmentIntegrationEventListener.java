@@ -1,6 +1,7 @@
 package com.warehouse.shipment.application.listener;
 
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
+import com.warehouse.shipment.api.event.ShipmentDeliveredIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentStatusChangedIntegrationEvent;
 import com.warehouse.shipment.application.port.secondary.ShipmentEventDataMapperPort;
@@ -28,19 +29,27 @@ public class ShipmentIntegrationEventListener {
     @EventListener
     public void handle(final ShipmentCreated event) {
         shipmentIntegrationEventServicePort.publishEvent(
-                new ShipmentCreatedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
+                new ShipmentCreatedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot()),
+                        event.getDeliveryPlan().map(shipmentEventDataMapper::map).orElse(null)));
     }
 
     @EventListener
     public void handle(final ShipmentDestinationChanged event) {
         shipmentIntegrationEventServicePort.publishEvent(
-                new ShipmentDestinationChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
+                new ShipmentDestinationChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot()),
+                        event.getDestinationDepartmentId()));
     }
 
     @EventListener
     public void handle(final ShipmentStatusChanged event) {
         shipmentIntegrationEventServicePort.publishEvent(
                 new ShipmentStatusChangedIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
+    }
+
+    @EventListener
+    public void handle(final ShipmentDelivered event) {
+        shipmentIntegrationEventServicePort.publishEvent(
+                new ShipmentDeliveredIntegrationEvent(shipmentEventDataMapper.map(event.getSnapshot())));
     }
 
     @EventListener

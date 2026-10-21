@@ -1,5 +1,13 @@
 package com.warehouse.logistics.infrastructure.adapter.primary.mapper;
 
+import com.warehouse.logistics.domain.vo.ReturnToken;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.DeliveryMissedDetails;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.DeliveryMissedRequest;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.DeliveryRejectDetails;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.DeliveryRejectRequest;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.DeliveryReturnDetails;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.DeliveryReturnRequest;
+import com.warehouse.logistics.infrastructure.adapter.primary.process.Request;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,8 +29,6 @@ import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnDetails
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.ProcessIdDto;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.ReturnTokenDto;
-import com.warehouse.logistics.domain.model.*;
-import com.warehouse.logistics.domain.vo.ReturnToken;
 import com.warehouse.terminal.DeviceInformation;
 import com.warehouse.terminal.jaxb.*;
 

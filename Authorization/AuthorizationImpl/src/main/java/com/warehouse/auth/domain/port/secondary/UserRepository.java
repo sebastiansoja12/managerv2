@@ -27,4 +27,6 @@ public interface UserRepository {
     UserId findInitialUser();
 
     Optional<OrganizationUser> findActiveSuperadmin(final OperatorId operatorId);
+
+    List<UserId> findActiveSuperadminIds(final OperatorId operatorId);
 }

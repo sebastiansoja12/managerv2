@@ -29,7 +29,7 @@ public class ShipmentNotifyClientAdapter implements ShipmentNotifyClientPort {
     public Result<ResponseStatus, ErrorCode> notifyReturnChanged(final ReturnPackageSnapshot snapshot) {
         final ShipmentReturnRequestApi request = RequestMapper.toShipmentReturnRequestApi(snapshot);
         final ResponseEntity<Void> responseEntity = restClient.put()
-                .uri("/v2/api/shipments/returns")
+                .uri("/v1/api/shipments/returns")
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(httpHeaders -> httpHeaders.set("Authorization", "Bearer " + JwtContext.getToken()))

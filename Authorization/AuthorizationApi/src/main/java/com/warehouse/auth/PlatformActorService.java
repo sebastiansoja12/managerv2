@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface PlatformActorService {
     Optional<PlatformActorDto> currentActor();
+
+    boolean isPlatformActorRequest();
 }

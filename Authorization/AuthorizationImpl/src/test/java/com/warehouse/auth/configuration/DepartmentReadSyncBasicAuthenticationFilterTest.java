@@ -43,8 +43,8 @@ class DepartmentReadSyncBasicAuthenticationFilterTest {
     @Test
     void shouldFilterDepartmentReadSyncEndpointWithApiPrefix() {
         final MockHttpServletRequest request = new MockHttpServletRequest("POST",
-                "/v2/api/departments/read-sync/1");
-        request.setRequestURI("/v2/api/departments/read-sync/1");
+                "/v1/api/departments/read-sync/1");
+        request.setRequestURI("/v1/api/departments/read-sync/1");
 
         assertFalse(filter.shouldNotFilter(request));
     }
@@ -52,8 +52,8 @@ class DepartmentReadSyncBasicAuthenticationFilterTest {
     @Test
     void shouldAuthenticateDepartmentReadSyncRequestWithBasicAuth() throws Exception {
         final MockHttpServletRequest request = new MockHttpServletRequest("POST",
-                "/v2/api/departments/read-sync/1");
-        request.setRequestURI("/v2/api/departments/read-sync/1");
+                "/v1/api/departments/read-sync/1");
+        request.setRequestURI("/v1/api/departments/read-sync/1");
         request.addHeader(HttpHeaders.AUTHORIZATION, basic("admin", "secret"));
         final MockHttpServletResponse response = new MockHttpServletResponse();
         final UserEntity user = user();
@@ -82,8 +82,8 @@ class DepartmentReadSyncBasicAuthenticationFilterTest {
     @Test
     void shouldRejectRequestWithoutBasicAuth() throws Exception {
         final MockHttpServletRequest request = new MockHttpServletRequest("POST",
-                "/v2/api/departments/read-sync/1");
-        request.setRequestURI("/v2/api/departments/read-sync/1");
+                "/v1/api/departments/read-sync/1");
+        request.setRequestURI("/v1/api/departments/read-sync/1");
         final MockHttpServletResponse response = new MockHttpServletResponse();
         final AtomicBoolean chainCalled = new AtomicBoolean(false);
 

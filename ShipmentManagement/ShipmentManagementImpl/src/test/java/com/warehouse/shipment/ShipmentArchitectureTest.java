@@ -105,7 +105,7 @@ class ShipmentArchitectureTest {
         final String shipmentResultFactorySource = Files.readString(Path.of(
                 "src/main/java/com/warehouse/shipment/application/service/ShipmentResultFactory.java"));
         assertThat(shipmentResultFactorySource)
-                .contains("getDepartmentCode(shipment.getTargetDepartmentId())")
+                .doesNotContain("getTargetDepartmentId")
                 .doesNotContain("targetDepartmentId == null");
         assertThat(shipmentPortImplementationSource)
                 .contains("shipmentResultFactory.create")
@@ -251,7 +251,8 @@ class ShipmentArchitectureTest {
                 "../ShipmentManagementApi/src/main/java/com/warehouse/shipment/api/event/snapshot/ShipmentEventData.java"));
         assertThat(integrationSnapshot)
                 .contains("ShipmentId shipmentId")
-                .contains("DepartmentId originDepartmentId")
+                .doesNotContain("DepartmentId originDepartmentId")
+                .doesNotContain("PickupPointId deliveryPickupPointId")
                 .contains("ShipmentId shipmentRelatedId")
                 .contains("TrackingNumber trackingNumber")
                 .contains("ExternalId<UUID> externalShipmentId")

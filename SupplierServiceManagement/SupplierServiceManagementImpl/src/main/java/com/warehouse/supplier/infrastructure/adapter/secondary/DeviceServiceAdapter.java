@@ -24,7 +24,7 @@ public class DeviceServiceAdapter implements DeviceServicePort {
     // TODO
     @Override
     public Result<Void, String> validateDevice(final DeviceId deviceId) {
-        final String url = "http://localhost:8080/v2/api/devices/" + deviceId.getValue();
+        final String url = "http://localhost:8080/v1/api/devices/" + deviceId.getValue();
         log.info("Validating device with url: {}", url);
         final ResponseEntity<Object> result =
                 restClient

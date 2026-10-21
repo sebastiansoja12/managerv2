@@ -5,7 +5,7 @@
 Manager 2.0 is a Java 21 / Spring Boot backend for warehouse and logistics
 operations. The repository is a multi-module Maven project. The main runtime is
 the `Application` module, which assembles the domain modules into one API served
-under `/v2/api`.
+under `/v1/api`.
 
 ## Technology
 
@@ -23,7 +23,7 @@ under `/v2/api`.
 
 | Module | Purpose |
 | --- | --- |
-| `Application` | Main Spring Boot application on port `8080`, API context `/v2/api`. |
+| `Application` | Main Spring Boot application on port `8080`, API context `/v1/api`. |
 | `Authorization` | Login, JWT/cookie authentication, refresh tokens, current user/operator context and permissions. |
 | `OrganisationStructure` | Operator management, operator configuration, provisioning of initial operator data and departments (identifiers, coordinates and read-model synchronization). |
 | `ShipmentManagement` | Shipments, dangerous goods, pickup and delivery methods, pickup-point assignment, return summaries, shipment status, notes, document links and tracking integrations. |
@@ -32,12 +32,13 @@ under `/v2/api`.
 | `DeliveryOperation` | Delivery, return and rejection process handling. |
 | `LogisticsOrchestrator` | Coordination layer for logistics flows. |
 | `ProcessHub` | Process logs and process details used by the GUI. |
+| `DepartmentMap` | Department floor plans (`department_maps`, elements), storage-location occupancy with optimistic locking, pallet placement, reservations and location history (`/department-maps`). |
 | `Device` | Device pairing, device verification and terminal/device access validation. |
 | `SupplierServiceManagement` | Suppliers, package types, delivery areas, vehicle data and supplier updates. |
 | `GeocodingService` | Geocoding provider configuration and geocoding API. |
 | `PathFinder` and `DestinationDetermination` | Routing, delivery-department determination, address coordinates and area calculation support. |
 | `DocumentStorage` | Barcode and CSV generation utilities, plus shared operator-scoped document storage (`DocumentStorageApi` and `DocumentStorageImpl`). |
-| `MessageProvider` and `MailService` | Message and mail infrastructure. |
+| `MessageProvider` and `MailService` | Message infrastructure; Kafka-driven e-mail notifications rendered from multilingual database templates. |
 | `Common` | Shared value objects, enums, exceptions, repository helpers, operator context and security utilities. |
 | `Gateway` | Gateway service on port `8088`; routes requests to manager and related services. |
 | `EurekaServer` | Eureka server on port `8761`. |
@@ -54,7 +55,7 @@ The default profile is `dev`.
 Important defaults from `Application/src/main/resources`:
 
 - API port: `8080`
-- API context path: `/v2/api`
+- API context path: `/v1/api`
 - Database: `jdbc:postgresql://localhost:5432/dev`
 - Database user/password: `postgres` / `postgres`
 - Liquibase changelog: `classpath:/changelog/db.changelog-master.xml`
@@ -80,6 +81,30 @@ Common environment variables:
 - `JWT_SECRET_KEY`
 - `AUTH_CORS_ALLOWED_ORIGINS`
 - `CREDENTIALS_ENCRYPTION_KEY`
+
+### E-mail notifications
+
+`MailService` consumes shipment integration events from Kafka in `MailKafkaListener`
+(`shipment.created`, `shipment.events` status changes, `shipment.out-for-delivery`, `shipment.delivered`,
+`shipment.reroute.requested`), maps each event to generic `MailRequest`s (template key, recipient, locale,
+variables) and sends them over SMTP. Mail texts are not in code: they are stored in the `mail_templates`
+table (`template_key`, `locale`, `subject`, `body`) seeded by Liquibase in `pl`, `en` and `de`.
+Templates use `{{variable}}` placeholders and optional `{{#variable}}...{{/variable}}` sections.
+A request without a template is skipped, so adding a template row enables a new notification
+(for example `shipment.status.prepared.recipient`). The recipient language is resolved from the
+party country code (`MAIL_COUNTRY_LOCALES`) with fallback to the language and then to `MAIL_DEFAULT_LOCALE`.
+
+Local development: `docker compose -f docker.compose.yml up -d mailhog` starts MailHog (SMTP `localhost:1025`,
+web UI http://localhost:8025) and the `dev` profile sends every e-mail there, so nothing leaves your machine.
+To use a real SMTP server instead, copy `application-local.properties.example` to `application-local.properties`
+(ignored by git, imported by the `dev` profile from the working directory or its parent) and fill in the mailbox
+credentials. Environment variables override both files.
+
+- `MAIL_ENABLED` (`false` by default, `true` in the `dev` profile; when `false` e-mails are only logged)
+- `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SMTP_AUTH`, `MAIL_SMTP_STARTTLS`, `MAIL_SMTP_SSL`
+- `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`
+- `MAIL_DEFAULT_LOCALE`, `MAIL_UNMAPPED_COUNTRY_LOCALE`, `MAIL_COUNTRY_LOCALES`
+- `MAIL_TRACKING_URL`, `MAIL_SHIPMENT_EDIT_URL`
 
 ## Build and Run
 
@@ -140,7 +165,7 @@ database volumes are retained unless `--volumes` is explicitly supplied.
 The stack is defined in `docker.compose.yml`. The project name remains
 `managerv2`, matching the existing containers and Docker Desktop configuration.
 
-The stack contains PostgreSQL, MongoDB, ZooKeeper, Kafka, Kafka UI, Eureka,
+The stack contains PostgreSQL, MongoDB, ZooKeeper, Kafka, Kafka UI, MailHog (http://localhost:8025), Eureka,
 Gateway, Software Configuration, Returning Manager and Route Tracker. Run the
 main `Application` separately using the instructions above.
 
@@ -161,7 +186,7 @@ Separate Dockerfiles are available for:
 
 ## API and Documentation
 
-Return operations are exposed by `ReturnPackageController` under `/v2/api/returns/packages`.
+Return operations are exposed by `ReturnPackageController` under `/v1/api/returns/packages`.
 Creation accepts a shipment ID; processing (`PUT /{returnId}/process`), completion
 (`PUT /{returnId}/complete`) and cancellation (`DELETE /{returnId}`) use the return package ID.
 The same controller provides the return details and paginated department list. The returning
@@ -173,14 +198,14 @@ returning context, restores the original shipment to `DELIVERY` and cancels its 
 shipment. The Manager `return_processing_state` changeset stores terminal cancellation markers
 so duplicate or delayed processing events cannot undo cancellation. No RTM schema change is required.
 
-Shipment search uses `ShipmentQueryPort` through the existing `/v2/api/shipments/read-model/search` endpoint.
+Shipment search uses `ShipmentQueryPort` through the existing `/v1/api/shipments/read-model/search` endpoint.
 
 `ReturnConsumedEventTransactionTest` requires an isolated PostgreSQL database. Enable it with
 `RETURN_TEST_POSTGRES=true` and set `RETURN_TEST_JDBC_URL`, `RETURN_TEST_JDBC_USER` and
 `RETURN_TEST_JDBC_PASSWORD`. It creates and removes its own test schema.
 
-- Runtime API prefix: `/v2/api`
-- Actuator health endpoint: `/v2/api/actuator/health`
+- Runtime API prefix: `/v1/api`
+- Actuator health endpoint: `/v1/api/actuator/health`
 - OpenAPI is configured by `Application/src/main/java/com/warehouse/configuration/OpenApiConfiguration.java`
 - Release notes are maintained in `CHANGELOG.md`
 - InPost tracking notes are in `docs/inpost-global-tracking.md`

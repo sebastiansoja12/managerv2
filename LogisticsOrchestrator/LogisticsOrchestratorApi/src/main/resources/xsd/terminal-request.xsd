@@ -19,6 +19,92 @@
 
     <xs:element name="TerminalResponse" type="TerminalResponseType"/>
 
+    <xs:element name="CollectRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="DeviceInformation" type="DeviceType"/>
+                <xs:element name="CollectDetails" type="CollectDetailsType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CollectResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ProcessId" type="xs:string"/>
+                <xs:element name="Success" type="xs:boolean"/>
+                <xs:element name="CollectResponseDetails" type="CollectResponseDetailsType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="CollectDetailsType">
+        <xs:sequence>
+            <xs:element name="CollectDetail" type="CollectDetailType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CollectDetailType">
+        <xs:sequence>
+            <xs:element name="TrackingNumber" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CollectResponseDetailsType">
+        <xs:sequence>
+            <xs:element name="CollectResponseDetail" type="CollectResponseDetailType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CollectResponseDetailType">
+        <xs:sequence>
+            <xs:element name="TrackingNumber" type="xs:string"/>
+            <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+            <xs:element name="Success" type="xs:boolean"/>
+            <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="PalletScanRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="DeviceInformation" type="DeviceType"/>
+                <xs:element name="PalletTrackingNumber" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="PalletScanResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ProcessId" type="xs:string"/>
+                <xs:element name="Success" type="xs:boolean"/>
+                <xs:element name="PalletTrackingNumber" type="xs:string"/>
+                <xs:element name="PalletID" type="xs:string" minOccurs="0"/>
+                <xs:element name="PalletStatus" type="xs:string" minOccurs="0"/>
+                <xs:element name="AlreadyLoaded" type="xs:boolean"/>
+                <xs:element name="ErrorCode" type="xs:string" minOccurs="0"/>
+                <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+                <xs:element name="PalletScanResponseDetails" type="PalletScanResponseDetailsType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="PalletScanResponseDetailsType">
+        <xs:sequence>
+            <xs:element name="PalletScanResponseDetail" type="PalletScanResponseDetailType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PalletScanResponseDetailType">
+        <xs:sequence>
+            <xs:element name="ShipmentID" type="xs:long"/>
+            <xs:element name="Success" type="xs:boolean"/>
+            <xs:element name="ShipmentStatus" type="xs:string" minOccurs="0"/>
+            <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="TerminalResponseType">
         <xs:sequence>
             <xs:element name="Device" type="DeviceType" minOccurs="0"/>

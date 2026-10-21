@@ -10,5 +10,5 @@ public interface BarcodeGeneratorService {
 
     Image getQRCodeImage(Long text) throws WriterException, IOException, BadElementException;
 
-    Image generateQRCodeImage(Long barcodeText) throws BadElementException, IOException;
+    Image generateQRCodeImage(String barcodeText) throws BadElementException, IOException;
 }

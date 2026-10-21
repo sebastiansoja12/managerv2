@@ -9,6 +9,7 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.exceptionhandler.exception.RestException;
 import com.warehouse.shipment.application.port.primary.command.*;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
+import com.warehouse.shipment.application.port.primary.result.ShipmentRerouteResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.secondary.*;
@@ -31,6 +32,8 @@ import com.warehouse.shipment.domain.service.AddressValidationService;
 import com.warehouse.shipment.domain.service.ShipmentStateValidatorServiceImpl;
 import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.Party;
+import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
+import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
 import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.conf.ShipmentMetrics;
@@ -40,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 public class ShipmentPortImpl implements ShipmentPort {
@@ -168,15 +172,9 @@ public class ShipmentPortImpl implements ShipmentPort {
                 null,
                 command.getPrice(),
                 false,
-                targetDepartment.getSuccess(),
-                originDepartment.getSuccess(),
                 command.getShipmentPriority(),
                 trackingNumber,
                 initialStatus,
-                pickupMethod,
-                command.getDeliveryMethod(),
-                pickupMethod.isPickupPointBased() ? command.getPickupPointId() : null,
-                command.getDeliveryMethod().isPickupPointBased() ? command.getDeliveryPickupPointId() : null,
                 command.getDimensions(),
                 command.getWeight(),
                 command.getCustomerReference(),
@@ -189,7 +187,15 @@ public class ShipmentPortImpl implements ShipmentPort {
         this.shipmentRepository.createOrUpdate(shipment);
         logCreatedShipment(shipment);
 
-        this.domainEventPublisher.publish(new ShipmentCreated(shipment.snapshot(), Instant.now()));
+        final ShipmentDeliveryPlan deliveryPlan = new ShipmentDeliveryPlan(
+                originDepartment.getSuccess(),
+                targetDepartment.getSuccess(),
+                pickupMethod,
+                command.getDeliveryMethod(),
+                pickupMethod.isPickupPointBased() ? command.getPickupPointId() : null,
+                command.getDeliveryMethod().isPickupPointBased() ? command.getDeliveryPickupPointId() : null);
+
+        this.domainEventPublisher.publish(new ShipmentCreated(shipment.snapshot(), deliveryPlan, Instant.now()));
 
         return Result.success(new ShipmentCreateResponse(shipment.getExternalShipmentId(),
                 shipment.getTrackingNumber().value()));
@@ -291,12 +297,11 @@ public class ShipmentPortImpl implements ShipmentPort {
             final Shipment newShipment = Shipment.parentShipment(shipmentId, shipment.getSender(),
                     shipment.getRecipient(), shipment.getShipmentId(),
                     shipment.getPrice(),
-					shipment.getTargetDepartmentId(), shipment.getOriginDepartmentId(),
                     shipment.getSignatureRequired(), shipment.getShipmentPriority(), trackingNumber,
 					shipmentConfiguration.workflowSettings().defaultStatus());
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.CHILD, shipmentId);
 			this.shipmentRepository.createOrUpdate(newShipment);
-            this.domainEventPublisher.publish(new ShipmentCreated(shipment.snapshot(), Instant.now()));
+            this.domainEventPublisher.publish(new ShipmentCreated(newShipment.snapshot(), Instant.now()));
         } else {
 			this.changeShipmentTypeTo(request.shipmentId(), ShipmentType.PARENT, null);
 			this.lockShipment(shipment.getShipmentRelatedId());
@@ -313,6 +318,16 @@ public class ShipmentPortImpl implements ShipmentPort {
 		this.shipmentRepository.createOrUpdate(shipment);
 		this.domainEventPublisher.publish(event);
 	}
+
+    @Override
+    @Transactional
+    public void markDelivered(final ShipmentId shipmentId) {
+        final Shipment shipment = this.shipmentRepository.findById(shipmentId);
+        if (shipment.isFullyDelivered()) {
+            return;
+        }
+        changeShipmentStatusTo(new ShipmentStatusRequest(shipmentId, ShipmentStatus.DELIVERY));
+    }
 
     @Override
     public void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod) {
@@ -343,6 +358,91 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public ShipmentRouteLog loadShipmentWithRouteLog(final TrackingNumber trackingNumber) {
         return this.shipmentResultFactory.createControlCenter(this.find(trackingNumber));
+    }
+
+    @Override
+    public Optional<OperatorId> findOperator(final TrackingNumber trackingNumber) {
+        return this.shipmentRepository.findOperatorIdByTrackingNumber(trackingNumber);
+    }
+
+    @Override
+    public Optional<ShipmentResult> findSourceShipment(final ShipmentId shipmentId) {
+        return this.shipmentRepository.findByShipmentRelatedId(shipmentId)
+                .map(Shipment::snapshot)
+                .map(ShipmentResult::new);
+    }
+
+    @Override
+    public ShipmentRerouteResult loadShipmentForReroute(final TrackingNumber trackingNumber) {
+        final Shipment shipment = this.find(trackingNumber);
+        return new ShipmentRerouteResult(shipment.snapshot(), shipment.canBeRerouted());
+    }
+
+    @Override
+    @Transactional
+    public ShipmentRerouteResult reroute(final ShipmentRerouteCommand command) {
+        final Party sender = command.sender();
+        final Party recipient = command.recipient();
+        final OperatorShipmentConfiguration shipmentConfiguration =
+                this.shipmentConfigurationServicePort.getCurrentOperatorShipmentConfiguration();
+
+        final Result<Void, ErrorCode> addressValidation = this.addressValidationService
+                .validateAddresses(Address.from(sender), Address.from(recipient), shipmentConfiguration.validationRules());
+        if (addressValidation.isFailure()) {
+            throw new RestException(400, addressValidation.getFailure().getMessage());
+        }
+
+        final Result<Void, ErrorCode> countryValidation =
+                validateCountries(sender.getCountryCode(), recipient.getCountryCode());
+        if (countryValidation.isFailure()) {
+            throw new RestException(400, countryValidation.getFailure().getMessage());
+        }
+
+        final Shipment shipment = this.find(command.trackingNumber());
+        final Optional<DepartmentId> destinationDepartmentId = resolveDestinationForRecipient(shipment, recipient);
+        shipment.reroute(sender, recipient);
+        this.shipmentRepository.createOrUpdate(shipment);
+
+        destinationDepartmentId.ifPresent(departmentId -> this.domainEventPublisher.publish(
+                new ShipmentDestinationChanged(shipment.snapshot(), departmentId, Instant.now())));
+        this.domainEventPublisher.publish(new ShipmentRerouted(shipment.snapshot(), Instant.now()));
+        return new ShipmentRerouteResult(shipment.snapshot(), shipment.canBeRerouted());
+    }
+
+    private Optional<DepartmentId> resolveDestinationForRecipient(final Shipment shipment, final Party recipient) {
+        if (shipment.recipientCityMatches(recipient.getCity())) {
+            return Optional.empty();
+        }
+        final Result<VoronoiResponse, ErrorCode> voronoiResponse =
+                this.pathFinderServicePort.determineDeliveryDepartment(Address.from(recipient));
+        if (voronoiResponse.isFailure()) {
+            logger.warn("Cannot determine delivery department for rerouted shipment {}, keeping current destination",
+                    shipment.getShipmentId().getValue());
+            return Optional.empty();
+        }
+        return Optional.of(this.departmentServicePort
+                .getDepartmentId(voronoiResponse.getSuccess().getDepartmentCodeResult()));
+    }
+
+    @Override
+    @Transactional
+    public ShipmentResult collectShipment(final TrackingNumber trackingNumber) {
+        final Shipment shipment = this.find(trackingNumber);
+        shipment.notifyShipmentCollected();
+        this.shipmentRepository.createOrUpdate(shipment);
+        this.domainEventPublisher.publish(new ShipmentSent(shipment.snapshot(), Instant.now()));
+        return this.shipmentResultFactory.create(shipment);
+    }
+
+    @Override
+    @Transactional
+    public ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId) {
+        final Shipment shipment = this.find(shipmentId);
+        if (shipment.notifyShipmentLoadedOnPallet()) {
+            this.shipmentRepository.createOrUpdate(shipment);
+            this.domainEventPublisher.publish(new ShipmentSent(shipment.snapshot(), Instant.now()));
+        }
+        return this.shipmentResultFactory.create(shipment);
     }
 
     @Override
@@ -404,9 +504,8 @@ public class ShipmentPortImpl implements ShipmentPort {
     public void changeDestination(final ShipmentId shipmentId, final DepartmentCode destination) {
         final Shipment shipment = this.shipmentRepository.findById(shipmentId);
         final DepartmentId targetDepartmentId = departmentServicePort.getDepartmentId(destination);
-        shipment.changeTargetDepartment(targetDepartmentId);
-        this.shipmentRepository.createOrUpdate(shipment);
-        this.domainEventPublisher.publish(new ShipmentDestinationChanged(shipment.snapshot(), Instant.now()));
+        this.domainEventPublisher.publish(new ShipmentDestinationChanged(shipment.snapshot(), targetDepartmentId,
+                Instant.now()));
     }
 
     @Override
@@ -462,5 +561,10 @@ public class ShipmentPortImpl implements ShipmentPort {
     @Override
     public boolean hasAnyShipment() {
         return shipmentRepository.existsAny();
+    }
+
+    @Override
+    public ShipmentOwnerContext findContext(final TrackingNumber trackingNumber) {
+        return this.shipmentRepository.findContext(trackingNumber);
     }
 }

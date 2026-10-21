@@ -64,7 +64,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/platform/**", "/operators", "/operators/**")
                         .hasAuthority(PlatformOwnerAuthenticationFilter.PLATFORM_OWNER_AUTHORITY)
                         .requestMatchers(
-                                "/v2/api/shipments/**",
+                                "/v1/api/shipments/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
@@ -74,7 +74,10 @@ public class SecurityConfiguration {
                         )
                         .permitAll()
                         .requestMatchers("/returns/packages", "/returns/packages/**").authenticated()
-                        .requestMatchers("/v2/api/returns").authenticated()
+                        .requestMatchers("/pallets", "/pallets/**").authenticated()
+                        .requestMatchers("/carriers", "/carriers/**").authenticated()
+                        .requestMatchers("/drivers", "/drivers/**").authenticated()
+                        .requestMatchers("/v1/api/returns").authenticated()
                         .requestMatchers(apiExposureProperties.pairKeySecurityMatchers(contextPath)).permitAll()
                         .anyRequest().permitAll()
                 )

@@ -13,21 +13,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.util.UUID;
 
 
 public class BarcodeGeneratorServiceImpl implements BarcodeGeneratorService {
-
-    private void generateQRCodeImage(String text) throws WriterException, IOException {
-        final QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        final BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 400, 400);
-        final String filePath = "./src/main/resources/" + text + UUID.randomUUID() + ".png";
-        final Path path = FileSystems.getDefault().getPath(filePath);
-        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
-
-    }
 
     @Override
     public Image getQRCodeImage(Long text) throws WriterException, IOException, BadElementException {
@@ -39,12 +27,12 @@ public class BarcodeGeneratorServiceImpl implements BarcodeGeneratorService {
     }
 
     @Override
-    public Image generateQRCodeImage(Long barcodeText) throws IOException {
+    public Image generateQRCodeImage(String barcodeText) throws IOException {
         final BufferedImage image = new BufferedImage(250,
                 250,
                 BufferedImage.TYPE_BYTE_GRAY);
         final ByteArrayOutputStream stream = QRCode
-                .from(String.valueOf(barcodeText))
+                .from(barcodeText)
                 .withSize(250, 250)
                 .stream();
 

@@ -1,18 +1,20 @@
 package com.warehouse.shipment.application.port.primary;
 
 import com.warehouse.commonassets.enumeration.ShipmentType;
-import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ShipmentId;
-import com.warehouse.commonassets.identificator.TrackingNumber;
+import com.warehouse.commonassets.identificator.*;
 import com.warehouse.shipment.application.port.primary.command.*;
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
+import com.warehouse.shipment.application.port.primary.result.ShipmentRerouteResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
+import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
-import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.vo.Party;
+import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
+
+import java.util.Optional;
 
 
 public interface ShipmentPort {
@@ -25,6 +27,8 @@ public interface ShipmentPort {
 
     void changeShipmentStatusTo(final ShipmentStatusRequest request);
 
+    void markDelivered(final ShipmentId shipmentId);
+
     void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod);
 
     ShipmentResult loadShipment(final ShipmentId shipmentId);
@@ -35,6 +39,17 @@ public interface ShipmentPort {
 
     ShipmentRouteLog loadShipmentWithRouteLog(final TrackingNumber trackingNumber);
 
+    ShipmentResult collectShipment(final TrackingNumber trackingNumber);
+
+    ShipmentResult loadShipmentOnPallet(final ShipmentId shipmentId);
+
+    Optional<OperatorId> findOperator(final TrackingNumber trackingNumber);
+
+    Optional<ShipmentResult> findSourceShipment(final ShipmentId shipmentId);
+
+    ShipmentRerouteResult loadShipmentForReroute(final TrackingNumber trackingNumber);
+
+    ShipmentRerouteResult reroute(final ShipmentRerouteCommand command);
 
     boolean existsShipment(final ShipmentId shipmentId);
 
@@ -63,4 +78,6 @@ public interface ShipmentPort {
     void returnToSender(final ShipmentId shipmentId);
 
     boolean hasAnyShipment();
+
+    ShipmentOwnerContext findContext(final TrackingNumber trackingNumber);
 }

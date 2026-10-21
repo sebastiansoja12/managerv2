@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-17-postgresql-reroute-token-verification" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="reroute_token" columnName="failed_attempts"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="reroute_token">
+            <column name="failed_attempts" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="used_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+        <createIndex indexName="idx_reroute_token_parcel_created" tableName="reroute_token">
+            <column name="parcel_id"/>
+            <column name="created"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
