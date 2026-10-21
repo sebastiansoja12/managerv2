@@ -54,6 +54,14 @@ public class UserInvitation {
                 timestamp.plus(validity), null, null);
     }
 
+    public static UserInvitation issue(final UserId userId,
+                                       final String username,
+                                       final String tokenHash,
+                                       final Instant timestamp,
+                                       final Duration validity) {
+        return issue(userId, null, username, tokenHash, timestamp, validity);
+    }
+
     public void ensureUsable(final Instant timestamp) {
         if (acceptedAt != null) {
             throw new InvalidUserInvitationException(UserInvitationFailure.ALREADY_ACCEPTED);
