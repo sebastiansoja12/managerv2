@@ -7,6 +7,7 @@ import com.warehouse.shipment.domain.vo.ShipmentSnapshot;
 import com.warehouse.shipment.domain.vo.Weight;
 import com.warehouse.shipment.domain.vo.WeightUnit;
 import com.warehouse.shipment.infrastructure.dto.ShipmentDetailsDto;
+import com.warehouse.shipment.infrastructure.dto.ShipmentDocumentDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentPartyDto;
 import com.warehouse.shipment.infrastructure.dto.ShipmentRerouteDetailsDto;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,19 @@ public class ShipmentApiServiceMapper {
                 shipment.snapshot().trackingNumber() == null ? null : shipment.snapshot().trackingNumber().value(),
                 shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getCity(),
                 shipment.snapshot().recipient() == null ? null : shipment.snapshot().recipient().getPostalCode()
+        );
+    }
+
+    public ShipmentDocumentDto mapDocument(final ShipmentResult shipment) {
+        final ShipmentSnapshot snapshot = shipment.snapshot();
+        return new ShipmentDocumentDto(
+                snapshot.shipmentId(),
+                snapshot.shipmentRelatedId(),
+                snapshot.shipmentStatus(),
+                snapshot.trackingNumber() == null ? null : snapshot.trackingNumber().value(),
+                weightInKilograms(snapshot.weight()),
+                snapshot.sender() == null ? null : map(snapshot.sender()),
+                snapshot.recipient() == null ? null : map(snapshot.recipient())
         );
     }
 
