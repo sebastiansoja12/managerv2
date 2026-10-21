@@ -5,7 +5,7 @@
 Manager 2.0 is a Java 21 / Spring Boot backend for warehouse and logistics
 operations. The repository is a multi-module Maven project. The main runtime is
 the `Application` module, which assembles the domain modules into one API served
-under `/v2/api`.
+under `/v1/api`.
 
 ## Technology
 
@@ -23,7 +23,7 @@ under `/v2/api`.
 
 | Module | Purpose |
 | --- | --- |
-| `Application` | Main Spring Boot application on port `8080`, API context `/v2/api`. |
+| `Application` | Main Spring Boot application on port `8080`, API context `/v1/api`. |
 | `Authorization` | Login, JWT/cookie authentication, refresh tokens, current user/operator context and permissions. |
 | `OrganisationStructure` | Operator management, operator configuration, provisioning of initial operator data and departments (identifiers, coordinates and read-model synchronization). |
 | `ShipmentManagement` | Shipments, dangerous goods, pickup and delivery methods, pickup-point assignment, return summaries, shipment status, notes, document links and tracking integrations. |
@@ -55,7 +55,7 @@ The default profile is `dev`.
 Important defaults from `Application/src/main/resources`:
 
 - API port: `8080`
-- API context path: `/v2/api`
+- API context path: `/v1/api`
 - Database: `jdbc:postgresql://localhost:5432/dev`
 - Database user/password: `postgres` / `postgres`
 - Liquibase changelog: `classpath:/changelog/db.changelog-master.xml`
@@ -186,7 +186,7 @@ Separate Dockerfiles are available for:
 
 ## API and Documentation
 
-Return operations are exposed by `ReturnPackageController` under `/v2/api/returns/packages`.
+Return operations are exposed by `ReturnPackageController` under `/v1/api/returns/packages`.
 Creation accepts a shipment ID; processing (`PUT /{returnId}/process`), completion
 (`PUT /{returnId}/complete`) and cancellation (`DELETE /{returnId}`) use the return package ID.
 The same controller provides the return details and paginated department list. The returning
@@ -198,14 +198,14 @@ returning context, restores the original shipment to `DELIVERY` and cancels its 
 shipment. The Manager `return_processing_state` changeset stores terminal cancellation markers
 so duplicate or delayed processing events cannot undo cancellation. No RTM schema change is required.
 
-Shipment search uses `ShipmentQueryPort` through the existing `/v2/api/shipments/read-model/search` endpoint.
+Shipment search uses `ShipmentQueryPort` through the existing `/v1/api/shipments/read-model/search` endpoint.
 
 `ReturnConsumedEventTransactionTest` requires an isolated PostgreSQL database. Enable it with
 `RETURN_TEST_POSTGRES=true` and set `RETURN_TEST_JDBC_URL`, `RETURN_TEST_JDBC_USER` and
 `RETURN_TEST_JDBC_PASSWORD`. It creates and removes its own test schema.
 
-- Runtime API prefix: `/v2/api`
-- Actuator health endpoint: `/v2/api/actuator/health`
+- Runtime API prefix: `/v1/api`
+- Actuator health endpoint: `/v1/api/actuator/health`
 - OpenAPI is configured by `Application/src/main/java/com/warehouse/configuration/OpenApiConfiguration.java`
 - Release notes are maintained in `CHANGELOG.md`
 - InPost tracking notes are in `docs/inpost-global-tracking.md`

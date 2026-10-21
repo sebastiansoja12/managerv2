@@ -115,8 +115,8 @@ class PlatformOwnerAuthenticationFilterTest {
                                            final String path,
                                            final boolean platformCookie,
                                            final boolean organizationCookie) {
-        final MockHttpServletRequest request = new MockHttpServletRequest(method, "/v2/api" + path);
-        request.setContextPath("/v2/api");
+        final MockHttpServletRequest request = new MockHttpServletRequest(method, "/v1/api" + path);
+        request.setContextPath("/v1/api");
         if (platformCookie && organizationCookie) {
             request.setCookies(new Cookie("PLATFORM-AUTH-TOKEN", PLATFORM_TOKEN), new Cookie("AUTH-TOKEN", "user-token"));
         } else if (platformCookie) {

@@ -34,15 +34,15 @@ import io.swagger.v3.oas.annotations.servers.Server;
         servers = {
                 @Server(
                         description = "Local environment",
-                        url = "http://localhost:8080/v2/api"
+                        url = "http://localhost:8080/v1/api"
                 ),
                 @Server(
                         description = "Development environment",
-                        url = "https://inparcel-dev-v2.herokuapp.com/v2/api"
+                        url = "https://inparcel-dev-v2.herokuapp.com/v1/api"
                 ),
                 @Server(
                         description = "Render environment",
-                        url = "https://managerv2-1.onrender.com/v2/api"
+                        url = "https://managerv2-1.onrender.com/v1/api"
                 ),
         },
         security = {

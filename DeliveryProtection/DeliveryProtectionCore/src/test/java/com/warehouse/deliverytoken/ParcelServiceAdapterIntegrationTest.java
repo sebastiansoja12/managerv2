@@ -53,7 +53,7 @@ public class ParcelServiceAdapterIntegrationTest {
 
     private final static Long PARCEL_ID = 1L;
 
-    private final static String URL = "http://localhost:8080/v2/api/shipments/%s";
+    private final static String URL = "http://localhost:8080/v1/api/shipments/%s";
 
     private static final String PARCEL_RESPONSE_JSON_URL =
             "/parcelserviceadapterintegration/parcel_1_response.json";

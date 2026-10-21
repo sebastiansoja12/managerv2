@@ -130,8 +130,8 @@ services:
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:-http://eureka-server:8761/eureka/}
       EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:-true}
-      RETURNING_TRACK_MANAGER_URL: ${RETURNING_TRACK_MANAGER_URL:-http://returning-manager:8070/v2/api}
-      ROUTE_TRACKER_FLOW_URL: ${ROUTE_TRACKER_FLOW_URL:-http://route-tracker:8082/v2/api}
+      RETURNING_TRACK_MANAGER_URL: ${RETURNING_TRACK_MANAGER_URL:-http://returning-manager:8070/v1/api}
+      ROUTE_TRACKER_FLOW_URL: ${ROUTE_TRACKER_FLOW_URL:-http://route-tracker:8082/v1/api}
     depends_on:
       eureka-server:
         condition: service_started

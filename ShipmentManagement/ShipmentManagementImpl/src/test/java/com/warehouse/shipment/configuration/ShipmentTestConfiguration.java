@@ -44,7 +44,7 @@ public class ShipmentTestConfiguration {
     ReturnProperties returnProperties() {
         final ReturnProperties returnProperties = new ReturnProperties();
         returnProperties.setUrl("http://localhost:8070");
-        returnProperties.setEndpoint("/v2/api/returns");
+        returnProperties.setEndpoint("/v1/api/returns");
         return returnProperties;
     }
 

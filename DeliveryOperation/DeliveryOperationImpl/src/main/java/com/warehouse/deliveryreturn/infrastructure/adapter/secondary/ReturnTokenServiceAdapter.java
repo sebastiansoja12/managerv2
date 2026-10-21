@@ -53,7 +53,7 @@ public class ReturnTokenServiceAdapter implements ReturnTokenServicePort {
 
         final ResponseEntity<? extends ReturnTokenResponseDto> responseEntity = restClient
                 .post()
-				.uri("/v2/api/{endpoint}", configuration.getEndpoint())
+				.uri("/v1/api/{endpoint}", configuration.getEndpoint())
                 .body(request)
                 .contentType(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -81,7 +81,7 @@ public class ReturnTokenServiceAdapter implements ReturnTokenServicePort {
         try {
             final ReturnTokenValidationResponseDto response = restClient
                     .post()
-                    .uri("/v2/api/returns/token/validate")
+                    .uri("/v1/api/returns/token/validate")
                     .body(requestDto)
                     .header("Authorization", "Bearer " + currentUserApiService.getCurrentUserAuthentication().jwtToken())
                     .contentType(MediaType.APPLICATION_JSON)

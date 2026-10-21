@@ -31,7 +31,7 @@ public class ParcelServiceAdapter extends RestGatewaySupport implements ParcelSe
 
     private final ParcelResponseMapper responseMapper = getMapper(ParcelResponseMapper.class);
     
-    private final String url = "/v2/api/%s/%s";
+    private final String url = "/v1/api/%s/%s";
 
     @Override
     public Parcel downloadParcel(ParcelId parcelId) {

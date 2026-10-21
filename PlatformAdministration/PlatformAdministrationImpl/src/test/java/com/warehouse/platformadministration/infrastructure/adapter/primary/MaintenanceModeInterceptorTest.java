@@ -50,8 +50,8 @@ class MaintenanceModeInterceptorTest {
     }
 
     private MockHttpServletRequest request(final String method, final String path) {
-        final MockHttpServletRequest request = new MockHttpServletRequest(method, "/v2/api" + path);
-        request.setContextPath("/v2/api");
+        final MockHttpServletRequest request = new MockHttpServletRequest(method, "/v1/api" + path);
+        request.setContextPath("/v1/api");
         return request;
     }
 }
