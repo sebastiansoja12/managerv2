@@ -3,6 +3,7 @@ package com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptRequestDto;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptResultDto;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryTargetDto;
+import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryDto;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RecordDeliveryAttemptCommand;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryTargetType;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryType;
@@ -31,5 +32,13 @@ public class DeliveryApiMapper {
                 delivery.shipmentId(),
                 new DeliveryTargetDto(DeliveryTargetDto.TargetType.valueOf(delivery.target().type().name()),
                         delivery.target().id()));
+    }
+
+    public ShipmentDeliveryDto mapShipmentDelivery(final DeliverySnapshot delivery) {
+        return new ShipmentDeliveryDto(
+                delivery.deliveryId(),
+                delivery.shipmentId(),
+                delivery.originDepartmentId(),
+                delivery.destinationDepartmentId());
     }
 }
