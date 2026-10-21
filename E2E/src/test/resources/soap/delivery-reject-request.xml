@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    <soapenv:Body>
+        <TerminalRequest xmlns="http://warehouse.com/logistics/terminal">
+            <ProcessType>REJECT</ProcessType>
+            <Device>
+                <Version>${version}</Version>
+                <DeviceID>${deviceId}</DeviceID>
+                <ResponsibleUser>${username}</ResponsibleUser>
+                <DepartmentCode>${departmentCode}</DepartmentCode>
+                <PairKey>${pairKey}</PairKey>
+                <DeviceUserType>SUPPLIER</DeviceUserType>
+                <DeviceType>TERMINAL</DeviceType>
+            </Device>
+            <DeliveryRejectRequest>
+                <DeliveryRejectDetails>
+                    <DeliveryRejectDetail>
+                        <ShipmentID>${shipmentId}</ShipmentID>
+                        <SupplierCode>${supplierCode}</SupplierCode>
+                        <DeliveryStatus>REJECTED</DeliveryStatus>
+                        <DepartmentCode>${departmentCode}</DepartmentCode>
+                        <RejectReason>${rejectReason}</RejectReason>
+                    </DeliveryRejectDetail>
+                </DeliveryRejectDetails>
+            </DeliveryRejectRequest>
+        </TerminalRequest>
+    </soapenv:Body>
+</soapenv:Envelope>
