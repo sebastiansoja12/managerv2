@@ -2,6 +2,6 @@ package com.warehouse.csv.domain.port.secondary;
 
 import com.warehouse.csv.domain.vo.ParcelCsv;
 
-public interface ParcelRepository {
-    ParcelCsv find(Long id);
+public interface ShipmentServicePort {
+    ParcelCsv find(final Long shipmentId);
 }
