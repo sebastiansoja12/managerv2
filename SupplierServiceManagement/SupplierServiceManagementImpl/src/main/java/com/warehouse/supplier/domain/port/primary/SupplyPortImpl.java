@@ -6,6 +6,7 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
@@ -82,6 +83,11 @@ public class SupplyPortImpl implements SupplyPort {
     @Override
     public Supplier getOneByCode(final SupplierCode supplierCode) {
         return supplierService.findByCode(supplierCode);
+    }
+
+    @Override
+    public Supplier getOneByUserId(final UserId userId) {
+        return supplierService.findByUserId(userId);
     }
 
     @Override

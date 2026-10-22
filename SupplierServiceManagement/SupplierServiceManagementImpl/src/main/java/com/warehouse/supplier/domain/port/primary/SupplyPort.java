@@ -5,6 +5,7 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.vo.*;
 
@@ -15,6 +16,7 @@ public interface SupplyPort {
     List<Supplier> getAllByCurrentDepartment();
     Supplier getOneById(final SupplierId supplierId);
     Supplier getOneByCode(final SupplierCode supplierCode);
+    Supplier getOneByUserId(final UserId userId);
     void activate(final SupplierCode supplierCode);
     void deactivate(final SupplierCode supplierCode);
     Result<Void, String> updateBasicData(final SupplierBasicDataUpdateCommand request);
