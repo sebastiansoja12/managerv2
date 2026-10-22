@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-22-suppliers-email" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="suppliers" columnName="email"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="suppliers">
+            <column name="email" type="VARCHAR(254)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2026-10-22-suppliers-aud-email" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="suppliers_aud"/>
+            <not>
+                <columnExists tableName="suppliers_aud" columnName="email"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="suppliers_aud">
+            <column name="email" type="VARCHAR(254)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2026-10-22-user-invitations" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_invitations"/>
+            </not>
+        </preConditions>
+        <createTable tableName="user_invitations">
+            <column name="invitation_id" type="UUID">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_user_invitations"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supplier_id" type="BIGINT">
+                <constraints unique="true" uniqueConstraintName="uk_user_invitations_supplier"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token_hash" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_user_invitations_token_hash"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="accepted_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+        <createIndex tableName="user_invitations" indexName="idx_user_invitations_user">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-10-22-mail-templates-user-invitation" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'user.invitation'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="79cbb8cd-08f8-4733-abd5-3e484460b5f8"/>
+            <column name="template_key" value="user.invitation"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Twoje konto kuriera zostało utworzone"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+utworzyliśmy dla Ciebie konto kuriera w systemie.
+
+Login: {{username}}
+
+Aby ustawić hasło i aktywować konto, otwórz link:
+{{invitationUrl}}
+
+Link jest ważny do {{expiresAt}}.
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="4e411461-897c-4ada-80e9-b37a220d206e"/>
+            <column name="template_key" value="user.invitation"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Your courier account has been created"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+a courier account has been created for you.
+
+Username: {{username}}
+
+To set your password and activate the account, open the link:
+{{invitationUrl}}
+
+The link is valid until {{expiresAt}}.
+
+Best regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="71583d96-6265-499c-b57f-cb653cb92293"/>
+            <column name="template_key" value="user.invitation"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Ihr Kurierkonto wurde erstellt"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+für Sie wurde ein Kurierkonto angelegt.
+
+Benutzername: {{username}}
+
+Um Ihr Passwort festzulegen und das Konto zu aktivieren, öffnen Sie den Link:
+{{invitationUrl}}
+
+Der Link ist gültig bis {{expiresAt}}.
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
