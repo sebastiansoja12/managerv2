@@ -38,6 +38,9 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
     @Column(name = "telephone_number")
     private String telephoneNumber;
 
+    @Column(name = "email")
+    private String email;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private SupplierStatus status;
@@ -95,6 +98,7 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
             final String firstName,
             final String lastName,
             final String telephoneNumber,
+            final String email,
             final SupplierStatus status,
             final UserStatus userStatus,
             final VehicleId vehicleId,
@@ -115,6 +119,7 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
         this.firstName = firstName;
         this.lastName = lastName;
         this.telephoneNumber = telephoneNumber;
+        this.email = email;
         this.status = status;
         this.userStatus = userStatus;
         this.vehicleId = vehicleId;
@@ -185,6 +190,10 @@ public class SupplierEntity extends BaseEntity<SupplierId> {
 
     public String getTelephoneNumber() {
         return telephoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public Boolean getTermsAccepted() {

@@ -40,6 +40,7 @@ public class SupplierApiServiceAdapter implements SupplierApiService {
                 request.firstName(),
                 request.lastName(),
                 request.telephoneNumber(),
+                request.email(),
                 new DepartmentCode(request.departmentCode()));
         final SupplierCreateResponse response = supplyPort.create(command);
         return new SupplierCodeDto(response.supplierCode().value());

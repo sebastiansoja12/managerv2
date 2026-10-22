@@ -33,6 +33,9 @@ public class SupplierController {
     @PostMapping
     @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_CREATE, UserPermission.ROLE_MANAGER_CREATE})
     public ResponseEntity<?> create(@RequestBody final SupplierCreateApiRequest supplierCreateApiRequest) {
+        if (supplierCreateApiRequest.email() == null || supplierCreateApiRequest.email().isBlank()) {
+            return ResponseEntity.badRequest().body("Email is required to create supplier user account");
+        }
         final SupplierCreateCommand command = RequestMapper.map(supplierCreateApiRequest);
         final SupplierCreateResponse response = this.supplyPort.create(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMapper.map(response));
