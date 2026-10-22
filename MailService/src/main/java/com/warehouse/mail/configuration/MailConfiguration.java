@@ -8,8 +8,10 @@ import com.warehouse.mail.domain.service.MailTemplateRenderer;
 import com.warehouse.mail.infrastructure.adapter.primary.MailListener;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.mail.infrastructure.adapter.primary.kafka.MailKafkaListener;
+import com.warehouse.mail.infrastructure.adapter.primary.kafka.UserInvitationMailKafkaListener;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.MailLocaleResolver;
 import com.warehouse.mail.infrastructure.adapter.primary.mapper.ShipmentMailRequestMapper;
+import com.warehouse.mail.infrastructure.adapter.primary.mapper.UserInvitationMailRequestMapper;
 import com.warehouse.mail.infrastructure.adapter.secondary.DisabledMailServiceAdapter;
 import com.warehouse.mail.infrastructure.adapter.secondary.MailTemplateReadRepository;
 import com.warehouse.mail.infrastructure.adapter.secondary.MailTemplateRepositoryImpl;
@@ -85,6 +87,12 @@ public class MailConfiguration {
     public MailKafkaListener mailKafkaListener(final MailPort mailPort,
                                                final ShipmentMailRequestMapper shipmentMailRequestMapper) {
         return new MailKafkaListener(mailPort, shipmentMailRequestMapper);
+    }
+
+    @Bean
+    public UserInvitationMailKafkaListener userInvitationMailKafkaListener(final MailPort mailPort,
+                                                                           final MailLocaleResolver mailLocaleResolver) {
+        return new UserInvitationMailKafkaListener(mailPort, new UserInvitationMailRequestMapper(mailLocaleResolver));
     }
 
     @Bean
