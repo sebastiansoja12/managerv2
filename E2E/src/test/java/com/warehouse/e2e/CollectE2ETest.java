@@ -81,10 +81,8 @@ class CollectE2ETest extends AbstractE2ETest {
         assertThat(collectedResponse.text("CollectResponse/Success")).isEqualTo("true");
         assertThat(details).containsExactly(
                 Map.of("TrackingNumber", CREATED_SHIPMENT_TRACKING_NUMBER.value(),
-                        "ShipmentID", String.valueOf(CREATED_SHIPMENT_ID.getValue()),
                         "Success", "true"),
                 Map.of("TrackingNumber", PREPARED_SHIPMENT_TRACKING_NUMBER.value(),
-                        "ShipmentID", String.valueOf(PREPARED_SHIPMENT_ID.getValue()),
                         "Success", "true"));
     }
 
@@ -95,7 +93,7 @@ class CollectE2ETest extends AbstractE2ETest {
         assertThat(partiallyCollectedResponse.text("CollectResponse/Success")).isEqualTo("false");
         assertThat(details).hasSize(4);
         assertThat(details.get(0)).containsEntry("TrackingNumber", PARTIALLY_COLLECTED_SHIPMENT_TRACKING_NUMBER.value())
-                .containsEntry("ShipmentID", String.valueOf(PARTIALLY_COLLECTED_SHIPMENT_ID.getValue()))
+                .doesNotContainKey("ShipmentID")
                 .containsEntry("Success", "true")
                 .doesNotContainKey("ErrorMessage");
         assertThat(details.get(1)).containsEntry("TrackingNumber", PARTIALLY_COLLECTED_SHIPMENT_TRACKING_NUMBER.value())

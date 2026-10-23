@@ -16,7 +16,7 @@ import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.delivery.dto.*;
 import com.warehouse.deliverymissed.dto.DeliveryMissedDetailsDto;
@@ -57,7 +57,7 @@ public class LogisticsRequestMapper {
 
     public DeliveryRejectDetails map(final DeliveryRejectDetailType detail) {
         return new DeliveryRejectDetails(
-                new ShipmentId(detail.getShipmentID()),
+                map(detail.getTrackingNumber()),
                 new DepartmentCode(detail.getDepartmentCode()),
                 new SupplierCode(detail.getSupplierCode()),
                 map(detail.getDeliveryStatus()),
@@ -90,7 +90,7 @@ public class LogisticsRequestMapper {
 
     public DeliveryReturnDetails map(final DeliveryReturnDetailType deliveryReturnDetail) {
         return new DeliveryReturnDetails(
-                new ShipmentId(deliveryReturnDetail.getShipmentID()),
+                map(deliveryReturnDetail.getTrackingNumber()),
                 new DepartmentCode(deliveryReturnDetail.getDepartmentCode()),
                 new SupplierCode(deliveryReturnDetail.getSupplierCode()),
                 map(deliveryReturnDetail.getDeliveryStatus()),
@@ -99,7 +99,7 @@ public class LogisticsRequestMapper {
 
     public DeliveryMissedDetails map(final DeliveryMissedDetailType deliveryMissedDetail) {
         return new DeliveryMissedDetails(
-                new ShipmentId(deliveryMissedDetail.getShipmentID()),
+                map(deliveryMissedDetail.getTrackingNumber()),
                 new DepartmentCode(deliveryMissedDetail.getDepartmentCode()),
                 new SupplierCode(deliveryMissedDetail.getSupplierCode()),
                 map(deliveryMissedDetail.getDeliveryStatus()));
@@ -160,7 +160,7 @@ public class LogisticsRequestMapper {
 
     private DeliveryRejectDetailsDto map(final DeliveryRejectDetails detail) {
         return new DeliveryRejectDetailsDto(
-                map(detail.getShipmentId()),
+                detail.getTrackingNumber(),
                 map(detail.getDepartmentCode()),
                 new com.warehouse.deliveryreject.dto.SupplierCodeDto(detail.getSupplierCode().value()),
                 map(detail.getDeliveryStatus()),
@@ -173,7 +173,7 @@ public class LogisticsRequestMapper {
 
     private DeliveryMissedDetailsDto map(final DeliveryMissedDetails detail) {
         return new DeliveryMissedDetailsDto(
-                map(detail.getShipmentId()),
+                detail.getTrackingNumber(),
                 map(detail.getDepartmentCode()),
                 map(detail.getSupplierCode()),
                 map(detail.getDeliveryStatus()));
@@ -187,7 +187,7 @@ public class LogisticsRequestMapper {
 
     private DeliveryReturnDetailsDto map(final DeliveryReturnDetails detail) {
         return new DeliveryReturnDetailsDto(
-                map(detail.getShipmentId()),
+                detail.getTrackingNumber(),
                 map(detail.getDeliveryStatus()),
                 map(detail.getDepartmentCode()),
                 map(detail.getSupplierCode()),
@@ -208,8 +208,8 @@ public class LogisticsRequestMapper {
                 DeviceTypeDto.valueOf(deviceInformation.getDeviceType().name()));
     }
 
-    private ShipmentIdDto map(final ShipmentId shipmentId) {
-        return new ShipmentIdDto(shipmentId.getValue());
+    private TrackingNumber map(final String trackingNumber) {
+        return trackingNumber == null ? null : new TrackingNumber(trackingNumber.trim());
     }
 
     private DepartmentCodeDto map(final DepartmentCode departmentCode) {

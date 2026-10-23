@@ -44,7 +44,9 @@ public interface DeliveryRejectResponseMapper {
                 map(details.getSupplierCode()),
                 map(details.getRejectReason()),
                 details.getSuccess(),
-                details.getErrorMessage());
+                details.getErrorMessage(),
+                details.getTrackingNumber(),
+                details.getNewTrackingNumber());
     }
 
     default DeviceInformationDto map(final DeviceInformation deviceInformation) {

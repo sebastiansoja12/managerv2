@@ -15,7 +15,7 @@
             <DeliveryRejectRequest>
                 <DeliveryRejectDetails>
                     <DeliveryRejectDetail>
-                        <ShipmentID>${shipmentId}</ShipmentID>
+                        <TrackingNumber>${trackingNumber}</TrackingNumber>
                         <SupplierCode>${supplierCode}</SupplierCode>
                         <DeliveryStatus>REJECTED</DeliveryStatus>
                         <DepartmentCode>${departmentCode}</DepartmentCode>

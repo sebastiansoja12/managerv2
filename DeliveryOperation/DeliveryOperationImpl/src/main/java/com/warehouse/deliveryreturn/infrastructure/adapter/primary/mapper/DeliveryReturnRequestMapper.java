@@ -9,10 +9,9 @@ import org.mapstruct.Mapping;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ProcessId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.delivery.dto.DeviceIdDto;
 import com.warehouse.delivery.dto.DeviceInformationDto;
-import com.warehouse.delivery.dto.ShipmentIdDto;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.infrastructure.api.dto.DeliveryReturnRequestDto;
@@ -37,8 +36,8 @@ public interface DeliveryReturnRequestMapper {
     @Mapping(target = "returnToken.value", source = "returnToken")
     DeliveryReturnDetails map(final DeliveryReturnDetail deliveryReturnDetail);
 
-    default ShipmentId mapToShipmentId(final Long shipmentId) {
-        return new ShipmentId(shipmentId);
+    default TrackingNumber mapToTrackingNumber(final String trackingNumber) {
+        return trackingNumber == null ? null : new TrackingNumber(trackingNumber);
     }
 
     @Mapping(target = "departmentCode.value", source = "departmentCode")
@@ -58,10 +57,6 @@ public interface DeliveryReturnRequestMapper {
 
     default com.warehouse.deliveryreturn.domain.vo.ReturnToken map(final ReturnTokenDto returnToken) {
         return returnToken == null ? null : new com.warehouse.deliveryreturn.domain.vo.ReturnToken(returnToken.value());
-    }
-
-    default ShipmentId map(final ShipmentIdDto value) {
-        return new ShipmentId(value.value());
     }
 
     @Mapping(target = "version", source = "version.value")

@@ -5,6 +5,7 @@ import static com.warehouse.e2e.LogisticsE2EFixture.DEPARTMENT_CODE;
 import static com.warehouse.e2e.LogisticsE2EFixture.DEPARTMENT_ID;
 import static com.warehouse.e2e.LogisticsE2EFixture.REJECTED_DELIVERY_ID;
 import static com.warehouse.e2e.LogisticsE2EFixture.REJECTED_SHIPMENT_ID;
+import static com.warehouse.e2e.LogisticsE2EFixture.REJECTED_SHIPMENT_TRACKING_NUMBER;
 import static com.warehouse.e2e.LogisticsE2EFixture.REJECT_REASON;
 import static com.warehouse.e2e.LogisticsE2EFixture.SUPPLIER_CODE;
 import static com.warehouse.e2e.LogisticsE2EFixture.TERMINAL_DEVICE_ID;
@@ -58,7 +59,8 @@ class DeliveryRejectE2ETest extends AbstractE2ETest {
         final String detail = "DeliveryRejectResponse/DeliveryRejectResponseDetails/DeliveryRejectResponseDetail";
 
         assertThat(response.count(detail)).isEqualTo(1);
-        assertThat(response.text(detail + "/ShipmentID")).isEqualTo(String.valueOf(REJECTED_SHIPMENT_ID.getValue()));
+        assertThat(response.text(detail + "/TrackingNumber")).isEqualTo(REJECTED_SHIPMENT_TRACKING_NUMBER.value());
+        assertThat(response.count(detail + "/ShipmentID")).isZero();
         assertThat(response.text(detail + "/DeliveryStatus")).isEqualTo("REJECTED");
         assertThat(response.text(detail + "/RejectReason")).isEqualTo(REJECT_REASON);
         assertThat(response.text(detail + "/DepartmentCode")).isEqualTo(DEPARTMENT_CODE.value());
@@ -66,13 +68,13 @@ class DeliveryRejectE2ETest extends AbstractE2ETest {
     }
 
     @Test
-    void shouldRespondWithNewShipmentIdOfRedirectedShipment() {
+    void shouldRespondWithNewTrackingNumberOfRedirectedShipment() {
         final ShipmentId redirectedShipmentId = redirectedShipmentId();
 
-        final String newShipmentId = response.text(
-                "DeliveryRejectResponse/DeliveryRejectResponseDetails/DeliveryRejectResponseDetail/NewShipmentID");
+        final String newTrackingNumber = response.text(
+                "DeliveryRejectResponse/DeliveryRejectResponseDetails/DeliveryRejectResponseDetail/NewTrackingNumber");
 
-        assertThat(newShipmentId).isEqualTo(String.valueOf(redirectedShipmentId.getValue()));
+        assertThat(newTrackingNumber).isEqualTo(shipment(redirectedShipmentId).get("tracking_number"));
     }
 
     @Test
@@ -92,7 +94,7 @@ class DeliveryRejectE2ETest extends AbstractE2ETest {
         assertThat(processLog.get("department_code")).isEqualTo(DEPARTMENT_CODE.value());
         assertThat(((Number) processLog.get("user_id")).longValue()).isEqualTo(TERMINAL_USER_ID.value());
         assertThat((String) processLog.get("request"))
-                .contains(String.valueOf(REJECTED_SHIPMENT_ID.getValue()))
+                .contains(REJECTED_SHIPMENT_TRACKING_NUMBER.value())
                 .contains(REJECT_REASON);
         assertThat((String) processLog.get("response")).contains(processId.toString());
     }

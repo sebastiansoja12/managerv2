@@ -13,10 +13,12 @@ import com.warehouse.deliverymissed.domain.model.DeliveryMissed;
 import com.warehouse.deliverymissed.domain.model.DeliveryMissedDetails;
 import com.warehouse.deliverymissed.domain.model.DeliveryMissedRequest;
 import com.warehouse.deliverymissed.domain.port.secondary.DeliveryInstructionServicePort;
+import com.warehouse.deliverymissed.domain.port.secondary.ShipmentIdentificationServicePort;
 import com.warehouse.deliverymissed.domain.service.DeliveryMissedService;
 import com.warehouse.deliverymissed.domain.service.SuggestedActionDetermineService;
 import com.warehouse.deliverymissed.domain.vo.*;
 import com.warehouse.deliverymissed.infrastructure.adapter.secondary.entity.id.DeliveryMissedDetailId;
+import com.warehouse.deliverymissed.domain.exception.ShipmentNotIdentifiedException;
 
 public class DeliveryMissedPortImpl implements DeliveryMissedPort {
 
@@ -26,16 +28,21 @@ public class DeliveryMissedPortImpl implements DeliveryMissedPort {
 
     private final SuggestedActionDetermineService suggestedActionDetermineService;
 
+    private final ShipmentIdentificationServicePort shipmentIdentificationServicePort;
+
     public DeliveryMissedPortImpl(final DeliveryMissedService deliveryMissedService,
                                   final DeliveryInstructionServicePort deliveryInstructionServicePort,
-                                  final SuggestedActionDetermineService suggestedActionDetermineService) {
+                                  final SuggestedActionDetermineService suggestedActionDetermineService,
+                                  final ShipmentIdentificationServicePort shipmentIdentificationServicePort) {
         this.deliveryMissedService = deliveryMissedService;
         this.deliveryInstructionServicePort = deliveryInstructionServicePort;
         this.suggestedActionDetermineService = suggestedActionDetermineService;
+        this.shipmentIdentificationServicePort = shipmentIdentificationServicePort;
     }
 
     @Override
     public DeliveryMissedResponse process(final DeliveryMissedRequest request) {
+        identifyShipments(request);
         final DeliveryId deliveryId = determineDeliveryId(request);
         final List<DeliveryMissed> deliveryMisses = new ArrayList<>();
         final Map<ShipmentId, DeliveryMissedInstruction> deliveryMissedInstructions =
@@ -75,4 +82,11 @@ public class DeliveryMissedPortImpl implements DeliveryMissedPort {
         return null;
     }
 
+
+    private void identifyShipments(final DeliveryMissedRequest request) {
+        for (final DeliveryMissedDetails detail : request.getDeliveryMissedDetails()) {
+            detail.setShipmentId(this.shipmentIdentificationServicePort.findShipmentId(detail.getTrackingNumber())
+                    .orElseThrow(() -> new ShipmentNotIdentifiedException(detail.getTrackingNumber())));
+        }
+    }
 }

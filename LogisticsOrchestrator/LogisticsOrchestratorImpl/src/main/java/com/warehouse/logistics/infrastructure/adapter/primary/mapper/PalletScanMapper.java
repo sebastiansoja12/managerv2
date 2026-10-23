@@ -3,7 +3,10 @@ package com.warehouse.logistics.infrastructure.adapter.primary.mapper;
 import com.warehouse.logistics.application.port.primary.command.PalletScanCommand;
 import com.warehouse.logistics.application.port.primary.result.PalletScanDetail;
 import com.warehouse.logistics.application.port.primary.result.PalletScanOutcome;
+import java.util.function.Function;
+
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.terminal.jaxb.PalletScanRequest;
 import com.warehouse.terminal.jaxb.PalletScanResponse;
 import com.warehouse.terminal.jaxb.PalletScanResponseDetailType;
@@ -16,10 +19,11 @@ public class PalletScanMapper {
         return new PalletScanCommand(processId, trackingNumber == null ? null : trackingNumber.trim());
     }
 
-    public PalletScanResponse map(final ProcessId processId, final PalletScanOutcome outcome) {
+    public PalletScanResponse map(final ProcessId processId, final PalletScanOutcome outcome,
+                                  final Function<ShipmentId, String> trackingNumberResolver) {
         final PalletScanResponseDetailsType details = new PalletScanResponseDetailsType();
         outcome.details().stream()
-                .map(this::map)
+                .map(detail -> map(detail, trackingNumberResolver))
                 .forEach(details.getPalletScanResponseDetail()::add);
 
         final PalletScanResponse response = new PalletScanResponse();
@@ -35,9 +39,10 @@ public class PalletScanMapper {
         return response;
     }
 
-    private PalletScanResponseDetailType map(final PalletScanDetail detail) {
+    private PalletScanResponseDetailType map(final PalletScanDetail detail,
+                                            final Function<ShipmentId, String> trackingNumberResolver) {
         final PalletScanResponseDetailType responseDetail = new PalletScanResponseDetailType();
-        responseDetail.setShipmentID(detail.shipmentId().getValue());
+        responseDetail.setTrackingNumber(trackingNumberResolver.apply(detail.shipmentId()));
         responseDetail.setSuccess(detail.success());
         responseDetail.setShipmentStatus(detail.shipmentStatus());
         responseDetail.setErrorMessage(detail.errorMessage());

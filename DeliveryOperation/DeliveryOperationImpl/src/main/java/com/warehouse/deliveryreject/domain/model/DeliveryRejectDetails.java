@@ -5,12 +5,14 @@ import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreject.domain.vo.Person;
 import com.warehouse.deliveryreject.domain.vo.RejectReason;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
 
 public class DeliveryRejectDetails {
+    private TrackingNumber trackingNumber;
     private ShipmentId shipmentId;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
@@ -20,7 +22,7 @@ public class DeliveryRejectDetails {
     private ShipmentStatus shipmentStatus;
     private ProcessType processType;
 
-    public DeliveryRejectDetails(final ShipmentId shipmentId,
+    public DeliveryRejectDetails(final TrackingNumber trackingNumber,
                                  final DepartmentCode departmentCode,
                                  final SupplierCode supplierCode,
                                  final DeliveryStatus deliveryStatus,
@@ -28,7 +30,7 @@ public class DeliveryRejectDetails {
                                  final Person recipient,
                                  final ShipmentStatus shipmentStatus,
                                  final ProcessType processType) {
-        this.shipmentId = shipmentId;
+        this.trackingNumber = trackingNumber;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deliveryStatus = deliveryStatus;
@@ -36,6 +38,10 @@ public class DeliveryRejectDetails {
         this.recipient = recipient;
         this.shipmentStatus = shipmentStatus;
         this.processType = processType;
+    }
+
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
     }
 
     public ShipmentId getShipmentId() {
