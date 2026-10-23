@@ -4,4 +4,5 @@ import com.warehouse.commonassets.identificator.UserId;
 
 public interface CurrentUserServicePort {
     UserId getCurrentUserId();
+    boolean isCurrentUserSupplier();
 }

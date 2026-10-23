@@ -37,5 +37,31 @@ public interface ProcessLogReadRepository extends JpaRepository<ProcessLogReadEn
     Optional<ProcessLogReadEntity> findByIdAndOperatorId(final ProcessId processId,
                                                          final OperatorId operatorId);
 
+    @EntityGraph(attributePaths = "communicationLogs")
+    @Query("""
+            select distinct p
+            from ProcessLogReadEntity p
+            left join p.communicationLogs c
+            where (p.operatorId = :operatorId
+                   or c.operatorId = :operatorId)
+              and p.deviceInformation.userId.value = :userId
+            """)
+    Page<ProcessLogReadEntity> findAllByOperatorIdAndUserId(final OperatorId operatorId,
+                                                            final Long userId,
+                                                            final Pageable pageable);
+
+    @Query("""
+            select distinct p
+            from ProcessLogReadEntity p
+            left join fetch p.communicationLogs c
+            where p.processId = :processId
+              and (p.operatorId = :operatorId
+                   or c.operatorId = :operatorId)
+              and p.deviceInformation.userId.value = :userId
+            """)
+    Optional<ProcessLogReadEntity> findByIdAndOperatorIdAndUserId(final ProcessId processId,
+                                                                  final OperatorId operatorId,
+                                                                  final Long userId);
+
     Optional<ProcessLogReadEntity> findByProcessId(final ProcessId processId);
 }
