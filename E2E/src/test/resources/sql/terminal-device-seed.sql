@@ -22,5 +22,6 @@ VALUES ('TL:e2e-terminal-0001', 'E2E-TERMINAL-0001', 'TERMINAL', 'ACTIVE', now()
 ON CONFLICT DO NOTHING;
 
 INSERT INTO device_pair (device_pair_id, device_id, paired, pair_time, pair_key, pair_key_expires_at)
-VALUES (900001, 'TL:e2e-terminal-0001', true, now(), 'e2e-terminal-0001-pair-key', now() + interval '2 days')
+VALUES (900001, 'TL:e2e-terminal-0001', true, now(),
+        encode(sha256(convert_to('e2e-terminal-0001-pair-key', 'UTF8')), 'hex'), now() + interval '2 days')
 ON CONFLICT DO NOTHING;

@@ -1,5 +1,6 @@
 package com.warehouse.terminal.response;
 
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.terminal.dto.DepartmentCodeDto;
 import com.warehouse.terminal.dto.DeviceIdDto;
@@ -11,9 +12,10 @@ public record DeviceAuthenticationResponseDto(Boolean value,
                                               DepartmentCodeDto departmentCode,
                                               UserIdDto userId,
                                               UsernameDto username,
-                                              OperatorId operatorId) {
+                                              OperatorId operatorId,
+                                              DepartmentId departmentId) {
 
     public static DeviceAuthenticationResponseDto invalid() {
-        return new DeviceAuthenticationResponseDto(false, null, null, null, null, null);
+        return new DeviceAuthenticationResponseDto(false, null, null, null, null, null, null);
     }
 }

@@ -1,10 +1,12 @@
 package com.warehouse.terminal.domain.model;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.vo.DevicePairId;
 import com.warehouse.terminal.infrastructure.adapter.secondary.entity.DevicePairEntity;
 
@@ -23,6 +25,12 @@ public class DevicePair {
 	private String pairKey;
 
 	private Instant pairKeyExpiresAt;
+
+	private UserId operatorUserId;
+
+	private Instant operatorSessionExpiresAt;
+
+	private Instant lastSeenAt;
 
 	public DevicePair(final DevicePairId devicePairId,
 					  final DeviceId deviceId,
@@ -126,12 +134,58 @@ public class DevicePair {
 
     public static DevicePair from(final DevicePairEntity devicePairEntity) {
         final DevicePairId pairId = new DevicePairId(devicePairEntity.getDevicePairId());
-        return new DevicePair(pairId, devicePairEntity.getDeviceId(),
+        final DevicePair devicePair = new DevicePair(pairId, devicePairEntity.getDeviceId(),
                 devicePairEntity.isPaired(), devicePairEntity.getLoginTime(),
                 devicePairEntity.getErrorDescription(),
                 devicePairEntity.getPairKey(),
 				devicePairEntity.getPairKeyExpiresAt());
+		devicePair.operatorUserId = devicePairEntity.getOperatorUserId();
+		devicePair.operatorSessionExpiresAt = devicePairEntity.getOperatorSessionExpiresAt();
+		devicePair.lastSeenAt = devicePairEntity.getLastSeenAt();
+        return devicePair;
     }
+
+	public void activate(final String pairKey, final Instant pairKeyExpiresAt) {
+		pair(pairKey, pairKeyExpiresAt);
+		endOperatorSession();
+	}
+
+	public void startOperatorSession(final UserId userId, final Instant expiresAt) {
+		this.operatorUserId = userId;
+		this.operatorSessionExpiresAt = expiresAt;
+	}
+
+	public void endOperatorSession() {
+		this.operatorUserId = null;
+		this.operatorSessionExpiresAt = null;
+	}
+
+	public boolean isOperatorSessionOwnedBy(final UserId userId) {
+		return operatorUserId != null && operatorUserId.equals(userId);
+	}
+
+	public Optional<UserId> activeOperator(final Instant now) {
+		if (operatorUserId == null || operatorSessionExpiresAt == null || !operatorSessionExpiresAt.isAfter(now)) {
+			return Optional.empty();
+		}
+		return Optional.of(operatorUserId);
+	}
+
+	public void markSeen(final Instant now) {
+		this.lastSeenAt = now;
+	}
+
+	public UserId getOperatorUserId() {
+		return operatorUserId;
+	}
+
+	public Instant getOperatorSessionExpiresAt() {
+		return operatorSessionExpiresAt;
+	}
+
+	public Instant getLastSeenAt() {
+		return lastSeenAt;
+	}
 
 	public boolean containsValidPairKey(final Instant now) {
 		return StringUtils.isNotBlank(pairKey)

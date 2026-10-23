@@ -8,16 +8,21 @@ import java.util.Locale;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.warehouse.auth.AccessUserControl;
 import com.warehouse.auth.CurrentUserApiService;
+import com.warehouse.auth.infrastructure.dto.UserDto;
 import com.warehouse.commonassets.enumeration.DeviceType;
+import com.warehouse.commonassets.enumeration.UserPermission;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
+import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.model.Device;
 import com.warehouse.terminal.domain.model.command.*;
 import com.warehouse.terminal.domain.port.primary.DevicePairPort;
 import com.warehouse.terminal.domain.port.primary.DevicePort;
+import com.warehouse.terminal.domain.vo.DevicePairKey;
 import com.warehouse.terminal.domain.vo.DeviceUserRequest;
 import com.warehouse.terminal.domain.vo.DeviceVersionRequest;
 import com.warehouse.terminal.dto.DeviceDto;
@@ -29,6 +34,8 @@ import com.warehouse.terminal.request.*;
 @RestController
 @RequestMapping("/devices")
 public class DeviceController {
+
+    private static final String HEADER_DEVICE_PAIR_KEY = "X-DEVICE-PAIR-KEY";
 
     private final DevicePort devicePort;
 
@@ -139,6 +146,7 @@ public class DeviceController {
         return ResponseEntity.ok().build();
     }
 
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
     @PutMapping("/{id}/ownerships")
     public ResponseEntity<?> updateOwnership(@PathVariable final String id,
                                              @RequestBody final DeviceOwnershipRequestDto request) {
@@ -163,17 +171,41 @@ public class DeviceController {
         return ResponseEntity.ok().body(deviceResponse);
     }
 
-    @PostMapping("/current-user/pairings")
-    public ResponseEntity<?> pairCurrentUserDevice(@RequestBody final CurrentUserDevicePairRequestDto requestDto) {
-        final UserId currentUserId = this.currentUserApiService.getCurrentUserId();
-        final DepartmentCode departmentCode = requestDto.departmentCode() != null
-                ? new DepartmentCode(requestDto.departmentCode().value())
-                : null;
-        final DevicePairRequest request = new DevicePairRequest(
-                requestDto.externalSystemId(),
-                departmentCode,
-                currentUserId);
-        return ResponseEntity.ok().body(responseMapper.map(this.devicePairPort.pair(request)));
+    @PostMapping("/current-user/sessions")
+    public ResponseEntity<?> startOperatorSession(@RequestHeader(HEADER_DEVICE_PAIR_KEY) final String pairKey) {
+        final DeviceOperatorSessionCommand command = new DeviceOperatorSessionCommand(new DevicePairKey(pairKey),
+                this.currentUserApiService.getCurrentUserId());
+        return ResponseEntity.ok().body(responseMapper.map(this.devicePairPort.startOperatorSession(command)));
+    }
+
+    @DeleteMapping("/current-user/sessions")
+    public ResponseEntity<?> endOperatorSession(@RequestHeader(HEADER_DEVICE_PAIR_KEY) final String pairKey) {
+        this.devicePairPort.endOperatorSession(new DeviceOperatorSessionCommand(new DevicePairKey(pairKey),
+                this.currentUserApiService.getCurrentUserId()));
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/current-user/pairing-codes")
+    public ResponseEntity<?> issuePairingCode() {
+        final UserDto user = this.currentUserApiService.getCurrentUser();
+        final DevicePairingCodeCommand command = new DevicePairingCodeCommand(
+                new UserId(user.userId().value()),
+                OperatorId.of(user.operatorId().value()),
+                new DepartmentCode(user.departmentCode()));
+        return ResponseEntity.ok().body(responseMapper.map(this.devicePairPort.issuePairingCode(command)));
+    }
+
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    @PostMapping("/{id}/activation-codes")
+    public ResponseEntity<?> issueActivationCode(@PathVariable final String id) {
+        return ResponseEntity.ok().body(responseMapper.map(this.devicePairPort.issueActivationCode(new DeviceId(id))));
+    }
+
+    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_UPDATE, UserPermission.ROLE_MANAGER_UPDATE})
+    @DeleteMapping("/{id}/pairings")
+    public ResponseEntity<?> revokePairing(@PathVariable final String id) {
+        this.devicePairPort.revoke(new DeviceId(id));
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")

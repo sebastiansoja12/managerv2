@@ -55,9 +55,7 @@ public class DeviceValidatorServiceImpl implements DeviceValidatorService {
     public void validateDevice(final DeviceValidationRequest request) {
         final User user = userServicePort.findUserByUsername(request.username().value());
         final Optional<Device> device = deviceRepository.findById(request.deviceId())
-                .stream()
-                .filter(dev -> user != null && dev.getUserId().equals(user.userId()))
-                .findAny();
+                .filter(dev -> user != null && canOperate(dev, user));
         final boolean deviceExists = device.isPresent();
         final boolean departmentExists = departmentServicePort.getDepartment(request.departmentCode()) != null;
         final boolean deviceValid = deviceExists && device.get().isActive();
@@ -68,5 +66,13 @@ public class DeviceValidatorServiceImpl implements DeviceValidatorService {
 					request.sourceServiceType().name(), request.targetServiceType().name(),
 					"Device is not valid:" + request.deviceId()));
 		}
+    }
+
+    private boolean canOperate(final Device device, final User user) {
+        if (device.getOwnership() != null && device.getOwnership().isShared()) {
+            return device.getDepartmentCode() != null && user.departmentCode() != null
+                    && Objects.equals(device.getDepartmentCode().value(), user.departmentCode().value());
+        }
+        return Objects.equals(device.getUserId(), user.userId());
     }
 }
