@@ -4,6 +4,7 @@ import com.warehouse.commonassets.event.application.port.secondary.DomainEventPu
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.logisticsdelivery.application.port.primary.command.AssignDeliverySupplierCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryRelation;
@@ -247,6 +248,17 @@ public class DeliveryPortImpl implements DeliveryPort {
 
     @Override
     @Transactional
+    public DeliverySnapshot completeShipmentDelivery(final ShipmentId shipmentId, final boolean recipientSigned) {
+        final Delivery delivery = this.deliveryRepository
+                .findByTargetAndType(DeliveryTarget.shipment(shipmentId), DeliveryType.OUTBOUND)
+                .orElseThrow(() -> new DeliveryNotFoundException("Delivery for shipment " + shipmentId.getValue()
+                        + " was not found"));
+        delivery.ensureRecipientSignature(recipientSigned);
+        return finishDelivery(delivery.getDeliveryId());
+    }
+
+    @Override
+    @Transactional
     public DeliverySnapshot commentStep(final CommentDeliveryStepCommand command) {
         final Delivery delivery = find(command.deliveryId());
         return saveModifiedWhen(delivery, delivery.commentStep(command.stepNumber(), command.comment()));
@@ -292,6 +304,14 @@ public class DeliveryPortImpl implements DeliveryPort {
     public List<DeliverySnapshot> findDeliveriesByDepartment(final DepartmentId departmentId, final int offset,
                                                              final int limit) {
         return this.deliveryRepository.findByDepartment(departmentId, offset, limit).stream()
+                .map(Delivery::snapshot)
+                .toList();
+    }
+
+    @Override
+    public List<DeliverySnapshot> findDeliveriesBySupplier(final SupplierId supplierId, final int offset,
+                                                           final int limit) {
+        return this.deliveryRepository.findBySupplier(supplierId, offset, limit).stream()
                 .map(Delivery::snapshot)
                 .toList();
     }
