@@ -14,7 +14,7 @@ public interface UserRepository {
 
     OrganizationUser findByUsername(final String username);
 
-    OrganizationUser findByApiKey(final String apiKey);
+    Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash);
 
     OrganizationUser findById(final UserId userId);
 

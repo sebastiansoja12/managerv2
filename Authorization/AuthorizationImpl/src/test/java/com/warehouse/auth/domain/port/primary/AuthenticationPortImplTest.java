@@ -223,11 +223,10 @@ class AuthenticationPortImplTest {
         }
 
         @Override
-        public OrganizationUser findByApiKey(final String apiKey) {
+        public Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash) {
             return users.values().stream()
-                    .filter(user -> apiKey.equals(user.getApiKey()))
-                    .findFirst()
-                    .orElse(null);
+                    .filter(user -> apiKeyHash.equals(user.getApiKey()))
+                    .findFirst();
         }
 
         @Override

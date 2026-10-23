@@ -40,6 +40,7 @@ public class SecurityConfiguration {
     private final AuthProperties authProperties;
     private final DepartmentReadSyncBasicAuthenticationFilter departmentReadSyncBasicAuthenticationFilter;
     private final ShipmentReadSyncBasicAuthenticationFilter shipmentReadSyncBasicAuthenticationFilter;
+    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http,
@@ -54,7 +55,8 @@ public class SecurityConfiguration {
                         .ignoringRequestMatchers(
                                 "/departments/read-sync/**",
                                 "/internal/shipments/read-sync/**",
-                                "/admin/async-jobs/**"))
+                                "/admin/async-jobs/**")
+                        .ignoringRequestMatchers(apiExposureProperties.mcpSecurityMatchers()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
@@ -85,6 +87,7 @@ public class SecurityConfiguration {
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(departmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(shipmentReadSyncBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http
                 .authenticationProvider(authenticationProvider);
 

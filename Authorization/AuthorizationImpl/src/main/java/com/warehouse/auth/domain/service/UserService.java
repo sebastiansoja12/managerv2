@@ -1,5 +1,8 @@
 package com.warehouse.auth.domain.service;
 
+import java.time.Instant;
+import java.util.Optional;
+
 import com.warehouse.auth.domain.model.FullNameChangeCommand;
 import com.warehouse.auth.domain.model.UpdateUserCommand;
 import com.warehouse.auth.domain.model.OrganizationUser;
@@ -30,6 +33,8 @@ public interface UserService {
     void changeLanguage(final UserId userId, final String language);
 
     void changeApiKey(final UserId userId, final String apiKey);
+    void issueApiKey(final UserId userId, final String apiKeyHash, final Instant issuedAt);
+    Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash);
 
     void changeRole(final UserId userId, final OrganizationUser.Role role);
 

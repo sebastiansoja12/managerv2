@@ -174,6 +174,6 @@ public class TenantMdcFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(final HttpServletRequest request) {
-        return apiExposureProperties.isPairKeyController(request);
+        return apiExposureProperties.isPairKeyController(request) || apiExposureProperties.isMcpPath(request);
     }
 }
