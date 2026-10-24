@@ -4,11 +4,14 @@ import com.warehouse.auth.configuration.ApiExposureProperties;
 import com.warehouse.auth.configuration.AuthCookieService;
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
+import com.warehouse.auth.domain.service.DepartmentService;
 import com.warehouse.auth.domain.service.JwtService;
 import com.warehouse.auth.domain.service.OperatorAccessPolicy;
 import com.warehouse.auth.domain.service.UserService;
 import com.warehouse.auth.domain.vo.Impersonation;
+import com.warehouse.auth.infrastructure.adapter.primary.ActingDepartmentHeader;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import io.jsonwebtoken.JwtException;
 import com.warehouse.commonassets.model.UsernameTenantPasswordAuthenticationToken;
 import jakarta.servlet.FilterChain;
@@ -53,6 +56,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final ApiExposureProperties apiExposureProperties;
 
+    private final DepartmentService departmentService;
+
+    private final ActingDepartmentHeader actingDepartmentHeader = new ActingDepartmentHeader();
+
 	@Override
 	protected void doFilterInternal(@NonNull final HttpServletRequest request,
                                     @NonNull final HttpServletResponse response,
@@ -86,6 +93,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     context.setAuthentication(authToken);
                     SecurityContextHolder.setContext(context);
+                    departmentService.findActingDepartmentId(user,
+                                    actingDepartmentHeader.fromValue(request.getHeader(ActingDepartmentHeader.NAME)))
+                            .ifPresent(departmentId -> context.setAuthentication(
+                                    actingDepartmentToken(authToken, user, departmentId, jwt)));
                 }
             }
         } catch (JwtException | IllegalArgumentException | UserNotFoundException exception) {
@@ -99,6 +110,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 		filterChain.doFilter(request, response);
 	}
+
+    private UsernameTenantPasswordAuthenticationToken actingDepartmentToken(
+            final UsernameTenantPasswordAuthenticationToken authToken,
+            final OrganizationUser user,
+            final DepartmentId departmentId,
+            final String jwt) {
+        final UsernameTenantPasswordAuthenticationToken actingToken = new UsernameTenantPasswordAuthenticationToken(
+                user.getUserId(), user.operatorId(), departmentId, jwt, user.getAuthorities());
+        actingToken.setDetails(authToken.getDetails());
+        return actingToken;
+    }
 
     @Override
     protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
