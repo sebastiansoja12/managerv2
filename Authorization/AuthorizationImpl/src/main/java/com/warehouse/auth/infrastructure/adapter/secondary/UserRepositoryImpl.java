@@ -2,8 +2,6 @@ package com.warehouse.auth.infrastructure.adapter.secondary;
 
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.secondary.UserRepository;
-import com.warehouse.auth.domain.service.ApiKeyEncoder;
-import com.warehouse.auth.domain.vo.ApiKey;
 import com.warehouse.auth.infrastructure.adapter.secondary.entity.UserEntity;
 import com.warehouse.auth.infrastructure.adapter.secondary.exception.UserNotFoundException;
 import com.warehouse.auth.infrastructure.adapter.secondary.mapper.UserToEntityMapper;
@@ -25,14 +23,10 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final NoOperatorContextRepository<UserEntity> noOperatorContextRepository;
 
-    private final ApiKeyEncoder apiKeyEncoder;
-
     public UserRepositoryImpl(final OperatorFilteredRepository<UserEntity> repository,
-                              final NoOperatorContextRepository<UserEntity> noOperatorContextRepository,
-                              final ApiKeyEncoder apiKeyEncoder) {
+                              final NoOperatorContextRepository<UserEntity> noOperatorContextRepository) {
         this.repository = repository;
         this.noOperatorContextRepository = noOperatorContextRepository;
-        this.apiKeyEncoder = apiKeyEncoder;
     }
 
     @Override
@@ -57,26 +51,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public OrganizationUser findByApiKey(final String apiKey) {
-        if (apiKey == null || apiKey.isBlank()) {
-            return null;
-        }
-
-        final OrganizationUser userWithDisplayedApiKey = findByStoredApiKey(apiKey);
-        if (userWithDisplayedApiKey != null) {
-            return userWithDisplayedApiKey;
-        }
-
-        final String encodedApiKey = apiKeyEncoder.decode(new ApiKey(null, apiKey)).key();
-        return findByStoredApiKey(encodedApiKey);
-    }
-
-    private OrganizationUser findByStoredApiKey(final String apiKey) {
+    public Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash) {
         return noOperatorContextRepository.createCriteria(UserEntity.class)
-                .eq("apiKey", apiKey)
+                .eq("apiKey", apiKeyHash)
                 .one()
-                .map(UserToModelMapper::map)
-                .orElse(null);
+                .map(UserToModelMapper::map);
     }
 
     @Override

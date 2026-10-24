@@ -36,7 +36,10 @@ public interface DeliveryReturnResponseMapper {
         final SupplierCodeDto supplierCode = map(deliveryReturnResponseDetails.getSupplierCode());
         final UpdateStatusDto updateStatus = map(deliveryReturnResponseDetails.getUpdateStatus());
         return new DeliveryReturnResponseDetailsDto(processId, shipmentId, departmentCode, supplierCode,
-                deliveryStatus, returnToken, updateStatus, deliveryReturnResponseDetails.getErrorMessage());
+                deliveryStatus, returnToken, updateStatus, deliveryReturnResponseDetails.getErrorMessage(),
+                deliveryReturnResponseDetails.getTrackingNumber(),
+                deliveryReturnResponseDetails.getNewShipmentId() == null ? null : map(deliveryReturnResponseDetails.getNewShipmentId()),
+                deliveryReturnResponseDetails.getNewTrackingNumber());
     }
 
     DeviceUserTypeDto map(final DeviceUserType deviceUserType);

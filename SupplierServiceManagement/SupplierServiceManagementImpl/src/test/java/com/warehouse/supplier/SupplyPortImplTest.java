@@ -7,12 +7,15 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.supplier.domain.exception.SupplierAlreadyExistsException;
+import com.warehouse.supplier.domain.enumeration.UserStatus;
 import com.warehouse.supplier.domain.model.Supplier;
 import com.warehouse.supplier.domain.port.primary.SupplyPortImpl;
 import com.warehouse.supplier.domain.port.secondary.DepartmentServicePort;
 import com.warehouse.supplier.domain.port.secondary.DeviceServicePort;
 import com.warehouse.supplier.domain.port.secondary.SupplierRepository;
+import com.warehouse.supplier.domain.port.secondary.UserServicePort;
 import com.warehouse.supplier.domain.registry.DomainContext;
 import com.warehouse.supplier.domain.service.*;
 import com.warehouse.supplier.domain.vo.*;
@@ -44,6 +47,9 @@ public class SupplyPortImplTest {
     @Mock
     private DepartmentServicePort departmentServicePort;
 
+    @Mock
+    private UserServicePort userServicePort;
+
     private SupplyPortImpl supplyPort;
 
     @BeforeEach
@@ -58,7 +64,22 @@ public class SupplyPortImplTest {
         domainContext.setApplicationEventPublisher(eventPublisher);
         domainContext.setApplicationContext(applicationContext);
         supplyPort = new SupplyPortImpl(service, generatorService, validatorService, driverLicenseService,
-                deviceServicePort, departmentServicePort);
+                deviceServicePort, departmentServicePort, userServicePort);
+    }
+
+    @Test
+    void shouldCreateUserAccountForNewSupplier() {
+        final SupplierCode supplierCode = new SupplierCode("123456");
+        final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "Adam", "Nowak", "+48111222333",
+                "adam@example.com", null);
+        when(userServicePort.createUserForSupplier(argThat(snapshot ->
+                "adam@example.com".equals(snapshot.email()) && supplierCode.equals(snapshot.supplierCode()))))
+                .thenReturn(new UserId(101L));
+
+        supplyPort.create(request);
+
+        verify(supplierRepository).create(argThat(supplier -> new UserId(101L).equals(supplier.createdUserId())
+                && supplier.getUserStatus() == UserStatus.USER_CREATED));
     }
 
     @Test
@@ -84,7 +105,7 @@ public class SupplyPortImplTest {
     void shouldCreateSupplierWithDepartmentCode() {
         final SupplierCode supplierCode = new SupplierCode("123456");
         final DepartmentCode departmentCode = new DepartmentCode("GD1");
-        final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "test", "test", "test", departmentCode);
+        final SupplierCreateCommand request = new SupplierCreateCommand(supplierCode, "test", "test", "test", null, departmentCode);
         when(departmentServicePort.validateDepartmentCode(departmentCode)).thenReturn(Result.success());
         when(departmentServicePort.getDepartmentId(departmentCode)).thenReturn(new DepartmentId(10L));
 

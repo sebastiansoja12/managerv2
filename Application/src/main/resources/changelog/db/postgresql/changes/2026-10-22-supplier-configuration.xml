@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-22-supplier-configurations" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="supplier_configurations"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supplier_configurations">
+            <column name="supplier_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_supplier_configurations"/>
+            </column>
+            <column name="max_delivery_attempts" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_shipments_per_route" type="INT"/>
+            <column name="substitute_supplier_id" type="BIGINT"/>
+            <column name="preferred_label_format" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_shipment_sort_order" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated_by" type="BIGINT"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="supplier_configurations" baseColumnNames="supplier_id"
+                                 constraintName="fk_supplier_configurations_supplier"
+                                 referencedTableName="suppliers" referencedColumnNames="supplier_id"
+                                 onDelete="CASCADE"/>
+        <createIndex tableName="supplier_configurations" indexName="idx_supplier_configurations_operator">
+            <column name="operator_id"/>
+        </createIndex>
+        <createTable tableName="supplier_configuration_settings">
+            <column name="supplier_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="setting" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="supplier_configuration_settings" columnNames="supplier_id, setting"
+                       constraintName="pk_supplier_configuration_settings"/>
+        <addForeignKeyConstraint baseTableName="supplier_configuration_settings" baseColumnNames="supplier_id"
+                                 constraintName="fk_supplier_configuration_settings_configuration"
+                                 referencedTableName="supplier_configurations" referencedColumnNames="supplier_id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+    <changeSet id="2026-10-22-supplier-configuration-policies" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="supplier_configuration_policies"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supplier_configuration_policies">
+            <column name="policy_id" type="UUID">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_supplier_configuration_policies"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated_by" type="BIGINT"/>
+            <column name="operator_id" type="BIGINT">
+                <constraints unique="true" uniqueConstraintName="uk_supplier_configuration_policies_operator"/>
+            </column>
+        </createTable>
+        <createTable tableName="supplier_configuration_policy_rules">
+            <column name="policy_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="setting" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enforced_value" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="supplier_configuration_policy_rules" columnNames="policy_id, setting"
+                       constraintName="pk_supplier_configuration_policy_rules"/>
+        <addForeignKeyConstraint baseTableName="supplier_configuration_policy_rules" baseColumnNames="policy_id"
+                                 constraintName="fk_supplier_configuration_policy_rules_policy"
+                                 referencedTableName="supplier_configuration_policies" referencedColumnNames="policy_id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+    <changeSet id="2026-10-22-supplier-configuration-changes" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="supplier_configuration_changes"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supplier_configuration_changes">
+            <column name="change_id" type="UUID">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_supplier_configuration_changes"/>
+            </column>
+            <column name="revision_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supplier_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="change_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="BIGINT"/>
+            <column name="changed_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="field" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="previous_value" type="VARCHAR(64)"/>
+            <column name="new_value" type="VARCHAR(64)"/>
+            <column name="operator_id" type="BIGINT"/>
+        </createTable>
+        <createIndex tableName="supplier_configuration_changes" indexName="idx_supplier_configuration_changes_supplier">
+            <column name="supplier_id"/>
+            <column name="changed_at"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-10-22-supplier-configurations-backfill" author="s-soja">
+        <comment>Create default configuration for every existing supplier</comment>
+        <sql>
+            INSERT INTO supplier_configurations (supplier_id, max_delivery_attempts, max_shipments_per_route,
+                                                 substitute_supplier_id, preferred_label_format,
+                                                 default_shipment_sort_order, version, created_at, operator_id)
+            SELECT s.supplier_id, 3, NULL, NULL, 'PDF_A6', 'DELIVERY_ORDER', 0, now(), s.operator_id
+            FROM suppliers s
+            WHERE NOT EXISTS (SELECT 1 FROM supplier_configurations c WHERE c.supplier_id = s.supplier_id);
+
+            INSERT INTO supplier_configuration_settings (supplier_id, setting, enabled)
+            SELECT c.supplier_id, defaults.setting, defaults.enabled
+            FROM supplier_configurations c
+            CROSS JOIN (VALUES
+                ('COPY_DEPARTMENT_CODE_FROM_DEVICE', FALSE),
+                ('SKIP_INVALID_SHIPMENTS', FALSE),
+                ('AUTO_GENERATE_LABELS', FALSE),
+                ('REQUIRE_PICKUP_SCAN', TRUE),
+                ('REQUIRE_DELIVERY_SCAN', TRUE),
+                ('ALLOW_MANUAL_SHIPMENT_ADDITION', FALSE),
+                ('ALLOW_SHIPMENT_TRANSFER', FALSE),
+                ('ALLOW_SHIPMENT_UNASSIGNMENT', FALSE),
+                ('REQUIRE_PROOF_OF_DELIVERY', TRUE),
+                ('REQUIRE_RECIPIENT_SIGNATURE', FALSE),
+                ('REQUIRE_DELIVERY_PHOTO', FALSE),
+                ('REQUIRE_NON_DELIVERY_REASON', TRUE),
+                ('ALLOW_DELIVERY_ADDRESS_CHANGE', FALSE),
+                ('ALLOW_DELIVERY_AREA_EDITING', FALSE),
+                ('ALLOW_OUT_OF_AREA_DELIVERY', FALSE),
+                ('ALLOW_DELIVERY_REORDERING', TRUE),
+                ('AUTO_ASSIGN_SHIPMENTS_BY_AREA', FALSE),
+                ('GENERATE_NEW_RETURN_CODES', FALSE),
+                ('AUTO_MARK_FOR_RETURN', FALSE),
+                ('REQUIRE_RETURN_SCAN', TRUE),
+                ('AUTO_GENERATE_RETURN_LABELS', FALSE),
+                ('NOTIFY_ABOUT_NEW_SHIPMENTS', TRUE),
+                ('NOTIFY_ABOUT_ROUTE_CHANGES', TRUE),
+                ('CONFIRM_SHIPMENT_TRANSFER', TRUE)
+            ) AS defaults(setting, enabled)
+            WHERE NOT EXISTS (SELECT 1 FROM supplier_configuration_settings existing
+                              WHERE existing.supplier_id = c.supplier_id AND existing.setting = defaults.setting);
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -6,6 +6,7 @@ import static com.warehouse.process.ProcessHubTestFixtures.processId;
 import static com.warehouse.process.ProcessHubTestFixtures.processLog;
 import static com.warehouse.process.ProcessHubTestFixtures.shipmentRejected;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.warehouse.commonassets.identificator.ProcessId;
 import com.warehouse.process.domain.enumeration.ProcessStatus;
 import com.warehouse.process.domain.model.ProcessLog;
+import com.warehouse.process.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
 import com.warehouse.process.domain.service.ProcessServiceImpl;
 
@@ -35,7 +37,7 @@ class ProcessPortImplTest {
     @BeforeEach
     void setUp() {
         initializeDomainContext();
-        processPort = new ProcessPortImpl(new ProcessServiceImpl(processRepository));
+        processPort = new ProcessPortImpl(new ProcessServiceImpl(processRepository, mock(CurrentUserServicePort.class)));
     }
 
     @Test

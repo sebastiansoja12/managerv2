@@ -53,6 +53,5 @@ public interface DeliveryMissedRequestMapper {
 
     SupplierCode map(final SupplierCodeDto supplierCode);
 
-    ShipmentId map(final ShipmentIdDto shipmentId);
 
 }

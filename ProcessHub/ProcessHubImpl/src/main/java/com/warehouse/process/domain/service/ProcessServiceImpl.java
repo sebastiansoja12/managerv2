@@ -1,6 +1,7 @@
 package com.warehouse.process.domain.service;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import com.warehouse.process.domain.event.ProcessFinished;
 import com.warehouse.process.domain.event.ProcessResponseUpdated;
 import com.warehouse.process.domain.exception.ProcessLogNotFoundException;
 import com.warehouse.process.domain.model.ProcessLog;
+import com.warehouse.process.domain.port.secondary.CurrentUserServicePort;
 import com.warehouse.process.domain.port.secondary.ProcessRepository;
 import com.warehouse.process.domain.vo.DeviceValidation;
 import com.warehouse.process.domain.vo.ProcessCommunication;
@@ -24,8 +26,12 @@ public class ProcessServiceImpl implements ProcessService {
 
     private final ProcessRepository processRepository;
 
-    public ProcessServiceImpl(final ProcessRepository processRepository) {
+    private final CurrentUserServicePort currentUserServicePort;
+
+    public ProcessServiceImpl(final ProcessRepository processRepository,
+                              final CurrentUserServicePort currentUserServicePort) {
         this.processRepository = processRepository;
+        this.currentUserServicePort = currentUserServicePort;
     }
 
     @Override
@@ -47,12 +53,17 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public ProcessLog findByIdForCurrentDepartment(final ProcessId processId) {
-        return this.processRepository.findByIdForCurrentDepartment(processId)
-                .orElseThrow(() -> new ProcessLogNotFoundException("Process log not found"));
+        final Optional<ProcessLog> processLog = this.currentUserServicePort.isCurrentUserSupplier()
+                ? this.processRepository.findByIdForUser(processId, this.currentUserServicePort.getCurrentUserId())
+                : this.processRepository.findByIdForCurrentDepartment(processId);
+        return processLog.orElseThrow(() -> new ProcessLogNotFoundException("Process log not found"));
     }
 
     @Override
     public Page<ProcessLog> findAllForCurrentDepartment(final Pageable pageable) {
+        if (this.currentUserServicePort.isCurrentUserSupplier()) {
+            return this.processRepository.findAllForUser(pageable, this.currentUserServicePort.getCurrentUserId());
+        }
         return this.processRepository.findAllForCurrentDepartment(pageable);
     }
 

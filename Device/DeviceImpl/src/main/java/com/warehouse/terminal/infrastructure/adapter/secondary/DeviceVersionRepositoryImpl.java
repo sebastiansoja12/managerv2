@@ -46,7 +46,7 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
         final String currentVersion = currentVersionOptional.get();
 
         final DeviceVersionEntity deviceVersionEntity = this.deviceVersionReadRepository
-                .findByDeviceId(deviceId)
+                .findFirstByDeviceIdOrderByIdDesc(deviceId)
                 .orElseThrow(() -> new RuntimeException("Device version not found"));
 
         if (currentVersion == null || deviceVersionEntity.getVersion() == null) {
@@ -58,13 +58,16 @@ public class DeviceVersionRepositoryImpl implements DeviceVersionRepository {
     @Override
     public Optional<DeviceVersion> find(final DeviceId deviceId) {
         return this.deviceVersionReadRepository
-                .findByDeviceId(deviceId)
+                .findFirstByDeviceIdOrderByIdDesc(deviceId)
                 .map(DeviceVersion::from);
     }
 
     @Override
     public void saveOrUpdate(final DeviceVersion deviceVersion) {
-        final DeviceVersionEntity deviceVersionEntity = DeviceVersionEntity.from(deviceVersion);
+        final DeviceVersionEntity deviceVersionEntity = this.deviceVersionReadRepository
+                .findFirstByDeviceIdOrderByIdDesc(deviceVersion.getDeviceId())
+                .map(existing -> existing.update(deviceVersion.getDeviceType(), deviceVersion.getVersion()))
+                .orElseGet(() -> DeviceVersionEntity.from(deviceVersion));
         this.deviceVersionReadRepository.save(deviceVersionEntity);
     }
 

@@ -3,6 +3,7 @@ package com.warehouse.logisticsdelivery.application.port.primary;
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.logisticsdelivery.application.port.primary.command.AssignDeliverySupplierCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryRelation;
 import com.warehouse.logisticsdelivery.application.port.primary.command.AttachDeliveryStepSignatureCommand;
@@ -49,6 +50,8 @@ public interface DeliveryPort {
 
     DeliverySnapshot finishDelivery(final DeliveryId deliveryId);
 
+    DeliverySnapshot completeShipmentDelivery(final ShipmentId shipmentId, final boolean recipientSigned);
+
     DeliverySnapshot commentStep(final CommentDeliveryStepCommand command);
 
     DeliverySnapshot correctStepStatus(final CorrectDeliveryStepStatusCommand command);
@@ -62,6 +65,8 @@ public interface DeliveryPort {
     List<DeliverySnapshot> findRecentDeliveries(final int offset, final int limit);
 
     List<DeliverySnapshot> findDeliveriesByDepartment(final DepartmentId departmentId, final int offset, final int limit);
+
+    List<DeliverySnapshot> findDeliveriesBySupplier(final SupplierId supplierId, final int offset, final int limit);
 
     DeliverySnapshot findDelivery(final DeliveryId deliveryId);
 

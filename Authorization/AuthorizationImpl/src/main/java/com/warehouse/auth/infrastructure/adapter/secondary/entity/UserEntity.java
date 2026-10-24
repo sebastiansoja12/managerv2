@@ -58,6 +58,9 @@ public class UserEntity extends BelongsToOperator implements UserDetails {
     @Column(name = "api_key")
     private String apiKey;
 
+    @Column(name = "api_key_issued_at")
+    private Instant apiKeyIssuedAt;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_role_permissions",

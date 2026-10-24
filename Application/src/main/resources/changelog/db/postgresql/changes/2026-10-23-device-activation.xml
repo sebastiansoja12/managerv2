@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-23-mobiles-assignment-mode" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="mobiles" columnName="assignment_mode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="mobiles">
+            <column name="assignment_mode" type="VARCHAR(16)" defaultValue="PERSONAL"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2026-10-23-scanners-assignment-mode" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="scanners" columnName="assignment_mode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="scanners">
+            <column name="assignment_mode" type="VARCHAR(16)" defaultValue="PERSONAL"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2026-10-23-terminals-assignment-mode" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="terminals" columnName="assignment_mode"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="terminals">
+            <column name="assignment_mode" type="VARCHAR(16)" defaultValue="PERSONAL"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2026-10-23-device-pair-operator-session" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="device_pair" columnName="operator_user_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="device_pair">
+            <column name="operator_user_id" type="BIGINT"/>
+            <column name="operator_session_expires_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="last_seen_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2026-10-23-device-activation-codes" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="device_activation_codes"/>
+            </not>
+        </preConditions>
+        <createTable tableName="device_activation_codes">
+            <column name="activation_code_id" type="UUID">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_device_activation_codes"/>
+            </column>
+            <column name="device_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_hash" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_device_activation_codes_code_hash"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="used_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+        <createIndex tableName="device_activation_codes" indexName="idx_device_activation_codes_device">
+            <column name="device_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-10-23-device-pair-key-hash" author="s-soja" dbms="postgresql">
+        <comment>Store device pair keys as SHA-256 hashes</comment>
+        <sql>
+            UPDATE device_pair SET pair_key = encode(sha256(convert_to(pair_key, 'UTF8')), 'hex')
+            WHERE pair_key IS NOT NULL;
+        </sql>
+    </changeSet>
+    <changeSet id="2026-10-23-device-pair-key-index" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="device_pair" indexName="idx_device_pair_pair_key"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="device_pair" indexName="idx_device_pair_pair_key">
+            <column name="pair_key"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-10-23-device-activation-codes-user-pairing" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="device_activation_codes" columnName="user_id"/>
+            </not>
+        </preConditions>
+        <dropNotNullConstraint tableName="device_activation_codes" columnName="device_id" columnDataType="VARCHAR(64)"/>
+        <addColumn tableName="device_activation_codes">
+            <column name="user_id" type="BIGINT"/>
+            <column name="operator_id" type="BIGINT"/>
+            <column name="department_code" type="VARCHAR(64)"/>
+        </addColumn>
+        <createIndex tableName="device_activation_codes" indexName="idx_device_activation_codes_user">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2026-10-23-device-version-remove-duplicates" author="s-soja" dbms="postgresql">
+        <comment>Keep only the newest device_version row of every device</comment>
+        <sql>
+            DELETE FROM device_version older
+            USING device_version newer
+            WHERE older.device_id = newer.device_id
+              AND older.id &lt; newer.id;
+        </sql>
+    </changeSet>
+    <changeSet id="2026-10-23-device-version-unique-device" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="device_version" indexName="uk_device_version_device_id"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint tableName="device_version" columnNames="device_id"
+                             constraintName="uk_device_version_device_id"/>
+    </changeSet>
+</databaseChangeLog>

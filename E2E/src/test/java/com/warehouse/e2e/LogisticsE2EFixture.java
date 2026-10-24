@@ -41,6 +41,8 @@ public final class LogisticsE2EFixture {
 
     public static final ShipmentId REJECTED_SHIPMENT_ID = new ShipmentId(900000001L);
 
+    public static final TrackingNumber REJECTED_SHIPMENT_TRACKING_NUMBER = new TrackingNumber("E2E-REJECT-0001");
+
     public static final String REJECTED_DELIVERY_ID = "e2e-reject-delivery-0001";
 
     public static final String REJECT_REASON = "Recipient refused to accept the parcel";
@@ -89,7 +91,7 @@ public final class LogisticsE2EFixture {
                 "username", TERMINAL_USERNAME,
                 "departmentCode", DEPARTMENT_CODE.value(),
                 "pairKey", TERMINAL_PAIR_KEY,
-                "shipmentId", String.valueOf(REJECTED_SHIPMENT_ID.getValue()),
+                "trackingNumber", REJECTED_SHIPMENT_TRACKING_NUMBER.value(),
                 "supplierCode", SUPPLIER_CODE.value(),
                 "rejectReason", REJECT_REASON));
     }

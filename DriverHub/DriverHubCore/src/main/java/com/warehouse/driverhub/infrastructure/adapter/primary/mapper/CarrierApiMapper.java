@@ -35,6 +35,7 @@ public final class CarrierApiMapper {
                         .toList(),
                 carrier.getVehicles().stream()
                         .map(vehicle -> new CarrierVehicleDto(vehicle.getVehicleId().value(), vehicle.getRegistrationNumber(),
+                                vehicle.getBrand(), vehicle.getModel(),
                                 vehicle.getVehicleType().name(), vehicle.getTrailerRegistrationNumber(),
                                 vehicle.getMaxLoadKg(), vehicle.isActive()))
                         .toList());
@@ -60,7 +61,8 @@ public final class CarrierApiMapper {
 
     public static VehicleCommand map(final CarrierVehicleRequestApi request) {
         requireBody(request);
-        return new VehicleCommand(request.registrationNumber(), vehicleType(request.vehicleType()),
+        return new VehicleCommand(request.registrationNumber(), request.brand(), request.model(),
+                vehicleType(request.vehicleType()),
                 request.trailerRegistrationNumber(), request.maxLoadKg());
     }
 

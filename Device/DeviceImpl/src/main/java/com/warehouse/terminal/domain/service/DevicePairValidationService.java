@@ -1,8 +1,8 @@
 package com.warehouse.terminal.domain.service;
 
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.terminal.domain.model.Device;
-import com.warehouse.terminal.domain.model.command.DevicePairRequest;
 
 public interface DevicePairValidationService {
-    Device validate(final DevicePairRequest request);
+    void validateOperator(final Device device, final UserId userId);
 }

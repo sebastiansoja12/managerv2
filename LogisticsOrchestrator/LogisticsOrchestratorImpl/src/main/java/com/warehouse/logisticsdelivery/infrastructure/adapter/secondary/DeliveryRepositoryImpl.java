@@ -2,6 +2,7 @@ package com.warehouse.logisticsdelivery.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
@@ -84,6 +85,19 @@ public class DeliveryRepositoryImpl implements DeliveryRepository {
                 .and(criteriaBuilder.or(
                         criteriaBuilder.equal(root.get("originDepartmentId").get("value"), departmentId.getValue()),
                         criteriaBuilder.equal(root.get("destinationDepartmentId").get("value"), departmentId.getValue())))
+                .desc("created")
+                .firstResult(offset)
+                .maxResults(limit)
+                .list().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Delivery> findBySupplier(final SupplierId supplierId, final int offset, final int limit) {
+        return repository.createCriteria(DeliveryEntity.class)
+                .eq("supplierId.value", supplierId.value())
                 .desc("created")
                 .firstResult(offset)
                 .maxResults(limit)

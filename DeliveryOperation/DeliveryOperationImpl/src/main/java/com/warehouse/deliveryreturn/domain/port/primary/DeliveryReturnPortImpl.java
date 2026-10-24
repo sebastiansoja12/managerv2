@@ -13,12 +13,17 @@ import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ReturnShipmentServicePort;
 import com.warehouse.deliveryreturn.domain.service.DeliveryReturnService;
 import com.warehouse.deliveryreturn.domain.vo.*;
 import com.warehouse.terminal.DeviceInformation;
 
 import lombok.extern.slf4j.Slf4j;
+import com.warehouse.deliveryreturn.domain.exception.ShipmentNotIdentifiedException;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentIdentificationServicePort;
+import com.warehouse.commonassets.identificator.TrackingNumber;
+import java.util.Map;
+import com.warehouse.commonassets.identificator.ShipmentId;
 
 
 @Slf4j
@@ -28,14 +33,17 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private final ReturnTokenServicePort returnTokenServicePort;
 
-    private final ShipmentStatusControlServicePort shipmentStatusControlServicePort;
+    private final ReturnShipmentServicePort returnShipmentServicePort;
+    private final ShipmentIdentificationServicePort shipmentIdentificationServicePort;
 
     public DeliveryReturnPortImpl(final DeliveryReturnService deliveryReturnService,
                                   final ReturnTokenServicePort returnTokenServicePort,
-                                  final ShipmentStatusControlServicePort shipmentStatusControlServicePort) {
+                                  final ReturnShipmentServicePort returnShipmentServicePort,
+                                  final ShipmentIdentificationServicePort shipmentIdentificationServicePort) {
         this.deliveryReturnService = deliveryReturnService;
         this.returnTokenServicePort = returnTokenServicePort;
-        this.shipmentStatusControlServicePort = shipmentStatusControlServicePort;
+        this.returnShipmentServicePort = returnShipmentServicePort;
+        this.shipmentIdentificationServicePort = shipmentIdentificationServicePort;
     }
 
     @Override
@@ -49,6 +57,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
         }
 
         deliveryReturnRequest.validateStatuses();
+
+        identifyShipments(deliveryReturnRequest);
 
         deliveryReturnRequest.rewriteDepartmentCodeFromDevice();
 
@@ -73,14 +83,16 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
         final List<DeliveryReturn> deliveryReturns =
                 deliveryReturnService.deliverReturn(deliveryReturnRequests, deviceInformation);
 
+        final Map<Long, TrackingNumber> trackingNumbers = deliveryReturnRequests.stream()
+                .collect(Collectors.toMap(detail -> detail.getShipmentId().getValue(), DeliveryReturnDetails::getTrackingNumber,
+                        (first, second) -> first));
+
 		final List<DeliveryReturnResponseDetails> deliveryReturnResponseDetails = deliveryReturns.stream()
                 .map(deliveryReturn -> {
-					final UpdateStatusShipmentRequest updateStatusShipmentRequest = new UpdateStatusShipmentRequest(
-                            deliveryReturnRequest.getProcessId(),
-							deliveryReturn.getShipmentId());
-					final UpdateStatus updateStatus = shipmentStatusControlServicePort
-							.updateStatus(updateStatusShipmentRequest);
-                    return DeliveryReturnResponseDetails.from(deliveryReturn, updateStatus);
+                    final ShipmentReturnResult returnResult = returnShipmentServicePort.returnShipment(
+                            deliveryReturnRequest.getProcessId(), new ShipmentId(deliveryReturn.getShipmentId()));
+                    return DeliveryReturnResponseDetails.from(deliveryReturn, returnResult,
+                            trackingNumbers.get(deliveryReturn.getShipmentId()));
 				}).toList();
 
 		return DeliveryReturnResponse
@@ -106,7 +118,8 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
                         detail.getSupplierCode(),
                         detail.getDeliveryStatus(),
                         detail.getReturnToken(),
-                        validationResult.message());
+                        validationResult.message(),
+                        detail.getTrackingNumber());
             }
         }
         return null;
@@ -123,5 +136,15 @@ public class DeliveryReturnPortImpl implements DeliveryReturnPort {
 
     private void logWrongProcessTypeInformation() {
         log.warn("Process type is different than RETURN");
+    }
+
+    private void identifyShipments(final DeliveryReturnRequest deliveryReturnRequest) {
+        for (final DeliveryReturnDetails detail : deliveryReturnRequest.getDeliveryReturnDetails()) {
+            if (detail == null) {
+                continue;
+            }
+            detail.setShipmentId(this.shipmentIdentificationServicePort.findShipmentId(detail.getTrackingNumber())
+                    .orElseThrow(() -> new ShipmentNotIdentifiedException(detail.getTrackingNumber())));
+        }
     }
 }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,16 +26,16 @@ import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierCode;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnRequest;
 import com.warehouse.deliveryreturn.domain.port.primary.DeliveryReturnPort;
 import com.warehouse.deliveryreturn.domain.port.secondary.MailServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ReturnTokenServicePort;
 import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentRepositoryServicePort;
-import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentStatusControlServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentIdentificationServicePort;
+import com.warehouse.deliveryreturn.domain.port.secondary.ReturnShipmentServicePort;
 import com.warehouse.deliveryreturn.domain.vo.ReturnTokenValidationResult;
-import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
-import com.warehouse.deliveryreturn.domain.vo.UpdateStatusShipmentRequest;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.BusinessException;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.exception.TechnicalException;
 import com.warehouse.terminal.DeviceInformation;
@@ -51,9 +52,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 	public static class DeliveryReturnPortIntegrationTestConfiguration {
 
 		@MockBean
-		public ShipmentStatusControlServicePort shipmentStatusControlServicePort;
-
-		@MockBean
 		public ShipmentProperties shipmentProperties;
 
 		@MockBean
@@ -64,6 +62,12 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		@MockBean
 		public MailServicePort mailServicePort;
+
+		@MockBean
+		public ShipmentIdentificationServicePort shipmentIdentificationServicePort;
+
+		@MockBean
+		public ReturnShipmentServicePort returnShipmentServicePort;
 
 		@MockBean
 		public SupplierValidatorProperties supplierValidatorProperties;
@@ -84,9 +88,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 	private ShipmentProperties shipmentProperties;
 
 	@Autowired
-	private ShipmentStatusControlServicePort shipmentStatusControlServicePort;
-
-	@Autowired
 	private ShipmentRepositoryServicePort shipmentRepositoryServicePort;
 
 	@Autowired
@@ -94,6 +95,12 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 	@Autowired
 	private MailServicePort mailServicePort;
+
+	@Autowired
+	private ShipmentIdentificationServicePort shipmentIdentificationServicePort;
+
+	@Autowired
+	private ReturnShipmentServicePort returnShipmentServicePort;
 
 	private final DeviceInformation deviceInformation = DeviceInformation.builder()
 			.version("1")
@@ -104,7 +111,9 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 	@BeforeEach
 	void setup() {
-		reset(shipmentStatusControlServicePort);
+		reset(returnShipmentServicePort);
+		when(shipmentIdentificationServicePort.findShipmentId(new TrackingNumber("TN-1")))
+				.thenReturn(Optional.of(new ShipmentId(1L)));
 	}
 
 	@Test
@@ -117,8 +126,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		when(returnTokenServicePort.validate(any()))
 				.thenReturn(ReturnTokenValidationResult.valid(new ShipmentId(1L)));
-		when(shipmentStatusControlServicePort.updateStatus(any(UpdateStatusShipmentRequest.class)))
-				.thenReturn(UpdateStatus.NOT_OK);
 		doThrow(new BusinessException(404, "Parcel 1 was not found")).when(shipmentRepositoryServicePort)
 				.downloadShipment(new ShipmentId(1L));
 		// when
@@ -138,7 +145,6 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		when(returnTokenServicePort.validate(any()))
 				.thenReturn(ReturnTokenValidationResult.valid(new ShipmentId(1L)));
-		when(shipmentStatusControlServicePort.updateStatus(any(UpdateStatusShipmentRequest.class))).thenReturn(UpdateStatus.OK);
 		doThrow(new TechnicalException(500, "Could not establish connection")).when(shipmentRepositoryServicePort)
 				.downloadShipment(new ShipmentId(1L));
 		// when
@@ -158,7 +164,7 @@ public class DeliveryReturnPortImplIntegrationTest {
 
 		final DeliveryReturnDetails deliveryReturnDetails = DeliveryReturnDetails.builder()
 				.deliveryStatus(deliveryStatus)
-				.shipmentId(new ShipmentId(parcelId))
+				.trackingNumber(new TrackingNumber("TN-" + parcelId))
 				.supplierCode(new SupplierCode(supplierCode))
 				.departmentCode(new DepartmentCode(depotCode))
 				.build();

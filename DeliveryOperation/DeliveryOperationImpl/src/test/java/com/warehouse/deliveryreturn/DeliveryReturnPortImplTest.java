@@ -3,11 +3,13 @@ package com.warehouse.deliveryreturn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,9 +23,12 @@ import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentCode;
 import com.warehouse.commonassets.identificator.DeviceId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryRequestException;
 import com.warehouse.deliveryreturn.domain.exception.DeliveryReturnDetailsException;
+import com.warehouse.deliveryreturn.domain.exception.ShipmentNotIdentifiedException;
+import com.warehouse.deliveryreturn.domain.port.secondary.ShipmentIdentificationServicePort;
 import com.warehouse.deliveryreturn.domain.exception.WrongDeliveryStatusException;
 import com.warehouse.deliveryreturn.domain.exception.WrongProcessTypeException;
 import com.warehouse.deliveryreturn.domain.model.DeliveryReturnDetails;
@@ -36,14 +41,14 @@ import com.warehouse.deliveryreturn.domain.vo.DeliveryReturnResponse;
 import com.warehouse.deliveryreturn.domain.vo.ReturnTokenValidationResult;
 import com.warehouse.deliveryreturn.domain.vo.DeliverableShipment;
 import com.warehouse.deliveryreturn.domain.vo.UpdateStatus;
-import com.warehouse.deliveryreturn.domain.vo.UpdateStatusShipmentRequest;
+import com.warehouse.deliveryreturn.domain.vo.ShipmentReturnResult;
 import com.warehouse.terminal.DeviceInformation;
 
 @ExtendWith(MockitoExtension.class)
 public class DeliveryReturnPortImplTest {
 
 	@Mock
-	private ShipmentStatusControlServicePort shipmentStatusControlServicePort;
+	private ReturnShipmentServicePort returnShipmentServicePort;
 
 	@Mock
 	private DeliveryReturnRepository deliveryReturnRepository;
@@ -56,6 +61,9 @@ public class DeliveryReturnPortImplTest {
 
 	@Mock
 	private MailServicePort mailServicePort;
+
+	@Mock
+	private ShipmentIdentificationServicePort shipmentIdentificationServicePort;
 
 	private DeliveryReturnPortImpl returnPort;
 
@@ -71,7 +79,25 @@ public class DeliveryReturnPortImplTest {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
 				returnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
 		returnPort = new DeliveryReturnPortImpl(deliveryReturnService, returnTokenServicePort,
-				shipmentStatusControlServicePort);
+				returnShipmentServicePort, shipmentIdentificationServicePort);
+		lenient().when(shipmentIdentificationServicePort.findShipmentId(new TrackingNumber("TN-1")))
+				.thenReturn(Optional.of(new ShipmentId(1L)));
+	}
+
+	@Test
+	void shouldThrowWhenTrackingNumberIsUnknown() {
+		// given
+		final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(2L, DeliveryStatus.RETURN, "KT1",
+				"abc", "12345");
+		final DeliveryReturnRequest deliveryReturnRequest = buildDeliveryReturnRequest(ProcessType.RETURN,
+				deviceInformation, deliveryReturnDetails);
+		when(shipmentIdentificationServicePort.findShipmentId(new TrackingNumber("TN-2"))).thenReturn(Optional.empty());
+		// when
+		final Executable executable = () -> returnPort.deliverReturn(deliveryReturnRequest);
+		// then
+		final ShipmentNotIdentifiedException exception = assertThrows(ShipmentNotIdentifiedException.class, executable);
+		assertEquals("Shipment with tracking number TN-2 not found", exception.getMessage());
+		verify(returnTokenServicePort, never()).validate(any());
 	}
 
 	@Test
@@ -146,7 +172,7 @@ public class DeliveryReturnPortImplTest {
 		assertEquals(1, response.getDeliveryReturnResponseDetails().size());
 		assertEquals("Wrong return token", response.getDeliveryReturnResponseDetails().getFirst().getErrorMessage());
 		assertEquals(UpdateStatus.NOT_OK, response.getDeliveryReturnResponseDetails().getFirst().getUpdateStatus());
-		verify(shipmentStatusControlServicePort, never()).updateStatus(any(UpdateStatusShipmentRequest.class));
+		verify(returnShipmentServicePort, never()).returnShipment(any(), any());
 		verify(shipmentRepositoryServicePort, never()).downloadShipment(any());
 		verify(mailServicePort, never()).sendNotification(any());
 	}
@@ -162,8 +188,8 @@ public class DeliveryReturnPortImplTest {
 				.thenReturn(ReturnTokenValidationResult.valid(new ShipmentId(1L)));
 		when(shipmentRepositoryServicePort.downloadShipment(any()))
 				.thenReturn(DeliverableShipment.builder().build());
-		when(shipmentStatusControlServicePort.updateStatus(any()))
-				.thenReturn(UpdateStatus.OK);
+		when(returnShipmentServicePort.returnShipment(any(), any()))
+				.thenReturn(ShipmentReturnResult.returned(new ShipmentId(77L), new TrackingNumber("FTM-RET-77")));
 
 		// when
 		final DeliveryReturnResponse response = returnPort.deliverReturn(deliveryReturnRequest);
@@ -171,7 +197,34 @@ public class DeliveryReturnPortImplTest {
 		// then
 		assertEquals(UpdateStatus.OK, response.getDeliveryReturnResponseDetails().getFirst().getUpdateStatus());
 		assertEquals("12345", response.getDeliveryReturnResponseDetails().getFirst().getReturnToken().value());
-		verify(shipmentStatusControlServicePort).updateStatus(any(UpdateStatusShipmentRequest.class));
+		assertEquals(new ShipmentId(77L), response.getDeliveryReturnResponseDetails().getFirst().getNewShipmentId());
+		assertEquals(new TrackingNumber("FTM-RET-77"), response.getDeliveryReturnResponseDetails().getFirst().getNewTrackingNumber());
+		assertEquals(new TrackingNumber("TN-1"), response.getDeliveryReturnResponseDetails().getFirst().getTrackingNumber());
+		verify(returnShipmentServicePort).returnShipment(any(), org.mockito.ArgumentMatchers.eq(new ShipmentId(1L)));
+	}
+
+	@Test
+	void shouldReportShipmentThatCouldNotBeReturned() {
+		// given
+		final List<DeliveryReturnDetails> deliveryReturnDetails = buildReturnDetails(1L, DeliveryStatus.RETURN, "KT1",
+				"abc", "12345");
+		final DeliveryReturnRequest deliveryReturnRequest = buildDeliveryReturnRequest(ProcessType.RETURN,
+				deviceInformation, deliveryReturnDetails);
+		when(returnTokenServicePort.validate(any()))
+				.thenReturn(ReturnTokenValidationResult.valid(new ShipmentId(1L)));
+		when(shipmentRepositoryServicePort.downloadShipment(any()))
+				.thenReturn(DeliverableShipment.builder().build());
+		when(returnShipmentServicePort.returnShipment(any(), any()))
+				.thenReturn(ShipmentReturnResult.failed("Cannot return shipment in current status"));
+
+		// when
+		final DeliveryReturnResponse response = returnPort.deliverReturn(deliveryReturnRequest);
+
+		// then
+		assertEquals(UpdateStatus.NOT_OK, response.getDeliveryReturnResponseDetails().getFirst().getUpdateStatus());
+		assertEquals("Cannot return shipment in current status",
+				response.getDeliveryReturnResponseDetails().getFirst().getErrorMessage());
+		assertEquals(null, response.getDeliveryReturnResponseDetails().getFirst().getNewShipmentId());
 	}
 
 	private DeliveryReturnRequest buildDeliveryReturnRequest(ProcessType processType,
@@ -184,7 +237,7 @@ public class DeliveryReturnPortImplTest {
 
 		final DeliveryReturnDetails deliveryReturnDetails = DeliveryReturnDetails.builder()
 				.deliveryStatus(deliveryStatus)
-				.shipmentId(new ShipmentId(parcelId))
+				.trackingNumber(new TrackingNumber("TN-" + parcelId))
 				.supplierCode(new SupplierCode(supplierCode))
 				.departmentCode(new DepartmentCode(depotCode))
 				.returnToken(new com.warehouse.deliveryreturn.domain.vo.ReturnToken(token))

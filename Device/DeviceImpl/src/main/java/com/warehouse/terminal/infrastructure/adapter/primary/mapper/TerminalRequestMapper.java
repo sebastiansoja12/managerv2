@@ -1,5 +1,6 @@
 package com.warehouse.terminal.infrastructure.adapter.primary.mapper;
 
+import java.util.Locale;
 import java.util.UUID;
 
 import org.mapstruct.Mapper;
@@ -8,11 +9,11 @@ import org.mapstruct.Mapping;
 import com.warehouse.commonassets.enumeration.DeviceType;
 import com.warehouse.commonassets.enumeration.DeviceUserType;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.terminal.domain.enumeration.DeviceAssignmentMode;
 import com.warehouse.terminal.domain.enumeration.DeviceStatus;
 import com.warehouse.terminal.domain.enumeration.NetworkType;
 import com.warehouse.terminal.domain.model.OwnershipProfile;
 import com.warehouse.terminal.domain.model.command.DeviceCreateCommand;
-import com.warehouse.terminal.domain.model.command.DevicePairRequest;
 import com.warehouse.terminal.domain.model.command.DeviceUpdateCommand;
 import com.warehouse.terminal.domain.model.device.Scanner;
 import com.warehouse.terminal.domain.vo.*;
@@ -21,17 +22,6 @@ import com.warehouse.terminal.request.*;
 
 @Mapper
 public interface TerminalRequestMapper {
-
-    default DevicePairRequest map(final DevicePairRequestDto terminalPairRequest) {
-        final String externalSystemId = terminalPairRequest != null ? terminalPairRequest.externalSystemId() : null;
-        final UserId userId = terminalPairRequest != null && terminalPairRequest.userId() != null
-                ? new UserId(terminalPairRequest.userId().value())
-                : null;
-        final DepartmentCode departmentCode = terminalPairRequest != null && terminalPairRequest.departmentCode() != null
-                ? new DepartmentCode(terminalPairRequest.departmentCode().value())
-                : null;
-        return new DevicePairRequest(externalSystemId, departmentCode, userId);
-    }
 
     default DeviceCreateCommand map(final DeviceCreateRequestDto request) {
         return DeviceCreateCommand.builder()
@@ -228,7 +218,10 @@ public interface TerminalRequestMapper {
                 request.unassignedAt(),
                 request.userId() != null ? new UserId(request.userId().value()) : null,
                 request.vehicleId() != null ? new VehicleId(request.vehicleId()) : null,
-                null
+                null,
+                request.assignmentMode() != null
+                        ? DeviceAssignmentMode.valueOf(request.assignmentMode().toUpperCase(Locale.ROOT))
+                        : null
         );
     }
 

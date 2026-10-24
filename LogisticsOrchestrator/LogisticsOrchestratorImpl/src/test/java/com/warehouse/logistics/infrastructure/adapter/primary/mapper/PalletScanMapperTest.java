@@ -38,13 +38,16 @@ class PalletScanMapperTest {
                 new PalletScanDetail(new ShipmentId(1L), true, "SENT", null),
                 new PalletScanDetail(new ShipmentId(2L), false, null, "Delivered shipment cannot be changed")));
 
-        final PalletScanResponse response = this.mapper.map(PROCESS_ID, outcome);
+        final PalletScanResponse response = this.mapper.map(PROCESS_ID, outcome,
+                shipmentId -> "TRK-" + shipmentId.getValue());
 
         assertThat(response.getProcessId()).isEqualTo(PROCESS_ID.value().toString());
         assertThat(response.isSuccess()).isFalse();
         assertThat(response.getPalletID()).isEqualTo("pallet-1");
         assertThat(response.getErrorCode()).isEqualTo("SHIPMENT_STATUS_UPDATE_FAILED");
         assertThat(response.getPalletScanResponseDetails().getPalletScanResponseDetail()).hasSize(2);
+        assertThat(response.getPalletScanResponseDetails().getPalletScanResponseDetail().get(0).getTrackingNumber())
+                .isEqualTo("TRK-1");
         assertThat(response.getPalletScanResponseDetails().getPalletScanResponseDetail().get(1).getErrorMessage())
                 .isEqualTo("Delivered shipment cannot be changed");
     }

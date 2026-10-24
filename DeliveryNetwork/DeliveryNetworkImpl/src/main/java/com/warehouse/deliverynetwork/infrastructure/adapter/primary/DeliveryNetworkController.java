@@ -59,7 +59,6 @@ public class DeliveryNetworkController {
     }
 
     @GetMapping
-    @AccessUserControl(permissions = {UserPermission.ROLE_ADMIN_READ, UserPermission.ROLE_MANAGER_READ})
     public ResponseEntity<DeliveryNetworkApiResponse> getCurrentNetwork() {
         final DeliveryNetworkResult deliveryNetwork = this.deliveryNetworkPort.getCurrentNetwork();
         return ResponseEntity.ok(this.deliveryNetworkEditorApiMapper.toResponse(deliveryNetwork));

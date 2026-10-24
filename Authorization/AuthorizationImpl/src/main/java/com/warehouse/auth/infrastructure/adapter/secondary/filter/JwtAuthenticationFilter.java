@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.filter;
 
+import com.warehouse.auth.configuration.ApiExposureProperties;
 import com.warehouse.auth.configuration.AuthCookieService;
 import com.warehouse.auth.domain.model.OrganizationUser;
 import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
@@ -44,6 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final OperatorAccessPolicy operatorAccessPolicy;
 
+    private final ApiExposureProperties apiExposureProperties;
+
 	@Override
 	protected void doFilterInternal(@NonNull final HttpServletRequest request,
                                     @NonNull final HttpServletResponse response,
@@ -87,6 +90,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
         final String uri = request.getRequestURI();
-        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith);
+        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith) || apiExposureProperties.isMcpPath(request);
     }
 }

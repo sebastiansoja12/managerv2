@@ -68,7 +68,6 @@
             <xs:complexType name="CollectResponseDetailType">
                 <xs:sequence>
                     <xs:element name="TrackingNumber" type="xs:string"/>
-                    <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
                     <xs:element name="Success" type="xs:boolean"/>
                     <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
                 </xs:sequence>
@@ -107,7 +106,7 @@
 
             <xs:complexType name="PalletScanResponseDetailType">
                 <xs:sequence>
-                    <xs:element name="ShipmentID" type="xs:long"/>
+                    <xs:element name="TrackingNumber" type="xs:string"/>
                     <xs:element name="Success" type="xs:boolean"/>
                     <xs:element name="ShipmentStatus" type="xs:string" minOccurs="0"/>
                     <xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
@@ -149,7 +148,7 @@
 
             <xs:complexType name="DeliveryRejectDetailType">
                 <xs:sequence>
-                    <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+                    <xs:element name="TrackingNumber" type="xs:string"/>
                     <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
                     <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
                     <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
@@ -171,7 +170,7 @@
 
             <xs:complexType name="DeliveryReturnDetailType">
                 <xs:sequence>
-                    <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+                    <xs:element name="TrackingNumber" type="xs:string"/>
                     <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
                     <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
                     <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
@@ -193,7 +192,7 @@
 
             <xs:complexType name="DeliveryMissedDetailType">
                 <xs:sequence>
-                    <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+                    <xs:element name="TrackingNumber" type="xs:string"/>
                     <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
                     <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
                     <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
@@ -216,8 +215,8 @@
                 <xs:sequence>
                     <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
                     <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
-                    <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
-                    <xs:element name="NewShipmentID" type="xs:long" minOccurs="0"/>
+                    <xs:element name="TrackingNumber" type="xs:string" minOccurs="0"/>
+                    <xs:element name="NewTrackingNumber" type="xs:string" minOccurs="0"/>
                     <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>
                     <xs:element name="RejectReason" type="xs:string" minOccurs="0"/>
                 </xs:sequence>
@@ -239,7 +238,8 @@
                 <xs:sequence>
                     <xs:element name="SupplierCode" type="xs:string" minOccurs="0"/>
                     <xs:element name="DepartmentCode" type="xs:string" minOccurs="0"/>
-                    <xs:element name="ShipmentID" type="xs:long" minOccurs="0"/>
+                    <xs:element name="TrackingNumber" type="xs:string" minOccurs="0"/>
+                    <xs:element name="NewTrackingNumber" type="xs:string" minOccurs="0"/>
                     <xs:element name="ReturnToken" type="xs:string" minOccurs="0"/>
                     <xs:element name="UpdateStatus" type="xs:string" minOccurs="0"/>
                     <xs:element name="DeliveryStatus" type="DeliveryStatusEnum" minOccurs="0"/>

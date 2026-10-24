@@ -4,5 +4,6 @@ public record ShipmentRejectResponseItemDto(Long shipmentId,
                                             Long newShipmentId,
                                             Boolean loggedInTracker,
                                             Boolean success,
-                                            String errorMessage) {
+                                            String errorMessage,
+                                            String newTrackingNumber) {
 }

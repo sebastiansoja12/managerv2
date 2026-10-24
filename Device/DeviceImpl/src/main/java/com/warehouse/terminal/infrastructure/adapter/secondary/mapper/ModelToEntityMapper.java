@@ -239,6 +239,7 @@ public class ModelToEntityMapper {
                 ownership.getVehicleId(),
                 ownership.getAssignedRole(),
                 ownership.getAssignedAt(),
-                ownership.getUnassignedAt());
+                ownership.getUnassignedAt(),
+                ownership.getAssignmentMode());
     }
 }

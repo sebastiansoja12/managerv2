@@ -2,31 +2,31 @@ package com.warehouse.logistics.infrastructure.adapter.primary.process;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.deliveryreject.domain.vo.RejectReason;
 
 public class DeliveryRejectDetails {
-    private ShipmentId shipmentId;
+    private TrackingNumber trackingNumber;
     private DepartmentCode departmentCode;
     private SupplierCode supplierCode;
     private DeliveryStatus deliveryStatus;
     private RejectReason rejectReason;
 
-    public DeliveryRejectDetails(final ShipmentId shipmentId,
+    public DeliveryRejectDetails(final TrackingNumber trackingNumber,
                                  final DepartmentCode departmentCode,
                                  final SupplierCode supplierCode,
                                  final DeliveryStatus deliveryStatus,
                                  final RejectReason rejectReason) {
-        this.shipmentId = shipmentId;
+        this.trackingNumber = trackingNumber;
         this.departmentCode = departmentCode;
         this.supplierCode = supplierCode;
         this.deliveryStatus = deliveryStatus;
         this.rejectReason = rejectReason;
     }
 
-    public void setShipmentId(final ShipmentId shipmentId) {
-        this.shipmentId = shipmentId;
+    public void setTrackingNumber(final TrackingNumber trackingNumber) {
+        this.trackingNumber = trackingNumber;
     }
 
     public void setDepartmentCode(final DepartmentCode departmentCode) {
@@ -45,8 +45,8 @@ public class DeliveryRejectDetails {
         this.rejectReason = rejectReason;
     }
 
-    public ShipmentId getShipmentId() {
-        return shipmentId;
+    public TrackingNumber getTrackingNumber() {
+        return trackingNumber;
     }
 
     public DepartmentCode getDepartmentCode() {

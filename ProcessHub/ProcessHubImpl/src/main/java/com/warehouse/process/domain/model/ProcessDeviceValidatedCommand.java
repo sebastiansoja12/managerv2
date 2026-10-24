@@ -16,6 +16,21 @@ public class ProcessDeviceValidatedCommand {
     private ServiceType sourceServiceType;
     private ServiceType targetServiceType;
     private LocalDateTime timestamp;
+    private String request;
+    private String response;
+    private String faultDescription;
+
+    public String getRequest() {
+        return request;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public String getFaultDescription() {
+        return faultDescription;
+    }
 
 
     public DeviceId getDeviceId() {

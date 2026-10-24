@@ -16,7 +16,7 @@ import com.warehouse.deliveryreturn.domain.service.DeliveryReturnServiceImpl;
 import com.warehouse.deliveryreturn.infrastructure.adapter.secondary.*;
 import com.warehouse.mail.infrastructure.adapter.primary.event.NotificationEventPublisher;
 import com.warehouse.process.ProcessHubEventPublisher;
-import com.warehouse.tools.parcelstatus.ShipmentStatusProperties;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import com.warehouse.tools.returntoken.ReturnTokenProperties;
 import com.warehouse.tools.shipment.ShipmentProperties;
 
@@ -28,13 +28,26 @@ public class DeliveryReturnConfiguration {
 	@Bean
 	public DeliveryReturnPort deliveryReturnPort(final DeliveryReturnRepository deliveryReturnRepository,
                                                  final ReturnTokenServicePort returnTokenServicePort,
-                                                 final ShipmentStatusControlServicePort shipmentStatusControlServicePort,
+                                                 final ReturnShipmentServicePort returnShipmentServicePort,
                                                  final ShipmentRepositoryServicePort shipmentRepositoryServicePort,
-                                                 final MailServicePort mailServicePort) {
+                                                 final MailServicePort mailServicePort,
+                                                 final ShipmentIdentificationServicePort shipmentIdentificationServicePort) {
 		final DeliveryReturnService deliveryReturnService = new DeliveryReturnServiceImpl(deliveryReturnRepository,
                 returnTokenServicePort, shipmentRepositoryServicePort, mailServicePort);
-		return new DeliveryReturnPortImpl(deliveryReturnService, returnTokenServicePort, shipmentStatusControlServicePort);
+		return new DeliveryReturnPortImpl(deliveryReturnService, returnTokenServicePort, returnShipmentServicePort,
+                shipmentIdentificationServicePort);
 	}
+
+    @Bean("deliveryReturn.returnShipmentServicePort")
+    public ReturnShipmentServicePort returnShipmentServicePort(final ShipmentApiService shipmentApiService,
+                                                               final ProcessHubEventPublisher processHubEventPublisher) {
+        return new ReturnShipmentServiceAdapter(shipmentApiService, processHubEventPublisher);
+    }
+
+    @Bean("deliveryReturn.shipmentIdentificationServicePort")
+    public ShipmentIdentificationServicePort shipmentIdentificationServicePort(final ShipmentApiService shipmentApiService) {
+        return new ShipmentIdentificationServiceAdapter(shipmentApiService);
+    }
 
     @Bean("deliveryReturn.mailServicePort")
     public MailServicePort mailServicePort(final NotificationEventPublisher eventPublisher) {
@@ -80,17 +93,5 @@ public class DeliveryReturnConfiguration {
     @ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
     public ReturnTokenServicePort deliveryReturnTokenMockServicePort() {
         return new ReturnTokenServiceMockAdapter();
-    }
-
-    @Bean("deliveryReturn.parcelStatusProperties")
-    public ShipmentStatusProperties parcelStatusProperties() {
-        return new ShipmentStatusProperties();
-    }
-
-    @Bean("deliveryReturn.parcelStatusControlChangeServicePort")
-    public ShipmentStatusControlServicePort parcelStatusControlChangeServicePort(
-			final ShipmentProperties shipmentProperties,
-            final ProcessHubEventPublisher processHubEventPublisher) {
-        return new ShipmentStatusControlServiceAdapter(shipmentProperties, processHubEventPublisher);
     }
 }

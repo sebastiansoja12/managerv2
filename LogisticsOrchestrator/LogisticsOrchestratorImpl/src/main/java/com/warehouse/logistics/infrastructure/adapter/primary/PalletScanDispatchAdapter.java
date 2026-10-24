@@ -4,6 +4,7 @@ import com.warehouse.logistics.application.port.primary.DeviceAgentPort;
 import com.warehouse.logistics.application.port.primary.DeviceValidatorPort;
 import com.warehouse.logistics.application.port.primary.PalletScanPort;
 import com.warehouse.logistics.application.port.primary.ProcessInitializerPort;
+import com.warehouse.logistics.application.port.primary.ShipmentIdentificationPort;
 import com.warehouse.logistics.application.port.primary.result.PalletScanOutcome;
 import com.warehouse.logistics.configuration.LogisticsSoapWebServiceConfiguration;
 import com.warehouse.logistics.infrastructure.adapter.primary.mapper.JaxbDeviceInformationMapper;
@@ -18,6 +19,8 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.enumeration.ServiceType;
 import com.warehouse.commonassets.identificator.ProcessId;
+import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.TrackingNumber;
 import com.warehouse.commonassets.validator.DeviceAccessValidator;
 import com.warehouse.process.ProcessHubEventPublisher;
 import com.warehouse.process.infrastructure.event.ProcessResponseChangedEvent;
@@ -46,13 +49,16 @@ public class PalletScanDispatchAdapter {
 
     private final XmlToStringService xmlToStringService;
 
+    private final ShipmentIdentificationPort shipmentIdentificationPort;
+
     public PalletScanDispatchAdapter(final ProcessInitializerPort processInitializerPort,
                                      final DeviceValidatorPort deviceValidatorPort,
                                      final DeviceAgentPort deviceAgentPort,
                                      final PalletScanPort palletScanPort,
                                      final PalletScanMapper palletScanMapper,
                                      final ProcessHubEventPublisher processHubEventPublisher,
-                                     final XmlToStringService xmlToStringService) {
+                                     final XmlToStringService xmlToStringService,
+                                     final ShipmentIdentificationPort shipmentIdentificationPort) {
         this.processInitializerPort = processInitializerPort;
         this.deviceValidatorPort = deviceValidatorPort;
         this.deviceAgentPort = deviceAgentPort;
@@ -60,6 +66,7 @@ public class PalletScanDispatchAdapter {
         this.palletScanMapper = palletScanMapper;
         this.processHubEventPublisher = processHubEventPublisher;
         this.xmlToStringService = xmlToStringService;
+        this.shipmentIdentificationPort = shipmentIdentificationPort;
     }
 
     @DeviceAccessValidator
@@ -84,9 +91,15 @@ public class PalletScanDispatchAdapter {
 
         final PalletScanOutcome outcome = palletScanPort.scan(palletScanMapper.map(processId, palletScanRequest));
 
-        final PalletScanResponse palletScanResponse = palletScanMapper.map(processId, outcome);
+        final PalletScanResponse palletScanResponse = palletScanMapper.map(processId, outcome, this::findTrackingNumber);
         publishResponseChangedEvent(processId, palletScanResponse);
         return palletScanResponse;
+    }
+
+    private String findTrackingNumber(final ShipmentId shipmentId) {
+        return shipmentIdentificationPort.findTrackingNumber(shipmentId)
+                .map(TrackingNumber::value)
+                .orElse(null);
     }
 
     private void publishResponseChangedEvent(final ProcessId processId, final PalletScanResponse palletScanResponse) {

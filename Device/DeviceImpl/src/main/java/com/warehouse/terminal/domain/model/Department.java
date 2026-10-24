@@ -1,9 +1,11 @@
 package com.warehouse.terminal.domain.model;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
+import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 
 public class Department {
+    private DepartmentId departmentId;
     private DepartmentCode departmentCode;
     private Boolean active;
     private Double latitude;
@@ -20,8 +22,24 @@ public class Department {
         this.longitude = longitude;
     }
 
+    public Department(final DepartmentId departmentId,
+                      final DepartmentCode departmentCode,
+                      final Double latitude,
+                      final Double longitude) {
+        this(departmentCode, latitude, longitude);
+        this.departmentId = departmentId;
+    }
+
     public static Department from(final DepartmentDto department) {
-        return new Department(new DepartmentCode(department.departmentCode()), department.coordinates().latitude(), department.coordinates().longitude());
+        return new Department(
+                department.departmentId() != null ? new DepartmentId(department.departmentId()) : null,
+                new DepartmentCode(department.departmentCode()),
+                department.coordinates().latitude(),
+                department.coordinates().longitude());
+    }
+
+    public DepartmentId getDepartmentId() {
+        return departmentId;
     }
 
     public DepartmentCode getDepartmentCode() {

@@ -2,6 +2,7 @@ package com.warehouse.supplier.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.SupplierCode;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.commonassets.repository.BaseRepository;
 import com.warehouse.commonassets.repository.Criteria;
 import com.warehouse.supplier.domain.model.Supplier;
@@ -55,6 +56,15 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     public Supplier findByCode(final SupplierCode supplierCode) {
         return this.supplierBaseRepository.createCriteria(SupplierEntity.class)
                 .eq("supplierCode.value", supplierCode)
+                .one()
+                .map(EntityToModelMapper::map)
+                .orElse(null);
+    }
+
+    @Override
+    public Supplier findByUserId(final UserId userId) {
+        return this.supplierBaseRepository.createCriteria(SupplierEntity.class)
+                .eq("createdUserId.value", userId.value())
                 .one()
                 .map(EntityToModelMapper::map)
                 .orElse(null);

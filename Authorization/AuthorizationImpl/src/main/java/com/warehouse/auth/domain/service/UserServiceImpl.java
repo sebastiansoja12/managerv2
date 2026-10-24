@@ -1,5 +1,8 @@
 package com.warehouse.auth.domain.service;
 
+import java.time.Instant;
+import java.util.Optional;
+
 import com.warehouse.auth.domain.event.*;
 import com.warehouse.auth.domain.exception.AuthenticationErrorException;
 import com.warehouse.auth.domain.model.FullNameChangeCommand;
@@ -100,6 +103,19 @@ public class UserServiceImpl implements UserService {
         user.changeApiKey(apiKey);
         this.userRepository.createOrUpdate(user);
         DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
+    }
+
+    @Override
+    public void issueApiKey(final UserId userId, final String apiKeyHash, final Instant issuedAt) {
+        final OrganizationUser user = this.userRepository.findById(userId);
+        user.issueApiKey(apiKeyHash, issuedAt);
+        this.userRepository.createOrUpdate(user);
+        DomainRegistry.eventPublisher().publishEvent(new UserChangedEvent(user.snapshot()));
+    }
+
+    @Override
+    public Optional<OrganizationUser> findByApiKeyHash(final String apiKeyHash) {
+        return this.userRepository.findByApiKeyHash(apiKeyHash);
     }
 
     @Override

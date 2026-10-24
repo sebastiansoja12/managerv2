@@ -55,7 +55,7 @@ public class LogisticsResponseMapper {
 
         final List<DeliveryReturnResponseDetail> details = deliveryReturnResponse.getDeliveryReturnResponseDetails()
                 .stream()
-                .map(this::map)
+                .map(detail -> map(detail))
                 .collect(Collectors.toList());
         return new com.warehouse.terminal.model.DeliveryReturnResponse(details);
     }
@@ -63,7 +63,7 @@ public class LogisticsResponseMapper {
     public DeliveryReturnResponseDetail map(final DeliveryReturnResponseDetails deliveryReturnResponseDetails) {
         final String supplierCode = deliveryReturnResponseDetails.getSupplierCode().value();
         final String departmentCode = deliveryReturnResponseDetails.getDepartmentCode().getValue();
-        final Long shipmentId = deliveryReturnResponseDetails.getShipmentId().getValue();
+        final String trackingNumber = value(deliveryReturnResponseDetails.getTrackingNumber());
         final String deliveryStatus = deliveryReturnResponseDetails.getDeliveryStatus().name();
         final String returnToken = deliveryReturnResponseDetails.getReturnToken() != null
                 ? deliveryReturnResponseDetails.getReturnToken().value()
@@ -74,7 +74,8 @@ public class LogisticsResponseMapper {
         final String updateStatus = deliveryReturnResponseDetails.getUpdateStatus() != null
                 ? deliveryReturnResponseDetails.getUpdateStatus().name()
                 : null;
-        return new DeliveryReturnResponseDetail(supplierCode, departmentCode, shipmentId, returnToken, updateStatus,
+        return new DeliveryReturnResponseDetail(supplierCode, departmentCode, trackingNumber,
+                value(deliveryReturnResponseDetails.getNewTrackingNumber()), returnToken, updateStatus,
                 deliveryStatus, deliveryId, deliveryReturnResponseDetails.getErrorMessage());
     }
 
@@ -105,7 +106,7 @@ public class LogisticsResponseMapper {
         }
 
         return deliveryRejectResponseDetails.stream()
-                .map(this::map)
+                .map(detail -> map(detail))
                 .collect(Collectors.toList());
     }
 
@@ -113,10 +114,8 @@ public class LogisticsResponseMapper {
         return new DeliveryRejectResponseDetail(
                 deliveryRejectResponseDetails.getSupplierCode().value(),
                 deliveryRejectResponseDetails.getDepartmentCode().value(),
-                deliveryRejectResponseDetails.getShipmentId().getValue(),
-                deliveryRejectResponseDetails.getNewShipmentId() != null
-                        ? deliveryRejectResponseDetails.getNewShipmentId().getValue()
-                        : null,
+                value(deliveryRejectResponseDetails.getTrackingNumber()),
+                value(deliveryRejectResponseDetails.getNewTrackingNumber()),
                 deliveryRejectResponseDetails.getDeliveryStatus().name(),
                 deliveryRejectResponseDetails.getRejectReason().getValue());
     }
@@ -181,7 +180,13 @@ public class LogisticsResponseMapper {
                 new RejectReason(dto.getRejectReason().value()),
                 DeliveryStatus.valueOf(dto.getDeliveryStatus().name()),
                 dto.getSuccess(),
-                dto.getErrorMessage());
+                dto.getErrorMessage(),
+                dto.getTrackingNumber(),
+                dto.getNewTrackingNumber());
+    }
+
+    private static String value(final TrackingNumber trackingNumber) {
+        return trackingNumber == null ? null : trackingNumber.value();
     }
 
     public ShipmentId map(final ShipmentIdDto shipmentId) {
@@ -222,7 +227,10 @@ public class LogisticsResponseMapper {
                 DeliveryStatus.valueOf(dto.getDeliveryStatus().name()),
                 dto.getReturnToken() != null ? new ReturnToken(map(dto.getReturnToken())) : null,
                 dto.getUpdateStatus() != null ? UpdateStatus.valueOf(dto.getUpdateStatus().name()) : null,
-                dto.getErrorMessage());
+                dto.getErrorMessage(),
+                dto.getTrackingNumber(),
+                dto.getNewShipmentId() != null ? new ShipmentId(dto.getNewShipmentId().value()) : null,
+                dto.getNewTrackingNumber());
     }
 
 }
