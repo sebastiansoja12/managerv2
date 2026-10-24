@@ -29,7 +29,8 @@ public final class CarrierEntityMapper {
                         .toList(),
                 carrier.getVehicles().stream()
                         .map(vehicle -> new CarrierVehicleEntity(vehicle.getVehicleId(), carrier.getCarrierId(),
-                                vehicle.getRegistrationNumber(), vehicle.getVehicleType(),
+                                vehicle.getRegistrationNumber(), vehicle.getBrand(), vehicle.getModel(),
+                                vehicle.getVehicleType(),
                                 vehicle.getTrailerRegistrationNumber(), vehicle.getMaxLoadKg(), vehicle.isActive()))
                         .toList());
         entity.assignOperator(carrier.getOperatorId());
@@ -46,6 +47,7 @@ public final class CarrierEntityMapper {
                         .toList(),
                 entity.getVehicles().stream()
                         .map(vehicle -> new CarrierVehicle(vehicle.getVehicleId(), vehicle.getRegistrationNumber(),
+                                vehicle.getBrand(), vehicle.getModel(),
                                 vehicle.getVehicleType(), vehicle.getTrailerRegistrationNumber(),
                                 vehicle.getMaxLoadKg(), vehicle.isActive()))
                         .toList());
@@ -63,6 +65,7 @@ public final class CarrierEntityMapper {
                 entity.getVehicles().stream()
                         .filter(CarrierVehicleEntity::isActive)
                         .map(vehicle -> new CarrierVehicle(vehicle.getVehicleId(), vehicle.getRegistrationNumber(),
+                                vehicle.getBrand(), vehicle.getModel(),
                                 vehicle.getVehicleType(), vehicle.getTrailerRegistrationNumber(),
                                 vehicle.getMaxLoadKg(), true))
                         .toList());

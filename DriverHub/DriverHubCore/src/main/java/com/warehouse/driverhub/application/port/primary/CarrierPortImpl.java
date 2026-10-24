@@ -77,7 +77,7 @@ public class CarrierPortImpl implements CarrierPort {
             throw DriverHubException.invalid("Request body is required");
         }
         final Carrier carrier = getCarrier(carrierId);
-        carrier.addVehicle(command.registrationNumber(), command.vehicleType(), command.trailerRegistrationNumber(),
+        carrier.addVehicle(command.registrationNumber(), command.brand(), command.model(), command.vehicleType(), command.trailerRegistrationNumber(),
                 command.maxLoadKg());
         return this.carrierRepository.save(carrier);
     }

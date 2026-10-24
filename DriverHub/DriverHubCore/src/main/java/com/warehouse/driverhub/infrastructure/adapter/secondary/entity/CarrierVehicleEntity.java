@@ -30,6 +30,12 @@ public class CarrierVehicleEntity {
     @Column(name = "registration_number", nullable = false, length = 32)
     private String registrationNumber;
 
+    @Column(name = "brand", length = 64)
+    private String brand;
+
+    @Column(name = "model", length = 64)
+    private String model;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "vehicle_type", nullable = false, length = 32)
     private VehicleType vehicleType;
@@ -49,6 +55,8 @@ public class CarrierVehicleEntity {
     public CarrierVehicleEntity(final VehicleId vehicleId,
                                 final CarrierId carrierId,
                                 final String registrationNumber,
+                                final String brand,
+                                final String model,
                                 final VehicleType vehicleType,
                                 final String trailerRegistrationNumber,
                                 final BigDecimal maxLoadKg,
@@ -56,6 +64,8 @@ public class CarrierVehicleEntity {
         this.vehicleId = vehicleId;
         this.carrierId = carrierId;
         this.registrationNumber = registrationNumber;
+        this.brand = brand;
+        this.model = model;
         this.vehicleType = vehicleType;
         this.trailerRegistrationNumber = trailerRegistrationNumber;
         this.maxLoadKg = maxLoadKg;
@@ -72,6 +82,14 @@ public class CarrierVehicleEntity {
 
     public String getRegistrationNumber() {
         return registrationNumber;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public String getModel() {
+        return model;
     }
 
     public VehicleType getVehicleType() {

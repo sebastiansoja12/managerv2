@@ -105,6 +105,20 @@ public class CarrierController {
         return changeVehicle(carrierId, vehicleId, new VehicleChange.RegistrationNumber(CarrierApiMapper.value(request)));
     }
 
+    @PutMapping("/{carrierId}/vehicles/{vehicleId}/brand")
+    public ResponseEntity<CarrierDto> changeVehicleBrand(@PathVariable final Long carrierId,
+                                                         @PathVariable final Long vehicleId,
+                                                         @RequestBody final FieldValueRequestApi request) {
+        return changeVehicle(carrierId, vehicleId, new VehicleChange.Brand(CarrierApiMapper.value(request)));
+    }
+
+    @PutMapping("/{carrierId}/vehicles/{vehicleId}/model")
+    public ResponseEntity<CarrierDto> changeVehicleModel(@PathVariable final Long carrierId,
+                                                         @PathVariable final Long vehicleId,
+                                                         @RequestBody final FieldValueRequestApi request) {
+        return changeVehicle(carrierId, vehicleId, new VehicleChange.Model(CarrierApiMapper.value(request)));
+    }
+
     @PutMapping("/{carrierId}/vehicles/{vehicleId}/vehicle-type")
     public ResponseEntity<CarrierDto> changeVehicleType(@PathVariable final Long carrierId,
                                                         @PathVariable final Long vehicleId,

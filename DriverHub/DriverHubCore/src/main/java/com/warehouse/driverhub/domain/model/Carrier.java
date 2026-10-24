@@ -89,10 +89,11 @@ public class Carrier {
         driver(driverId).apply(change);
     }
 
-    public void addVehicle(final String registrationNumber, final VehicleType vehicleType,
-                           final String trailerRegistrationNumber, final BigDecimal maxLoadKg) {
-        final CarrierVehicle vehicle = new CarrierVehicle(VehicleId.generate(), registrationNumber, vehicleType,
-                trailerRegistrationNumber, maxLoadKg, true);
+    public void addVehicle(final String registrationNumber, final String brand, final String model,
+                           final VehicleType vehicleType, final String trailerRegistrationNumber,
+                           final BigDecimal maxLoadKg) {
+        final CarrierVehicle vehicle = new CarrierVehicle(VehicleId.generate(), registrationNumber, brand, model,
+                vehicleType, trailerRegistrationNumber, maxLoadKg, true);
         ensureUniqueRegistration(null, vehicle.getRegistrationNumber());
         this.vehicles.add(vehicle);
     }
