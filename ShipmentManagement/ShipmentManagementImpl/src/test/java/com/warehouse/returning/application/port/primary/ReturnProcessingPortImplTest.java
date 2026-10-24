@@ -52,6 +52,8 @@ class ReturnProcessingPortImplTest {
             return transaction;
         });
         when(consumedEvents.tryConsume(command.eventId())).thenReturn(true);
+        when(shipments.getShipment(command.shipmentId()))
+                .thenReturn(new ReturnableShipment(command.shipmentId(), ShipmentStatus.DELIVERY, null));
         doAnswer(invocation -> { assertEventContext(); return null; })
                 .when(shipments).markReturned(command.shipmentId());
         doAnswer(invocation -> { assertEventContext(); return null; }).when(transactions).commit(transaction);
@@ -79,6 +81,8 @@ class ReturnProcessingPortImplTest {
     void shouldRollBackAndRestoreContextWhenPublicationFails() {
         when(transactions.getTransaction(any())).thenReturn(transaction);
         when(consumedEvents.tryConsume(command.eventId())).thenReturn(true);
+        when(shipments.getShipment(command.shipmentId()))
+                .thenReturn(new ReturnableShipment(command.shipmentId(), ShipmentStatus.DELIVERY, null));
         doThrow(new IllegalStateException("Outbox unavailable")).when(shipments).markReturned(command.shipmentId());
 
         assertThrows(IllegalStateException.class, () -> port.applyProcessingStarted(command));
@@ -86,6 +90,19 @@ class ReturnProcessingPortImplTest {
         verify(transactions).rollback(transaction);
         verify(transactions, never()).commit(any());
         assertNull(SecurityContextHolder.getContext().getAuthentication());
+    }
+
+    @Test
+    void shouldNotReturnShipmentAgainWhenCourierAlreadyReturnedIt() {
+        when(transactions.getTransaction(any())).thenReturn(transaction);
+        when(consumedEvents.tryConsume(command.eventId())).thenReturn(true);
+        when(shipments.getShipment(command.shipmentId()))
+                .thenReturn(new ReturnableShipment(command.shipmentId(), ShipmentStatus.RETURN, new ShipmentId(789L)));
+
+        port.applyProcessingStarted(command);
+
+        verify(shipments, never()).markReturned(any());
+        verify(transactions).commit(transaction);
     }
 
     private void assertEventContext() {
