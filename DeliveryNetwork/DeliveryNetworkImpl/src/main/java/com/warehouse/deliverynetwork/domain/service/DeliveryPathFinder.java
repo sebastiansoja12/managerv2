@@ -108,8 +108,10 @@ public class DeliveryPathFinder {
         for (final DepartmentConnection connection : connections) {
             adjacency.computeIfAbsent(connection.firstDepartmentId(), ignored -> new HashSet<>())
                     .add(connection.secondDepartmentId());
-            adjacency.computeIfAbsent(connection.secondDepartmentId(), ignored -> new HashSet<>())
-                    .add(connection.firstDepartmentId());
+            if (connection.bidirectional()) {
+                adjacency.computeIfAbsent(connection.secondDepartmentId(), ignored -> new HashSet<>())
+                        .add(connection.firstDepartmentId());
+            }
         }
         return adjacency;
     }
