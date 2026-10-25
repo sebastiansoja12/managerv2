@@ -1,7 +1,7 @@
 package com.warehouse.organisationstructure.department.domain.service;
 
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.organisationstructure.department.domain.port.secondary.CurrentUserServicePort;
+import com.warehouse.organisationstructure.department.application.port.secondary.CurrentUserServicePort;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 

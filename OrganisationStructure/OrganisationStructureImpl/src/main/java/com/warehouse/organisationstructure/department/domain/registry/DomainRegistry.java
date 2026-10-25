@@ -1,6 +1,6 @@
 package com.warehouse.organisationstructure.department.domain.registry;
 
-import com.warehouse.organisationstructure.department.domain.port.secondary.DepartmentCoordinatesServicePort;
+import com.warehouse.organisationstructure.department.application.port.secondary.DepartmentCoordinatesServicePort;
 import com.warehouse.organisationstructure.department.domain.service.AuthenticationService;
 import com.warehouse.organisationstructure.department.domain.service.DepartmentService;
 import org.slf4j.Logger;

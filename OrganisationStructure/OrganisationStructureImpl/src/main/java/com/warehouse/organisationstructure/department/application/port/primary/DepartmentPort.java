@@ -1,4 +1,4 @@
-package com.warehouse.organisationstructure.department.domain.port.primary;
+package com.warehouse.organisationstructure.department.application.port.primary;
 
 import com.warehouse.commonassets.enumeration.CountryCode;
 import com.warehouse.commonassets.identificator.DepartmentCode;

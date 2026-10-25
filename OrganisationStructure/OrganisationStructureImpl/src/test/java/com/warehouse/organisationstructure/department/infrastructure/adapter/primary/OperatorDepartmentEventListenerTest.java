@@ -13,7 +13,7 @@ import com.warehouse.commonassets.identificator.UserId;
 import com.warehouse.organisationstructure.department.api.event.OperatorInitialDepartmentCreateEvent;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreate;
 import com.warehouse.organisationstructure.department.domain.model.DepartmentCreateCommand;
-import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.application.port.primary.DepartmentPort;
 
 class OperatorDepartmentEventListenerTest {
 

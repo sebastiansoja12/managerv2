@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.application.port.primary.DepartmentPort;
 import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.returning.api.ReturningApiService;

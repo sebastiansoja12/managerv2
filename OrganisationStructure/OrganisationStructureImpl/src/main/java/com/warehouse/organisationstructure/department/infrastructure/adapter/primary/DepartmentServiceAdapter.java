@@ -10,7 +10,7 @@ import com.warehouse.organisationstructure.department.api.dto.DepartmentDetailsD
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDirectoryEntryDto;
 import com.warehouse.organisationstructure.department.api.dto.DepartmentDto;
 import com.warehouse.organisationstructure.department.domain.model.Department;
-import com.warehouse.organisationstructure.department.domain.port.primary.DepartmentPort;
+import com.warehouse.organisationstructure.department.application.port.primary.DepartmentPort;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.mapper.RequestMapper;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.primary.mapper.ResponseMapper;
 

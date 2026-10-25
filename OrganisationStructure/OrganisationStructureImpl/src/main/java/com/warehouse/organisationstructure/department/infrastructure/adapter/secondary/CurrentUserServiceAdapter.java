@@ -2,7 +2,7 @@ package com.warehouse.organisationstructure.department.infrastructure.adapter.se
 
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.identificator.UserId;
-import com.warehouse.organisationstructure.department.domain.port.secondary.CurrentUserServicePort;
+import com.warehouse.organisationstructure.department.application.port.secondary.CurrentUserServicePort;
 
 public class CurrentUserServiceAdapter implements CurrentUserServicePort {
 
