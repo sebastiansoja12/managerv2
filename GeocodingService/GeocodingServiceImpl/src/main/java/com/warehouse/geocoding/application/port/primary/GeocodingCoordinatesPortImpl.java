@@ -1,13 +1,12 @@
 package com.warehouse.geocoding.application.port.primary;
 
-import java.util.Set;
-
 import com.warehouse.geocoding.application.port.secondary.GeocodingProviderServicePort;
 import com.warehouse.geocoding.domain.model.GeocodingConfiguration;
 import com.warehouse.geocoding.domain.vo.Coordinates;
 import com.warehouse.geocoding.domain.vo.GeocodingAddress;
 import com.warehouse.geocoding.domain.vo.GeocodingConfig;
-import com.warehouse.geocoding.application.port.primary.GeocodingPort;
+
+import java.util.Set;
 
 public class GeocodingCoordinatesPortImpl implements GeocodingCoordinatesPort {
 
@@ -27,8 +26,7 @@ public class GeocodingCoordinatesPortImpl implements GeocodingCoordinatesPort {
                 configuration.getApiKey(), configuration.getApiUrl(), configuration.getApiUserName(),
                 configuration.getApiPassword());
         return geolocationServiceProvider.stream()
-                .filter(e -> geocodingConfig != null)
-                .filter(provider -> provider.canHandle(geocodingConfig.provider()))
+                .filter(provider -> provider.canHandle(configuration.getProvider()))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("External system for finding geolocations not configured for this operator!!!"))
                 .obtainCoordinates(address, geocodingConfig);
