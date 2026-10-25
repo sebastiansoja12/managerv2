@@ -51,7 +51,8 @@ public class DeliveryNetworkApiMapper {
     private DepartmentConnectionDto toDto(final DepartmentConnection connection) {
         return new DepartmentConnectionDto(
                 toDto(connection.firstDepartmentId()),
-                toDto(connection.secondDepartmentId()));
+                toDto(connection.secondDepartmentId()),
+                connection.bidirectional());
     }
 
     private RouteDepartmentDto toDto(final DepartmentNode department) {
