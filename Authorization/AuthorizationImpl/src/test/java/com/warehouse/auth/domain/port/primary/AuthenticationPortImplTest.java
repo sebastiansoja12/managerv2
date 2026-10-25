@@ -177,7 +177,6 @@ class AuthenticationPortImplTest {
                 "Sebastian",
                 "Soja",
                 "operator-user",
-                "raw-password",
                 "sebastian@test.pl",
                 "SUPPLIER",
                 new DepartmentCode("TST"),
@@ -190,7 +189,7 @@ class AuthenticationPortImplTest {
         assertThat(userId).isEqualTo(createdUser.getUserId());
         assertThat(createdUser.operatorId()).isEqualTo(OperatorId.of(123L));
         assertThat(createdUser.getRole()).isEqualTo(OrganizationUser.Role.SUPPLIER);
-        assertThat(passwordEncoder.matches("raw-password", createdUser.getPassword())).isTrue();
+        assertThat(createdUser.getPassword()).isNotBlank();
         assertThat(createdUser.getDepartmentId()).isEqualTo(new DepartmentId(10L));
         assertThat(createdUser.getApiKey()).isNotNull();
         assertThat(createdUser.getApiKey()).isNotEqualTo("dummy");
@@ -207,7 +206,6 @@ class AuthenticationPortImplTest {
                 "Sebastian",
                 "Soja",
                 "operator-user",
-                "raw-password",
                 "sebastian@test.pl",
                 "USER",
                 new DepartmentCode("MISSING"),
