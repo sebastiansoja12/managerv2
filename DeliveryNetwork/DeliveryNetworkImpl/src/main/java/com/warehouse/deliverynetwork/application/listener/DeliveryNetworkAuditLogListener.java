@@ -53,6 +53,7 @@ public class DeliveryNetworkAuditLogListener {
     }
 
     private String format(final DepartmentConnection connection) {
-        return connection.firstDepartmentId().getValue() + "-" + connection.secondDepartmentId().getValue();
+        return connection.firstDepartmentId().getValue() + (connection.bidirectional() ? "-" : ">")
+                + connection.secondDepartmentId().getValue();
     }
 }

@@ -13,6 +13,7 @@ import com.warehouse.deliverynetwork.application.port.primary.result.DepartmentE
 import com.warehouse.deliverynetwork.application.port.primary.result.DeliveryNetworkExportResult;
 import com.warehouse.deliverynetwork.application.port.primary.result.DeliveryNetworkResult;
 import com.warehouse.deliverynetwork.application.port.primary.result.ShipmentDeliveryRouteResult;
+import com.warehouse.deliverynetwork.application.port.secondary.DeliveryNetworkConfigurationServicePort;
 import com.warehouse.deliverynetwork.application.port.secondary.DeliveryNetworkRepository;
 import com.warehouse.deliverynetwork.application.port.secondary.DepartmentDirectoryServicePort;
 import com.warehouse.deliverynetwork.application.port.secondary.ShipmentDeliveryServicePort;
@@ -25,6 +26,8 @@ import com.warehouse.deliverynetwork.domain.service.DeliveryPathFinder;
 import com.warehouse.deliverynetwork.domain.vo.DeliveryNetworkSnapshot;
 import com.warehouse.deliverynetwork.domain.vo.DeliveryPath;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentConnection;
+import com.warehouse.deliverynetwork.domain.vo.DepartmentConnectionPolicies;
+import com.warehouse.deliverynetwork.domain.vo.DepartmentConnectionRules;
 import com.warehouse.deliverynetwork.domain.vo.DepartmentNode;
 import com.warehouse.deliverynetwork.domain.vo.ShipmentRouteDocumentFile;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +54,8 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
 
     private final ShipmentDeliveryRouteFactory shipmentDeliveryRouteFactory;
 
+    private final DeliveryNetworkConfigurationServicePort deliveryNetworkConfigurationServicePort;
+
     public DeliveryNetworkPortImpl(
             final DeliveryNetworkRepository deliveryNetworkRepository,
             final DepartmentDirectoryServicePort departmentDirectoryServicePort,
@@ -59,7 +64,8 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
             final DomainEventPublisher domainEventPublisher,
             final ShipmentDeliveryServicePort shipmentDeliveryServicePort,
             final ShipmentRouteDocumentService shipmentRouteDocumentService,
-            final ShipmentDeliveryRouteFactory shipmentDeliveryRouteFactory) {
+            final ShipmentDeliveryRouteFactory shipmentDeliveryRouteFactory,
+            final DeliveryNetworkConfigurationServicePort deliveryNetworkConfigurationServicePort) {
         this.deliveryNetworkRepository = deliveryNetworkRepository;
         this.departmentDirectoryServicePort = departmentDirectoryServicePort;
         this.operatorContextProvider = operatorContextProvider;
@@ -68,6 +74,7 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
         this.shipmentDeliveryServicePort = shipmentDeliveryServicePort;
         this.shipmentRouteDocumentService = shipmentRouteDocumentService;
         this.shipmentDeliveryRouteFactory = shipmentDeliveryRouteFactory;
+        this.deliveryNetworkConfigurationServicePort = deliveryNetworkConfigurationServicePort;
     }
 
     @Override
@@ -81,9 +88,11 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
     public DeliveryNetworkResult replaceCurrentNetwork(final ReplaceDeliveryNetworkCommand command) {
         final DeliveryNetwork deliveryNetwork = loadCurrentNetwork();
         final List<DepartmentNode> departments = this.departmentDirectoryServicePort.getCurrentOperatorDepartments();
+        final DepartmentConnectionPolicies policies = connectionPolicies();
         final List<DepartmentConnection> connections = command.connections()
                 .stream()
-                .map(this::connection)
+                .map(connection -> connection(connection, policies
+                        .forDepartment(connection.firstDepartmentId()).bidirectionalByDefault()))
                 .toList();
 
         return replace(deliveryNetwork, departments, connections);
@@ -96,9 +105,12 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
         final DeliveryNetwork deliveryNetwork = loadCurrentNetwork();
         final DepartmentDirectory directory = currentDepartmentDirectory();
         directory.validateImport(command.departments());
+        final DepartmentConnectionPolicies policies = connectionPolicies();
         final List<DepartmentConnection> connections = command.connections()
                 .stream()
-                .map(directory::connection)
+                .map(connection -> directory.connection(connection, policies.forDepartment(
+                        directory.department(connection.firstDepartmentCode()).departmentId())
+                        .bidirectionalByDefault()))
                 .toList();
 
         return replace(deliveryNetwork, directory.departments(), connections);
@@ -119,7 +131,8 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
                 .stream()
                 .map(connection -> new DepartmentConnectionCodeResult(
                         directory.departmentCode(connection.firstDepartmentId()),
-                        directory.departmentCode(connection.secondDepartmentId())))
+                        directory.departmentCode(connection.secondDepartmentId()),
+                        connection.bidirectional()))
                 .toList();
 
         return new DeliveryNetworkExportResult(departmentResults, connections);
@@ -136,6 +149,40 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
         this.deliveryNetworkRepository.save(deliveryNetwork);
         this.domainEventPublisher.publish(new DeliveryNetworkChanged(previousSnapshot, deliveryNetwork.snapshot(),
                 Instant.now()));
+    }
+
+    @Override
+    @Transactional
+    public void connectDepartmentToSortingFacilities(final DepartmentId departmentId) {
+        final DepartmentConnectionRules rules = connectionPolicies().forDepartment(departmentId);
+        if (!rules.autoConnectDepartments()) {
+            return;
+        }
+        final DeliveryNetwork deliveryNetwork = loadCurrentNetwork();
+        final DeliveryNetworkSnapshot previousSnapshot = deliveryNetwork.snapshot();
+        deliveryNetwork.connectToNearestSortingFacilities(departmentId,
+                this.departmentDirectoryServicePort.getCurrentOperatorDepartments(),
+                rules.sortingFacilityConnectionCount(), rules.maxAutoConnectionDistanceInKilometers(),
+                rules.bidirectionalByDefault());
+        if (previousSnapshot.connections().equals(deliveryNetwork.connections())) {
+            return;
+        }
+        this.deliveryNetworkRepository.save(deliveryNetwork);
+        this.domainEventPublisher.publish(new DeliveryNetworkChanged(previousSnapshot, deliveryNetwork.snapshot(),
+                Instant.now()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean canActivateDepartment(final DepartmentId departmentId) {
+        if (!connectionPolicies().forDepartment(departmentId).requireSortingConnectionForActivation()) {
+            return true;
+        }
+        final List<DepartmentNode> departments = this.departmentDirectoryServicePort.getCurrentOperatorDepartments();
+        final boolean sortingFacility = departments.stream()
+                .anyMatch(department -> department.departmentId().equals(departmentId)
+                        && department.isSortingFacility());
+        return sortingFacility || loadCurrentNetwork().hasSortingFacilityConnection(departmentId, departments);
     }
 
     @Override
@@ -187,8 +234,14 @@ public class DeliveryNetworkPortImpl implements DeliveryNetworkPort {
         return this.operatorContextProvider.currentOperatorId();
     }
 
-    private DepartmentConnection connection(final DepartmentConnectionCommand connection) {
-        return new DepartmentConnection(connection.firstDepartmentId(), connection.secondDepartmentId());
+    private DepartmentConnection connection(final DepartmentConnectionCommand connection,
+                                            final boolean bidirectionalByDefault) {
+        return new DepartmentConnection(connection.firstDepartmentId(), connection.secondDepartmentId(),
+                connection.bidirectional() == null ? bidirectionalByDefault : connection.bidirectional());
+    }
+
+    private DepartmentConnectionPolicies connectionPolicies() {
+        return this.deliveryNetworkConfigurationServicePort.currentPolicies();
     }
 
     private DepartmentDirectory currentDepartmentDirectory() {
