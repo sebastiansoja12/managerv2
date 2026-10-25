@@ -34,16 +34,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>PathFinderApi</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.warehouse</groupId>
-            <artifactId>GeocodingServiceApi</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>

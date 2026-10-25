@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.warehouse.commonassets.enumeration.GeocodingProvider;
-import com.warehouse.geocoding.domain.port.primary.GeocodingPort;
+import com.warehouse.geocoding.application.port.primary.GeocodingPort;
 import com.warehouse.infrastructure.dto.GeocodingConfigurationDto;
 
 @ExtendWith(MockitoExtension.class)

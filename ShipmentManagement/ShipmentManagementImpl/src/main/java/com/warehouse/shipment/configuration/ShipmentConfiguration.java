@@ -50,6 +50,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPe
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.SignaturePersistenceMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
+import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 
 import java.util.List;
 
@@ -433,9 +434,10 @@ public class ShipmentConfiguration {
 	@Bean
 	@ConditionalOnProperty(name="services.mock", havingValue="false")
 	public PathFinderServicePort pathFinderServicePort(final VoronoiService voronoiService,
-													   final DepartmentApiService departmentApiService) {
+												   final DepartmentApiService departmentApiService,
+												   final GeocodingCoordinatesService geocodingCoordinatesService) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using path finder service");
-		return new PathFinderAdapter(voronoiService, departmentApiService);
+		return new PathFinderAdapter(voronoiService, departmentApiService, geocodingCoordinatesService);
 	}
 
 	//MOCK

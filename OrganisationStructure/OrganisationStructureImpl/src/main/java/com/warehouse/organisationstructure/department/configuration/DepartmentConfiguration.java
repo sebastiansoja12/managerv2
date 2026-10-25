@@ -24,7 +24,7 @@ import com.warehouse.organisationstructure.department.infrastructure.adapter.pri
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.*;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.DepartmentEntity;
 import com.warehouse.organisationstructure.department.infrastructure.adapter.secondary.entity.readmodel.DepartmentReadEntity;
-import com.warehouse.voronoi.VoronoiCoordinatesService;
+import com.warehouse.geocoding.api.GeocodingCoordinatesService;
 
 @Configuration
 public class DepartmentConfiguration {
@@ -85,7 +85,7 @@ public class DepartmentConfiguration {
 
     @Bean
     public DepartmentCoordinatesServicePort departmentCoordinatesServicePort(
-            @Qualifier("voronoiCoordinatesService") final VoronoiCoordinatesService coordinatesService) {
+            final GeocodingCoordinatesService coordinatesService) {
         return new DepartmentCoordinatesServiceAdapter(coordinatesService);
     }
 }
