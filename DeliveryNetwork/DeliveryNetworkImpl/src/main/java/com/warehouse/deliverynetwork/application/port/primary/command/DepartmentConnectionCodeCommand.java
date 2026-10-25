@@ -6,7 +6,13 @@ import java.util.Objects;
 
 public record DepartmentConnectionCodeCommand(
         DepartmentCode firstDepartmentCode,
-        DepartmentCode secondDepartmentCode) {
+        DepartmentCode secondDepartmentCode,
+        Boolean bidirectional) {
+
+    public DepartmentConnectionCodeCommand(final DepartmentCode firstDepartmentCode,
+                                           final DepartmentCode secondDepartmentCode) {
+        this(firstDepartmentCode, secondDepartmentCode, null);
+    }
 
     public DepartmentConnectionCodeCommand {
         Objects.requireNonNull(firstDepartmentCode, "First department code cannot be null");
