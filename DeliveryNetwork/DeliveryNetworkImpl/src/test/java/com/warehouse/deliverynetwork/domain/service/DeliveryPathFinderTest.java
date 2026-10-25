@@ -165,6 +165,20 @@ class DeliveryPathFinderTest {
     }
 
     @Test
+    void shouldFollowOneWayConnectionOnlyInItsDirection() {
+        final DeliveryNetwork deliveryNetwork = network(
+                DepartmentConnection.oneWay(departmentId(1L), departmentId(2L)));
+        final List<DepartmentNode> departments = List.of(branch(1L), branch(2L));
+
+        assertEquals(List.of(departmentId(1L), departmentId(2L)), this.deliveryPathFinder.findShortestPath(
+                deliveryNetwork, departments, departmentId(1L), departmentId(2L)).departmentIds());
+        assertThrows(
+                DeliveryPathNotFoundException.class,
+                () -> this.deliveryPathFinder.findShortestPath(
+                        deliveryNetwork, departments, departmentId(2L), departmentId(1L)));
+    }
+
+    @Test
     void shouldRejectDisconnectedDepartments() {
         final DeliveryNetwork deliveryNetwork = network(connection(1L, 10L), connection(2L, 11L));
         final List<DepartmentNode> departments = List.of(
