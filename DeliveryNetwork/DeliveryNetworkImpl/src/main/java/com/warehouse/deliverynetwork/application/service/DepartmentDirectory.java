@@ -50,10 +50,12 @@ public class DepartmentDirectory {
         return departmentCode;
     }
 
-    public DepartmentConnection connection(final DepartmentConnectionCodeCommand connection) {
+    public DepartmentConnection connection(final DepartmentConnectionCodeCommand connection,
+                                           final boolean bidirectionalByDefault) {
         return new DepartmentConnection(
                 department(connection.firstDepartmentCode()).departmentId(),
-                department(connection.secondDepartmentCode()).departmentId());
+                department(connection.secondDepartmentCode()).departmentId(),
+                connection.bidirectional() == null ? bidirectionalByDefault : connection.bidirectional());
     }
 
     public void validateImport(final List<DepartmentImportCommand> importedDepartments) {
