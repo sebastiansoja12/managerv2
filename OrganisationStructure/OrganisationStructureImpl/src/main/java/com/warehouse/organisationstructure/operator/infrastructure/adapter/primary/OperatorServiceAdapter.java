@@ -3,8 +3,12 @@ package com.warehouse.organisationstructure.operator.infrastructure.adapter.prim
 import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.api.dto.OperatorDto;
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.organisationstructure.api.dto.OperatorIdDto;
 import com.warehouse.organisationstructure.operator.domain.port.primary.OperatorPort;
 import com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper.OperatorMapper;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class OperatorServiceAdapter implements OperatorApiService {
 
@@ -27,5 +31,11 @@ public class OperatorServiceAdapter implements OperatorApiService {
     @Override
     public OperatorDto getById(final OperatorId operatorId) {
         return OperatorMapper.toDto(operatorPort.getById(operatorId));
+    }
+
+    @Override
+    public Set<OperatorIdDto> findActiveOperators() {
+        final Set<OperatorId> operatorIds = operatorPort.findAllActive();
+        return operatorIds.stream().map(operatorId -> new OperatorIdDto(operatorId.value())).collect(Collectors.toSet());
     }
 }

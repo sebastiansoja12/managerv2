@@ -1,6 +1,9 @@
 package com.warehouse.supplier.configuration;
 
 import com.warehouse.auth.SupplierUserEventPublisher;
+import com.warehouse.commonassets.context.OperatorContext;
+import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
+import com.warehouse.organisationstructure.api.OperatorApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
 import com.warehouse.supplier.api.SupplierApiService;
 import com.warehouse.supplier.infrastructure.adapter.primary.SupplierApiServiceAdapter;
@@ -50,20 +53,30 @@ public class SupplierConfiguration {
     @Bean
     public DriverLicenseObserverPort driverLicenseObserverPort(
             final DriverLicenseService driverLicenseService,
-            final SupplierNoDepartmentContextService supplierNoDepartmentContextService
-    ) {
-        return new DriverLicenseObserverPortImpl(driverLicenseService, supplierNoDepartmentContextService);
+            final SupplierInvalidatorService supplierInvalidatorService,
+            final OperatorServicePort operatorServicePort,
+            final SupplierRepository supplierRepository,
+            final OperatorContext operatorContext,
+            final MailServicePort mailServicePort) {
+        return new DriverLicenseObserverPortImpl(driverLicenseService, supplierInvalidatorService, operatorServicePort, supplierRepository, operatorContext, mailServicePort);
     }
 
     @Bean
-    public DangerousGoodObserverPort dangerousGoodObserverPort(final SupplierNoDepartmentContextService service) {
-        return new DangerousGoodObserverPortImpl(service);
+    public MailServicePort supplierMailServicePort(final IntegrationEventPublisher integrationEventPublisher) {
+        return new MailServiceAdapter(integrationEventPublisher);
     }
 
     @Bean
-    public SupplierNoDepartmentContextRepository supplierNoDepartmentContextRepository(
-            final SupplierReadRepository supplierReadRepository) {
-        return new SupplierNoDepartmentContextRepositoryImpl(supplierReadRepository);
+    public OperatorServicePort supplierOperatorServicePort(final OperatorApiService operatorApiService) {
+        return new OperatorServiceAdapter(operatorApiService);
+    }
+
+    @Bean
+    public DangerousGoodObserverPort dangerousGoodObserverPort(final SupplierInvalidatorService service,
+                                                               final OperatorServicePort operatorServicePort,
+                                                               final SupplierRepository supplierRepository,
+                                                               final OperatorContext operatorContext) {
+        return new DangerousGoodObserverPortImpl(service, operatorServicePort, supplierRepository, operatorContext);
     }
 
     @Bean

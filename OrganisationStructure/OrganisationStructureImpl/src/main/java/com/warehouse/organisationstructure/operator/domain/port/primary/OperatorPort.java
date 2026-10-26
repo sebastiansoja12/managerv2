@@ -6,6 +6,7 @@ import com.warehouse.organisationstructure.operator.domain.model.Operator;
 import com.warehouse.organisationstructure.operator.domain.model.UpdateOperatorCommand;
 
 import java.util.List;
+import java.util.Set;
 
 public interface OperatorPort {
     List<Operator> getAll();
@@ -14,4 +15,5 @@ public interface OperatorPort {
     boolean isActive(final OperatorId operatorId);
     OperatorId create(final CreateOperatorCommand command);
     Operator update(final OperatorId operatorId, final UpdateOperatorCommand command);
+    Set<OperatorId> findAllActive();
 }

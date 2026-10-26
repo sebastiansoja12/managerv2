@@ -17,6 +17,11 @@
             <artifactId>Common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.warehouse</groupId>
+            <artifactId>MailService</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
