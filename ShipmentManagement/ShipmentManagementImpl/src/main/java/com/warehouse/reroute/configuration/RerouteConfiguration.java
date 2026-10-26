@@ -19,7 +19,6 @@ import com.warehouse.reroute.domain.service.RerouteTokenValueGenerator;
 import com.warehouse.reroute.domain.vo.RerouteTokenPolicy;
 import com.warehouse.reroute.infrastructure.adapter.primary.ExpiredRerouteTokenCleanupJob;
 import com.warehouse.reroute.infrastructure.adapter.primary.mapper.RerouteApiMapper;
-import com.warehouse.reroute.infrastructure.adapter.primary.validator.RerouteRequestValidator;
 import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteIntegrationEventServiceAdapter;
 import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteNotificationServiceAdapter;
 import com.warehouse.reroute.infrastructure.adapter.secondary.RerouteTokenJpaRepository;
@@ -75,11 +74,6 @@ public class RerouteConfiguration {
     @Bean
     public RerouteApiMapper rerouteApiMapper() {
         return new RerouteApiMapper();
-    }
-
-    @Bean
-    public RerouteRequestValidator rerouteRequestValidator() {
-        return new RerouteRequestValidator();
     }
 
     @Bean

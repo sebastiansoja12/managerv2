@@ -51,6 +51,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.SignatureP
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.geocoding.api.GeocodingCoordinatesService;
+import com.warehouse.geocoding.api.PostalCodeService;
 
 import java.util.List;
 
@@ -77,6 +78,11 @@ public class ShipmentConfiguration {
 	@Bean
 	public PriceRepository priceRepository(final PriceReadRepository repository) {
 		return new PriceRepositoryImpl(repository);
+	}
+
+	@Bean
+	public PostalCodeServicePort postalCodeServicePort(final PostalCodeService postalCodeService) {
+		return new PostalCodeServiceAdapter(postalCodeService);
 	}
 
 	@Bean
@@ -111,7 +117,8 @@ public class ShipmentConfiguration {
                                      final ShipmentStatusChangeStrategyResolver shipmentStatusChangeStrategyResolver,
                                      final DomainEventPublisher domainEventPublisher,
                                      final DepartmentServicePort departmentServicePort,
-                                     final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService) {
+                                     final ShipmentDepartmentResolutionService shipmentDepartmentResolutionService,
+                                     final PostalCodeServicePort postalCodeServicePort) {
 		final AddressValidationService addressValidationService = new AddressValidationService();
 		return new ShipmentPortImpl(shipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
@@ -119,7 +126,8 @@ public class ShipmentConfiguration {
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService);
+                domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService,
+                postalCodeServicePort);
 	}
 
     @Bean

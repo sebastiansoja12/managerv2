@@ -107,6 +107,9 @@ class ShipmentPortImplTest {
     @Mock
     private PickupPointServicePort pickupPointServicePort;
 
+    @Mock
+    private PostalCodeServicePort postalCodeServicePort;
+
     private final AddressValidationService addressValidationService = new AddressValidationService();
 
     private ShipmentPortImpl shipmentPort;
@@ -137,7 +140,10 @@ class ShipmentPortImplTest {
 				this.signatureService, shipmentResultFactory, mailNotificationServicePort,
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
-                this.domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService);
+                this.domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService,
+                this.postalCodeServicePort);
+        lenient().when(this.postalCodeServicePort.findCountryCode("00-000", "test"))
+                .thenReturn(Optional.of(CountryCode.PL), Optional.of(CountryCode.DE));
 	}
 
     @Test
@@ -521,6 +527,19 @@ class ShipmentPortImplTest {
         when(shipmentRepository.exists(shipmentId)).thenReturn(false);
         final boolean exists = shipmentPort.existsShipment(shipmentId);
         assertFalse(exists);
+    }
+
+    @Test
+    void shouldRejectShipmentWhenSenderPostalCodeIsUnknown() {
+        when(this.shipmentConfigurationPort.getCurrentOperatorShipmentConfiguration())
+                .thenReturn(permissiveConfiguration());
+        when(this.postalCodeServicePort.findCountryCode("00-000", "test")).thenReturn(Optional.empty());
+
+        final Result<ShipmentCreateResponse, ErrorCode> result = this.shipmentPort.ship(shipmentCreateCommand());
+
+        assertTrue(result.isFailure());
+        assertEquals(ErrorCode.SENDER_POSTAL_CODE_NOT_FOUND, result.getFailure());
+        verify(this.shipmentRepository, never()).createOrUpdate(any());
     }
 
     @Test
