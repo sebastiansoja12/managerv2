@@ -29,6 +29,22 @@ public class SpecificationShipmentRepositoryImpl
 
     @Override
     public List<Shipment> list(final ShipmentSearchCriteria criteria) {
+        return filteredCriteria(criteria)
+                .desc("createdAt")
+                .firstResult(criteria.pageNumber() * criteria.pageSize())
+                .maxResults(criteria.pageSize())
+                .list()
+                .stream()
+                .map(this::toDomain)
+                .toList();
+    }
+
+    @Override
+    public long count(final ShipmentSearchCriteria criteria) {
+        return filteredCriteria(criteria).count();
+    }
+
+    private Criteria<ShipmentReadEntity> filteredCriteria(final ShipmentSearchCriteria criteria) {
         final Criteria<ShipmentReadEntity> shipmentCriteria = repository.createCriteria(ShipmentReadEntity.class);
 
         if (criteria.shipmentId() != null) {
@@ -85,14 +101,7 @@ public class SpecificationShipmentRepositoryImpl
             shipmentCriteria.le("createdAt", criteria.createdTo());
         }
 
-        return shipmentCriteria
-                .desc("createdAt")
-                .firstResult(criteria.pageNumber() * criteria.pageSize())
-                .maxResults(criteria.pageSize())
-                .list()
-                .stream()
-                .map(this::toDomain)
-                .toList();
+        return shipmentCriteria;
     }
 
     private Shipment toDomain(final ShipmentReadEntity entity) {

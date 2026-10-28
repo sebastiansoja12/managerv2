@@ -2,7 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary;
 
 import com.warehouse.shipment.application.port.primary.ShipmentQueryPort;
 import com.warehouse.shipment.domain.vo.ShipmentSearchCriteria;
-import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentDto;
+import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentPageDto;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.ShipmentSearchRequestApi;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentRequestMapper;
 import com.warehouse.shipment.infrastructure.adapter.primary.mapper.ShipmentResponseMapper;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/shipments/read-model")
@@ -37,12 +35,10 @@ public class ShipmentSearchController {
     @PostMapping("/search")
     @Counted(value = "controller.shipment.list")
     @Timed(value = "controller.shipment.list")
-    public ResponseEntity<List<ShipmentDto>> search(
+    public ResponseEntity<ShipmentPageDto> search(
             @RequestBody(required = false) final ShipmentSearchRequestApi request) {
         final ShipmentSearchCriteria criteria = requestMapper.map(request);
-        final List<ShipmentDto> shipmentResponse = shipmentQueryPort.searchShipments(criteria).stream()
-                .map(responseMapper::map)
-                .toList();
-        return ResponseEntity.ok(shipmentResponse);
+        final ShipmentPageDto shipmentPage = responseMapper.map(shipmentQueryPort.searchShipments(criteria));
+        return ResponseEntity.ok(shipmentPage);
     }
 }

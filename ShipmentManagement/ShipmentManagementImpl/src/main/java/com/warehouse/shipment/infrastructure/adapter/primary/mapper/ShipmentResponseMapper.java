@@ -2,6 +2,7 @@ package com.warehouse.shipment.infrastructure.adapter.primary.mapper;
 
 import com.warehouse.shipment.application.port.primary.result.ShipmentCreateResponse;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
+import com.warehouse.shipment.application.port.primary.result.ShipmentPageResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 
 import com.warehouse.commonassets.identificator.ShipmentId;
@@ -60,6 +61,15 @@ public interface ShipmentResponseMapper {
 
     default ShipmentDto map(final ShipmentResult shipmentResult) {
         return map(shipmentResult.snapshot());
+    }
+
+    default ShipmentPageDto map(final ShipmentPageResult shipmentPage) {
+        return new ShipmentPageDto(
+                shipmentPage.content().stream().map(this::map).toList(),
+                shipmentPage.page(),
+                shipmentPage.size(),
+                shipmentPage.totalElements(),
+                shipmentPage.totalPages());
     }
 
     default PersonApi map(final Party person) {
