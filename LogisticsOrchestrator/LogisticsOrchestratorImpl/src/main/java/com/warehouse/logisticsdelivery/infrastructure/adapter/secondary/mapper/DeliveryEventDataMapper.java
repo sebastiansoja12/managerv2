@@ -48,7 +48,8 @@ public class DeliveryEventDataMapper implements DeliveryEventDataMapperPort {
                 step.departmentId(),
                 step.vehicleId(),
                 step.comment(),
-                step.failureReason()
+                step.failureReason(),
+                step.commentCode() == null ? null : step.commentCode().name()
         );
     }
 }

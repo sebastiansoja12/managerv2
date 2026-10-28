@@ -12,5 +12,6 @@ public record DeliveryStepResponseDto(int stepNumber,
                                       String vehicleId,
                                       String signatureId,
                                       String comment,
+                                      String commentCode,
                                       String failureReason) {
 }

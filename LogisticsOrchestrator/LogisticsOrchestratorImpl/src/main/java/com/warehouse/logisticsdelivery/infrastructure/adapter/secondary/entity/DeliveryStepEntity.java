@@ -2,6 +2,7 @@ package com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.enumeration.DeliveryStatus;
 import com.warehouse.commonassets.identificator.*;
+import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryCommentCode;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryStepOutcome;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -58,6 +59,10 @@ public class DeliveryStepEntity {
     @Column(name = "comment", length = 1000)
     private String comment;
 
+    @Column(name = "comment_code")
+    @Enumerated(EnumType.STRING)
+    private DeliveryCommentCode commentCode;
+
     @Column(name = "failure_reason", length = 1000)
     private String failureReason;
 
@@ -80,6 +85,7 @@ public class DeliveryStepEntity {
                                final DepartmentId departmentId,
                                final VehicleId vehicleId,
                                final String comment,
+                               final DeliveryCommentCode commentCode,
                                final String failureReason,
                                final String token) {
         this.id = id == null ? DeliveryStepId.generate() : id;
@@ -94,6 +100,7 @@ public class DeliveryStepEntity {
         this.departmentId = departmentId;
         this.vehicleId = vehicleId;
         this.comment = comment;
+        this.commentCode = commentCode;
         this.failureReason = failureReason;
         this.token = token;
     }
@@ -110,6 +117,7 @@ public class DeliveryStepEntity {
     public DepartmentId getDepartmentId() { return departmentId; }
     public VehicleId getVehicleId() { return vehicleId; }
     public String getComment() { return comment; }
+    public DeliveryCommentCode getCommentCode() { return commentCode; }
     public String getFailureReason() { return failureReason; }
     public String getToken() { return token; }
 }
