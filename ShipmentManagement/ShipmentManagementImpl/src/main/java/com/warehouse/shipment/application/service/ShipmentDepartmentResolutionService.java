@@ -7,6 +7,7 @@ import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCom
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
 import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.application.port.secondary.PickupPointServicePort;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.vo.Address;
@@ -36,23 +37,31 @@ public class ShipmentDepartmentResolutionService {
             return resolvePickupPointDepartmentId(
                     command.getDeliveryPickupPointId(), ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
         }
+        return resolveNearestDepartmentId(recipient, ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
+    }
 
+    public Result<DepartmentId, ErrorCode> resolveOriginDepartmentId(
+            final ShipmentCreateCommand command, final Party sender) {
+        if (command.getPickupMethod().isPickupPointBased()) {
+            return resolvePickupPointDepartmentId(command.getPickupPointId(), ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
+        }
+        if (command.getSource() == ShipmentSource.EXTERNAL) {
+            return resolveNearestDepartmentId(sender, ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
+        }
+        return validateDepartmentId(operatorContextProvider.currentDepartmentId(),
+                ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
+    }
+
+    private Result<DepartmentId, ErrorCode> resolveNearestDepartmentId(
+            final Party party, final ErrorCode missingDepartmentError) {
         final Result<VoronoiResponse, ErrorCode> voronoiResponse =
-                pathFinderServicePort.determineDeliveryDepartment(Address.from(recipient));
+                pathFinderServicePort.determineDeliveryDepartment(Address.from(party));
         if (voronoiResponse.isFailure()) {
             return Result.failure(voronoiResponse.getFailure());
         }
         final DepartmentId departmentId = departmentServicePort.getDepartmentId(
                 voronoiResponse.getSuccess().getDepartmentCodeResult());
-        return validateDepartmentId(departmentId, ErrorCode.DESTINATION_DEPARTMENT_NOT_AVAILABLE);
-    }
-
-    public Result<DepartmentId, ErrorCode> resolveOriginDepartmentId(final ShipmentCreateCommand command) {
-        if (command.getPickupMethod().isPickupPointBased()) {
-            return resolvePickupPointDepartmentId(command.getPickupPointId(), ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
-        }
-        return validateDepartmentId(operatorContextProvider.currentDepartmentId(),
-                ErrorCode.ORIGIN_DEPARTMENT_NOT_AVAILABLE);
+        return validateDepartmentId(departmentId, missingDepartmentError);
     }
 
     private Result<DepartmentId, ErrorCode> resolvePickupPointDepartmentId(

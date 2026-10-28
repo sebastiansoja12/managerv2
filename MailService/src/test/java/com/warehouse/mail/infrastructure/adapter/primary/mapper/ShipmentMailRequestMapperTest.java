@@ -73,6 +73,16 @@ class ShipmentMailRequestMapperTest {
     }
 
     @Test
+    void shouldUseExternalTemplatesForShipmentCreatedByExternalIntegration() {
+        final List<MailRequest> requests = mapper.mapCreated(shipment(ShipmentStatus.CREATED,
+                party("Jan", "jan@example.com", "PL"), party("Anna", "anna@example.com", "PL"), null, "EXTERNAL"));
+
+        assertEquals(2, requests.size());
+        assertEquals("shipment.created.external.sender", requests.get(0).templateKey());
+        assertEquals("shipment.created.external.recipient", requests.get(1).templateKey());
+    }
+
+    @Test
     void shouldNotNotifyAboutCreatedReturnShipment() {
         final List<MailRequest> requests = mapper.mapCreated(shipment(ShipmentStatus.CREATED,
                 party("Jan", "jan@example.com", "PL"), party("Anna", "anna@example.com", "PL"), new ShipmentId(7L)));

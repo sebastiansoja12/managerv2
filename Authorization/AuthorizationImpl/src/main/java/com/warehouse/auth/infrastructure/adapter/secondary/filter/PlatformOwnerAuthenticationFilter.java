@@ -1,5 +1,6 @@
 package com.warehouse.auth.infrastructure.adapter.secondary.filter;
 
+import com.warehouse.auth.configuration.ApiExposureProperties;
 import com.warehouse.auth.configuration.AuthCookieService;
 import com.warehouse.auth.domain.port.primary.PlatformOwnerAuthenticationPort;
 import jakarta.servlet.FilterChain;
@@ -35,10 +36,14 @@ public class PlatformOwnerAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthCookieService authCookieService;
 
+    private final ApiExposureProperties apiExposureProperties;
+
     public PlatformOwnerAuthenticationFilter(final PlatformOwnerAuthenticationPort platformOwnerAuthenticationPort,
-                                             final AuthCookieService authCookieService) {
+                                             final AuthCookieService authCookieService,
+                                             final ApiExposureProperties apiExposureProperties) {
         this.platformOwnerAuthenticationPort = platformOwnerAuthenticationPort;
         this.authCookieService = authCookieService;
+        this.apiExposureProperties = apiExposureProperties;
     }
 
     @Override
@@ -53,7 +58,8 @@ public class PlatformOwnerAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
-        return !isPlatformOwnerRequest(request) && authCookieService.readAccessToken(request).isPresent();
+        return apiExposureProperties.isExternalPath(request)
+                || !isPlatformOwnerRequest(request) && authCookieService.readAccessToken(request).isPresent();
     }
 
     private void authenticate(final HttpServletRequest request, final String accessToken) {

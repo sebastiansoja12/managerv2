@@ -83,6 +83,17 @@ class JwtAuthenticationFilterImpersonationTest {
     }
 
     @Test
+    void shouldNotAuthenticateExternalShipmentRequest() throws Exception {
+        final MockHttpServletRequest request = request(impersonationToken());
+        request.setMethod("POST");
+        request.setRequestURI("/v1/api/external/shipments");
+
+        final Authentication authentication = filter(request);
+
+        assertThat(authentication).isNull();
+    }
+
+    @Test
     void shouldRejectImpersonationWithoutActiveOwnerOrConsent() throws Exception {
         when(platformOwnerAuthenticationPort.isImpersonationActive(new Impersonation(PLATFORM_OWNER_ID, "owner", 77L), OperatorId.of(20L))).thenReturn(false);
         final MockHttpServletRequest request = request(impersonationToken());

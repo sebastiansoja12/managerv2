@@ -56,11 +56,13 @@ public class SecurityConfiguration {
                                 "/departments/read-sync/**",
                                 "/internal/shipments/read-sync/**",
                                 "/admin/async-jobs/**")
-                        .ignoringRequestMatchers(apiExposureProperties.mcpSecurityMatchers()))
+                        .ignoringRequestMatchers(apiExposureProperties.mcpSecurityMatchers())
+                        .ignoringRequestMatchers(apiExposureProperties.externalSecurityMatchers()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(apiExposureProperties.externalSecurityMatchers()).permitAll()
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/auth/csrf").permitAll()
                         .requestMatchers("/platform/auth/login", "/platform/auth/refresh", "/platform/auth/logout").permitAll()
                         .requestMatchers("/platform/**", "/operators", "/operators/**")

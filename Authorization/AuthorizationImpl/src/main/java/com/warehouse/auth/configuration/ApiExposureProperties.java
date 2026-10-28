@@ -27,6 +27,10 @@ public class ApiExposureProperties {
             "/mcp"
     ));
 
+    private List<String> externalPaths = new ArrayList<>(List.of(
+            "/external"
+    ));
+
     private List<PublicEndpoint> publicEndpoints = new ArrayList<>(List.of(
             new PublicEndpoint("POST", "/device-activations")
     ));
@@ -72,6 +76,28 @@ public class ApiExposureProperties {
 
     public String[] mcpSecurityMatchers() {
         return mcpPaths.stream()
+                .map(this::normalizePath)
+                .flatMap(path -> Stream.of(path, path + "/**"))
+                .toArray(String[]::new);
+    }
+
+    public List<String> getExternalPaths() {
+        return externalPaths;
+    }
+
+    public void setExternalPaths(final List<String> externalPaths) {
+        this.externalPaths = externalPaths;
+    }
+
+    public boolean isExternalPath(final HttpServletRequest request) {
+        final String normalizedPath = requestPathWithoutContext(request);
+        return externalPaths.stream()
+                .map(this::normalizePath)
+                .anyMatch(path -> normalizedPath.equals(path) || normalizedPath.startsWith(path + "/"));
+    }
+
+    public String[] externalSecurityMatchers() {
+        return externalPaths.stream()
                 .map(this::normalizePath)
                 .flatMap(path -> Stream.of(path, path + "/**"))
                 .toArray(String[]::new);

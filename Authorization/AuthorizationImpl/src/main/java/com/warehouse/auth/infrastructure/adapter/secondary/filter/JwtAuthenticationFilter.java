@@ -90,6 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
         final String uri = request.getRequestURI();
-        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith) || apiExposureProperties.isMcpPath(request);
+        return DEVICE_ENDPOINTS.stream().anyMatch(uri::startsWith) || apiExposureProperties.isMcpPath(request)
+                || apiExposureProperties.isExternalPath(request);
     }
 }

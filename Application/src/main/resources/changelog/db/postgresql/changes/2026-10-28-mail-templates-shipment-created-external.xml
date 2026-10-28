@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="2026-10-28-mail-templates-shipment-created-external-sender" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'shipment.created.external.sender'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="c066f03f-ea41-400a-8bd7-5749a33eec1f"/>
+            <column name="template_key" value="shipment.created.external.sender"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Przesyłka {{trackingNumber}} została zarejestrowana"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+Twoja przesyłka została zarejestrowana przez zewnętrzny serwis. Przygotuj paczkę do odbioru przez kuriera lub nadania w wybranym punkcie.
+
+Nadawca: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Odbiorca: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}{{#shipmentEditUrl}}
+
+Jeśli dane przesyłki są błędne, możesz je poprawić, dopóki przesyłka nie zostanie odebrana przez kuriera ani umieszczona w paczkomacie:
+{{shipmentEditUrl}}{{/shipmentEditUrl}}
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="85d78f46-f7ef-41a4-9ea6-d9f870d089ee"/>
+            <column name="template_key" value="shipment.created.external.sender"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="Shipment {{trackingNumber}} has been registered"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+Your shipment has been registered through an external service. Please prepare the parcel for courier pickup or drop-off at the selected point.
+
+Sender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Recipient: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}{{#shipmentEditUrl}}
+
+If the shipment details are wrong, you can correct them until the shipment is picked up by a courier or placed in a parcel locker:
+{{shipmentEditUrl}}{{/shipmentEditUrl}}
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="f5318ab9-94a7-44c1-8ef8-790562454e11"/>
+            <column name="template_key" value="shipment.created.external.sender"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Sendung {{trackingNumber}} wurde registriert"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+Ihre Sendung wurde über einen externen Dienst registriert. Bitte bereiten Sie das Paket für die Abholung durch den Kurier oder die Abgabe an der gewählten Stelle vor.
+
+Absender: {{senderFirstName}} {{senderLastName}}, {{senderStreet}}, {{senderPostalCode}} {{senderCity}}, {{senderCountryCode}}
+Empfänger: {{recipientFirstName}} {{recipientLastName}}, {{recipientStreet}}, {{recipientPostalCode}} {{recipientCity}}, {{recipientCountryCode}}{{#shipmentEditUrl}}
+
+Falls die Sendungsdaten fehlerhaft sind, können Sie sie korrigieren, solange die Sendung nicht vom Kurier abgeholt oder in eine Packstation gelegt wurde:
+{{shipmentEditUrl}}{{/shipmentEditUrl}}
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+    <changeSet id="2026-10-28-mail-templates-shipment-created-external-recipient" author="s-soja">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM mail_templates WHERE template_key = 'shipment.created.external.recipient'</sqlCheck>
+        </preConditions>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="2d631762-d636-4485-a2cc-0640e5900570"/>
+            <column name="template_key" value="shipment.created.external.recipient"/>
+            <column name="locale" value="pl"/>
+            <column name="subject" value="Zarejestrowano dla Ciebie przesyłkę {{trackingNumber}}"/>
+            <column name="body"><![CDATA[Dzień dobry{{#firstName}} {{firstName}}{{/firstName}},
+
+{{senderFirstName}} {{senderLastName}} zarejestrował(a) dla Ciebie przesyłkę przez zewnętrzny serwis. Poinformujemy Cię, gdy przesyłka zostanie nadana, oraz o kolejnych etapach jej drogi.
+
+Numer przesyłki: {{trackingNumber}}{{#trackingUrl}}
+Śledź przesyłkę: {{trackingUrl}}{{/trackingUrl}}
+
+Pozdrawiamy,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="34afdf4d-3095-428e-be1b-46e5fe596e8f"/>
+            <column name="template_key" value="shipment.created.external.recipient"/>
+            <column name="locale" value="en"/>
+            <column name="subject" value="A shipment {{trackingNumber}} has been registered for you"/>
+            <column name="body"><![CDATA[Hello{{#firstName}} {{firstName}}{{/firstName}},
+
+{{senderFirstName}} {{senderLastName}} has registered a shipment for you through an external service. We will let you know when it is dispatched and keep you informed about its progress.
+
+Tracking number: {{trackingNumber}}{{#trackingUrl}}
+Track your shipment: {{trackingUrl}}{{/trackingUrl}}
+
+Kind regards,
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        <insert tableName="mail_templates">
+            <column name="template_id" value="ea585c33-43ed-4acb-8b1e-74fa3446e155"/>
+            <column name="template_key" value="shipment.created.external.recipient"/>
+            <column name="locale" value="de"/>
+            <column name="subject" value="Eine Sendung {{trackingNumber}} wurde für Sie registriert"/>
+            <column name="body"><![CDATA[Guten Tag{{#firstName}} {{firstName}}{{/firstName}},
+
+{{senderFirstName}} {{senderLastName}} hat über einen externen Dienst eine Sendung für Sie registriert. Wir informieren Sie, sobald sie aufgegeben wurde, sowie über die weiteren Schritte.
+
+Sendungsnummer: {{trackingNumber}}{{#trackingUrl}}
+Sendung verfolgen: {{trackingUrl}}{{/trackingUrl}}
+
+Mit freundlichen Grüßen
+{{fromName}}]]></column>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

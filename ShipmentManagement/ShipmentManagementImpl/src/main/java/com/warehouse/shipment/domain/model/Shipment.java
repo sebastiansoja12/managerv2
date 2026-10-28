@@ -5,6 +5,7 @@ import com.warehouse.commonassets.identificator.*;
 import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.*;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
 import com.warehouse.shipment.domain.vo.conf.ShipmentServiceLevel;
@@ -65,6 +66,8 @@ public class Shipment {
 
     private Money declaredValue;
 
+    private ShipmentSource source;
+
     private Shipment(final ShipmentId shipmentId,
                     final Party sender,
                     final Party recipient,
@@ -94,6 +97,7 @@ public class Shipment {
         this.serviceLevel = ShipmentServiceLevel.STANDARD;
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = externalShipmentId;
+        this.source = ShipmentSource.WEB;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -120,6 +124,7 @@ public class Shipment {
         this.serviceLevel = ShipmentServiceLevel.STANDARD;
         this.trackingNumber = trackingNumber;
         this.externalShipmentId = ExternalId.randomUUID();
+        this.source = ShipmentSource.WEB;
     }
 
     public Shipment(final ShipmentId shipmentId,
@@ -137,7 +142,8 @@ public class Shipment {
                     final String contentDescription,
                     final Money declaredValue,
                     final ShipmentServiceLevel serviceLevel,
-                    final PackagingType packagingType) {
+                    final PackagingType packagingType,
+                    final ShipmentSource source) {
         this.shipmentId = shipmentId;
         this.sender = sender;
         this.recipient = recipient;
@@ -159,6 +165,7 @@ public class Shipment {
         this.customerReference = customerReference;
         this.contentDescription = contentDescription;
         this.declaredValue = declaredValue;
+        this.source = source;
     }
 
     public static Shipment parentShipment(final ShipmentId shipmentId,
@@ -199,7 +206,8 @@ public class Shipment {
                                      final String contentDescription,
                                      final Money declaredValue,
                                      final ShipmentServiceLevel serviceLevel,
-                                     final PackagingType packagingType) {
+                                     final PackagingType packagingType,
+                                     final ShipmentSource source) {
         final Shipment shipment = new Shipment(shipmentId, sender, recipient, shipmentStatus, shipmentType,
                 shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
                 shipmentPriority, trackingNumber, externalShipmentId);
@@ -213,6 +221,7 @@ public class Shipment {
         shipment.declaredValue = declaredValue;
         shipment.serviceLevel = serviceLevel == null ? ShipmentServiceLevel.STANDARD : serviceLevel;
         shipment.packagingType = packagingType;
+        shipment.source = source;
         return shipment;
     }
 
@@ -220,7 +229,7 @@ public class Shipment {
 		return new ShipmentSnapshot(shipmentId, sender, recipient,
 				shipmentStatus, shipmentType, shipmentRelatedId, price, createdAt, updatedAt, locked, signatureRequired,
 				shipmentPriority, trackingNumber, externalShipmentId, acceptedAt, cancelledAt, cancellationReason, dimensions, weight, customerReference,
-				contentDescription, declaredValue, serviceLevel, packagingType);
+				contentDescription, declaredValue, serviceLevel, packagingType, source);
 	}
 
     public Party getSender() {
@@ -318,6 +327,10 @@ public class Shipment {
     public ShipmentServiceLevel getServiceLevel() { return serviceLevel; }
 
     public PackagingType getPackagingType() { return packagingType; }
+
+    public ShipmentSource getSource() {
+        return source;
+    }
 
     public void prepareShipmentToCreate() {
         ensureShipmentIsNotDelivered();

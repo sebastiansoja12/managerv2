@@ -6,6 +6,7 @@ import com.warehouse.commonassets.model.Money;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.Weight;
@@ -43,6 +44,8 @@ public class ShipmentCreateCommand {
 	private Money declaredValue;
 
 	private CustomerReference customerReference;
+
+	private ShipmentSource source;
 
 	public ShipmentCreateCommand() {
 
@@ -193,5 +196,13 @@ public class ShipmentCreateCommand {
 
 	public void setCustomerReference(final CustomerReference customerReference) {
 		this.customerReference = customerReference;
+	}
+
+	public ShipmentSource getSource() {
+		return source == null ? ShipmentSource.WEB : source;
+	}
+
+	public void setSource(final ShipmentSource source) {
+		this.source = source;
 	}
 }
