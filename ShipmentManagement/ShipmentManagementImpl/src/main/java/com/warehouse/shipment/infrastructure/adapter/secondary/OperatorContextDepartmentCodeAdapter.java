@@ -1,10 +1,12 @@
 package com.warehouse.shipment.infrastructure.adapter.secondary;
 
 import com.warehouse.commonassets.identificator.DepartmentCode;
-import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
+import com.warehouse.commonassets.repository.OperatorDetails;
 import com.warehouse.shipment.application.port.secondary.CurrentDepartmentCodePort;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
+
+import java.util.Optional;
 
 public class OperatorContextDepartmentCodeAdapter implements CurrentDepartmentCodePort {
 
@@ -18,8 +20,10 @@ public class OperatorContextDepartmentCodeAdapter implements CurrentDepartmentCo
     }
 
     @Override
-    public DepartmentCode currentDepartmentCode() {
-        final DepartmentId departmentId = operatorContextProvider.currentDepartmentId();
-        return departmentServicePort.getDepartmentCode(departmentId);
+    public Optional<DepartmentCode> currentDepartmentCode() {
+        // external requests run without a department in context
+        return operatorContextProvider.currentContext()
+                .map(OperatorDetails::departmentId)
+                .map(departmentServicePort::getDepartmentCode);
     }
 }

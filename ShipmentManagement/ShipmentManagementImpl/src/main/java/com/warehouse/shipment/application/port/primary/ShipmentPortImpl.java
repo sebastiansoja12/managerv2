@@ -21,6 +21,7 @@ import com.warehouse.shipment.application.service.delivery.ShipmentDeliveryStrat
 import com.warehouse.shipment.application.service.status.ShipmentStatusChangeStrategyResolver;
 import com.warehouse.shipment.domain.enumeration.PersonType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.domain.enumeration.ShipmentSource;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
@@ -31,10 +32,10 @@ import com.warehouse.shipment.domain.vo.Address;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.ShipmentDeliveryPlan;
 import com.warehouse.shipment.domain.vo.ShipmentOwnerContext;
-import com.warehouse.shipment.domain.vo.VoronoiResponse;
 import com.warehouse.shipment.domain.vo.conf.OperatorShipmentConfiguration;
 import com.warehouse.shipment.domain.vo.conf.ShipmentMetrics;
 import com.warehouse.shipment.domain.vo.conf.ShipmentWorkflowSettings;
+import com.warehouse.shipment.domain.vo.conf.TrackingNumberPrefixMode;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -48,7 +49,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     private final Logger logger;
 
-    private final PathFinderServicePort pathFinderServicePort;
 
     private final DepartmentCountryAvailabilityService departmentCountryAvailabilityService;
 
@@ -78,7 +78,6 @@ public class ShipmentPortImpl implements ShipmentPort {
 
 	public ShipmentPortImpl(final ShipmentRepository shipmentRepository,
                             final Logger logger,
-                            final PathFinderServicePort pathFinderServicePort,
                             final DepartmentCountryAvailabilityService departmentCountryAvailabilityService,
                             final ShipmentResultFactory shipmentResultFactory,
                             final MailNotificationServicePort mailNotificationServicePort,
@@ -94,7 +93,6 @@ public class ShipmentPortImpl implements ShipmentPort {
                             final OperatorServicePort operatorServicePort) {
 		this.shipmentRepository = shipmentRepository;
 		this.logger = logger;
-		this.pathFinderServicePort = pathFinderServicePort;
         this.departmentCountryAvailabilityService = departmentCountryAvailabilityService;
         this.shipmentResultFactory = shipmentResultFactory;
         this.mailNotificationServicePort = mailNotificationServicePort;
@@ -168,14 +166,16 @@ public class ShipmentPortImpl implements ShipmentPort {
         }
 
         final Result<DepartmentId, ErrorCode> originDepartment =
-                shipmentDepartmentResolutionService.resolveOriginDepartmentId(command, sender);
+                shipmentDepartmentResolutionService.resolveOriginDepartmentId(command);
         if (originDepartment.isFailure()) {
             return Result.failure(originDepartment.getFailure());
         }
 
         final ShipmentId shipmentId = ShipmentId.nextId();
-        final TrackingNumber trackingNumber = this.trackingNumberGenerationService.generate(workflowSettings,
-                shipmentConfiguration.trackingNumberRule(), shipmentId);
+        final TrackingNumber trackingNumber = requiresTemporaryTrackingNumber(command, shipmentConfiguration)
+                ? this.trackingNumberGenerationService.temporary()
+                : this.trackingNumberGenerationService.generate(workflowSettings,
+                        shipmentConfiguration.trackingNumberRule(), shipmentId);
 
         final Shipment shipment = new Shipment(
                 shipmentId,
@@ -212,6 +212,12 @@ public class ShipmentPortImpl implements ShipmentPort {
 
         return Result.success(new ShipmentCreateResponse(shipment.getExternalShipmentId(),
                 shipment.getTrackingNumber().value()));
+    }
+
+    private boolean requiresTemporaryTrackingNumber(final ShipmentCreateCommand command,
+                                                    final OperatorShipmentConfiguration shipmentConfiguration) {
+        return command.getSource() == ShipmentSource.EXTERNAL
+                && shipmentConfiguration.trackingNumberRule().prefixMode() == TrackingNumberPrefixMode.DEPARTMENT_CODE;
     }
 
     private Result<Party, ErrorCode> assignCountry(final Party party, final ErrorCode postalCodeNotFound) {
@@ -278,13 +284,14 @@ public class ShipmentPortImpl implements ShipmentPort {
 
     public void changeRecipientTo(final ShipmentId shipmentId, final Party recipient) {
         final Shipment shipment = this.find(shipmentId);
-        if (!shipment.recipientCityMatches(recipient.getCity())) {
-            final Result<VoronoiResponse, ErrorCode> voronoiResponse =
-                    this.pathFinderServicePort.determineDeliveryDepartment(Address.from(recipient));
-            if (voronoiResponse.isFailure()) {
+        if (!shipment.recipientAddressMatches(recipient)) {
+            final Result<DepartmentId, ErrorCode> deliveryDepartment =
+                    this.shipmentDepartmentResolutionService.resolveDeliveryDepartmentId(recipient);
+            if (deliveryDepartment.isFailure()) {
                 logger.warn("Cannot determine delivery department for recipient {}, skipping...", recipient);
             } else {
-                this.changeDestination(shipmentId, voronoiResponse.getSuccess().getDepartmentCodeResult());
+                this.domainEventPublisher.publish(new ShipmentDestinationChanged(shipment.snapshot(),
+                        deliveryDepartment.getSuccess(), Instant.now()));
             }
         }
         shipment.changeRecipient(recipient);
@@ -424,18 +431,17 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     private Optional<DepartmentId> resolveDestinationForRecipient(final Shipment shipment, final Party recipient) {
-        if (shipment.recipientCityMatches(recipient.getCity())) {
+        if (shipment.recipientAddressMatches(recipient)) {
             return Optional.empty();
         }
-        final Result<VoronoiResponse, ErrorCode> voronoiResponse =
-                this.pathFinderServicePort.determineDeliveryDepartment(Address.from(recipient));
-        if (voronoiResponse.isFailure()) {
+        final Result<DepartmentId, ErrorCode> deliveryDepartment =
+                this.shipmentDepartmentResolutionService.resolveDeliveryDepartmentId(recipient);
+        if (deliveryDepartment.isFailure()) {
             logger.warn("Cannot determine delivery department for rerouted shipment {}, keeping current destination",
                     shipment.getShipmentId().getValue());
             return Optional.empty();
         }
-        return Optional.of(this.departmentServicePort
-                .getDepartmentId(voronoiResponse.getSuccess().getDepartmentCodeResult()));
+        return Optional.of(deliveryDepartment.getSuccess());
     }
 
     @Override

@@ -53,6 +53,7 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPe
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.geocoding.api.GeocodingCoordinatesService;
+import com.warehouse.organisationstructure.deliveryarea.api.DeliveryAreaApiService;
 import com.warehouse.geocoding.api.PostalCodeService;
 
 import java.util.List;
@@ -106,7 +107,6 @@ public class ShipmentConfiguration {
 
 	@Bean
 	public ShipmentPort shipmentPort(final ShipmentRepository shipmentRepository,
-									 final PathFinderServicePort pathFinderServicePort,
 									 final DepartmentCountryAvailabilityService departmentCountryAvailabilityService,
 									 final ShipmentResultFactory shipmentResultFactory,
 									 final MailNotificationServicePort mailNotificationServicePort,
@@ -121,7 +121,7 @@ public class ShipmentConfiguration {
                                      final OperatorServicePort shipmentOperatorServicePort) {
 		final AddressValidationService addressValidationService = new AddressValidationService();
 		return new ShipmentPortImpl(shipmentRepository,
-				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
+				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class),
 				departmentCountryAvailabilityService, shipmentResultFactory,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
@@ -140,9 +140,16 @@ public class ShipmentConfiguration {
             final PickupPointServicePort pickupPointServicePort,
             final DepartmentServicePort departmentServicePort,
             final PathFinderServicePort pathFinderServicePort,
+            final DeliveryAreaServicePort deliveryAreaServicePort,
             final OperatorContextProvider operatorContextProvider) {
-        return new ShipmentDepartmentResolutionService(
-                pickupPointServicePort, departmentServicePort, pathFinderServicePort, operatorContextProvider);
+        return new ShipmentDepartmentResolutionService(pickupPointServicePort, departmentServicePort,
+                pathFinderServicePort, deliveryAreaServicePort, operatorContextProvider);
+    }
+
+    @Bean
+    public DeliveryAreaServicePort deliveryAreaServicePort(final GeocodingCoordinatesService geocodingCoordinatesService,
+                                                           final DeliveryAreaApiService deliveryAreaApiService) {
+        return new DeliveryAreaServiceAdapter(geocodingCoordinatesService, deliveryAreaApiService);
     }
 
     @Bean

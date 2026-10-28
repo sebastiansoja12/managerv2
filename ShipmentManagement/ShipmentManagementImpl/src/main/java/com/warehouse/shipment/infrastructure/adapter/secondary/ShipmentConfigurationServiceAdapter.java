@@ -38,6 +38,6 @@ public class ShipmentConfigurationServiceAdapter implements ShipmentConfiguratio
                 || configuration.trackingNumberRule().prefixMode() != TrackingNumberPrefixModeDto.DEPARTMENT_CODE) {
             return null;
         }
-        return currentDepartmentCodePort.currentDepartmentCode();
+        return currentDepartmentCodePort.currentDepartmentCode().orElse(null);
     }
 }
