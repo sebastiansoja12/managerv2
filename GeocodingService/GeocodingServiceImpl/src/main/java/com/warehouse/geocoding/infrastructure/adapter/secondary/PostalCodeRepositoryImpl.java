@@ -3,6 +3,7 @@ package com.warehouse.geocoding.infrastructure.adapter.secondary;
 import java.util.List;
 
 import com.warehouse.geocoding.application.port.secondary.PostalCodeRepository;
+import com.warehouse.geocoding.domain.vo.Coordinates;
 import com.warehouse.geocoding.domain.vo.PostalCode;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.entity.PostalCodeEntity;
 
@@ -32,7 +33,7 @@ public class PostalCodeRepositoryImpl implements PostalCodeRepository {
     private List<PostalCode> map(final List<PostalCodeEntity> entities) {
         return entities.stream()
                 .map(entity -> new PostalCode(entity.getCountryCode(), entity.getPostalCode(), entity.getCity(),
-                        entity.getRegionCode()))
+                        entity.getRegionCode(), new Coordinates(entity.getLatitude(), entity.getLongitude())))
                 .toList();
     }
 }
