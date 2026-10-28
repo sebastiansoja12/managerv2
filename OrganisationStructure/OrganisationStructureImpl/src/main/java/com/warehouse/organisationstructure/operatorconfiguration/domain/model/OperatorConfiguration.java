@@ -8,15 +8,25 @@ public class OperatorConfiguration {
 
     private DeliveryTimeConfiguration deliveryTimeConfiguration;
 
+    private DepartmentConfiguration departmentConfiguration;
+
     public OperatorConfiguration() {
     }
 
     public OperatorConfiguration(final ShippingCapabilities shippingCapabilities,
                                  final ShipmentConfiguration shipmentConfiguration,
                                  final DeliveryTimeConfiguration deliveryTimeConfiguration) {
+        this(shippingCapabilities, shipmentConfiguration, deliveryTimeConfiguration, null);
+    }
+
+    public OperatorConfiguration(final ShippingCapabilities shippingCapabilities,
+                                 final ShipmentConfiguration shipmentConfiguration,
+                                 final DeliveryTimeConfiguration deliveryTimeConfiguration,
+                                 final DepartmentConfiguration departmentConfiguration) {
         this.shippingCapabilities = shippingCapabilities;
         this.shipmentConfiguration = shipmentConfiguration;
         this.deliveryTimeConfiguration = deliveryTimeConfiguration;
+        this.departmentConfiguration = departmentConfiguration;
     }
 
     public OperatorConfiguration(final ShippingCapabilities shippingCapabilities,
@@ -45,7 +55,8 @@ public class OperatorConfiguration {
                         false
                 ),
                 ShipmentConfiguration.defaultConfiguration(),
-                new DeliveryTimeConfiguration()
+                new DeliveryTimeConfiguration(),
+                DepartmentConfiguration.defaultConfiguration()
         );
     }
 
@@ -63,5 +74,14 @@ public class OperatorConfiguration {
 
     public DeliveryTimeConfiguration getDeliveryTimeConfiguration() {
         return deliveryTimeConfiguration;
+    }
+
+    public DepartmentConfiguration getDepartmentConfiguration() {
+        return departmentConfiguration;
+    }
+
+    public OperatorConfiguration withDepartmentConfiguration(final DepartmentConfiguration departmentConfiguration) {
+        return new OperatorConfiguration(shippingCapabilities, shipmentConfiguration, deliveryTimeConfiguration,
+                departmentConfiguration);
     }
 }

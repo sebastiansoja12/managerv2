@@ -23,7 +23,12 @@ public class OperatorConfigurationRepositoryImpl implements OperatorConfiguratio
 
     @Override
     public OperatorConfiguration save(final OperatorId operatorId, final OperatorConfiguration configuration) {
-        return repository.save(OperatorConfigurationMapper.toEntity(operatorId, configuration))
+        final OperatorConfiguration source = configuration != null && configuration.getDepartmentConfiguration() == null
+                ? configuration.withDepartmentConfiguration(findByOperatorId(operatorId)
+                        .map(OperatorConfiguration::getDepartmentConfiguration)
+                        .orElse(null))
+                : configuration;
+        return repository.save(OperatorConfigurationMapper.toEntity(operatorId, source))
                 .toModel();
     }
 }

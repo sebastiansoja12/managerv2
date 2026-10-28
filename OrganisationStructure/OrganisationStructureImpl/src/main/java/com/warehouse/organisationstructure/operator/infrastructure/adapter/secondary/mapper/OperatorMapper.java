@@ -1,6 +1,7 @@
 package com.warehouse.organisationstructure.operator.infrastructure.adapter.secondary.mapper;
 
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.organisationstructure.api.dto.DepartmentConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.DefaultShipmentStatusDto;
 import com.warehouse.organisationstructure.api.dto.DeliveryTimeConfigurationDto;
 import com.warehouse.organisationstructure.api.dto.OperatorConfigurationDto;
@@ -30,6 +31,7 @@ import com.warehouse.organisationstructure.operatorconfiguration.domain.model.La
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.NotificationChannel;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ServiceLevel;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLabelConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.ShipmentLimits;
@@ -127,6 +129,24 @@ public final class OperatorMapper {
                 toModelShippingCapabilities(dto.shippingCapabilities()),
                 toModelShipmentConfiguration(dto.shipmentConfiguration()),
                 toModelDeliveryTimeConfiguration(dto.deliveryTimeConfiguration())
+        );
+    }
+
+    public static DepartmentConfigurationDto toDtoDepartmentConfiguration(final DepartmentConfiguration configuration) {
+        return new DepartmentConfigurationDto(
+                configuration.isAutoAssignDeliveryAreas(),
+                configuration.isAutoConnectDepartments(),
+                configuration.isPreventDepartmentDeletion(),
+                configuration.isPreventDepartmentArchiving()
+        );
+    }
+
+    public static DepartmentConfiguration toModelDepartmentConfiguration(final DepartmentConfigurationDto dto) {
+        return new DepartmentConfiguration(
+                dto.autoAssignDeliveryAreas(),
+                dto.autoConnectDepartments(),
+                dto.preventDepartmentDeletion(),
+                dto.preventDepartmentArchiving()
         );
     }
 

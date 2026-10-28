@@ -1,8 +1,10 @@
 package com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity;
 
 import com.warehouse.commonassets.identificator.OperatorId;
+import com.warehouse.organisationstructure.operatorconfiguration.domain.model.DepartmentConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.domain.model.OperatorConfiguration;
 import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.embeddable.DeliveryTimeConfigurationEmbeddable;
+import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.embeddable.DepartmentConfigurationEmbeddable;
 import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.embeddable.ShipmentConfigurationEmbeddable;
 import com.warehouse.organisationstructure.operatorconfiguration.infrastructure.adapter.secondary.entity.embeddable.ShippingCapabilitiesEmbeddable;
 import jakarta.persistence.AttributeOverride;
@@ -30,6 +32,9 @@ public class OperatorConfigurationEntity {
 
     @Embedded
     private DeliveryTimeConfigurationEmbeddable deliveryTimeConfiguration;
+
+    @Embedded
+    private DepartmentConfigurationEmbeddable departmentConfiguration;
 
     public OperatorConfigurationEntity() {
     }
@@ -61,6 +66,7 @@ public class OperatorConfigurationEntity {
         entity.shipmentConfiguration = ShipmentConfigurationEmbeddable.from(source.getShipmentConfiguration());
         entity.deliveryTimeConfiguration = DeliveryTimeConfigurationEmbeddable.from(
                 source.getDeliveryTimeConfiguration());
+        entity.departmentConfiguration = DepartmentConfigurationEmbeddable.from(source.getDepartmentConfiguration());
         return entity;
     }
 
@@ -68,7 +74,9 @@ public class OperatorConfigurationEntity {
         return new OperatorConfiguration(
                 shippingCapabilities != null ? shippingCapabilities.toModel() : null,
                 shipmentConfiguration != null ? shipmentConfiguration.toModel() : null,
-                deliveryTimeConfiguration != null ? deliveryTimeConfiguration.toModel() : null
+                deliveryTimeConfiguration != null ? deliveryTimeConfiguration.toModel() : null,
+                departmentConfiguration != null ? departmentConfiguration.toModel()
+                        : DepartmentConfiguration.defaultConfiguration()
         );
     }
 }
