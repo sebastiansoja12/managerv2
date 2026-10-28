@@ -3,7 +3,7 @@ package com.warehouse.shipment;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.commonassets.event.integration.model.IntegrationEvent;
 import com.warehouse.commonassets.identificator.DepartmentId;
-import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDeliveredIntegrationEvent;
@@ -13,6 +13,7 @@ import com.warehouse.shipment.api.event.snapshot.ShipmentDeliveryData;
 import com.warehouse.shipment.application.listener.ShipmentIntegrationEventListener;
 import com.warehouse.shipment.infrastructure.adapter.secondary.ShipmentIntegrationEventServiceAdapter;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentEventDataMapper;
+import com.warehouse.shipment.domain.event.ShipmentCanceled;
 import com.warehouse.shipment.domain.event.ShipmentCreated;
 import com.warehouse.shipment.domain.event.ShipmentDelivered;
 import com.warehouse.shipment.domain.event.ShipmentDestinationChanged;
@@ -104,6 +105,15 @@ class ShipmentIntegrationEventListenerTest {
         this.listener.handle(new ShipmentDelivered(shipment.snapshot(), Instant.now()));
 
         assertPublishedEvent(ShipmentDeliveredIntegrationEvent.class, shipment);
+    }
+
+    @Test
+    void shouldPublishCanceledIntegrationEvent() {
+        final Shipment shipment = DataTestCreator.shipment();
+
+        this.listener.handle(new ShipmentCanceled(shipment.snapshot(), Instant.now()));
+
+        assertPublishedEvent(ShipmentCanceledIntegrationEvent.class, shipment);
     }
 
     private IntegrationEvent assertPublishedEvent(final Class<? extends IntegrationEvent> expectedType,

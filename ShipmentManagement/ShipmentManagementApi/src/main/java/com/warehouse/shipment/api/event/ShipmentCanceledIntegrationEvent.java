@@ -9,10 +9,10 @@ import com.warehouse.shipment.api.event.snapshot.ShipmentEventData;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @IntegrationEventType(value = "shipment.canceled", version = 1)
-public class ShipmentCanceledMessage extends ShipmentChangedIntegrationEvent implements IntegrationEvent {
+public class ShipmentCanceledIntegrationEvent extends ShipmentChangedIntegrationEvent implements IntegrationEvent {
 
     @JsonCreator
-    public ShipmentCanceledMessage(@JsonProperty("payload") final ShipmentEventData shipmentEventData) {
+    public ShipmentCanceledIntegrationEvent(@JsonProperty("payload") final ShipmentEventData shipmentEventData) {
         super(shipmentEventData);
     }
 }

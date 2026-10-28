@@ -1,7 +1,6 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.primary.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.PickupPointId;
@@ -12,6 +11,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDe
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
 import org.junit.jupiter.api.Test;
@@ -56,8 +56,7 @@ class ShipmentDeliveryEventListenerTest {
     @Test
     void shouldCreateDeliveryFromShipmentCreatedEvent() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
-        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(
-                deliveryPort, new OperatorContext());
+        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
         final ShipmentCreatedIntegrationEvent event = new ObjectMapper().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}},
@@ -94,8 +93,7 @@ class ShipmentDeliveryEventListenerTest {
     @Test
     void shouldCreateDerivedDeliveryWhenShipmentCreatedEventHasNoDeliveryData() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
-        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(
-                deliveryPort, new OperatorContext());
+        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
         final ShipmentCreatedIntegrationEvent event = new ObjectMapper().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 43}, "signatureRequired": true},
@@ -118,8 +116,7 @@ class ShipmentDeliveryEventListenerTest {
     @Test
     void shouldChangeDestinationDepartmentFromDestinationChangedEvent() throws Exception {
         final DeliveryPort deliveryPort = mock(DeliveryPort.class);
-        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(
-                deliveryPort, new OperatorContext());
+        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
         final ShipmentDestinationChangedIntegrationEvent event = new ObjectMapper().readValue("""
                 {
                   "payload": {"shipmentId": {"value": 42}},
@@ -134,5 +131,23 @@ class ShipmentDeliveryEventListenerTest {
 
         verify(deliveryPort).changeDestinationDepartment(new ShipmentId(42L), new DepartmentId(9L));
         verify(deliveryPort, never()).completeDelivery(any());
+    }
+
+    @Test
+    void shouldCancelShipmentDeliveriesFromShipmentCanceledEvent() throws Exception {
+        final DeliveryPort deliveryPort = mock(DeliveryPort.class);
+        final ShipmentDeliveryEventListener listener = new ShipmentDeliveryEventListener(deliveryPort);
+        final ShipmentCanceledIntegrationEvent event = new ObjectMapper().readValue("""
+                {
+                  "payload": {"shipmentId": {"value": 42}},
+                  "operatorId": {"value": 7},
+                  "userId": {"value": 42},
+                  "departmentId": {"value": 12}
+                }
+                """, ShipmentCanceledIntegrationEvent.class);
+
+        listener.handle(event);
+
+        verify(deliveryPort).cancelShipmentDeliveries(new ShipmentId(42L));
     }
 }
