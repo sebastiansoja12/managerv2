@@ -1,6 +1,5 @@
 package com.warehouse.logisticsdelivery.infrastructure.adapter.primary.kafka;
 
-import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.enumeration.ShipmentStatus;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaEventListener;
 import com.warehouse.logisticsdelivery.application.port.primary.DeliveryPort;
@@ -9,6 +8,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDe
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryMethod;
 import com.warehouse.logisticsdelivery.domain.enumeration.PickupMethod;
+import com.warehouse.shipment.api.event.ShipmentCanceledIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentDestinationChangedIntegrationEvent;
@@ -21,12 +21,9 @@ import org.springframework.stereotype.Component;
 public class ShipmentDeliveryEventListener {
 
     private final DeliveryPort deliveryPort;
-    private final OperatorContext operatorContext;
 
-    public ShipmentDeliveryEventListener(final DeliveryPort deliveryPort,
-                                         final OperatorContext operatorContext) {
+    public ShipmentDeliveryEventListener(final DeliveryPort deliveryPort) {
         this.deliveryPort = deliveryPort;
-        this.operatorContext = operatorContext;
     }
 
     @KafkaEventListener(
@@ -39,8 +36,7 @@ public class ShipmentDeliveryEventListener {
         if (delivery == null) {
             final CreateDerivedDeliveryCommand command = new CreateDerivedDeliveryCommand(payload.shipmentId(),
                     payload.signatureRequired(), event.userId());
-            this.operatorContext.runAs(event.operatorId(), event.userId(), event.departmentId(),
-                    () -> deliveryPort.createDerivedDelivery(command));
+            deliveryPort.createDerivedDelivery(command);
             return;
         }
         final CreateDeliveryCommand command = new CreateDeliveryCommand(
@@ -54,7 +50,15 @@ public class ShipmentDeliveryEventListener {
                 null,
                 payload.signatureRequired(),
                 event.userId());
-        this.operatorContext.runAs(event.operatorId(), event.userId(), event.departmentId(), () -> deliveryPort.createDelivery(command));
+        deliveryPort.createDelivery(command);
+    }
+
+    @KafkaEventListener(
+            topics = "shipment.canceled",
+            groupId = "logistics-orchestrator"
+    )
+    public void handle(final ShipmentCanceledIntegrationEvent event) {
+        deliveryPort.cancelShipmentDeliveries(event.payload().shipmentId());
     }
 
     @KafkaEventListener(
@@ -63,16 +67,15 @@ public class ShipmentDeliveryEventListener {
     )
     public void handle(final ShipmentChangedIntegrationEvent event) {
         if (event instanceof ShipmentDestinationChangedIntegrationEvent destinationChangedEvent) {
-            this.operatorContext.runAs(event.operatorId(), event.userId(), event.departmentId(),
-                    () -> deliveryPort.changeDestinationDepartment(event.payload().shipmentId(),
-                            destinationChangedEvent.destinationDepartmentId()));
+            deliveryPort.changeDestinationDepartment(event.payload().shipmentId(),
+                    destinationChangedEvent.destinationDepartmentId());
             return;
         }
         final ShipmentEventData payload = event.payload();
         if (event instanceof ShipmentStatusChangedIntegrationEvent && payload.shipmentStatus() == ShipmentStatus.DELIVERY) {
             final CompleteDeliveryCommand command = new CompleteDeliveryCommand(payload.shipmentId(), null,
                     event.userId(), event.departmentId());
-            this.operatorContext.runAs(event.operatorId(), event.userId(), event.departmentId(), () -> deliveryPort.completeDelivery(command));
+            deliveryPort.completeDelivery(command);
         }
     }
 }

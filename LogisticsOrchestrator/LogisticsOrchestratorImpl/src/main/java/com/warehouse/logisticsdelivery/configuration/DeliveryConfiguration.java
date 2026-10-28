@@ -17,6 +17,7 @@ import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryHistor
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryReadModelRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
+import com.warehouse.logisticsdelivery.application.port.secondary.SignatureRepository;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryApiServiceAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.DeliveryReadModelRebuildApiServiceAdapter;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.primary.mapper.DeliveryApiMapper;
@@ -27,6 +28,8 @@ import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.Delivery
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DeliveryReadModelRepositoryImpl;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.DeliveryRepositoryImpl;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.ShipmentServiceAdapter;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.SignatureReadRepository;
+import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.SignatureRepositoryImpl;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.DeliveryEntity;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.DeliveryHistoryEntity;
 import com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity.DeliveryReadEntity;
@@ -93,9 +96,15 @@ public class DeliveryConfiguration {
     public DeliveryPort deliveryPort(final DeliveryRepository deliveryRepository,
                                      final ShipmentServicePort shipmentServicePort,
                                      final DomainEventPublisher domainEventPublisher,
-                                     final OperatorContextProvider operatorContextProvider) {
+                                     final OperatorContextProvider operatorContextProvider,
+                                     final SignatureRepository signatureRepository) {
         return new DeliveryPortImpl(deliveryRepository, shipmentServicePort, domainEventPublisher,
-                operatorContextProvider);
+                operatorContextProvider, signatureRepository);
+    }
+
+    @Bean
+    public SignatureRepository signatureRepository(final SignatureReadRepository signatureReadRepository) {
+        return new SignatureRepositoryImpl(signatureReadRepository);
     }
 
     @Bean("logisticsDelivery.shipmentServicePort")

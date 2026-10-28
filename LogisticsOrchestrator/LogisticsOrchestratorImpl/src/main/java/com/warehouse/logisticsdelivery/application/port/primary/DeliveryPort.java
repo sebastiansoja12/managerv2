@@ -4,6 +4,7 @@ import com.warehouse.commonassets.identificator.DeliveryId;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SupplierId;
+import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.logisticsdelivery.application.port.primary.command.AssignDeliverySupplierCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryRelation;
 import com.warehouse.logisticsdelivery.application.port.primary.command.AttachDeliveryStepSignatureCommand;
@@ -18,9 +19,11 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDe
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RecordDeliveryAttemptCommand;
+import com.warehouse.logisticsdelivery.domain.model.Signature;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DeliveryPort {
 
@@ -50,7 +53,12 @@ public interface DeliveryPort {
 
     DeliverySnapshot finishDelivery(final DeliveryId deliveryId);
 
-    DeliverySnapshot completeShipmentDelivery(final ShipmentId shipmentId, final boolean recipientSigned);
+    DeliverySnapshot completeShipmentDelivery(final ShipmentId shipmentId, final boolean recipientSigned,
+                                              final String recipientName, final String signature);
+
+    Optional<Signature> findSignature(final DeliveryId deliveryId);
+
+    void assignShipmentSupplier(final ShipmentId shipmentId, final SupplierId supplierId, final VehicleId vehicleId);
 
     DeliverySnapshot commentStep(final CommentDeliveryStepCommand command);
 
@@ -61,6 +69,8 @@ public interface DeliveryPort {
     DeliverySnapshot reassignStepCarrier(final ReassignDeliveryStepCarrierCommand command);
 
     void cancelDelivery(final DeliveryId deliveryId);
+
+    void cancelShipmentDeliveries(final ShipmentId shipmentId);
 
     List<DeliverySnapshot> findRecentDeliveries(final int offset, final int limit);
 

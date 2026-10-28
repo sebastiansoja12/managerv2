@@ -9,7 +9,6 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.commonassets.enumeration.ShipmentType;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.TrackingNumber;
-import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.ShipmentModificationException;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
@@ -26,13 +25,10 @@ import com.warehouse.shipment.infrastructure.adapter.primary.validator.ShipmentR
 import com.warehouse.shipment.infrastructure.adapter.secondary.exception.TechnicalException;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import static com.warehouse.shipment.infrastructure.adapter.primary.validator.SignatureValidator.validateSignatureMethod;
 
 @RestController
 @RequestMapping("/shipments")
@@ -150,18 +146,6 @@ public class ShipmentInternalController {
         shipmentRequestValidator.validateBody(shipmentStatusRequest);
         final ShipmentStatusRequest request = requestMapper.map(shipmentStatusRequest);
         shipmentPort.changeShipmentStatusTo(request);
-        return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
-    }
-
-    @PutMapping("/signature")
-    @Counted(value = "controller.signature.add")
-    @Timed(value = "controller.signature.add")
-    public ResponseEntity<?> changeSignature(@RequestBody final SignatureChangeRequestApi signatureChangeRequest,
-                                             @Param("signatureMethod") final String signatureMethod) {
-        validateSignatureMethod(signatureMethod);
-        shipmentRequestValidator.validateBody(signatureChangeRequest);
-        final SignatureChangeRequest request = requestMapper.map(signatureChangeRequest);
-        shipmentPort.changeShipmentSignatureTo(request, SignatureMethod.valueOf(signatureMethod));
         return ResponseEntity.status(HttpStatus.OK).body(new ShipmentResponseInformation(Status.OK));
     }
 

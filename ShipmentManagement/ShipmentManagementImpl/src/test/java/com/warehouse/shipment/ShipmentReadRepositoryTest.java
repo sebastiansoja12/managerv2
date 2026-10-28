@@ -27,7 +27,6 @@ import com.warehouse.shipment.application.listener.ShipmentDomainEventListener;
 import com.warehouse.shipment.application.port.secondary.PathFinderServicePort;
 import com.warehouse.shipment.application.port.secondary.PriceRepository;
 import com.warehouse.shipment.application.port.secondary.RouteLogServicePort;
-import com.warehouse.shipment.application.port.secondary.SignatureRepository;
 import com.warehouse.shipment.infrastructure.adapter.primary.ShipmentInternalController;
 import com.warehouse.returning.api.ReturningApiService;
 import com.warehouse.shipment.infrastructure.adapter.secondary.PriceReadRepository;
@@ -77,11 +76,6 @@ public class ShipmentReadRepositoryTest {
         @Bean
         public PathFinderServicePort pathFinderServicePort() {
             return Mockito.mock(PathFinderServicePort.class);
-        }
-
-        @Bean
-        public SignatureRepository signatureRepository() {
-            return Mockito.mock(SignatureRepository.class);
         }
 
         @Bean

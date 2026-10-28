@@ -1,44 +1,36 @@
-package com.warehouse.shipment.infrastructure.adapter.secondary.entity;
+package com.warehouse.logisticsdelivery.infrastructure.adapter.secondary.entity;
 
-import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.commonassets.identificator.SignatureId;
-import com.warehouse.shipment.domain.enumeration.SignatureMethod;
+import com.warehouse.logisticsdelivery.domain.enumeration.SignatureMethod;
 import jakarta.persistence.*;
-import org.hibernate.envers.Audited;
 
 import java.time.Instant;
 
-@Entity
+@Entity(name = "delivery.SignatureEntity")
 @Table(name = "signature")
-@Audited
 public class SignatureEntity {
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "signature_id", nullable = false, unique = true))
+    @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "signature_id", nullable = false))
     private SignatureId signatureId;
 
     @Column(name = "signer_name", nullable = false)
     private String signerName;
-    
+
     @Column(name = "signed_at", nullable = false)
     private Instant signedAt;
-    
-    @Column(name = "signature_method", nullable = false)
-    @Enumerated(jakarta.persistence.EnumType.STRING)
-    private SignatureMethod signatureMethod;
-    
-    @Column(name = "document_reference", nullable = false)
-    private String documentReference;
 
-    @Column(name = "shipment_id", nullable = false)
-    @EmbeddedId
-    @AttributeOverride(name = "value", column = @Column(name = "shipment_id"))
-    private ShipmentId shipmentId;
+    @Column(name = "signature_method", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SignatureMethod signatureMethod;
+
+    @Column(name = "document_reference")
+    private String documentReference;
 
     @Column(name = "signature", nullable = false)
     private byte[] signature;
 
-    public SignatureEntity() {
+    protected SignatureEntity() {
     }
 
     public SignatureEntity(final SignatureId signatureId,
@@ -46,39 +38,33 @@ public class SignatureEntity {
                            final Instant signedAt,
                            final SignatureMethod signatureMethod,
                            final String documentReference,
-                           final ShipmentId shipmentId,
                            final byte[] signature) {
         this.signatureId = signatureId;
         this.signerName = signerName;
         this.signedAt = signedAt;
         this.signatureMethod = signatureMethod;
         this.documentReference = documentReference;
-        this.shipmentId = shipmentId;
         this.signature = signature;
-    }
-    
-    public String getDocumentReference() {
-        return documentReference;
-    }
-
-    public ShipmentId getShipmentId() {
-        return shipmentId;
     }
 
     public SignatureId getSignatureId() {
         return signatureId;
     }
 
-    public SignatureMethod getSignatureMethod() {
-        return signatureMethod;
+    public String getSignerName() {
+        return signerName;
     }
 
     public Instant getSignedAt() {
         return signedAt;
     }
 
-    public String getSignerName() {
-        return signerName;
+    public SignatureMethod getSignatureMethod() {
+        return signatureMethod;
+    }
+
+    public String getDocumentReference() {
+        return documentReference;
     }
 
     public byte[] getSignature() {

@@ -5,7 +5,6 @@ import com.warehouse.shipment.domain.vo.conf.ShipmentValidationRules;
 import com.warehouse.shipment.infrastructure.adapter.primary.api.*;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.EmptyRequestException;
 import com.warehouse.shipment.infrastructure.adapter.primary.exception.ShipmentValidationException;
-import com.warehouse.shipment.infrastructure.adapter.primary.exception.SignatureValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
@@ -153,39 +152,10 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
         }
     }
 
-    @Override
-    public void validateBody(final SignatureChangeRequestApi signatureChangeRequest) {
-        final List<String> errors = new ArrayList<>();
-        errors.addAll(validateShipment(signatureChangeRequest.shipmentId()));
-        errors.addAll(validateSignerName(signatureChangeRequest.signerName()));
-        errors.addAll(validateDocumentReference(signatureChangeRequest.documentReference()));
-        errors.addAll(validateSignature(signatureChangeRequest.signature()));
-
-        if (!errors.isEmpty()) {
-            throw new SignatureValidationException(errors, HttpStatus.BAD_REQUEST);
-        }
-    }
-
     private Collection<String> validateShipment(final ShipmentIdDto shipmentId) {
         final Set<String> errors = new HashSet<>();
         if (shipmentId == null || shipmentId.getValue() == null) {
             errors.add("Shipment Id is required");
-        }
-        return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
-    }
-
-    private Collection<String> validateSignerName(final String s) {
-        final Set<String> errors = new HashSet<>();
-        if (StringUtils.isEmpty(s)) {
-            errors.add("Signer name is required");
-        }
-        return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
-    }
-
-    private Collection<String> validateDocumentReference(final String s) {
-        final Set<String> errors = new HashSet<>();
-        if (StringUtils.isEmpty(s)) {
-            errors.add("Document reference is required");
         }
         return errors.isEmpty() ? Collections.emptyList() : new ArrayList<>(errors);
     }
@@ -200,15 +170,5 @@ public class ShipmentRequestValidatorImpl implements ShipmentRequestValidator {
         if (Objects.isNull(shipmentId.getValue())) {
             throw new EmptyRequestException("Value cannot be null");
         }
-    }
-
-    private static List<String> validateSignature(final String signature) {
-        final List<String> errors = new ArrayList<>();
-
-        if (StringUtils.isEmpty(signature)) {
-            errors.add("Signature cannot be empty");
-        }
-
-        return errors.isEmpty() ? Collections.emptyList() : errors;
     }
 }

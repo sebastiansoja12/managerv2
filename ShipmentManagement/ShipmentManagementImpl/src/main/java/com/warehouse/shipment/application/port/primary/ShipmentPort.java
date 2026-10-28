@@ -8,7 +8,6 @@ import com.warehouse.shipment.application.port.primary.result.ShipmentRerouteRes
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.domain.enumeration.PersonType;
-import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
 import com.warehouse.shipment.domain.vo.Party;
@@ -28,8 +27,6 @@ public interface ShipmentPort {
     void changeShipmentStatusTo(final ShipmentStatusRequest request);
 
     void markDelivered(final ShipmentId shipmentId);
-
-    void changeShipmentSignatureTo(final SignatureChangeRequest request, final SignatureMethod signatureMethod);
 
     ShipmentResult loadShipment(final ShipmentId shipmentId);
 

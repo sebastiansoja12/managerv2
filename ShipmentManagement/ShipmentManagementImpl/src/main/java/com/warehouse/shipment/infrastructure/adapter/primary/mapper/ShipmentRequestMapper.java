@@ -16,7 +16,6 @@ import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.application.port.primary.command.ShipmentCreateCommand;
 import com.warehouse.shipment.application.port.primary.command.ShipmentDeliveryCommand;
-import com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest;
 import com.warehouse.shipment.domain.vo.Party;
 import com.warehouse.shipment.domain.vo.Dimensions;
 import com.warehouse.shipment.domain.vo.LengthUnit;
@@ -83,12 +82,6 @@ public interface ShipmentRequestMapper {
         return new ShipmentStatusRequest(
                 new ShipmentId(shipmentStatusRequest.shipmentId().getValue()),
                 ShipmentStatus.valueOf(shipmentStatusRequest.shipmentStatus().name()));
-    }
-
-    default SignatureChangeRequest map(final SignatureChangeRequestApi signatureChangeRequest) {
-        final ShipmentId shipmentId = new ShipmentId(signatureChangeRequest.shipmentId().getValue());
-        return new SignatureChangeRequest(shipmentId, signatureChangeRequest.signature(), signatureChangeRequest.signerName(),
-                signatureChangeRequest.documentReference());
     }
 
     default ShipmentDeliveryCommand map(final ShipmentDeliveryRequestApiDto deliveryRequest) {

@@ -37,8 +37,8 @@ public class ShipmentHandoverServiceAdapter implements ShipmentHandoverServicePo
         final String requestLog = "HandoverShipmentRequest{trackingNumber=%s, signed=%s}"
                 .formatted(trackingNumber.value(), recipientConfirmation.signed());
         try {
-            final ShipmentDetailsDto shipment = shipmentApiService.handOverShipment(new ShipmentHandoverRequestDto(
-                    trackingNumber, recipientConfirmation.recipientName(), recipientConfirmation.signature()));
+            final ShipmentDetailsDto shipment = shipmentApiService.handOverShipment(
+                    new ShipmentHandoverRequestDto(trackingNumber));
             publishCommunication(processId, requestLog, formatResponse(shipment), null);
             log.info("Shipment {} handed over to recipient", shipment.shipmentId().getValue());
             return HandoverResult.handedOver(trackingNumber, shipment.shipmentId());

@@ -3,7 +3,6 @@ package com.warehouse.shipment.application.service;
 import com.warehouse.shipment.application.port.primary.result.ShipmentRouteLog;
 import com.warehouse.shipment.application.port.primary.result.ShipmentResult;
 import com.warehouse.shipment.application.port.secondary.DepartmentServicePort;
-import com.warehouse.shipment.application.port.secondary.SignatureRepository;
 import com.warehouse.shipment.application.port.secondary.ReturningServicePort;
 import com.warehouse.shipment.domain.model.Shipment;
 import com.warehouse.returning.api.dto.ReturnDetailsDto;
@@ -15,28 +14,17 @@ public class ShipmentResultFactory {
     private final RouteLogService routeLogService;
 
     private final ReturningServicePort returningServicePort;
-    private final SignatureRepository signatureRepository;
-
-    public ShipmentResultFactory(final DepartmentServicePort departmentServicePort,
-                                 final RouteLogService routeLogService,
-                                 final ReturningServicePort returningServicePort,
-                                 final SignatureRepository signatureRepository) {
-        this.departmentServicePort = departmentServicePort;
-        this.routeLogService = routeLogService;
-        this.returningServicePort = returningServicePort;
-        this.signatureRepository = signatureRepository;
-    }
 
     public ShipmentResultFactory(final DepartmentServicePort departmentServicePort,
                                  final RouteLogService routeLogService,
                                  final ReturningServicePort returningServicePort) {
-        this(departmentServicePort, routeLogService, returningServicePort, null);
+        this.departmentServicePort = departmentServicePort;
+        this.routeLogService = routeLogService;
+        this.returningServicePort = returningServicePort;
     }
 
     public ShipmentResult create(final Shipment shipment) {
-        return new ShipmentResult(
-                shipment.snapshot(),
-                signatureRepository == null ? null : signatureRepository.get(shipment.getShipmentId()));
+        return new ShipmentResult(shipment.snapshot());
     }
 
     public ShipmentRouteLog createControlCenter(final Shipment shipment) {

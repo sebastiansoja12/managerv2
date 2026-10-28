@@ -129,10 +129,6 @@ public class ShipmentReadEntity extends BelongsToOperator {
     })
     private Money price;
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "signature_id"))
-    private SignatureId signatureId;
-
     @Column(name = "signature_required", nullable = false)
     private Boolean signatureRequired;
 

@@ -53,9 +53,7 @@ public class ShipmentApiServiceAdapter implements ShipmentApiService {
     @Override
     public ShipmentDetailsDto handOverShipment(final ShipmentHandoverRequestDto shipmentHandoverRequest) {
         return mapper.map(shipmentPort.handOverShipment(new ShipmentHandoverCommand(
-                shipmentHandoverRequest.trackingNumber(),
-                shipmentHandoverRequest.recipientName(),
-                shipmentHandoverRequest.signature())));
+                shipmentHandoverRequest.trackingNumber())));
     }
 
     @Override

@@ -22,7 +22,6 @@ import com.warehouse.shipment.application.service.status.*;
 import com.warehouse.shipment.domain.enumeration.DeliveryMethod;
 import com.warehouse.shipment.domain.enumeration.PackagingType;
 import com.warehouse.shipment.domain.enumeration.PickupMethod;
-import com.warehouse.shipment.domain.enumeration.SignatureMethod;
 import com.warehouse.shipment.domain.event.*;
 import com.warehouse.shipment.domain.exception.enumeration.ErrorCode;
 import com.warehouse.shipment.domain.helper.Result;
@@ -49,7 +48,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -93,9 +91,6 @@ class ShipmentPortImplTest {
     private DepartmentCountryAvailabilityService departmentCountryAvailabilityService;
 
     @Mock
-    private SignatureService signatureService;
-
-    @Mock
     private Logger logger;
 
     @Mock
@@ -137,7 +132,7 @@ class ShipmentPortImplTest {
 						pathFinderServicePort, operatorContextProvider);
 		shipmentPort = new ShipmentPortImpl(shipmentRepository,
 				this.logger, pathFinderServicePort, this.departmentCountryAvailabilityService,
-				this.signatureService, shipmentResultFactory, mailNotificationServicePort,
+				shipmentResultFactory, mailNotificationServicePort,
                 this.trackingNumberGenerationService, this.shipmentConfigurationPort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
                 this.domainEventPublisher, departmentServicePort, shipmentDepartmentResolutionService, addressValidationService,
@@ -699,25 +694,6 @@ class ShipmentPortImplTest {
         assertSame(newRecipient, shipment.getRecipient());
         verify(this.domainEventPublisher, never()).publish(any(ShipmentDestinationChanged.class));
         verify(this.logger).warn(anyString(), same(newRecipient));
-    }
-
-    @Test
-    void shouldCreateSignatureFromRequest() {
-        final com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest request =
-                new com.warehouse.shipment.application.port.primary.command.SignatureChangeRequest(
-                        shipmentId(), "signed", "Jan", "DOC-1");
-        final ArgumentCaptor<com.warehouse.shipment.domain.model.Signature> signatureCaptor =
-                ArgumentCaptor.forClass(com.warehouse.shipment.domain.model.Signature.class);
-
-        this.shipmentPort.changeShipmentSignatureTo(request, SignatureMethod.DIGITAL);
-
-        verify(this.signatureService).createSignature(signatureCaptor.capture());
-        assertEquals(shipmentId(), signatureCaptor.getValue().getShipmentId());
-        assertEquals("Jan", signatureCaptor.getValue().getSignerName());
-        assertEquals("DOC-1", signatureCaptor.getValue().getDocumentReference());
-        assertEquals(SignatureMethod.DIGITAL, signatureCaptor.getValue().getSignatureMethod());
-        assertArrayEquals("signed".getBytes(StandardCharsets.UTF_8),
-                signatureCaptor.getValue().getSignature());
     }
 
     @Test

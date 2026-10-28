@@ -47,7 +47,6 @@ import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentEn
 import com.warehouse.shipment.infrastructure.adapter.secondary.entity.ShipmentReadEntity;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.OperatorShipmentConfigurationMapper;
 import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.ShipmentPersistenceMapper;
-import com.warehouse.shipment.infrastructure.adapter.secondary.mapper.SignaturePersistenceMapper;
 import com.warehouse.tools.routelog.RouteTrackerLogProperties;
 import com.warehouse.voronoi.VoronoiService;
 import com.warehouse.geocoding.api.GeocodingCoordinatesService;
@@ -98,17 +97,14 @@ public class ShipmentConfiguration {
 	@Bean
 	public ShipmentResultFactory shipmentResultFactory(final DepartmentServicePort departmentServicePort,
 												 final RouteLogService routeLogService,
-												 final ReturningServicePort returningServicePort,
-												 final SignatureRepository signatureRepository) {
-		return new ShipmentResultFactory(departmentServicePort, routeLogService, returningServicePort,
-				signatureRepository);
+												 final ReturningServicePort returningServicePort) {
+		return new ShipmentResultFactory(departmentServicePort, routeLogService, returningServicePort);
 	}
 
 	@Bean
 	public ShipmentPort shipmentPort(final ShipmentRepository shipmentRepository,
 									 final PathFinderServicePort pathFinderServicePort,
 									 final DepartmentCountryAvailabilityService departmentCountryAvailabilityService,
-									 final SignatureService signatureService,
 									 final ShipmentResultFactory shipmentResultFactory,
 									 final MailNotificationServicePort mailNotificationServicePort,
 									 final TrackingNumberGenerationService trackingNumberGenerationService,
@@ -122,7 +118,7 @@ public class ShipmentConfiguration {
 		final AddressValidationService addressValidationService = new AddressValidationService();
 		return new ShipmentPortImpl(shipmentRepository,
 				LOGGER_FACTORY.getLogger(ShipmentPortImpl.class), pathFinderServicePort,
-				departmentCountryAvailabilityService, signatureService, shipmentResultFactory,
+				departmentCountryAvailabilityService, shipmentResultFactory,
 				mailNotificationServicePort, trackingNumberGenerationService,
 				shipmentConfigurationServicePort,
                 shipmentDeliveryStrategyResolver, shipmentStatusChangeStrategyResolver,
@@ -307,27 +303,6 @@ public class ShipmentConfiguration {
 	}
 
 	@Bean
-	public SignatureService signatureService(final SignatureRepository signatureRepository,
-                                             final ShipmentRepository shipmentRepository,
-                                             final ShipmentReadModelRepository shipmentReadModelRepository,
-                                             final DomainEventPublisher domainEventPublisher) {
-		return new SignatureServiceImpl(signatureRepository, shipmentRepository, shipmentReadModelRepository, domainEventPublisher);
-	}
-
-	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "false")
-	public SignatureRepository signatureRepository(final SignatureReadRepository repository,
-                                                   final SignaturePersistenceMapper persistenceMapper) {
-		return new SignatureRepositoryImpl(repository, persistenceMapper);
-	}
-
-	@Bean
-	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
-	public SignatureRepository signatureMockRepository(final SignaturePersistenceMapper persistenceMapper) {
-		return new SignatureMockRepositoryImpl(persistenceMapper);
-	}
-
-	@Bean
 	@ConditionalOnProperty(name = "services.mock", havingValue = "true", matchIfMissing = true)
 	public RouteLogServicePort routeLogServiceMockPort() {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using mock Route log service port");
@@ -389,10 +364,9 @@ public class ShipmentConfiguration {
 	@Bean
 	public ShipmentReadModelRepository shipmentReadModelRepository(
 			final OperatorFilteredRepository<ShipmentReadEntity> repository,
-            final ShipmentPersistenceMapper persistenceMapper,
-            final SignatureRepository signatureRepository) {
+            final ShipmentPersistenceMapper persistenceMapper) {
 		LOGGER_FACTORY.getLogger(ShipmentConfiguration.class).warn("Using Shipment read model repository");
-		return new ShipmentReadModelRepositoryImpl(repository, persistenceMapper, signatureRepository);
+		return new ShipmentReadModelRepositoryImpl(repository, persistenceMapper);
 	}
 
 	@Bean
@@ -427,11 +401,6 @@ public class ShipmentConfiguration {
     @Bean
     public ShipmentPersistenceMapper shipmentPersistenceMapper() {
         return new ShipmentPersistenceMapper();
-    }
-
-    @Bean
-    public SignaturePersistenceMapper signaturePersistenceMapper() {
-        return new SignaturePersistenceMapper();
     }
 
 	@Bean("shipment.routeTrackerLogProperties")

@@ -10,10 +10,13 @@ import com.warehouse.logistics.domain.vo.DeliveryTarget;
 import com.warehouse.commonassets.enumeration.ProcessType;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.ShipmentId;
+import com.warehouse.commonassets.identificator.SupplierId;
 import com.warehouse.commonassets.identificator.UserId;
+import com.warehouse.commonassets.identificator.VehicleId;
 import com.warehouse.logisticsdelivery.api.DeliveryApiService;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptRequestDto;
 import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliveryCompletionRequestDto;
+import com.warehouse.logisticsdelivery.api.dto.ShipmentDeliverySupplierAssignmentRequestDto;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryAttemptResultDto;
 import com.warehouse.logisticsdelivery.api.dto.DeliveryTargetDto;
 
@@ -48,8 +51,16 @@ public class DeliveryServiceAdapter implements DeliveryServicePort {
     }
 
     @Override
-    public void completeShipmentDelivery(final ShipmentId shipmentId, final boolean recipientSigned) {
+    public void completeShipmentDelivery(final ShipmentId shipmentId, final boolean recipientSigned,
+                                         final String recipientName, final String signature) {
         this.deliveryApiService.completeShipmentDelivery(
-                new ShipmentDeliveryCompletionRequestDto(shipmentId, recipientSigned));
+                new ShipmentDeliveryCompletionRequestDto(shipmentId, recipientSigned, recipientName, signature));
+    }
+
+    @Override
+    public void assignShipmentSupplier(final ShipmentId shipmentId, final SupplierId supplierId,
+                                       final VehicleId vehicleId) {
+        this.deliveryApiService.assignShipmentSupplier(
+                new ShipmentDeliverySupplierAssignmentRequestDto(shipmentId, supplierId, vehicleId));
     }
 }

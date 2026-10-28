@@ -20,6 +20,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.RecordDe
 import com.warehouse.logisticsdelivery.application.port.primary.result.DeliveryRelation;
 import com.warehouse.logisticsdelivery.application.port.secondary.DeliveryRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.ShipmentServicePort;
+import com.warehouse.logisticsdelivery.application.port.secondary.SignatureRepository;
 import com.warehouse.logisticsdelivery.application.port.secondary.SourceShipment;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryDerivationType;
 import com.warehouse.logisticsdelivery.domain.enumeration.DeliveryLifecycleStatus;
@@ -33,9 +34,11 @@ import com.warehouse.logisticsdelivery.domain.event.DeliveryCompleted;
 import com.warehouse.logisticsdelivery.domain.event.DeliveryCreated;
 import com.warehouse.logisticsdelivery.domain.event.DeliveryModified;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryAlreadyExistsException;
+import com.warehouse.logisticsdelivery.domain.exception.DeliveryModificationException;
 import com.warehouse.logisticsdelivery.domain.exception.DeliveryNotFoundException;
 import com.warehouse.logisticsdelivery.domain.exception.SourceShipmentNotFoundException;
 import com.warehouse.logisticsdelivery.domain.model.Delivery;
+import com.warehouse.logisticsdelivery.domain.model.Signature;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 import com.warehouse.logisticsdelivery.domain.vo.DeliveryTarget;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +70,7 @@ class DeliveryPortImplTest {
     private ShipmentServicePort shipmentServicePort;
     private DomainEventPublisher domainEventPublisher;
     private OperatorContextProvider operatorContextProvider;
+    private SignatureRepository signatureRepository;
     private DeliveryPortImpl deliveryPort;
 
     @BeforeEach
@@ -75,8 +79,9 @@ class DeliveryPortImplTest {
         this.shipmentServicePort = mock(ShipmentServicePort.class);
         this.domainEventPublisher = mock(DomainEventPublisher.class);
         this.operatorContextProvider = mock(OperatorContextProvider.class);
+        this.signatureRepository = mock(SignatureRepository.class);
         this.deliveryPort = new DeliveryPortImpl(this.deliveryRepository, this.shipmentServicePort,
-                this.domainEventPublisher, this.operatorContextProvider);
+                this.domainEventPublisher, this.operatorContextProvider, this.signatureRepository);
     }
 
     @Test
@@ -314,6 +319,60 @@ class DeliveryPortImplTest {
     }
 
     @Test
+    void shouldNotPublishCanceledEventWhenDeliveryIsAlreadyCanceled() {
+        final Delivery delivery = shipmentDelivery(new ShipmentId(10L));
+        delivery.markAsCanceled();
+        when(this.deliveryRepository.findById(delivery.getDeliveryId())).thenReturn(Optional.of(delivery));
+
+        this.deliveryPort.cancelDelivery(delivery.getDeliveryId());
+
+        verify(this.deliveryRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(this.domainEventPublisher);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRecipientSignedWithoutSignatureContent() {
+        final ShipmentId shipmentId = new ShipmentId(10L);
+        when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.shipment(shipmentId), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(shipmentDelivery(shipmentId)));
+
+        assertThatThrownBy(() -> this.deliveryPort.completeShipmentDelivery(shipmentId, true, "Jan Kowalski", null))
+                .isInstanceOf(DeliveryModificationException.class);
+        verifyNoInteractions(this.signatureRepository, this.domainEventPublisher);
+    }
+
+    @Test
+    void shouldCancelActiveShipmentDeliveriesAndPublishCanceledEvents() {
+        final ShipmentId shipmentId = new ShipmentId(10L);
+        final Delivery delivery = shipmentDelivery(shipmentId);
+        when(this.deliveryRepository.findByTarget(DeliveryTarget.shipment(shipmentId))).thenReturn(List.of(delivery));
+
+        this.deliveryPort.cancelShipmentDeliveries(shipmentId);
+
+        verify(this.deliveryRepository).createOrUpdate(delivery);
+        assertThat(delivery.getStatus()).isEqualTo(DeliveryLifecycleStatus.CANCELED);
+        assertThat(publishedEvent(DeliveryCanceled.class).getSnapshot().deliveryId())
+                .isEqualTo(delivery.getDeliveryId());
+    }
+
+    @Test
+    void shouldIgnoreCanceledAndCompletedDeliveriesWhenCancelingShipmentDeliveries() {
+        final ShipmentId shipmentId = new ShipmentId(10L);
+        final Delivery canceled = shipmentDelivery(shipmentId);
+        canceled.markAsCanceled();
+        final Delivery completed = shipmentDelivery(shipmentId);
+        completed.complete(null, USER_ID, new DepartmentId(7L));
+        when(this.deliveryRepository.findByTarget(DeliveryTarget.shipment(shipmentId)))
+                .thenReturn(List.of(canceled, completed));
+
+        this.deliveryPort.cancelShipmentDeliveries(shipmentId);
+
+        assertThat(completed.getStatus()).isEqualTo(DeliveryLifecycleStatus.COMPLETED);
+        verify(this.deliveryRepository, never()).createOrUpdate(any());
+        verifyNoInteractions(this.domainEventPublisher);
+    }
+
+    @Test
     void shouldThrowExceptionWhenDeliveryDoesNotExist() {
         final DeliveryId deliveryId = new DeliveryId("missing");
         when(this.deliveryRepository.findById(deliveryId)).thenReturn(Optional.empty());
@@ -349,6 +408,35 @@ class DeliveryPortImplTest {
         verify(this.deliveryRepository).createOrUpdate(delivery);
         assertThat(snapshot.supplierId()).isEqualTo(new SupplierId(4L));
         assertThat(publishedEvent(DeliveryModified.class).getSnapshot().vehicleId()).isEqualTo(new VehicleId(9L));
+    }
+
+    @Test
+    void shouldAssignScanningSupplierWithVehicleToShipmentDelivery() {
+        final ShipmentId shipmentId = new ShipmentId(10L);
+        final Delivery delivery = shipmentDelivery(shipmentId);
+        delivery.assignSupplier(new SupplierId(3L), new VehicleId(8L));
+        when(this.deliveryRepository.findActiveByTargetAndType(DeliveryTarget.shipment(shipmentId),
+                DeliveryType.OUTBOUND)).thenReturn(Optional.of(delivery));
+
+        this.deliveryPort.assignShipmentSupplier(shipmentId, new SupplierId(4L), new VehicleId(9L));
+
+        verify(this.deliveryRepository).createOrUpdate(delivery);
+        final DeliverySnapshot snapshot = publishedEvent(DeliveryModified.class).getSnapshot();
+        assertThat(snapshot.supplierId()).isEqualTo(new SupplierId(4L));
+        assertThat(snapshot.vehicleId()).isEqualTo(new VehicleId(9L));
+    }
+
+    @Test
+    void shouldNotSaveWhenScanningSupplierAndVehicleAreAlreadyAssigned() {
+        final ShipmentId shipmentId = new ShipmentId(10L);
+        final Delivery delivery = shipmentDelivery(shipmentId);
+        delivery.assignSupplier(new SupplierId(4L), new VehicleId(9L));
+        when(this.deliveryRepository.findActiveByTargetAndType(DeliveryTarget.shipment(shipmentId),
+                DeliveryType.OUTBOUND)).thenReturn(Optional.of(delivery));
+
+        this.deliveryPort.assignShipmentSupplier(shipmentId, new SupplierId(4L), new VehicleId(9L));
+
+        verify(this.deliveryRepository, never()).createOrUpdate(any());
     }
 
     @Test
@@ -390,6 +478,24 @@ class DeliveryPortImplTest {
         assertThat(snapshot.status()).isEqualTo(DeliveryLifecycleStatus.COMPLETED);
         assertThat(publishedEvent(DeliveryCompleted.class).getSnapshot()).isEqualTo(snapshot);
         verify(this.shipmentServicePort).markDelivered(new ShipmentId(10L));
+    }
+
+    @Test
+    void shouldAttachRecipientSignatureToCompletedStep() {
+        final ShipmentId shipmentId = new ShipmentId(10L);
+        final Delivery delivery = shipmentDelivery(shipmentId);
+        when(this.deliveryRepository.findByTargetAndType(DeliveryTarget.shipment(shipmentId), DeliveryType.OUTBOUND))
+                .thenReturn(Optional.of(delivery));
+        when(this.deliveryRepository.findById(delivery.getDeliveryId())).thenReturn(Optional.of(delivery));
+        final ArgumentCaptor<Signature> signature = ArgumentCaptor.forClass(Signature.class);
+
+        this.deliveryPort.completeShipmentDelivery(shipmentId, true, "Jan Kowalski", "<svg/>");
+
+        verify(this.signatureRepository).save(signature.capture());
+        when(this.signatureRepository.findById(signature.getValue().getSignatureId()))
+                .thenReturn(Optional.of(signature.getValue()));
+        assertThat(signature.getValue().getSignerName()).isEqualTo("Jan Kowalski");
+        assertThat(this.deliveryPort.findSignature(delivery.getDeliveryId())).contains(signature.getValue());
     }
 
     @Test
