@@ -25,7 +25,7 @@ public class KafkaOutboxPublicationService {
     private final int batchSize;
     private final long lockDurationMs;
     private final long retryDelayMs;
-    private final int maxAttempts;
+    private final long maxRetryDelayMs;
     private final String workerId;
 
     public KafkaOutboxPublicationService(final KafkaOutboxPort outboxPort,
@@ -33,13 +33,17 @@ public class KafkaOutboxPublicationService {
                                          @Value("${manager.kafka.outbox.batch-size:50}") final int batchSize,
                                          @Value("${manager.kafka.outbox.lock-duration-ms:30000}") final long lockDurationMs,
                                          @Value("${manager.kafka.outbox.retry-delay-ms:5000}") final long retryDelayMs,
-                                         @Value("${manager.kafka.outbox.max-attempts:10}") final int maxAttempts) {
+                                         @Value("${manager.kafka.outbox.max-retry-delay-ms:300000}") final long maxRetryDelayMs) {
+        if (retryDelayMs <= 0 || maxRetryDelayMs < retryDelayMs) {
+            throw new IllegalArgumentException(
+                    "Kafka outbox retry delays must be positive and maximum delay must not be smaller than initial delay");
+        }
         this.outboxPort = outboxPort;
         this.messagePublisherPort = messagePublisherPort;
         this.batchSize = batchSize;
         this.lockDurationMs = lockDurationMs;
         this.retryDelayMs = retryDelayMs;
-        this.maxAttempts = maxAttempts;
+        this.maxRetryDelayMs = maxRetryDelayMs;
         this.workerId = UUID.randomUUID().toString();
     }
 
@@ -80,14 +84,13 @@ public class KafkaOutboxPublicationService {
                 record.eventId(),
                 this.workerId,
                 exception,
-                nextAttemptAt(record),
-                this.maxAttempts);
+                nextAttemptAt(record));
         log.error("Cannot publish outbox Kafka event {}", record.eventId(), exception);
     }
 
     private Instant nextAttemptAt(final KafkaOutboxRecord record) {
         final int exponent = Math.min(record.attemptCount(), 10);
-        final long delay = Math.multiplyExact(this.retryDelayMs, 1L << exponent);
+        final long delay = Math.min(Math.multiplyExact(this.retryDelayMs, 1L << exponent), this.maxRetryDelayMs);
         return Instant.now().plusMillis(delay);
     }
 }

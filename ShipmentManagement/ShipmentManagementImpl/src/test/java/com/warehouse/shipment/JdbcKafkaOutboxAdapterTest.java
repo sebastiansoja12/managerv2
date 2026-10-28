@@ -111,32 +111,70 @@ class JdbcKafkaOutboxAdapterTest {
     }
 
     @Test
-    void shouldReleaseFailedRecordForRetryAndMoveItToDeadAfterMaxAttempts() {
+    void shouldKeepRetryingAfterMoreThanTenFailures() {
         final KafkaOutboxRecord record = record();
         final Instant now = Instant.parse("2026-08-31T12:00:00Z");
-        final Instant nextAttemptAt = now.plusSeconds(5);
+        this.adapter.save(record);
+
+        for (int attempt = 1; attempt <= 12; attempt++) {
+            final Instant attemptTime = now.plusSeconds((attempt - 1L) * 300);
+            final Instant nextAttemptAt = attemptTime.plusSeconds(300);
+            final String workerId = "worker-" + attempt;
+            assertThat(this.adapter.claim(record.eventId(), workerId, attemptTime, attemptTime.plusSeconds(30)))
+                    .isTrue();
+
+            this.adapter.markFailed(
+                    record.eventId(), workerId, new RuntimeException("Kafka unavailable"), nextAttemptAt);
+
+            assertThat(status(record.eventId())).isEqualTo(KafkaOutboxStatus.PENDING);
+            assertThat(attemptCount(record.eventId())).isEqualTo(attempt);
+            assertThat(this.jdbcTemplate.queryForObject(
+                    "SELECT next_attempt_at FROM kafka_event_outbox WHERE event_id = ?",
+                    Timestamp.class, record.eventId().toString())).isEqualTo(Timestamp.from(nextAttemptAt));
+            assertThat(this.adapter.claim(record.eventId(), "other-worker",
+                    nextAttemptAt.minusSeconds(1), nextAttemptAt.plusSeconds(30))).isFalse();
+        }
+
+        assertThat(this.adapter.claimPending(10, "next-worker", now.plusSeconds(3600), now.plusSeconds(3630)))
+                .hasSize(1);
+    }
+
+    @Test
+    void shouldRecoverPreviouslyDeadRecordForRetry() {
+        final KafkaOutboxRecord record = record();
+        final Instant now = Instant.parse("2026-08-31T12:00:00Z");
+        this.adapter.save(record);
+        this.jdbcTemplate.update(
+                "UPDATE kafka_event_outbox SET status = ?, attempt_count = 10 WHERE event_id = ?",
+                KafkaOutboxStatus.DEAD.name(), record.eventId().toString());
+
+        final List<KafkaOutboxRecord> claimed = this.adapter.claimPending(10, "worker", now, now.plusSeconds(30));
+
+        assertThat(claimed).hasSize(1);
+        assertThat(claimed.getFirst().attemptCount()).isEqualTo(10);
+        assertThat(status(record.eventId())).isEqualTo(KafkaOutboxStatus.PROCESSING);
+    }
+
+    @Test
+    void shouldRecordFailureOnlyOnceForOwningWorker() {
+        final KafkaOutboxRecord record = record();
+        final Instant now = Instant.parse("2026-08-31T12:00:00Z");
         this.adapter.save(record);
         this.adapter.claim(record.eventId(), "worker-1", now, now.plusSeconds(30));
 
-        this.adapter.markFailed(
-                record.eventId(), "worker-1", new RuntimeException("Kafka unavailable"), nextAttemptAt, 2);
+        this.adapter.markFailed(record.eventId(), "worker-2", new RuntimeException("Not owner"), now.plusSeconds(300));
+
+        assertThat(status(record.eventId())).isEqualTo(KafkaOutboxStatus.PROCESSING);
+        assertThat(attemptCount(record.eventId())).isZero();
+
+        this.adapter.markFailed(record.eventId(), "worker-1", new RuntimeException("Kafka unavailable"), now.plusSeconds(300));
+        this.adapter.markFailed(record.eventId(), "worker-1", new RuntimeException("Duplicate callback"), now.plusSeconds(600));
 
         assertThat(status(record.eventId())).isEqualTo(KafkaOutboxStatus.PENDING);
         assertThat(attemptCount(record.eventId())).isEqualTo(1);
-        assertThat(this.adapter.claim(record.eventId(), "worker-2", now.plusSeconds(1), now.plusSeconds(31)))
-                .isFalse();
-        assertThat(this.adapter.claim(record.eventId(), "worker-2", nextAttemptAt, nextAttemptAt.plusSeconds(30)))
-                .isTrue();
-
-        this.adapter.markFailed(
-                record.eventId(), "worker-2", new RuntimeException("Still unavailable"),
-                nextAttemptAt.plusSeconds(5), 2);
-
-        assertThat(status(record.eventId())).isEqualTo(KafkaOutboxStatus.DEAD);
-        assertThat(attemptCount(record.eventId())).isEqualTo(2);
-        assertThat(this.adapter.claim(
-                record.eventId(), "worker-3", nextAttemptAt.plusSeconds(60), nextAttemptAt.plusSeconds(90)))
-                .isFalse();
+        assertThat(this.jdbcTemplate.queryForObject(
+                "SELECT last_error FROM kafka_event_outbox WHERE event_id = ?",
+                String.class, record.eventId().toString())).isEqualTo("Kafka unavailable");
     }
 
     @Test
