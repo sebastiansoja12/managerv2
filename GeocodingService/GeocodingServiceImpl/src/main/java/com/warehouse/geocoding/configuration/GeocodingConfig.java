@@ -25,6 +25,7 @@ import com.warehouse.geocoding.infrastructure.adapter.primary.GeocodingCoordinat
 import com.warehouse.geocoding.infrastructure.adapter.primary.PostalCodeServiceAdapter;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.GeocodingConfigurationRepositoryImpl;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.GeolocationGeoapifyClientServiceAdapter;
+import com.warehouse.geocoding.infrastructure.adapter.secondary.GeolocationGeocodifyClientServiceAdapter;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.GeolocationOpenCageClientServiceAdapter;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.GeolocationPositionStackClientServiceAdapter;
 import com.warehouse.geocoding.infrastructure.adapter.secondary.PostalCodeReadRepository;
@@ -70,6 +71,11 @@ public class GeocodingConfig {
     @Bean
     public GeocodingProviderServicePort openCageProviderServicePort() {
         return new GeolocationOpenCageClientServiceAdapter();
+    }
+
+    @Bean
+    public GeocodingProviderServicePort geocodifyProviderServicePort() {
+        return new GeolocationGeocodifyClientServiceAdapter();
     }
 
     @Bean
