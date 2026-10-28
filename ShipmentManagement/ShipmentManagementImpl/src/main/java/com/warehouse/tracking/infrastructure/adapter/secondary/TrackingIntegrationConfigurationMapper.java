@@ -3,9 +3,9 @@ package com.warehouse.tracking.infrastructure.adapter.secondary;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.security.CredentialCipher;
 import com.warehouse.tracking.domain.enumeration.TrackingEnvironment;
 import com.warehouse.tracking.domain.model.TrackingIntegrationConfiguration;
@@ -54,7 +54,7 @@ public final class TrackingIntegrationConfigurationMapper {
                                       final ObjectMapper objectMapper) {
         try {
             return objectMapper.writeValueAsString(configuration.getValues());
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Could not serialize tracking integration configuration", exception);
         }
     }
@@ -81,7 +81,7 @@ public final class TrackingIntegrationConfigurationMapper {
             return objectMapper.readValue(
                     credentialCipher.decrypt(entity.getEncryptedConfiguration()),
                     new TypeReference<Map<String, String>>() { });
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Could not deserialize tracking integration configuration", exception);
         }
     }

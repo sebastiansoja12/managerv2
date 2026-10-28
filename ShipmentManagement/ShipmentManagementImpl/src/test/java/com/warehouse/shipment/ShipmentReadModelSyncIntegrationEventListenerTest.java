@@ -1,6 +1,7 @@
 package com.warehouse.shipment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.event.application.port.secondary.IntegrationEventPublisher;
 import com.warehouse.shipment.api.event.ShipmentReadModelChanged;
 import com.warehouse.shipment.application.listener.ShipmentReadModelSyncIntegrationEventListener;
@@ -45,7 +46,7 @@ class ShipmentReadModelSyncIntegrationEventListenerTest {
     void shouldDeserializeLegacyMessageWithFullShipmentSnapshot() throws Exception {
         final Shipment shipment = DataTestCreator.shipment();
         final Instant timestamp = Instant.parse("2026-08-31T12:00:00Z");
-        final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+        final ObjectMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
         final var message = objectMapper.createObjectNode();
         message.set("snapshot", objectMapper.valueToTree(shipment.snapshot()));
         message.put("timestamp", timestamp.toString());

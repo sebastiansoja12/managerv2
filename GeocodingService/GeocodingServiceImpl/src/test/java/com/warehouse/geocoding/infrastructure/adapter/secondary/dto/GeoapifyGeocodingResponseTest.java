@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 class GeoapifyGeocodingResponseTest {
 
@@ -80,7 +80,7 @@ class GeoapifyGeocodingResponseTest {
                 """;
 
         final GeoapifyGeocodingResponse geocodingResponse =
-                new ObjectMapper().readValue(response, GeoapifyGeocodingResponse.class);
+                JsonMapper.builder().configureForJackson2().build().readValue(response, GeoapifyGeocodingResponse.class);
         final GeoapifyGeocodingResult result = geocodingResponse.results().get(0);
 
         assertFalse(geocodingResponse.results().isEmpty());

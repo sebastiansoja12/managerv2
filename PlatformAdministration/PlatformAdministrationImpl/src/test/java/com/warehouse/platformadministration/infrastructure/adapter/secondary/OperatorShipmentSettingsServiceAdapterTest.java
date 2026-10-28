@@ -1,6 +1,6 @@
 package com.warehouse.platformadministration.infrastructure.adapter.secondary;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -24,7 +24,7 @@ class OperatorShipmentSettingsServiceAdapterTest {
     private final OperatorConfigurationApiService operatorConfigurationApiService = mock(OperatorConfigurationApiService.class);
 
     private final OperatorShipmentSettingsServiceAdapter adapter = new OperatorShipmentSettingsServiceAdapter(
-            operatorConfigurationApiService, new OperatorScopeExecutor(new OperatorContext()), new ObjectMapper());
+            operatorConfigurationApiService, new OperatorScopeExecutor(new OperatorContext()), JsonMapper.builder().configureForJackson2().build());
 
     @AfterEach
     void tearDown() {

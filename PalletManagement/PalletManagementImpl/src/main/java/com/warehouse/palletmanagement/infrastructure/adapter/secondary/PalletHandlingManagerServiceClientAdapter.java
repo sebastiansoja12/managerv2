@@ -3,7 +3,8 @@ package com.warehouse.palletmanagement.infrastructure.adapter.secondary;
 import com.warehouse.palletmanagement.domain.vo.PalletUpdate;
 import com.warehouse.palletmanagement.domain.enumeration.PalletStatus;
 import com.warehouse.palletmanagement.infrastructure.adapter.secondary.api.PalletHandlingStatusRequestApi;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.identificator.ShipmentId;
 import com.warehouse.auth.CurrentUserApiService;
 import com.warehouse.commonassets.resilience.CircuitBreakerExecutor;
@@ -301,7 +302,7 @@ public class PalletHandlingManagerServiceClientAdapter implements PalletHandling
             return new PalletRequestRejectedException(status,
                     error.code() == null ? "PALLET_REQUEST_REJECTED" : error.code(),
                     error.message() == null ? "Pallet request rejected" : error.message());
-        } catch (final IOException exception) {
+        } catch (final IOException | JacksonException exception) {
             return new PalletRequestRejectedException(status, "PALLET_REQUEST_REJECTED", "Pallet request rejected");
         }
     }

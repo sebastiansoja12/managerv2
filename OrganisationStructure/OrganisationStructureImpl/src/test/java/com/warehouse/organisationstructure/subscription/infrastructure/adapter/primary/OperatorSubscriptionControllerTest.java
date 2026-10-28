@@ -1,9 +1,8 @@
 package com.warehouse.organisationstructure.subscription.infrastructure.adapter.primary;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import com.warehouse.auth.AccessAudience;
 import com.warehouse.auth.AccessUserControl;
 import com.warehouse.organisationstructure.subscription.InMemoryOperatorSubscriptionStore;
@@ -13,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -31,8 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 class OperatorSubscriptionControllerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private final JsonMapper objectMapper = JsonMapper.builder().configureForJackson2().disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS).build();
 
     private InMemoryOperatorSubscriptionStore store;
 
@@ -47,7 +45,7 @@ class OperatorSubscriptionControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(new OperatorSubscriptionController(port),
                         new CurrentSubscriptionController(port))
                 .setControllerAdvice(new OperatorSubscriptionExceptionHandler())
-                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+                .setMessageConverters(new JacksonJsonHttpMessageConverter(objectMapper))
                 .setConversionService(conversionService())
                 .build();
     }

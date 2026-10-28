@@ -1,8 +1,8 @@
 package com.warehouse.logistics;
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.boot.data.jpa.test.autoconfigure.AutoConfigureDataJpa;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -16,12 +16,12 @@ import com.warehouse.deliveryreturn.infrastructure.api.DeliveryReturnService;
 @AutoConfigureDataJpa
 public class DeliveryTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     DeliveryMissedService deliveryMissedService;
 
-    @MockBean
+    @MockitoBean
     DeliveryRejectService deliveryRejectService;
 
-    @MockBean
+    @MockitoBean
     DeliveryReturnService deliveryReturnService;
 }

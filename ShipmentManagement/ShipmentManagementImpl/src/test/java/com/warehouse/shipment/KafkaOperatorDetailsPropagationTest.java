@@ -1,6 +1,6 @@
 package com.warehouse.shipment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;

@@ -16,7 +16,6 @@ import java.time.Instant;
 public class DepartmentEntity extends BelongsToOperator {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @AttributeOverride(name = "value", column = @Column(name = "department_id", nullable = false))
     private DepartmentId departmentId;
 

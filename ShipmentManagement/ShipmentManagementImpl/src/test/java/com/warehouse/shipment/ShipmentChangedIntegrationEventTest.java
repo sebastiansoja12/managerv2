@@ -1,7 +1,8 @@
 package com.warehouse.shipment;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.shipment.api.event.ShipmentChangedIntegrationEvent;
 import com.warehouse.shipment.api.event.ShipmentCreatedIntegrationEvent;
 import com.warehouse.commonassets.identificator.DepartmentId;
@@ -26,7 +27,7 @@ class ShipmentChangedIntegrationEventTest {
                 new DepartmentId(9L), new DepartmentId(10L), PickupMethod.DEPARTMENT, DeliveryMethod.COURIER,
                 null, null));
         final ShipmentCreatedIntegrationEvent original = new ShipmentCreatedIntegrationEvent(snapshot, deliveryData);
-        final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+        final ObjectMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
 
         final ShipmentCreatedIntegrationEvent restored = objectMapper.readValue(
                 objectMapper.writeValueAsString(original), ShipmentCreatedIntegrationEvent.class);
@@ -43,7 +44,7 @@ class ShipmentChangedIntegrationEventTest {
                 snapshot
         );
 
-        final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+        final ObjectMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
         final JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(event));
 
         final JsonNode payload = json.path("payload");

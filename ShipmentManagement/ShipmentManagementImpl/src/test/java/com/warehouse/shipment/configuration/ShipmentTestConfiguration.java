@@ -1,8 +1,8 @@
 package com.warehouse.shipment.configuration;
 
 import org.mockito.Mockito;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -20,19 +20,19 @@ import com.warehouse.voronoi.VoronoiService;
 @EnableJpaRepositories(basePackages = { "com.warehouse.shipment"})
 public class ShipmentTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     public JavaMailSender javaMailSender;
 
-    @MockBean
+    @MockitoBean
     public ShipmentInternalController shipmentInternalController;
 
-    @MockBean
+    @MockitoBean
     public DepartmentPort departmentPort;
 
-    @MockBean
+    @MockitoBean
     public VoronoiService voronoiService;
 
-    @MockBean
+    @MockitoBean
     public RouteLogServicePort routeLogServicePort;
 
     @Bean

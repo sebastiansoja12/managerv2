@@ -1,6 +1,6 @@
 package com.warehouse.organisationstructure.subscription.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.auth.PlatformActorService;
 import com.warehouse.commonassets.repository.OperatorContextProvider;
 import com.warehouse.organisationstructure.subscription.application.port.primary.OperatorSubscriptionPort;

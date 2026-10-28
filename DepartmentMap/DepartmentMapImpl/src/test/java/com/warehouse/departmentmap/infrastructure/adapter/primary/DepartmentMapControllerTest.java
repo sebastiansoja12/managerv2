@@ -1,8 +1,7 @@
 package com.warehouse.departmentmap.infrastructure.adapter.primary;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.departmentmap.InMemoryDepartmentMapStore;
 import com.warehouse.departmentmap.application.port.primary.DepartmentMapPortImpl;
 import com.warehouse.departmentmap.application.port.primary.PalletLocationPortImpl;
@@ -10,7 +9,7 @@ import com.warehouse.departmentmap.domain.service.StorageLocationSynchronizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 class DepartmentMapControllerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final JsonMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -40,7 +39,7 @@ class DepartmentMapControllerTest {
                 new PalletLocationPortImpl(store, store, store, store));
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new DepartmentMapExceptionHandler())
-                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+                .setMessageConverters(new JacksonJsonHttpMessageConverter(objectMapper))
                 .build();
     }
 

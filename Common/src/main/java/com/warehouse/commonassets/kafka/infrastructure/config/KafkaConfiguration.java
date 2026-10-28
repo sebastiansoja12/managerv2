@@ -15,12 +15,12 @@ import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.converter.RecordMessageConverter;
-import org.springframework.kafka.support.converter.StringJsonMessageConverter;
-import org.springframework.kafka.support.mapping.DefaultJackson2JavaTypeMapper;
-import org.springframework.kafka.support.mapping.Jackson2JavaTypeMapper;
+import org.springframework.kafka.support.converter.StringJacksonJsonMessageConverter;
+import org.springframework.kafka.support.mapping.DefaultJacksonJavaTypeMapper;
+import org.springframework.kafka.support.mapping.JacksonJavaTypeMapper;
 import org.springframework.util.backoff.FixedBackOff;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.commonassets.context.OperatorContext;
 import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaOperatorContextRecordInterceptor;
 
@@ -29,15 +29,15 @@ import com.warehouse.commonassets.kafka.infrastructure.adapter.primary.KafkaOper
 public class KafkaConfiguration {
 
     @Bean
-    public RecordMessageConverter kafkaRecordMessageConverter(final ObjectMapper objectMapper) {
-        final StringJsonMessageConverter converter = new StringJsonMessageConverter(objectMapper);
+    public RecordMessageConverter kafkaRecordMessageConverter(final JsonMapper jsonMapper) {
+        final StringJacksonJsonMessageConverter converter = new StringJacksonJsonMessageConverter(jsonMapper);
         converter.setTypeMapper(this.kafkaTypeMapper());
         return converter;
     }
 
-    private DefaultJackson2JavaTypeMapper kafkaTypeMapper() {
-        final DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
-        typeMapper.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.TYPE_ID);
+    private DefaultJacksonJavaTypeMapper kafkaTypeMapper() {
+        final DefaultJacksonJavaTypeMapper typeMapper = new DefaultJacksonJavaTypeMapper();
+        typeMapper.setTypePrecedence(JacksonJavaTypeMapper.TypePrecedence.TYPE_ID);
         typeMapper.addTrustedPackages("com.warehouse.*");
         return typeMapper;
     }

@@ -2,6 +2,8 @@ server:
   port: 8071
 
 spring:
+  jackson:
+    use-jackson2-defaults: true
   application:
     name: pallet-handling-manager
 

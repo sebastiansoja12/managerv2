@@ -7,8 +7,7 @@ import com.warehouse.platformadministration.domain.vo.ReadModelRebuildJob;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -31,7 +30,7 @@ class OperatorReadModelControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = standaloneSetup(new OperatorReadModelController(readModelRebuildPort))
-                .setMessageConverters(new MappingJackson2HttpMessageConverter(Jackson2ObjectMapperBuilder.json().build()))
+                .setMessageConverters(new JacksonJsonHttpMessageConverter())
                 .build();
     }
 

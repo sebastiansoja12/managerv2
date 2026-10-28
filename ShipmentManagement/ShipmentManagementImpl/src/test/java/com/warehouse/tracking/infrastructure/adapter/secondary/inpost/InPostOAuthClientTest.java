@@ -20,7 +20,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.tracking.domain.enumeration.TrackingEnvironment;
 import com.warehouse.tracking.domain.enumeration.TrackingProviderId;
 import com.warehouse.tracking.domain.exception.TrackingErrorCode;
@@ -43,7 +43,7 @@ class InPostOAuthClientTest {
                 .andExpect(content().formData(expectedForm))
                 .andRespond(withSuccess("{\"access_token\":\"token\",\"token_type\":\"Bearer\","
                         + "\"expires_in\":3600}", MediaType.APPLICATION_JSON));
-        final InPostOAuthClient client = new InPostOAuthClient(builder.build(), new ObjectMapper());
+        final InPostOAuthClient client = new InPostOAuthClient(builder.build(), JsonMapper.builder().configureForJackson2().build());
 
         final InPostTokenResponse response = client.requestToken(configuration(), "request-id");
 
@@ -59,7 +59,7 @@ class InPostOAuthClientTest {
             final MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
             server.expect(requestTo("https://stage-api.inpost-group.com/oauth2/token"))
                     .andRespond(withStatus(status).body("client_secret=must-not-leak"));
-            final InPostOAuthClient client = new InPostOAuthClient(builder.build(), new ObjectMapper());
+            final InPostOAuthClient client = new InPostOAuthClient(builder.build(), JsonMapper.builder().configureForJackson2().build());
 
             final InPostRequestException exception = assertThrows(InPostRequestException.class,
                     () -> client.requestToken(configuration(), "request-id"));

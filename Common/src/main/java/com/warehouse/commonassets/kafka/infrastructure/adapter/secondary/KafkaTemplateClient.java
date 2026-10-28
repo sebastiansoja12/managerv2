@@ -1,7 +1,7 @@
 package com.warehouse.commonassets.kafka.infrastructure.adapter.secondary;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.commonassets.identificator.OperatorId;
 import com.warehouse.commonassets.identificator.UserId;
@@ -157,7 +157,7 @@ public class KafkaTemplateClient {
         Objects.requireNonNull(event, "Kafka event cannot be null");
         try {
             return this.objectMapper.writeValueAsString(event);
-        } catch (final JsonProcessingException exception) {
+        } catch (final JacksonException exception) {
             throw new IllegalStateException("Cannot serialize Kafka event: " + event.getClass().getName(), exception);
         }
     }

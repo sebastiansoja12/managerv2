@@ -2,7 +2,7 @@ package com.warehouse.tracking.infrastructure.adapter.secondary;
 
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.warehouse.commonassets.repository.OperatorFilteredRepository;
 import com.warehouse.commonassets.security.CredentialCipher;
 import com.warehouse.tracking.domain.enumeration.TrackingProviderId;

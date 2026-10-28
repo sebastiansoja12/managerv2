@@ -1,6 +1,6 @@
 package com.warehouse.platformadministration.infrastructure.adapter.primary;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.warehouse.platformadministration.application.port.primary.MaintenanceModePort;
 import com.warehouse.platformadministration.domain.model.MaintenanceMode;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ class MaintenanceModeInterceptorTest {
     private final MaintenanceModePort maintenanceModePort = mock(MaintenanceModePort.class);
 
     private final MaintenanceModeInterceptor interceptor = new MaintenanceModeInterceptor(maintenanceModePort,
-            new ObjectMapper());
+            JsonMapper.builder().configureForJackson2().build());
 
     @Test
     void shouldRespondWithServiceUnavailableWhenRequestIsBlocked() throws Exception {

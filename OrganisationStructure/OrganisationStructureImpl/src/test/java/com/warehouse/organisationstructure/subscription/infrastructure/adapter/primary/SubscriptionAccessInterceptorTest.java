@@ -1,9 +1,9 @@
 package com.warehouse.organisationstructure.subscription.infrastructure.adapter.primary;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import com.warehouse.organisationstructure.subscription.InMemoryOperatorSubscriptionStore;
 import com.warehouse.organisationstructure.subscription.application.port.primary.OperatorSubscriptionPortImpl;
 import com.warehouse.organisationstructure.subscription.domain.enumeration.SubscriptionPlan;
@@ -25,8 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SubscriptionAccessInterceptorTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private final ObjectMapper objectMapper = JsonMapper.builder().configureForJackson2().disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS).build();
 
     private InMemoryOperatorSubscriptionStore store;
 

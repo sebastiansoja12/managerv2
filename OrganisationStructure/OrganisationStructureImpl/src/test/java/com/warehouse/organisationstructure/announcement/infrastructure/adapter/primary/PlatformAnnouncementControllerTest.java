@@ -11,8 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -44,7 +43,7 @@ class PlatformAnnouncementControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = standaloneSetup(new PlatformAnnouncementController(announcementService))
-                .setMessageConverters(new MappingJackson2HttpMessageConverter(Jackson2ObjectMapperBuilder.json().build()))
+                .setMessageConverters(new JacksonJsonHttpMessageConverter())
                 .build();
     }
 

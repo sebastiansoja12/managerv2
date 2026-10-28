@@ -8,9 +8,9 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatusCode;
@@ -41,10 +41,10 @@ public class QrCodeGeneratorControllerIntegrationTest {
     @Autowired
     private RestClient restClient;
 
-    @MockBean
+    @MockitoBean
     private ShipmentApiService shipmentApiService;
 
-    @MockBean
+    @MockitoBean
     private DeliveryServicePort deliveryServicePort;
 
     @Test
