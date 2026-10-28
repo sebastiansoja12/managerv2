@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -97,6 +98,49 @@ class KafkaOperatorDetailsPropagationTest {
 
         interceptor.afterRecord(record, null);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
+
+    @Test
+    void shouldClearStaleOperatorContextWhenKafkaRecordHasNoOperatorHeader() {
+        final OperatorContext operatorContext = new OperatorContext();
+        final KafkaOperatorContextRecordInterceptor interceptor =
+                new KafkaOperatorContextRecordInterceptor(operatorContext);
+        operatorContext.assignOperator(OperatorId.of(99L));
+        final ConsumerRecord<String, String> record = new ConsumerRecord<>(
+                "shipment.reroute.requested", 0, 0L, "shipment-1", "{}");
+
+        interceptor.intercept(record, null);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
+
+    @Test
+    void shouldRejectKafkaRecordWithUserHeaderButNoOperatorHeader() {
+        final KafkaOperatorContextRecordInterceptor interceptor =
+                new KafkaOperatorContextRecordInterceptor(new OperatorContext());
+        final ConsumerRecord<String, String> record = new ConsumerRecord<>(
+                "shipment.created", 0, 5L, "shipment-1", "{}");
+        addHeader(record, KafkaEventHeaders.USER_ID, 22L);
+
+        assertThatThrownBy(() -> interceptor.intercept(record, null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("shipment.created-0@5")
+                .hasMessageContaining(KafkaEventHeaders.OPERATOR_ID);
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
+
+    @Test
+    void shouldRejectKafkaRecordWithMalformedOperatorHeader() {
+        final KafkaOperatorContextRecordInterceptor interceptor =
+                new KafkaOperatorContextRecordInterceptor(new OperatorContext());
+        final ConsumerRecord<String, String> record = new ConsumerRecord<>(
+                "shipment.created", 0, 5L, "shipment-1", "{}");
+        record.headers().add(KafkaEventHeaders.OPERATOR_ID, "abc".getBytes(StandardCharsets.UTF_8));
+
+        assertThatThrownBy(() -> interceptor.intercept(record, null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("invalid " + KafkaEventHeaders.OPERATOR_ID)
+                .hasMessageContaining("abc");
     }
 
     private void addHeader(final ConsumerRecord<String, String> record, final String name, final Long value) {
