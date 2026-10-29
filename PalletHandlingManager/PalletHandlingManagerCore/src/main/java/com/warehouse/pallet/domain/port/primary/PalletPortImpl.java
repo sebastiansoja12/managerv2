@@ -119,6 +119,12 @@ public class PalletPortImpl implements PalletPort {
     }
 
     @Override
+    public Pallet revertLoading(final PalletId palletId, final OperatorId operatorId) {
+        getPallet(palletId, operatorId);
+        return record(this.palletStorageService.revertLoading(palletId), PalletHistoryEventType.LOADING_REVERTED, null);
+    }
+
+    @Override
     public List<PalletHistoryEntry> getHistory(final PalletId palletId, final OperatorId operatorId) {
         getPallet(palletId, operatorId);
         return this.palletHistoryRepository.findByPalletId(palletId);

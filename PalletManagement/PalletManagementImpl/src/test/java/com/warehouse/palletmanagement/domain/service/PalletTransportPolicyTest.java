@@ -56,6 +56,12 @@ class PalletTransportPolicyTest {
     }
 
     @Test
+    void shouldLockCarrierWhenPalletIsLoaded() {
+        assertThatThrownBy(() -> PalletTransportPolicy.ensureCarrierChangeable(PalletFixture.loadedPallet(1L)))
+                .isInstanceOf(PalletRequestRejectedException.class);
+    }
+
+    @Test
     void shouldLockCarrierWhenPalletDeparted() {
         assertThatThrownBy(() -> PalletTransportPolicy.ensureCarrierChangeable(
                 PalletFixture.pallet(PalletStatus.IN_TRANSIT, false, null, 1L)))

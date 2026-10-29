@@ -24,7 +24,7 @@ public class ResponseMapper {
         final String lastName = user.getLastName();
         final String email = user.getEmail();
         final String role = user.getRole().name();
-        final String departmentCodeValue = departmentCode.getValue();
+        final String departmentCodeValue = departmentCode == null ? null : departmentCode.getValue();
         final String language = user.getLanguage();
         final Boolean deleted = user.isDeleted();
         final Instant createdAt = user.createdAt();

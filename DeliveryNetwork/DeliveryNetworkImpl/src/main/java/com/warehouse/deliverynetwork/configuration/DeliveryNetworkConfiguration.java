@@ -8,21 +8,32 @@ import com.warehouse.deliverynetwork.application.port.primary.DeliveryNetworkPor
 import com.warehouse.deliverynetwork.application.port.primary.DeliveryNetworkPortImpl;
 import com.warehouse.deliverynetwork.application.port.secondary.DeliveryNetworkRepository;
 import com.warehouse.deliverynetwork.application.port.secondary.DepartmentDirectoryServicePort;
+import com.warehouse.deliverynetwork.application.port.secondary.ShipmentDeliveryServicePort;
+import com.warehouse.deliverynetwork.application.port.secondary.ShipmentRouteDocumentRendererServicePort;
+import com.warehouse.deliverynetwork.application.service.ShipmentRouteDocumentService;
 import com.warehouse.deliverynetwork.domain.service.DeliveryPathFinder;
+import com.warehouse.deliverynetwork.domain.service.ShipmentHandlingPlanFactory;
 import com.warehouse.deliverynetwork.infrastructure.adapter.primary.DeliveryNetworkApiServiceAdapter;
 import com.warehouse.deliverynetwork.infrastructure.adapter.primary.mapper.DeliveryNetworkApiMapper;
 import com.warehouse.deliverynetwork.infrastructure.adapter.primary.mapper.DeliveryNetworkEditorApiMapper;
 import com.warehouse.deliverynetwork.infrastructure.adapter.primary.spreadsheet.DeliveryNetworkSpreadsheetService;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.DeliveryNetworkRepositoryImpl;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.DepartmentDirectoryServiceAdapter;
+import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.ShipmentDeliveryServiceAdapter;
+import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.document.PdfShipmentRouteDocumentServiceAdapter;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.entity.DeliveryNetworkEntity;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.mapper.DeliveryNetworkPersistenceMapper;
 import com.warehouse.deliverynetwork.infrastructure.adapter.secondary.mapper.DepartmentDirectoryMapper;
+import com.warehouse.logisticsdelivery.api.DeliveryApiService;
 import com.warehouse.organisationstructure.department.api.DepartmentApiService;
+import com.warehouse.shipment.infrastructure.ShipmentApiService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.ZoneId;
 
 @Configuration
 public class DeliveryNetworkConfiguration {
@@ -60,6 +71,27 @@ public class DeliveryNetworkConfiguration {
     }
 
     @Bean
+    public ShipmentDeliveryServicePort shipmentDeliveryServicePort(
+            final ShipmentApiService shipmentApiService,
+            final DeliveryApiService deliveryApiService) {
+        return new ShipmentDeliveryServiceAdapter(shipmentApiService, deliveryApiService);
+    }
+
+    @Bean
+    public ShipmentRouteDocumentRendererServicePort shipmentRouteDocumentRendererServicePort(
+            @Value("${manager.delivery-network-documents.zone-id:Europe/Warsaw}") final String zoneId) {
+        return new PdfShipmentRouteDocumentServiceAdapter(ZoneId.of(zoneId));
+    }
+
+    @Bean
+    public ShipmentRouteDocumentService shipmentRouteDocumentService(
+            final DepartmentDirectoryServicePort departmentDirectoryServicePort,
+            final ShipmentRouteDocumentRendererServicePort shipmentRouteDocumentRendererServicePort) {
+        return new ShipmentRouteDocumentService(departmentDirectoryServicePort,
+                shipmentRouteDocumentRendererServicePort, new ShipmentHandlingPlanFactory());
+    }
+
+    @Bean
     public DeliveryPathFinder deliveryPathFinder() {
         return new DeliveryPathFinder();
     }
@@ -85,13 +117,17 @@ public class DeliveryNetworkConfiguration {
             final DepartmentDirectoryServicePort departmentDirectoryServicePort,
             final OperatorContextProvider operatorContextProvider,
             final DeliveryPathFinder deliveryPathFinder,
-            final DomainEventPublisher domainEventPublisher) {
+            final DomainEventPublisher domainEventPublisher,
+            final ShipmentDeliveryServicePort shipmentDeliveryServicePort,
+            final ShipmentRouteDocumentService shipmentRouteDocumentService) {
         return new DeliveryNetworkPortImpl(
                 deliveryNetworkRepository,
                 departmentDirectoryServicePort,
                 operatorContextProvider,
                 deliveryPathFinder,
-                domainEventPublisher);
+                domainEventPublisher,
+                shipmentDeliveryServicePort,
+                shipmentRouteDocumentService);
     }
 
     @Bean

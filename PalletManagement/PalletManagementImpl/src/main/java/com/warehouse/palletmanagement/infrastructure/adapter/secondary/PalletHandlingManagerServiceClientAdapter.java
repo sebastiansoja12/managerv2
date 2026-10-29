@@ -137,6 +137,17 @@ public class PalletHandlingManagerServiceClientAdapter implements PalletHandling
     }
 
     @Override
+    public PalletDetails revertLoading(final PalletId palletId) {
+        final String authorization = authorization();
+        final URI uri = palletUri("/{palletId}/revert-loading", palletId.value());
+        return this.responseMapper.map(write(() -> this.restClient.put()
+                .uri(uri)
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .retrieve()
+                .body(PalletHandlingPalletApi.class)));
+    }
+
+    @Override
     public PalletDetails cancelPallet(final PalletId palletId) {
         final String authorization = authorization();
         final URI uri = UriComponentsBuilder.fromUriString(this.baseUrl + PALLETS + "/{palletId}/cancel")

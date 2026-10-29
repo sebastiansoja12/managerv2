@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface ShipmentServicePort {
     ShipmentLoadResult loadOnPallet(final ShipmentId shipmentId);
+    ShipmentLoadResult revertLoadingFromPallet(final ShipmentId shipmentId);
     Optional<PalletShipment> findShipment(final ShipmentId shipmentId);
     Optional<PalletDocumentShipment> describeShipment(final ShipmentId shipmentId);
 }

@@ -6,6 +6,7 @@ import com.warehouse.commonassets.identificator.DepartmentId;
 import com.warehouse.organisationstructure.department.domain.model.Department;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DepartmentRepository {
 
@@ -16,6 +17,8 @@ public interface DepartmentRepository {
     Department findByDepartmentCodeIncludingArchived(final DepartmentCode departmentCode);
 
     Department findByDepartmentId(final DepartmentId departmentId);
+
+    Optional<DepartmentCode> findDepartmentCode(final DepartmentId departmentId);
 
     List<Department> findAll();
 

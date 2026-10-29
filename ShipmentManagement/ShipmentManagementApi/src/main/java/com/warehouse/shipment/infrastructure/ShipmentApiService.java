@@ -27,6 +27,8 @@ public interface ShipmentApiService {
 
     ShipmentDetailsDto loadShipmentOnPallet(final ShipmentId shipmentId);
 
+    ShipmentDetailsDto revertShipmentLoadingFromPallet(final ShipmentId shipmentId);
+
     Optional<ShipmentRerouteDetailsDto> getShipmentForReroute(final TrackingNumber trackingNumber);
 
     Optional<SourceShipmentDto> findSourceShipment(final ShipmentId shipmentId);

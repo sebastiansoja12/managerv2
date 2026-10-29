@@ -19,6 +19,7 @@ import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDe
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreateDerivedDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.CreatePalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.application.port.primary.command.RecordDeliveryAttemptCommand;
+import com.warehouse.logisticsdelivery.application.port.primary.command.RevertPalletDeliveryCommand;
 import com.warehouse.logisticsdelivery.domain.model.Signature;
 import com.warehouse.logisticsdelivery.domain.vo.DeliverySnapshot;
 
@@ -32,6 +33,8 @@ public interface DeliveryPort {
     void createDerivedDelivery(final CreateDerivedDeliveryCommand command);
 
     void createPalletDelivery(final CreatePalletDeliveryCommand command);
+
+    void revertPalletDelivery(final RevertPalletDeliveryCommand command);
 
     void completeDelivery(final CompleteDeliveryCommand command);
 

@@ -1,14 +1,18 @@
 package com.warehouse.palletmanagement.application.port.primary;
 
 import com.warehouse.commonassets.event.application.port.secondary.DomainEventPublisher;
+import com.warehouse.commonassets.identificator.PalletId;
 import com.warehouse.palletmanagement.application.port.primary.command.PalletScanCommand;
 import com.warehouse.palletmanagement.application.port.primary.result.PalletScanResult;
 import com.warehouse.palletmanagement.application.port.secondary.PalletHandlingManagerServicePort;
 import com.warehouse.palletmanagement.application.port.secondary.ShipmentServicePort;
+import com.warehouse.palletmanagement.application.service.PalletTransportService;
 import com.warehouse.palletmanagement.domain.enumeration.PalletScanErrorCode;
 import com.warehouse.palletmanagement.domain.event.PalletLoaded;
+import com.warehouse.palletmanagement.domain.event.PalletLoadingReverted;
 import com.warehouse.palletmanagement.domain.model.PalletScan;
 import com.warehouse.palletmanagement.domain.vo.PalletDetails;
+import com.warehouse.palletmanagement.domain.vo.PalletLoadingRevertedSnapshot;
 import com.warehouse.palletmanagement.domain.vo.ShipmentLoadResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +27,16 @@ public class PalletScanPortImpl implements PalletScanPort {
 
     private final PalletHandlingManagerServicePort palletHandlingManagerServicePort;
     private final ShipmentServicePort shipmentServicePort;
+    private final PalletTransportService palletTransportService;
     private final DomainEventPublisher domainEventPublisher;
 
     public PalletScanPortImpl(final PalletHandlingManagerServicePort palletHandlingManagerServicePort,
                               final ShipmentServicePort shipmentServicePort,
+                              final PalletTransportService palletTransportService,
                               final DomainEventPublisher domainEventPublisher) {
         this.palletHandlingManagerServicePort = palletHandlingManagerServicePort;
         this.shipmentServicePort = shipmentServicePort;
+        this.palletTransportService = palletTransportService;
         this.domainEventPublisher = domainEventPublisher;
     }
 
@@ -61,5 +68,22 @@ public class PalletScanPortImpl implements PalletScanPort {
             log.info("Pallet {} rescanned, already loaded", pallet.trackingNumber().value());
         }
         return PalletScanResult.loaded(pallet, palletScan.alreadyLoaded(), results);
+    }
+
+    @Override
+    public PalletDetails revertLoading(final PalletId palletId) {
+        final PalletDetails pallet = this.palletHandlingManagerServicePort.revertLoading(palletId);
+        final long failedCount = pallet.shipmentIds().stream()
+                .map(this.shipmentServicePort::revertLoadingFromPallet)
+                .filter(result -> !result.loaded())
+                .count();
+        if (failedCount > 0) {
+            log.warn("Pallet {} loading reverted with {} of {} shipments not updated",
+                    pallet.trackingNumber().value(), failedCount, pallet.shipmentIds().size());
+        }
+        this.domainEventPublisher.publish(new PalletLoadingReverted(new PalletLoadingRevertedSnapshot(
+                pallet.palletId(), pallet.trackingNumber(), pallet.shipmentIds()), Instant.now()));
+        log.info("Pallet {} loading reverted", pallet.trackingNumber().value());
+        return this.palletTransportService.withTransport(pallet);
     }
 }

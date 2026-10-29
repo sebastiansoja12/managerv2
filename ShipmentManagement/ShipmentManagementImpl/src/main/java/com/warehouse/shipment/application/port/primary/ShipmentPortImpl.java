@@ -474,6 +474,19 @@ public class ShipmentPortImpl implements ShipmentPort {
     }
 
     @Override
+    @Transactional
+    public ShipmentResult revertShipmentLoadingFromPallet(final ShipmentId shipmentId) {
+        final Shipment shipment = this.find(shipmentId);
+        final ShipmentWorkflowSettings workflowSettings = this.shipmentConfigurationServicePort
+                .getCurrentOperatorShipmentConfiguration().workflowSettings();
+        if (shipment.revertLoadingFromPallet(workflowSettings)) {
+            this.shipmentRepository.createOrUpdate(shipment);
+            this.domainEventPublisher.publish(new ShipmentStatusChanged(shipment.snapshot(), Instant.now()));
+        }
+        return this.shipmentResultFactory.create(shipment);
+    }
+
+    @Override
     public boolean existsShipment(final ShipmentId shipmentId) {
         return this.shipmentRepository.exists(shipmentId);
     }
